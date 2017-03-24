@@ -30,8 +30,3 @@ data class Uri(val uri: String) {
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 
-data class Status(val code: Int, val description: String) {
-    companion object {
-        val OK = Status(200, "OK")
-    }
-}
