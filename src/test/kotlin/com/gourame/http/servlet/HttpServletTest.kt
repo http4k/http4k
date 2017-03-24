@@ -17,7 +17,7 @@ class HttpServletTest {
     fun can_use_as_servlet() {
         val server = JettyServer({ request -> Response(Status.OK, mapOf(), Entity("Hello World")) }, 8000).start()
         val client = ApacheHttpClient()
-        assertThat(client(Request(Method.GET, Uri("http://localhost:8000/"))).entity, equalTo(Entity("Hello World")))
+        assertThat(client(Request(Method.GET, Uri.uri("http://localhost:8000/"))).entity, equalTo(Entity("Hello World")))
         server.stop()
     }
 }

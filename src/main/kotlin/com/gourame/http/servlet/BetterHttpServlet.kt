@@ -22,7 +22,7 @@ class BetterHttpServlet(private val handler: HttpHandler) : HttpServlet() {
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
-        Request(Method.valueOf(method), Uri(requestURI + queryString.toQueryString().orEmpty()),
+        Request(Method.valueOf(method), Uri.uri(requestURI + queryString.toQueryString().orEmpty()),
             headerParameters(), Entity(inputStream.readBytes())
         )
 

@@ -22,11 +22,5 @@ data class Entity(val value: ByteArray) {
     override fun toString(): String = String(value)
 }
 
-data class Uri(val uri: String) {
-    constructor(scheme: String, authority: String, path: String, query: String, fragment: String) : this("ignored")
-
-    override fun toString(): String = uri
-}
-
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 

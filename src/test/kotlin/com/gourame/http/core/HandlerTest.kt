@@ -13,7 +13,7 @@ class HandlerTest {
     @Test
     fun basic_handler() {
         val handler = { request: Request -> Response(OK) }
-        val response = handler(Request(method = GET, uri = Uri("irrelevant")))
+        val response = handler(Request(method = GET, uri = Uri.uri("irrelevant")))
         assertThat(response, equalTo(Response(OK)))
     }
 }

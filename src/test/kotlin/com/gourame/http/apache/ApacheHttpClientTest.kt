@@ -14,7 +14,7 @@ class ApacheHttpClientTest {
 
     @Test
     fun basic_request() {
-        val response = client(Request(GET, Uri("http://httpbin.org/get")))
+        val response = client(Request(GET, Uri.uri("http://httpbin.org/get")))
         assertThat(response.status, equalTo(OK))
         assertThat(response.entity.toString(), containsSubstring("}"))
     }
