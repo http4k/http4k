@@ -2,19 +2,24 @@ package com.gourame.http.core
 
 typealias HttpHandler = (Request) -> Response
 
-data class Request(val method: Method, val uri: Uri, val headers: Headers = mapOf(), val entity: Entity = Entity.empty)typealias Headers = Map<String, String>
+typealias Headers = Map<String, String>
+
+data class Request(val method: Method, val uri: Uri, val headers: Headers = mapOf(), val entity: Entity = Entity.empty)
 
 data class Response(val status: Status, val headers: Headers = mapOf(), val entity: Entity = Entity.empty)
 
-data class Entity(val value: Any) {
+data class Entity(val value: ByteArray) {
+    constructor(value: String) : this(value.toByteArray())
+
     companion object {
         val empty = Entity("")
     }
 
-    override fun toString(): String = when (value) {
-        is ByteArray -> String(value)
-        else -> value.toString()
-    }
+    override fun equals(other: Any?): Boolean = other != null && other is Entity && value.contentEquals(other.value)
+
+    override fun hashCode(): Int = value.contentHashCode()
+
+    override fun toString(): String = String(value)
 }
 
 data class Uri(val uri: String) {

@@ -1,9 +1,8 @@
 package com.gourame.http.apache
 
-import com.gourame.http.apache.ApacheHttpClient
 import com.gourame.http.core.Method.GET
 import com.gourame.http.core.Request
-import com.gourame.http.core.Status
+import com.gourame.http.core.Status.Companion.OK
 import com.gourame.http.core.Uri
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -16,7 +15,7 @@ class ApacheHttpClientTest {
     @Test
     fun basic_request() {
         val response = client(Request(GET, Uri("http://httpbin.org/get")))
-        assertThat(response.status, equalTo(Status.Companion.OK))
+        assertThat(response.status, equalTo(OK))
         assertThat(response.entity.toString(), containsSubstring("}"))
     }
 }

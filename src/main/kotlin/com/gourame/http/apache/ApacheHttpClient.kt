@@ -28,9 +28,10 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
     private fun Request.toApacheRequest(): HttpRequestBase {
         return object : HttpEntityEnclosingRequestBase() {
             init {
-                uri = URI(this@toApacheRequest.uri.toString())
-                entity = ByteArrayEntity(this@toApacheRequest.entity.toString().toByteArray())
-                this@toApacheRequest.headers.minus("content-length").map { addHeader(it.key, it.value) }
+                val request = this@toApacheRequest
+                uri = URI(request.uri.toString())
+                entity = ByteArrayEntity(request.entity.toString().toByteArray())
+                request.headers.minus("content-length").map { addHeader(it.key, it.value) }
             }
 
             override fun getMethod(): String = this@toApacheRequest.method.name
