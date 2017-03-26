@@ -6,7 +6,7 @@ import com.gourame.http.core.HttpHandler
 import com.gourame.http.core.Method
 import com.gourame.http.core.Request
 import com.gourame.http.core.Response
-import com.gourame.http.core.Uri
+import com.gourame.http.core.Uri.Companion.uri
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -24,11 +24,11 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
-        Request(Method.valueOf(method), Uri.Companion.uri(requestURI + queryString.toQueryString().orEmpty()),
+        Request(Method.valueOf(method), uri(requestURI + queryString.toQueryString()),
             headerParameters(), Entity(inputStream.readBytes())
         )
 
-    private fun HttpServletRequest.headerParameters(): Headers = this.headerNames.asSequence().map { it to this.getHeader(it) }.toMap()
+    private fun HttpServletRequest.headerParameters(): Headers = headerNames.asSequence().map { it to this.getHeader(it) }.toMap()
 
     private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 }

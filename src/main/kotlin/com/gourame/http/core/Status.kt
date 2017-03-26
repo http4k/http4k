@@ -55,6 +55,7 @@ data class Status(val code: Int, val description: String) {
         val GATEWAY_TIMEOUT = status(504, "Gateway Timeout")
         val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.copy(description = "Client Timeout")
         val HTTP_VERSION_NOT_SUPPORTED = status(505, "HTTP Version Not Supported")
+
         private fun status(code: Int, description: String) = Status(code, description)
     }
 
