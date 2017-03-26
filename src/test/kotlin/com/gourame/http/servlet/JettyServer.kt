@@ -1,6 +1,7 @@
 package com.gourame.http.servlet
 
 import com.gourame.http.core.HttpHandler
+import com.gourame.http.servlet.asServlet
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
@@ -8,7 +9,7 @@ import org.eclipse.jetty.servlet.ServletHolder
 class JettyServer(application: HttpHandler, port: Int) {
     private val server = Server(port).apply {
         handler = ServletContextHandler(ServletContextHandler.SESSIONS).apply {
-            addServlet(ServletHolder(HttpHandlerServlet(application)), "/*")
+            addServlet(ServletHolder(application.asServlet()), "/*")
         }
     }
 

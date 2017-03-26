@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+fun HttpHandler.asServlet() = HttpHandlerServlet(this)
+
 class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     override fun service(req: HttpServletRequest, resp: HttpServletResponse) =
         transfer(handler(req.asServletRequest()), resp)
@@ -22,7 +24,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
-        Request(Method.valueOf(method), Uri.uri(requestURI + queryString.toQueryString().orEmpty()),
+        Request(Method.valueOf(method), Uri.Companion.uri(requestURI + queryString.toQueryString().orEmpty()),
             headerParameters(), Entity(inputStream.readBytes())
         )
 
