@@ -11,7 +11,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 
-class HttpServletTest {
+class HttpHandlerServletTest {
 
     @Test
     fun can_use_as_servlet() {

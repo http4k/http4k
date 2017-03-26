@@ -9,7 +9,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 
-class HandlerTest {
+class HttpHandlerTest {
     @Test
     fun basic_handler() {
         val handler = { request: Request -> Response(OK) }

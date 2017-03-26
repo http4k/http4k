@@ -8,7 +8,7 @@ import org.eclipse.jetty.servlet.ServletHolder
 class JettyServer(application: HttpHandler, port: Int) {
     private val server = Server(port).apply {
         handler = ServletContextHandler(ServletContextHandler.SESSIONS).apply {
-            addServlet(ServletHolder(BetterHttpServlet(application)), "/*")
+            addServlet(ServletHolder(HttpHandlerServlet(application)), "/*")
         }
     }
 
