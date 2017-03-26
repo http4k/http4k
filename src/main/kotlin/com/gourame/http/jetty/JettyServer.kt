@@ -1,10 +1,12 @@
-package com.gourame.http.servlet
+package com.gourame.http.jetty
 
 import com.gourame.http.core.HttpHandler
 import com.gourame.http.servlet.asServlet
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
+
+fun HttpHandler.asJettyServer(port: Int = 8000) = JettyServer(this, port)
 
 class JettyServer(application: HttpHandler, port: Int) {
     private val server = Server(port).apply {
