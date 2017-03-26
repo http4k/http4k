@@ -33,4 +33,10 @@ class UriTest {
         assertThat(uri.query, equalTo(""))
         assertThat(uri.toString(), equalTo(value))
     }
+
+    @Test
+    fun handles_empty_uri(){
+        val uri = Uri.uri("")
+        assertThat(uri.toString(), equalTo(""))
+    }
 }

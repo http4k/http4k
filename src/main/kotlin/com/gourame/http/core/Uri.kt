@@ -6,26 +6,23 @@ data class Uri(val scheme: String, val authority: String, val path: String, val 
         private val RFC3986 = Regex("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?")
         fun uri(value: String): Uri {
             val result = RFC3986.matchEntire(value) ?: throw RuntimeException("Invalid Uri: $value")
-            return Uri(scheme = result.groupValues[1],
-                authority = result.groupValues[2],
-                path = result.groupValues[3],
-                query = result.groupValues[4],
-                fragment = result.groupValues[5])
+            val (scheme, authority, path, query, fragment) = result.destructured
+            return Uri(scheme, authority, path, query, fragment)
         }
     }
 
     override fun toString(): String {
-        val builder = StringBuilder()
-        builder.append(scheme).append(":")
-        builder.append("//").append(authority)
-        builder.append(path)
-        if (query.isNotBlank()) {
-            builder.append("?").append(query)
-        }
-        if (fragment.isNotBlank()) {
-            builder.append("#").append(fragment)
-        }
-        return builder.toString()
+        return StringBuilder()
+            .appendIfNotBlank(scheme, scheme, ":")
+            .appendIfNotBlank(authority, "//", authority)
+            .append(path)
+            .appendIfNotBlank(query, "?", query)
+            .appendIfNotBlank(fragment, "#", fragment).toString()
+    }
+
+    fun StringBuilder.appendIfNotBlank(valueToCheck: String, vararg toAppend: String): StringBuilder {
+        if (valueToCheck.isNotBlank()) toAppend.forEach { append(it) }
+        return this
     }
 
     val host: String by lazy {
