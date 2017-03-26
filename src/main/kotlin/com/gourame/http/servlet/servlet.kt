@@ -20,7 +20,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        destination.outputStream.write(source.entity.value)
+        source.entity?.let { destination.outputStream.write(it.value) }
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
