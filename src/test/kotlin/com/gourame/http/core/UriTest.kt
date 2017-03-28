@@ -2,7 +2,7 @@ package com.gourame.http.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import junit.framework.Assert.assertNull
+import junit.framework.TestCase.assertNull
 import org.junit.Test
 
 class UriTest {

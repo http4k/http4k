@@ -64,4 +64,7 @@ data class Status(val code: Int, val description: String) {
     val redirection by lazy { REDIRECTION.contains(code) }
     val clientError by lazy { CLIENT_ERROR.contains(code) }
     val serverError by lazy { SERVER_ERROR.contains(code) }
+
+    override fun equals(other: Any?): Boolean = other != null && other is Status && other.code == code
+    override fun hashCode(): Int = code.hashCode()
 }

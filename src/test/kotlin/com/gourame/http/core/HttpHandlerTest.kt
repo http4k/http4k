@@ -9,7 +9,7 @@ import org.junit.Test
 class HttpHandlerTest {
     @Test
     fun basic_handler() {
-        val handler = { request: Request -> Response(OK) }
+        val handler = { _: Request -> Response(OK) }
         val response = handler(get("irrelevant"))
         assertThat(response, equalTo(Response(OK)))
     }
