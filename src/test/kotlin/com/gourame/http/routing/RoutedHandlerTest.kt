@@ -58,4 +58,14 @@ class RoutedHandlerTest {
 
         assertThat(response.entity.toString(), equalTo("matched a"))
     }
+
+    @Test
+    fun path_parameters_are_available_in_request() {
+        val routes = routes(
+            GET to "/{a}/{b}/{c}" by { req: Request -> Response(OK, entity = Entity("matched ${req.pathParameter("a")}, ${req.pathParameter("b")}, ${req.pathParameter("c")}")) }
+        )
+
+        val response = routes(get("/x/y/z"))
+        assertThat(response.entity.toString(), equalTo("matched x, y, z"))
+    }
 }

@@ -24,7 +24,7 @@ class RoutedHandler(vararg private val routes: Route) : HttpHandler {
         )
         return when (matchingResult) {
             is MatchingResult.NoMatch -> Response(matchingResult.status)
-            is MatchingResult.Match -> matchingResult.candidates.first().handler(request)
+            is MatchingResult.Match -> matchingResult.candidates.first().let { it.handler(request.withUriTemplate(it.template)) }
         }
     }
 
@@ -42,6 +42,11 @@ class RoutedHandler(vararg private val routes: Route) : HttpHandler {
 
     private infix fun RoutePredicate.otherwise(fallbackStatus: Status): Pair<RoutePredicate, Status> = Pair(this, fallbackStatus)
 }
+
+fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = copy(headers = headers.plus("x-uri-template" to uriTemplate.toString()))
+fun Request.pathParameter(name: String): String = this.uriTemplate().extract(uri.toString())[name] ?: throw IllegalArgumentException("path parameter '$name' not found")
+
+private fun Request.uriTemplate(): UriTemplate = headers["x-uri-template"]?.let { UriTemplate.uriTemplate(it) } ?: throw RuntimeException("uri template not present in the request")
 
 private typealias RoutePredicate = (Route) -> Boolean
 private typealias RouteCandidates = List<Route>
