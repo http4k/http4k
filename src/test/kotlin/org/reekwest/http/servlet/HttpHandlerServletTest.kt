@@ -15,6 +15,7 @@ import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.StringEntity
 import org.reekwest.http.core.extract
 import org.reekwest.http.core.headerValues
+import org.reekwest.http.core.toEntity
 import org.reekwest.http.jetty.JettyServer
 import org.reekwest.http.jetty.startJettyServer
 import org.reekwest.http.routing.by
@@ -27,7 +28,7 @@ class HttpHandlerServletTest {
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _: Request -> Response(OK, entity = Entity("Hello World")) },
+            GET to "/" by { _: Request -> Response(OK, entity = "Hello World".toEntity()) },
             GET to "/request-headers" by { request: Request -> Response(OK, entity = Entity(request.headerValues("foo").joinToString(", "))) }
         ).startJettyServer()
     }

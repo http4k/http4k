@@ -10,6 +10,8 @@ data class Entity(val value: ByteArray) {
     override fun toString(): String = String(value)
 }
 
+fun String.toEntity() = Entity(this)
+
 interface EntityExtractor<out T> : (HttpMessage) -> T
 
 object StringEntity : EntityExtractor<String> {
