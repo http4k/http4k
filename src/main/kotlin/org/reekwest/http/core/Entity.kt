@@ -9,3 +9,11 @@ data class Entity(val value: ByteArray) {
 
     override fun toString(): String = String(value)
 }
+
+interface EntityExtractor<out T> : (HttpMessage) -> T
+
+object StringEntity : EntityExtractor<String> {
+    override fun invoke(request: HttpMessage): String = request.entity?.toString() ?: ""
+}
+
+fun <T> HttpMessage.extract(entityExtractor: EntityExtractor<T>): T = entityExtractor(this)

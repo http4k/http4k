@@ -1,16 +1,21 @@
 package org.reekwest.http.core
 
 import java.net.URLDecoder
+import java.net.URLEncoder
+
+typealias Parameters = List<Parameter>
 
 fun Request.query(name: String): String? = uri.queries().findSingle(name)
 
 fun Request.queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
-fun Request.header(name: String): String? = headers.findSingle(name)
+fun HttpMessage.header(name: String): String? = headers.find { it.first.equals(name, true) }?.second
 
-fun Request.headerValues(name: String): List<String?> = headers.findMultiple(name)
+fun HttpMessage.headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
 private fun Uri.queries(): Parameters = query.toParameters()
+
+fun Parameters.toUrlEncoded(): String = this.map { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }.joinToString("&")
 
 internal fun String.toParameters() = split("&").map(String::toParameter)
 
@@ -22,6 +27,6 @@ private fun String.toParameter(): Parameter = split("=").map(String::decode).let
 
 private fun String.decode() = URLDecoder.decode(this, "UTF-8")
 
-typealias Parameters = List<Parameter>
+private fun String.encode() = URLEncoder.encode(this, "UTF-8")
 
 private typealias Parameter = Pair<String, String?>

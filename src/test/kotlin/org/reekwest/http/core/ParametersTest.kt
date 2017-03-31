@@ -19,4 +19,9 @@ class ParametersTest {
         assertThat("foo=one+two&bar=three".toParameters().findSingle("foo")!!, equalTo("one two"))
         assertThat("foo=one&super%2Fbar=two".toParameters().findSingle("super/bar")!!, equalTo("two"))
     }
+
+    @Test
+    fun round_trip() {
+        assertThat("a=1&b&c+d=three+four&a=2".toParameters().toUrlEncoded(), equalTo("a=1&b&c+d=three+four&a=2"))
+    }
 }

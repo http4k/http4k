@@ -12,6 +12,8 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.StringEntity
+import org.reekwest.http.core.extract
 import org.reekwest.http.core.headerValues
 import org.reekwest.http.jetty.JettyServer
 import org.reekwest.http.jetty.startJettyServer
@@ -35,7 +37,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/"))
 
-        assertThat(response.entity, equalTo(Entity("Hello World")))
+        assertThat(response.extract(StringEntity), equalTo("Hello World"))
     }
 
     @Test
@@ -43,7 +45,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
 
-        assertThat(response.entity, equalTo(Entity("one, two, three")))
+        assertThat(response.extract(StringEntity), equalTo("one, two, three"))
     }
 
     @After
