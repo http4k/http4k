@@ -20,6 +20,8 @@ data class Request(val method: Method, val uri: Uri, override val headers: Heade
     }
 }
 
+fun Request.query(name:String, value:String) = copy(uri = uri.query(name,value))
+
 data class Response(val status: Status, override val headers: Headers = listOf(), override val entity: Entity? = null) : HttpMessage()
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }

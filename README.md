@@ -20,7 +20,7 @@ Features:
 
 ```kotlin
 val app = { request: Request -> Response(OK, entity = "Hello, ${request.query("name")}!".toEntity()) }
-val get = get("/?name=John+Doe")
+val get = get("/").query("name", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
 assertThat(response.extract(StringEntity), equalTo("Hello, John Doe!"))

@@ -39,4 +39,10 @@ class UriTest {
         val uri = Uri.uri("")
         assertThat(uri.toString(), equalTo(""))
     }
+
+    @Test
+    fun can_add_parameter() {
+        val uri = Uri.uri(value = "http://ignore").query("a", "b")
+        assertThat(uri.toString(), equalTo("http://ignore?&a=b"))
+    }
 }

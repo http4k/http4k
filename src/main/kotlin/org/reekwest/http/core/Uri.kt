@@ -36,3 +36,5 @@ data class Uri(val scheme: String, val authority: String, val path: String, val 
         }
     }
 }
+
+fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlEncoded())

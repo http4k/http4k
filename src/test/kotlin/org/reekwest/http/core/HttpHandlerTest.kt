@@ -16,6 +16,13 @@ class HttpHandlerTest {
     }
 
     @Test
+    fun query_parameters() {
+        val handler = { request: Request -> Response(OK, entity = "Hello, ${request.query("name")}".toEntity()) }
+        val response = handler(get("/").query("name", "John Doe"))
+        assertThat(response, equalTo(Response(OK, entity = "Hello, John Doe".toEntity())))
+    }
+
+    @Test
     fun form_handling() {
         val handler = { request: Request -> Response(OK, entity = Entity("Hello, ${request.form("name")}")) }
         val form = listOf("name" to "John Doe")
