@@ -42,7 +42,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-group = 'io.github.reekwest'
+group = 'org'
 archivesBaseName = 'reekwest'
 description = 'sane HTTP request API for Kotlin'
 
@@ -122,6 +122,7 @@ bintray {
     publish = true
     pkg {
         repo = 'maven'
+        userOrg = 'reekwest'
         name = archivesBaseName
 
         desc = description
