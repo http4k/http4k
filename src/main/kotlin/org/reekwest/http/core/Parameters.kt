@@ -6,6 +6,10 @@ fun Request.query(name: String): String? = uri.queries().findSingle(name)
 
 fun Request.queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
+fun Request.header(name: String): String? = headers.findSingle(name)
+
+fun Request.headerValues(name: String): List<String?> = headers.findMultiple(name)
+
 private fun Uri.queries(): Parameters = query.toParameters()
 
 internal fun String.toParameters() = split("&").map(String::toParameter)

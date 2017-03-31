@@ -4,9 +4,11 @@ import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Headers
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
+import org.reekwest.http.core.Parameters
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Uri
+import java.util.*
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -25,10 +27,12 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
 
     private fun HttpServletRequest.asServletRequest(): Request =
         Request(Method.valueOf(method), Uri.uri(requestURI + queryString.toQueryString()),
-            headerParameters(), Entity(inputStream.readBytes())
-        )
+            headerParameters(), Entity(inputStream.readBytes()))
 
-    private fun HttpServletRequest.headerParameters(): Headers = headerNames.asSequence().map { it to this.getHeader(it) }.toList()
+    private fun HttpServletRequest.headerParameters(): Headers =
+        headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })
+
+    private fun Enumeration<String>.asPairs(key: String): Parameters = asSequence().map { key to it }.toList()
 
     private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 }
