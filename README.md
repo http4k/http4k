@@ -26,13 +26,21 @@ assertThat(response.status, equalTo(OK))
 assertThat(response.extract(StringEntity), equalTo("Hello, John Doe!"))
 ```
 
-## Using inside a webserver
+## Using as a server
 
 ```kotlin
 { _: Request -> Response(OK, entity = "Hello World".toEntity()) }.startJettyServer()
 ```
 
 That will make a server running on http://localhost:8000
+
+## Using as a client
+
+```kotlin
+val client = ApacheHttpClient()
+val response = client(Request(GET, Uri.uri("http://httpbin.org/get")))
+assertThat(response.status, equalTo(OK))
+```
 
 ## Routing
 
