@@ -1,26 +1,50 @@
-group 'com.gourame'
-version '1.0-SNAPSHOT'
-
 buildscript {
     ext.kotlin_version = '1.1.1'
     ext.jetty_version = '9.3.16.v20170120'
 
     repositories {
         mavenCentral()
+        jcenter()
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.6"
+        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
     }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+    id 'net.saliman.cobertura' version '2.2.5'
+    id 'com.github.kt3k.coveralls' version '2.0.1'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
+apply plugin: 'cobertura'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+apply plugin: 'provided-base'
 
-sourceCompatibility = 1.5
+cobertura.coverageFormats = ['html', 'xml']
+cobertura.coverageSourceDirs = ['src/main/kotlin']
 
-repositories {
-    mavenCentral()
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
+group = 'io.github.reekwest'
+archivesBaseName = 'reekwest'
+description = 'sane HTTP request API for Kotlin'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -29,11 +53,7 @@ dependencies {
     compile "org.apache.httpcomponents:httpmime:4.5.3"
     compile "org.apache.httpcomponents:httpclient:4.5.3"
 
-    testCompile "junit:junit:4.11"
-    testCompile "com.natpryce:hamkrest:1.3.0.0"
-
     compile "javax.servlet:javax.servlet-api:3.1.0"
-
     compile "org.eclipse.jetty:jetty-http:9.3.9.v20160517"
     compile "org.eclipse.jetty:jetty-io:9.3.9.v20160517"
     compile "org.eclipse.jetty:jetty-util:9.3.9.v20160517"
@@ -41,10 +61,78 @@ dependencies {
     compile "org.eclipse.jetty:jetty-servlet:9.3.9.v20160517"
     compile "org.eclipse.jetty:jetty-webapp:9.3.9.v20160517"
     compile "org.eclipse.jetty:jetty-security:9.3.9.v20160517"
+
+    testCompile "junit:junit:4.11"
+    testCompile "com.natpryce:hamkrest:1.3.0.0"
 }
 
 compileTestKotlin {
     kotlinOptions {
         languageVersion = "1.1"
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = archivesBaseName
+
+            pom.withXml {
+                asNode().appendNode('name', archivesBaseName)
+                asNode().appendNode('description', description)
+                asNode().appendNode('url', 'http://' + archivesBaseName + '.github.io')
+                asNode().appendNode('developers').appendNode('developer').
+                        appendNode('name', 'David Denton').parent().
+                        appendNode('email', 'mail@daviddenton.github.io')
+                asNode().appendNode('developers').appendNode('developer').
+                        appendNode('name', 'Ivan Sanchez').parent().
+                        appendNode('email', 'mail@s4nchez.github.io')
+                asNode().appendNode('scm').
+                        appendNode('url', 'git@github.com:reekwest/' + archivesBaseName + '.git').parent().
+                        appendNode('connection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git').parent().
+                        appendNode('developerConnection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git')
+                asNode().appendNode('licenses').appendNode('license').
+                        appendNode('name', 'Apache License, Version 2.0').parent().
+                        appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+            }
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = 'reekwest'
+    key = project.hasProperty('bintrayKey') ? project.bintrayKey : 'BINTRAYKEY'
+
+    publications = ['mavenJava']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = archivesBaseName
+
+        desc = description
+        websiteUrl = 'https://github.com/reekwest/reekwest'
+        issueTrackerUrl = 'https://github.com/reekwest/reekwest/issues'
+        vcsUrl = 'https://github.com/reekwest/reekwest.git'
+        licenses = ['Apache-2.0']
+        labels = []
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+        }
     }
 }
