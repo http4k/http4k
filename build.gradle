@@ -42,7 +42,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-group = 'org'
+group = 'org.reekwest'
 archivesBaseName = 'reekwest'
 description = 'sane HTTP request API for Kotlin'
 
