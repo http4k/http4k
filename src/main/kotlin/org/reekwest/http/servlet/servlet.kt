@@ -6,7 +6,6 @@ import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
-import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.Uri
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -29,7 +28,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
             headerParameters(), Entity(inputStream.readBytes())
         )
 
-    private fun HttpServletRequest.headerParameters(): Headers = headerNames.asSequence().map { it to this.getHeader(it) }.toMap()
+    private fun HttpServletRequest.headerParameters(): Headers = headerNames.asSequence().map { it to this.getHeader(it) }.toList()
 
     private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 }

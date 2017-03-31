@@ -9,6 +9,7 @@ import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.UriTemplate
 import org.reekwest.http.core.UriTemplate.Companion.uriTemplate
+import org.reekwest.http.core.findSingle
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
@@ -46,7 +47,7 @@ class RoutedHandler(vararg private val routes: Route) : HttpHandler {
 fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = copy(headers = headers.plus("x-uri-template" to uriTemplate.toString()))
 fun Request.pathParameter(name: String): String = this.uriTemplate().extract(uri.toString())[name] ?: throw IllegalArgumentException("path parameter '$name' not found")
 
-private fun Request.uriTemplate(): UriTemplate = headers["x-uri-template"]?.let { UriTemplate.uriTemplate(it) } ?: throw RuntimeException("uri template not present in the request")
+private fun Request.uriTemplate(): UriTemplate = headers.findSingle("x-uri-template")?.let { UriTemplate.uriTemplate(it) } ?: throw RuntimeException("uri template not present in the request")
 
 private typealias RoutePredicate = (Route) -> Boolean
 private typealias RouteCandidates = List<Route>
