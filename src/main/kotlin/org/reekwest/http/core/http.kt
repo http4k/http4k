@@ -8,14 +8,19 @@ typealias HttpHandler = (Request) -> Response
 
 typealias Headers = Map<String, String>
 
-data class Request(val method: Method, val uri: Uri, val headers: Headers = mapOf(), val entity: Entity? = null) {
+sealed class HttpMessage {
+    abstract val headers: Headers
+    abstract val entity: Entity?
+}
+
+data class Request(val method: Method, val uri: Uri, override val headers: Headers = mapOf(), override val entity: Entity? = null) : HttpMessage() {
     companion object {
         fun get(uri: String, headers: Headers = mapOf(), entity: Entity? = null) = Request(GET, uri(uri), headers, entity)
         fun post(uri: String, headers: Headers = mapOf(), entity: Entity? = null) = Request(POST, uri(uri), headers, entity)
     }
 }
 
-data class Response(val status: Status, val headers: Headers = mapOf(), val entity: Entity? = null)
+data class Response(val status: Status, override val headers: Headers = mapOf(), override val entity: Entity? = null) : HttpMessage()
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 
