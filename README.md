@@ -38,8 +38,10 @@ That will make a server running on http://localhost:8000
 
 ```kotlin
 val client = ApacheHttpClient()
-val response = client(Request(GET, Uri.uri("http://httpbin.org/get")))
+val request = get("http://httpbin.org/get").query("name", "John Doe")
+val response = client(request)
 assertThat(response.status, equalTo(OK))
+assertThat(response.entity.toString(), containsSubstring("John Doe"))
 ```
 
 ## Routing
