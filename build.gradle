@@ -114,7 +114,7 @@ publishing {
 }
 
 bintray {
-    user = project.bintrayUser
+    user = project.hasProperty('bintrayUser') ? project.bintrayUser : 'BINTRAYUSER'
     key = project.hasProperty('bintrayKey') ? project.bintrayKey : 'BINTRAYKEY'
 
     publications = ['mavenJava']
