@@ -15,3 +15,32 @@ Features:
    * Client: ApacheHttpClient
    * Server: Servlets, Jetty
  * No 3rd party dependency required to start
+
+## Basic Usage
+
+```kotlin
+val app = { request: Request -> Response(OK, entity = "Hello, ${request.query("name")}!".toEntity()) }
+val get = get("/?name=John+Doe")
+val response = app(get)
+assertThat(response.status, equalTo(OK))
+assertThat(response.extract(StringEntity), equalTo("Hello, John Doe!"))
+```
+
+## Using inside a webserver
+
+```kotlin
+{ _: Request -> Response(OK, entity = "Hello World".toEntity()) }.startJettyServer()
+```
+
+That will make a server running on http://localhost:8000
+
+## Routing
+
+Reekwest comes with basic routing. It's just another function where you can wrap handlers:
+
+```kotlin
+server = routes(
+    GET to "/hello/{name:*}" by { request: Request -> Response(OK, entity = "Hello, ${request.pathParameter("name")}!".toEntity()) },
+    POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
+).startJettyServer()
+```
