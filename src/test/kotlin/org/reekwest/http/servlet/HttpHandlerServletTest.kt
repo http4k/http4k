@@ -30,7 +30,7 @@ class HttpHandlerServletTest {
         server = routes(
             GET to "/" by { _: Request -> Response(OK, entity = "Hello World".toEntity()) },
             GET to "/request-headers" by { request: Request -> Response(OK, entity = Entity(request.headerValues("foo").joinToString(", "))) }
-        ).startJettyServer()
+        ).startJettyServer(block = false)
     }
 
     @Test

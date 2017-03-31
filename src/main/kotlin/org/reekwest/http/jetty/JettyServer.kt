@@ -1,14 +1,17 @@
 package org.reekwest.http.jetty
 
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.servlet.asServlet
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
+import org.reekwest.http.core.HttpHandler
+import org.reekwest.http.servlet.asServlet
 
 fun HttpHandler.asJettyServer(port: Int = 8000) = JettyServer(this, port)
 
-fun HttpHandler.startJettyServer(port: Int = 8000) = asJettyServer(port).start()
+fun HttpHandler.startJettyServer(port: Int = 8000, block: Boolean = true): JettyServer {
+    val server = asJettyServer(port).start()
+    return if (block) server.block() else server
+}
 
 class JettyServer(application: HttpHandler, port: Int) {
     private val server = Server(port).apply {
