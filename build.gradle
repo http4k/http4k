@@ -85,30 +85,30 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = archivesBaseName
+            mavenJava(MavenPublication) {
+                artifactId = archivesBaseName
 
-            pom.withXml {
-                asNode().appendNode('name', archivesBaseName)
-                asNode().appendNode('description', description)
-                asNode().appendNode('url', 'http://' + archivesBaseName + '.github.io')
-                asNode().appendNode('developers').appendNode('developer').
-                        appendNode('name', 'David Denton').parent().
-                        appendNode('email', 'mail@daviddenton.github.io')
-                asNode().appendNode('developers').appendNode('developer').
-                        appendNode('name', 'Ivan Sanchez').parent().
-                        appendNode('email', 'mail@s4nchez.github.io')
-                asNode().appendNode('scm').
-                        appendNode('url', 'git@github.com:reekwest/' + archivesBaseName + '.git').parent().
-                        appendNode('connection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git').parent().
-                        appendNode('developerConnection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git')
-                asNode().appendNode('licenses').appendNode('license').
-                        appendNode('name', 'Apache License, Version 2.0').parent().
-                        appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                pom.withXml {
+                    asNode().appendNode('name', archivesBaseName)
+                    asNode().appendNode('description', description)
+                    asNode().appendNode('url', 'http://' + archivesBaseName + '.github.io')
+                    asNode().appendNode('developers')
+                            .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'mail@s4nchez.github.io')
+                            .parent().parent()
+                            .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'mail@daviddenton.github.io')
+                    asNode().appendNode('scm').
+                            appendNode('url', 'git@github.com:reekwest/' + archivesBaseName + '.git').parent().
+                            appendNode('connection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git').parent().
+                            appendNode('developerConnection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git')
+                    asNode().appendNode('licenses').appendNode('license').
+                            appendNode('name', 'Apache License, Version 2.0').parent().
+                            appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+                }
+                from components.java
+
+                artifact sourcesJar
+                artifact javadocJar
             }
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
         }
     }
 }
