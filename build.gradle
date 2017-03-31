@@ -134,6 +134,16 @@ bintray {
         publicDownloadNumbers = true
         version {
             name = project.version
+            vcsTag = project.version
+            gpg {
+                sign = true
+            }
+            mavenCentralSync {
+                sync = true
+                user = project.hasProperty('sonatypeUser') ? project.sonatypeUser : 'sonatypeUser'
+                password = project.hasProperty('sonatypePassword') ? project.bintrayUser : 'sonatypePassword'
+                close = '1'
+            }
         }
     }
 }
