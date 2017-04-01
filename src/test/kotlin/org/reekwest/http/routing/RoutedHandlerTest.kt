@@ -7,11 +7,10 @@ import org.junit.Test
 import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.get
+import org.reekwest.http.core.ok
 import org.reekwest.http.core.post
 
 class RoutedHandlerTest {
@@ -29,7 +28,7 @@ class RoutedHandlerTest {
     @Test
     fun method_not_allowed() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> Response(OK, entity = Entity("matched")) }
+            GET to "/a/{route}" by { _: Request -> ok(entity = Entity("matched")) }
         )
 
         val response = routes(post("/a/something"))
@@ -40,7 +39,7 @@ class RoutedHandlerTest {
     @Test
     fun matches_uri_template_and_method() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> Response(OK, entity = Entity("matched")) }
+            GET to "/a/{route}" by { _: Request -> ok(entity = Entity("matched")) }
         )
 
         val response = routes(get("/a/something"))
@@ -51,8 +50,8 @@ class RoutedHandlerTest {
     @Test
     fun matches_uses_first_match() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> Response(OK, entity = Entity("matched a")) },
-            GET to "/a/{route}" by { _: Request -> Response(OK, entity = Entity("matched b")) }
+            GET to "/a/{route}" by { _: Request -> ok(entity = Entity("matched a")) },
+            GET to "/a/{route}" by { _: Request -> ok(entity = Entity("matched b")) }
         )
 
         val response = routes(get("/a/something"))
@@ -63,7 +62,7 @@ class RoutedHandlerTest {
     @Test
     fun path_parameters_are_available_in_request() {
         val routes = routes(
-            GET to "/{a}/{b}/{c}" by { req: Request -> Response(OK, entity = Entity("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}")) }
+            GET to "/{a}/{b}/{c}" by { req: Request -> ok(entity = Entity("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}")) }
         )
 
         val response = routes(get("/x/y/z"))

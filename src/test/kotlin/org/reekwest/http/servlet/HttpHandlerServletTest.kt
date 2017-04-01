@@ -9,12 +9,11 @@ import org.reekwest.http.apache.ApacheHttpClient
 import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.Response
-import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.StringEntity
 import org.reekwest.http.core.extract
 import org.reekwest.http.core.get
 import org.reekwest.http.core.headerValues
+import org.reekwest.http.core.ok
 import org.reekwest.http.core.toEntity
 import org.reekwest.http.jetty.JettyServer
 import org.reekwest.http.jetty.startJettyServer
@@ -28,8 +27,8 @@ class HttpHandlerServletTest {
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _: Request -> Response(OK, entity = "Hello World".toEntity()) },
-            GET to "/request-headers" by { request: Request -> Response(OK, entity = Entity(request.headerValues("foo").joinToString(", "))) }
+            GET to "/" by { _: Request -> ok(entity = "Hello World".toEntity()) },
+            GET to "/request-headers" by { request: Request -> ok(entity = Entity(request.headerValues("foo").joinToString(", "))) }
         ).startJettyServer(block = false)
     }
 

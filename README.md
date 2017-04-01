@@ -29,7 +29,7 @@ assertThat(response.extract(StringEntity), equalTo("Hello, John Doe!"))
 ## Using as a server
 
 ```kotlin
-{ _: Request -> Response(OK, entity = "Hello World".toEntity()) }.startJettyServer()
+{ _: Request -> ok(entity = "Hello World".toEntity()) }.startJettyServer()
 ```
 
 That will make a server running on http://localhost:8000
