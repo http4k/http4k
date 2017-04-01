@@ -7,12 +7,12 @@ import org.junit.Test
 import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.Request.Companion.get
-import org.reekwest.http.core.Request.Companion.post
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.get
+import org.reekwest.http.core.post
 
 class RoutedHandlerTest {
 
@@ -73,7 +73,7 @@ class RoutedHandlerTest {
     @Test
     fun breaks_if_trying_to_access_path_parameters_without_header_present() {
         try {
-            Request.get("/").path("abc")
+            get("/").path("abc")
             fail("Expected exception")
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("x-uri-template header not present in the request"))

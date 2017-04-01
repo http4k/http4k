@@ -4,8 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.get
 import org.reekwest.http.core.query
 
 class ApacheHttpClientTest {

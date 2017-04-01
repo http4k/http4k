@@ -9,11 +9,11 @@ import org.reekwest.http.apache.ApacheHttpClient
 import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.StringEntity
 import org.reekwest.http.core.extract
+import org.reekwest.http.core.get
 import org.reekwest.http.core.headerValues
 import org.reekwest.http.core.toEntity
 import org.reekwest.http.jetty.JettyServer
