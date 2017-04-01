@@ -1,5 +1,9 @@
 package org.reekwest.http.routing
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import junit.framework.Assert.fail
+import org.junit.Test
 import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
@@ -9,9 +13,6 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
-import org.junit.Test
 
 class RoutedHandlerTest {
 
@@ -62,10 +63,20 @@ class RoutedHandlerTest {
     @Test
     fun path_parameters_are_available_in_request() {
         val routes = routes(
-            GET to "/{a}/{b}/{c}" by { req: Request -> Response(OK, entity = Entity("matched ${req.pathParameter("a")}, ${req.pathParameter("b")}, ${req.pathParameter("c")}")) }
+            GET to "/{a}/{b}/{c}" by { req: Request -> Response(OK, entity = Entity("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}")) }
         )
 
         val response = routes(get("/x/y/z"))
         assertThat(response.entity.toString(), equalTo("matched x, y, z"))
+    }
+
+    @Test
+    fun breaks_if_trying_to_access_path_parameters_without_header_present() {
+        try {
+            Request.get("/").path("abc")
+            fail("Expected exception")
+        } catch (e: IllegalStateException) {
+            assertThat(e.message, equalTo("x-uri-template header not present in the request"))
+        }
     }
 }

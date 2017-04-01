@@ -50,7 +50,7 @@ Reekwest comes with basic routing. It's just another function where you can wrap
 
 ```kotlin
 server = routes(
-    GET to "/hello/{name:*}" by { request: Request -> Response(OK, entity = "Hello, ${request.pathParameter("name")}!".toEntity()) },
+    GET to "/hello/{name:*}" by { request: Request -> Response(OK, entity = "Hello, ${request.path("name")}!".toEntity()) },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
 ```
