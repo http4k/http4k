@@ -3,6 +3,7 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.stringentity.entity
 
 class HttpHandlerTest {
     @Test
@@ -14,9 +15,9 @@ class HttpHandlerTest {
 
     @Test
     fun query_parameters() {
-        val handler = { request: Request -> ok(entity = "Hello, ${request.query("name")}".toEntity()) }
+        val handler = { request: Request -> ok().entity("Hello, ${request.query("name")}") }
         val response = handler(get("/").query("name", "John Doe"))
-        assertThat(response, equalTo(ok(entity = "Hello, John Doe".toEntity())))
+        assertThat(response, equalTo(ok().entity("Hello, John Doe")))
     }
 
     @Test

@@ -12,4 +12,10 @@ class ResponseExtensionsKtTest {
         assertThat(ok(), equalTo(Response(OK)))
         assertThat(notFound(), equalTo(Response(NOT_FOUND)))
     }
+
+    @Test
+    fun can_modify_entity(){
+        val testEntity = Entity("abc".toByteArray())
+        assertThat(ok().entity(testEntity).entity, equalTo(testEntity))
+    }
 }
