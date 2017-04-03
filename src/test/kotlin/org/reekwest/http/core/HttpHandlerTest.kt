@@ -3,7 +3,10 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.core.stringentity.entity
+import org.reekwest.http.core.entity.StringEntity
+import org.reekwest.http.core.entity.entity
+import org.reekwest.http.core.entity.extract
+import org.reekwest.http.core.entity.form
 
 class HttpHandlerTest {
     @Test
@@ -22,10 +25,10 @@ class HttpHandlerTest {
 
     @Test
     fun form_handling() {
-        val handler = { request: Request -> ok(entity = Entity("Hello, ${request.form("name")}")) }
+        val handler = { request: Request -> ok().entity("Hello, ${request.form("name")}") }
         val form = listOf("name" to "John Doe")
 
-        val response = handler(post("irrelevant", listOf("content-type" to APPLICATION_FORM_URLENCODED), form.toEntity()))
+        val response = handler(post("irrelevant").entity(form))
 
         assertThat(response.extract(StringEntity), equalTo("Hello, John Doe"))
     }

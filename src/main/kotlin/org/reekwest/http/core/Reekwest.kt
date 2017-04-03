@@ -1,5 +1,7 @@
 package org.reekwest.http.core
 
+import org.reekwest.http.core.entity.Entity
+
 typealias HttpHandler = (Request) -> Response
 
 typealias Headers = Parameters

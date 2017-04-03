@@ -41,7 +41,7 @@ val client = ApacheHttpClient()
 val request = get("http://httpbin.org/get").query("name", "John Doe")
 val response = client(request)
 assertThat(response.status, equalTo(OK))
-assertThat(response.entity.toString(), containsSubstring("John Doe"))
+assertThat(response.extract(StringEntity), containsSubstring("John Doe"))
 ```
 
 ## Routing

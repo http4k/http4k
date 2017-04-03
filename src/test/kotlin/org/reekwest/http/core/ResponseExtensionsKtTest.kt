@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.entity.StringEntity
 
 class ResponseExtensionsKtTest {
     @Test
@@ -15,7 +16,7 @@ class ResponseExtensionsKtTest {
 
     @Test
     fun can_modify_entity(){
-        val testEntity = Entity("abc".toByteArray())
+        val testEntity = StringEntity.toEntity("abc")
         assertThat(ok().entity(testEntity).entity, equalTo(testEntity))
     }
 }

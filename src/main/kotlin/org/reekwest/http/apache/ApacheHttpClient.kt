@@ -10,13 +10,14 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils.toByteArray
-import org.reekwest.http.core.Entity
 import org.reekwest.http.core.Headers
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
+import org.reekwest.http.core.entity.Entity
 import java.net.URI
+import java.nio.ByteBuffer
 
 class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefault()) : HttpHandler {
 
@@ -40,7 +41,7 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun HttpEntity.toTarget(): Entity = Entity(toByteArray(this))
+    private fun HttpEntity.toTarget(): Entity = ByteBuffer.wrap(toByteArray(this))
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 }
