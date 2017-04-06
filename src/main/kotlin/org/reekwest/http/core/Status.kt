@@ -67,4 +67,5 @@ data class Status(val code: Int, val description: String) {
 
     override fun equals(other: Any?): Boolean = other != null && other is Status && other.code == code
     override fun hashCode(): Int = code.hashCode()
+    override fun toString(): String = "$code $description"
 }
