@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.entity.StringEntity
 
-class HttpMessageTest {
+class HttpMessageAsStringTest {
     @Test
     fun represents_request_to_string() {
         val request = Request(Method.GET, Uri.uri("http://www.somewhere.com/path"), listOf("foo" to "one", "bar" to "two"), StringEntity.toEntity("body"))
