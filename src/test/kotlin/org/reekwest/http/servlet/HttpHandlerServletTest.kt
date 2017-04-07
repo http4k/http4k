@@ -8,9 +8,8 @@ import org.junit.Test
 import org.reekwest.http.apache.ApacheHttpClient
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.entity.StringEntity
-import org.reekwest.http.core.entity.entity
-import org.reekwest.http.core.entity.extract
+import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.body.string
 import org.reekwest.http.core.get
 import org.reekwest.http.core.headerValues
 import org.reekwest.http.core.ok
@@ -26,8 +25,8 @@ class HttpHandlerServletTest {
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _: Request -> ok().entity("Hello World") },
-            GET to "/request-headers" by { request: Request -> ok().entity(request.headerValues("foo").joinToString(", ")) }
+            GET to "/" by { _: Request -> ok().bodyString("Hello World") },
+            GET to "/request-headers" by { request: Request -> ok().bodyString(request.headerValues("foo").joinToString(", ")) }
         ).startJettyServer(block = false)
     }
 
@@ -36,7 +35,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/"))
 
-        assertThat(response.extract(StringEntity), equalTo("Hello World"))
+        assertThat(response.body.string(), equalTo("Hello World"))
     }
 
     @Test
@@ -44,7 +43,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
 
-        assertThat(response.extract(StringEntity), equalTo("one, two, three"))
+        assertThat(response.body.string(), equalTo("one, two, three"))
     }
 
     @After

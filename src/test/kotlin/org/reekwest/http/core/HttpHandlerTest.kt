@@ -3,10 +3,10 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.core.entity.StringEntity
-import org.reekwest.http.core.entity.entity
-import org.reekwest.http.core.entity.extract
-import org.reekwest.http.core.entity.form
+import org.reekwest.http.core.body.bodyForm
+import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.body.form
+import org.reekwest.http.core.body.string
 
 class HttpHandlerTest {
     @Test
@@ -18,19 +18,19 @@ class HttpHandlerTest {
 
     @Test
     fun query_parameters() {
-        val handler = { request: Request -> ok().entity("Hello, ${request.query("name")}") }
+        val handler = { request: Request -> ok().bodyString("Hello, ${request.query("name")}") }
         val response = handler(get("/").query("name", "John Doe"))
-        assertThat(response, equalTo(ok().entity("Hello, John Doe")))
+        assertThat(response, equalTo(ok().bodyString("Hello, John Doe")))
     }
 
     @Test
     fun form_handling() {
-        val handler = { request: Request -> ok().entity("Hello, ${request.form("name")}") }
+        val handler = { request: Request -> ok().bodyString("Hello, ${request.form("name")}") }
         val form = listOf("name" to "John Doe")
 
-        val response = handler(post("irrelevant").entity(form))
+        val response = handler(post("irrelevant").bodyForm(form))
 
-        assertThat(response.extract(StringEntity), equalTo("Hello, John Doe"))
+        assertThat(response.body.string(), equalTo("Hello, John Doe"))
     }
 }
 

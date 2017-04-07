@@ -15,7 +15,7 @@ import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
-import org.reekwest.http.core.entity.Entity
+import org.reekwest.http.core.body.Body
 import java.net.URI
 import java.nio.ByteBuffer
 
@@ -31,7 +31,7 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
             init {
                 val request = this@toApacheRequest
                 uri = URI(request.uri.toString())
-                entity = ByteArrayEntity(request.entity.toString().toByteArray())
+                entity = ByteArrayEntity(request.body.toString().toByteArray())
                 request.headers.filter { it.first != "content-length" }.map { addHeader(it.first, it.second) }
             }
 
@@ -41,7 +41,7 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun HttpEntity.toTarget(): Entity = ByteBuffer.wrap(toByteArray(this))
+    private fun HttpEntity.toTarget(): Body = ByteBuffer.wrap(toByteArray(this))
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 }
