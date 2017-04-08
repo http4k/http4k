@@ -1,18 +1,19 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.header
 import org.reekwest.http.core.headerValues
 
 object Header {
-    fun optional(name: String) = object : MessagePart<Request, String?> {
+    fun optional(name: String) = object : MessagePart<HttpMessage, String?> {
         override fun toString(): String = "optional header $name"
-        override fun get(msg: Request) = msg.header(name)
+        override fun get(msg: HttpMessage) = msg.header(name)
     }
 
-    fun required(name: String) = object : MessagePart<Request, String> {
+    fun required(name: String) = object : MessagePart<HttpMessage, String> {
         override fun toString(): String = "required header $name"
-        override fun get(msg: Request) = msg.header(name) ?: throw Missing(this)
+        override fun get(msg: HttpMessage) = msg.header(name) ?: throw Missing(this)
     }
 
     object multi {
