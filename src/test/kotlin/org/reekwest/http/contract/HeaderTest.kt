@@ -14,14 +14,14 @@ import org.reekwest.http.core.contract.Missing
 import org.reekwest.http.core.contract.get
 
 class HeaderTest {
-    private val request = Request(GET, uri("/"), listOf("hello" to "world"))
+    private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
 
     @Test
     fun `retrieve successfully`() {
         assertThat(request[Header.optional("hello")], equalTo("world"))
         assertThat(request[Header.required("hello")], equalTo("world"))
         assertThat(request[Header.required("hello").map { it.length }], equalTo(5))
-        assertThat(request[Header.optional("hello").map { it!!.length }], equalTo(5))
+        assertThat(request[Header.optional("hello").map { it.length }], equalTo(5))
     }
 
     @Test
@@ -33,8 +33,6 @@ class HeaderTest {
     @Test
     fun `retrieve fails with invalid`() {
         assertThat({ request[Header.required("hello").map { it.toInt() }] }, throws<Invalid>())
-        assertThat({ request[Header.optional("world").map { it!!.toInt() }] }, throws<Invalid>())
+        assertThat({ request[Header.optional("hello").map { it.toInt() }] }, throws<Invalid>())
     }
-
-
 }
