@@ -1,5 +1,6 @@
 package org.reekwest.http.core.cookie
 
+import org.reekwest.http.core.Response
 import org.reekwest.http.core.cookie.Cookie.Attribute.COMMENT
 import org.reekwest.http.core.cookie.Cookie.Attribute.DOMAIN
 import org.reekwest.http.core.cookie.Cookie.Attribute.EXPIRES
@@ -32,4 +33,8 @@ private fun Cookie.attribute(name: Cookie.Attribute, value: String): Cookie = at
 
 private val RFC822 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
 
+fun Response.cookie(cookie: Cookie): Response = copy(headers = headers.plus("Set-Cookie" to cookie.toString()))
 
+fun Response.removeCookie(name: String): Response = copy(headers = headers.filterNot { it.first == "Set-Cookie" && (it.second?.startsWith("$name=") ?: false) })
+
+fun Response.replaceCookie(cookie: Cookie): Response = removeCookie(cookie.name).cookie(cookie)
