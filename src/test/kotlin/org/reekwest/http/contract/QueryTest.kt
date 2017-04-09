@@ -8,10 +8,7 @@ import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.http.core.contract.Invalid
-import org.reekwest.http.core.contract.Missing
-import org.reekwest.http.core.contract.Query
-import org.reekwest.http.core.contract.get
+import org.reekwest.http.core.contract.*
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")

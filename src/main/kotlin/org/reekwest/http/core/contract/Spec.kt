@@ -1,5 +1,9 @@
 package org.reekwest.http.core.contract
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+
 interface MultiSpec<in IN, OUT> {
     fun optional(name: String, description: String? = null): MsgPart<IN, OUT, List<OUT?>?>
     fun required(name: String, description: String? = null): MsgPart<IN, OUT, List<OUT?>>
@@ -33,3 +37,20 @@ open class Spec<in IN, OUT>(private val location: String, val fn: (IN, String) -
         }
     }
 }
+
+// Extension methods for commonly used conversions
+
+fun <IN> Spec<IN, String>.int(): Spec<IN, Int> = this.map(String::toInt)
+fun <IN> Spec<IN, String>.long(): Spec<IN, Long> = this.map(String::toLong)
+fun <IN> Spec<IN, String>.double(): Spec<IN, Double> = this.map(String::toDouble)
+fun <IN> Spec<IN, String>.float(): Spec<IN, Float> = this.map(String::toFloat)
+
+fun <IN> Spec<IN, String>.boolean(): Spec<IN, Boolean> = this.map {
+    if (it.toUpperCase() == "TRUE") true
+    else if (it.toUpperCase() == "FALSE") false
+    else throw kotlin.IllegalArgumentException("illegal boolean")
+}
+
+fun <IN> Spec<IN, String>.localDate(): Spec<IN, LocalDate> = this.map { LocalDate.parse(it) }
+fun <IN> Spec<IN, String>.dateTime(): Spec<IN, LocalDateTime> = this.map { LocalDateTime.parse(it) }
+fun <IN> Spec<IN, String>.zonedDateTime(): Spec<IN, ZonedDateTime> = this.map { ZonedDateTime.parse(it) }
