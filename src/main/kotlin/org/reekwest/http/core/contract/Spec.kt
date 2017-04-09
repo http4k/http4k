@@ -17,15 +17,15 @@ open class Spec<in IN, OUT>(private val location: String, val fn: (IN, String) -
         override fun convert(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(meta)
     }
 
-    private val a: Spec<IN, OUT>
+    internal val id: Spec<IN, OUT>
         get() = this
 
     val multi = object : MultiSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): MsgPart<IN, OUT, List<OUT?>?> = object : MsgPart<IN, OUT, List<OUT?>?>(Meta(name, location, description), a) {
+        override fun optional(name: String, description: String?): MsgPart<IN, OUT, List<OUT?>?> = object : MsgPart<IN, OUT, List<OUT?>?>(Meta(name, location, description), id) {
             override fun convert(o: List<OUT?>?) = o
         }
 
-        override fun required(name: String, description: String?) = object : MsgPart<IN, OUT, List<OUT?>>(Meta(name, location, description), a) {
+        override fun required(name: String, description: String?) = object : MsgPart<IN, OUT, List<OUT?>>(Meta(name, location, description), id) {
             override fun convert(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(meta) else orEmpty
