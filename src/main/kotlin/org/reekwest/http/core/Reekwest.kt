@@ -2,7 +2,6 @@ package org.reekwest.http.core
 
 import org.reekwest.http.core.body.Body
 
-
 typealias HttpHandler = (Request) -> Response
 
 typealias Headers = Parameters

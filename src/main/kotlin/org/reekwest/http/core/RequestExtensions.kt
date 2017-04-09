@@ -14,3 +14,9 @@ fun put(uri: String, headers: Headers = listOf(), body: Body? = null) = Request(
 
 fun Request.query(name: String, value: String) = copy(uri = uri.query(name, value))
 
+fun Request.header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+
+fun Request.replaceHeader(name: String, value: String?) = removeHeader(name).header(name, value)
+
+fun Request.removeHeader(name: String) = copy(headers = headers.filterNot { it.first == name })
+
