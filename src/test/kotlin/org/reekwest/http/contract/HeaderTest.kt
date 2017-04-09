@@ -21,6 +21,7 @@ class HeaderTest {
         assertThat(request[Header.optional("hello")], equalTo("world"))
         assertThat(request[Header.required("hello")], equalTo("world"))
         assertThat(request[Header.required("hello").map { it.length }], equalTo(5))
+        assertThat(request[Header.optional("hello").map { it!!.length }], equalTo(5))
     }
 
     @Test
