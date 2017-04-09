@@ -19,12 +19,13 @@ abstract class MessagePart<in IN, out RAW, out OUT>(val meta: Meta, internal val
     }
 }
 
+
 operator fun <T, FINAL> Request.get(param: MessagePart<Request, T, FINAL>): FINAL = param[this]
 operator fun <T, FINAL> Response.get(param: MessagePart<Response, T, FINAL>): FINAL = param[this]
 
 open class Optional<in IN, out OUT>(meta: Meta, fn: (IN) -> OUT?) : MessagePart<IN, OUT, OUT?>(meta, fn) {
     override operator fun get(m: IN): OUT? = fn(m)
-    fun <X> map(next: (OUT) -> X) = Optional(meta, mapValid(next))
+    fun <X> map(next: (OUT) -> X): Optional<IN, X?> = Optional(meta, mapValid(next))
 }
 
 open class Required<in IN, out OUT>(meta: Meta, fn: (IN) -> OUT?) : MessagePart<IN, OUT, OUT>(meta, fn) {
