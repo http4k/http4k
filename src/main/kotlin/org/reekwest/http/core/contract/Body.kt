@@ -1,13 +1,16 @@
 package org.reekwest.http.core.contract
 
-//object Body : Required<HttpMessage, ByteBuffer>(Meta("body", "body"), { it.body!! })
-//
-///**
-// * Extension functions for various body types
-// */
-//
-//fun Body.string(description: String? = null)
-//    = Required<HttpMessage, String>(Meta("body", "body", description), { String(it.body!!.array()) })
+import org.reekwest.http.core.HttpMessage
+import java.nio.ByteBuffer
+
+object Body : Spec<HttpMessage, ByteBuffer>("body", { message, _ -> listOf(message.body)})
+
+/**
+ * Extension functions for various body types
+ */
+
+fun Body.string(description: String? = null) = Body.map { String(it.array()) }.required("body", description)
+
 //
 //fun Body.form() = Required<Request, Form>(Meta("form", "body"), {
 //    if (it[CONTENT_TYPE] != APPLICATION_FORM_URLENCODED) throw Invalid(this)

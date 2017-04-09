@@ -1,12 +1,21 @@
 package org.reekwest.http.contract
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import org.junit.Test
+import org.reekwest.http.core.body.toBody
+import org.reekwest.http.core.contract.Body
+import org.reekwest.http.core.contract.get
+import org.reekwest.http.core.contract.string
+import org.reekwest.http.core.get
+
 class BodyTest {
-//
-//    @Test
-//    fun `can get string body`() {
-//        val request = get("").copy(body = "some value".toBody())
-//        assertThat(request[Body.string()], equalTo("some value"))
-//    }
+
+    @Test
+    fun `can get string body`() {
+        val request = get("").copy(body = "some value".toBody())
+        assertThat(request[Body.string()], equalTo("some value"))
+    }
 //
 //    @Test
 //    fun `can get form body`() {
