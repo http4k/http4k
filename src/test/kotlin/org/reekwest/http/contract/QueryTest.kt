@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.core.Method
+import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.contract.Invalid
@@ -14,7 +14,7 @@ import org.reekwest.http.core.contract.Query
 import org.reekwest.http.core.contract.get
 
 class QueryTest {
-    private val request = Request(Method.GET, uri("/?hello=world&hello=world2"))
+    private val request = withQueryOf("/?hello=world&hello=world2")
 
     @Test
     fun `value present`() {
@@ -46,6 +46,15 @@ class QueryTest {
         assertThat({ request[Query.map(String::toInt).optional("hello")] }, throws<Invalid>())
     }
 
+    @Test
+    fun `int`() {
+        assertThat(withQueryOf("/?hello=123")[Query.int().optional("hello")], equalTo(123))
+        assertThat(withQueryOf("/")[Query.int().optional("world")], absent())
+        val badRequest = withQueryOf("/?hello=notAnumber")
+        assertThat({ badRequest[Query.int().optional("hello")] }, throws<Invalid>())
+    }
+
+    private fun withQueryOf(value: String) = Request(GET, uri(value))
 //
 //    @Test
 //    fun `toString is ok`() {
