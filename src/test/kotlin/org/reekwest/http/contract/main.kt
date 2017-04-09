@@ -4,7 +4,7 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.contract.H2
+import org.reekwest.http.core.contract.Header
 
 //
 //fun Required<Request, String?>.toInt() = this.map(Integer::parseInt)
@@ -33,8 +33,8 @@ import org.reekwest.http.core.contract.H2
 
 fun main(args: Array<String>) {
     val request: Request = Request(Method.GET, Uri.uri("/?hello=123&hello"), listOf("hello" to "123"), "asd=23423&asd=23423".toBody())
-    println(H2.map { it.reversed() }.optional("hello")[request])
-    println(H2.optional("hello")[request])
+    println(Header.map { it.reversed() }.optional("hello")[request])
+    println(Header.optional("hello")[request])
 }
 
 //fun main(args: Array<String>) {
