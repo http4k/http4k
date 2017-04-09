@@ -32,20 +32,20 @@ class BodyTest {
         val request = get("").copy(
             headers = listOf("Content-Type" to "unknown"),
             body = "hello=world&another=planet".toBody())
-        assertThat({request[Body.form()]}, throws<Invalid>())
+        assertThat({ request[Body.form()] }, throws<Invalid>())
     }
 
     data class MyCustomBodyType(val value: String)
-
-    @Test
-    fun `can create a custom Body type`() {
-
-        fun Body.toCustomType() = Body.string().map(::MyCustomBodyType)
-
-        val request = get("").copy(
-            body = "hello world!".toBody())
-        assertThat(request[Body.toCustomType()], equalTo(MyCustomBodyType("hello world!")))
-    }
+//
+//    @Test
+//    fun `can create a custom Body type`() {
+//
+//        fun Body.toCustomType() = Body.map { String(it.array()) }.map(::MyCustomBodyType)
+//
+//        val request = get("").copy(
+//            body = "hello world!".toBody())
+//        assertThat(request[Body.toCustomType()], equalTo(MyCustomBodyType("hello world!")))
+//    }
 }
 
 
