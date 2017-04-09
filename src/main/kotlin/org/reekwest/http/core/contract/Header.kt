@@ -1,5 +1,6 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.header
 import org.reekwest.http.core.headerValues
@@ -14,5 +15,9 @@ object Header {
             val values = it.headerValues(name)
             if (values.isEmpty()) null else values
         }
+    }
+
+    object Common {
+        val CONTENT_TYPE = Header.optional("Content-Type").map(::ContentType)
     }
 }
