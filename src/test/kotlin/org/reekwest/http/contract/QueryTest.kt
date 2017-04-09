@@ -45,4 +45,12 @@ class QueryTest {
         assertThat({ request[Query.multi.required("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
         assertThat({ request[Query.multi.optional("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
     }
+
+    @Test
+    fun `toString is ok`() {
+        assertThat(Query.required("hello").toString(), equalTo("Required query 'hello'"))
+        assertThat(Query.optional("hello").toString(), equalTo("Optional query 'hello'"))
+        assertThat(Query.multi.required("hello").toString(), equalTo("Required query 'hello'"))
+        assertThat(Query.multi.optional("hello").toString(), equalTo("Optional query 'hello'"))
+    }
 }

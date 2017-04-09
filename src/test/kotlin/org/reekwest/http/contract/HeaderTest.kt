@@ -45,4 +45,13 @@ class HeaderTest {
         assertThat({ request[Header.multi.required("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
         assertThat({ request[Header.multi.optional("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
     }
+
+    @Test
+    fun `toString is ok`() {
+        assertThat(Header.required("hello").toString(), equalTo("Required header 'hello'"))
+        assertThat(Header.optional("hello").toString(), equalTo("Optional header 'hello'"))
+        assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
+        assertThat(Header.multi.optional("hello").toString(), equalTo("Optional header 'hello'"))
+    }
+
 }

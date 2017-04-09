@@ -5,13 +5,13 @@ import org.reekwest.http.core.header
 import org.reekwest.http.core.headerValues
 
 object Header {
-    fun optional(name: String) = Optional<Request, String>("header") { it.header(name) }
-    fun required(name: String) = Required<Request, String>("header") { it.header(name) }
+    fun optional(name: String, description: String? = null) = Optional<Request, String>(Meta(name, "header", description)) { it.header(name) }
+    fun required(name: String, description: String? = null) = Required<Request, String>(Meta(name, "header", description)) { it.header(name) }
 
     object multi {
-        fun optional(name: String) = Optional<Request, List<String?>>("header") { it.headerValues(name) }
-        fun required(name: String) = Required<Request, List<String?>>("header") {
-        val values = it.headerValues(name)
+        fun optional(name: String, description: String? = null) = Optional<Request, List<String?>>(Meta(name, "header", description)) { it.headerValues(name) }
+        fun required(name: String, description: String? = null) = Required<Request, List<String?>>(Meta(name, "header", description)) {
+            val values = it.headerValues(name)
             if (values.isEmpty()) null else values
         }
     }
