@@ -23,9 +23,9 @@ class HeaderTest {
         assertThat(request[Header.map { it.length }.required("hello")], equalTo(5))
         assertThat(request[Header.map { it.length }.optional("hello")], equalTo(5))
 
-//        val expected: List<String?> = listOf("world", "world2")
-//        assertThat(request[Header.multi.required("hello")], equalTo(expected))
-//        assertThat(request[Header.multi.optional("hello")], equalTo(expected))
+        val expected: List<String?> = listOf("world", "world2")
+        assertThat(request[Header.multi.required("hello")], equalTo(expected))
+        assertThat(request[Header.multi.optional("hello")], equalTo(expected))
     }
 
     @Test
@@ -33,17 +33,17 @@ class HeaderTest {
         assertThat(request[Header.optional("world")], absent())
         assertThat({ request[Header.required("world")] }, throws<Missing>())
 
-//        assertThat(request[Header.multi.optional("world")], equalTo(emptyList()))
-//        assertThat({ request[Header.multi.required("world")] }, throws<Missing>())
+        assertThat(request[Header.multi.optional("world")], equalTo(emptyList()))
+        assertThat({ request[Header.multi.required("world")] }, throws<Missing>())
     }
 
     @Test
     fun `invalid value`() {
-        assertThat({ request[Header.map { it.toInt() }.required("hello")] }, throws<Invalid>())
-        assertThat({ request[Header.map { it.toInt() }.optional("hello")] }, throws<Invalid>())
+        assertThat({ request[Header.map(String::toInt).required("hello")] }, throws<Invalid>())
+        assertThat({ request[Header.map(String::toInt).optional("hello")] }, throws<Invalid>())
 
-//        assertThat({ request[Header.multi.required("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
-//        assertThat({ request[Header.multi.optional("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
+        assertThat({ request[Header.map(String::toInt).multi.required("hello")] }, throws<Invalid>())
+        assertThat({ request[Header.map(String::toInt).optional("hello")] }, throws<Invalid>())
     }
 
     @Test

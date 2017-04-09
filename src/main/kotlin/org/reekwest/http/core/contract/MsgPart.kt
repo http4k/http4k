@@ -1,10 +1,9 @@
 package org.reekwest.http.core.contract
 
-import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 
-abstract class MsgPart<in IN : HttpMessage, in OUT, out FINAL>(val meta: Meta, private val spec: Spec<IN, OUT>) {
+abstract class MsgPart<in IN, in OUT, out FINAL>(val meta: Meta, private val spec: Spec<IN, OUT>) {
     operator fun get(m: IN): FINAL = try {
         convert(spec.fn(m, meta.name))
     } catch (e: Missing) {
