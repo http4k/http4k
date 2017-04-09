@@ -7,7 +7,7 @@ import org.reekwest.http.core.body.Form
 import org.reekwest.http.core.toParameters
 import java.nio.ByteBuffer
 
-object Body : Required<HttpMessage, ByteBuffer>({ it.body!! })
+object Body : Required<HttpMessage, ByteBuffer>("body", { it.body!! })
 
 /**
  * Extension functions for various body types
@@ -15,7 +15,7 @@ object Body : Required<HttpMessage, ByteBuffer>({ it.body!! })
 
 fun Body.string() = Body.map { String(it.array()) }
 
-fun Body.form() = Required<Request, Form>({
+fun Body.form() = Required<Request, Form>("body", {
     val contentType = Header.required("Content-Type")
     if (it[contentType] != ContentType.APPLICATION_FORM_URLENCODED.value) throw Invalid(this)
     else String(it.body!!.array()).toParameters()
