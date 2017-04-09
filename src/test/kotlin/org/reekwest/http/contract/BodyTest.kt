@@ -10,7 +10,6 @@ import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.contract.*
 import org.reekwest.http.core.get
 
-
 class BodyTest {
 
     @Test
