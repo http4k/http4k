@@ -17,22 +17,32 @@ class HeaderTest {
     private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
 
     @Test
-    fun `retrieve successfully`() {
+    fun `value present`() {
         assertThat(request[Header.optional("hello")], equalTo("world"))
         assertThat(request[Header.required("hello")], equalTo("world"))
         assertThat(request[Header.required("hello").map { it.length }], equalTo(5))
         assertThat(request[Header.optional("hello").map { it.length }], equalTo(5))
+
+        val expected: List<String?> = listOf("world", "world2")
+        assertThat(request[Header.multi.required("hello")], equalTo(expected))
+        assertThat(request[Header.multi.optional("hello")], equalTo(expected))
     }
 
     @Test
-    fun `retrieve fails with missing`() {
+    fun `value missing`() {
         assertThat(request[Header.optional("world")], absent())
         assertThat({ request[Header.required("world")] }, throws<Missing>())
+
+        assertThat(request[Header.multi.optional("world")], equalTo(emptyList()))
+        assertThat({ request[Header.multi.required("world")] }, throws<Missing>())
     }
 
     @Test
-    fun `retrieve fails with invalid`() {
+    fun `invalid value`() {
         assertThat({ request[Header.required("hello").map { it.toInt() }] }, throws<Invalid>())
         assertThat({ request[Header.optional("hello").map { it.toInt() }] }, throws<Invalid>())
+
+        assertThat({ request[Header.multi.required("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
+        assertThat({ request[Header.multi.optional("hello").map { it.map { it?.toInt() } }] }, throws<Invalid>())
     }
 }

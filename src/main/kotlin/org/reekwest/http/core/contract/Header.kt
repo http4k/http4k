@@ -10,6 +10,6 @@ object Header {
 
     object multi {
         fun optional(name: String) = Optional<Request, List<String?>> { it.headerValues(name) }
-        fun required(name: String) = Required<Request, List<String?>> { it.headerValues(name) }
+        fun required(name: String) = Required<Request, List<String?>> { if (it.headerValues(name).isEmpty()) null else it.headerValues(name) }
     }
 }
