@@ -4,7 +4,7 @@ import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.headerValues
 
-object Header : LensBuilder<HttpMessage, String>("header", HttpMessage::headerValues) {
+object Header : LensSpec<HttpMessage, String>("header", HttpMessage::headerValues) {
 
     object Common {
         val CONTENT_TYPE = map(::ContentType).optional("Content-Type")

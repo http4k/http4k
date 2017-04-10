@@ -3,7 +3,7 @@ package org.reekwest.http.core.contract
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 
-abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val spec: LensBuilder<IN, OUT>) {
+abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val spec: LensSpec<IN, OUT>) {
     operator fun invoke(m: IN): FINAL = try {
         convert(spec.fn(m, meta.name))
     } catch (e: Missing) {
