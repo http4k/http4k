@@ -18,5 +18,5 @@ fun Request.header(name: String, value: String?) = copy(headers = headers.plus(n
 
 fun Request.replaceHeader(name: String, value: String?) = removeHeader(name).header(name, value)
 
-fun Request.removeHeader(name: String) = copy(headers = headers.filterNot { it.first == name })
+fun Request.removeHeader(name: String) = copy(headers = headers.filterNot { it.first.equals(name, true) })
 

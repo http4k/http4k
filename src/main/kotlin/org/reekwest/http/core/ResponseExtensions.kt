@@ -12,4 +12,4 @@ fun Response.header(name: String, value: String?) = copy(headers = headers.plus(
 
 fun Response.replaceHeader(name: String, value: String?) = removeHeader(name).header(name, value)
 
-fun Response.removeHeader(name: String) = copy(headers = headers.filterNot { it.first == name })
+fun Response.removeHeader(name: String) = copy(headers = headers.filterNot { it.first.equals(name, true) })
