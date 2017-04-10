@@ -1,5 +1,6 @@
 package org.reekwest.http.core.body
 
+import org.reekwest.http.core.Body
 import org.reekwest.http.core.Response
 import java.nio.ByteBuffer
 

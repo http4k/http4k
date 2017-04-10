@@ -1,5 +1,6 @@
 package org.reekwest.http.core.body
 
+import org.reekwest.http.core.Body
 import org.reekwest.http.core.Parameters
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.findSingle

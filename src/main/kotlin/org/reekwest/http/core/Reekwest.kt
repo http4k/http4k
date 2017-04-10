@@ -1,11 +1,5 @@
 package org.reekwest.http.core
 
-import org.reekwest.http.core.body.Body
-
-typealias HttpHandler = (Request) -> Response
-
-typealias Headers = Parameters
-
 sealed class HttpMessage {
     abstract val headers: Headers
     abstract val body: Body?
@@ -20,3 +14,9 @@ data class Response(val status: Status, override val headers: Headers = listOf()
 }
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
+
+typealias HttpHandler = (Request) -> Response
+
+typealias Headers = Parameters
+
+typealias Body = java.nio.ByteBuffer

@@ -19,6 +19,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     override fun service(req: HttpServletRequest, resp: HttpServletResponse) =
         transfer(handler(req.asServletRequest()), resp)
 
+    @Suppress("DEPRECATION")
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }

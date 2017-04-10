@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.core.body.body
 import org.reekwest.http.core.body.toBody
 
 class ResponseExtensionsKtTest {
