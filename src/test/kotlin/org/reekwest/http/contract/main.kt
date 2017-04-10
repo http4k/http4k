@@ -33,8 +33,8 @@ import org.reekwest.http.core.contract.Header
 
 fun main(args: Array<String>) {
     val request: Request = Request(Method.GET, Uri.uri("/?hello=123&hello"), listOf("hello" to "123"), "asd=23423&asd=23423".toBody())
-    println(Header.map { it.reversed() }.optional("hello")[request])
-    println(Header.optional("hello")[request])
+    println(Header.map { it.reversed() }.optional("hello")(request))
+    println(Header.optional("hello")(request))
 }
 
 //fun main(args: Array<String>) {
