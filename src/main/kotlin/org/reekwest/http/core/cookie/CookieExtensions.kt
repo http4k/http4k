@@ -9,6 +9,7 @@ import org.reekwest.http.core.cookie.Cookie.Attribute.HTTP_ONLY
 import org.reekwest.http.core.cookie.Cookie.Attribute.MAX_AGE
 import org.reekwest.http.core.cookie.Cookie.Attribute.PATH
 import org.reekwest.http.core.cookie.Cookie.Attribute.SECURE
+import org.reekwest.http.core.header
 import org.reekwest.http.core.replaceHeader
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -35,7 +36,7 @@ private fun Cookie.attribute(name: Cookie.Attribute, value: String): Cookie = at
 
 private val RFC822 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
 
-fun Response.cookie(cookie: Cookie): Response = copy(headers = headers.plus("Set-Cookie" to cookie.toString()))
+fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.toString())
 
 fun Response.removeCookie(name: String): Response = copy(headers = headers.filterNot { it.first == "Set-Cookie" && (it.second?.startsWith("$name=") ?: false) })
 
