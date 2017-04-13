@@ -8,47 +8,50 @@ import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.http.core.contract.*
+import org.reekwest.http.core.contract.Invalid
+import org.reekwest.http.core.contract.Missing
+import org.reekwest.http.core.contract.Query
+import org.reekwest.http.core.contract.int
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")
 
     @Test
     fun `value present`() {
-        assertThat(request[Query.optional("hello")], equalTo("world"))
-        assertThat(request[Query.required("hello")], equalTo("world"))
-        assertThat(request[Query.map { it.length }.required("hello")], equalTo(5))
-        assertThat(request[Query.map { it.length }.optional("hello")], equalTo(5))
+        assertThat(Query.optional("hello")(request), equalTo("world"))
+        assertThat(Query.required("hello")(request), equalTo("world"))
+        assertThat(Query.map { it.length }.required("hello")(request), equalTo(5))
+        assertThat(Query.map { it.length }.optional("hello")(request), equalTo(5))
 
         val expected: List<String?> = listOf("world", "world2")
-        assertThat(request[Query.multi.required("hello")], equalTo(expected))
-        assertThat(request[Query.multi.optional("hello")], equalTo(expected))
+        assertThat(Query.multi.required("hello")(request), equalTo(expected))
+        assertThat(Query.multi.optional("hello")(request), equalTo(expected))
     }
 
     @Test
     fun `value missing`() {
-        assertThat(request[Query.optional("world")], absent())
-        assertThat({ request[Query.required("world")] }, throws<Missing>())
+        assertThat(Query.optional("world")(request), absent())
+        assertThat({ Query.required("world")(request) }, throws<Missing>())
 
-        assertThat(request[Query.multi.optional("world")], equalTo(emptyList()))
-        assertThat({ request[Query.multi.required("world")] }, throws<Missing>())
+        assertThat(Query.multi.optional("world")(request), equalTo(emptyList()))
+        assertThat({ Query.multi.required("world")(request) }, throws<Missing>())
     }
 
     @Test
     fun `invalid value`() {
-        assertThat({ request[Query.map(String::toInt).required("hello")] }, throws<Invalid>())
-        assertThat({ request[Query.map(String::toInt).optional("hello")] }, throws<Invalid>())
+        assertThat({ Query.map(String::toInt).required("hello")(request) }, throws<Invalid>())
+        assertThat({ Query.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
 
-        assertThat({ request[Query.map(String::toInt).multi.required("hello")] }, throws<Invalid>())
-        assertThat({ request[Query.map(String::toInt).optional("hello")] }, throws<Invalid>())
+        assertThat({ Query.map(String::toInt).multi.required("hello")(request) }, throws<Invalid>())
+        assertThat({ Query.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
     }
 
     @Test
     fun `int`() {
-        assertThat(withQueryOf("/?hello=123")[Query.int().optional("hello")], equalTo(123))
-        assertThat(withQueryOf("/")[Query.int().optional("world")], absent())
+        assertThat(Query.int().optional("hello")(withQueryOf("/?hello=123")), equalTo(123))
+        assertThat(Query.int().optional("world")(withQueryOf("/")), absent())
         val badRequest = withQueryOf("/?hello=notAnumber")
-        assertThat({ badRequest[Query.int().optional("hello")] }, throws<Invalid>())
+        assertThat({ Query.int().optional("hello")(badRequest) }, throws<Invalid>())
     }
 
     private fun withQueryOf(value: String) = Request(GET, uri(value))

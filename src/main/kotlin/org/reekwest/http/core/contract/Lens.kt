@@ -3,9 +3,9 @@ package org.reekwest.http.core.contract
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 
-abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val spec: LensSpec<IN, OUT>) {
-    operator fun invoke(m: IN): FINAL = try {
-        convert(spec.fn(m, meta.name))
+abstract class Lens<in IN, in OUT, FINAL>(val meta: Meta, private val spec: LensSpec<IN, OUT>) {
+    operator fun invoke(target: IN): FINAL = try {
+        convert(spec.fn(target, meta.name))
     } catch (e: Missing) {
         throw e
     } catch (e: Exception) {
@@ -13,6 +13,8 @@ abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val spec: 
     }
 
     abstract internal fun convert(o: List<OUT?>?): FINAL
+
+    operator fun <R : IN> invoke(target: R, value: FINAL): R = TODO()
 }
 
 operator fun <T, FINAL> Request.get(lens: Lens<Request, T, FINAL>): FINAL = lens(this)

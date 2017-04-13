@@ -4,12 +4,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiLensSpec<in IN, OUT> {
+interface MultiLensSpec<IN, OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>?>
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
 }
 
-open class LensSpec<in IN, OUT>(private val location: String, val fn: (IN, String) -> List<OUT?>?) {
+open class LensSpec<IN, OUT>(private val location: String, val fn: (IN, String) -> List<OUT?>?) {
     fun <NEXT> map(next: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location)
     { req, name -> fn(req, name)?.let { it.map { it?.let(next) } } }
 

@@ -7,7 +7,10 @@ import org.junit.Test
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.body.Form
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.contract.*
+import org.reekwest.http.core.contract.Body
+import org.reekwest.http.core.contract.Invalid
+import org.reekwest.http.core.contract.form
+import org.reekwest.http.core.contract.string
 import org.reekwest.http.core.get
 
 class BodyTest {
@@ -15,7 +18,7 @@ class BodyTest {
     @Test
     fun `can get string body`() {
         val request = get("").copy(body = "some value".toBody())
-        assertThat(request[Body.string()], equalTo("some value"))
+        assertThat(Body.string()(request), equalTo("some value"))
     }
 
     @Test
@@ -24,7 +27,7 @@ class BodyTest {
             headers = listOf("Content-Type" to ContentType.APPLICATION_FORM_URLENCODED.value),
             body = "hello=world&another=planet".toBody())
         val expected: Form = listOf("hello" to "world", "another" to "planet")
-        assertThat(request[Body.form()], equalTo(expected))
+        assertThat(Body.form()(request), equalTo(expected))
     }
 
     @Test
@@ -32,7 +35,7 @@ class BodyTest {
         val request = get("").copy(
             headers = listOf("Content-Type" to "unknown"),
             body = "hello=world&another=planet".toBody())
-        assertThat({ request[Body.form()] }, throws<Invalid>())
+        assertThat({ Body.form()(request) }, throws<Invalid>())
     }
 
     data class MyCustomBodyType(val value: String)
