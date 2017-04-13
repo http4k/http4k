@@ -29,7 +29,6 @@ class HeaderTest {
 
     @Test
     fun `value missing`() {
-        val a = Header.optional("world")(request, "")
         assertThat(Header.optional("world")(request), absent())
         assertThat({ Header.required("world")(request) }, throws<Missing>())
 
@@ -44,6 +43,13 @@ class HeaderTest {
 
         assertThat({ Header.map(String::toInt).multi.required("hello")(request) }, throws<Invalid>())
         assertThat({ Header.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
+    }
+
+    @Test
+    fun `sets value on request`() {
+        val header = Header.required("bob")
+        val withHeader = header(request, "hello")
+        assertThat(header(withHeader), equalTo("hello"))
     }
 
     @Test
