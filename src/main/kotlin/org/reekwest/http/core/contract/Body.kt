@@ -21,7 +21,7 @@ object Body : BodySpec<ByteBuffer>(LensSpec<HttpMessage, ByteBuffer>(
     { target, _, bodies -> bodies.fold(target) { a, b -> a.copy(body = b) } }, { it }, { it })
 
 ) {
-    val string = Body.map { it: ByteBuffer -> String(it.array()) }
+    val string = Body.map({ it: ByteBuffer -> String(it.array()) }, { it.toByteBuffer()})
 }
 
 /**
