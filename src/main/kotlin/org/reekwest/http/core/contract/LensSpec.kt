@@ -11,29 +11,26 @@ interface MultiLensSpec<in IN, OUT : Any> {
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
 }
 
-open class LensSpec<IN, OUT : Any>(private val location: String,
-                                   internal val getFn: (IN, String) -> List<ByteBuffer?>?,
-                                   internal val setFn: (IN, String, List<ByteBuffer>) -> IN,
-                                   internal val deserialize: (ByteBuffer) -> OUT,
-                                   internal val serialize: (OUT) -> ByteBuffer
+open class LensSpec<IN, OUT : Any>(
+    internal val locator: Locator<IN, ByteBuffer>,
+    internal val deserialize: (ByteBuffer) -> OUT,
+    internal val serialize: (OUT) -> ByteBuffer
 ) {
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
-        getFn, setFn,
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(locator,
         deserialize.then(nextIn),
         { UTF_8.encode(it.toString()) })
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
-        getFn, setFn,
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(locator,
         deserialize.then(nextIn),
         nextOut.then(serialize)
     )
 
-    fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), this) {
+    fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, locator.name, false, description), this) {
         override fun convertIn(o: List<OUT?>?): OUT? = o?.firstOrNull()
         override fun convertOut(o: OUT?): List<OUT> = o?.let { listOf(it) } ?: emptyList()
     }
 
-    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, true, description), this) {
+    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.name, true, description), this) {
         override fun convertIn(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(meta)
         override fun convertOut(o: OUT): List<OUT> = listOf(o)
     }
@@ -41,12 +38,12 @@ open class LensSpec<IN, OUT : Any>(private val location: String,
     private val spec: LensSpec<IN, OUT> get() = this
 
     val multi = object : MultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), spec) {
+        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, locator.name, false, description), spec) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?): List<OUT> = o?.mapNotNull { it } ?: emptyList()
         }
 
-        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), spec) {
+        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, locator.name, true, description), spec) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(meta) else orEmpty
@@ -60,9 +57,11 @@ open class LensSpec<IN, OUT : Any>(private val location: String,
 open class StringLensSpec<IN>(location: String,
                               get: (IN, String) -> List<String?>?,
                               set: (IN, String, List<String>) -> IN)
-    : LensSpec<IN, String>(location, { target, name -> get(target, name)?.mapNotNull { it -> it?.toByteBuffer() } },
-    { target, name, values -> set(target, name, values.map { String(it.array()) }) },
-    { it -> String(it.array()) }, { it.toByteBuffer() }
+    : LensSpec<IN, String>(object : Locator<IN, ByteBuffer> {
+    override val name: String = location
+    override fun get(target: IN, name: String) = get(target, name)?.mapNotNull { it -> it?.toByteBuffer() }
+    override fun set(target: IN, name: String, values: List<ByteBuffer>) = set(target, name, values.map { String(it.array()) })
+}, { it -> String(it.array()) }, { it.toByteBuffer() }
 )
 // Extension methods for commonly used conversions
 
