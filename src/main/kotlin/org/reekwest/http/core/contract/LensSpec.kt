@@ -11,16 +11,21 @@ interface MultiLensSpec<in IN, OUT> {
 
 fun <A, B, C> Function1<A, B>.then(next: Function1<B, C>): Function1<A, C> = { next.invoke(this.invoke(it)) }
 
-open class LensSpec<IN, OUT>(private val location: String, val inFn: (IN, String) -> List<OUT?>?,
-                             val outFn: (OUT) -> String = { it.toString() }
+open class LensSpec<IN, OUT>(private val location: String,
+                             val get: (IN, String) -> List<OUT?>?,
+                             val set: (IN, String, OUT) -> IN
 ) {
-    fun <M : IN> set(m: M, value: OUT): M = throw IllegalArgumentException()
+    fun <M : IN> aset(m: M, value: OUT): M = throw IllegalArgumentException()
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
-        { req, name -> inFn(req, name)?.let { it.map { it?.let(nextIn) } } })
+        { req, name -> get(req, name)?.let { it.map { it?.let(nextIn) } } },
+        { req, name, out -> req }
+    )
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
-        { req, name -> inFn(req, name)?.let { it.map { it?.let(nextIn) } } }, nextOut.then(outFn))
+        { req, name -> get(req, name)?.let { it.map { it?.let(nextIn) } } },
+        { req, name, out -> set(req, name, nextOut(out)) }
+    )
 
     fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, location, description), this) {
         override fun convertIn(o: List<OUT?>?): OUT? = o?.firstOrNull()

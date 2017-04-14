@@ -2,7 +2,7 @@ package org.reekwest.http.core.contract
 
 abstract class Lens<in IN, OUT, FINAL>(val meta: Meta, private val spec: LensSpec<IN, OUT>) {
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(spec.inFn(target, meta.name))
+        convertIn(spec.get(target, meta.name))
     } catch (e: Missing) {
         throw e
     } catch (e: Exception) {
