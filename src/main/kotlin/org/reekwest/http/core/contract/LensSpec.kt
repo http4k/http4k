@@ -1,5 +1,7 @@
 package org.reekwest.http.core.contract
 
+import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -9,19 +11,16 @@ interface MultiLensSpec<in IN, OUT: Any> {
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
 }
 
-
-fun <A, B, C> Function1<A, B>.then(next: Function1<B, C>): Function1<A, C> = { next.invoke(this.invoke(it)) }
-
 open class LensSpec<IN, OUT : Any>(private val location: String,
-                                   val get: (IN, String) -> List<String?>?,
-                                   val set: (IN, String, List<String>) -> IN,
-                                   val deserialize: (String) -> OUT,
-                                   val serialize: (OUT) -> String
+                                   val get: (IN, String) -> List<ByteBuffer?>?,
+                                   val set: (IN, String, List<ByteBuffer>) -> IN,
+                                   val deserialize: (ByteBuffer) -> OUT,
+                                   val serialize: (OUT) -> ByteBuffer
 ) {
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
         get, set,
         deserialize.then(nextIn),
-        { s -> s.toString() })
+        { UTF_8.encode(it.toString()) })
 
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
         get, set,
