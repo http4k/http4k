@@ -15,7 +15,9 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
     abstract internal fun convertIn(o: List<OUT?>?): FINAL
     abstract internal fun convertOut(o: FINAL): List<OUT>
 
-    /**
+    infix fun <R : IN> to(value: FINAL): (R) -> R = { invoke(value, it)}
+
+        /**
      * The arguments to this method are in this specific order so we can partially apply several functions
      * and then fold them over a single target to modify.
      */
