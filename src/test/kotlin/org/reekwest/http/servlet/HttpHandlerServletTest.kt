@@ -9,7 +9,6 @@ import org.reekwest.http.apache.ApacheHttpClient
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.body.string
 import org.reekwest.http.core.get
 import org.reekwest.http.core.headerValues
 import org.reekwest.http.core.ok
@@ -35,7 +34,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/"))
 
-        assertThat(response.body.string(), equalTo("Hello World"))
+        assertThat(response.bodyString(), equalTo("Hello World"))
     }
 
     @Test
@@ -43,7 +42,7 @@ class HttpHandlerServletTest {
         val client = client
         val response = client(get("http://localhost:8000/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
 
-        assertThat(response.body.string(), equalTo("one, two, three"))
+        assertThat(response.bodyString(), equalTo("one, two, three"))
     }
 
     @After

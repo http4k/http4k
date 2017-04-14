@@ -5,8 +5,13 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.core.body.string
-import org.reekwest.http.core.contract.*
+import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.contract.Body
+import org.reekwest.http.core.contract.Header
+import org.reekwest.http.core.contract.Query
+import org.reekwest.http.core.contract.boolean
+import org.reekwest.http.core.contract.int
+import org.reekwest.http.core.contract.with
 import org.reekwest.http.core.get
 import org.reekwest.http.core.header
 import org.reekwest.http.core.query
@@ -23,7 +28,7 @@ class BindingValuesToMessagesTest {
             Query.boolean().required("boolean") to true
         )
 
-        assertThat(populated.body.string(), equalTo("the body"))
+        assertThat(populated.bodyString(), equalTo("the body"))
         assertThat(populated.header("intHeader"), equalTo("123"))
         assertThat(populated.query("boolean"), equalTo("true"))
     }
@@ -35,7 +40,7 @@ class BindingValuesToMessagesTest {
             Header.int().required("intHeader") to 123
         )
 
-        assertThat(populated.body.string(), equalTo("the body"))
+        assertThat(populated.bodyString(), equalTo("the body"))
         assertThat(populated.header("intHeader"), equalTo("123"))
     }
 }

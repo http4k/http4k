@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.body.Form
-import org.reekwest.http.core.body.string
+import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.contract.Body
 import org.reekwest.http.core.contract.Invalid
@@ -55,7 +55,7 @@ class BodyTest {
         val custom = MyCustomBodyType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)
 
-        assertThat(reqWithBody.body.string(), equalTo("hello world!"))
+        assertThat(reqWithBody.bodyString(), equalTo("hello world!"))
 
         assertThat(customBody(reqWithBody), equalTo(MyCustomBodyType("hello world!")))
     }

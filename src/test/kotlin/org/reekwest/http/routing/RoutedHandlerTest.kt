@@ -9,7 +9,6 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.body.string
 import org.reekwest.http.core.get
 import org.reekwest.http.core.ok
 import org.reekwest.http.core.post
@@ -45,7 +44,7 @@ class RoutedHandlerTest {
 
         val response = routes(get("/a/something"))
 
-        assertThat(response.body.string(), equalTo("matched"))
+        assertThat(response.bodyString(), equalTo("matched"))
     }
 
     @Test
@@ -57,7 +56,7 @@ class RoutedHandlerTest {
 
         val response = routes(get("/a/something"))
 
-        assertThat(response.body.string(), equalTo("matched a"))
+        assertThat(response.bodyString(), equalTo("matched a"))
     }
 
     @Test
@@ -67,7 +66,7 @@ class RoutedHandlerTest {
         )
 
         val response = routes(get("/x/y/z"))
-        assertThat(response.body.string(), equalTo("matched x, y, z"))
+        assertThat(response.bodyString(), equalTo("matched x, y, z"))
     }
 
     @Test

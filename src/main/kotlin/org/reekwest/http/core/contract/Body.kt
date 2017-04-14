@@ -1,9 +1,13 @@
 package org.reekwest.http.core.contract
 
-import org.reekwest.http.core.*
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.reekwest.http.core.body.string
+import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.core.Request
+import org.reekwest.http.core.body
+import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
+import org.reekwest.http.core.copy
+import org.reekwest.http.core.toParameters
 import java.nio.ByteBuffer
 
 open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>) {
@@ -34,7 +38,7 @@ fun Body.string(description: String? = null) = Body.string.required(description)
 fun Body.form() = StringLensSpec<Request>("form", {
     target, _ ->
     if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(Meta("form", "body", true))
-    else listOf(target.body.string())
+    else listOf(target.bodyString())
 },
     { target, _, formBody -> formBody.fold(target, { memo, next -> memo.body(next.toByteBuffer()) }) }
 ).map { it.toParameters() }.required("body")

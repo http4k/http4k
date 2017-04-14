@@ -6,7 +6,6 @@ import org.junit.Test
 import org.reekwest.http.core.body.bodyForm
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.form
-import org.reekwest.http.core.body.string
 
 class HttpHandlerTest {
     @Test
@@ -30,7 +29,7 @@ class HttpHandlerTest {
 
         val response = handler(post("irrelevant").bodyForm(form))
 
-        assertThat(response.body.string(), equalTo("Hello, John Doe"))
+        assertThat(response.bodyString(), equalTo("Hello, John Doe"))
     }
 }
 
