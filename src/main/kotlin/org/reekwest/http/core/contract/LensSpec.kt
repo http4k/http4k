@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiLensSpec<in IN, OUT: Any> {
+interface MultiLensSpec<in IN, OUT : Any> {
     fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>?>
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
 }
@@ -58,6 +58,13 @@ open class LensSpec<IN, OUT : Any>(private val location: String,
     }
 }
 
+open class StringLensSpec<IN>(location: String,
+                              get: (IN, String) -> List<String?>?,
+                              set: (IN, String, List<String>) -> IN)
+    : LensSpec<IN, String>(location, { target, name -> get(target, name)?.mapNotNull { it -> it?.toByteBuffer() } },
+    { target, name, values -> set(target, name, values.map { String(it.array()) }) },
+    { it -> String(it.array()) }, { it.toByteBuffer() }
+)
 // Extension methods for commonly used conversions
 
 fun <IN> LensSpec<IN, String>.int(): LensSpec<IN, Int> = this.map(String::toInt)
