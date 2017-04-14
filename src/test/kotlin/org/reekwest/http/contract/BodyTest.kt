@@ -48,8 +48,6 @@ class BodyTest {
         assertThat(body(withBody), equalTo("hello"))
     }
 
-    data class MyCustomBodyType(val value: String)
-
     @Test
     fun `can create a custom Body type and get and set on request`() {
         val customBody = Body.string.map({ MyCustomBodyType(it) }, { it.value }).required()

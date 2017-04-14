@@ -12,6 +12,8 @@ import org.reekwest.http.core.contract.Invalid
 import org.reekwest.http.core.contract.Missing
 import org.reekwest.http.core.contract.Query
 import org.reekwest.http.core.contract.int
+import org.reekwest.http.core.get
+import org.reekwest.http.core.query
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")
@@ -59,6 +61,18 @@ class QueryTest {
         val query = Query.required("bob")
         val withQuery = query("hello", request)
         assertThat(query(withQuery), equalTo("hello"))
+    }
+
+    @Test
+    fun `can create a custom type and get and set on request`() {
+        val custom = Query.map({ MyCustomBodyType(it) }, { it.value }).required("bob")
+
+        val instance = MyCustomBodyType("hello world!")
+        val reqWithQuery = custom(instance, get(""))
+
+        assertThat(reqWithQuery.query("bob"), equalTo("hello world!"))
+
+        assertThat(custom(reqWithQuery), equalTo(MyCustomBodyType("hello world!")))
     }
 
     private fun withQueryOf(value: String) = Request(GET, uri(value))

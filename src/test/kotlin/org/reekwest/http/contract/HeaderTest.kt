@@ -11,6 +11,8 @@ import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.contract.Header
 import org.reekwest.http.core.contract.Invalid
 import org.reekwest.http.core.contract.Missing
+import org.reekwest.http.core.get
+import org.reekwest.http.core.header
 
 class HeaderTest {
     private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
@@ -51,6 +53,19 @@ class HeaderTest {
         val withHeader = header("hello", request)
         assertThat(header(withHeader), equalTo("hello"))
     }
+
+    @Test
+    fun `can create a custom type and get and set on request`() {
+        val custom = Header.map({ MyCustomBodyType(it) }, { it.value }).required("bob")
+
+        val instance = MyCustomBodyType("hello world!")
+        val reqWithHeader = custom(instance, get(""))
+
+        assertThat(reqWithHeader.header("bob"), equalTo("hello world!"))
+
+        assertThat(custom(reqWithHeader), equalTo(MyCustomBodyType("hello world!")))
+    }
+
 
     @Test
     fun `toString is ok`() {
