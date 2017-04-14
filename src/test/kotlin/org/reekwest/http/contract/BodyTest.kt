@@ -3,16 +3,12 @@ package org.reekwest.http.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.body.Form
 import org.reekwest.http.core.body.string
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.contract.Body
-import org.reekwest.http.core.contract.Invalid
-import org.reekwest.http.core.contract.form
-import org.reekwest.http.core.contract.string
+import org.reekwest.http.core.contract.*
 import org.reekwest.http.core.get
 
 class BodyTest {
@@ -52,9 +48,8 @@ class BodyTest {
     data class MyCustomBodyType(val value: String)
 
     @Test
-    @Ignore
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string.map(::MyCustomBodyType, { it.value }).required()
+        val customBody = Body.map({ MyCustomBodyType(String(it.array())) }, { it.value.toByteBuffer() }).required()
 
         val custom = MyCustomBodyType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)

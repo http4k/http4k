@@ -18,7 +18,7 @@ open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>)
 object Body : BodySpec<ByteBuffer>(LensSpec<HttpMessage, ByteBuffer>(
     "body",
     { target, _ -> listOf(target.body) },
-    { target, _, body -> body.fold(target) { a, b -> a.copy(body = b) } }, { it }, { it })
+    { target, _, bodies -> bodies.fold(target) { a, b -> a.copy(body = b) } }, { it }, { it })
 
 ) {
     val string = Body.map { it: ByteBuffer -> String(it.array()) }
