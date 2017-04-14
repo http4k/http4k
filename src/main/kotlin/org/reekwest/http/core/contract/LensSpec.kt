@@ -12,18 +12,18 @@ interface MultiLensSpec<in IN, OUT : Any> {
 }
 
 open class LensSpec<IN, OUT : Any>(private val location: String,
-                                   val get: (IN, String) -> List<ByteBuffer?>?,
-                                   val set: (IN, String, List<ByteBuffer>) -> IN,
+                                   val getFn: (IN, String) -> List<ByteBuffer?>?,
+                                   val setFn: (IN, String, List<ByteBuffer>) -> IN,
                                    val deserialize: (ByteBuffer) -> OUT,
                                    val serialize: (OUT) -> ByteBuffer
 ) {
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
-        get, set,
+        getFn, setFn,
         deserialize.then(nextIn),
         { UTF_8.encode(it.toString()) })
 
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
-        get, set,
+        getFn, setFn,
         deserialize.then(nextIn),
         nextOut.then(serialize)
     )

@@ -39,16 +39,15 @@ class BodyTest {
     }
 
     data class MyCustomBodyType(val value: String)
-//
-//    @Test
-//    fun `can create a custom Body type`() {
-//
-//        fun Body.toCustomType() = Body.map { String(it.array()) }.map(::MyCustomBodyType)
-//
-//        val request = get("").copy(
-//            body = "hello world!".toBody())
-//        assertThat(request[Body.toCustomType()], equalTo(MyCustomBodyType("hello world!")))
-//    }
+
+    @Test
+    fun `can create a custom Body type`() {
+        fun Body.toCustomType() = Body.map { String(it.array()) }.map(::MyCustomBodyType).get("bob")
+
+        val request = get("").copy(
+            body = "hello world!".toBody())
+        assertThat(Body.toCustomType()(request), equalTo(MyCustomBodyType("hello world!")))
+    }
 }
 
 

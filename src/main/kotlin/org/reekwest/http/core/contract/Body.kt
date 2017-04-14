@@ -9,15 +9,26 @@ import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.toParameters
 import java.nio.ByteBuffer
 
-object Body : LensSpec<HttpMessage, ByteBuffer>("body",
+open class BodySpec<OUT: Any>(private val delegate: LensSpec<HttpMessage, OUT>) {
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): BodySpec<NEXT> = BodySpec(delegate.map(nextIn))
+
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BodySpec<NEXT> =
+        BodySpec(delegate.map(nextIn, nextOut))
+
+    fun get(description: String? = null) = delegate.required("body", description)
+}
+
+object Body : BodySpec<ByteBuffer>(LensSpec<HttpMessage, ByteBuffer>(
+    "body",
     { target, _ -> listOf(target.body) },
     { target, _, bytes -> target }, { it }, { it })
+)
 
 /**
  * Extension functions for various body types
  */
 
-fun Body.string(description: String? = null) = Body.map { String(it.array()) }.required("body", description)
+fun Body.string(description: String? = null) = Body.map { String(it.array()) }.get(description)
 
 fun Body.form() = StringLensSpec<Request>("form", {
     message, _ ->
