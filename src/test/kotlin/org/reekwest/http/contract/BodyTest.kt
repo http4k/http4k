@@ -40,7 +40,7 @@ class BodyTest {
 
     @Test
     fun `sets value on request`() {
-        val body = Body.string.get()
+        val body = Body.string.required()
         val withBody = body(get(""), "hello")
         assertThat(body(withBody), equalTo("hello"))
     }
@@ -49,7 +49,7 @@ class BodyTest {
 
     @Test
     fun `can create a custom Body type`() {
-        fun Body.toCustomType() = Body.string.map(::MyCustomBodyType).get("bob")
+        fun Body.toCustomType() = Body.string.map(::MyCustomBodyType).required("bob")
 
         val request = get("").copy(
             body = "hello world!".toBody())

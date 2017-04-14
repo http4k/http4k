@@ -12,7 +12,7 @@ open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>)
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BodySpec<NEXT> =
         BodySpec(delegate.map(nextIn, nextOut))
 
-    fun get(description: String? = null) = delegate.required("body", description)
+    fun required(description: String? = null) = delegate.required("body", description)
 }
 
 object Body : BodySpec<ByteBuffer>(LensSpec<HttpMessage, ByteBuffer>(
@@ -28,7 +28,7 @@ object Body : BodySpec<ByteBuffer>(LensSpec<HttpMessage, ByteBuffer>(
  * Extension functions for various body types
  */
 
-fun Body.string(description: String? = null) = Body.string.get(description)
+fun Body.string(description: String? = null) = Body.string.required(description)
 
 fun Body.form() = StringLensSpec<Request>("form", {
     target, _ ->
