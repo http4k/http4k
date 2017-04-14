@@ -4,37 +4,39 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiLensSpec<in IN, OUT> {
+interface MultiLensSpec<in IN, OUT: Any> {
     fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>?>
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
 }
 
+
 fun <A, B, C> Function1<A, B>.then(next: Function1<B, C>): Function1<A, C> = { next.invoke(this.invoke(it)) }
 
-open class LensSpec<IN, OUT>(private val location: String,
-                             val get: (IN, String) -> List<OUT?>?,
-                             val set: (IN, String, OUT) -> IN
+open class LensSpec<IN, OUT : Any>(private val location: String,
+                                   val get: (IN, String) -> List<String?>?,
+                                   val set: (IN, String, List<String>) -> IN,
+                                   val deserialize: (String) -> OUT,
+                                   val serialize: (OUT) -> String
 ) {
-    fun <M : IN> aset(m: M, value: OUT): M = throw IllegalArgumentException()
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
+        get, set,
+        deserialize.then(nextIn),
+        { s -> s.toString() })
 
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
-        { req, name -> get(req, name)?.let { it.map { it?.let(nextIn) } } },
-        { req, name, out -> req }
-    )
-
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
-        { req, name -> get(req, name)?.let { it.map { it?.let(nextIn) } } },
-        { req, name, out -> set(req, name, nextOut(out)) }
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location,
+        get, set,
+        deserialize.then(nextIn),
+        nextOut.then(serialize)
     )
 
     fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, location, description), this) {
         override fun convertIn(o: List<OUT?>?): OUT? = o?.firstOrNull()
-        override fun convertOut(o: OUT?): OUT = TODO("not implemented")
+        override fun convertOut(o: OUT?): List<OUT> = o?.let { listOf(it) } ?: emptyList()
     }
 
     fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, description), this) {
         override fun convertIn(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(meta)
-        override fun convertOut(o: OUT): OUT = TODO("not implemented")
+        override fun convertOut(o: OUT): List<OUT> = listOf(o)
     }
 
     internal val id: LensSpec<IN, OUT>
@@ -43,7 +45,7 @@ open class LensSpec<IN, OUT>(private val location: String,
     val multi = object : MultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, description), id) {
             override fun convertIn(o: List<OUT?>?) = o
-            override fun convertOut(o: List<OUT?>?): OUT = TODO("not implemented")
+            override fun convertOut(o: List<OUT?>?): List<OUT> = o?.mapNotNull { it } ?: emptyList()
         }
 
         override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, description), id) {
@@ -52,7 +54,7 @@ open class LensSpec<IN, OUT>(private val location: String,
                 return if (orEmpty.isEmpty()) throw Missing(meta) else orEmpty
             }
 
-            override fun convertOut(o: List<OUT?>): OUT = TODO("not implemented")
+            override fun convertOut(o: List<OUT?>): List<OUT> = o.mapNotNull { it }
         }
     }
 }

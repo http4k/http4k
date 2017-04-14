@@ -54,6 +54,15 @@ class QueryTest {
         assertThat({ Query.int().optional("hello")(badRequest) }, throws<Invalid>())
     }
 
+
+    @Test
+    fun `sets value on request`() {
+        val query = Query.required("bob")
+        val withQuery = query(request, "hello")
+        assertThat(query(withQuery), equalTo("hello"))
+    }
+
+
     private fun withQueryOf(value: String) = Request(GET, uri(value))
 //
 //    @Test
