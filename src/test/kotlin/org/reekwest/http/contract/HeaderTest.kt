@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
@@ -47,7 +46,6 @@ class HeaderTest {
     }
 
     @Test
-    @Ignore
     fun `sets value on request`() {
         val header = Header.required("bob")
         val withHeader = header(request, "hello")
@@ -56,10 +54,10 @@ class HeaderTest {
 
     @Test
     fun `toString is ok`() {
-//        assertThat(Header.required("hello").toString(), equalTo("Required header 'hello'"))
-//        assertThat(Header.optional("hello").toString(), equalTo("Optional header 'hello'"))
-//        assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
-//        assertThat(Header.multi.optional("hello").toString(), equalTo("Optional header 'hello'"))
+        assertThat(Header.required("hello").toString(), equalTo("Required header 'hello'"))
+        assertThat(Header.optional("hello").toString(), equalTo("Optional header 'hello'"))
+        assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
+        assertThat(Header.multi.optional("hello").toString(), equalTo("Optional header 'hello'"))
     }
 
 }

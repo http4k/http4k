@@ -54,7 +54,6 @@ class QueryTest {
         assertThat({ Query.int().optional("hello")(badRequest) }, throws<Invalid>())
     }
 
-
     @Test
     fun `sets value on request`() {
         val query = Query.required("bob")
@@ -62,14 +61,13 @@ class QueryTest {
         assertThat(query(withQuery), equalTo("hello"))
     }
 
-
     private fun withQueryOf(value: String) = Request(GET, uri(value))
-//
-//    @Test
-//    fun `toString is ok`() {
-//        assertThat(Query.required("hello").toString(), equalTo("Required query 'hello'"))
-//        assertThat(Query.optional("hello").toString(), equalTo("Optional query 'hello'"))
-//        assertThat(Query.multi.required("hello").toString(), equalTo("Required query 'hello'"))
-//        assertThat(Query.multi.optional("hello").toString(), equalTo("Optional query 'hello'"))
-//    }
+
+    @Test
+    fun `toString is ok`() {
+        assertThat(Query.required("hello").toString(), equalTo("Required query 'hello'"))
+        assertThat(Query.optional("hello").toString(), equalTo("Optional query 'hello'"))
+        assertThat(Query.multi.required("hello").toString(), equalTo("Required query 'hello'"))
+        assertThat(Query.multi.optional("hello").toString(), equalTo("Optional query 'hello'"))
+    }
 }

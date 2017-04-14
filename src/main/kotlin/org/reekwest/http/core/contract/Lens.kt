@@ -1,6 +1,11 @@
 package org.reekwest.http.core.contract
 
 abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: LensSpec<IN, OUT>) {
+
+    override fun toString(): String {
+        return "${if(meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
+    }
+
     operator fun invoke(target: IN): FINAL = try {
         convertIn(spec.getFn(target, meta.name)?.let { it.map { it?.let(spec.deserialize) } })
     } catch (e: Missing) {

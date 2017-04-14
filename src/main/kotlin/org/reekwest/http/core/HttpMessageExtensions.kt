@@ -12,7 +12,7 @@ fun Request.body(body: Body) = copy(body = body)
 
 fun Response.body(body: Body) = copy(body = body)
 
-private fun <T : HttpMessage> T.copy(headers: Headers = this.headers, body: Body? = this.body): T = when (this) {
+internal fun <T : HttpMessage> T.copy(headers: Headers = this.headers, body: Body? = this.body): T = when (this) {
     is Request -> this.copy(headers = headers, body = body) as T
     is Response -> this.copy(headers = headers, body = body) as T
     else -> throw IllegalStateException("Unknown class $this")
