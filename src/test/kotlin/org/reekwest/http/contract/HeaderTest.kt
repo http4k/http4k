@@ -48,7 +48,7 @@ class HeaderTest {
     @Test
     fun `sets value on request`() {
         val header = Header.required("bob")
-        val withHeader = header(request, "hello")
+        val withHeader = header("hello", request)
         assertThat(header(withHeader), equalTo("hello"))
     }
 

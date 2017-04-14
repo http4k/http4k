@@ -57,7 +57,7 @@ class QueryTest {
     @Test
     fun `sets value on request`() {
         val query = Query.required("bob")
-        val withQuery = query(request, "hello")
+        val withQuery = query("hello", request)
         assertThat(query(withQuery), equalTo("hello"))
     }
 
