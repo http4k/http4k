@@ -12,10 +12,10 @@ interface MultiLensSpec<in IN, OUT : Any> {
 }
 
 open class LensSpec<IN, OUT : Any>(private val location: String,
-                                   val getFn: (IN, String) -> List<ByteBuffer?>?,
-                                   val setFn: (IN, String, List<ByteBuffer>) -> IN,
-                                   val deserialize: (ByteBuffer) -> OUT,
-                                   val serialize: (OUT) -> ByteBuffer
+                                   internal val getFn: (IN, String) -> List<ByteBuffer?>?,
+                                   internal val setFn: (IN, String, List<ByteBuffer>) -> IN,
+                                   internal val deserialize: (ByteBuffer) -> OUT,
+                                   internal val serialize: (OUT) -> ByteBuffer
 ) {
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location,
         getFn, setFn,
@@ -38,16 +38,15 @@ open class LensSpec<IN, OUT : Any>(private val location: String,
         override fun convertOut(o: OUT): List<OUT> = listOf(o)
     }
 
-    internal val id: LensSpec<IN, OUT>
-        get() = this
+    private val spec: LensSpec<IN, OUT> get() = this
 
     val multi = object : MultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), id) {
+        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), spec) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?): List<OUT> = o?.mapNotNull { it } ?: emptyList()
         }
 
-        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), id) {
+        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), spec) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(meta) else orEmpty
