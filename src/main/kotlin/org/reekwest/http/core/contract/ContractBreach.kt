@@ -1,6 +1,10 @@
 package org.reekwest.http.core.contract
 
-sealed class ContractBreach(meta: Meta) : Exception(meta.toString())
+data class ContractBreach(val failures: List<ExtractionFailure>) : Exception(failures.map { it.toString() }.joinToString()) {
 
-class Missing(meta: Meta) : ContractBreach(meta)
-class Invalid(meta: Meta) : ContractBreach(meta)
+    companion object {
+        fun invoke(vararg failures: ExtractionFailure) = ContractBreach(failures.toList())
+        fun Missing(vararg lenses: Lens<*, *, *>) = ContractBreach(lenses.map { Missing(it.meta) }.toList())
+        fun Invalid(vararg lenses: Lens<*, *, *>) = ContractBreach(lenses.map { Invalid(it.meta) }.toList())
+    }
+}

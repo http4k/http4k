@@ -13,4 +13,3 @@ object Header : StringLensSpec<HttpMessage>("header",
         val CONTENT_TYPE = map(::ContentType).optional("Content-Type")
     }
 }
-

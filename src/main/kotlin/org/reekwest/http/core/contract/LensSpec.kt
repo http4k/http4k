@@ -1,5 +1,6 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
@@ -31,7 +32,7 @@ open class LensSpec<IN, OUT : Any>(
     }
 
     fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.name, true, description), this) {
-        override fun convertIn(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(meta)
+        override fun convertIn(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT): List<OUT> = listOf(o)
     }
 
@@ -46,7 +47,7 @@ open class LensSpec<IN, OUT : Any>(
         override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, locator.name, true, description), spec) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
-                return if (orEmpty.isEmpty()) throw Missing(meta) else orEmpty
+                return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty
             }
 
             override fun convertOut(o: List<OUT?>): List<OUT> = o.mapNotNull { it }

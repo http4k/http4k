@@ -8,8 +8,8 @@ import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.http.core.contract.Invalid
-import org.reekwest.http.core.contract.Missing
+import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.contract.Query
 import org.reekwest.http.core.contract.int
 import org.reekwest.http.core.get
@@ -33,27 +33,39 @@ class QueryTest {
     @Test
     fun `value missing`() {
         assertThat(Query.optional("world")(request), absent())
-        assertThat({ Query.required("world")(request) }, throws<Missing>())
+
+        val requiredQuery = Query.required("world")
+        assertThat({ requiredQuery(request) }, throws(equalTo(Missing(requiredQuery))))
 
         assertThat(Query.multi.optional("world")(request), equalTo(emptyList()))
-        assertThat({ Query.multi.required("world")(request) }, throws<Missing>())
+        val optionalMultiQuery = Query.multi.required("world")
+        assertThat({ optionalMultiQuery(request) }, throws(equalTo(Missing(optionalMultiQuery))))
     }
 
     @Test
     fun `invalid value`() {
-        assertThat({ Query.map(String::toInt).required("hello")(request) }, throws<Invalid>())
-        assertThat({ Query.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
+        val requiredQuery = Query.map(String::toInt).required("hello")
+        assertThat({ requiredQuery(request) }, throws(equalTo(Invalid(requiredQuery))))
 
-        assertThat({ Query.map(String::toInt).multi.required("hello")(request) }, throws<Invalid>())
-        assertThat({ Query.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
+        val optionalQuery = Query.map(String::toInt).optional("hello")
+        assertThat({ optionalQuery(request) }, throws(equalTo(Invalid(optionalQuery))))
+
+        val requiredMultiQuery = Query.map(String::toInt).multi.required("hello")
+        assertThat({ requiredMultiQuery(request) }, throws(equalTo(Invalid(requiredMultiQuery))))
+
+        val optionalMultiQuery = Query.map(String::toInt).multi.optional("hello")
+        assertThat({ optionalMultiQuery(request) }, throws(equalTo(Invalid(optionalMultiQuery))))
     }
 
     @Test
     fun `int`() {
-        assertThat(Query.int().optional("hello")(withQueryOf("/?hello=123")), equalTo(123))
+        val optionalQuery = Query.int().optional("hello")
+        assertThat(optionalQuery(withQueryOf("/?hello=123")), equalTo(123))
+
         assertThat(Query.int().optional("world")(withQueryOf("/")), absent())
+
         val badRequest = withQueryOf("/?hello=notAnumber")
-        assertThat({ Query.int().optional("hello")(badRequest) }, throws<Invalid>())
+        assertThat({ optionalQuery(badRequest) }, throws(equalTo(Invalid(optionalQuery))))
     }
 
     @Test

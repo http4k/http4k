@@ -6,10 +6,10 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
 
     operator fun invoke(target: IN): FINAL = try {
         convertIn(spec.locator.get(target, meta.name)?.let { it.map { it?.let(spec.deserialize) } })
-    } catch (e: Missing) {
+    } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
-        throw Invalid(meta)
+        throw ContractBreach.Invalid(this)
     }
 
     abstract internal fun convertIn(o: List<OUT?>?): FINAL

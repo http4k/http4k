@@ -8,9 +8,10 @@ import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.contract.Header
-import org.reekwest.http.core.contract.Invalid
-import org.reekwest.http.core.contract.Missing
+import org.reekwest.http.core.contract.int
 import org.reekwest.http.core.get
 import org.reekwest.http.core.header
 
@@ -32,19 +33,39 @@ class HeaderTest {
     @Test
     fun `value missing`() {
         assertThat(Header.optional("world")(request), absent())
-        assertThat({ Header.required("world")(request) }, throws<Missing>())
+        val requiredHeader = Header.required("world")
+        assertThat({ requiredHeader(request) }, throws(equalTo(Missing(requiredHeader))))
 
         assertThat(Header.multi.optional("world")(request), equalTo(emptyList()))
-        assertThat({ Header.multi.required("world")(request) }, throws<Missing>())
+        val optionalMultiHeader = Header.multi.required("world")
+        assertThat({ optionalMultiHeader(request) }, throws(equalTo(Missing(optionalMultiHeader))))
     }
 
     @Test
     fun `invalid value`() {
-        assertThat({ Header.map(String::toInt).required("hello")(request) }, throws<Invalid>())
-        assertThat({ Header.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
+        val requiredHeader = Header.map(String::toInt).required("hello")
+        assertThat({ requiredHeader(request) }, throws(equalTo(Invalid(requiredHeader))))
 
-        assertThat({ Header.map(String::toInt).multi.required("hello")(request) }, throws<Invalid>())
-        assertThat({ Header.map(String::toInt).optional("hello")(request) }, throws<Invalid>())
+        val optionalHeader = Header.map(String::toInt).optional("hello")
+        assertThat({ optionalHeader(request) }, throws(equalTo(Invalid(optionalHeader))))
+
+        val requiredMultiHeader = Header.map(String::toInt).multi.required("hello")
+        assertThat({ requiredMultiHeader(request) }, throws(equalTo(Invalid(requiredMultiHeader))))
+
+        val optionalMultiHeader = Header.map(String::toInt).multi.optional("hello")
+        assertThat({ optionalMultiHeader(request) }, throws(equalTo(Invalid(optionalMultiHeader))))
+    }
+
+    @Test
+    fun `int`() {
+        val optionalHeader = Header.int().optional("hello")
+        val requestWithHeader = withHeaderOf("123")
+        assertThat(optionalHeader(requestWithHeader), equalTo(123))
+
+        assertThat(Header.int().optional("world")(withHeaderOf("/")), absent())
+
+        val badRequest = withHeaderOf("/?hello=notAnumber")
+        assertThat({ optionalHeader(badRequest) }, throws(equalTo(Invalid(optionalHeader))))
     }
 
     @Test
@@ -66,6 +87,7 @@ class HeaderTest {
         assertThat(custom(reqWithHeader), equalTo(MyCustomBodyType("hello world!")))
     }
 
+    private fun withHeaderOf(s: String) = Request(GET, uri("/"), listOf("hello" to s))
 
     @Test
     fun `toString is ok`() {
@@ -74,5 +96,4 @@ class HeaderTest {
         assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
         assertThat(Header.multi.optional("hello").toString(), equalTo("Optional header 'hello'"))
     }
-
 }
