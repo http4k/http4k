@@ -35,9 +35,18 @@ private val formSpec: BodySpec<FormFields> = BodySpec(LensSpec(FormLocator,
 
 fun Body.form() = formSpec.required("form")
 
-fun Body.validatingForm(vararg formFields: Lens<ValidatingForm, *, *>) =
+enum class FormValidator : (WebForm) -> WebForm {
+    Strict {
+        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw ContractBreach(form.errors)
+    },
+    Feedback {
+        override fun invoke(form: WebForm): WebForm = form
+    };
+}
+
+fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
     formSpec.map({
-        val formInstance = ValidatingForm(it)
+        val formInstance = WebForm(it, emptyList())
         val failures = formFields.fold(listOf<ExtractionFailure>()) {
             memo, next ->
             try {
@@ -47,13 +56,13 @@ fun Body.validatingForm(vararg formFields: Lens<ValidatingForm, *, *>) =
                 memo.plus(e.failures)
             }
         }
-        if (failures.isEmpty()) formInstance else throw ContractBreach(failures)
+        validator(formInstance.copy(errors = failures))
     }, { it.fields }).required("form")
 
-data class ValidatingForm constructor(val fields: Map<String, List<String>>) {
-    operator fun plus(kv: Pair<String, String>): ValidatingForm =
+data class WebForm constructor(val fields: Map<String, List<String>>, val errors: List<ExtractionFailure>) {
+    operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
-    fun with(vararg modifiers: (ValidatingForm) -> ValidatingForm): ValidatingForm = modifiers.fold(this, { memo, next -> next(memo) })
+    fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
 }
 

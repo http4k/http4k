@@ -8,6 +8,8 @@ import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.contract.*
 import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.core.contract.FormValidator.Feedback
+import org.reekwest.http.core.contract.FormValidator.Strict
 import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.get
 
@@ -33,13 +35,13 @@ class FormTest {
     }
 
     @Test
-    fun `validating form blows up if not URL content type`() {
+    fun `web form blows up if not URL content type`() {
         val request = emptyRequest.copy(
             headers = listOf("Content-Type" to "unknown"),
             body = "hello=world&another=123".toBody())
 
         assertThat({
-            Body.validatingForm(
+            Body.webForm(Strict,
                 FormField.required("hello"),
                 FormField.int().required("another")
             )(request)
@@ -47,21 +49,34 @@ class FormTest {
     }
 
     @Test
-    fun `validating form extracts ok form values`() {
+    fun `web form extracts ok form values`() {
         val request = emptyRequest.copy(
             headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
             body = "hello=world&another=123".toBody())
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
-        assertThat(Body.validatingForm(
+        assertThat(Body.webForm(Strict,
             FormField.required("hello"),
             FormField.int().required("another")
-        )(request), equalTo(ValidatingForm(expected)))
+        )(request), equalTo(WebForm(expected, emptyList())))
     }
 
     @Test
-    fun `validating form blows up with invalid form values`() {
+    fun `feedback web form extracts ok form values and errors`() {
+        val request = emptyRequest.copy(
+            headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
+            body = "another=123".toBody())
+
+        val requiredString = FormField.required("hello")
+        assertThat(Body.webForm(Feedback,
+            requiredString,
+            FormField.int().required("another")
+        )(request), equalTo(WebForm(mapOf("another" to listOf("123")), listOf(Missing(requiredString.meta)))))
+    }
+
+    @Test
+    fun `strict web form blows up with invalid form values`() {
         val request = emptyRequest.copy(
             headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
             body = "another=notANumber".toBody())
@@ -69,7 +84,7 @@ class FormTest {
         val stringRequiredField = FormField.required("hello")
         val intRequiredField = FormField.int().required("another")
         assertThat(
-            { Body.validatingForm(stringRequiredField, intRequiredField)(request) },
+            { Body.webForm(Strict, stringRequiredField, intRequiredField)(request) },
             throws(equalTo(ContractBreach(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta))))
         )
     }
