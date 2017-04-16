@@ -1,15 +1,9 @@
 package org.reekwest.http.routing
 
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Method
-import org.reekwest.http.core.Request
-import org.reekwest.http.core.Response
-import org.reekwest.http.core.Status
+import org.reekwest.http.core.*
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.http.core.UriTemplate
 import org.reekwest.http.core.UriTemplate.Companion.uriTemplate
-import org.reekwest.http.core.findSingle
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 

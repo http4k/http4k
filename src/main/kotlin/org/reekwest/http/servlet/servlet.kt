@@ -1,12 +1,6 @@
 package org.reekwest.http.servlet
 
-import org.reekwest.http.core.Headers
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Method
-import org.reekwest.http.core.Parameters
-import org.reekwest.http.core.Request
-import org.reekwest.http.core.Response
-import org.reekwest.http.core.Uri
+import org.reekwest.http.core.*
 import java.nio.ByteBuffer
 import java.util.*
 import javax.servlet.http.HttpServlet

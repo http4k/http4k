@@ -1,9 +1,9 @@
 package org.reekwest.http.core
 
-import org.reekwest.http.core.Method.GET
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.Method.GET
 
 class RequestTest {
 

@@ -1,9 +1,9 @@
 package org.reekwest.http.core
 
-import org.reekwest.http.core.UriTemplate.Companion.uriTemplate
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.UriTemplate.Companion.uriTemplate
 
 class UriTemplateTest {
 

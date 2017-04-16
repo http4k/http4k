@@ -6,12 +6,7 @@ import org.junit.Test
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.contract.Body
-import org.reekwest.http.core.contract.Header
-import org.reekwest.http.core.contract.Query
-import org.reekwest.http.core.contract.boolean
-import org.reekwest.http.core.contract.int
-import org.reekwest.http.core.contract.with
+import org.reekwest.http.core.contract.*
 import org.reekwest.http.core.get
 import org.reekwest.http.core.header
 import org.reekwest.http.core.query

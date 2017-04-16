@@ -16,8 +16,8 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-data class CookieAttribute(val name:String){
-    companion object{
+data class CookieAttribute(val name: String) {
+    companion object {
         val COMMENT = CookieAttribute("Comment")
         val DOMAIN = CookieAttribute("Domain")
         val MAX_AGE = CookieAttribute("Max-Age")

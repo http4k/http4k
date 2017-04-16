@@ -1,11 +1,6 @@
 package org.reekwest.http.core.body
 
-import org.reekwest.http.core.Body
-import org.reekwest.http.core.Parameters
-import org.reekwest.http.core.Request
-import org.reekwest.http.core.findSingle
-import org.reekwest.http.core.toParameters
-import org.reekwest.http.core.toUrlEncoded
+import org.reekwest.http.core.*
 import java.nio.ByteBuffer
 
 typealias Form = Parameters

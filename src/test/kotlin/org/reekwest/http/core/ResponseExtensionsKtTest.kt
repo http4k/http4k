@@ -15,7 +15,7 @@ class ResponseExtensionsKtTest {
     }
 
     @Test
-    fun can_modify_body(){
+    fun can_modify_body() {
         val testBody = "abc".toBody()
         assertThat(ok().body(testBody).body, equalTo(testBody))
     }
@@ -42,7 +42,7 @@ class ResponseExtensionsKtTest {
     }
 
     @Test
-    fun can_replace_header(){
+    fun can_replace_header() {
         val message = ok().header("foo", "bar").header("Foo", "Bar").removeHeader("foo").replaceHeader("Foo", "replaced")
 
         assertThat(message.headers, equalTo(listOf("Foo" to "replaced") as Headers))
