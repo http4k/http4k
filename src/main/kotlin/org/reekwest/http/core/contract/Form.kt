@@ -4,6 +4,8 @@ import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
 import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
+import org.reekwest.http.core.with
+import org.reekwest.http.toByteBuffer
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
 
@@ -70,3 +72,6 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
     }
 }
 
+object FormField : StringLensSpec<WebForm>("form field",
+    { (fields), name -> fields.getOrDefault(name, listOf()) },
+    { form, name, values -> values.fold(form, { m, next -> m.plus(name to next) }) })

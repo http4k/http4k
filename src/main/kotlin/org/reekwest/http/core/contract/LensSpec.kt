@@ -1,6 +1,8 @@
 package org.reekwest.http.core.contract
 
 import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
+import org.reekwest.http.then
+import org.reekwest.http.toByteBuffer
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
