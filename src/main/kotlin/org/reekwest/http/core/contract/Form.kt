@@ -35,16 +35,25 @@ private val formSpec: BodySpec<FormFields> = BodySpec(LensSpec(FormLocator,
 
 fun Body.form() = formSpec.required("form")
 
-fun Body.aForm(vararg fields: FormField) =
-    formSpec.map({ fields ->
-        // do some validation here...
-        AForm(fields)
-    }, { it.fields })
+fun Body.validatingForm(vararg formFields: Lens<ValidatingForm, *, *>) =
+    formSpec.map({
+        val formInstance = ValidatingForm(it)
+        val failures = formFields.fold(listOf<ExtractionFailure>()) {
+            memo, next ->
+            try {
+                next(formInstance)
+                memo
+            } catch (e: ContractBreach) {
+                memo.plus(e.failures)
+            }
+        }
+        if (failures.isEmpty()) formInstance else throw ContractBreach(failures)
+    }, { it.fields }).required("form")
 
-data class AForm constructor(val fields: Map<String, List<String>>) {
-    operator fun plus(kv: Pair<String, String>): AForm =
+data class ValidatingForm constructor(val fields: Map<String, List<String>>) {
+    operator fun plus(kv: Pair<String, String>): ValidatingForm =
         copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
-    fun with(vararg modifiers: (AForm) -> AForm): AForm = modifiers.fold(this, { memo, next -> next(memo) })
+    fun with(vararg modifiers: (ValidatingForm) -> ValidatingForm): ValidatingForm = modifiers.fold(this, { memo, next -> next(memo) })
 }
 
