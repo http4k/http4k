@@ -64,5 +64,9 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
         copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
+
+    companion object {
+        fun emptyForm() = WebForm(emptyMap(), emptyList())
+    }
 }
 
