@@ -1,8 +1,9 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.asString
 import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.then
-import org.reekwest.http.toByteBuffer
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
@@ -57,15 +58,9 @@ open class LensSpec<IN, OUT : Any>(
     }
 }
 
-open class StringLensSpec<IN>(location: String,
-                              get: (IN, String) -> List<String?>?,
-                              set: (IN, String, List<String>) -> IN)
-    : LensSpec<IN, String>(object : Locator<IN, ByteBuffer> {
-    override val name: String = location
-    override fun get(target: IN, name: String) = get(target, name)?.mapNotNull { it -> it?.toByteBuffer() }
-    override fun set(target: IN, name: String, values: List<ByteBuffer>) = set(target, name, values.map { String(it.array()) })
-}, { it -> String(it.array()) }, { it.toByteBuffer() }
-)
+open class StringLensSpec<IN>(locator: Locator<IN, ByteBuffer>)
+    : LensSpec<IN, String>(locator, { it.asString() }, { it.asByteBuffer() } )
+
 // Extension methods for commonly used conversions
 
 fun <IN> LensSpec<IN, String>.int(): LensSpec<IN, Int> = this.map(String::toInt)
