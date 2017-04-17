@@ -31,16 +31,14 @@ enum class FormValidator : (WebForm) -> WebForm {
     };
 }
 
-object FormField : LensSpec<WebForm, String>(FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
+object FormField : LensSpec<WebForm, String>("form field", FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
 
 fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
-    BodySpec(LensSpec(FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
+    BodySpec(LensSpec("form", FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 
 /** private **/
 
 private object FormLocator : Locator<HttpMessage, ByteBuffer> {
-    override val location = "form"
-
     override fun get(target: HttpMessage, name: String): List<ByteBuffer> {
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
         return target.body?.let { listOf(it) } ?: emptyList()
@@ -52,7 +50,6 @@ private object FormLocator : Locator<HttpMessage, ByteBuffer> {
 }
 
 private object FormFieldLocator : Locator<WebForm, String> {
-    override val location = "form field"
     override fun get(target: WebForm, name: String) = target.fields.getOrDefault(name, listOf())
     override fun set(target: WebForm, name: String, values: List<String>) = values.fold(target, { m, next -> m.plus(name to next) })
 }
