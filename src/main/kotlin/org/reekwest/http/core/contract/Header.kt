@@ -9,11 +9,11 @@ import org.reekwest.http.core.headerValues
 import java.nio.ByteBuffer
 
 object Header : LensSpec<HttpMessage, String>(
-    (object : Locator<HttpMessage, String> {
+    object : Locator<HttpMessage, String> {
         override val location = "header"
         override fun get(target: HttpMessage, name: String) = target.headerValues(name)
         override fun set(target: HttpMessage, name: String, values: List<String>) = values.fold(target, { m, next -> m.header(name, next) })
-    }).asByteBuffers(),
+    }.asByteBuffers(),
     ByteBuffer::asString, String::asByteBuffer) {
 
     object Common {
