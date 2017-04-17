@@ -39,19 +39,19 @@ fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *
 /** private **/
 
 private object FormLocator : NamedLens<HttpMessage, ByteBuffer> {
-    override fun get(target: HttpMessage, name: String): List<ByteBuffer> {
+    override fun invoke(name: String, target: HttpMessage): List<ByteBuffer> {
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
         return target.body?.let { listOf(it) } ?: emptyList()
     }
 
-    override fun set(target: HttpMessage, name: String, values: List<ByteBuffer>) = values
+    override fun invoke(name: String, values: List<ByteBuffer>, target: HttpMessage) = values
         .fold(target, { memo, next -> memo.with(Body.binary() to next) })
         .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
 }
 
 private object FormFieldLocator : NamedLens<WebForm, String> {
-    override fun get(target: WebForm, name: String) = target.fields.getOrDefault(name, listOf())
-    override fun set(target: WebForm, name: String, values: List<String>) = values.fold(target, { m, next -> m.plus(name to next) })
+    override fun invoke(name: String, target: WebForm) = target.fields.getOrDefault(name, listOf())
+    override fun invoke(name: String, values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
 }
 
 private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {

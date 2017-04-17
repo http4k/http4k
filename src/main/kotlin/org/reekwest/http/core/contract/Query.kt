@@ -6,7 +6,7 @@ import org.reekwest.http.core.query
 
 object Query : LensSpec<Request, String>("query",
     object : NamedLens<Request, String> {
-        override fun get(target: Request, name: String) = target.queries(name)
-        override fun set(target: Request, name: String, values: List<String>) = values.fold(target, { m, next -> m.query(name, next) })
+        override fun invoke(name: String, target: Request) = target.queries(name)
+        override fun invoke(name: String, values: List<String>, target: Request) = values.fold(target, { m, next -> m.query(name, next) })
     }.asByteBuffers(),
     ByteBufferStringBiDiMapper)

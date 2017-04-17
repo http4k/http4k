@@ -17,9 +17,9 @@ open class LensSpec<IN, OUT : Any>(
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
     private val finalLocator = object : NamedLens<IN, OUT> {
-        override fun get(target: IN, name: String) = namedLens.get(target, name)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+        override fun invoke(name: String, target: IN) = namedLens.invoke(name, target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
 
-        override fun set(target: IN, name: String, values: List<OUT>) = namedLens.set(target, name, values.map { mapper.mapOut(it) })
+        override fun invoke(name: String, values: List<OUT>, target: IN) = namedLens.invoke(name, values.map { mapper.mapOut(it) }, target)
     }
 
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, namedLens, mapper.map(nextIn))

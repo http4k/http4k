@@ -5,14 +5,14 @@ import org.reekwest.http.asString
 import java.nio.ByteBuffer
 
 interface NamedLens<IN, OUT> {
-    fun get(target: IN, name: String): List<OUT?>?
-    fun set(target: IN, name: String, values: List<OUT>): IN
+    operator fun invoke(name: String, target: IN): List<OUT?>?
+    operator fun invoke(name: String, values: List<OUT>, target: IN): IN
 
     fun <NEXT> map(inFn: (OUT) -> NEXT?, outFn: (NEXT) -> OUT): NamedLens<IN, NEXT> {
         val sup = this
         return object : NamedLens<IN, NEXT> {
-            override fun get(target: IN, name: String) = sup.get(target, name)?.map { it?.let(inFn) }
-            override fun set(target: IN, name: String, values: List<NEXT>) = sup.set(target, name, values.map(outFn))
+            override fun invoke(name: String, target: IN) = sup(name, target)?.map { it?.let(inFn) }
+            override fun invoke(name: String, values: List<NEXT>, target: IN) = sup(name, values.map(outFn), target)
         }
     }
 }

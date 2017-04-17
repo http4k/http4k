@@ -8,7 +8,7 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val namedLe
      * Lens operation to get the value from the target
      */
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(namedLens.get(target, meta.name))
+        convertIn(namedLens.invoke(meta.name, target))
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
@@ -22,7 +22,7 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val namedLe
      * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = namedLens.set(target, meta.name, convertOut(value)) as R
+    operator fun <R : IN> invoke(value: FINAL, target: R): R = namedLens.invoke(meta.name, convertOut(value), target) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target
