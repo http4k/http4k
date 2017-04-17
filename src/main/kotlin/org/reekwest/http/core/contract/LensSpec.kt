@@ -27,12 +27,12 @@ open class LensSpec<IN, OUT : Any>(
         nextOut.then(serialize)
     )
 
-    fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, locator.name, false, description), this) {
+    fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, locator.location, false, description), this) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
         override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
     }
 
-    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.name, true, description), this) {
+    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.location, true, description), this) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
@@ -40,12 +40,12 @@ open class LensSpec<IN, OUT : Any>(
     private val spec: LensSpec<IN, OUT> get() = this
 
     val multi = object : MultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, locator.name, false, description), spec) {
+        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, locator.location, false, description), spec) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
 
-        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, locator.name, true, description), spec) {
+        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, locator.location, true, description), spec) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty

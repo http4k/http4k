@@ -1,8 +1,8 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.asByteBuffer
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
-import org.reekwest.http.asByteBuffer
 import java.nio.ByteBuffer
 
 open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>) {
@@ -15,7 +15,7 @@ open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>)
 }
 
 internal object BodyLocator : Locator<HttpMessage, ByteBuffer> {
-    override val name = "body"
+    override val location = "body"
     override fun get(target: HttpMessage, name: String) = listOf(target.body)
     override fun set(target: HttpMessage, name: String, values: List<ByteBuffer>) = values.fold(target) { a, b -> a.copy(body = b) }
 }

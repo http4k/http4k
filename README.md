@@ -19,8 +19,8 @@ Features:
 ## Basic Usage
 
 ```kotlin
-val app = { request: Request -> ok().bodyString("Hello, ${request.query("name")}!") }
-val get = get("/").query("name", "John Doe")
+val app = { request: Request -> ok().bodyString("Hello, ${request.query("location")}!") }
+val get = get("/").query("location", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
 assertThat(response.extract(StringBody), equalTo("Hello, John Doe!"))
@@ -38,7 +38,7 @@ That will make a server running on http://localhost:8000
 
 ```kotlin
 val client = ApacheHttpClient()
-val request = get("http://httpbin.org/get").query("name", "John Doe")
+val request = get("http://httpbin.org/get").query("location", "John Doe")
 val response = client(request)
 assertThat(response.status, equalTo(OK))
 assertThat(response.extract(StringBody), containsSubstring("John Doe"))
@@ -50,7 +50,7 @@ Reekwest comes with basic routing. It's just another function where you can wrap
 
 ```kotlin
 server = routes(
-    GET to "/hello/{name:*}" by { request: Request -> ok().bodyString("Hello, ${request.path("name")}!") },
+    GET to "/hello/{location:*}" by { request: Request -> ok().bodyString("Hello, ${request.path("location")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
 ```

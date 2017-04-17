@@ -13,7 +13,7 @@ import java.nio.ByteBuffer
 typealias FormFields = Map<String, List<String>>
 
 private object FormLocator : Locator<HttpMessage, ByteBuffer> {
-    override val name = "form"
+    override val location = "form"
     override fun get(target: HttpMessage, name: String): List<ByteBuffer> {
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
         return target.body?.let { listOf(it) } ?: emptyList()
