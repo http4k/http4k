@@ -13,37 +13,37 @@ interface MultiLensSpec<in IN, OUT : Any> {
 
 open class LensSpec<IN, OUT : Any>(
     private val location: String,
-    private val namedLens: TargetFieldLens<IN, ByteBuffer>,
+    private val extractionLens: TargetFieldLens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private val finalLocator = object : TargetFieldLens<IN, OUT> {
-        override fun invoke(name: String, target: IN) = namedLens.invoke(name, target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+    private val mappingLens = object : TargetFieldLens<IN, OUT> {
+        override fun invoke(name: String, target: IN) = extractionLens.invoke(name, target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
 
-        override fun invoke(name: String, values: List<OUT>, target: IN) = namedLens.invoke(name, values.map { mapper.mapOut(it) }, target)
+        override fun invoke(name: String, values: List<OUT>, target: IN) = extractionLens.invoke(name, values.map { mapper.mapOut(it) }, target)
     }
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, namedLens, mapper.map(nextIn))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, extractionLens, mapper.map(nextIn))
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, namedLens, mapper.map(nextIn, nextOut))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, extractionLens, mapper.map(nextIn, nextOut))
 
     fun optional(name: String, description: String? = null) =
-        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), finalLocator) {
+        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
         }
 
-    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, true, description), finalLocator) {
+    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
 
     val multi = object : MultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), finalLocator) {
+        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
 
-        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), finalLocator) {
+        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty
