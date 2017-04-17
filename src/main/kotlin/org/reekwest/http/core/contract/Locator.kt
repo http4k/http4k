@@ -9,7 +9,7 @@ interface Locator<IN, OUT> {
     fun get(target: IN, name: String): List<OUT?>?
     fun set(target: IN, name: String, values: List<OUT>): IN
 
-    fun <NEXT> map(inFn: (OUT) -> NEXT, outFn: (NEXT) -> OUT): Locator<IN, NEXT> {
+    fun <NEXT> map(inFn: (OUT) -> NEXT?, outFn: (NEXT) -> OUT): Locator<IN, NEXT> {
         val sup = this
         return object : Locator<IN, NEXT> {
             override val name = sup.name
