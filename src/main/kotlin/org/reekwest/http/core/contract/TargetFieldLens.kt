@@ -15,13 +15,11 @@ interface TargetFieldLens<IN, OUT> {
      */
     operator fun invoke(name: String, values: List<OUT>, target: IN): IN
 
-    fun <NEXT> map(inFn: (OUT) -> NEXT?, outFn: (NEXT) -> OUT): TargetFieldLens<IN, NEXT> {
-        val sup = this
-        return object : TargetFieldLens<IN, NEXT> {
-            override fun invoke(name: String, target: IN) = sup(name, target)?.map { it?.let(inFn) }
-            override fun invoke(name: String, values: List<NEXT>, target: IN) = sup(name, values.map(outFn), target)
+    fun <NEXT> map(inFn: (OUT) -> NEXT?, outFn: (NEXT) -> OUT): TargetFieldLens<IN, NEXT> =
+        object : TargetFieldLens<IN, NEXT> {
+            override fun invoke(name: String, target: IN) = this@TargetFieldLens(name, target)?.map { it?.let(inFn) }
+            override fun invoke(name: String, values: List<NEXT>, target: IN) = this@TargetFieldLens(name, values.map(outFn), target)
         }
-    }
 }
 
 fun <IN> TargetFieldLens<IN, String>.asByteBuffers() = map(String::asByteBuffer, ByteBuffer::asString)
