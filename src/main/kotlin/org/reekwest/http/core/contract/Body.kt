@@ -3,6 +3,7 @@ package org.reekwest.http.core.contract
 import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString
 import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.core.contract.BiDiMapper.Companion.Identity
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
@@ -19,7 +20,7 @@ object Body : BodySpec<ByteBuffer>(LensSpec(
         override val location = "body"
         override fun get(target: HttpMessage, name: String) = listOf(target.body)
         override fun set(target: HttpMessage, name: String, values: List<ByteBuffer>) = values.fold(target) { a, b -> a.copy(body = b) }
-    }, { it }, { it })) {
+    }, Identity())) {
 
     val string = Body.map(ByteBuffer::asString, String::asByteBuffer)
 
@@ -27,7 +28,3 @@ object Body : BodySpec<ByteBuffer>(LensSpec(
     fun string(description: String? = null) = Body.string.required(description)
 
 }
-
-/**
- * Extension functions for various body types
- */

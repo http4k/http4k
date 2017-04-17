@@ -5,7 +5,7 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(spec.locator.get(target, meta.name)?.let { it.map { it?.let(spec.deserialize) } })
+        convertIn(spec.locator.get(target, meta.name)?.let { it.map { it?.let { spec.mapper.mapIn(it) } } })
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
@@ -23,5 +23,5 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
      */
     @Suppress("UNCHECKED_CAST")
     operator fun <R : IN> invoke(value: FINAL, target: R): R =
-        spec.locator.set(target, meta.name, convertOut(value).map(spec.serialize)) as R
+        spec.locator.set(target, meta.name, convertOut(value).map{ spec.mapper.mapOut(it) }) as R
 }

@@ -1,9 +1,9 @@
 package org.reekwest.http.core.contract
 
-import org.reekwest.http.asByteBuffer
-import org.reekwest.http.asString
-import org.reekwest.http.core.*
-import java.nio.ByteBuffer
+import org.reekwest.http.core.ContentType
+import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.core.header
+import org.reekwest.http.core.headerValues
 
 object Header : LensSpec<HttpMessage, String>(
     object : Locator<HttpMessage, String> {
@@ -11,7 +11,7 @@ object Header : LensSpec<HttpMessage, String>(
         override fun get(target: HttpMessage, name: String) = target.headerValues(name)
         override fun set(target: HttpMessage, name: String, values: List<String>) = values.fold(target, { m, next -> m.header(name, next) })
     }.asByteBuffers(),
-    ByteBuffer::asString, String::asByteBuffer) {
+    ByteBufferStringBiDiMapper) {
 
     object Common {
         val CONTENT_TYPE = map(::ContentType).optional("Content-Type")

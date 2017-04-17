@@ -1,9 +1,7 @@
 package org.reekwest.http.core.contract
 
 import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
-import org.reekwest.http.then
 import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -15,22 +13,17 @@ interface MultiLensSpec<in IN, OUT : Any> {
 
 open class LensSpec<IN, OUT : Any>(
     internal val locator: Locator<IN, ByteBuffer>,
-    internal val deserialize: (ByteBuffer) -> OUT,
-    internal val serialize: (OUT) -> ByteBuffer
+    internal val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(locator,
-        deserialize.then(nextIn),
-        { UTF_8.encode(it.toString()) })
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(locator, mapper.map(nextIn))
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(locator,
-        deserialize.then(nextIn),
-        nextOut.then(serialize)
-    )
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(locator, mapper.map(nextIn, nextOut))
 
-    fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, locator.location, false, description), this) {
-        override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
-        override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
-    }
+    fun optional(name: String, description: String? = null) =
+        object : Lens<IN, OUT, OUT?>(Meta(name, locator.location, false, description), this) {
+            override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
+            override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
+        }
 
     fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.location, true, description), this) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
