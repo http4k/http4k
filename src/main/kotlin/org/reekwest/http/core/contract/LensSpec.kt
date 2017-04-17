@@ -13,10 +13,10 @@ interface MultiLensSpec<in IN, OUT : Any> {
 
 open class LensSpec<IN, OUT : Any>(
     private val location: String,
-    private val namedLens: NamedLens<IN, ByteBuffer>,
+    private val namedLens: TargetFieldLens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private val finalLocator = object : NamedLens<IN, OUT> {
+    private val finalLocator = object : TargetFieldLens<IN, OUT> {
         override fun invoke(name: String, target: IN) = namedLens.invoke(name, target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
 
         override fun invoke(name: String, values: List<OUT>, target: IN) = namedLens.invoke(name, values.map { mapper.mapOut(it) }, target)

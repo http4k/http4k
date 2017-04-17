@@ -38,7 +38,7 @@ fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *
 
 /** private **/
 
-private object FormLocator : NamedLens<HttpMessage, ByteBuffer> {
+private object FormLocator : TargetFieldLens<HttpMessage, ByteBuffer> {
     override fun invoke(name: String, target: HttpMessage): List<ByteBuffer> {
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
         return target.body?.let { listOf(it) } ?: emptyList()
@@ -49,7 +49,7 @@ private object FormLocator : NamedLens<HttpMessage, ByteBuffer> {
         .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
 }
 
-private object FormFieldLocator : NamedLens<WebForm, String> {
+private object FormFieldLocator : TargetFieldLens<WebForm, String> {
     override fun invoke(name: String, target: WebForm) = target.fields.getOrDefault(name, listOf())
     override fun invoke(name: String, values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
 }
