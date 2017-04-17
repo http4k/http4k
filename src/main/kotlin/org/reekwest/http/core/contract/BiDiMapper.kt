@@ -35,6 +35,6 @@ fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEX
     val a = this
     return object : BiDiMapper<ByteBuffer, NEXT> {
         override fun mapIn(source: ByteBuffer): NEXT = nextIn(a.mapIn(source))
-        override fun mapOut(source: NEXT): ByteBuffer = (a.mapOut(nextOut(source)))
+        override fun mapOut(source: NEXT): ByteBuffer = a.mapOut(nextOut(source))
     }
 }
