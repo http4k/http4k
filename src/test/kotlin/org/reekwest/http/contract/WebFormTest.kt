@@ -13,7 +13,7 @@ import org.reekwest.http.core.contract.FormValidator.Strict
 import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.get
 
-class FormTest {
+class WebFormTest {
 
     private val emptyRequest = get("")
 
