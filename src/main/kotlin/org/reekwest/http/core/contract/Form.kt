@@ -73,7 +73,10 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
     }
 }
 
-object FormField : LensSpec<WebForm, String>(StringLocator("form field",
-    { (fields), name -> fields.getOrDefault(name, listOf()) },
-    { form, name, values -> values.fold(form, { m, next -> m.plus(name to next) }) }),
+object FormField : LensSpec<WebForm, String>(
+    (object : Locator<WebForm, String> {
+        override val location = "form field"
+        override fun get(target: WebForm, name: String) = target.fields.getOrDefault(name, listOf())
+        override fun set(target: WebForm, name: String, values: List<String>) = values.fold(target, { m, next -> m.plus(name to next) })
+    }).asByteBuffers(),
     ByteBuffer::asString, String::asByteBuffer)

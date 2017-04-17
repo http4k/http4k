@@ -19,10 +19,4 @@ interface Locator<IN, OUT> {
     }
 }
 
-
-internal class StringLocator<IN>(override val location: String,
-                                 val getFn: (IN, String) -> List<String?>?,
-                                 val setFn: (IN, String, List<String>) -> IN) : Locator<IN, ByteBuffer> {
-    override fun get(target: IN, name: String) = getFn(target, name)?.mapNotNull { it -> it?.asByteBuffer() }
-    override fun set(target: IN, name: String, values: List<ByteBuffer>) = setFn(target, name, values.map(ByteBuffer::asString))
-}
+fun <IN> Locator<IN, String>.asByteBuffers() = map(String::asByteBuffer, ByteBuffer::asString)

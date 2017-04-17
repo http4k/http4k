@@ -9,9 +9,11 @@ import org.reekwest.http.core.headerValues
 import java.nio.ByteBuffer
 
 object Header : LensSpec<HttpMessage, String>(
-    StringLocator("header",
-        { request, name -> request.headerValues(name) },
-        { req, name, values -> values.fold(req, { m, next -> m.header(name, next) }) }),
+    (object : Locator<HttpMessage, String> {
+        override val location = "header"
+        override fun get(target: HttpMessage, name: String) = target.headerValues(name)
+        override fun set(target: HttpMessage, name: String, values: List<String>) = values.fold(target, { m, next -> m.header(name, next) })
+    }).asByteBuffers(),
     ByteBuffer::asString, String::asByteBuffer) {
 
     object Common {
@@ -19,10 +21,10 @@ object Header : LensSpec<HttpMessage, String>(
     }
 }
 
-object Cookies {
-    private val allCookies = LensSpec<HttpMessage, String>(
-        StringLocator("header",
-            { request, name -> request.headerValues(name) },
-            { req, name, values -> values.fold(req, { m, next -> m.header(name, next) }) }),
-        ByteBuffer::asString, String::asByteBuffer)
-}
+//object Cookies {
+//    private val allCookies = LensSpec<HttpMessage, String>(
+//        StringLocator("header",
+//            { request, name -> request.headerValues(name) },
+//            { req, name, values -> values.fold(req, { m, next -> m.header(name, next) }) }),
+//        ByteBuffer::asString, String::asByteBuffer)
+//}
