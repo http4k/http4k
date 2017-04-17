@@ -19,5 +19,5 @@ object Cookies {
         ByteBuffer::asString, String::asByteBuffer)
         .map({Cookie("name", "value")}, {it.toString()})
 
-    fun named(name: String) = delegate.optional(name)
+    fun optional(name: String) = delegate.optional(name)
 }
