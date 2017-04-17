@@ -15,6 +15,10 @@ open class LensSpec<IN, OUT : Any>(
     internal val locator: Locator<IN, ByteBuffer>,
     internal val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
+    internal fun get(target: IN, name: String) = locator.get(target, name)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+
+    internal fun set(target: IN, name: String, values: List<OUT>) = locator.set(target, name, values.map { mapper.mapOut(it) })
+
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(locator, mapper.map(nextIn))
 
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(locator, mapper.map(nextIn, nextOut))
