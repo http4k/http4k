@@ -1,6 +1,6 @@
 package org.reekwest.http.core.contract
 
-abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: Locator<IN, OUT>) {
+abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val namedLens: NamedLens<IN, OUT>) {
 
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
@@ -8,7 +8,7 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
      * Lens operation to get the value from the target
      */
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(spec.get(target, meta.name))
+        convertIn(namedLens.get(target, meta.name))
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
@@ -22,7 +22,7 @@ abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val spec: L
      * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = spec.set(target, meta.name, convertOut(value)) as R
+    operator fun <R : IN> invoke(value: FINAL, target: R): R = namedLens.set(target, meta.name, convertOut(value)) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target

@@ -5,7 +5,7 @@ import org.reekwest.http.core.queries
 import org.reekwest.http.core.query
 
 object Query : LensSpec<Request, String>("query",
-    object : Locator<Request, String> {
+    object : NamedLens<Request, String> {
         override fun get(target: Request, name: String) = target.queries(name)
         override fun set(target: Request, name: String, values: List<String>) = values.fold(target, { m, next -> m.query(name, next) })
     }.asByteBuffers(),

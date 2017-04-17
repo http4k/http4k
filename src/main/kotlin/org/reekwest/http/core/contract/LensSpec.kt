@@ -13,18 +13,18 @@ interface MultiLensSpec<in IN, OUT : Any> {
 
 open class LensSpec<IN, OUT : Any>(
     private val location: String,
-    private val extractingLocator: Locator<IN, ByteBuffer>,
+    private val namedLens: NamedLens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private val finalLocator = object : Locator<IN, OUT> {
-        override fun get(target: IN, name: String) = extractingLocator.get(target, name)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+    private val finalLocator = object : NamedLens<IN, OUT> {
+        override fun get(target: IN, name: String) = namedLens.get(target, name)?.let { it.map { it?.let { mapper.mapIn(it) } } }
 
-        override fun set(target: IN, name: String, values: List<OUT>) = extractingLocator.set(target, name, values.map { mapper.mapOut(it) })
+        override fun set(target: IN, name: String, values: List<OUT>) = namedLens.set(target, name, values.map { mapper.mapOut(it) })
     }
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, extractingLocator, mapper.map(nextIn))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, namedLens, mapper.map(nextIn))
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, extractingLocator, mapper.map(nextIn, nextOut))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, namedLens, mapper.map(nextIn, nextOut))
 
     fun optional(name: String, description: String? = null) =
         object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), finalLocator) {
