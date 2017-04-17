@@ -1,11 +1,12 @@
 package org.reekwest.http.core.contract
 
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.asString
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
 import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.with
-import org.reekwest.http.asByteBuffer
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
 
@@ -72,6 +73,7 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
     }
 }
 
-object FormField : StringLensSpec<WebForm>(StringLocator("form field",
+object FormField : LensSpec<WebForm, String>(StringLocator("form field",
     { (fields), name -> fields.getOrDefault(name, listOf()) },
-    { form, name, values -> values.fold(form, { m, next -> m.plus(name to next) }) }))
+    { form, name, values -> values.fold(form, { m, next -> m.plus(name to next) }) }),
+    ByteBuffer::asString, String::asByteBuffer)

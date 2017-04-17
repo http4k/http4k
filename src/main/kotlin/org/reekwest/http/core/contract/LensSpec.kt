@@ -1,7 +1,5 @@
 package org.reekwest.http.core.contract
 
-import org.reekwest.http.asByteBuffer
-import org.reekwest.http.asString
 import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.then
 import java.nio.ByteBuffer
@@ -30,13 +28,13 @@ open class LensSpec<IN, OUT : Any>(
     )
 
     fun optional(name: String, description: String? = null) = object : Lens<IN, OUT, OUT?>(Meta(name, locator.name, false, description), this) {
-        override fun convertIn(o: List<OUT?>?): OUT? = o?.firstOrNull()
-        override fun convertOut(o: OUT?): List<OUT> = o?.let { listOf(it) } ?: emptyList()
+        override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
+        override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
     }
 
     fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, locator.name, true, description), this) {
-        override fun convertIn(o: List<OUT?>?): OUT = o?.firstOrNull() ?: throw Missing(this)
-        override fun convertOut(o: OUT): List<OUT> = listOf(o)
+        override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
+        override fun convertOut(o: OUT) = listOf(o)
     }
 
     private val spec: LensSpec<IN, OUT> get() = this
@@ -44,7 +42,7 @@ open class LensSpec<IN, OUT : Any>(
     val multi = object : MultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, locator.name, false, description), spec) {
             override fun convertIn(o: List<OUT?>?) = o
-            override fun convertOut(o: List<OUT?>?): List<OUT> = o?.mapNotNull { it } ?: emptyList()
+            override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
 
         override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, locator.name, true, description), spec) {
@@ -53,13 +51,10 @@ open class LensSpec<IN, OUT : Any>(
                 return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty
             }
 
-            override fun convertOut(o: List<OUT?>): List<OUT> = o.mapNotNull { it }
+            override fun convertOut(o: List<OUT?>) = o.mapNotNull { it }
         }
     }
 }
-
-open class StringLensSpec<IN>(locator: Locator<IN, ByteBuffer>)
-    : LensSpec<IN, String>(locator, { it.asString() }, { it.asByteBuffer() } )
 
 // Extension methods for commonly used conversions
 
