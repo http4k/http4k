@@ -26,23 +26,36 @@ open class LensSpec<IN, OUT : Any>(
 
     fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, extractionLens, mapper.map(nextIn, nextOut))
 
+    /**
+     * Create a lens which resolves to a single optional (nullable) value
+     */
     fun optional(name: String, description: String? = null) =
         object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
         }
 
+    /**
+     * Create a lens which resolves to a single required (non-nullable) value.
+     */
     fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
 
     val multi = object : MultiLensSpec<IN, OUT> {
+
+        /**
+         * Create a lens which resolves to a optional (nullable) list value
+         */
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
 
+        /**
+         * Create a lens which resolves to required (non-nullable) list value.
+         */
         override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
