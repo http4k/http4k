@@ -33,27 +33,14 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 object FormField : LensSpec<WebForm, String>(FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
 
-fun Body.form() = BodySpec(LensSpec(FormLocator, FormFieldsBiDiMapper)).required("form")
-
 fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
-    BodySpec(LensSpec(FormLocator, FormFieldsBiDiMapper)).map({
-        val formInstance = WebForm(it, emptyList())
-        val failures = formFields.fold(listOf<ExtractionFailure>()) {
-            memo, next ->
-            try {
-                next(formInstance)
-                memo
-            } catch (e: ContractBreach) {
-                memo.plus(e.failures)
-            }
-        }
-        validator(formInstance.copy(errors = failures))
-    }, { it.fields }).required("form")
+    BodySpec(LensSpec(FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 
 /** private **/
 
 private object FormLocator : Locator<HttpMessage, ByteBuffer> {
     override val location = "form"
+
     override fun get(target: HttpMessage, name: String): List<ByteBuffer> {
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
         return target.body?.let { listOf(it) } ?: emptyList()
@@ -62,6 +49,12 @@ private object FormLocator : Locator<HttpMessage, ByteBuffer> {
     override fun set(target: HttpMessage, name: String, values: List<ByteBuffer>) = values
         .fold(target, { memo, next -> memo.with(Body.binary() to next) })
         .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+}
+
+private object FormFieldLocator : Locator<WebForm, String> {
+    override val location = "form field"
+    override fun get(target: WebForm, name: String) = target.fields.getOrDefault(name, listOf())
+    override fun set(target: WebForm, name: String, values: List<String>) = values.fold(target, { m, next -> m.plus(name to next) })
 }
 
 private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
@@ -75,10 +68,19 @@ private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
 
     // FIXME this doesn't serialize properly
     override fun mapOut(source: FormFields): ByteBuffer = source.toString().asByteBuffer()
-}
 
-private object FormFieldLocator : Locator<WebForm, String> {
-    override val location = "form field"
-    override fun get(target: WebForm, name: String) = target.fields.getOrDefault(name, listOf())
-    override fun set(target: WebForm, name: String, values: List<String>) = values.fold(target, { m, next -> m.plus(name to next) })
+    internal fun validatingFor(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
+        FormFieldsBiDiMapper.map({ it ->
+            val formInstance = WebForm(it, emptyList())
+            val failures = formFields.fold(listOf<ExtractionFailure>()) {
+                memo, next ->
+                try {
+                    next(formInstance)
+                    memo
+                } catch (e: ContractBreach) {
+                    memo.plus(e.failures)
+                }
+            }
+            validator(formInstance.copy(errors = failures))
+        }, { it.fields })
 }

@@ -18,23 +18,6 @@ class WebFormTest {
     private val emptyRequest = get("")
 
     @Test
-    fun `can get form body`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
-            body = "hello=world&another=planet".toBody())
-        val expected = mapOf("hello" to listOf("world"), "another" to listOf("planet"))
-        assertThat(Body.form()(request), equalTo(expected))
-    }
-
-    @Test
-    fun `form body blows up if not URL content type`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to "unknown"),
-            body = "hello=world&another=planet".toBody())
-        assertThat({ Body.form()(request) }, throws(equalTo(Invalid(CONTENT_TYPE))))
-    }
-
-    @Test
     fun `web form blows up if not URL content type`() {
         val request = emptyRequest.copy(
             headers = listOf("Content-Type" to "unknown"),

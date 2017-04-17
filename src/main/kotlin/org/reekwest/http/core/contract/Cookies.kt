@@ -12,8 +12,8 @@ object Cookies {
             override fun get(target: Request, name: String) = target.cookie(name)?.let { listOf(it) }?.map(Cookie::toString) ?: emptyList()
             override fun set(target: Request, name: String, values: List<String>) = values.fold(target, { m, next -> m.header("Cookie", next) })
         }.asByteBuffers(),
-        ByteBufferStringBiDiMapper)
-        .map({ Cookie("name", "value") }, { it.toString() })
+        ByteBufferStringBiDiMapper.map({ Cookie("name", "value") }, { it.toString() })
+    )
 
     fun optional(name: String) = delegate.optional(name)
 }
