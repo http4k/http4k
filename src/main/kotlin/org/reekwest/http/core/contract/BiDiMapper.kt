@@ -24,17 +24,17 @@ object ByteBufferStringBiDiMapper : BiDiMapper<ByteBuffer, String> {
 }
 
 fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT): BiDiMapper<ByteBuffer, NEXT> {
-    val a = this
+    val bidi = this
     return object : BiDiMapper<ByteBuffer, NEXT> {
-        override fun mapIn(source: ByteBuffer): NEXT = nextIn(a.mapIn(source))
+        override fun mapIn(source: ByteBuffer): NEXT = nextIn(bidi.mapIn(source))
         override fun mapOut(source: NEXT): ByteBuffer = UTF_8.encode(source.toString())
     }
 }
 
 fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiMapper<ByteBuffer, NEXT> {
-    val a = this
+    val bidi = this
     return object : BiDiMapper<ByteBuffer, NEXT> {
-        override fun mapIn(source: ByteBuffer): NEXT = nextIn(a.mapIn(source))
-        override fun mapOut(source: NEXT): ByteBuffer = a.mapOut(nextOut(source))
+        override fun mapIn(source: ByteBuffer): NEXT = nextIn(bidi.mapIn(source))
+        override fun mapOut(source: NEXT): ByteBuffer = bidi.mapOut(nextOut(source))
     }
 }
