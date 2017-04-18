@@ -5,7 +5,7 @@
 [![build status](https://travis-ci.org/reekwest/reekwest.svg?branch=master)](https://travis-ci.org/reekwest/reekwest)
 [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest/_latestVersion)
 
-A sane implementation of HTTP for Kotlin
+A sensible implementation of HTTP for Kotlin
 
 Features:
  * Immutable Request/Response
