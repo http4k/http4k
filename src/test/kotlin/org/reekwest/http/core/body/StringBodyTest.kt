@@ -8,6 +8,6 @@ import org.reekwest.http.core.ok
 class StringBodyTest {
     @Test
     fun can_use_string_as_entity() {
-        assertThat(ok().bodyString("abc").extract(StringBody), equalTo("abc"))
+        assertThat(ok().bodyString("abc").bodyString(), equalTo("abc"))
     }
 }

@@ -3,9 +3,9 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.core.body.bodyForm
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.form
+import org.reekwest.http.core.body.toBody
 
 class HttpHandlerTest {
     @Test
@@ -27,7 +27,7 @@ class HttpHandlerTest {
         val handler = { request: Request -> ok().bodyString("Hello, ${request.form("name")}") }
         val form = listOf("name" to "John Doe")
 
-        val response = handler(post("irrelevant").bodyForm(form))
+        val response = handler(post("irrelevant").body(form.toBody()))
 
         assertThat(response.bodyString(), equalTo("Hello, John Doe"))
     }

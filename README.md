@@ -23,7 +23,7 @@ val app = { request: Request -> ok().bodyString("Hello, ${request.query("locatio
 val get = get("/").query("location", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
-assertThat(response.extract(StringBody), equalTo("Hello, John Doe!"))
+assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
 ```
 
 ## Using as a server
@@ -41,7 +41,7 @@ val client = ApacheHttpClient()
 val request = get("http://httpbin.org/get").query("location", "John Doe")
 val response = client(request)
 assertThat(response.status, equalTo(OK))
-assertThat(response.extract(StringBody), containsSubstring("John Doe"))
+assertThat(response.bodyString(), containsSubstring("John Doe"))
 ```
 
 ## Routing

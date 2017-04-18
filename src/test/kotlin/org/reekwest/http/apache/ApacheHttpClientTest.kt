@@ -5,8 +5,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.core.body.StringBody
-import org.reekwest.http.core.body.extract
+import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.get
 import org.reekwest.http.core.query
 
@@ -18,7 +17,7 @@ class ApacheHttpClientTest {
         val request = get("http://httpbin.org/get").query("name", "John Doe")
         val response = client(request)
         assertThat(response.status, equalTo(OK))
-        assertThat(response.extract(StringBody), containsSubstring("John Doe"))
+        assertThat(response.bodyString(), containsSubstring("John Doe"))
     }
 }
 
