@@ -1,4 +1,4 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val namedLens: TargetFieldLens<IN, OUT>) {
 

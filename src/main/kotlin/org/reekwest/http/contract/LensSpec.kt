@@ -1,6 +1,6 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
-import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
+import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalDateTime

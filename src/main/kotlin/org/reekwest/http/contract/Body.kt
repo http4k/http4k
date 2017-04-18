@@ -1,9 +1,9 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString
+import org.reekwest.http.contract.BiDiMapper.Companion.Identity
 import org.reekwest.http.core.HttpMessage
-import org.reekwest.http.core.contract.BiDiMapper.Companion.Identity
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 

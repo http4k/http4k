@@ -1,4 +1,4 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.cookie.Cookie

@@ -1,10 +1,10 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
+import org.reekwest.http.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
-import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
-import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.with
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
@@ -67,7 +67,7 @@ private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
     override fun mapOut(source: FormFields): ByteBuffer = source.toString().asByteBuffer()
 
     internal fun validatingFor(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
-        FormFieldsBiDiMapper.map({ it ->
+        map({ it ->
             val formInstance = WebForm(it, emptyList())
             val failures = formFields.fold(listOf<ExtractionFailure>()) {
                 memo, next ->

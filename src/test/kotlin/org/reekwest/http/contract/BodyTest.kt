@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.contract.Body
 import org.reekwest.http.core.get
 
 class BodyTest {

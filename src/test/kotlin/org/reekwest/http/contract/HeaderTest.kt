@@ -5,13 +5,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.http.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
-import org.reekwest.http.core.contract.ContractBreach.Companion.Missing
-import org.reekwest.http.core.contract.Header
-import org.reekwest.http.core.contract.int
 import org.reekwest.http.core.get
 import org.reekwest.http.core.header
 

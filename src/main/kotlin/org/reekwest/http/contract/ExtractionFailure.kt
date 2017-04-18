@@ -1,4 +1,4 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 sealed class ExtractionFailure {
     abstract val meta: Meta

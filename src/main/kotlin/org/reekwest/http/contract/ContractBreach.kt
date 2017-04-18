@@ -1,4 +1,4 @@
-package org.reekwest.http.core.contract
+package org.reekwest.http.contract
 
 data class ContractBreach(val failures: List<ExtractionFailure>) : Exception(failures.map { it.toString() }.joinToString()) {
     companion object {

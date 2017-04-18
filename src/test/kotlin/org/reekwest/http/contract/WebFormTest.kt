@@ -4,13 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.http.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.contract.FormValidator.Feedback
+import org.reekwest.http.contract.FormValidator.Strict
+import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.contract.*
-import org.reekwest.http.core.contract.ContractBreach.Companion.Invalid
-import org.reekwest.http.core.contract.FormValidator.Feedback
-import org.reekwest.http.core.contract.FormValidator.Strict
-import org.reekwest.http.core.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.get
 
 class WebFormTest {
