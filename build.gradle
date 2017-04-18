@@ -1,6 +1,7 @@
 buildscript {
     ext.kotlin_version = '1.1.1'
     ext.jetty_version = '9.3.16.v20170120'
+    ext.apache_http_version = '4.5.3'
 
     repositories {
         mavenCentral()
@@ -49,18 +50,12 @@ description = 'sane HTTP request API for Kotlin'
 dependencies {
     provided "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    provided "org.apache.httpcomponents:httpcore:4.4.6"
-    provided "org.apache.httpcomponents:httpmime:4.5.3"
-    provided "org.apache.httpcomponents:httpclient:4.5.3"
+    provided "org.apache.httpcomponents:httpclient:$apache_http_version"
 
     provided "javax.servlet:javax.servlet-api:3.1.0"
-    provided "org.eclipse.jetty:jetty-http:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-io:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-util:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-server:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-servlet:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-webapp:9.3.9.v20160517"
-    provided "org.eclipse.jetty:jetty-security:9.3.9.v20160517"
+
+    provided "org.eclipse.jetty:jetty-server:$jetty_version"
+    provided "org.eclipse.jetty:jetty-servlet:$jetty_version"
 
     testCompile "junit:junit:4.11"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
