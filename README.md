@@ -49,7 +49,7 @@ assertThat(response.bodyString(), containsSubstring("John Doe"))
 Reekwest comes with basic routing. It's just another function where you can wrap handlers:
 
 ```kotlin
-server = routes(
+routes(
     GET to "/hello/{location:*}" by { request: Request -> ok().bodyString("Hello, ${request.path("location")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
