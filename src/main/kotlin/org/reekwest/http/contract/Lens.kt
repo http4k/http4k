@@ -11,14 +11,14 @@ interface Lens<IN, OUT> {
 
 fun <IN> Function1<String, Lens<IN, String>>.asByteBuffers(): (String) -> Lens<IN, ByteBuffer> {
     // FIXME remove this
-    val bob = this
+    val outer = this
     return {
         object : Lens<IN, ByteBuffer> {
             override fun invoke(values: List<ByteBuffer>, target: IN): IN =
-                bob(it)(values.map(ByteBuffer::asString), target)
+                outer(it)(values.map(ByteBuffer::asString), target)
 
             override fun invoke(target: IN): List<ByteBuffer?>? =
-                bob(it)(target)?.map { it?.let(String::asByteBuffer) }
+                outer(it)(target)?.map { it?.let(String::asByteBuffer) }
         }
     }
 }

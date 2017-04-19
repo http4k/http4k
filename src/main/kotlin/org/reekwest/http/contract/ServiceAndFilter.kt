@@ -1,4 +1,6 @@
-package org.reekwest.http.core
+package org.reekwest.http.contract
+
+private typealias Service<Req, Resp> = (Req) -> Resp
 
 interface Filter<in ReqIn, out RespOut, out ReqOut, in RespIn> :
     Function2<ReqIn, Service<ReqOut, RespIn>, RespOut> {

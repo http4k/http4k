@@ -15,9 +15,7 @@ data class Response(val status: Status, override val headers: Headers = listOf()
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 
-typealias Service<Req, Resp> = (Req) -> Resp
-
-typealias HttpHandler = Service<Request, Response>
+typealias HttpHandler = (Request) -> Response
 
 typealias Headers = Parameters
 
