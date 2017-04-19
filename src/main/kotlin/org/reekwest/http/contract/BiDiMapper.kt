@@ -23,18 +23,14 @@ object ByteBufferStringBiDiMapper : BiDiMapper<ByteBuffer, String> {
     override fun mapOut(source: String): ByteBuffer = source.asByteBuffer()
 }
 
-fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT): BiDiMapper<ByteBuffer, NEXT> {
-    val bidi = this
-    return object : BiDiMapper<ByteBuffer, NEXT> {
-        override fun mapIn(source: ByteBuffer): NEXT = nextIn(bidi.mapIn(source))
+fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT): BiDiMapper<ByteBuffer, NEXT> =
+    object : BiDiMapper<ByteBuffer, NEXT> {
+        override fun mapIn(source: ByteBuffer): NEXT = nextIn(this@map.mapIn(source))
         override fun mapOut(source: NEXT): ByteBuffer = UTF_8.encode(source.toString())
     }
-}
 
-fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiMapper<ByteBuffer, NEXT> {
-    val bidi = this
-    return object : BiDiMapper<ByteBuffer, NEXT> {
-        override fun mapIn(source: ByteBuffer): NEXT = nextIn(bidi.mapIn(source))
-        override fun mapOut(source: NEXT): ByteBuffer = bidi.mapOut(nextOut(source))
+fun <NEXT : Any, OUT : Any> BiDiMapper<ByteBuffer, OUT>.map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiMapper<ByteBuffer, NEXT> =
+    object : BiDiMapper<ByteBuffer, NEXT> {
+        override fun mapIn(source: ByteBuffer): NEXT = nextIn(this@map.mapIn(source))
+        override fun mapOut(source: NEXT): ByteBuffer = this@map.mapOut(nextOut(source))
     }
-}
