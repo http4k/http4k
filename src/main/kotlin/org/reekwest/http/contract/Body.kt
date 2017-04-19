@@ -19,8 +19,7 @@ object Body : BodySpec<ByteBuffer>(LensSpec("body",
     {
         object : Lens<HttpMessage, ByteBuffer> {
             override fun invoke(target: HttpMessage): List<ByteBuffer?>? = listOf(target.body)
-            override fun invoke(values: List<ByteBuffer?>?, target: HttpMessage): HttpMessage =
-                values?.let { it.fold(target) { memo, next -> next?.let { memo.copy(body = it) } ?: memo } } ?: target
+            override fun invoke(values: List<ByteBuffer>, target: HttpMessage): HttpMessage = values.fold(target) { a, b -> a.copy(body = b) }
         }
     }, Identity())) {
 

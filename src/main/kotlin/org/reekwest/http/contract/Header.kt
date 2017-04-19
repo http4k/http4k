@@ -6,12 +6,11 @@ import org.reekwest.http.core.header
 import org.reekwest.http.core.headerValues
 
 object Header : LensSpec<HttpMessage, String>("header",
-    { name: String ->
-        object : Lens<HttpMessage, String> {
-            override fun invoke(target: HttpMessage): List<String?>? = target.headerValues(name)
-            override fun invoke(values: List<String?>?, target: HttpMessage) =
-                values?.let { it.fold(target) { memo, next -> next?.let { memo.header(name, it) } ?: memo } } ?: target
-        }
+    {name: String ->
+        object: Lens<HttpMessage, String> {
+                override fun invoke(target: HttpMessage): List<String?>?  = target.headerValues(name)
+                override fun invoke(values: List<String>, target: HttpMessage)= values.fold(target, { m, next -> m.header(name, next) })
+            }
     }.asByteBuffers(),
     ByteBufferStringBiDiMapper) {
 
