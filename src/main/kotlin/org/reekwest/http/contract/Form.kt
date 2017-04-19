@@ -33,7 +33,7 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 object FormField : LensSpec<WebForm, String>("form field", FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
 
-fun Body.webForm(validator: FormValidator, vararg formFields: MetaLens<WebForm, *, *>) =
+fun Body.webForm(validator: FormValidator, vararg formFields: ContractualLens<WebForm, *, *>) =
     BodySpec(LensSpec("form", FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 
 /** private **/
@@ -73,7 +73,7 @@ private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
     // FIXME this doesn't serialize properly
     override fun mapOut(source: FormFields): ByteBuffer = source.toString().asByteBuffer()
 
-    internal fun validatingFor(validator: FormValidator, vararg formFields: MetaLens<WebForm, *, *>) =
+    internal fun validatingFor(validator: FormValidator, vararg formFields: ContractualLens<WebForm, *, *>) =
         FormFieldsBiDiMapper.map({ it ->
             val formInstance = WebForm(it, emptyList())
             val failures = formFields.fold(listOf<ExtractionFailure>()) {

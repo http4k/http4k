@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 interface MultiLensSpec<in IN, OUT : Any> {
-    fun optional(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT?>?>
-    fun required(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT?>>
+    fun optional(name: String, description: String? = null): ContractualLens<IN, OUT, List<OUT?>?>
+    fun required(name: String, description: String? = null): ContractualLens<IN, OUT, List<OUT?>>
 }
 
 open class LensSpec<IN, OUT : Any>(
@@ -32,7 +32,7 @@ open class LensSpec<IN, OUT : Any>(
      * Create a lens which resolves to a single optional (nullable) value
      */
     fun optional(name: String, description: String? = null) =
-        object : MetaLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
+        object : ContractualLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
         }
@@ -40,7 +40,7 @@ open class LensSpec<IN, OUT : Any>(
     /**
      * Create a lens which resolves to a single required (non-nullable) value.
      */
-    fun required(name: String, description: String? = null) = object : MetaLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
+    fun required(name: String, description: String? = null) = object : ContractualLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
@@ -50,7 +50,7 @@ open class LensSpec<IN, OUT : Any>(
         /**
          * Create a lens which resolves to a optional (nullable) list value
          */
-        override fun optional(name: String, description: String?): MetaLens<IN, OUT, List<OUT?>?> = object : MetaLens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
+        override fun optional(name: String, description: String?): ContractualLens<IN, OUT, List<OUT?>?> = object : ContractualLens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
@@ -58,7 +58,7 @@ open class LensSpec<IN, OUT : Any>(
         /**
          * Create a lens which resolves to required (non-nullable) list value.
          */
-        override fun required(name: String, description: String?) = object : MetaLens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
+        override fun required(name: String, description: String?) = object : ContractualLens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty
