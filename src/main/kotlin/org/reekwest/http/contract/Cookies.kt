@@ -10,7 +10,7 @@ object Cookies {
         {
             name: String ->
             object : Lens<Request, String> {
-                override fun invoke(target: Request): List<String?>? = target.cookie(name)?.let { listOf(it) }?.map(Cookie::toString) ?: emptyList()
+                override fun invoke(target: Request): List<String> = target.cookie(name)?.let { listOf(it) }?.map(Cookie::toString) ?: emptyList()
                 override fun invoke(values: List<String>, target: Request) = values.fold(target, { m, next -> m.header("Cookie", next) })
             }
         }.asByteBuffers(),

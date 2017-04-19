@@ -1,10 +1,10 @@
 package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
-import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.contract.ContractBreach.Companion.Invalid
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.with
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
@@ -41,7 +41,7 @@ fun Body.webForm(validator: FormValidator, vararg formFields: ContractualLens<We
 private object FormLocator : (String) -> Lens<HttpMessage, ByteBuffer> {
     override fun invoke(name: String): Lens<HttpMessage, ByteBuffer> =
         object : Lens<HttpMessage, ByteBuffer> {
-            override fun invoke(target: HttpMessage): List<ByteBuffer?>? {
+            override fun invoke(target: HttpMessage): List<ByteBuffer> {
                 if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
                 return target.body?.let { listOf(it) } ?: emptyList()
             }

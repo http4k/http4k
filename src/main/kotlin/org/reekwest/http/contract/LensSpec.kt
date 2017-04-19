@@ -19,7 +19,7 @@ open class LensSpec<IN, OUT : Any>(
     private val mappingLens = { name: String ->
         val lens = createLens(name)
         object : Lens<IN, OUT> {
-            override fun invoke(target: IN): List<OUT?>? = lens(target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+            override fun invoke(target: IN): List<OUT> = lens(target).let { it.map { it.let { mapper.mapIn(it) } } }
             override fun invoke(values: List<OUT>, target: IN): IN = lens(values.map { mapper.mapOut(it) }, target)
         }
     }
