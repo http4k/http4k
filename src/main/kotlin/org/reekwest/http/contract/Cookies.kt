@@ -7,9 +7,12 @@ import org.reekwest.http.core.header
 
 object Cookies {
     private val delegate = LensSpec("cookie",
-        object : TargetFieldLens<Request, String> {
-            override fun invoke(name: String, target: Request) = target.cookie(name)?.let { listOf(it) }?.map(Cookie::toString) ?: emptyList()
-            override fun invoke(name: String, values: List<String>, target: Request) = values.fold(target, { m, next -> m.header("Cookie", next) })
+        {
+            name: String ->
+            object : Lens<Request, String> {
+                override fun invoke(target: Request): List<String?>? = target.cookie(name)?.let { listOf(it) }?.map(Cookie::toString) ?: emptyList()
+                override fun invoke(values: List<String>, target: Request) = values.fold(target, { m, next -> m.header("Cookie", next) })
+            }
         }.asByteBuffers(),
         ByteBufferStringBiDiMapper.map({ Cookie("name", "value") }, { it.toString() })
     )

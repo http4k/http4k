@@ -7,30 +7,32 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 interface MultiLensSpec<in IN, OUT : Any> {
-    fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>?>
-    fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT?>>
+    fun optional(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT?>?>
+    fun required(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT?>>
 }
 
 open class LensSpec<IN, OUT : Any>(
     private val location: String,
-    private val extractionLens: TargetFieldLens<IN, ByteBuffer>,
+    private val createLens: (String) -> Lens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private val mappingLens = object : TargetFieldLens<IN, OUT> {
-        override fun invoke(name: String, target: IN) = extractionLens.invoke(name, target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
-
-        override fun invoke(name: String, values: List<OUT>, target: IN) = extractionLens.invoke(name, values.map { mapper.mapOut(it) }, target)
+    private val mappingLens = { name: String ->
+        val lens = createLens(name)
+        object : Lens<IN, OUT> {
+            override fun invoke(target: IN): List<OUT?>? = lens(target)?.let { it.map { it?.let { mapper.mapIn(it) } } }
+            override fun invoke(values: List<OUT>, target: IN): IN = lens(values.map { mapper.mapOut(it) }, target)
+        }
     }
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, extractionLens, mapper.map(nextIn))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = LensSpec(location, createLens, mapper.map(nextIn))
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, extractionLens, mapper.map(nextIn, nextOut))
+    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, createLens, mapper.map(nextIn, nextOut))
 
     /**
      * Create a lens which resolves to a single optional (nullable) value
      */
     fun optional(name: String, description: String? = null) =
-        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
+        object : MetaLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o?.firstOrNull()
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
         }
@@ -38,7 +40,7 @@ open class LensSpec<IN, OUT : Any>(
     /**
      * Create a lens which resolves to a single required (non-nullable) value.
      */
-    fun required(name: String, description: String? = null) = object : Lens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
+    fun required(name: String, description: String? = null) = object : MetaLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
         override fun convertIn(o: List<OUT?>?) = o?.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
@@ -48,7 +50,7 @@ open class LensSpec<IN, OUT : Any>(
         /**
          * Create a lens which resolves to a optional (nullable) list value
          */
-        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT?>?> = object : Lens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
+        override fun optional(name: String, description: String?): MetaLens<IN, OUT, List<OUT?>?> = object : MetaLens<IN, OUT, List<OUT?>?>(Meta(name, location, false, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?) = o
             override fun convertOut(o: List<OUT?>?) = o?.mapNotNull { it } ?: emptyList()
         }
@@ -56,7 +58,7 @@ open class LensSpec<IN, OUT : Any>(
         /**
          * Create a lens which resolves to required (non-nullable) list value.
          */
-        override fun required(name: String, description: String?) = object : Lens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
+        override fun required(name: String, description: String?) = object : MetaLens<IN, OUT, List<OUT?>>(Meta(name, location, true, description), mappingLens) {
             override fun convertIn(o: List<OUT?>?): List<OUT?> {
                 val orEmpty = o ?: emptyList()
                 return if (orEmpty.isEmpty()) throw Missing(this) else orEmpty

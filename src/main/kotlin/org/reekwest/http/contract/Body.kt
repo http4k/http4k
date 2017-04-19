@@ -16,9 +16,11 @@ open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>)
 }
 
 object Body : BodySpec<ByteBuffer>(LensSpec("body",
-    object : TargetFieldLens<HttpMessage, ByteBuffer> {
-        override fun invoke(name: String, target: HttpMessage) = listOf(target.body)
-        override fun invoke(name: String, values: List<ByteBuffer>, target: HttpMessage) = values.fold(target) { a, b -> a.copy(body = b) }
+    {
+        object : Lens<HttpMessage, ByteBuffer> {
+            override fun invoke(target: HttpMessage): List<ByteBuffer?>? = listOf(target.body)
+            override fun invoke(values: List<ByteBuffer>, target: HttpMessage): HttpMessage = values.fold(target) { a, b -> a.copy(body = b) }
+        }
     }, Identity())) {
 
     val string = Body.map(ByteBuffer::asString, String::asByteBuffer)

@@ -1,34 +1,24 @@
 package org.reekwest.http.contract
 
-abstract class Lens<in IN, OUT : Any, FINAL>(val meta: Meta, private val namedLens: TargetFieldLens<IN, OUT>) {
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.asString
+import java.nio.ByteBuffer
 
-    override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
+interface Lens<IN, OUT> {
+    operator fun invoke(target: IN): List<OUT?>?
+    operator fun invoke(values: List<OUT>, target: IN): IN
+}
 
-    /**
-     * Lens operation to get the value from the target
-     */
-    operator fun invoke(target: IN): FINAL = try {
-        convertIn(namedLens.invoke(meta.name, target))
-    } catch (e: ContractBreach) {
-        throw e
-    } catch (e: Exception) {
-        throw ContractBreach.Invalid(this)
+fun <IN> Function1<String, Lens<IN, String>>.asByteBuffers(): (String) -> Lens<IN, ByteBuffer> {
+    // FIXME remove this
+    val bob = this
+    return {
+        object : Lens<IN, ByteBuffer> {
+            override fun invoke(values: List<ByteBuffer>, target: IN): IN =
+                bob(it)(values.map(ByteBuffer::asString), target)
+
+            override fun invoke(target: IN): List<ByteBuffer?>? =
+                bob(it)(target)?.map { it?.let(String::asByteBuffer) }
+        }
     }
-
-    /**
-     * Lens operation to set the value into the target
-     *
-     * The arguments to this method are in this specific order so we can partially apply several functions
-     * and then fold them over a single target to modify.
-     */
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = namedLens.invoke(meta.name, convertOut(value), target) as R
-
-    /**
-     * Bind this Lens to a value, so we can set it into a target
-     */
-    infix fun <R : IN> to(value: FINAL): (R) -> R = { invoke(value, it) }
-
-    abstract internal fun convertIn(o: List<OUT?>?): FINAL
-    abstract internal fun convertOut(o: FINAL): List<OUT>
 }

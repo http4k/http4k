@@ -1,10 +1,10 @@
 package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
-import org.reekwest.http.contract.ContractBreach.Companion.Invalid
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.contract.ContractBreach.Companion.Invalid
+import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.with
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
@@ -33,25 +33,32 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 object FormField : LensSpec<WebForm, String>("form field", FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
 
-fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
+fun Body.webForm(validator: FormValidator, vararg formFields: MetaLens<WebForm, *, *>) =
     BodySpec(LensSpec("form", FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 
 /** private **/
 
-private object FormLocator : TargetFieldLens<HttpMessage, ByteBuffer> {
-    override fun invoke(name: String, target: HttpMessage): List<ByteBuffer> {
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
-        return target.body?.let { listOf(it) } ?: emptyList()
-    }
+private object FormLocator : (String) -> Lens<HttpMessage, ByteBuffer> {
+    override fun invoke(name: String): Lens<HttpMessage, ByteBuffer> =
+        object : Lens<HttpMessage, ByteBuffer> {
+            override fun invoke(target: HttpMessage): List<ByteBuffer?>? {
+                if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
+                return target.body?.let { listOf(it) } ?: emptyList()
+            }
 
-    override fun invoke(name: String, values: List<ByteBuffer>, target: HttpMessage) = values
-        .fold(target, { memo, next -> memo.with(Body.binary() to next) })
-        .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+            override fun invoke(values: List<ByteBuffer>, target: HttpMessage): HttpMessage = values
+                .fold(target, { memo, next -> memo.with(Body.binary() to next) })
+                .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+        }
 }
 
-private object FormFieldLocator : TargetFieldLens<WebForm, String> {
-    override fun invoke(name: String, target: WebForm) = target.fields.getOrDefault(name, listOf())
-    override fun invoke(name: String, values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
+private object FormFieldLocator : (String) -> Lens<WebForm, String> {
+    override fun invoke(name: String): Lens<WebForm, String> =
+        object : Lens<WebForm, String> {
+            override fun invoke(target: WebForm) = target.fields.getOrDefault(name, listOf())
+            override fun invoke(values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
+        }
+
 }
 
 private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
@@ -66,8 +73,8 @@ private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
     // FIXME this doesn't serialize properly
     override fun mapOut(source: FormFields): ByteBuffer = source.toString().asByteBuffer()
 
-    internal fun validatingFor(validator: FormValidator, vararg formFields: Lens<WebForm, *, *>) =
-        map({ it ->
+    internal fun validatingFor(validator: FormValidator, vararg formFields: MetaLens<WebForm, *, *>) =
+        FormFieldsBiDiMapper.map({ it ->
             val formInstance = WebForm(it, emptyList())
             val failures = formFields.fold(listOf<ExtractionFailure>()) {
                 memo, next ->
