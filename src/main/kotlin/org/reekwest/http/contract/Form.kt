@@ -1,10 +1,10 @@
 package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
-import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.contract.ContractBreach.Companion.Invalid
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.with
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
@@ -46,9 +46,9 @@ private object FormLocator : (String) -> Lens<HttpMessage, ByteBuffer> {
                 return target.body?.let { listOf(it) } ?: emptyList()
             }
 
-            override fun invoke(values: List<ByteBuffer>, target: HttpMessage): HttpMessage = values
-                .fold(target, { memo, next -> memo.with(Body.binary() to next) })
-                .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+            override fun invoke(values: List<ByteBuffer?>?, target: HttpMessage): HttpMessage =
+                values?.let { it.fold(target) { memo, next -> next?.let { memo.with(Body.binary() to it) } ?: memo } }
+                    ?.with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED) ?: target
         }
 }
 
@@ -56,7 +56,8 @@ private object FormFieldLocator : (String) -> Lens<WebForm, String> {
     override fun invoke(name: String): Lens<WebForm, String> =
         object : Lens<WebForm, String> {
             override fun invoke(target: WebForm) = target.fields.getOrDefault(name, listOf())
-            override fun invoke(values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
+            override fun invoke(values: List<String?>?, target: WebForm) =
+                values?.let { it.fold(target) { memo, next -> next?.let { memo.plus(name to it) } ?: memo } } ?: target
         }
 
 }
