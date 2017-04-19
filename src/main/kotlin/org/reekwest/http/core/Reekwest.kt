@@ -17,6 +17,8 @@ enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 
 typealias HttpHandler = (Request) -> Response
 
+typealias HttpClient = HttpHandler
+
 typealias Headers = Parameters
 
 typealias Body = java.nio.ByteBuffer
