@@ -35,7 +35,7 @@ class QueryTest {
         val requiredQuery = Query.required("world")
         assertThat({ requiredQuery(request) }, throws(equalTo(Missing(requiredQuery))))
 
-        assertThat(Query.multi.optional("world")(request), equalTo(emptyList()))
+        assertThat(Query.multi.optional("world")(request), absent())
         val optionalMultiQuery = Query.multi.required("world")
         assertThat({ optionalMultiQuery(request) }, throws(equalTo(Missing(optionalMultiQuery))))
     }

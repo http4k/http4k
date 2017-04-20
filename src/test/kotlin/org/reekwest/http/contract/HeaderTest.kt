@@ -34,7 +34,7 @@ class HeaderTest {
         val requiredHeader = Header.required("world")
         assertThat({ requiredHeader(request) }, throws(equalTo(Missing(requiredHeader))))
 
-        assertThat(Header.multi.optional("world")(request), equalTo(emptyList()))
+        assertThat(Header.multi.optional("world")(request), absent())
         val optionalMultiHeader = Header.multi.required("world")
         assertThat({ optionalMultiHeader(request) }, throws(equalTo(Missing(optionalMultiHeader))))
     }

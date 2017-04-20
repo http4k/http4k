@@ -31,7 +31,7 @@ class FormFieldTest {
         val requiredFormField = FormField.required("world")
         assertThat({ requiredFormField(form) }, throws(equalTo(Missing(requiredFormField))))
 
-        assertThat(FormField.multi.optional("world")(form), equalTo(emptyList()))
+        assertThat(FormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = FormField.multi.required("world")
         assertThat({ optionalMultiFormField(form) }, throws(equalTo(Missing(optionalMultiFormField))))
     }

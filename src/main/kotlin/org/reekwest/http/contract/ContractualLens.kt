@@ -29,6 +29,6 @@ abstract class ContractualLens<in IN, OUT : Any, FINAL>(val meta: Meta, private 
      */
     infix fun <R : IN> to(value: FINAL): (R) -> R = { invoke(value, it) }
 
-    abstract internal fun convertIn(o: List<OUT?>?): FINAL
+    abstract internal fun convertIn(o: List<OUT>): FINAL
     abstract internal fun convertOut(o: FINAL): List<OUT>
 }
