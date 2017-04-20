@@ -1,6 +1,6 @@
 package org.reekwest.http.contract
 
-abstract class ContractualLens<in IN, OUT : Any, FINAL>(val meta: Meta, private val createRawLens: (String) -> Lens<IN, OUT>) {
+abstract class ContractualLens<in IN, OUT, FINAL>(val meta: Meta, private val createRawLens: (String) -> Lens<IN, OUT>) {
 
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 

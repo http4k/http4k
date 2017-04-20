@@ -6,12 +6,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiLensSpec<in IN, OUT : Any> {
+interface MultiLensSpec<in IN, OUT> {
     fun optional(name: String, description: String? = null): ContractualLens<IN, OUT, List<OUT>?>
     fun required(name: String, description: String? = null): ContractualLens<IN, OUT, List<OUT>>
 }
 
-open class LensSpec<IN, OUT : Any>(
+open class LensSpec<IN, OUT>(
     private val location: String,
     private val createLens: (String) -> Lens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>

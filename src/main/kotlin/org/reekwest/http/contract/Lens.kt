@@ -4,8 +4,9 @@ import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString
 import java.nio.ByteBuffer
 
-interface Lens<IN, OUT> {
-    operator fun invoke(target: IN): List<OUT>
+interface GetLens<in IN, out OUT> : (IN) -> List<OUT>
+
+interface Lens<IN, OUT> : GetLens<IN, OUT> {
     operator fun invoke(values: List<OUT>, target: IN): IN
 }
 
