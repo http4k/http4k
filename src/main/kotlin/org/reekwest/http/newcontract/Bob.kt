@@ -1,9 +1,7 @@
 package org.reekwest.http.newcontract
 
 import org.reekwest.http.contract.*
-import org.reekwest.http.core.Request
-import org.reekwest.http.core.queries
-import org.reekwest.http.core.query
+import org.reekwest.http.core.*
 
 class MappableGetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String): GetLens<IN, OUT> = object : GetLens<IN, OUT> {
@@ -80,3 +78,11 @@ object Query : SetLensSpec<Request, String, String>("query",
     MappableGetLens({ name, target -> target.queries(name).map { it ?: "" } }, { it }),
     MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.query(name, next) }) }, { it })
 )
+
+object Header : SetLensSpec<HttpMessage, String, String>("header",
+    MappableGetLens({ name, target -> target.headerValues(name).map { it ?: "" } }, { it }),
+    MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }, { it })
+)
+
+fun <IN> SetLensSpec<IN, String, String>.int(): SetLensSpec<IN, String, Int> = this.map(String::toInt, Int::toString)
+fun <IN> SetLensSpec<IN, String, String>.long(): SetLensSpec<IN, String, Long> = this.map(String::toLong, Long::toString)
