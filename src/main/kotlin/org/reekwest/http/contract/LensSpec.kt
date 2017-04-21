@@ -7,19 +7,19 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 interface MultiLensSpec<IN, OUT> {
-    fun optional(name: String, description: String? = null): BiDiContractualLens<IN, OUT, List<OUT>?>
-    fun required(name: String, description: String? = null): BiDiContractualLens<IN, OUT, List<OUT>>
+    fun optional(name: String, description: String? = null): BiDiMetaLens<IN, OUT, List<OUT>?>
+    fun required(name: String, description: String? = null): BiDiMetaLens<IN, OUT, List<OUT>>
 }
 
 open class LensSpec<IN, OUT>(
     private val location: String,
-    private val createLens: (String) -> Lens<IN, ByteBuffer>,
+    private val createLens: (String) -> BiDiLens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private fun mappingLens(name: String): Lens<IN, OUT> {
+    private fun mappingLens(name: String): BiDiLens<IN, OUT> {
         val lens = createLens(name)
 
-        return object : Lens<IN, OUT> {
+        return object : BiDiLens<IN, OUT> {
             override fun invoke(target: IN): List<OUT> = lens(target).let { it.map { it.let { mapper.mapIn(it) } } }
             override fun invoke(values: List<OUT>, target: IN): IN = lens(values.map { mapper.mapOut(it) }, target)
         }
@@ -33,7 +33,7 @@ open class LensSpec<IN, OUT>(
      * Create a lens which resolves to a single optional (nullable) value
      */
     fun optional(name: String, description: String? = null) =
-        object : BiDiContractualLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens(name)) {
+        object : BiDiMetaLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens(name)) {
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
             override fun convertIn(o: List<OUT>) = o.firstOrNull()
         }
@@ -41,7 +41,7 @@ open class LensSpec<IN, OUT>(
     /**
      * Create a lens which resolves to a single required (non-nullable) value.
      */
-    fun required(name: String, description: String? = null) = object : BiDiContractualLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens(name)) {
+    fun required(name: String, description: String? = null) = object : BiDiMetaLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens(name)) {
         override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
@@ -51,7 +51,7 @@ open class LensSpec<IN, OUT>(
         /**
          * Create a lens which resolves to a optional (nullable) list value
          */
-        override fun optional(name: String, description: String?): BiDiContractualLens<IN, OUT, List<OUT>?> = object : BiDiContractualLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), mappingLens(name)) {
+        override fun optional(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>?> = object : BiDiMetaLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), mappingLens(name)) {
             override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
             override fun convertOut(o: List<OUT>?): List<OUT> = o ?: emptyList()
         }
@@ -59,7 +59,7 @@ open class LensSpec<IN, OUT>(
         /**
          * Create a lens which resolves to required (non-nullable) list value.
          */
-        override fun required(name: String, description: String?) = object : BiDiContractualLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), mappingLens(name)) {
+        override fun required(name: String, description: String?) = object : BiDiMetaLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), mappingLens(name)) {
             override fun convertOut(o: List<OUT>): List<OUT> = o
             override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
         }

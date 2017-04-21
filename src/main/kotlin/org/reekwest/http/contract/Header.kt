@@ -7,7 +7,7 @@ import org.reekwest.http.core.headerValues
 
 object Header : LensSpec<HttpMessage, String>("header",
     {name: String ->
-        object: Lens<HttpMessage, String> {
+        object: BiDiLens<HttpMessage, String> {
                 override fun invoke(target: HttpMessage): List<String>  = target.headerValues(name).mapNotNull { it }
                 override fun invoke(values: List<String>, target: HttpMessage)= values.fold(target, { m, next -> m.header(name, next) })
             }

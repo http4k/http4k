@@ -1,6 +1,6 @@
 package org.reekwest.http.contract
 
-abstract class ContractualLens<IN, OUT, out FINAL>(val meta: Meta, internal val delegateLens: Lens<IN, OUT>) {
+abstract class MetaLens<in IN, in OUT, out FINAL>(val meta: Meta, private val delegateLens: GetLens<IN, OUT>) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
@@ -17,7 +17,7 @@ abstract class ContractualLens<IN, OUT, out FINAL>(val meta: Meta, internal val 
     abstract internal fun convertIn(o: List<OUT>): FINAL
 }
 
-abstract class BiDiContractualLens<IN, OUT, FINAL>(meta: Meta, delegateLens: Lens<IN, OUT>) : ContractualLens<IN, OUT, FINAL>(meta, delegateLens) {
+abstract class BiDiMetaLens<IN, OUT, FINAL>(meta: Meta, val delegateLens: BiDiLens<IN, OUT>) : MetaLens<IN, OUT, FINAL>(meta, delegateLens) {
 
     /**
      * Lens operation to set the value into the target

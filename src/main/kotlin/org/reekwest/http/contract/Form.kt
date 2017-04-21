@@ -33,14 +33,14 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 object FormField : LensSpec<WebForm, String>("form field", FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
 
-fun Body.webForm(validator: FormValidator, vararg formFields: BiDiContractualLens<WebForm, *, *>) =
+fun Body.webForm(validator: FormValidator, vararg formFields: BiDiMetaLens<WebForm, *, *>) =
     BodySpec(LensSpec("form", FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 
 /** private **/
 
-private object FormLocator : (String) -> Lens<HttpMessage, ByteBuffer> {
-    override fun invoke(name: String): Lens<HttpMessage, ByteBuffer> =
-        object : Lens<HttpMessage, ByteBuffer> {
+private object FormLocator : (String) -> BiDiLens<HttpMessage, ByteBuffer> {
+    override fun invoke(name: String): BiDiLens<HttpMessage, ByteBuffer> =
+        object : BiDiLens<HttpMessage, ByteBuffer> {
             override fun invoke(target: HttpMessage): List<ByteBuffer> {
                 if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
                 return target.body?.let { listOf(it) } ?: emptyList()
@@ -52,9 +52,9 @@ private object FormLocator : (String) -> Lens<HttpMessage, ByteBuffer> {
         }
 }
 
-private object FormFieldLocator : (String) -> Lens<WebForm, String> {
-    override fun invoke(name: String): Lens<WebForm, String> =
-        object : Lens<WebForm, String> {
+private object FormFieldLocator : (String) -> BiDiLens<WebForm, String> {
+    override fun invoke(name: String): BiDiLens<WebForm, String> =
+        object : BiDiLens<WebForm, String> {
             override fun invoke(target: WebForm) = target.fields.getOrDefault(name, listOf())
             override fun invoke(values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
         }
@@ -73,7 +73,7 @@ private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
     // FIXME this doesn't serialize properly
     override fun mapOut(source: FormFields): ByteBuffer = source.toString().asByteBuffer()
 
-    internal fun validatingFor(validator: FormValidator, vararg formFields: BiDiContractualLens<WebForm, *, *>) =
+    internal fun validatingFor(validator: FormValidator, vararg formFields: BiDiMetaLens<WebForm, *, *>) =
         FormFieldsBiDiMapper.map({ it ->
             val formInstance = WebForm(it, emptyList())
             val failures = formFields.fold(listOf<ExtractionFailure>()) {
