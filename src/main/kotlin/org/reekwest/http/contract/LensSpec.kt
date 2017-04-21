@@ -16,9 +16,9 @@ open class LensSpec<IN, OUT>(
     private val createLens: (String) -> Lens<IN, ByteBuffer>,
     private val mapper: BiDiMapper<ByteBuffer, OUT>
 ) {
-    private val mappingLens = { name: String ->
+    private fun mappingLens(name: String): Lens<IN, OUT> {
         val lens = createLens(name)
-        object : Lens<IN, OUT> {
+        return object : Lens<IN, OUT> {
             override fun invoke(target: IN): List<OUT> = lens(target).let { it.map { it.let { mapper.mapIn(it) } } }
             override fun invoke(values: List<OUT>, target: IN): IN = lens(values.map { mapper.mapOut(it) }, target)
         }
@@ -32,7 +32,7 @@ open class LensSpec<IN, OUT>(
      * Create a lens which resolves to a single optional (nullable) value
      */
     fun optional(name: String, description: String? = null) =
-        object : ContractualLens<IN, OUT, OUT?>(Meta(name, location, false, description), mappingLens) {
+        object : ContractualLens<IN, OUT, OUT?>(Meta(name, location, false, description), this::mappingLens) {
             override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
             override fun convertIn(o: List<OUT>) = o.firstOrNull()
         }
@@ -40,7 +40,7 @@ open class LensSpec<IN, OUT>(
     /**
      * Create a lens which resolves to a single required (non-nullable) value.
      */
-    fun required(name: String, description: String? = null) = object : ContractualLens<IN, OUT, OUT>(Meta(name, location, true, description), mappingLens) {
+    fun required(name: String, description: String? = null) = object : ContractualLens<IN, OUT, OUT>(Meta(name, location, true, description), this::mappingLens) {
         override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
         override fun convertOut(o: OUT) = listOf(o)
     }
@@ -50,7 +50,7 @@ open class LensSpec<IN, OUT>(
         /**
          * Create a lens which resolves to a optional (nullable) list value
          */
-        override fun optional(name: String, description: String?): ContractualLens<IN, OUT, List<OUT>?> = object : ContractualLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), mappingLens) {
+        override fun optional(name: String, description: String?): ContractualLens<IN, OUT, List<OUT>?> = object : ContractualLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), this@LensSpec::mappingLens) {
             override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
             override fun convertOut(o: List<OUT>?): List<OUT> = o ?: emptyList()
         }
@@ -58,7 +58,7 @@ open class LensSpec<IN, OUT>(
         /**
          * Create a lens which resolves to required (non-nullable) list value.
          */
-        override fun required(name: String, description: String?) = object : ContractualLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), mappingLens) {
+        override fun required(name: String, description: String?) = object : ContractualLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), this@LensSpec::mappingLens) {
             override fun convertOut(o: List<OUT>): List<OUT> = o
             override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
         }
