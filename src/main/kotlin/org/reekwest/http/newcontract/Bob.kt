@@ -8,6 +8,8 @@ import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.*
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.cookie.Cookie
+import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.newcontract.Header.Common.CONTENT_TYPE
 import java.net.URLDecoder
 import java.nio.ByteBuffer
@@ -112,6 +114,11 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, createGetLens: MappableG
 object Query : BiDiLensSpec<Request, String, String>("query",
     MappableGetLens({ name, target -> target.queries(name).map { it ?: "" } }, { it }),
     MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.query(name, next) }) }, { it })
+)
+
+object Cookies : BiDiLensSpec<Request, Cookie, Cookie>("cookie",
+    MappableGetLens({ name, target -> target.cookie(name)?.let { listOf(it) } ?: emptyList() }, { it }),
+    MappableSetLens({ _, values, target -> values.fold(target, { m, next -> m.header("Cookie", next.toString()) }) }, { it })
 )
 
 object Header : BiDiLensSpec<HttpMessage, String, String>("header",
