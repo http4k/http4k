@@ -4,9 +4,12 @@ import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString
 import java.nio.ByteBuffer
 
+@FunctionalInterface
 interface GetLens<in IN, out OUT> {
     operator fun invoke(target: IN): List<OUT>
 }
+
+@FunctionalInterface
 interface SetLens<IN, in OUT> {
     operator fun invoke(values: List<OUT>, target: IN): IN
 }
