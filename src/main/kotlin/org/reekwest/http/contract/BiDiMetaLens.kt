@@ -17,7 +17,7 @@ abstract class MetaLens<in IN, in OUT, out FINAL>(val meta: Meta, private val de
     abstract internal fun convertIn(o: List<OUT>): FINAL
 }
 
-abstract class BiDiMetaLens<IN, OUT, FINAL>(meta: Meta, val delegateLens: BiDiLens<IN, OUT>) : MetaLens<IN, OUT, FINAL>(meta, delegateLens) {
+abstract class BiDiMetaLens<IN, OUT, FINAL>(meta: Meta, val delegateLens: BiDiLens<IN, OUT>) : MetaLens<IN, OUT, FINAL>(meta, delegateLens.getLens) {
 
     /**
      * Lens operation to set the value into the target
@@ -26,7 +26,7 @@ abstract class BiDiMetaLens<IN, OUT, FINAL>(meta: Meta, val delegateLens: BiDiLe
      * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = delegateLens(convertOut(value), target) as R
+    operator fun <R : IN> invoke(value: FINAL, target: R): R = delegateLens.setLens(convertOut(value), target) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target

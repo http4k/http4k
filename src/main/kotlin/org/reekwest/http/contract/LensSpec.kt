@@ -44,15 +44,7 @@ interface BiDiMultiLensSpec<IN, OUT> : MultiGetLensSpec<IN, OUT> {
 open class BiDiLensSpec<IN, MID, OUT>(location: String, createGetLens: MappableGetLens<IN, MID, OUT>,
                                       private val createSetLens: MappableSetLens<IN, MID, OUT>) : GetLensSpec<IN, MID, OUT>(location, createGetLens) {
 
-    private fun biDiLensFor(name: String): BiDiLens<IN, OUT> {
-        val getLens = createGetLens(name)
-        val setLens = createSetLens(name)
-
-        return object : BiDiLens<IN, OUT> {
-            override fun invoke(target: IN): List<OUT> = getLens(target)
-            override fun invoke(values: List<OUT>, target: IN): IN = setLens(values, target)
-        }
-    }
+    private fun biDiLensFor(name: String): BiDiLens<IN, OUT> = BiDiLens(createGetLens(name), createSetLens(name))
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiLensSpec<IN, MID, NEXT> =
         BiDiLensSpec(location,
