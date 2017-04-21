@@ -54,36 +54,15 @@ private fun formParametersFrom(target: Request): Map<String, List<String>> {
         .mapValues { it.value.map { it.second } }
 }
 
-
-//object FormField : LensSpec<WebForm, String>("form field", FormFieldLocator.asByteBuffers(), ByteBufferStringBiDiMapper)
+object FormField : BiDiLensSpec<WebForm, String, String>("form field",
+    GetLens({ name, (fields) -> fields.getOrDefault(name, listOf()) }, { it }),
+    SetLens({ name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }, { it })
+)
 //
 //fun Body.webForm(validator: FormValidator, vararg formFields: BiDiMetaLens<WebForm, *, *>) =
 //    BodySpec(LensSpec("form", FormLocator, FormFieldsBiDiMapper.validatingFor(validator, *formFields))).required("form")
 //
 ///** private **/
-//
-//private object FormLocator : (String) -> BiDiLens<HttpMessage, ByteBuffer> {
-//    override fun invoke(name: String): BiDiLens<HttpMessage, ByteBuffer> =
-//        object : BiDiLens<HttpMessage, ByteBuffer> {
-//            override fun invoke(target: HttpMessage): List<ByteBuffer> {
-//                if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
-//                return target.body?.let { listOf(it) } ?: emptyList()
-//            }
-//
-//            override fun invoke(values: List<ByteBuffer>, target: HttpMessage): HttpMessage = values
-//                .fold(target, { memo, next -> memo.with(Body.binary() to next) })
-//                .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
-//        }
-//}
-//
-//private object FormFieldLocator : (String) -> BiDiLens<WebForm, String> {
-//    override fun invoke(name: String): BiDiLens<WebForm, String> =
-//        object : BiDiLens<WebForm, String> {
-//            override fun invoke(target: WebForm) = target.fields.getOrDefault(name, listOf())
-//            override fun invoke(values: List<String>, target: WebForm) = values.fold(target, { m, next -> m.plus(name to next) })
-//        }
-//
-//}
 //
 //private object FormFieldsBiDiMapper : BiDiMapper<ByteBuffer, FormFields> {
 //    override fun mapIn(source: ByteBuffer): FormFields = String(source.array())
