@@ -1,15 +1,22 @@
 package org.reekwest.http.contract
 
-class Get<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
+class Get<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
 
     fun <NEXT> map(nextFn: (OUT) -> NEXT) = Get(rootFn, { nextFn(fn(it)) })
+
+    companion object {
+        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): Get<IN, OUT, OUT> = Get(rootFn, { it })
+    }
 }
 
-class Set<IN, MID, in OUT>(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
+class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
     operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
     fun <NEXT> map(nextFn: (NEXT) -> OUT) = Set(rootFn, { value: NEXT -> fn(nextFn(value)) })
-}
+
+    companion object {
+        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): Set<IN, OUT, OUT> = Set(rootFn, { it })
+    }}
 
 abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (IN) -> List<OUT>) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
@@ -29,7 +36,7 @@ abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (
 }
 
 abstract class BiDiLens<in IN, OUT, FINAL>(meta: Meta, get: (IN) -> List<OUT>,
-                                           private val set: (List<OUT>, IN) -> IN ) : Lens<IN, OUT, FINAL>(meta, get) {
+                                           private val set: (List<OUT>, IN) -> IN) : Lens<IN, OUT, FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target
