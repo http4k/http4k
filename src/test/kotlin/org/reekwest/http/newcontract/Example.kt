@@ -1,11 +1,10 @@
-package org.reekwest.http.bob
+package org.reekwest.http.newcontract
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.newcontract.*
 
 
 data class CustomType(val s: String)
