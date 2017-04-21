@@ -7,10 +7,10 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
-open class BodySpec<OUT : Any>(private val delegate: LensSpec<HttpMessage, OUT>) {
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT) = BodySpec(delegate.map(nextIn))
+open class BodySpec<OUT >(private val delegate: LensSpec<HttpMessage, OUT>) {
+    fun <NEXT > map(nextIn: (OUT) -> NEXT) = BodySpec(delegate.map(nextIn))
 
-    fun <NEXT : Any> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BodySpec(delegate.map(nextIn, nextOut))
+    fun <NEXT > map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BodySpec(delegate.map(nextIn, nextOut))
 
     fun required(description: String? = null) = delegate.required("body", description)
 }
