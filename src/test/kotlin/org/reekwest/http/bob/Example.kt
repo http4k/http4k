@@ -11,7 +11,10 @@ import org.reekwest.http.newcontract.long
 fun main(args: Array<String>) {
     val optional = Query.optional("name")
     val requiredHeader = Header.long().required("name")
-    println(optional(Request(GET, uri("/bob?name=food"))))
-    println(optional(Request(GET, uri("/bob"))))
-    println(requiredHeader(Request(GET, uri("/bob"), listOf("name" to "123", "name" to "1232"))))
+    val request = Request(GET, uri("/bob"), listOf("name" to "123", "name" to "1232"))
+
+    println(optional(request))
+    println(optional(request))
+    println(requiredHeader(request))
+    println(requiredHeader(4444, request))
 }

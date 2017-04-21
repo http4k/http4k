@@ -19,10 +19,7 @@ class MappableSetLens<IN, MID, in OUT>(private val rootFn: (String, List<MID>, I
     fun <NEXT> map(nextFn: (NEXT) -> OUT): MappableSetLens<IN, MID, NEXT> = MappableSetLens(rootFn, { fn(nextFn(it)) })
 }
 
-open class GetLensSpec<IN, MID, OUT>(
-    internal val location: String,
-    internal val createGetLens: MappableGetLens<IN, MID, OUT>
-) {
+open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val createGetLens: MappableGetLens<IN, MID, OUT> ) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, createGetLens.map(nextIn))
 
     open fun optional(name: String, description: String? = null): MetaLens<IN, OUT, OUT?> =
@@ -36,11 +33,8 @@ open class GetLensSpec<IN, MID, OUT>(
         }
 }
 
-open class SetLensSpec<IN, MID, OUT>(
-    location: String,
-    createGetLens: MappableGetLens<IN, MID, OUT>,
-    private val createSetLens: MappableSetLens<IN, MID, OUT>
-) : GetLensSpec<IN, MID, OUT>(location, createGetLens) {
+open class SetLensSpec<IN, MID, OUT>(location: String, createGetLens: MappableGetLens<IN, MID, OUT>,
+                                     private val createSetLens: MappableSetLens<IN, MID, OUT> ) : GetLensSpec<IN, MID, OUT>(location, createGetLens) {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): SetLensSpec<IN, MID, NEXT> =
         SetLensSpec(location,
