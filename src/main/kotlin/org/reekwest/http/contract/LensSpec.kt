@@ -5,13 +5,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiGetLensSpec<in IN, OUT> {
+interface MultiLensSpec<in IN, OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT>>
 }
 
-open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val get: Get<IN, MID, OUT>) {
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, get.map(nextIn))
+open class LensSpec<IN, MID, OUT>(internal val location: String, internal val get: Get<IN, MID, OUT>) {
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, MID, NEXT> = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT, OUT?> =
         object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), get(name)) {
@@ -23,7 +23,7 @@ open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val
             override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
         }
 
-    open val multi = object : MultiGetLensSpec<IN, OUT> {
+    open val multi = object : MultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT>?> =
             object : Lens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), get(name)) {
                 override fun convertIn(o: List<OUT>) = if (o.isEmpty()) null else o
@@ -36,13 +36,13 @@ open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val
     }
 }
 
-interface BiDiMultiLensSpec<in IN, OUT> : MultiGetLensSpec<IN, OUT> {
+interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>?>
     override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>>
 }
 
 open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
-                                      private val set: Set<IN, MID, OUT>) : GetLensSpec<IN, MID, OUT>(location, get) {
+                                      private val set: Set<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, get) {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiLensSpec<IN, MID, NEXT> =
         BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
