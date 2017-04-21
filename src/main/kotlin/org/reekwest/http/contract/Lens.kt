@@ -1,9 +1,5 @@
 package org.reekwest.http.contract
 
-typealias Get<IN, OUT> = (IN) -> List<OUT>
-
-typealias Set<IN, OUT> = (List<OUT>, IN) -> IN
-
 class GetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
 

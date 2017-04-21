@@ -1,13 +1,13 @@
 package org.reekwest.http.contract
 
-abstract class MetaLens<in IN, in OUT, out FINAL>(val meta: Meta, private val delegateLens: Get<IN, OUT>) {
+abstract class MetaLens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (IN) -> List<OUT>) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
      * Lens operation to get the value from the target
      */
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(delegateLens(target))
+        convertIn(get(target))
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
