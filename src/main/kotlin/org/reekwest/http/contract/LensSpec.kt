@@ -24,9 +24,9 @@ open class LensSpec<IN, OUT>(
         }
     }
 
-    fun <NEXT > map(nextIn: (OUT) -> NEXT) = LensSpec(location, createLens, mapper.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, NEXT> = LensSpec(location, createLens, mapper.map(nextIn))
 
-    fun <NEXT > map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = LensSpec(location, createLens, mapper.map(nextIn, nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): LensSpec<IN, NEXT> = LensSpec(location, createLens, mapper.map(nextIn, nextOut))
 
     /**
      * Create a lens which resolves to a single optional (nullable) value
