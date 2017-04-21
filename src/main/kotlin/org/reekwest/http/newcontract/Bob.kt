@@ -1,6 +1,7 @@
 package org.reekwest.http.newcontract
 
 import org.reekwest.http.contract.*
+import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.*
 
 class MappableGetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
@@ -19,6 +20,11 @@ class MappableSetLens<IN, MID, in OUT>(private val rootFn: (String, List<MID>, I
     fun <NEXT> map(nextFn: (NEXT) -> OUT): MappableSetLens<IN, MID, NEXT> = MappableSetLens(rootFn, { fn(nextFn(it)) })
 }
 
+interface MultiLensSpec<in IN, OUT> {
+    fun optional(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT>?>
+    fun required(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT>>
+}
+
 open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val createGetLens: MappableGetLens<IN, MID, OUT> ) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, createGetLens.map(nextIn))
 
@@ -29,8 +35,20 @@ open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val
 
     open fun required(name: String, description: String? = null): MetaLens<IN, OUT, OUT> =
         object : MetaLens<IN, OUT, OUT>(Meta(name, location, false, description), createGetLens(name)) {
-            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw ContractBreach.Missing(this)
+            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
         }
+
+    val multi = object: MultiLensSpec<IN, OUT> {
+        override fun optional(name: String, description: String?): MetaLens<IN, OUT, List<OUT>?> =
+            object : MetaLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name)) {
+                override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
+            }
+
+        override fun required(name: String, description: String?): MetaLens<IN, OUT, List<OUT>> =
+            object : MetaLens<IN, OUT, List<OUT>>(Meta(name, location, false, description), createGetLens(name)) {
+                override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
+            }
+    }
 }
 
 open class SetLensSpec<IN, MID, OUT>(location: String, createGetLens: MappableGetLens<IN, MID, OUT>,
@@ -62,7 +80,7 @@ open class SetLensSpec<IN, MID, OUT>(location: String, createGetLens: MappableGe
             override fun invoke(target: IN): List<OUT> = getLens(target)
             override fun invoke(values: List<OUT>, target: IN): IN = setLens(values, target)
         }) {
-            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw ContractBreach.Missing(this)
+            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
             override fun convertOut(o: OUT): List<OUT> = listOf(o)
         }
     }
