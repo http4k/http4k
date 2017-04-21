@@ -10,28 +10,28 @@ interface MultiGetLensSpec<in IN, OUT> {
     fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT>>
 }
 
-open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val createGetLens: GetLens<IN, MID, OUT>) {
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, createGetLens.map(nextIn))
+open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val get: Get<IN, MID, OUT>) {
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT, OUT?> =
-        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name)) {
-            override fun convertIn(o: List<OUT>): OUT? = o.firstOrNull()
+        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), get(name)) {
+            override fun convertIn(o: List<OUT>) = o.firstOrNull()
         }
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT, OUT> =
-        object : Lens<IN, OUT, OUT>(Meta(name, location, false, description), createGetLens(name)) {
-            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
+        object : Lens<IN, OUT, OUT>(Meta(name, location, false, description), get(name)) {
+            override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
         }
 
     open val multi = object : MultiGetLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT>?> =
-            object : Lens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name)) {
-                override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
+            object : Lens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), get(name)) {
+                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) null else o
             }
 
         override fun required(name: String, description: String?): Lens<IN, OUT, List<OUT>> =
-            object : Lens<IN, OUT, List<OUT>>(Meta(name, location, false, description), createGetLens(name)) {
-                override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
+            object : Lens<IN, OUT, List<OUT>>(Meta(name, location, false, description), get(name)) {
+                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) throw Missing(this) else o
             }
     }
 }
@@ -41,35 +41,35 @@ interface BiDiMultiLensSpec<in IN, OUT> : MultiGetLensSpec<IN, OUT> {
     override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>>
 }
 
-open class BiDiLensSpec<IN, MID, OUT>(location: String, getLens: GetLens<IN, MID, OUT>,
-                                      private val setLens: SetLens<IN, MID, OUT>) : GetLensSpec<IN, MID, OUT>(location, getLens) {
+open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
+                                      private val set: Set<IN, MID, OUT>) : GetLensSpec<IN, MID, OUT>(location, get) {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiLensSpec<IN, MID, NEXT> =
-        BiDiLensSpec(location, createGetLens.map(nextIn), setLens.map(nextOut))
+        BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT, OUT?> =
-        object : BiDiLens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name), setLens(name)) {
-            override fun convertIn(o: List<OUT>): OUT? = o.firstOrNull()
-            override fun convertOut(o: OUT?): List<OUT> = o?.let { listOf(it) } ?: emptyList()
+        object : BiDiLens<IN, OUT, OUT?>(Meta(name, location, false, description), get(name), set(name)) {
+            override fun convertIn(o: List<OUT>) = o.firstOrNull()
+            override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
         }
 
     override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> =
-        object : BiDiLens<IN, OUT, OUT>(Meta(name, location, true, description), createGetLens(name), setLens(name)) {
-            override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
-            override fun convertOut(o: OUT): List<OUT> = listOf(o)
+        object : BiDiLens<IN, OUT, OUT>(Meta(name, location, true, description), get(name), set(name)) {
+            override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
+            override fun convertOut(o: OUT) = listOf(o)
         }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>?> =
-            object : BiDiLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), getLens(name), setLens(name)) {
-                override fun convertOut(o: List<OUT>?): List<OUT> = o ?: emptyList()
-                override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
+            object : BiDiLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), get(name), set(name)) {
+                override fun convertOut(o: List<OUT>?) = o ?: emptyList()
+                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) null else o
             }
 
         override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>> =
-            object : BiDiLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), getLens(name), setLens(name)) {
-                override fun convertOut(o: List<OUT>): List<OUT> = o
-                override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
+            object : BiDiLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), get(name), set(name)) {
+                override fun convertOut(o: List<OUT>) = o
+                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) throw Missing(this) else o
             }
     }
 }

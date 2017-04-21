@@ -32,13 +32,13 @@ enum class FormValidator : (WebForm) -> WebForm {
 }
 
 fun Body.form() = BiDiLensSpec<Request, WebForm, WebForm>("form",
-    GetLens({ _, target ->
+    Get({ _, target ->
         if (Header.Common.CONTENT_TYPE(target) != ContentType.APPLICATION_FORM_URLENCODED) throw ContractBreach.Invalid(Header.Common.CONTENT_TYPE)
         listOf(WebForm(formParametersFrom(target), emptyList()))
     }, { it }),
-    SetLens({ _, values, target ->
+    Set({ _, values, target ->
         values.fold(target, { memo, next ->
-            memo.with(Body.required("body") to next.toString().asByteBuffer())
+            memo.with(required("body") to next.toString().asByteBuffer())
         })
             .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }, { it })
@@ -55,8 +55,8 @@ private fun formParametersFrom(target: Request): Map<String, List<String>> {
 }
 
 object FormField : BiDiLensSpec<WebForm, String, String>("form field",
-    GetLens({ name, (fields) -> fields.getOrDefault(name, listOf()) }, { it }),
-    SetLens({ name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }, { it })
+    Get({ name, (fields) -> fields.getOrDefault(name, listOf()) }, { it }),
+    Set({ name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }, { it })
 )
 //
 //fun Body.webForm(validator: FormValidator, vararg formFields: BiDiMetaLens<WebForm, *, *>) =
