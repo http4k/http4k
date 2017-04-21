@@ -1,8 +1,16 @@
 package org.reekwest.http.newcontract
 
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.asString
 import org.reekwest.http.contract.*
+import org.reekwest.http.contract.ContractBreach.Companion.Invalid
 import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import org.reekwest.http.core.*
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.newcontract.Header.Common.CONTENT_TYPE
+import java.net.URLDecoder
+import java.nio.ByteBuffer
 
 class MappableGetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String): GetLens<IN, OUT> = object : GetLens<IN, OUT> {
@@ -51,8 +59,7 @@ open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val
     }
 }
 
-
-interface BiDiMultiLensSpec<IN, OUT>: MultiGetLensSpec<IN, OUT> {
+interface BiDiMultiLensSpec<IN, OUT> : MultiGetLensSpec<IN, OUT> {
     override fun optional(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>?>
     override fun required(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>>
 }
@@ -110,6 +117,44 @@ object Query : BiDiLensSpec<Request, String, String>("query",
 object Header : BiDiLensSpec<HttpMessage, String, String>("header",
     MappableGetLens({ name, target -> target.headerValues(name).map { it ?: "" } }, { it }),
     MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }, { it })
+) {
+    object Common {
+        val CONTENT_TYPE = Header.map(::ContentType).optional("Content-Type")
+    }
+}
+
+object Body : BiDiLensSpec<HttpMessage, ByteBuffer, ByteBuffer>("body",
+    MappableGetLens({ _, target -> target.body?.let { listOf(it) } ?: emptyList() }, { it }),
+    MappableSetLens({ _, values, target -> values.fold(target) { a, b -> a.copy(body = b) } }, { it })
+) {
+    val string = Body.map(ByteBuffer::asString, String::asByteBuffer)
+    fun string(description: String? = null) = string.required("body", description)
+}
+
+fun Body.form() = BiDiLensSpec<Request, WebForm, WebForm>("form",
+    MappableGetLens({ _, target ->
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw Invalid(CONTENT_TYPE)
+        listOf(WebForm(formParametersFrom(target), emptyList()))
+    }, { it }),
+    MappableSetLens({ _, values, target ->
+        //FIXME this doesn't work!
+        target
+    }, { it })
+).required("form")
+
+private fun formParametersFrom(target: Request): Map<String, List<String>> {
+    return target.bodyString()
+        .split("&")
+        .filter { it.contains("=") }
+        .map { it.split("=") }
+        .map { URLDecoder.decode(it[0], "UTF-8") to if (it.size > 1) URLDecoder.decode(it[1], "UTF-8") else "" }
+        .groupBy { it.first }
+        .mapValues { it.value.map { it.second } }
+}
+
+object FormField : BiDiLensSpec<WebForm, String, String>("header",
+    MappableGetLens({ name, (fields) -> fields.getOrDefault(name, listOf()) }, { it }),
+    MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }, { it })
 )
 
 fun <IN> BiDiLensSpec<IN, String, String>.int(): BiDiLensSpec<IN, String, Int> = this.map(String::toInt, Int::toString)
