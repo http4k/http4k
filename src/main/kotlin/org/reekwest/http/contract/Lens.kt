@@ -1,8 +1,6 @@
 package org.reekwest.http.contract
 
-interface GetLens<in IN, out OUT> {
-    operator fun invoke(target: IN): List<OUT>
-}
+typealias GetLens<IN, OUT> = (IN) -> List<OUT>
 
 interface SetLens<IN, in OUT> {
     operator fun invoke(values: List<OUT>, target: IN): IN
@@ -11,9 +9,7 @@ interface SetLens<IN, in OUT> {
 interface BiDiLens<IN, OUT> : GetLens<IN, OUT>, SetLens<IN, OUT>
 
 class MappableGetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
-    operator fun invoke(name: String): GetLens<IN, OUT> = object : GetLens<IN, OUT> {
-        override fun invoke(target: IN): List<OUT> = rootFn(name, target).map(fn)
-    }
+    operator fun invoke(name: String): GetLens<IN, OUT> = { rootFn(name, it).map(fn) }
 
     fun <NEXT> map(nextFn: (OUT) -> NEXT): MappableGetLens<IN, MID, NEXT> = MappableGetLens(rootFn, { nextFn(fn(it)) })
 }

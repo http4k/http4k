@@ -1,8 +1,12 @@
 package org.reekwest.http.contract
 
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.with
 import java.net.URLDecoder
 
 typealias FormFields = Map<String, List<String>>
@@ -33,8 +37,10 @@ fun Body.form() = BiDiLensSpec<Request, WebForm, WebForm>("form",
         listOf(WebForm(formParametersFrom(target), emptyList()))
     }, { it }),
     MappableSetLens({ _, values, target ->
-        //FIXME this doesn't work!
-        target
+        values.fold(target, { memo, next ->
+            memo.with(Body.required("body") to next.toString().asByteBuffer())
+        })
+            .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }, { it })
 ).required("form")
 

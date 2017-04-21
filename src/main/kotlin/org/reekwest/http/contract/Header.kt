@@ -10,6 +10,6 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header",
     MappableSetLens({ name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }, { it })
 ) {
     object Common {
-        val CONTENT_TYPE = map(::ContentType).optional("Content-Type")
+        val CONTENT_TYPE = map(::ContentType, { it.value }).optional("Content-Type")
     }
 }
