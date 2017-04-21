@@ -4,7 +4,7 @@ typealias Get<IN, OUT> = (IN) -> List<OUT>
 
 typealias Set<IN, OUT> = (List<OUT>, IN) -> IN
 
-data class BiDiLens<IN, OUT>(val getLens: Get<IN, OUT>, val setLens: Set<IN, OUT>)
+data class BiDiLens<IN, OUT>(val get: Get<IN, OUT>, val set: Set<IN, OUT>)
 
 class GetLens<in IN, MID, out OUT>(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
