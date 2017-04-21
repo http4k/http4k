@@ -1,6 +1,6 @@
 package org.reekwest.http.contract
 
-abstract class ContractualLens<in IN, OUT, FINAL>(val meta: Meta, private val createRawLens: (String) -> Lens<IN, OUT>) {
+abstract class ContractualLens<in IN, OUT, FINAL>(val meta: Meta, private val delegateLens: Lens<IN, OUT>) {
 
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
@@ -8,7 +8,7 @@ abstract class ContractualLens<in IN, OUT, FINAL>(val meta: Meta, private val cr
      * Lens operation to get the value from the target
      */
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(createRawLens(meta.name)(target))
+        convertIn(delegateLens(target))
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
@@ -22,7 +22,7 @@ abstract class ContractualLens<in IN, OUT, FINAL>(val meta: Meta, private val cr
      * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = createRawLens(meta.name)(convertOut(value), target) as R
+    operator fun <R : IN> invoke(value: FINAL, target: R): R = delegateLens(convertOut(value), target) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target
