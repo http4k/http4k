@@ -11,7 +11,6 @@ class SetLens<IN, MID, in OUT>(private val rootFn: (String, List<MID>, IN) -> IN
     fun <NEXT> map(nextFn: (NEXT) -> OUT) = SetLens(rootFn, { value: NEXT -> fn(nextFn(value)) })
 }
 
-
 abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (IN) -> List<OUT>) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
