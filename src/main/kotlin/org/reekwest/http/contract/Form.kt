@@ -32,11 +32,11 @@ enum class FormValidator : (WebForm) -> WebForm {
 }
 
 fun Body.form() = BiDiLensSpec<Request, WebForm, WebForm>("form",
-    MappableGetLens({ _, target ->
+    GetLens({ _, target ->
         if (Header.Common.CONTENT_TYPE(target) != ContentType.APPLICATION_FORM_URLENCODED) throw ContractBreach.Invalid(Header.Common.CONTENT_TYPE)
         listOf(WebForm(formParametersFrom(target), emptyList()))
     }, { it }),
-    MappableSetLens({ _, values, target ->
+    SetLens({ _, values, target ->
         values.fold(target, { memo, next ->
             memo.with(Body.required("body") to next.toString().asByteBuffer())
         })
