@@ -6,39 +6,39 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 interface MultiGetLensSpec<in IN, OUT> {
-    fun optional(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT>?>
-    fun required(name: String, description: String? = null): MetaLens<IN, OUT, List<OUT>>
+    fun optional(name: String, description: String? = null): Lens<IN, OUT, List<OUT>?>
+    fun required(name: String, description: String? = null): Lens<IN, OUT, List<OUT>>
 }
 
 open class GetLensSpec<IN, MID, OUT>(internal val location: String, internal val createGetLens: GetLens<IN, MID, OUT>) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT): GetLensSpec<IN, MID, NEXT> = GetLensSpec(location, createGetLens.map(nextIn))
 
-    open fun optional(name: String, description: String? = null): MetaLens<IN, OUT, OUT?> =
-        object : MetaLens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name)) {
+    open fun optional(name: String, description: String? = null): Lens<IN, OUT, OUT?> =
+        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name)) {
             override fun convertIn(o: List<OUT>): OUT? = o.firstOrNull()
         }
 
-    open fun required(name: String, description: String? = null): MetaLens<IN, OUT, OUT> =
-        object : MetaLens<IN, OUT, OUT>(Meta(name, location, false, description), createGetLens(name)) {
+    open fun required(name: String, description: String? = null): Lens<IN, OUT, OUT> =
+        object : Lens<IN, OUT, OUT>(Meta(name, location, false, description), createGetLens(name)) {
             override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
         }
 
     open val multi = object : MultiGetLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): MetaLens<IN, OUT, List<OUT>?> =
-            object : MetaLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name)) {
+        override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT>?> =
+            object : Lens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name)) {
                 override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
             }
 
-        override fun required(name: String, description: String?): MetaLens<IN, OUT, List<OUT>> =
-            object : MetaLens<IN, OUT, List<OUT>>(Meta(name, location, false, description), createGetLens(name)) {
+        override fun required(name: String, description: String?): Lens<IN, OUT, List<OUT>> =
+            object : Lens<IN, OUT, List<OUT>>(Meta(name, location, false, description), createGetLens(name)) {
                 override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
             }
     }
 }
 
 interface BiDiMultiLensSpec<in IN, OUT> : MultiGetLensSpec<IN, OUT> {
-    override fun optional(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>?>
-    override fun required(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>>
+    override fun optional(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>?>
+    override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>>
 }
 
 open class BiDiLensSpec<IN, MID, OUT>(location: String, createGetLens: GetLens<IN, MID, OUT>,
@@ -47,27 +47,27 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, createGetLens: GetLens<I
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiLensSpec<IN, MID, NEXT> =
         BiDiLensSpec(location, createGetLens.map(nextIn), createSetLens.map(nextOut))
 
-    override fun optional(name: String, description: String?): BiDiMetaLens<IN, OUT, OUT?> =
-        object : BiDiMetaLens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name), createSetLens(name)) {
+    override fun optional(name: String, description: String?): BiDiLens<IN, OUT, OUT?> =
+        object : BiDiLens<IN, OUT, OUT?>(Meta(name, location, false, description), createGetLens(name), createSetLens(name)) {
             override fun convertIn(o: List<OUT>): OUT? = o.firstOrNull()
             override fun convertOut(o: OUT?): List<OUT> = o?.let { listOf(it) } ?: emptyList()
         }
 
-    override fun required(name: String, description: String?): BiDiMetaLens<IN, OUT, OUT> =
-        object : BiDiMetaLens<IN, OUT, OUT>(Meta(name, location, true, description), createGetLens(name), createSetLens(name)) {
+    override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> =
+        object : BiDiLens<IN, OUT, OUT>(Meta(name, location, true, description), createGetLens(name), createSetLens(name)) {
             override fun convertIn(o: List<OUT>): OUT = o.firstOrNull() ?: throw Missing(this)
             override fun convertOut(o: OUT): List<OUT> = listOf(o)
         }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>?> =
-            object : BiDiMetaLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name), createSetLens(name)) {
+        override fun optional(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>?> =
+            object : BiDiLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), createGetLens(name), createSetLens(name)) {
                 override fun convertOut(o: List<OUT>?): List<OUT> = o ?: emptyList()
                 override fun convertIn(o: List<OUT>): List<OUT>? = if (o.isEmpty()) null else o
             }
 
-        override fun required(name: String, description: String?): BiDiMetaLens<IN, OUT, List<OUT>> =
-            object : BiDiMetaLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), createGetLens(name), createSetLens(name)) {
+        override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>> =
+            object : BiDiLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), createGetLens(name), createSetLens(name)) {
                 override fun convertOut(o: List<OUT>): List<OUT> = o
                 override fun convertIn(o: List<OUT>): List<OUT> = if (o.isEmpty()) throw Missing(this) else o
             }
