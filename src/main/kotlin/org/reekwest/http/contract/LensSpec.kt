@@ -13,26 +13,26 @@ open class LensSpec<IN, MID, out OUT>(internal val location: String, internal va
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {
-        val meta = Meta(name, location, false, description)
+        val meta = Meta(false, location, name, description)
         val getLens = get(name)
         return Lens(meta, { getLens(it).firstOrNull() })
     }
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
-        val meta = Meta(name, location, false, description)
+        val meta = Meta(false, location, name, description)
         val getLens = get(name)
         return Lens(meta, { getLens(it).firstOrNull() ?: throw ContractBreach(Missing(meta)) })
     }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, List<OUT>?> {
-            val meta = Meta(name, location, false, description)
+            val meta = Meta(false, location, name, description)
             val getLens = get(name)
             return Lens(meta, { getLens(it).let { if (it.isEmpty()) null else it } })
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
-            val meta = Meta(name, location, false, description)
+            val meta = Meta(false, location, name, description)
             val getLens = get(name)
             return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw ContractBreach(Missing(meta)) else it } })
         }
@@ -50,7 +50,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT?> {
-        val meta = Meta(name, location, false, description)
+        val meta = Meta(false, location, name, description)
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(meta,
@@ -60,7 +60,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
     }
 
     override fun required(name: String, description: String?): BiDiLens<IN, OUT> {
-        val meta = Meta(name, location, true, description)
+        val meta = Meta(true, location, name, description)
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(meta,
@@ -70,7 +70,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?> {
-            val meta = Meta(name, location, false, description)
+            val meta = Meta(false, location, name, description)
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(meta,
@@ -80,7 +80,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
         }
 
         override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>> {
-            val meta = Meta(name, location, true, description)
+            val meta = Meta(true, location, name, description)
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(meta,
