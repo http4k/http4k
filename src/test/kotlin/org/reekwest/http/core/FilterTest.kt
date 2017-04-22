@@ -9,8 +9,8 @@ import org.reekwest.http.core.Uri.Companion.uri
 class FilterTest {
 
     private val echoHeaders = { req: Request -> req.headers.fold(Response(OK)) { memo, next -> memo.header(next.first, next.second) } }
-    private val addRequestHeader = Filter { next -> { req -> next(req.header("hello", "world")) } }
-    private val addResponseHeader = Filter { next -> { req -> next(req).header("goodbye", "cruel") } }
+    private val addRequestHeader = Filter { next -> { next(it.header("hello", "world")) } }
+    private val addResponseHeader = Filter { next -> { next(it).header("goodbye", "cruel") } }
 
     @Test
     fun `can manipulate value on way in and out of service`() {
