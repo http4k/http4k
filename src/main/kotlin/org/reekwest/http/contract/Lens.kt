@@ -35,12 +35,9 @@ open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
     }
 }
 
-class BiDiLens<in IN, OUT, FINAL>(meta: Meta,
-                                  get: (IN) -> FINAL,
-                                  private val set: (List<OUT>, IN) -> IN,
-                                  internal val convertOut: (FINAL) -> List<OUT>
-)
-    : Lens<IN, OUT, FINAL>(meta, get) {
+class BiDiLens<in IN, in OUT, FINAL>(meta: Meta,
+                                     get: (IN) -> FINAL,
+                                     private val set: (FINAL, IN) -> IN) : Lens<IN, OUT, FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target
@@ -49,7 +46,7 @@ class BiDiLens<in IN, OUT, FINAL>(meta: Meta,
      * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : IN> invoke(value: FINAL, target: R): R = set(convertOut(value), target) as R
+    operator fun <R : IN> invoke(value: FINAL, target: R): R = set(value, target) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target

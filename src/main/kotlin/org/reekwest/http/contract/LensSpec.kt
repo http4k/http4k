@@ -49,14 +49,16 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
         BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT, OUT?> =
-        BiDiLens(Meta(name, location, false, description), { get(name)(it).firstOrNull() },
-            set(name),
-            { it?.let { listOf(it) } ?: emptyList() })
+        BiDiLens(Meta(name, location, false, description),
+            { get(name)(it).firstOrNull() },
+            { out: OUT?, target: IN -> set(name)(out?.let { listOf(it) } ?: emptyList(), target) }
+        )
 
     override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> {
         val meta = Meta(name, location, true, description)
-        return BiDiLens(meta, { get(name)(it).firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) },
-            set(name), { listOf(it) })
+        return BiDiLens(meta,
+            { get(name)(it).firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) },
+            { out: OUT, target: IN -> set(name)(listOf(out), target) })
     }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
@@ -66,8 +68,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
                     val list = get(name)(it)
                     if (list.isEmpty()) null else list
                 },
-                set(name),
-                { it ?: emptyList() }
+                { out: List<OUT>?, target: IN -> set(name)(out ?: emptyList(), target) }
             )
 
         override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>> {
@@ -77,7 +78,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
                     val list = get(name)(it)
                     if (list.isEmpty()) throw ContractBreach(org.reekwest.http.contract.Missing(meta)) else list
                 },
-                set(name), { it })
+                { out: List<OUT>, target: IN -> set(name)(out, target) })
         }
     }
 }
