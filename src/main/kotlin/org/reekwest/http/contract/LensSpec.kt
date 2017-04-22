@@ -17,7 +17,7 @@ open class LensSpec<IN, MID, OUT>(internal val location: String, internal val ge
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT, OUT> {
         val meta = Meta(name, location, false, description)
-        return Lens(meta, { get(name)(it).firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) })
+        return Lens(meta, { get(name)(it).firstOrNull() ?: throw ContractBreach(Missing(meta)) })
     }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
@@ -31,7 +31,7 @@ open class LensSpec<IN, MID, OUT>(internal val location: String, internal val ge
             val meta = Meta(name, location, false, description)
             return Lens(meta, {
                 val list = get(name)(it)
-                if (list.isEmpty()) throw ContractBreach(org.reekwest.http.contract.Missing(meta)) else list
+                if (list.isEmpty()) throw ContractBreach(Missing(meta)) else list
             })
         }
     }
@@ -57,7 +57,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
     override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> {
         val meta = Meta(name, location, true, description)
         return BiDiLens(meta,
-            { get(name)(it).firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) },
+            { get(name)(it).firstOrNull() ?: throw ContractBreach(Missing(meta)) },
             { out: OUT, target: IN -> set(name)(listOf(out), target) })
     }
 
@@ -76,7 +76,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
             return BiDiLens(meta,
                 {
                     val list = get(name)(it)
-                    if (list.isEmpty()) throw ContractBreach(org.reekwest.http.contract.Missing(meta)) else list
+                    if (list.isEmpty()) throw ContractBreach(Missing(meta)) else list
                 },
                 { out: List<OUT>, target: IN -> set(name)(out, target) })
         }
