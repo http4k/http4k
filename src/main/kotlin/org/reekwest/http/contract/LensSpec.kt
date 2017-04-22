@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
-interface MultiLensSpec<in IN, OUT> {
+interface MultiLensSpec<in IN, out OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
