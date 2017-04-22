@@ -10,7 +10,7 @@ interface MultiLensSpec<in IN, out OUT> {
 }
 
 open class LensSpec<IN, MID, out OUT>(internal val location: String, internal val get: Get<IN, MID, OUT>) {
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, MID, NEXT> = LensSpec(location, get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> =
         Lens(Meta(name, location, false, description), { get(name)(it).firstOrNull() })
@@ -39,8 +39,7 @@ interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
 open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
                                       private val set: Set<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, get) {
 
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiLensSpec<IN, MID, NEXT> =
-        BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT?> =
         BiDiLens(Meta(name, location, false, description),
