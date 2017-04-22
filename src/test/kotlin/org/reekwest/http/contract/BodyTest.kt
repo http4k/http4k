@@ -19,14 +19,14 @@ class BodyTest {
 
     @Test
     fun `sets value on request`() {
-        val body = Body.string.required("body")
+        val body = Body.string.required()
         val withBody = body("hello", emptyRequest)
         assertThat(body(withBody), equalTo("hello"))
     }
 
     @Test
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string.map({ MyCustomBodyType(it) }, { it.value }).required("body")
+        val customBody = Body.string.map({ MyCustomBodyType(it) }, { it.value }).required()
 
         val custom = MyCustomBodyType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)
