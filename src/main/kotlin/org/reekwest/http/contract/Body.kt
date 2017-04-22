@@ -6,18 +6,18 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
-open class BodySpec<OUT>(private val delegate: LensSpec<HttpMessage, ByteBuffer, OUT>) {
+open class BodySpec<in IN : HttpMessage, MID, OUT>(private val delegate: LensSpec<IN, MID, OUT>) {
     open fun required(description: String? = null) = delegate.required(delegate.location, description)
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<NEXT> = BodySpec(delegate.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<IN, MID, NEXT> = BodySpec(delegate.map(nextIn))
 }
 
-open class BiDiBodySpec<OUT>(private val delegate: BiDiLensSpec<HttpMessage, ByteBuffer, OUT>) : BodySpec<OUT>(delegate) {
+open class BiDiBodySpec<in IN : HttpMessage, MID, OUT>(private val delegate: BiDiLensSpec<IN, MID, OUT>) : BodySpec<IN, MID, OUT>(delegate) {
     override fun required(description: String?) = delegate.required(delegate.location, description)
 
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiBodySpec<NEXT> = BiDiBodySpec(delegate.map(nextIn, nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiBodySpec<IN, MID, NEXT> = BiDiBodySpec(delegate.map(nextIn, nextOut))
 }
 
-object Body : BiDiBodySpec<ByteBuffer>(BiDiLensSpec<HttpMessage, ByteBuffer, ByteBuffer>("body",
+object Body : BiDiBodySpec<HttpMessage, ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
     Get { _, target -> target.body?.let { listOf(it) } ?: emptyList() },
     Set { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) } }
 )) {
