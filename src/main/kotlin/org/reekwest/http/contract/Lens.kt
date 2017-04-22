@@ -19,8 +19,8 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
     }
 }
 
-open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
-                                          private val get: (IN) -> FINAL) {
+open class Lens<in IN, out FINAL>(val meta: Meta,
+                                  private val get: (IN) -> FINAL) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
@@ -35,9 +35,9 @@ open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
     }
 }
 
-class BiDiLens<in IN, in OUT, FINAL>(meta: Meta,
-                                     get: (IN) -> FINAL,
-                                     private val set: (FINAL, IN) -> IN) : Lens<IN, OUT, FINAL>(meta, get) {
+class BiDiLens<in IN, FINAL>(meta: Meta,
+                             get: (IN) -> FINAL,
+                             private val set: (FINAL, IN) -> IN) : Lens<IN, FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target
