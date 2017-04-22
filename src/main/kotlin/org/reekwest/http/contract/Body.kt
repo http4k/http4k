@@ -6,7 +6,7 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
-open class BodySpec<in IN : HttpMessage, MID, OUT>(private val delegate: LensSpec<IN, MID, OUT>) {
+open class BodySpec<in IN : HttpMessage, MID, out OUT>(private val delegate: LensSpec<IN, MID, OUT>) {
     open fun required(description: String? = null) = delegate.required(delegate.location, description)
     fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<IN, MID, NEXT> = BodySpec(delegate.map(nextIn))
 }
