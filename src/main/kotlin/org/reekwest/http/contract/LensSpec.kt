@@ -1,6 +1,5 @@
 package org.reekwest.http.contract
 
-import org.reekwest.http.contract.ContractBreach.Companion.Missing
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -14,25 +13,23 @@ open class LensSpec<IN, MID, OUT>(internal val location: String, internal val ge
     fun <NEXT> map(nextIn: (OUT) -> NEXT): LensSpec<IN, MID, NEXT> = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT, OUT?> =
-        object : Lens<IN, OUT, OUT?>(Meta(name, location, false, description), get(name)) {
-            override fun convertIn(o: List<OUT>) = o.firstOrNull()
-        }
+        Lens(Meta(name, location, false, description), get(name), { it.firstOrNull() })
 
-    open fun required(name: String, description: String? = null): Lens<IN, OUT, OUT> =
-        object : Lens<IN, OUT, OUT>(Meta(name, location, false, description), get(name)) {
-            override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
-        }
+    open fun required(name: String, description: String? = null): Lens<IN, OUT, OUT> {
+        val meta = Meta(name, location, false, description)
+        return Lens(meta, get(name), { it.firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) })
+    }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): Lens<IN, OUT, List<OUT>?> =
-            object : Lens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), get(name)) {
-                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) null else o
-            }
+            Lens(Meta(name, location, false, description), get(name)
+                , { if (it.isEmpty()) null else it })
 
-        override fun required(name: String, description: String?): Lens<IN, OUT, List<OUT>> =
-            object : Lens<IN, OUT, List<OUT>>(Meta(name, location, false, description), get(name)) {
-                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) throw Missing(this) else o
-            }
+        override fun required(name: String, description: String?): Lens<IN, OUT, List<OUT>> {
+            val meta = Meta(name, location, false, description)
+            return Lens(meta, get(name),
+                { if (it.isEmpty()) throw ContractBreach(org.reekwest.http.contract.Missing(meta)) else it })
+        }
     }
 }
 
@@ -48,29 +45,32 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
         BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
     override fun optional(name: String, description: String?): BiDiLens<IN, OUT, OUT?> =
-        object : BiDiLens<IN, OUT, OUT?>(Meta(name, location, false, description), get(name), set(name)) {
-            override fun convertIn(o: List<OUT>) = o.firstOrNull()
-            override fun convertOut(o: OUT?) = o?.let { listOf(it) } ?: emptyList()
-        }
+        BiDiLens(Meta(name, location, false, description), get(name),
+            { it.firstOrNull() },
+            set(name),
+            { it?.let { listOf(it) } ?: emptyList() })
 
-    override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> =
-        object : BiDiLens<IN, OUT, OUT>(Meta(name, location, true, description), get(name), set(name)) {
-            override fun convertIn(o: List<OUT>) = o.firstOrNull() ?: throw Missing(this)
-            override fun convertOut(o: OUT) = listOf(o)
-        }
+    override fun required(name: String, description: String?): BiDiLens<IN, OUT, OUT> {
+        val meta = Meta(name, location, true, description)
+        return BiDiLens(meta, get(name),
+            { it.firstOrNull() ?: throw ContractBreach(org.reekwest.http.contract.Missing(meta)) },
+            set(name), { listOf(it) })
+    }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun optional(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>?> =
-            object : BiDiLens<IN, OUT, List<OUT>?>(Meta(name, location, false, description), get(name), set(name)) {
-                override fun convertOut(o: List<OUT>?) = o ?: emptyList()
-                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) null else o
-            }
+            BiDiLens(Meta(name, location, false, description), get(name),
+                { if (it.isEmpty()) null else it },
+                set(name),
+                { it ?: emptyList() }
+            )
 
-        override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>> =
-            object : BiDiLens<IN, OUT, List<OUT>>(Meta(name, location, true, description), get(name), set(name)) {
-                override fun convertOut(o: List<OUT>) = o
-                override fun convertIn(o: List<OUT>) = if (o.isEmpty()) throw Missing(this) else o
-            }
+        override fun required(name: String, description: String?): BiDiLens<IN, OUT, List<OUT>> {
+            val meta = Meta(name, location, true, description)
+            return BiDiLens(meta, get(name),
+                { if (it.isEmpty()) throw ContractBreach(org.reekwest.http.contract.Missing(meta)) else it },
+                set(name), { it })
+        }
     }
 }
 

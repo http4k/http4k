@@ -16,9 +16,12 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
 
     companion object {
         operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): Set<IN, OUT, OUT> = Set(rootFn, { it })
-    }}
+    }
+}
 
-abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (IN) -> List<OUT>) {
+open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
+                                          private val get: (IN) -> List<OUT>,
+                                          internal val convertIn: (List<OUT>) -> FINAL) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
@@ -31,12 +34,15 @@ abstract class Lens<in IN, in OUT, out FINAL>(val meta: Meta, private val get: (
     } catch (e: Exception) {
         throw ContractBreach.Invalid(this)
     }
-
-    abstract internal fun convertIn(o: List<OUT>): FINAL
 }
 
-abstract class BiDiLens<in IN, OUT, FINAL>(meta: Meta, get: (IN) -> List<OUT>,
-                                           private val set: (List<OUT>, IN) -> IN) : Lens<IN, OUT, FINAL>(meta, get) {
+class BiDiLens<in IN, OUT, FINAL>(meta: Meta,
+                                  get: (IN) -> List<OUT>,
+                                  convertIn: (List<OUT>) -> FINAL,
+                                  private val set: (List<OUT>, IN) -> IN,
+                                  internal val convertOut: (FINAL) -> List<OUT>
+)
+    : Lens<IN, OUT, FINAL>(meta, get, convertIn) {
 
     /**
      * Lens operation to set the value into the target
@@ -51,6 +57,4 @@ abstract class BiDiLens<in IN, OUT, FINAL>(meta: Meta, get: (IN) -> List<OUT>,
      * Bind this Lens to a value, so we can set it into a target
      */
     infix fun <R : IN> to(value: FINAL): (R) -> R = { invoke(value, it) }
-
-    abstract internal fun convertOut(o: FINAL): List<OUT>
 }

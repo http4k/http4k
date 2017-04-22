@@ -1,5 +1,7 @@
 package org.reekwest.http.core
 
+import java.nio.ByteBuffer
+
 sealed class HttpMessage {
     abstract val headers: Headers
     abstract val body: Body?
@@ -21,4 +23,13 @@ typealias HttpClient = HttpHandler
 
 typealias Headers = Parameters
 
-typealias Body = java.nio.ByteBuffer
+typealias Body = ByteBuffer
+
+typealias Filter = (HttpHandler) -> HttpHandler
+
+@JvmName("thenFilter")
+fun Filter.then(next: Filter): Filter = { handler -> next(this(handler)) }
+
+@JvmName("thenService")
+fun Filter.then(next: HttpHandler): HttpHandler = this.then(next)
+
