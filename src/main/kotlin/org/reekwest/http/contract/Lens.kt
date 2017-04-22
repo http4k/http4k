@@ -31,7 +31,7 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
-        throw ContractBreach.Invalid(this)
+        throw ContractBreach(Invalid(this))
     }
 }
 

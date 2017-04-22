@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.ContractBreach.Companion.Invalid
-import org.reekwest.http.contract.ContractBreach.Companion.Missing
 
 class FormFieldTest {
     private val form = WebForm(mapOf("hello" to listOf("world", "world2")), emptyList())
@@ -29,26 +27,26 @@ class FormFieldTest {
     fun `value missing`() {
         assertThat(FormField.optional("world")(form), absent())
         val requiredFormField = FormField.required("world")
-        assertThat({ requiredFormField(form) }, throws(equalTo(Missing(requiredFormField))))
+        assertThat({ requiredFormField(form) }, throws(equalTo(ContractBreach(Missing(requiredFormField)))))
 
         assertThat(FormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = FormField.multi.required("world")
-        assertThat({ optionalMultiFormField(form) }, throws(equalTo(Missing(optionalMultiFormField))))
+        assertThat({ optionalMultiFormField(form) }, throws(equalTo(ContractBreach(Missing(optionalMultiFormField)))))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormField = FormField.map(String::toInt).required("hello")
-        assertThat({ requiredFormField(form) }, throws(equalTo(Invalid(requiredFormField))))
+        assertThat({ requiredFormField(form) }, throws(equalTo(ContractBreach(Invalid(requiredFormField)))))
 
         val optionalFormField = FormField.map(String::toInt).optional("hello")
-        assertThat({ optionalFormField(form) }, throws(equalTo(Invalid(optionalFormField))))
+        assertThat({ optionalFormField(form) }, throws(equalTo(ContractBreach(Invalid(optionalFormField)))))
 
         val requiredMultiFormField = FormField.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormField(form) }, throws(equalTo(Invalid(requiredMultiFormField))))
+        assertThat({ requiredMultiFormField(form) }, throws(equalTo(ContractBreach(Invalid(requiredMultiFormField)))))
 
         val optionalMultiFormField = FormField.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormField(form) }, throws(equalTo(Invalid(optionalMultiFormField))))
+        assertThat({ optionalMultiFormField(form) }, throws(equalTo(ContractBreach(Invalid(optionalMultiFormField)))))
     }
 
     @Test
@@ -60,7 +58,7 @@ class FormFieldTest {
         assertThat(FormField.int().optional("world")(withFormFieldOf("/")), absent())
 
         val badForm = withFormFieldOf("/?hello=notAnumber")
-        assertThat({ optionalFormField(badForm) }, throws(equalTo(Invalid(optionalFormField))))
+        assertThat({ optionalFormField(badForm) }, throws(equalTo(ContractBreach(Invalid(optionalFormField)))))
     }
 
     @Test

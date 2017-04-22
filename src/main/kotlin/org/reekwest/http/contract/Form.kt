@@ -2,7 +2,6 @@ package org.reekwest.http.contract
 
 import org.reekwest.http.asByteBuffer
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
-import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.body.bodyString
@@ -33,14 +32,13 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 fun Body.form() = BiDiBodySpec(BiDiLensSpec<Request, WebForm, WebForm>("body",
     Get { _, target ->
-        if (Header.Common.CONTENT_TYPE(target) != ContentType.APPLICATION_FORM_URLENCODED) throw ContractBreach.Invalid(Header.Common.CONTENT_TYPE)
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(Header.Common.CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target ->
         values.fold(target, { memo, next ->
             memo.with(required("body") to next.toString().asByteBuffer())
-        })
-            .with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+        }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )).required()
 
