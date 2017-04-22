@@ -25,11 +25,15 @@ typealias Headers = Parameters
 
 typealias Body = ByteBuffer
 
-typealias Filter = (HttpHandler) -> HttpHandler
+interface Filter : (HttpHandler) -> HttpHandler {
+    companion object {
+        operator fun invoke(fn: (HttpHandler) -> HttpHandler): Filter = object : Filter {
+            operator override fun invoke(next: HttpHandler): HttpHandler = fn(next)
+        }
+    }
+}
 
-@JvmName("thenFilter")
-fun Filter.then(next: Filter): Filter = { handler -> next(this(handler)) }
+fun Filter.then(next: Filter): Filter = Filter { next(this(it)) }
 
-@JvmName("thenService")
-fun Filter.then(next: HttpHandler): HttpHandler = this.then(next)
+fun Filter.then(next: HttpHandler): HttpHandler = { this(next)(it) }
 

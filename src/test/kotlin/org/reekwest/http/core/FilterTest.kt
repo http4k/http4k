@@ -3,28 +3,20 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.contract.Filter
+import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.Uri.Companion.uri
 
 class FilterTest {
 
-    private val repeat = Filter.mk { str: String, svc: (String) -> Int -> svc(str + str) / 2 }
+    private val echoHeaders = { req: Request -> req.headers.fold(Response(OK)) { memo, next -> memo.header(next.first, next.second) } }
+    private val addRequestHeader = Filter { next -> { req -> next(req.header("hello", "world")) } }
+    private val addResponseHeader = Filter { next -> { req -> next(req).header("goodbye", "cruel") } }
 
     @Test
     fun `can manipulate value on way in and out of service`() {
-        val svc = repeat.andThen({ it.toInt() })
-        assertThat(svc("4"), equalTo(22))
+        val svc = addRequestHeader.then(addResponseHeader).then(echoHeaders)
+        val response = svc(Request(Method.GET, uri("/")))
+        assertThat(response.header("hello"), equalTo("world"))
+        assertThat(response.header("goodbye"), equalTo("cruel"))
     }
-
-    @Test
-    fun `can stack filters value on way in and out of service`() {
-        val svc = repeat.andThen(repeat).andThen({ it.toInt() })
-        assertThat(svc("4"), equalTo(1111))
-    }
-
-    @Test
-    fun `noop`() {
-        val svc = Filter.noOp<String, Int>().andThen({ it.toInt() })
-        assertThat(svc("4"), equalTo(4))
-    }
-
 }
