@@ -20,15 +20,14 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
 }
 
 open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
-                                          private val get: (IN) -> List<OUT>,
-                                          internal val convertIn: (List<OUT>) -> FINAL) {
+                                          private val get: (IN) -> FINAL) {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
      * Lens operation to get the value from the target
      */
     operator fun invoke(target: IN): FINAL = try {
-        convertIn(get(target))
+        get(target)
     } catch (e: ContractBreach) {
         throw e
     } catch (e: Exception) {
@@ -37,12 +36,11 @@ open class Lens<in IN, in OUT, out FINAL>(val meta: Meta,
 }
 
 class BiDiLens<in IN, OUT, FINAL>(meta: Meta,
-                                  get: (IN) -> List<OUT>,
-                                  convertIn: (List<OUT>) -> FINAL,
+                                  get: (IN) -> FINAL,
                                   private val set: (List<OUT>, IN) -> IN,
                                   internal val convertOut: (FINAL) -> List<OUT>
 )
-    : Lens<IN, OUT, FINAL>(meta, get, convertIn) {
+    : Lens<IN, OUT, FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target
