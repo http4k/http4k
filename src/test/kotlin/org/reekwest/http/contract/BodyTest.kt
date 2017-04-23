@@ -26,7 +26,7 @@ class BodyTest {
 
     @Test
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string.map({ MyCustomBodyType(it) }, { it.value }).required()
+        val customBody = Body.string.map(::MyCustomBodyType, { it.value }).required()
 
         val custom = MyCustomBodyType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)

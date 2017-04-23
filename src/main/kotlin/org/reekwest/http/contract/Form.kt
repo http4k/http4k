@@ -54,12 +54,12 @@ fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) 
 
 private val formSpec = BiDiLensSpec<Request, WebForm, WebForm>("body",
     Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(Header.Common.CONTENT_TYPE))
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target ->
         values.fold(target, { memo, next ->
-            memo.with(Body.required("body") to next.toString().asByteBuffer())
+            memo.with(Body.required() to next.toString().asByteBuffer())
         }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )

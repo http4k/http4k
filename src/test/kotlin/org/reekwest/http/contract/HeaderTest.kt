@@ -53,18 +53,6 @@ class HeaderTest {
     }
 
     @Test
-    fun `int`() {
-        val optionalHeader = Header.int().optional("hello")
-        val requestWithHeader = withHeaderOf("123")
-        assertThat(optionalHeader(requestWithHeader), equalTo(123))
-
-        assertThat(Header.int().optional("world")(withHeaderOf("/")), absent())
-
-        val badRequest = withHeaderOf("/?hello=notAnumber")
-        assertThat({ optionalHeader(badRequest) }, throws(equalTo(ContractBreach(Invalid(optionalHeader)))))
-    }
-
-    @Test
     fun `sets value on request`() {
         val header = Header.required("bob")
         val withHeader = header("hello", request)
@@ -73,7 +61,7 @@ class HeaderTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Header.map({ MyCustomBodyType(it) }, { it.value }).required("bob")
+        val custom = Header.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
         val reqWithHeader = custom(instance, get(""))
@@ -82,8 +70,6 @@ class HeaderTest {
 
         assertThat(custom(reqWithHeader), equalTo(MyCustomBodyType("hello world!")))
     }
-
-    private fun withHeaderOf(s: String) = Request(GET, uri("/"), listOf("hello" to s))
 
     @Test
     fun `toString is ok`() {

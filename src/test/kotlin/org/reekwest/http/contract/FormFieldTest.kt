@@ -50,18 +50,6 @@ class FormFieldTest {
     }
 
     @Test
-    fun `int`() {
-        val optionalFormField = FormField.int().optional("hello")
-        val formWithFormField = withFormFieldOf("123")
-        assertThat(optionalFormField(formWithFormField), equalTo(123))
-
-        assertThat(FormField.int().optional("world")(withFormFieldOf("/")), absent())
-
-        val badForm = withFormFieldOf("/?hello=notAnumber")
-        assertThat({ optionalFormField(badForm) }, throws(equalTo(ContractBreach(Invalid(optionalFormField)))))
-    }
-
-    @Test
     fun `sets value on form`() {
         val formField = FormField.required("bob")
         val withFormField = formField("hello", form)
@@ -70,7 +58,7 @@ class FormFieldTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = FormField.map({ MyCustomBodyType(it) }, { it.value }).required("bob")
+        val custom = FormField.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
         val formWithField = custom(instance, WebForm.emptyForm())

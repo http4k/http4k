@@ -54,17 +54,6 @@ class QueryTest {
     }
 
     @Test
-    fun `int`() {
-        val optionalQuery = Query.int().optional("hello")
-        assertThat(optionalQuery(withQueryOf("/?hello=123")), equalTo(123))
-
-        assertThat(Query.int().optional("world")(withQueryOf("/")), absent())
-
-        val badRequest = withQueryOf("/?hello=notAnumber")
-        assertThat({ optionalQuery(badRequest) }, throws(equalTo(ContractBreach(Invalid(optionalQuery)))))
-    }
-
-    @Test
     fun `sets value on request`() {
         val query = Query.required("bob")
         val withQuery = query("hello", request)
@@ -73,7 +62,7 @@ class QueryTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Query.map({ MyCustomBodyType(it) }, { it.value }).required("bob")
+        val custom = Query.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
         val reqWithQuery = custom(instance, get(""))
