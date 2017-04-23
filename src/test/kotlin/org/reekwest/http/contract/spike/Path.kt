@@ -13,8 +13,3 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
 
     fun int() = map(String::toInt)
 }
-
-fun main(args: Array<String>) {
-    val a = Path.int().of("name")
-    a("123")
-}
