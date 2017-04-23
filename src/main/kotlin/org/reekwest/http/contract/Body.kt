@@ -24,3 +24,4 @@ object Body : BiDiBodySpec<HttpMessage, ByteBuffer, ByteBuffer>(BiDiLensSpec("bo
     val string = map(ByteBuffer::asString, String::asByteBuffer)
     fun string(description: String? = null) = string.required(description)
 }
+
