@@ -9,7 +9,7 @@ interface MultiLensSpec<in IN, out OUT> {
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
 
-open class LensSpec<IN, MID, out OUT>(internal val location: String, internal val get: Get<IN, MID, OUT>) {
+open class LensSpec<IN, MID, out OUT>(protected val location: String, protected val get: Get<IN, MID, OUT>) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {

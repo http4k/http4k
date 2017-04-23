@@ -7,12 +7,12 @@ import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
 open class BodySpec<in IN : HttpMessage, MID, out OUT>(private val delegate: LensSpec<IN, MID, OUT>) {
-    open fun required(description: String? = null) = delegate.required(delegate.location, description)
+    open fun required(description: String? = null) = delegate.required("body", description)
     fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<IN, MID, NEXT> = BodySpec(delegate.map(nextIn))
 }
 
 open class BiDiBodySpec<in IN : HttpMessage, MID, OUT>(private val delegate: BiDiLensSpec<IN, MID, OUT>) : BodySpec<IN, MID, OUT>(delegate) {
-    override fun required(description: String?) = delegate.required(delegate.location, description)
+    override fun required(description: String?) = delegate.required("body", description)
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiBodySpec<IN, MID, NEXT> = BiDiBodySpec(delegate.map(nextIn, nextOut))
 }
