@@ -12,4 +12,5 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
     Get { _, target -> listOf(target) })) {
 
     fun int() = map(String::toInt)
+    fun fixed(name: String) = of(name)
 }
