@@ -9,6 +9,7 @@ import org.reekwest.http.contract.FormValidator.Strict
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.contract.WebForm.Companion.emptyForm
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.get
@@ -84,7 +85,7 @@ class WebFormTest {
         val intRequiredField = FormField.int().required("another")
         assertThat(
             { Body.webForm(Strict, stringRequiredField, intRequiredField)(request) },
-            throws(equalTo(ContractBreach(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta))))
+            throws(equalTo(ContractBreach(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), status = NOT_ACCEPTABLE)))
         )
     }
 

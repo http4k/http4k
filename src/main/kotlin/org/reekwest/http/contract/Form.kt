@@ -3,6 +3,7 @@ package org.reekwest.http.contract
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Request
+import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
@@ -28,7 +29,7 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
 
 enum class FormValidator : (WebForm) -> WebForm {
     Strict {
-        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw ContractBreach(form.errors)
+        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw ContractBreach(form.errors, NOT_ACCEPTABLE)
     },
     Feedback {
         override fun invoke(form: WebForm): WebForm = form
