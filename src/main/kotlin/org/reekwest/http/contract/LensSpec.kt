@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.*
+import java.util.*
 
 interface MultiLensSpec<in IN, out OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
@@ -105,3 +106,4 @@ fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map({
 fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, ISO_LOCAL_DATE::format)
 fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, ISO_LOCAL_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, ISO_ZONED_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, UUID::toString)
