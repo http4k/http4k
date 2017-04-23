@@ -3,6 +3,7 @@ package org.reekwest.http.contract
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter.*
 
 interface MultiLensSpec<in IN, out OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
@@ -101,6 +102,6 @@ fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map({
     else throw kotlin.IllegalArgumentException("illegal boolean")
 }, Boolean::toString)
 
-fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map { LocalDate.parse(it) }
-fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map { LocalDateTime.parse(it) }
-fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map { ZonedDateTime.parse(it) }
+fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, ISO_LOCAL_DATE::format)
+fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, ISO_LOCAL_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, ISO_ZONED_DATE_TIME::format)
