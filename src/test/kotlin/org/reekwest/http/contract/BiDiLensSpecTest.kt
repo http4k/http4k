@@ -33,6 +33,12 @@ class BiDiLensSpecContract {
     fun `local date`() = checkContract(spec.localDate(), "2001-01-01", LocalDate.of(2001, 1, 1))
 
     @Test
+    fun `boolean`() {
+        checkContract(spec.boolean(), "true", true)
+        checkContract(spec.boolean(), "false", false)
+    }
+
+    @Test
     fun `datetime`() = checkContract(spec.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
 
     @Test
