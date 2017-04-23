@@ -1,10 +1,10 @@
 package org.reekwest.http.contract
 
-import org.reekwest.http.asByteBuffer
 import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.body.bodyString
+import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
 import java.net.URLDecoder
 
@@ -37,20 +37,22 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) = BiDiBodySpec(formSpec)
     .map(
-        { webForm ->
-            val failures = formFields.fold(listOf<ExtractionFailure>()) {
-                memo, next ->
-                try {
-                    next(webForm)
-                    memo
-                } catch (e: ContractBreach) {
-                    memo.plus(e.failures)
-                }
-            }
-            validator(webForm.copy(errors = failures))
-        },
-        { it }
+        { webForm -> validateFields(webForm, validator, *formFields) },
+        { webForm -> validateFields(webForm, validator, *formFields) }
     ).required()
+
+private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
+    val failures = formFields.fold(listOf<ExtractionFailure>()) {
+        memo, next ->
+        try {
+            next(webForm)
+            memo
+        } catch (e: ContractBreach) {
+            memo.plus(e.failures)
+        }
+    }
+    return validator(webForm.copy(errors = failures))
+}
 
 private val formSpec = BiDiLensSpec<Request, WebForm, WebForm>("body",
     Get { _, target ->
@@ -58,8 +60,8 @@ private val formSpec = BiDiLensSpec<Request, WebForm, WebForm>("body",
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target ->
-        values.fold(target, { memo, next ->
-            memo.with(Body.required() to next.toString().asByteBuffer())
+        values.fold(target, { memo, (fields) ->
+            memo.bodyString(fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded())
         }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )
