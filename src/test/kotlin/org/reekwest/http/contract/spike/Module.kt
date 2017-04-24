@@ -1,8 +1,6 @@
-package org.reekwest.http.contract
+package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.spike.ModuleRenderer
-import org.reekwest.http.contract.spike.NoRenderer
-import org.reekwest.http.contract.spike.ServerRoute
+import org.reekwest.http.contract.CatchContractBreach
 import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.core.*
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
