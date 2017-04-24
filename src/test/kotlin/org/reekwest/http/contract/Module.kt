@@ -5,7 +5,6 @@ import org.reekwest.http.contract.spike.NoRenderer
 import org.reekwest.http.contract.spike.ServerRoute
 import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.core.*
-import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 
 typealias HandlerMatcher = (Request) -> HttpHandler?
@@ -23,13 +22,7 @@ interface Module {
     fun toHttpHandler(): HttpHandler {
         val svcBinding = toHandlerMatcher()
         return { req ->
-            svcBinding(req)?.let {
-                try {
-                    it(req)
-                } catch (e: ContractBreach) {
-                    Response(BAD_REQUEST)
-                }
-            } ?: Response(NOT_FOUND)
+            svcBinding(req)?.let { it(req) } ?: Response(NOT_FOUND)
         }
     }
 
@@ -42,7 +35,8 @@ data class RouteModule(private val rootPath: APath,
                        private val renderer: ModuleRenderer,
                        private val filter: Filter) : Module {
 
-    constructor(path: APath, renderer: ModuleRenderer = NoRenderer) : this(path, emptyList(), renderer, Filter { it })
+    constructor(path: APath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
+        : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
     private fun validate(route: ServerRoute) = Filter {
         // DO ROUTE VALIDATION HERE
