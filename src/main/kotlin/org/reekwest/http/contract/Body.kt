@@ -6,22 +6,25 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
 
-open class BodySpec<in IN : HttpMessage, MID, out OUT>(private val delegate: LensSpec<IN, MID, OUT>) {
-    open fun required(description: String? = null) = delegate.required("body", description)
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<IN, MID, NEXT> = BodySpec(delegate.map(nextIn))
+typealias BodyLens<T> = Lens<HttpMessage, T>
+typealias BiDiBodyLens<T> = BiDiLens<HttpMessage, T>
+
+open class BodySpec<MID, out OUT>(private val delegate: LensSpec<HttpMessage, MID, OUT>) {
+    open fun required(description: String? = null): BodyLens<OUT> = delegate.required("body", description)
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodySpec<MID, NEXT> = BodySpec(delegate.map(nextIn))
 }
 
-open class BiDiBodySpec<in IN : HttpMessage, MID, OUT>(private val delegate: BiDiLensSpec<IN, MID, OUT>) : BodySpec<IN, MID, OUT>(delegate) {
-    override fun required(description: String?) = delegate.required("body", description)
+open class BiDiBodySpec<MID, OUT>(private val delegate: BiDiLensSpec<HttpMessage, MID, OUT>) : BodySpec<MID, OUT>(delegate) {
+    override fun required(description: String?): BiDiBodyLens<OUT> = delegate.required("body", description)
 
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiBodySpec<IN, MID, NEXT> = BiDiBodySpec(delegate.map(nextIn, nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT): BiDiBodySpec<MID, NEXT> = BiDiBodySpec(delegate.map(nextIn, nextOut))
 }
 
-object Body : BiDiBodySpec<HttpMessage, ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
+object Body : BiDiBodySpec<ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
     Get { _, target -> target.body?.let { listOf(it) } ?: emptyList() },
     Set { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) } }
 )) {
     val string = map(ByteBuffer::asString, String::asByteBuffer)
-    fun string(description: String? = null) = string.required(description)
+    fun string(description: String? = null): BiDiBodyLens<String> = string.required(description)
 }
 

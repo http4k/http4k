@@ -1,5 +1,6 @@
 package org.reekwest.http.contract.spike
 
+import org.reekwest.http.contract.BodyLens
 import org.reekwest.http.contract.Lens
 import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.contract.spike.p2.Root
@@ -7,9 +8,12 @@ import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
+typealias QueryLens<T> = Lens<Request, T>
+typealias HeaderLens<T> = Lens<Request, T>
+
 data class Route private constructor(private val name: String,
                                      private val description: String?,
-                                     private val body: Lens<Request, *>?,
+                                     private val body: BodyLens<*>?,
                                      private val produces: Set<ContentType> = emptySet(),
                                      private val consumes: Set<ContentType> = emptySet(),
                                      private val requestParams: Iterable<Lens<Request, *>> = emptyList(),
