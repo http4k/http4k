@@ -1,15 +1,14 @@
 package org.reekwest.http.contract.spike
 
 import org.reekwest.http.contract.BodyLens
+import org.reekwest.http.contract.HeaderLens
 import org.reekwest.http.contract.Lens
+import org.reekwest.http.contract.QueryLens
 import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.contract.spike.p2.Root
 import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
-
-typealias QueryLens<T> = Lens<Request, T>
-typealias HeaderLens<T> = Lens<Request, T>
 
 data class Route private constructor(private val name: String,
                                      private val description: String?,
@@ -21,7 +20,8 @@ data class Route private constructor(private val name: String,
 
     constructor(name: String, description: String? = null) : this(name, description, null)
 
-    fun taking(new: Lens<Request, *>) = copy(requestParams = requestParams.plus(new))
+    fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(new))
+    fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(new))
     fun body(new: Lens<HttpMessage, *>) = copy(body = new)
     fun returning(new: Pair<Status, String>, description: String? = null) = copy(responses = responses.plus(RouteResponse(new.first, new.second, description)))
     fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
@@ -45,7 +45,7 @@ abstract class ServerRoute(val pathBuilder: PathBuilder, val method: Method, var
 class RouteBinder<in T>(private val pathBuilder: PathBuilder,
                         private val method: Method,
                         private val invoker: (T, APath, Filter) -> HttpHandler?) {
-     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
+    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: APath) =
             {
                 actualMethod: Method, actualPath: APath ->

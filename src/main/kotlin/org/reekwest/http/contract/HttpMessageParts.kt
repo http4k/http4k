@@ -5,6 +5,10 @@ import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.cookie.cookies
 
+typealias QueryLens<T> = Lens<Request, T>
+
+typealias HeaderLens<T> = Lens<Request, T>
+
 object Query : BiDiLensSpec<Request, String, String>("query",
     Get { name, target -> target.queries(name).map { it ?: "" } },
     Set { name, values, target -> values.fold(target, { m, next -> m.query(name, next) }) }
