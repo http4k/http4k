@@ -24,6 +24,7 @@ data class Route private constructor(private val name: String,
     fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
 
     infix operator fun div(next: String): PathBuilder0 = PathBuilder0(this, { Root / next })
+    infix operator fun <T> div(next: Lens<String, T>) = PathBuilder0(this, { Root }) / next
 
 }
 
@@ -40,7 +41,7 @@ abstract class ServerRoute(val pathBuilder: PathBuilder, val method: Method, var
 class RouteBinder<in T>(private val pathBuilder: PathBuilder,
                         private val method: Method,
                         private val invoker: (T, APath, Filter) -> HttpHandler?) {
-    infix fun to(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
+     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: APath) =
             {
                 actualMethod: Method, actualPath: APath ->
