@@ -18,7 +18,7 @@ interface Module {
         }
     }
 
-    fun asHttpHandler(): HttpHandler {
+    fun toHttpHandler(): HttpHandler {
         val svcBinding = toRequestRouter()
         return { req ->
             svcBinding(req)?.let { it(req) } ?: Response(NOT_FOUND)

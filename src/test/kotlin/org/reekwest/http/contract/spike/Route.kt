@@ -1,9 +1,6 @@
 package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.BodyLens
-import org.reekwest.http.contract.HeaderLens
-import org.reekwest.http.contract.Lens
-import org.reekwest.http.contract.QueryLens
+import org.reekwest.http.contract.*
 import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.contract.spike.p2.Root
 import org.reekwest.http.core.*
@@ -49,7 +46,13 @@ class RouteBinder<in T>(private val pathBuilder: PathBuilder,
         override fun match(filter: Filter, basePath: APath) =
             {
                 actualMethod: Method, actualPath: APath ->
-                matches(actualMethod, basePath, actualPath)?.let { invoker(fn, actualPath, filter) }
+                matches(actualMethod, basePath, actualPath)?.let {
+                    try {
+                        invoker(fn, actualPath, filter)
+                    } catch (e: ContractBreach) {
+                        null
+                    }
+                }
             }
     }
 }
