@@ -11,6 +11,6 @@ fun main(args: Array<String>) {
     val anInt = Path.int().of("name")
 
     Route("")
-        .taking(Query.required("goobas")) / Path.of("bob") / anInt at GET bind ::hello
+        .query(Query.required("goobas")) / Path.of("bob") / anInt at GET bind ::hello
 }
 
