@@ -1,48 +1,39 @@
 package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.ContractBreach
-import org.reekwest.http.contract.spike.p2.APath
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Method
-import org.reekwest.http.core.then
 
-interface PathBuilder {
-    val route: Route
-    val pathFn: (APath) -> APath
+sealed class PathBuilder {
+    abstract val parent: PathBuilder
+    abstract fun toList(): List<String>
+    abstract fun startsWith(other: PathBuilder): Boolean
+
+    operator fun div(child: String): PathBuilder = Slash(this, child)
+
+    companion object {
+        operator fun invoke(str: String): PathBuilder =
+            if (str == "" || str == "/")
+                Root
+            else if (!str.startsWith("/"))
+                PathBuilder("/" + str)
+            else {
+                val slash = str.lastIndexOf('/')
+                val prefix = PathBuilder(str.substring(0, slash))
+                if (slash == str.length - 1) prefix else prefix / str.substring(slash + 1)
+            }
+    }
 }
 
-class PathBuilder0(override val route: Route, override val pathFn: (APath) -> APath) : PathBuilder {
-    infix fun at(method: Method): RouteBinder<() -> HttpHandler> =
-        RouteBinder(this, method, { fn, _, filter -> fn().let { filter.then(it) } })
-
-    infix operator fun div(next: String): PathBuilder0 = PathBuilder0(route, { pathFn(it) / next })
-
-    infix operator fun <T> div(next: PathLens<T>): PathBuilder1<T> = PathBuilder1(route, pathFn, next)
+data class Slash(override val parent: PathBuilder, val child: String) : PathBuilder() {
+    override fun toList(): List<String> = parent.toList().plus(child)
+    override fun toString(): String = "$parent/$child"
+    override  fun startsWith(other: PathBuilder): Boolean {
+        val components = other.toList()
+        return toList().take(components.size) == components
+    }
 }
 
-class PathBuilder1<out A>(override val route: Route, override val pathFn: (APath) -> APath, private val ppa: PathLens<A>) : PathBuilder {
-
-    infix operator fun div(next: String): PathBuilder2<A, String> = div(Path.fixed(next))
-
-    infix operator fun <T> div(next: PathLens<T>): PathBuilder2<A, T> = PathBuilder2(route, pathFn, ppa, next)
-
-    infix fun at(method: Method): RouteBinder<(A) -> HttpHandler?> =
-        RouteBinder(this, method, { fn, path, filter ->
-            safe { ppa(path.toString())?.let { fn(it) }?.let { filter.then(it) } }
-        })
-}
-
-class PathBuilder2<out A, out B>(override val route: Route, override val pathFn: (APath) -> APath, private val ppa: PathLens<A>, private val ppb: PathLens<B>) : PathBuilder {
-
-    infix fun at(method: Method): RouteBinder<(A, B) -> HttpHandler?> =
-        RouteBinder(this, method,
-            { fn, path, filter ->
-                safe { ppa(path.toString()) }?.let { ppb(path.toString())?.let { b -> fn(it, b) }?.let { filter.then(it) } }
-            })
-}
-
-private fun <T> safe(fn: () -> T?): T? = try {
-    fn()
-} catch (e: ContractBreach) {
-    null
+object Root : PathBuilder() {
+    override fun toList(): List<String> = emptyList()
+    override val parent: PathBuilder = this
+    override fun toString(): String = ""
+    override fun startsWith(other: PathBuilder): Boolean = other == Root
 }

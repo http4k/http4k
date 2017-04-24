@@ -3,7 +3,6 @@ package org.reekwest.http.contract.spike
 import org.reekwest.http.contract.Header
 import org.reekwest.http.contract.Query
 import org.reekwest.http.contract.int
-import org.reekwest.http.contract.spike.p2.Root
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request

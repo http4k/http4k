@@ -1,8 +1,6 @@
 package org.reekwest.http.contract.spike
 
 import org.reekwest.http.contract.*
-import org.reekwest.http.contract.spike.p2.APath
-import org.reekwest.http.contract.spike.p2.Root
 import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
@@ -24,28 +22,28 @@ data class Route private constructor(private val name: String,
     fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
     fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
 
-    infix operator fun div(next: String): PathBuilder0 = PathBuilder0(this, { Root / next })
-    infix operator fun <T> div(next: Lens<String, T>) = PathBuilder0(this, { Root }) / next
+    infix operator fun div(next: String): PathBinder0 = PathBinder0(this, { Root / next })
+    infix operator fun <T> div(next: Lens<String, T>) = PathBinder0(this, { Root }) / next
 
 }
 
 
-abstract class ServerRoute(val pathBuilder: PathBuilder, val method: Method, vararg val pathParams: Lens<String, *>) {
+abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vararg val pathParams: Lens<String, *>) {
 
-    fun matches(actualMethod: Method, basePath: APath, actualPath: APath): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
+    fun matches(actualMethod: Method, basePath: PathBuilder, actualPath: PathBuilder): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
 
-    abstract fun match(filter: Filter, basePath: APath): (Method, APath) -> HttpHandler?
+    abstract fun match(filter: Filter, basePath: PathBuilder): (Method, PathBuilder) -> HttpHandler?
 
-    fun describeFor(basePath: APath): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
+    fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
-class RouteBinder<in T>(private val pathBuilder: PathBuilder,
+class RouteBinder<in T>(private val pathBuilder: PathBinder,
                         private val method: Method,
-                        private val invoker: (T, APath, Filter) -> HttpHandler?) {
+                        private val invoker: (T, PathBuilder, Filter) -> HttpHandler?) {
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
-        override fun match(filter: Filter, basePath: APath) =
+        override fun match(filter: Filter, basePath: PathBuilder) =
             {
-                actualMethod: Method, actualPath: APath ->
+                actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
                     try {
                         invoker(fn, actualPath, filter)

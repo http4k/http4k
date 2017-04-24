@@ -1,7 +1,6 @@
 package org.reekwest.http.contract.spike
 
 import org.reekwest.http.contract.CatchContractBreach
-import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.core.*
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 
@@ -29,12 +28,12 @@ interface Module {
 }
 
 
-data class RouteModule(private val rootPath: APath,
+data class RouteModule(private val rootPath: PathBuilder,
                        private val routes: Iterable<ServerRoute>,
                        private val renderer: ModuleRenderer,
                        private val filter: Filter) : Module {
 
-    constructor(path: APath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
+    constructor(path: PathBuilder, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
     private fun validate(route: ServerRoute) = Filter {
@@ -45,7 +44,7 @@ data class RouteModule(private val rootPath: APath,
     override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
             memo ?:
-                route.match(filter, rootPath)(it.method, APath(it.uri.path))?.
+                route.match(filter, rootPath)(it.method, PathBuilder(it.uri.path))?.
                     let { validate(route).then(it) }
         })
     }
