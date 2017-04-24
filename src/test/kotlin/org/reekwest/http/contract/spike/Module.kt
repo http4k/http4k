@@ -5,26 +5,27 @@ import org.reekwest.http.contract.spike.p2.APath
 import org.reekwest.http.core.*
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 
-typealias HandlerMatcher = (Request) -> HttpHandler?
+typealias Router<T> = (T) -> HttpHandler?
+typealias RequestRouter = Router<Request>
 
 interface Module {
     infix fun then(that: Module): Module {
-        val thisBinding = toHandlerMatcher()
-        val thatBinding = that.toHandlerMatcher()
+        val thisBinding = toRequestRouter()
+        val thatBinding = that.toRequestRouter()
 
         return object : Module {
-            override fun toHandlerMatcher(): HandlerMatcher = { req -> thisBinding(req) ?: thatBinding(req) }
+            override fun toRequestRouter(): RequestRouter = { req -> thisBinding(req) ?: thatBinding(req) }
         }
     }
 
-    fun toHttpHandler(): HttpHandler {
-        val svcBinding = toHandlerMatcher()
+    fun asHttpHandler(): HttpHandler {
+        val svcBinding = toRequestRouter()
         return { req ->
             svcBinding(req)?.let { it(req) } ?: Response(NOT_FOUND)
         }
     }
 
-    fun toHandlerMatcher(): HandlerMatcher
+    fun toRequestRouter(): RequestRouter
 }
 
 
@@ -41,7 +42,7 @@ data class RouteModule(private val rootPath: APath,
         it
     }
 
-    override fun toHandlerMatcher(): HandlerMatcher = {
+    override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
             memo ?:
                 route.match(filter, rootPath)(it.method, APath(it.uri.path))?.
