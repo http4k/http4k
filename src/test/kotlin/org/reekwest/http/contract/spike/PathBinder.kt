@@ -10,24 +10,24 @@ interface PathBinder {
 
 class PathBinder0(override val route: Route, override val pathFn: (PathBuilder) -> PathBuilder) : PathBinder {
     infix fun at(method: Method): RouteBinder<() -> HttpHandler> =
-        RouteBinder(emptyList(), this, method, { fn, _ -> fn() })
+        RouteBinder(this, method, { fn, _ -> fn() })
 
-    infix operator fun div(next: String): PathBinder0 = PathBinder0(route, { pathFn(it) / next })
+    infix operator fun div(next: String) = PathBinder0(route, { pathFn(it) / next })
 
-    infix operator fun <T> div(next: PathLens<T>): PathBinder1<T> = PathBinder1(route, pathFn, next)
+    infix operator fun <T> div(next: PathLens<T>) = PathBinder1(route, pathFn, next)
 }
 
 class PathBinder1<out A>(override val route: Route, override val pathFn: (PathBuilder) -> PathBuilder, private val ppa: PathLens<A>) : PathBinder {
 
-    infix operator fun div(next: String): PathBinder2<A, String> = div(Path.fixed(next))
+    infix operator fun div(next: String) = div(Path.fixed(next))
 
-    infix operator fun <T> div(next: PathLens<T>): PathBinder2<A, T> = PathBinder2(route, pathFn, ppa, next)
+    infix operator fun <T> div(next: PathLens<T>) = PathBinder2(route, pathFn, ppa, next)
 
     infix fun at(method: Method): RouteBinder<(A) -> HttpHandler> =
-        RouteBinder(listOf(ppa), this, method, { fn, parts -> fn(parts[ppa]) })
+        RouteBinder(this, method, { fn, parts -> fn(parts[ppa]) }, ppa)
 }
 
 class PathBinder2<out A, out B>(override val route: Route, override val pathFn: (PathBuilder) -> PathBuilder, private val ppa: PathLens<A>, private val ppb: PathLens<B>) : PathBinder {
     infix fun at(method: Method): RouteBinder<(A, B) -> HttpHandler> =
-        RouteBinder(listOf(ppa, ppb), this, method, { fn, parts -> fn(parts[ppa], parts[ppb]) })
+        RouteBinder(this, method, { fn, parts -> fn(parts[ppa], parts[ppb]) }, ppa, ppb)
 }
