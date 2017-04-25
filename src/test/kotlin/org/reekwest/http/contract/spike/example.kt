@@ -17,7 +17,8 @@ fun main(args: Array<String>) {
     val anInt = Path.int().of("name")
 
     val asd = Route("")
-        .header(Header.int().optional("bob"))
+        .header(Header.int().required("bob"))
+        .header(Header.int().required("bob2"))
         .query(Query.optional("goobas")) / Path.of("bob") / anInt at GET bind ::hello
 
     val handler = RouteModule(Root).withRoute(asd).toHttpHandler()

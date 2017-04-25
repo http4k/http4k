@@ -59,8 +59,9 @@ class RouteBinder<in T> internal constructor(private val pathBuilder: PathBinder
     private fun from(path: PathBuilder) = try {
         if (path.toList().size == pathLenses.size) {
             ExtractedParts(mapOf(*pathLenses
-                .mapIndexed { index, lens -> lens to path(index, lens) }.
-                toTypedArray()))
+                .mapIndexed { index, lens -> lens to path(index, lens) }
+                .toTypedArray())
+            )
         } else {
             null
         }

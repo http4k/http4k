@@ -29,6 +29,24 @@ interface Module {
     fun toRequestRouter(): RequestRouter
 }
 
+private class ValidationFilter(private val route: ServerRoute) : Filter {
+    private fun validate(request: Request) {
+        val errors = route.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
+            try {
+                next(request)
+                memo
+            } catch (e: ContractBreach) {
+                memo.plus(e.failures)
+            }
+        }
+        if (!errors.isEmpty()) throw ContractBreach(errors)
+    }
+
+    override fun invoke(next: HttpHandler): HttpHandler = {
+        validate(it)
+        next(it)
+    }
+}
 
 data class RouteModule(private val rootPath: PathBuilder,
                        private val routes: Iterable<ServerRoute>,
@@ -38,32 +56,11 @@ data class RouteModule(private val rootPath: PathBuilder,
     constructor(path: PathBuilder, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
-    private fun validate(route: ServerRoute): Filter {
-        fun validate(request: Request) {
-            val errors = route.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
-                try {
-                    next(request)
-                    memo
-                } catch (e: ContractBreach) {
-                    memo.plus(e.failures)
-                }
-            }
-            if (!errors.isEmpty()) throw ContractBreach(errors)
-        }
-
-        return Filter { next ->
-            {
-                validate(it)
-                next(it)
-            }
-        }
-    }
 
     override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
-            memo ?:
-                route.match(rootPath)(it.method, PathBuilder(it.uri.path))?.
-                    let { validate(route).then(filter).then(it) }
+            val validator = ValidationFilter(route).then(filter)
+            memo ?: route.match(rootPath)(it.method, PathBuilder(it.uri.path))?.let { validator.then(it) }
         })
     }
 
