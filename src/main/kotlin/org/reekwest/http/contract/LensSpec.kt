@@ -102,7 +102,7 @@ fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::p
 fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, ISO_ZONED_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, UUID::toString)
 
-private fun safeBooleanFrom(value: String): Boolean =
+internal fun safeBooleanFrom(value: String): Boolean =
     if (value.toUpperCase() == "TRUE") true
     else if (value.toUpperCase() == "FALSE") false
     else throw kotlin.IllegalArgumentException("illegal boolean")

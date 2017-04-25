@@ -4,6 +4,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 
 class PathTest {
 
@@ -28,5 +33,41 @@ class PathTest {
     @Test
     fun `toString is ok`() {
         assertThat(Path.of("hello").toString(), equalTo("Required path 'hello'"))
+    }
+
+    @Test
+    fun `int`() = checkContract(Path.int(), "123", 123)
+
+    @Test
+    fun `long`() = checkContract(Path.long(), "123", 123)
+
+    @Test
+    fun `float`() = checkContract(Path.float(), "123.0", 123f)
+
+    @Test
+    fun `double`() = checkContract(Path.double(), "123.0", 123.0)
+
+    @Test
+    fun `local date`() = checkContract(Path.localDate(), "2001-01-01", LocalDate.of(2001, 1, 1))
+
+    @Test
+    fun `uuid`() = checkContract(Path.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
+
+    @Test
+    fun `boolean`() {
+        checkContract(Path.boolean(), "true", true)
+        checkContract(Path.boolean(), "false", false)
+    }
+
+    @Test
+    fun `datetime`() = checkContract(Path.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
+
+    @Test
+    fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
+
+    private fun <T> checkContract(Path: PathSegmentSpec<String, T>, valueAsString: String, tValue: T) {
+        val requiredLens = Path.of("hello")
+        assertThat(requiredLens(valueAsString), equalTo(tValue))
+        assertThat({ requiredLens("hello") }, throws(equalTo(ContractBreach(Invalid(requiredLens)))))
     }
 }

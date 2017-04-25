@@ -4,6 +4,10 @@ import org.reekwest.http.core.*
 import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.cookie.cookies
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.*
 
 typealias QueryLens<T> = Lens<Request, T>
 
@@ -38,6 +42,16 @@ open class PathSegmentSpec<MID, out OUT>(private val delegate: LensSpec<String, 
 object Path : PathSegmentSpec<String, String>(LensSpec<String, String, String>("path",
     Get.Companion { _, target -> listOf(target) })) {
 
-    fun int() = map(String::toInt)
     fun fixed(name: String) = of(name)
 }
+
+fun Path.int() = this.map(String::toInt)
+fun Path.long() = this.map(String::toLong)
+fun Path.double() = this.map(String::toDouble)
+fun Path.float() = this.map(String::toFloat)
+fun Path.boolean() = this.map(::safeBooleanFrom)
+fun Path.localDate() = this.map(LocalDate::parse)
+fun Path.dateTime() = this.map(LocalDateTime::parse)
+fun Path.zonedDateTime() = this.map(ZonedDateTime::parse)
+fun Path.uuid() = this.map(UUID::fromString)
+

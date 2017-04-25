@@ -35,6 +35,12 @@ class BodyTest {
 
         assertThat(customBody(reqWithBody), equalTo(MyCustomBodyType("hello world!")))
     }
+
+    @Test
+    fun `can create a one way custom Body type`() {
+        val customBody = Body.string.map(::MyCustomBodyType).required()
+        assertThat(customBody(emptyRequest.bodyString("hello world!")), equalTo(MyCustomBodyType("hello world!")))
+    }
 }
 
 
