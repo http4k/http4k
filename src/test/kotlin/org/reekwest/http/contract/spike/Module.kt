@@ -1,6 +1,8 @@
 package org.reekwest.http.contract.spike
 
 import org.reekwest.http.contract.CatchContractBreach
+import org.reekwest.http.contract.ContractBreach
+import org.reekwest.http.contract.ExtractionFailure
 import org.reekwest.http.core.*
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 
@@ -36,9 +38,25 @@ data class RouteModule(private val rootPath: PathBuilder,
     constructor(path: PathBuilder, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
-    private fun validate(route: ServerRoute) = Filter {
-        // DO ROUTE VALIDATION HERE
-        it
+    private fun validate(route: ServerRoute): Filter {
+        fun validate(request: Request) {
+            val errors = route.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
+                try {
+                    next(request)
+                    memo
+                } catch (e: ContractBreach) {
+                    memo.plus(e.failures)
+                }
+            }
+            if (!errors.isEmpty()) throw ContractBreach(errors)
+        }
+
+        return Filter { next ->
+            {
+                validate(it)
+                next(it)
+            }
+        }
     }
 
     override fun toRequestRouter(): RequestRouter = {

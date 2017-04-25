@@ -7,13 +7,14 @@ data class RouteResponse(val status: Status, val description: String?, val examp
 
 data class Route private constructor(private val name: String,
                                      private val description: String?,
-                                     private val body: BodyLens<*>?,
+                                     val body: BodyLens<*>?,
                                      private val produces: Set<ContentType> = emptySet(),
                                      private val consumes: Set<ContentType> = emptySet(),
-                                     private val requestParams: Iterable<Lens<Request, *>> = emptyList(),
-                                     private val responses: Iterable<RouteResponse> = emptyList()) {
-
+                                     val requestParams: Iterable<Lens<Request, *>> = emptyList(),
+                                     private val responses: Iterable<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
     constructor(name: String, description: String? = null) : this(name, description, null)
+
+    override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it)} ?: emptyList()).iterator()
 
     fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(new))
     fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(new))
