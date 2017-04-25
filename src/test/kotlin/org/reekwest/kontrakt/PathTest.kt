@@ -1,8 +1,10 @@
 package org.reekwest.kontrakt
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.junit.Ignore
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,6 +13,18 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class PathTest {
+
+    @Test
+    @Ignore // FIXME
+    fun `fixed value present`() {
+        assertThat(Path.fixed("hello")("hello"), equalTo("world"))
+    }
+
+    @Test
+    @Ignore // FIXME
+    fun `fixed value mismatch`() {
+        assertThat(Path.fixed("hello")("world"), absent())
+    }
 
     @Test
     fun `value present`() {
