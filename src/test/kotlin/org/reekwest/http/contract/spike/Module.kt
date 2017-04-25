@@ -11,18 +11,18 @@ typealias RequestRouter = Router<Request>
 
 interface Module {
     infix fun then(that: Module): Module {
-        val thisBinding = toRequestRouter()
-        val thatBinding = that.toRequestRouter()
+        val thisRouter = toRequestRouter()
+        val thatRouter = that.toRequestRouter()
 
         return object : Module {
-            override fun toRequestRouter(): RequestRouter = { req -> thisBinding(req) ?: thatBinding(req) }
+            override fun toRequestRouter(): RequestRouter = { req -> thisRouter(req) ?: thatRouter(req) }
         }
     }
 
     fun toHttpHandler(): HttpHandler {
-        val svcBinding = toRequestRouter()
+        val router = toRequestRouter()
         return { req ->
-            svcBinding(req)?.let { it(req) } ?: Response(NOT_FOUND)
+            router(req)?.let { it(req) } ?: Response(NOT_FOUND)
         }
     }
 
