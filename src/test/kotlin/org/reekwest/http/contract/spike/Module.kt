@@ -29,9 +29,9 @@ interface Module {
     fun toRequestRouter(): RequestRouter
 }
 
-private class ValidationFilter(private val serverRoute: ServerRoute) : Filter {
+private class ValidationFilter(private val route: Route) : Filter {
     private fun validate(request: Request): List<ExtractionFailure> =
-        serverRoute.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
+        route.fold(emptyList<ExtractionFailure>()) { memo, next ->
             try {
                 next(request)
                 memo
@@ -47,15 +47,15 @@ private class ValidationFilter(private val serverRoute: ServerRoute) : Filter {
     }
 }
 
-class RouteModule private constructor(private val core: ModuleCore) : Module {
+class RouteModule private constructor(private val core: Core) : Module {
 
     constructor(path: Path, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(ModuleCore(path, emptyList(), renderer, CatchContractBreach.then(filter)))
+        : this(Core(path, emptyList(), renderer, CatchContractBreach.then(filter)))
 
     override fun toRequestRouter(): RequestRouter = {
-        core.routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
-            val validator = core.filter.then(ValidationFilter(route))
-            memo ?: route.match(core.rootPath)(it.method, Path(it.uri.path))?.let { validator.then(it) }
+        core.routes.fold<ServerRoute, HttpHandler?>(null, { memo, serverRoute ->
+            val validator = core.filter.then(ValidationFilter(serverRoute.pathBuilder.route))
+            memo ?: serverRoute.match(core.rootPath)(it.method, Path(it.uri.path))?.let { validator.then(it) }
         })
     }
 
@@ -64,10 +64,10 @@ class RouteModule private constructor(private val core: ModuleCore) : Module {
     fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(core.withRoutes(new.toList()))
 
     companion object {
-        private data class ModuleCore(val rootPath: Path,
-                                      val routes: List<ServerRoute>,
-                                      val renderer: ModuleRenderer,
-                                      val filter: Filter) {
+        private data class Core(val rootPath: Path,
+                                val routes: List<ServerRoute>,
+                                val renderer: ModuleRenderer,
+                                val filter: Filter) {
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
         }
     }

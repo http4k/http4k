@@ -5,27 +5,30 @@ import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
-data class Route private constructor(private val name: String,
-                                     private val description: String?,
-                                     val body: BodyLens<*>?,
-                                     private val produces: Set<ContentType> = emptySet(),
-                                     private val consumes: Set<ContentType> = emptySet(),
-                                     val requestParams: Iterable<Lens<Request, *>> = emptyList(),
-                                     private val responses: Iterable<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
-    constructor(name: String, description: String? = null) : this(name, description, null)
+class Route private constructor(private val core: Core) : Iterable<Lens<Request, *>> {
+    constructor(name: String, description: String? = null) : this(Core(name, description, null))
 
-    override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList()).iterator()
+    override fun iterator(): Iterator<Lens<Request, *>> = core.requestParams.plus(core.body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
 
-    fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(new))
-    fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(new))
-    fun body(new: Lens<HttpMessage, *>) = copy(body = new)
-    fun returning(new: Pair<Status, String>, description: String? = null) = copy(responses = responses.plus(RouteResponse(new.first, new.second, description)))
-    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
-    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
+    fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
+    fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
+    fun body(new: Lens<HttpMessage, *>) = Route(core.copy(body = new))
+    fun returning(new: Pair<Status, String>, description: String? = null) = Route(core.copy(responses = core.responses.plus(RouteResponse(new.first, new.second, description))))
+    fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
+    fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))
 
     infix operator fun div(next: String): PathBinder0 = PathBinder0(this, { Root / next })
     infix operator fun <T> div(next: Lens<String, T>) = PathBinder0(this, { Root }) / next
 
+    companion object {
+        private data class Core(val name: String,
+                                val description: String?,
+                                val body: BodyLens<*>?,
+                                val produces: Set<ContentType> = emptySet(),
+                                val consumes: Set<ContentType> = emptySet(),
+                                val requestParams: List<Lens<Request, *>> = emptyList(),
+                                val responses: List<RouteResponse> = emptyList())
+    }
 }
 
 abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vararg val pathParams: Lens<String, *>) {
@@ -40,14 +43,14 @@ internal class ExtractedParts(private val mapping: Map<PathSegmentLens<*>, *>) {
     operator fun <T> get(lens: PathSegmentLens<T>): T = mapping[lens] as T
 }
 
-class RouteBinder<in T> internal constructor(private val pathBuilder: PathBinder,
+class RouteBinder<in T> internal constructor(private val pathBinder: PathBinder,
                                              private val method: Method,
                                              private val invoker: (T, ExtractedParts) -> HttpHandler,
                                              private vararg val pathLenses: PathSegmentLens<*>) {
 
-    private fun matches(actualMethod: Method, basePath: Path, actualPath: Path): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
+    private fun matches(actualMethod: Method, basePath: Path, actualPath: Path) = actualMethod == method && actualPath == pathBinder.pathFn(basePath)
 
-    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
+    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder, method) {
         override fun match(basePath: Path) =
             {
                 actualMethod: Method, actualPath: Path ->
@@ -59,10 +62,7 @@ class RouteBinder<in T> internal constructor(private val pathBuilder: PathBinder
 
     private fun from(path: Path) = try {
         if (path.toList().size == pathLenses.size) {
-            ExtractedParts(mapOf(*pathLenses
-                .mapIndexed { index, lens -> lens to path(index, lens) }
-                .toTypedArray())
-            )
+            ExtractedParts(mapOf(*pathLenses.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
         } else {
             null
         }
