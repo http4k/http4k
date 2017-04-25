@@ -17,10 +17,8 @@ interface ResourceLoader {
         fun Directory(baseDir: String) = object : ResourceLoader {
             private val finalBaseDir = if (baseDir.endsWith("/")) baseDir else baseDir + "/"
 
-            override fun load(path: String): URL? {
-                val f = File(finalBaseDir, path)
-                return if (f.exists() && f.isFile) f.toURI().toURL() else null
-            }
+            override fun load(path: String): URL? =
+                File(finalBaseDir, path).let { f -> if (f.exists() && f.isFile) f.toURI().toURL() else null }
         }
 
     }
