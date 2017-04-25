@@ -1,6 +1,9 @@
 package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.*
+import org.reekwest.http.contract.BodyLens
+import org.reekwest.http.contract.HeaderLens
+import org.reekwest.http.contract.Lens
+import org.reekwest.http.contract.QueryLens
 import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
@@ -37,19 +40,16 @@ abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vara
     fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
-class RouteBinder<in T>(private val pathBuilder: PathBinder,
+class RouteBinder<in T>(private val pathExtractor: PathExtractor,
+                        private val pathBuilder: PathBinder,
                         private val method: Method,
-                        private val invoker: (T, PathBuilder, Filter) -> HttpHandler?) {
+                        private val invoker: (T, ExtractedParts, Filter) -> HttpHandler?) {
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: PathBuilder) =
             {
                 actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
-                    try {
-                        invoker(fn, actualPath, filter)
-                    } catch (e: ContractBreach) {
-                        null
-                    }
+                    pathExtractor.from(actualPath)?.let { invoker(fn, it, filter) }
                 }
             }
     }
