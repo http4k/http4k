@@ -48,22 +48,28 @@ private class ValidationFilter(private val route: ServerRoute) : Filter {
     }
 }
 
-data class RouteModule(private val rootPath: Path,
-                       private val routes: Iterable<ServerRoute>,
-                       private val renderer: ModuleRenderer,
-                       private val filter: Filter) : Module {
+class RouteModule private constructor(private val core: ModuleCore) : Module {
 
     constructor(path: Path, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
+        : this(ModuleCore(path, emptyList(), renderer, CatchContractBreach.then(filter)))
 
     override fun toRequestRouter(): RequestRouter = {
-        routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
-            val validator = filter.then(ValidationFilter(route))
-            memo ?: route.match(rootPath)(it.method, Path(it.uri.path))?.let { validator.then(it) }
+        core.routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
+            val validator = core.filter.then(ValidationFilter(route))
+            memo ?: route.match(core.rootPath)(it.method, Path(it.uri.path))?.let { validator.then(it) }
         })
     }
 
-    fun withRoute(new: ServerRoute) = copy(routes = routes + new)
-    fun withRoutes(vararg new: ServerRoute) = copy(routes = routes + new)
-    fun withRoutes(new: Iterable<ServerRoute>) = copy(routes = routes + new)
+    fun withRoute(new: ServerRoute) = withRoutes(new)
+    fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
+    fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(core.withRoutes(new.toList()))
+
+    companion object {
+        private data class ModuleCore(val rootPath: Path,
+                                      val routes: List<ServerRoute>,
+                                      val renderer: ModuleRenderer,
+                                      val filter: Filter) {
+            fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
+        }
+    }
 }
