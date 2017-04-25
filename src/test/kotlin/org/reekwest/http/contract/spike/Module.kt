@@ -56,7 +56,6 @@ data class RouteModule(private val rootPath: Path,
     constructor(path: Path, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
-
     override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
             val validator = filter.then(ValidationFilter(route))
