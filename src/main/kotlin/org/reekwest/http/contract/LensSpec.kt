@@ -21,7 +21,7 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, protected 
     }
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
-        val meta = Meta(false, location, name, description)
+        val meta = Meta(true, location, name, description)
         val getLens = get(name)
         return Lens(meta, { getLens(it).firstOrNull() ?: throw ContractBreach(Missing(meta)) })
     }
@@ -34,7 +34,7 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, protected 
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
-            val meta = Meta(false, location, name, description)
+            val meta = Meta(true, location, name, description)
             val getLens = get(name)
             return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw ContractBreach(Missing(meta)) else it } })
         }
