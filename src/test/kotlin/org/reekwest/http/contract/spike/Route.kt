@@ -40,13 +40,13 @@ abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vara
 class RouteBinder<in T>(private val pathLenses: List<PathLens<*>>,
                         private val pathBuilder: PathBinder,
                         private val method: Method,
-                        private val invoker: (T, ExtractedParts, Filter) -> HttpHandler?) {
+                        private val invoker: (T, ExtractedParts) -> HttpHandler) {
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: PathBuilder) =
             {
                 actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
-                    from(actualPath)?.let { invoker(fn, it, filter) }
+                    from(actualPath)?.let { filter(invoker(fn, it)) }
                 }
             }
     }
