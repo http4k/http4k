@@ -3,7 +3,9 @@ package org.reekwest.http.contract
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.*
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.*
 
 interface MultiLensSpec<in IN, out OUT> {

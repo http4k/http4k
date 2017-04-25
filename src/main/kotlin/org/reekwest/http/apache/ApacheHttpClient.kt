@@ -10,7 +10,12 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils.toByteArray
-import org.reekwest.http.core.*
+import org.reekwest.http.core.Body
+import org.reekwest.http.core.Headers
+import org.reekwest.http.core.HttpHandler
+import org.reekwest.http.core.Request
+import org.reekwest.http.core.Response
+import org.reekwest.http.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 

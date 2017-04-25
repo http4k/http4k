@@ -1,9 +1,15 @@
 package org.reekwest.http.contract
 
-import org.reekwest.http.core.*
+import org.reekwest.http.core.ContentType
+import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.core.Request
 import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.cookie.cookies
+import org.reekwest.http.core.header
+import org.reekwest.http.core.headerValues
+import org.reekwest.http.core.queries
+import org.reekwest.http.core.query
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime

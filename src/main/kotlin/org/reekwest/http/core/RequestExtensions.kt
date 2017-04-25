@@ -1,6 +1,8 @@
 package org.reekwest.http.core
 
-import org.reekwest.http.core.Method.*
+import org.reekwest.http.core.Method.GET
+import org.reekwest.http.core.Method.POST
+import org.reekwest.http.core.Method.PUT
 import org.reekwest.http.core.Uri.Companion.uri
 
 fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = Request(GET, uri(uri), headers, body)

@@ -39,6 +39,7 @@ class QueryTest {
     }
 
     data class Bob(val int: Int)
+
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")

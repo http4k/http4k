@@ -3,7 +3,9 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.core.Method.*
+import org.reekwest.http.core.Method.GET
+import org.reekwest.http.core.Method.POST
+import org.reekwest.http.core.Method.PUT
 import org.reekwest.http.core.Uri.Companion.uri
 
 class RequestExtensionsTest {

@@ -62,7 +62,7 @@ private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
-    Set { _, values, target:HttpMessage ->
+    Set { _, values, target: HttpMessage ->
         values.fold(target, { memo, (fields) ->
             memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
         }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
