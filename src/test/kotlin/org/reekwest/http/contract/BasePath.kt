@@ -1,5 +1,4 @@
-package org.reekwest.http.contract.spike
-
+package org.reekwest.http.contract
 
 sealed class BasePath {
     abstract val parent: BasePath

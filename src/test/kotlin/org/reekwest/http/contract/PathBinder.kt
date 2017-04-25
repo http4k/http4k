@@ -1,10 +1,6 @@
-package org.reekwest.http.contract.spike
+package org.reekwest.http.contract
 
-import org.reekwest.http.contract.Path
-import org.reekwest.http.contract.PathLens
 import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Method
-import java.lang.UnsupportedOperationException
 
 interface PathBinder {
     val route: Route
@@ -21,7 +17,7 @@ class PathBinder0(override val route: Route, override val pathFn: (BasePath) -> 
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder1(route, pathFn, next)
 
-    infix fun at(method: Method): RouteBinder<() -> HttpHandler> =
+    infix fun at(method: org.reekwest.http.core.Method): RouteBinder<() -> HttpHandler> =
         RouteBinder(this, method, { fn, _ -> fn() })
 }
 
@@ -30,7 +26,7 @@ class PathBinder1<out A>(override val route: Route, override val pathFn: (BasePa
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder2(route, pathFn, psA, next)
 
-    infix fun at(method: Method): RouteBinder<(A) -> HttpHandler> =
+    infix fun at(method: org.reekwest.http.core.Method): RouteBinder<(A) -> HttpHandler> =
         RouteBinder(this, method, { fn, parts -> fn(parts[psA]) }, psA)
 }
 
@@ -39,7 +35,7 @@ class PathBinder2<out A, out B>(override val route: Route, override val pathFn: 
                                 private val psB: PathLens<B>) : PathBinder {
     override fun <T> div(next: PathLens<T>) = PathBinder3(route, pathFn, psA, psB, next)
 
-    infix fun at(method: Method): RouteBinder<(A, B) -> HttpHandler> =
+    infix fun at(method: org.reekwest.http.core.Method): RouteBinder<(A, B) -> HttpHandler> =
         RouteBinder(this, method, { fn, parts -> fn(parts[psA], parts[psB]) }, psA, psB)
 }
 
@@ -49,7 +45,7 @@ class PathBinder3<out A, out B, out C>(override val route: Route, override val p
                                        private val psC: PathLens<C>) : PathBinder {
     override fun <T> div(next: PathLens<T>) = PathBinder4(route, pathFn, psA, psB, psC, next)
 
-    infix fun at(method: Method): RouteBinder<(A, B, C) -> HttpHandler> =
+    infix fun at(method: org.reekwest.http.core.Method): RouteBinder<(A, B, C) -> HttpHandler> =
         RouteBinder(this, method, { fn, parts -> fn(parts[psA], parts[psB], parts[psC]) }, psA, psB, psC)
 }
 
@@ -58,8 +54,8 @@ class PathBinder4<out A, out B, out C, out D>(override val route: Route, overrid
                                               private val psB: PathLens<B>,
                                               private val psC: PathLens<C>,
                                               private val psD: PathLens<D>) : PathBinder {
-    override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
+    override fun <T> div(next: PathLens<T>) = throw java.lang.UnsupportedOperationException("No support for longer paths!")
 
-    infix fun at(method: Method): RouteBinder<(A, B, C, D) -> HttpHandler> =
+    infix fun at(method: org.reekwest.http.core.Method): RouteBinder<(A, B, C, D) -> HttpHandler> =
         RouteBinder(this, method, { fn, parts -> fn(parts[psA], parts[psB], parts[psC], parts[psD]) }, psA, psB, psC, psD)
 }

@@ -1,12 +1,16 @@
-package org.reekwest.http.contract.spike
+package org.reekwest.http.contract
 
-import org.reekwest.http.contract.*
-import org.reekwest.http.core.*
+import org.reekwest.http.core.ContentType
+import org.reekwest.http.core.HttpHandler
+import org.reekwest.http.core.HttpMessage
+import org.reekwest.http.core.Method
+import org.reekwest.http.core.Request
+import org.reekwest.http.core.Status
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
-class Route private constructor(private val core: Core) : Iterable<Lens<Request, *>> {
-    constructor(name: String, description: String? = null) : this(Core(name, description, null))
+class Route private constructor(private val core: Route.Companion.Core) : Iterable<Lens<Request, *>> {
+    constructor(name: String, description: String? = null) : this(Route.Companion.Core(name, description, null))
 
     override fun iterator(): Iterator<Lens<Request, *>> = core.requestParams.plus(core.body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
 
@@ -24,8 +28,8 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
         private data class Core(val name: String,
                                 val description: String?,
                                 val body: BodyLens<*>?,
-                                val produces: Set<ContentType> = emptySet(),
-                                val consumes: Set<ContentType> = emptySet(),
+                                val produces: kotlin.collections.Set<ContentType> = emptySet(),
+                                val consumes: kotlin.collections.Set<ContentType> = emptySet(),
                                 val requestParams: List<Lens<Request, *>> = emptyList(),
                                 val responses: List<RouteResponse> = emptyList())
     }
