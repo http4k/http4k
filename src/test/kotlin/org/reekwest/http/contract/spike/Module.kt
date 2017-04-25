@@ -29,9 +29,9 @@ interface Module {
     fun toRequestRouter(): RequestRouter
 }
 
-private class ValidationFilter(private val route: ServerRoute) : Filter {
-    private fun validate(request: Request) {
-        val errors = route.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
+private class ValidationFilter(private val serverRoute: ServerRoute) : Filter {
+    private fun validate(request: Request): List<ExtractionFailure> =
+        serverRoute.pathBuilder.route.fold(emptyList<ExtractionFailure>()) { memo, next ->
             try {
                 next(request)
                 memo
@@ -39,12 +39,11 @@ private class ValidationFilter(private val route: ServerRoute) : Filter {
                 memo.plus(e.failures)
             }
         }
-        if (!errors.isEmpty()) throw ContractBreach(errors)
-    }
 
     override fun invoke(next: HttpHandler): HttpHandler = {
-        validate(it)
-        next(it)
+        validate(it).let { errors ->
+            if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
+        }
     }
 }
 
