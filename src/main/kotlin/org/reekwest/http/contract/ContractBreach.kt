@@ -31,8 +31,8 @@ object CatchContractBreach : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = {
         try {
             next(it)
-        } catch (e: ContractBreach) {
-            Response(BAD_REQUEST)
+        } catch (contractBreach: ContractBreach) {
+            Response(contractBreach.status)
         }
     }
 }
