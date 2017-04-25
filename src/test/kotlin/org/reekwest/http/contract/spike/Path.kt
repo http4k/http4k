@@ -1,19 +1,41 @@
 package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.Get
-import org.reekwest.http.contract.Lens
-import org.reekwest.http.contract.LensSpec
 
-typealias PathLens<T> = Lens<String, T>
+sealed class Path {
+    abstract val parent: Path
+    abstract fun toList(): List<String>
+    operator fun <T> invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-open class PathSpec<MID, out OUT>(private val delegate: LensSpec<String, String, OUT>) {
-    open fun of(name: String, description: String? = null): PathLens<OUT> = delegate.required(name, description)
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
+//    abstract fun startsWith(other: PathBuilder): Boolean
+
+    operator fun div(child: String): Path = Slash(this, child)
+
+    companion object {
+        operator fun invoke(str: String): Path =
+            if (str == "" || str == "/")
+                Root
+            else if (!str.startsWith("/"))
+                Path("/" + str)
+            else {
+                val slash = str.lastIndexOf('/')
+                val prefix = Path(str.substring(0, slash))
+                if (slash == str.length - 1) prefix else prefix / str.substring(slash + 1)
+            }
+    }
 }
 
-object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
-    Get { _, target -> listOf(target) })) {
+data class Slash(override val parent: Path, val child: String) : Path() {
+    override fun toList(): List<String> = parent.toList().plus(child)
+    override fun toString(): String = "$parent/$child"
+//    override fun startsWith(other: PathBuilder): Boolean {
+//        val components = other.toList()
+//        return toList().take(components.size) == components
+//    }
+}
 
-    fun int() = map(String::toInt)
-    fun fixed(name: String) = of(name)
+object Root : Path() {
+    override fun toList(): List<String> = emptyList()
+    override val parent: Path = this
+    override fun toString(): String = ""
+//    override fun startsWith(other: PathBuilder): Boolean = other == Root
 }

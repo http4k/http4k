@@ -48,19 +48,19 @@ private class ValidationFilter(private val route: ServerRoute) : Filter {
     }
 }
 
-data class RouteModule(private val rootPath: PathBuilder,
+data class RouteModule(private val rootPath: Path,
                        private val routes: Iterable<ServerRoute>,
                        private val renderer: ModuleRenderer,
                        private val filter: Filter) : Module {
 
-    constructor(path: PathBuilder, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
+    constructor(path: Path, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(path, emptyList(), renderer, CatchContractBreach.then(filter))
 
 
     override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
             val validator = filter.then(ValidationFilter(route))
-            memo ?: route.match(rootPath)(it.method, PathBuilder(it.uri.path))?.let { validator.then(it) }
+            memo ?: route.match(rootPath)(it.method, Path(it.uri.path))?.let { validator.then(it) }
         })
     }
 
