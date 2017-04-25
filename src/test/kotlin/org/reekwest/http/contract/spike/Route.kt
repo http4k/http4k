@@ -1,9 +1,6 @@
 package org.reekwest.http.contract.spike
 
-import org.reekwest.http.contract.BodyLens
-import org.reekwest.http.contract.HeaderLens
-import org.reekwest.http.contract.Lens
-import org.reekwest.http.contract.QueryLens
+import org.reekwest.http.contract.*
 import org.reekwest.http.core.*
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
@@ -40,18 +37,29 @@ abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vara
     fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
-class RouteBinder<in T>(pathLenses: List<PathLens<*>>,
+class RouteBinder<in T>(private val pathLenses: List<PathLens<*>>,
                         private val pathBuilder: PathBinder,
                         private val method: Method,
                         private val invoker: (T, ExtractedParts, Filter) -> HttpHandler?) {
-    private val extractor = PathExtractor(pathLenses)
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: PathBuilder) =
             {
                 actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
-                    extractor.from(actualPath)?.let { invoker(fn, it, filter) }
+                    from(actualPath)?.let { invoker(fn, it, filter) }
                 }
             }
+    }
+
+    private fun from(path: PathBuilder) = try {
+        if (path.toList().size == pathLenses.size) {
+            ExtractedParts(mapOf(*pathLenses
+                .mapIndexed { index, lens -> lens to path(index, lens) }.
+                toTypedArray()))
+        } else {
+            null
+        }
+    } catch (e: ContractBreach) {
+        null
     }
 }
