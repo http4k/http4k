@@ -40,16 +40,17 @@ abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vara
     fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
-class RouteBinder<in T>(private val pathExtractor: PathExtractor,
+class RouteBinder<in T>(pathLenses: List<PathLens<*>>,
                         private val pathBuilder: PathBinder,
                         private val method: Method,
                         private val invoker: (T, ExtractedParts, Filter) -> HttpHandler?) {
+    private val extractor = PathExtractor(pathLenses)
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(filter: Filter, basePath: PathBuilder) =
             {
                 actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
-                    pathExtractor.from(actualPath)?.let { invoker(fn, it, filter) }
+                    extractor.from(actualPath)?.let { invoker(fn, it, filter) }
                 }
             }
     }
