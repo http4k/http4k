@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request

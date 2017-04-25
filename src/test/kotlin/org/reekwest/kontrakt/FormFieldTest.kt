@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
@@ -61,7 +61,7 @@ class FormFieldTest {
         val custom = FormField.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
-        val formWithField = custom(instance, WebForm.emptyForm())
+        val formWithField = custom(instance, WebForm.Companion.emptyForm())
 
         assertThat(formWithField.fields["bob"], equalTo(listOf("hello world!")))
 

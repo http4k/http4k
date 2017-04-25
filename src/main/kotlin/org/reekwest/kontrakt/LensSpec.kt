@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import java.time.LocalDate
 import java.time.LocalDateTime

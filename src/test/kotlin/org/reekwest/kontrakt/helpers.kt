@@ -1,3 +1,3 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 data class MyCustomBodyType(val value: String)

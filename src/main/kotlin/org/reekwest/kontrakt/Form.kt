@@ -1,6 +1,5 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
@@ -9,11 +8,12 @@ import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.copy
 import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
+import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
 import java.net.URLDecoder
 
 typealias FormFields = Map<String, List<String>>
 
-object FormField : BiDiLensSpec <WebForm, String, String>("form field",
+object FormField : BiDiLensSpec<WebForm, String, String>("form field",
     Get { name, (fields) -> fields.getOrDefault(name, listOf()) },
     Set { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
@@ -59,13 +59,13 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
     Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(CONTENT_TYPE))
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(Header.Common.CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target: HttpMessage ->
         values.fold(target, { memo, (fields) ->
             memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
-        }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+        }).with(Header.Common.CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )
 

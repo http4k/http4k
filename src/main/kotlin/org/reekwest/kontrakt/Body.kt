@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString

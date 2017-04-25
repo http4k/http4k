@@ -46,7 +46,7 @@ assertThat(response.bodyString(), containsSubstring("John Doe"))
 
 ## Routing
 
-Reekwest comes with basic routing. It's just another function where you can wrap handlers:
+Reekwest comes with basic routing. It'pkg just another function where you can wrap handlers:
 
 ```kotlin
 routes(

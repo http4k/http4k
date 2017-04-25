@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.HttpMessage
@@ -31,7 +31,7 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header",
     Set { name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }
 ) {
     object Common {
-        val CONTENT_TYPE = map(::ContentType, { it.value }).optional("Content-Type")
+        val CONTENT_TYPE = Header.map(::ContentType, { it.value }).optional("Content-Type")
     }
 }
 
@@ -46,18 +46,18 @@ open class PathSpec<MID, out OUT>(private val delegate: LensSpec<String, String,
 }
 
 object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
-    Get.Companion { _, target -> listOf(target) })) {
+    Get { _, target -> listOf(target) })) {
 
     fun fixed(name: String) = of(name)
 }
 
-fun Path.int() = this.map(String::toInt)
-fun Path.long() = this.map(String::toLong)
-fun Path.double() = this.map(String::toDouble)
-fun Path.float() = this.map(String::toFloat)
-fun Path.boolean() = this.map(::safeBooleanFrom)
-fun Path.localDate() = this.map(LocalDate::parse)
-fun Path.dateTime() = this.map(LocalDateTime::parse)
-fun Path.zonedDateTime() = this.map(ZonedDateTime::parse)
-fun Path.uuid() = this.map(UUID::fromString)
+fun Path.int() = map(String::toInt)
+fun Path.long() = map(String::toLong)
+fun Path.double() = map(String::toDouble)
+fun Path.float() = map(String::toFloat)
+fun Path.boolean() = map(::safeBooleanFrom)
+fun Path.localDate() = map(LocalDate::parse)
+fun Path.dateTime() = map(LocalDateTime::parse)
+fun Path.zonedDateTime() = map(ZonedDateTime::parse)
+fun Path.uuid() = map(UUID::fromString)
 

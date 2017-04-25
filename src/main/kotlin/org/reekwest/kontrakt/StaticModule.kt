@@ -1,7 +1,5 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.Root
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.Method.GET
@@ -12,8 +10,8 @@ import org.reekwest.http.core.with
 import java.nio.ByteBuffer
 
 class StaticModule(private val basePath: BasePath,
-                   private val resourceLoader: ResourceLoader = ResourceLoader.Classpath("/"),
-                   private val moduleFilter: Filter = Filter { it }) : org.reekwest.http.contract.Module {
+                   private val resourceLoader: ResourceLoader = ResourceLoader.Companion.Classpath("/"),
+                   private val moduleFilter: Filter = Filter { it }) : Module {
     override fun toRouter(): Router =
         {
             req ->
@@ -24,7 +22,7 @@ class StaticModule(private val basePath: BasePath,
                     moduleFilter.then({
                         Response(OK)
                             .with(
-                                CONTENT_TYPE to ContentType.lookupFor(path),
+                                Header.Common.CONTENT_TYPE to ContentType.lookupFor(path),
                                 Body.required() to ByteBuffer.wrap(url.openStream().readBytes())
                             )
                     })

@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.kontrakt
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.HttpHandler
@@ -9,8 +9,8 @@ import org.reekwest.http.core.Status
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
-class Route private constructor(private val core: Route.Companion.Core) : Iterable<Lens<Request, *>> {
-    constructor(name: String, description: String? = null) : this(Route.Companion.Core(name, description, null))
+class Route private constructor(private val core: Core) : Iterable<Lens<Request, *>> {
+    constructor(name: String, description: String? = null) : this(Core(name, description, null))
 
     override fun iterator(): Iterator<Lens<Request, *>> = core.requestParams.plus(core.body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
 
