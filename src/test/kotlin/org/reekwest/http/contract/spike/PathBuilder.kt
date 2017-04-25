@@ -4,9 +4,9 @@ package org.reekwest.http.contract.spike
 sealed class PathBuilder {
     abstract val parent: PathBuilder
     abstract fun toList(): List<String>
-    operator fun <T> invoke(index: Int, fn: (String) -> T): T? = if (toList().size > index) fn(toList()[index]) else null
+    operator fun <T> invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-    abstract fun startsWith(other: PathBuilder): Boolean
+//    abstract fun startsWith(other: PathBuilder): Boolean
 
     operator fun div(child: String): PathBuilder = Slash(this, child)
 
@@ -27,15 +27,15 @@ sealed class PathBuilder {
 data class Slash(override val parent: PathBuilder, val child: String) : PathBuilder() {
     override fun toList(): List<String> = parent.toList().plus(child)
     override fun toString(): String = "$parent/$child"
-    override fun startsWith(other: PathBuilder): Boolean {
-        val components = other.toList()
-        return toList().take(components.size) == components
-    }
+//    override fun startsWith(other: PathBuilder): Boolean {
+//        val components = other.toList()
+//        return toList().take(components.size) == components
+//    }
 }
 
 object Root : PathBuilder() {
     override fun toList(): List<String> = emptyList()
     override val parent: PathBuilder = this
     override fun toString(): String = ""
-    override fun startsWith(other: PathBuilder): Boolean = other == Root
+//    override fun startsWith(other: PathBuilder): Boolean = other == Root
 }
