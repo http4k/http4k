@@ -11,18 +11,18 @@ class ResourceLoaderTest {
         checkContents(ResourceLoader.Classpath("/"), "mybob.xml", "<xml>content</xml>")
     }
 
-    private fun checkContents(loader: ResourceLoader, path: String, expected: String) {
-        assertThat(loader.load(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
-    }
-
     @Test
     fun `classpath loader loads existing child file`() {
-        assertThat(false, equalTo(false))
+        checkContents(ResourceLoader.Classpath("/"), "org/index.html", "hello from the io index.html")
     }
 
     @Test
     fun `classpath loader for missing file`() {
         assertThat(false, equalTo(false))
+    }
+
+    private fun checkContents(loader: ResourceLoader, path: String, expected: String) {
+        assertThat(loader.load(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
     }
 
 //
