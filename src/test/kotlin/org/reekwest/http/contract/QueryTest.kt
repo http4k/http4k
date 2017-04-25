@@ -38,6 +38,7 @@ class QueryTest {
         assertThat({ optionalMultiQuery(request) }, throws(equalTo(ContractBreach(Missing(optionalMultiQuery)))))
     }
 
+    data class Bob(val int: Int)
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")

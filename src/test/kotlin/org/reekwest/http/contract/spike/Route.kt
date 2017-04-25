@@ -30,8 +30,6 @@ data class Route private constructor(private val name: String,
 
 abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vararg val pathParams: Lens<String, *>) {
 
-    fun matches(actualMethod: Method, basePath: PathBuilder, actualPath: PathBuilder): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
-
     abstract fun match(basePath: PathBuilder): (Method, PathBuilder) -> HttpHandler?
 
     fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
@@ -46,6 +44,9 @@ class RouteBinder<in T> internal constructor(private val pathBuilder: PathBinder
                                              private val method: Method,
                                              private val invoker: (T, ExtractedParts) -> HttpHandler,
                                              private vararg val pathLenses: PathLens<*>) {
+
+    private fun matches(actualMethod: Method, basePath: PathBuilder, actualPath: PathBuilder): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
+
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
         override fun match(basePath: PathBuilder) =
             {
