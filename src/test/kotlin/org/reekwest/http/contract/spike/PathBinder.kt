@@ -27,7 +27,7 @@ class PathBinder1<out A>(override val route: Route, override val pathFn: (PathBu
 
     infix fun at(method: Method): RouteBinder<(A) -> HttpHandler?> =
         RouteBinder(this, method, { fn, path, filter ->
-            safe { ppa(path.toString())?.let { fn(it) }?.let { filter.then(it) } }
+            safe { path(0, ppa)?.let { fn(it) }?.let { filter.then(it) } }
         })
 }
 
@@ -36,7 +36,7 @@ class PathBinder2<out A, out B>(override val route: Route, override val pathFn: 
     infix fun at(method: Method): RouteBinder<(A, B) -> HttpHandler?> =
         RouteBinder(this, method,
             { fn, path, filter ->
-                safe { ppa(path.toString()) }?.let { ppb(path.toString())?.let { b -> fn(it, b) }?.let { filter.then(it) } }
+                safe { path(0, ppa) }?.let { path(1, ppb)?.let { b -> fn(it, b) }?.let { filter.then(it) } }
             })
 }
 

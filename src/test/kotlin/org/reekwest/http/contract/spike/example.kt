@@ -20,6 +20,6 @@ fun main(args: Array<String>) {
         .query(Query.optional("goobas")) / Path.of("bob") / anInt at GET bind ::hello
 
     val handler = RouteModule(Root).withRoute(asd).toHttpHandler()
-    val a = handler(Request(GET, Uri.uri("")))
+    println(handler(Request(GET, Uri.uri("/bob"))))
 }
 

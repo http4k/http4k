@@ -20,13 +20,13 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
 }
 
 open class Lens<in IN, out FINAL>(val meta: Meta,
-                                  private val get: (IN) -> FINAL) {
+                                  private val get: (IN) -> FINAL) : (IN) -> FINAL {
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
      * Lens operation to get the value from the target
      */
-    operator fun invoke(target: IN): FINAL = try {
+    override operator fun invoke(target: IN): FINAL = try {
         get(target)
     } catch (e: ContractBreach) {
         throw e
