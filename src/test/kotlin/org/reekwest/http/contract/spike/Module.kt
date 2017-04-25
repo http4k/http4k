@@ -62,8 +62,8 @@ data class RouteModule(private val rootPath: PathBuilder,
     override fun toRequestRouter(): RequestRouter = {
         routes.fold<ServerRoute, HttpHandler?>(null, { memo, route ->
             memo ?:
-                route.match(filter, rootPath)(it.method, PathBuilder(it.uri.path))?.
-                    let { validate(route).then(it) }
+                route.match(rootPath)(it.method, PathBuilder(it.uri.path))?.
+                    let { validate(route).then(filter).then(it) }
         })
     }
 

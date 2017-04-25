@@ -16,7 +16,6 @@ fun main(args: Array<String>) {
 
     val anInt = Path.int().of("name")
 
-
     val asd = Route("")
         .header(Header.int().optional("bob"))
         .query(Query.optional("goobas")) / Path.of("bob") / anInt at GET bind ::hello

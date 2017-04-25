@@ -14,7 +14,7 @@ data class Route private constructor(private val name: String,
                                      private val responses: Iterable<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
     constructor(name: String, description: String? = null) : this(name, description, null)
 
-    override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it)} ?: emptyList()).iterator()
+    override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList()).iterator()
 
     fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(new))
     fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(new))
@@ -32,7 +32,7 @@ abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vara
 
     fun matches(actualMethod: Method, basePath: PathBuilder, actualPath: PathBuilder): Boolean? = actualMethod == method && actualPath == pathBuilder.pathFn(basePath)
 
-    abstract fun match(filter: Filter, basePath: PathBuilder): (Method, PathBuilder) -> HttpHandler?
+    abstract fun match(basePath: PathBuilder): (Method, PathBuilder) -> HttpHandler?
 
     fun describeFor(basePath: PathBuilder): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
@@ -47,11 +47,11 @@ class RouteBinder<in T> internal constructor(private val pathBuilder: PathBinder
                                              private val invoker: (T, ExtractedParts) -> HttpHandler,
                                              private vararg val pathLenses: PathLens<*>) {
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBuilder, method) {
-        override fun match(filter: Filter, basePath: PathBuilder) =
+        override fun match(basePath: PathBuilder) =
             {
                 actualMethod: Method, actualPath: PathBuilder ->
                 matches(actualMethod, basePath, actualPath)?.let {
-                    from(actualPath)?.let { filter(invoker(fn, it)) }
+                    from(actualPath)?.let { invoker(fn, it) }
                 }
             }
     }
