@@ -14,7 +14,7 @@ import java.nio.ByteBuffer
 class StaticModule(private val basePath: BasePath,
                    private val resourceLoader: ResourceLoader = ResourceLoader.Classpath("/"),
                    private val moduleFilter: Filter = Filter { it }) : org.reekwest.http.contract.Module {
-    override fun toRequestRouter(): RequestRouter =
+    override fun toRouter(): Router =
         {
             req ->
             val path = convertPath(BasePath(req.uri.path))

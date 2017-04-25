@@ -14,18 +14,18 @@ import org.reekwest.http.core.Uri.Companion.uri
 class ModuleTest {
 
     private val notFoundModule = object : Module {
-        override fun toRequestRouter(): RequestRouter = {
+        override fun toRouter(): Router = {
             null
         }
     }
 
     private val contractBreachModule = object : Module {
-        override fun toRequestRouter(): RequestRouter = {
+        override fun toRouter(): Router = {
             { throw ContractBreach() }
         }
     }
     private val okModule = object : Module {
-        override fun toRequestRouter(): RequestRouter = {
+        override fun toRouter(): Router = {
             { Response(OK) }
         }
     }

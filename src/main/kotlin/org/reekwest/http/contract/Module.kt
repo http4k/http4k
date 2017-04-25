@@ -6,21 +6,20 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 
-typealias Router<T> = (T) -> HttpHandler?
-typealias RequestRouter = Router<Request>
+typealias Router = (Request) -> HttpHandler?
 
 interface Module {
     infix fun then(that: Module): Module {
-        val thisBinding = toRequestRouter()
-        val thatBinding = that.toRequestRouter()
+        val thisBinding = toRouter()
+        val thatBinding = that.toRouter()
 
         return object : Module {
-            override fun toRequestRouter(): RequestRouter = { req -> thisBinding(req) ?: thatBinding(req) }
+            override fun toRouter(): Router = { req -> thisBinding(req) ?: thatBinding(req) }
         }
     }
 
     fun toHttpHandler(): HttpHandler {
-        val handlerMatcher = toRequestRouter()
+        val handlerMatcher = toRouter()
         return { req ->
             handlerMatcher(req)?.let {
                 try {
@@ -32,5 +31,5 @@ interface Module {
         }
     }
 
-    fun toRequestRouter(): RequestRouter
+    fun toRouter(): Router
 }
