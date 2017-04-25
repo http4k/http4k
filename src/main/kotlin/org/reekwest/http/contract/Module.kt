@@ -19,9 +19,9 @@ interface Module {
     }
 
     fun toHttpHandler(): HttpHandler {
-        val svcBinding = toHandlerMatcher()
+        val handlerMatcher = toHandlerMatcher()
         return { req ->
-            svcBinding(req)?.let {
+            handlerMatcher(req)?.let {
                 try {
                     it(req)
                 } catch (e: ContractBreach) {

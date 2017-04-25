@@ -6,6 +6,7 @@ import org.junit.Test
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
+import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri
@@ -15,6 +16,12 @@ class ModuleTest {
     private val notFoundModule = object : Module {
         override fun toHandlerMatcher(): HandlerMatcher = {
             null
+        }
+    }
+
+    private val contractBreachModule = object : Module {
+        override fun toHandlerMatcher(): HandlerMatcher = {
+            { throw ContractBreach() }
         }
     }
     private val okModule = object : Module {
@@ -31,6 +38,11 @@ class ModuleTest {
     @Test
     fun `falls back to 404 response`() {
         assertThat(notFoundModule.toHttpHandler()(Request(Method.GET, Uri.uri("/boo"))), equalTo(Response(NOT_FOUND)))
+    }
+
+    @Test
+    fun `contract breach results in 400`() {
+        assertThat(contractBreachModule.toHttpHandler()(Request(Method.GET, Uri.uri("/boo"))), equalTo(Response(BAD_REQUEST)))
     }
 
     @Test
