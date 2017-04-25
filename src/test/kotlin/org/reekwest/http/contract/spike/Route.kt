@@ -33,34 +33,34 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
 
 abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vararg val pathParams: Lens<String, *>) {
 
-    abstract fun match(basePath: Path): (Method, Path) -> HttpHandler?
+    abstract fun match(basePath: BasePath): (Method, BasePath) -> HttpHandler?
 
-    fun describeFor(basePath: Path): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
+    fun describeFor(basePath: BasePath): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
-internal class ExtractedParts(private val mapping: Map<PathSegmentLens<*>, *>) {
+internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(lens: PathSegmentLens<T>): T = mapping[lens] as T
+    operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
 }
 
 class RouteBinder<in T> internal constructor(private val pathBinder: PathBinder,
                                              private val method: Method,
                                              private val invoker: (T, ExtractedParts) -> HttpHandler,
-                                             private vararg val pathLenses: PathSegmentLens<*>) {
+                                             private vararg val pathLenses: PathLens<*>) {
 
-    private fun matches(actualMethod: Method, basePath: Path, actualPath: Path) = actualMethod == method && actualPath == pathBinder.pathFn(basePath)
+    private fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) = actualMethod == method && actualPath == pathBinder.pathFn(basePath)
 
     infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder, method) {
-        override fun match(basePath: Path) =
+        override fun match(basePath: BasePath) =
             {
-                actualMethod: Method, actualPath: Path ->
+                actualMethod: Method, actualPath: BasePath ->
                 matches(actualMethod, basePath, actualPath)?.let {
                     from(actualPath)?.let { invoker(fn, it) }
                 }
             }
     }
 
-    private fun from(path: Path) = try {
+    private fun from(path: BasePath) = try {
         if (path.toList().size == pathLenses.size) {
             ExtractedParts(mapOf(*pathLenses.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
         } else {

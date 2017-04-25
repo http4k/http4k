@@ -5,28 +5,28 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
 
-class PathSegmentTest {
+class PathTest {
 
     @Test
     fun `value present`() {
-        assertThat(PathSegment.of("hello")("world"), equalTo("world"))
-        assertThat(PathSegment.map { it.length }.of("hello")("world"), equalTo(5))
+        assertThat(Path.of("hello")("world"), equalTo("world"))
+        assertThat(Path.map { it.length }.of("hello")("world"), equalTo(5))
     }
 
     @Test
     fun `invalid value`() {
-        val path = PathSegment.map(String::toInt).of("hello")
+        val path = Path.map(String::toInt).of("hello")
         assertThat({ path("world") }, throws(equalTo(ContractBreach(Invalid(path)))))
     }
 
     @Test
     fun `can create a custom type and get it`() {
-        val path = PathSegment.map(::MyCustomBodyType).of("bob")
+        val path = Path.map(::MyCustomBodyType).of("bob")
         assertThat(path("hello world!"), equalTo(MyCustomBodyType("hello world!")))
     }
 
     @Test
     fun `toString is ok`() {
-        assertThat(PathSegment.of("hello").toString(), equalTo("Required path 'hello'"))
+        assertThat(Path.of("hello").toString(), equalTo("Required path 'hello'"))
     }
 }
