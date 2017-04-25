@@ -1,6 +1,7 @@
 package org.reekwest.http.contract.spike
 
 import org.reekwest.http.contract.Header
+import org.reekwest.http.contract.PathSegment
 import org.reekwest.http.contract.Query
 import org.reekwest.http.contract.int
 import org.reekwest.http.core.HttpHandler

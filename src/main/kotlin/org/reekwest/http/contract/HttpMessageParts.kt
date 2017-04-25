@@ -9,6 +9,8 @@ typealias QueryLens<T> = Lens<Request, T>
 
 typealias HeaderLens<T> = Lens<Request, T>
 
+typealias PathSegmentLens<T> = Lens<String, T>
+
 object Query : BiDiLensSpec<Request, String, String>("query",
     Get { name, target -> target.queries(name).map { it ?: "" } },
     Set { name, values, target -> values.fold(target, { m, next -> m.query(name, next) }) }
@@ -27,3 +29,15 @@ object Cookies : BiDiLensSpec<Request, Cookie, Cookie>("cookie",
     Get { name, target -> target.cookies().filter { it.name == name } },
     Set { _, values, target -> values.fold(target, { m, (name, value) -> m.cookie(name, value) }) }
 )
+
+open class PathSegmentSpec<MID, out OUT>(private val delegate: LensSpec<String, String, OUT>) {
+    open fun of(name: String, description: String? = null): PathSegmentLens<OUT> = delegate.required(name, description)
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSegmentSpec<MID, NEXT> = PathSegmentSpec(delegate.map(nextIn))
+}
+
+object PathSegment : PathSegmentSpec<String, String>(LensSpec<String, String, String>("path",
+    Get.Companion { _, target -> listOf(target) })) {
+
+    fun int() = map(String::toInt)
+    fun fixed(name: String) = of(name)
+}

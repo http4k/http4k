@@ -1,5 +1,7 @@
 package org.reekwest.http.contract.spike
 
+import org.reekwest.http.contract.PathSegment
+import org.reekwest.http.contract.PathSegmentLens
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
 import java.lang.UnsupportedOperationException
