@@ -33,7 +33,7 @@ interface Filter : (HttpHandler) -> HttpHandler {
     }
 }
 
-fun Filter.then(next: Filter): Filter = Filter { next(this(it)) }
+fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 
 fun Filter.then(next: HttpHandler): HttpHandler = { this(next)(it) }
 

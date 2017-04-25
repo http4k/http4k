@@ -21,7 +21,7 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, protected 
     }
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
-        val meta = Meta(false, location, name, description)
+        val meta = Meta(true, location, name, description)
         val getLens = get(name)
         return Lens(meta, { getLens(it).firstOrNull() ?: throw ContractBreach(Missing(meta)) })
     }
@@ -34,7 +34,7 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, protected 
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
-            val meta = Meta(false, location, name, description)
+            val meta = Meta(true, location, name, description)
             val getLens = get(name)
             return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw ContractBreach(Missing(meta)) else it } })
         }
@@ -96,14 +96,13 @@ fun <IN> BiDiLensSpec<IN, String, String>.int() = this.map(String::toInt, Int::t
 fun <IN> BiDiLensSpec<IN, String, String>.long() = this.map(String::toLong, Long::toString)
 fun <IN> BiDiLensSpec<IN, String, String>.double() = this.map(String::toDouble, Double::toString)
 fun <IN> BiDiLensSpec<IN, String, String>.float() = this.map(String::toFloat, Float::toString)
-
-fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map({
-    if (it.toUpperCase() == "TRUE") true
-    else if (it.toUpperCase() == "FALSE") false
-    else throw kotlin.IllegalArgumentException("illegal boolean")
-}, Boolean::toString)
-
+fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map(::safeBooleanFrom, Boolean::toString)
 fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, ISO_LOCAL_DATE::format)
 fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, ISO_LOCAL_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, ISO_ZONED_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, UUID::toString)
+
+private fun safeBooleanFrom(value: String): Boolean =
+    if (value.toUpperCase() == "TRUE") true
+    else if (value.toUpperCase() == "FALSE") false
+    else throw kotlin.IllegalArgumentException("illegal boolean")
