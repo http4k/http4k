@@ -65,7 +65,7 @@ class PathTest {
     @Test
     fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
 
-    private fun <T> checkContract(Path: PathSegmentSpec<String, T>, valueAsString: String, tValue: T) {
+    private fun <T> checkContract(Path: PathSpec<String, T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))
         assertThat({ requiredLens("hello") }, throws(equalTo(ContractBreach(Invalid(requiredLens)))))

@@ -40,12 +40,12 @@ object Cookies : BiDiLensSpec<Request, Cookie, Cookie>("cookie",
     Set { _, values, target -> values.fold(target, { m, (name, value) -> m.cookie(name, value) }) }
 )
 
-open class PathSegmentSpec<MID, out OUT>(private val delegate: LensSpec<String, String, OUT>) {
+open class PathSpec<MID, out OUT>(private val delegate: LensSpec<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> = delegate.required(name, description)
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSegmentSpec<MID, NEXT> = PathSegmentSpec(delegate.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
 }
 
-object Path : PathSegmentSpec<String, String>(LensSpec<String, String, String>("path",
+object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
     Get.Companion { _, target -> listOf(target) })) {
 
     fun fixed(name: String) = of(name)
