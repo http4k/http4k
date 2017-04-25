@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -15,7 +15,8 @@ import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.body.bodyString
-import org.reekwest.kontrakt.ResourceLoader.Companion.Classpath
+import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
+import org.reekwest.kontrakt.module.ResourceLoader.Companion.Classpath
 
 class StaticModuleTest {
 
@@ -25,9 +26,8 @@ class StaticModuleTest {
     fun `looks up contents of existing root file`() {
         val module = StaticModule(Root / "svc")
         val result = module.toHttpHandler()(Request(GET, uri("/svc/mybob.xml")))
-        assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(APPLICATION_XML))
+        assertThat(CONTENT_TYPE(result), equalTo(APPLICATION_XML))
     }
 
     @Test
@@ -36,7 +36,7 @@ class StaticModuleTest {
         val result = module.toHttpHandler()(Request(GET, uri("/svc")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("hello from the root index.html"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(TEXT_HTML))
+        assertThat(CONTENT_TYPE(result), equalTo(TEXT_HTML))
     }
 
     @Test
@@ -45,7 +45,7 @@ class StaticModuleTest {
         val result = module.toHttpHandler()(Request(GET, uri("/svc")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("hello from the io index.html"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(TEXT_HTML))
+        assertThat(CONTENT_TYPE(result), equalTo(TEXT_HTML))
     }
 
     @Test
@@ -61,36 +61,36 @@ class StaticModuleTest {
         val result = module.toHttpHandler()(Request(GET, uri("/svc/$pkg/StaticModule.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
+        assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
     }
 
     @Test
     fun `looks up contents of existing subdir file`() {
         val module = StaticModule(Root)
-        val result = module.toHttpHandler()(Request(GET, uri("/org/reekwest/kontrakt/StaticModule.js")))
+        val result = module.toHttpHandler()(Request(GET, uri("/$pkg/StaticModule.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
+        assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
     }
 
     @Test
     fun `can alter the root path`() {
-        val module = StaticModule(Root / "svc", Classpath("$pkg"))
+        val module = StaticModule(Root / "svc", Classpath(pkg))
         val result = module.toHttpHandler()(Request(GET, uri("/svc/StaticModule.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
+        assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
     }
 
     @Test
     fun `can add a filter`() {
-        val module = StaticModule(Root / "svc", Classpath("$pkg"), Filter.Companion {
+        val module = StaticModule(Root / "svc", Classpath(pkg), Filter {
             { req -> it(req).copy(EXPECTATION_FAILED) }
         })
         val result = module.toHttpHandler()(Request(GET, uri("/svc/StaticModule.js")))
         assertThat(result.status, equalTo(EXPECTATION_FAILED))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(Header.Common.CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
+        assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
     }
 
     @Test

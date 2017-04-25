@@ -1,9 +1,12 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
+import org.reekwest.kontrakt.CatchContractBreach
+import org.reekwest.kontrakt.ContractBreach
+import org.reekwest.kontrakt.ExtractionFailure
 
 class RouteModule private constructor(private val core: Core) : Module {
 

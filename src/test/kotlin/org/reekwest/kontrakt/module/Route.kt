@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.HttpHandler
@@ -6,6 +6,12 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Status
+import org.reekwest.kontrakt.BodyLens
+import org.reekwest.kontrakt.ContractBreach
+import org.reekwest.kontrakt.HeaderLens
+import org.reekwest.kontrakt.Lens
+import org.reekwest.kontrakt.PathLens
+import org.reekwest.kontrakt.QueryLens
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 

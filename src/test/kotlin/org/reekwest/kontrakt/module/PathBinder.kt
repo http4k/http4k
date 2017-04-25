@@ -1,7 +1,9 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
+import org.reekwest.kontrakt.Path
+import org.reekwest.kontrakt.PathLens
 import java.lang.UnsupportedOperationException
 
 interface PathBinder {

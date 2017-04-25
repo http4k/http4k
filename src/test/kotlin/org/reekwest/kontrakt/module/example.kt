@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
@@ -6,6 +6,10 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.kontrakt.Header
+import org.reekwest.kontrakt.Path
+import org.reekwest.kontrakt.Query
+import org.reekwest.kontrakt.int
 
 fun main(args: Array<String>) {
 

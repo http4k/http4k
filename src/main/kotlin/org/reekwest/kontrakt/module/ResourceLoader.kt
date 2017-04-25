@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import java.io.File
 import java.net.URL

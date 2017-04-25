@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 sealed class BasePath {
     abstract val parent: BasePath

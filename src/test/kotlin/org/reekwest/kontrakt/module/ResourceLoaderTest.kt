@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.module
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
@@ -9,12 +9,12 @@ class ResourceLoaderTest {
 
     @Test
     fun `classpath loader loads existing file`() {
-        checkContents(ResourceLoader.Companion.Classpath("/"), "mybob.xml", "<xml>content</xml>")
+        checkContents(ResourceLoader.Classpath("/"), "mybob.xml", "<xml>content</xml>")
     }
 
     @Test
     fun `classpath loader loads existing child file`() {
-        checkContents(ResourceLoader.Companion.Classpath("/"), "org/index.html", "hello from the io index.html")
+        checkContents(ResourceLoader.Classpath("/"), "org/index.html", "hello from the io index.html")
     }
 
     @Test
@@ -24,12 +24,12 @@ class ResourceLoaderTest {
 
     @Test
     fun `directory loader loads existing file`() {
-        checkContents(ResourceLoader.Companion.Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
+        checkContents(ResourceLoader.Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
     }
 
     @Test
     fun `directory loader loads existing child file`() {
-        checkContents(ResourceLoader.Companion.Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
+        checkContents(ResourceLoader.Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
     }
 
     @Test
