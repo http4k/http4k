@@ -91,11 +91,10 @@ allprojects {
             }
         }
     }
-}
-subprojects {
+
     bintray {
-        user = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayKey') ? project.bintrayKey : System.getenv('BINTRAY_KEY')
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
 
         publications = ['mavenJava']
         dryRun = false
