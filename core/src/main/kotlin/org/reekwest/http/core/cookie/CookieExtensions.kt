@@ -60,9 +60,9 @@ fun Request.cookie(name: String, value: String): Request = replaceHeader("Cookie
 
 internal fun String.toCookieList(): List<Cookie> = split("; ").filter { it.trim().isNotBlank() }.map { it.split("=").let { Cookie(it.elementAt(0), it.elementAtOrElse(1, { "\"\"" }).unquoted()) } }
 
-internal fun Request.cookies(): List<Cookie> = headers.find { it.first == "Cookie" }?.second?.toCookieList() ?: listOf()
+fun Request.cookies(): List<Cookie> = headers.find { it.first == "Cookie" }?.second?.toCookieList() ?: listOf()
 
-internal fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.attribute(PATH)?.length ?: 0 }.firstOrNull()
+fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.attribute(PATH)?.length ?: 0 }.firstOrNull()
 
 private fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
 

@@ -5,6 +5,7 @@ import org.reekwest.http.asString
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
 import java.nio.ByteBuffer
+import java.util.Collections.emptyList
 
 typealias BodyLens<T> = Lens<HttpMessage, T>
 typealias BiDiBodyLens<T> = BiDiLens<HttpMessage, T>

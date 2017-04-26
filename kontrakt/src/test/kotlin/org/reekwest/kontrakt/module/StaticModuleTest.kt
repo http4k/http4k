@@ -10,7 +10,6 @@ import org.reekwest.http.core.Filter
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.ResourceLoader.Companion.Classpath
-import org.reekwest.http.core.StaticContent
 import org.reekwest.http.core.Status.Companion.EXPECTATION_FAILED
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.body.bodyString
@@ -18,7 +17,7 @@ import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
 
 class StaticModuleTest {
 
-    private val pkg = StaticContent::class.java.`package`.name.replace('.', '/')
+    private val pkg = this::class.java.`package`.name.replace('.', '/')
 
     @Test
     fun `looks up contents of existing root file`() {

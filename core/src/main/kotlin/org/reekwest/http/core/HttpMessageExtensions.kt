@@ -14,7 +14,7 @@ fun Response.body(body: Body) = copy(body = body)
 
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
 
-internal fun <T : HttpMessage> T.copy(headers: Headers = this.headers, body: Body? = this.body): T = when (this) {
+fun <T : HttpMessage> T.copy(headers: Headers = this.headers, body: Body? = this.body): T = when (this) {
     is Request -> this.copy(headers = headers, body = body) as T
     is Response -> this.copy(headers = headers, body = body) as T
     else -> throw IllegalStateException("Unknown class $this")
