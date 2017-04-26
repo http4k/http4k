@@ -1,2 +1,2 @@
-rootProject.name = 'reekwest'
-include 'core', 'kontrakt'
+rootProject.name = 'all'
+include 'reekwest', 'kontrakt'

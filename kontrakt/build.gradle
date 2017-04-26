@@ -5,7 +5,7 @@ description = 'Typesafe HTTP contracts for Reekwest'
 dependencies {
     provided kotlin_lib
 
-    compile project(":core")
+    compile project(":reekwest")
 
     testCompile testing
 }
