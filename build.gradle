@@ -119,8 +119,8 @@ allprojects {
                 }
                 mavenCentralSync {
                     sync = true
-                    user = project.hasProperty('sonatypeUser') ? project.sonatypeUser : System.getenv('SONATYPE_USER')
-                    password = project.hasProperty('sonatypePassword') ? project.sonatypePassword : System.getenv('SONATYPE_KEY')
+                    user = System.getenv('SONATYPE_USER')
+                    password = System.getenv('SONATYPE_KEY')
                     close = '1'
                 }
             }
