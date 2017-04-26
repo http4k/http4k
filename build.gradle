@@ -91,10 +91,11 @@ allprojects {
             }
         }
     }
-
+}
+subprojects {
     bintray {
-        user = project.hasProperty('bintrayUser') ? project.bintrayUser : 'BINTRAYUSER'
-        key = project.hasProperty('bintrayKey') ? project.bintrayKey : 'BINTRAYKEY'
+        user = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayKey') ? project.bintrayKey : System.getenv('BINTRAY_KEY')
 
         publications = ['mavenJava']
         dryRun = false
@@ -119,12 +120,11 @@ allprojects {
                 }
                 mavenCentralSync {
                     sync = true
-                    user = project.hasProperty('sonatypeUser') ? project.sonatypeUser : 'sonatypeUser'
-                    password = project.hasProperty('sonatypePassword') ? project.sonatypePassword : 'sonatypePassword'
+                    user = project.hasProperty('sonatypeUser') ? project.sonatypeUser : System.getenv('SONATYPE_USER')
+                    password = project.hasProperty('sonatypePassword') ? project.sonatypePassword : System.getenv('SONATYPE_KEY')
                     close = '1'
                 }
             }
         }
     }
 }
-
