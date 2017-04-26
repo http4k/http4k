@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.1'
+    ext.kotlin_version = '1.1.2'
     ext.jetty_version = '9.3.16.v20170120'
     ext.apache_http_version = '4.5.3'
 
