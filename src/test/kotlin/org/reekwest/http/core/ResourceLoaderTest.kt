@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt.module
+package org.reekwest.http.core
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
