@@ -17,7 +17,7 @@ private fun Uri.queries(): Parameters = query.toParameters()
 
 fun Parameters.toUrlEncoded(): String = this.map { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }.joinToString("&")
 
-internal fun String.toParameters() = split("&").map(String::toParameter)
+internal fun String.toParameters() = if(isNotEmpty()) split("&").map(String::toParameter) else listOf()
 
 internal fun Parameters.findSingle(name: String): String? = find { it.first == name }?.second
 
