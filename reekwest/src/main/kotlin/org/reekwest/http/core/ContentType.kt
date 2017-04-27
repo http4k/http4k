@@ -14,6 +14,7 @@ data class ContentType(val value: String) {
         val APPLICATION_XML = ContentType("application/xml")
         val TEXT_HTML = ContentType("text/html")
         val TEXT_PLAIN = ContentType("text/plain")
+        val OCTET_STREAM = ContentType("application/octet-stream")
         val TEXT_XML = ContentType("text/xml")
         val WILDCARD = ContentType("*/*")
     }

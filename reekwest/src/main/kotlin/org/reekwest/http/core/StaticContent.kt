@@ -1,5 +1,6 @@
 package org.reekwest.http.core
 
+import org.reekwest.http.core.ContentType.Companion.OCTET_STREAM
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
@@ -10,9 +11,10 @@ class StaticContent(private val basePath: String = "", private val resourceLoade
         val path = convertPath(req.uri.path)
         return resourceLoader.load(path)?.let {
             url ->
-            if (req.method == GET) {
+            val lookupFor = ContentType.lookupFor(path)
+            if (req.method == GET && lookupFor != OCTET_STREAM) {
                 Response(OK,
-                    listOf("Content-Type" to ContentType.lookupFor(path).value),
+                    listOf("Content-Type" to lookupFor.value),
                     ByteBuffer.wrap(url.openStream().readBytes())
                 )
             } else Response(NOT_FOUND)

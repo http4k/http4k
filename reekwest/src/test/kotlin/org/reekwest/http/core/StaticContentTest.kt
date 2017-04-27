@@ -2,7 +2,6 @@ package org.reekwest.http.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_XML
 import org.reekwest.http.core.ContentType.Companion.TEXT_HTML
@@ -85,10 +84,10 @@ class StaticContentTest {
     }
 
     @Test
-    @Ignore // FIXME what to go in this case..
-    fun `cannot serve the root`() {
+    fun `cannot serve a directory`() {
         val handler = StaticContent("/svc", Classpath())
-        val result = handler(Request(GET, uri("/")))
+        val result = handler(Request(GET, uri("/svc/org")))
+        println(result)
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
