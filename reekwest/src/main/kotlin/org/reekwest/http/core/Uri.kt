@@ -1,5 +1,7 @@
 package org.reekwest.http.core
 
+import org.reekwest.http.appendIfNotBlank
+
 data class Uri(val scheme: String, val authority: String, val path: String, val query: String, val fragment: String) {
     companion object {
         private val AUTHORITY = Regex("(?:([^@]+)@)?([^:]+)(?::([\\d]+))?")
@@ -18,11 +20,6 @@ data class Uri(val scheme: String, val authority: String, val path: String, val 
             .append(path)
             .appendIfNotBlank(query, "?", query)
             .appendIfNotBlank(fragment, "#", fragment).toString()
-    }
-
-    fun StringBuilder.appendIfNotBlank(valueToCheck: String, vararg toAppend: String): StringBuilder {
-        if (valueToCheck.isNotBlank()) toAppend.forEach { append(it) }
-        return this
     }
 
     val host: String by lazy {
