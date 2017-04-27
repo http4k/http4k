@@ -48,4 +48,12 @@ class CurlTest {
         val curl = get("http://www.google.com").bodyString("my \"quote\"").toCurl()
         assertThat(curl, equalTo("""curl -X GET --data "my \"quote\"" "http://www.google.com""""))
     }
+
+    @Test
+    fun `limits the entity if it's too large`() {
+        val largeBody = (0..500).joinToString(" ")
+        val curl = get("http://www.google.com").bodyString(largeBody).toCurl()
+        val data = "data \"([^\"]+)\"".toRegex().find(curl)?.groupValues?.get(1)!!
+        assertThat(data.length, equalTo(256 + "[truncated]".length))
+    }
 }
