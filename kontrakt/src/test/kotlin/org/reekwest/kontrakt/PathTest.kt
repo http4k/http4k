@@ -48,7 +48,7 @@ class PathTest {
 
     @Test
     fun `toString is ok`() {
-        assertThat(Path.of("hello").toString(), equalTo("Required path 'hello'"))
+        assertThat(Path.of("hello").toString(), equalTo("{hello}"))
     }
 
     @Test

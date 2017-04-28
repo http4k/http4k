@@ -24,10 +24,7 @@ sealed class BasePath {
 data class Slash(override val parent: BasePath, val child: String) : BasePath() {
     override fun toList(): List<String> = parent.toList().plus(child)
     override fun toString(): String = "$parent/$child"
-    override fun startsWith(other: BasePath): Boolean {
-        val components = other.toList()
-        return toList().take(components.size) == components
-    }
+    override fun startsWith(other: BasePath): Boolean = other.toList().let {toList().take(it.size) == it}
 }
 
 object Root : BasePath() {
