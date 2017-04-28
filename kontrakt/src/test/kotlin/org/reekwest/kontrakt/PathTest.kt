@@ -1,10 +1,8 @@
 package org.reekwest.kontrakt
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.invalid
@@ -17,15 +15,18 @@ import java.util.*
 class PathTest {
 
     @Test
-    @Ignore // FIXME
     fun `fixed value present`() {
-        assertThat(Path.fixed("hello")("hello"), equalTo("world"))
+        assertThat(Path.fixed("hello")("hello"), equalTo("hello"))
     }
 
     @Test
-    @Ignore // FIXME
     fun `fixed value mismatch`() {
-        assertThat(Path.fixed("hello")("world"), absent())
+        assertThat({ (Path.fixed("hello"))("world") }, throws(equalTo(LensFailure())))
+    }
+
+    @Test
+    fun `fixed toString`() {
+        assertThat(Path.fixed("hello").toString(), equalTo("hello"))
     }
 
     @Test

@@ -30,7 +30,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
             } else null
         }
 
-    fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString("/")
+    fun describe(basePath: BasePath) = "/${core.pathFn(basePath)}${pathLenses.joinToString("/")}"
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
@@ -103,5 +103,5 @@ private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = to
 private fun Request.extract(moduleRoot: BasePath, lenses: List<PathLens<*>>): ExtractedParts? =
     BasePath(this.uri.path.replace(moduleRoot.toString(), "")).let {
         path ->
-         if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
-}
+        if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
+    }

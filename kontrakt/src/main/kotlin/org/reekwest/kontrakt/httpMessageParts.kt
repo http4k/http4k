@@ -61,7 +61,8 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
 
     fun fixed(name: String): PathLens<String> {
         val getLens = delegate.get(name)
-        return object : Lens<String, String>(Meta(true, "path", name), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
+        return object : Lens<String, String>(Meta(true, "path", name),
+            { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
             override fun toString(): String = name
         }
     }
