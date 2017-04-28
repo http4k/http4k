@@ -1,16 +1,8 @@
 package org.reekwest.http.core
 
-import java.nio.ByteBuffer
-
 typealias HttpHandler = (Request) -> Response
 
 typealias HttpClient = HttpHandler
-
-typealias Headers = Parameters
-
-typealias Body = ByteBuffer
-
-fun String.toBody(): Body = ByteBuffer.wrap(toByteArray())
 
 interface Filter : (HttpHandler) -> HttpHandler {
     companion object {

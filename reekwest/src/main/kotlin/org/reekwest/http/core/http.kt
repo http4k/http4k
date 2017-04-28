@@ -2,6 +2,12 @@
 
 package org.reekwest.http.core
 
+import java.nio.ByteBuffer
+
+typealias Headers = Parameters
+
+typealias Body = ByteBuffer
+
 sealed class HttpMessage {
     abstract val headers: Headers
     abstract val body: Body?
@@ -68,8 +74,6 @@ data class Response(val status: Status, override val headers: Headers = listOf()
     override fun toString(): String = toMessage()
 }
 
-private fun Headers.toMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
-
 fun <T : HttpMessage> T.header(name: String, value: String?): T = copy(headers = headers.plus(name to value))
 
 fun <T : HttpMessage> T.replaceHeader(name: String, value: String?): T = copy(headers = headers.remove(name).plus(name to value))
@@ -90,4 +94,8 @@ fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body? = t
 
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
 
+fun String.toBody(): Body = ByteBuffer.wrap(toByteArray())
+
 private fun Headers.remove(name: String) = filterNot { it.first.equals(name, true) }
+
+private fun Headers.toMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
