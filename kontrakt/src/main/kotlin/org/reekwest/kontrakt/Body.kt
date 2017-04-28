@@ -4,6 +4,12 @@ import org.reekwest.http.asByteBuffer
 import org.reekwest.http.asString
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.copy
+import org.reekwest.kontrakt.lens.BiDiLens
+import org.reekwest.kontrakt.lens.BiDiLensSpec
+import org.reekwest.kontrakt.lens.Get
+import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.LensSpec
+import org.reekwest.kontrakt.lens.Set
 import java.nio.ByteBuffer
 import java.util.Collections.emptyList
 

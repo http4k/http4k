@@ -10,7 +10,7 @@ import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.kontrakt.ContractBreach
+import org.reekwest.kontrakt.lens.ContractBreach
 
 class ModuleTest {
 

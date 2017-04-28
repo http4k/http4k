@@ -1,12 +1,4 @@
-package org.reekwest.kontrakt
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
-import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.util.*
+package org.reekwest.kontrakt.lens
 
 interface MultiLensSpec<in IN, out OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
@@ -93,18 +85,3 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
         }
     }
 }
-
-fun <IN> BiDiLensSpec<IN, String, String>.int() = this.map(String::toInt, Int::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.long() = this.map(String::toLong, Long::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.double() = this.map(String::toDouble, Double::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.float() = this.map(String::toFloat, Float::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map(::safeBooleanFrom, Boolean::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, ISO_LOCAL_DATE::format)
-fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, ISO_LOCAL_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, ISO_ZONED_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, UUID::toString)
-
-internal fun safeBooleanFrom(value: String): Boolean =
-    if (value.toUpperCase() == "TRUE") true
-    else if (value.toUpperCase() == "FALSE") false
-    else throw kotlin.IllegalArgumentException("illegal boolean")

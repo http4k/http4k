@@ -2,7 +2,7 @@ package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
-import org.reekwest.kontrakt.ExtractionFailure
+import org.reekwest.kontrakt.lens.ExtractionFailure
 
 interface ModuleRenderer {
     fun notFound(): Response

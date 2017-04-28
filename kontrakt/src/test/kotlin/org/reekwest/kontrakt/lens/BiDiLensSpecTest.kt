@@ -1,10 +1,19 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.lens
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.kontrakt.boolean
+import org.reekwest.kontrakt.dateTime
+import org.reekwest.kontrakt.double
+import org.reekwest.kontrakt.float
+import org.reekwest.kontrakt.int
+import org.reekwest.kontrakt.localDate
+import org.reekwest.kontrakt.long
+import org.reekwest.kontrakt.uuid
+import org.reekwest.kontrakt.zonedDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

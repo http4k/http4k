@@ -8,11 +8,15 @@ import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.cookie.cookies
 import org.reekwest.http.core.header
 import org.reekwest.http.core.headerValues
-import org.reekwest.http.core.queries
-import org.reekwest.http.core.query
+import org.reekwest.kontrakt.lens.BiDiLensSpec
+import org.reekwest.kontrakt.lens.Get
+import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.LensSpec
+import org.reekwest.kontrakt.lens.Set
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 typealias QueryLens<T> = Lens<Request, T>
@@ -61,3 +65,18 @@ fun Path.dateTime() = map(LocalDateTime::parse)
 fun Path.zonedDateTime() = map(ZonedDateTime::parse)
 fun Path.uuid() = map(UUID::fromString)
 
+
+fun <IN> BiDiLensSpec<IN, String, String>.int() = this.map(String::toInt, Int::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.long() = this.map(String::toLong, Long::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.double() = this.map(String::toDouble, Double::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.float() = this.map(String::toFloat, Float::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map(::safeBooleanFrom, Boolean::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
+fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, UUID::toString)
+
+internal fun safeBooleanFrom(value: String): Boolean =
+    if (value.toUpperCase() == "TRUE") true
+    else if (value.toUpperCase() == "FALSE") false
+    else throw kotlin.IllegalArgumentException("illegal boolean")

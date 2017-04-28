@@ -10,6 +10,9 @@ import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.with
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Missing
 
 class WebFormTest {
 

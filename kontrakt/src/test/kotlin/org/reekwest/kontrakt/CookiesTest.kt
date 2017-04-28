@@ -11,6 +11,9 @@ import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Missing
 
 class CookiesTest {
     private val request = Request(GET, uri(""))

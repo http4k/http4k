@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Ignore
 import org.junit.Test
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

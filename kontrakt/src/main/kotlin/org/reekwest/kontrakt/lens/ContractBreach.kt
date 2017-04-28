@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt
+package org.reekwest.kontrakt.lens
 
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler

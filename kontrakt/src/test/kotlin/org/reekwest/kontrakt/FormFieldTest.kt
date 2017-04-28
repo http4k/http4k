@@ -5,6 +5,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Missing
 
 class FormFieldTest {
     private val form = WebForm(mapOf("hello" to listOf("world", "world2")), emptyList())

@@ -10,6 +10,9 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.header
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Missing
 
 class HeaderTest {
     private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))

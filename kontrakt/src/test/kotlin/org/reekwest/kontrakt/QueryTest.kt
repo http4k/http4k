@@ -9,6 +9,9 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Missing
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")

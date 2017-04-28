@@ -9,6 +9,13 @@ import org.reekwest.http.core.copy
 import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
 import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
+import org.reekwest.kontrakt.lens.BiDiLensSpec
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.ExtractionFailure
+import org.reekwest.kontrakt.lens.Get
+import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.Set
 import java.net.URLDecoder
 
 typealias FormFields = Map<String, List<String>>
@@ -59,13 +66,13 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
     Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(Header.Common.CONTENT_TYPE))
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target: HttpMessage ->
         values.fold(target, { memo, (fields) ->
             memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
-        }).with(Header.Common.CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+        }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )
 

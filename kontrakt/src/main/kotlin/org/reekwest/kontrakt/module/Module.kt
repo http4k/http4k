@@ -5,7 +5,7 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.kontrakt.ContractBreach
+import org.reekwest.kontrakt.lens.ContractBreach
 
 typealias Router = (Request) -> HttpHandler?
 

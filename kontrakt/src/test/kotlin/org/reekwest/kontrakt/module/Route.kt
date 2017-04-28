@@ -7,11 +7,11 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Status
 import org.reekwest.kontrakt.BodyLens
-import org.reekwest.kontrakt.ContractBreach
-import org.reekwest.kontrakt.ExtractionFailure
 import org.reekwest.kontrakt.HeaderLens
-import org.reekwest.kontrakt.Lens
 import org.reekwest.kontrakt.QueryLens
+import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.ExtractionFailure
+import org.reekwest.kontrakt.lens.Lens
 import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)

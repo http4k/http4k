@@ -4,9 +4,9 @@ import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
-import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
+import org.reekwest.kontrakt.lens.ContractBreach
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
