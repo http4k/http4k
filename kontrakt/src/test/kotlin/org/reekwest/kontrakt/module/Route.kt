@@ -16,10 +16,8 @@ import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
-class Route private constructor(private val core: Core) : Iterable<Lens<Request, *>> {
+class Route private constructor(private val core: Core) {
     constructor(name: String, description: String? = null) : this(Core(name, description, null))
-
-    override fun iterator(): Iterator<Lens<Request, *>> = core.requestParams.plus(core.body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
@@ -33,7 +31,7 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
     internal val validationFilter = Filter {
         next ->
         {
-            val errors = fold(emptyList<ExtractionFailure>()) { memo, next ->
+            val errors = core.fold(emptyList<ExtractionFailure>()) { memo, next ->
                 try {
                     next(it)
                     memo
@@ -52,6 +50,11 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
                                 val produces: kotlin.collections.Set<ContentType> = emptySet(),
                                 val consumes: kotlin.collections.Set<ContentType> = emptySet(),
                                 val requestParams: List<Lens<Request, *>> = emptyList(),
-                                val responses: List<RouteResponse> = emptyList())
+                                val responses: List<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
+
+            override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
+        }
+
+
     }
 }
