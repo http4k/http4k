@@ -10,7 +10,7 @@ import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.header
 import org.reekwest.http.core.with
 
-class BindingValuesToMessagesTest {
+class HttpMessageTest {
 
     private val emptyRequest = get("")
 
