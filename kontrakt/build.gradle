@@ -4,6 +4,7 @@ dependencies {
     provided kotlin_lib
 
     compile project(":reekwest")
+    compile "net.sourceforge.argo:argo:3.40"
 
     testCompile testing
 }
