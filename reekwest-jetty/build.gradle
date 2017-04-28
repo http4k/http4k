@@ -1,0 +1,26 @@
+archivesBaseName = 'reekwest-apache-httpclient'
+
+description = 'Reekwest HTTP Client built on top of apache-httpclient'
+
+ext{
+    ext.jetty_version = '9.3.16.v20170120'
+
+    jetty = [
+            "org.eclipse.jetty:jetty-server:$jetty_version",
+            "org.eclipse.jetty:jetty-servlet:$jetty_version",
+    ]
+}
+
+dependencies {
+    provided kotlin_lib
+
+    compile servlet
+    compile jetty
+
+    compile project(":reekwest")
+
+    testCompile project(":reekwest-apache-httpclient")
+
+    testCompile testing
+}
+

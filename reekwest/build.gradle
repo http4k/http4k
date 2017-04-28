@@ -4,9 +4,7 @@ description = 'sane HTTP request API for Kotlin'
 
 dependencies {
     provided kotlin_lib
-    provided apache_client
-    provided jetty
-
+    provided servlet
     testCompile testing
 }
 
