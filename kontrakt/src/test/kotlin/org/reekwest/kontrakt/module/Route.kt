@@ -54,7 +54,5 @@ class Route private constructor(private val core: Core) {
 
             override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
         }
-
-
     }
 }
