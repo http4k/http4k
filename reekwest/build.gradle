@@ -1,5 +1,3 @@
-archivesBaseName = 'reekwest'
-
 description = 'sane HTTP request API for Kotlin'
 
 dependencies {

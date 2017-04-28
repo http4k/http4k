@@ -1,5 +1,3 @@
-archivesBaseName = 'reekwest-client-apache'
-
 description = 'Reekwest HTTP Client built on top of apache-httpclient'
 
 ext{

@@ -102,7 +102,7 @@ allprojects {
         pkg {
             repo = 'maven'
             userOrg = 'reekwest'
-            name = archivesBaseName
+            name = project.name
 
             desc = description
             websiteUrl = 'https://github.com/reekwest/reekwest'

@@ -1,5 +1,3 @@
-archivesBaseName = 'reekwest-server-jetty'
-
 description = 'Reekwest HTTP Server built on top of jetty'
 
 ext{

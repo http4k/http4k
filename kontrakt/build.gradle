@@ -1,5 +1,3 @@
-archivesBaseName = 'kontrakt'
-
 description = 'Typesafe HTTP contracts for Reekwest'
 
 dependencies {
