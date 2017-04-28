@@ -9,7 +9,7 @@ import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
 class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
-    private val validation = pathBinder.core.route.validationFilter()
+    private val validation = pathBinder.core.route.validationFilter
 
     fun router(moduleRoot: BasePath): Router = { pathBinder.extract(moduleRoot, it)?.let { it -> validation.then(toHandler(it)) } }
 

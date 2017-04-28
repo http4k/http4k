@@ -11,9 +11,7 @@ class RouteModule private constructor(private val core: ModuleRouter) : Module {
     constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(ModuleRouter(moduleRoot, renderer, CatchContractBreach.then(filter)))
 
-    override fun toRouter(): Router = {
-        if (BasePath(it.uri.path).startsWith(core.moduleRoot)) core(it) else null
-    }
+    override fun toRouter(): Router = core
 
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
@@ -27,9 +25,11 @@ class RouteModule private constructor(private val core: ModuleRouter) : Module {
             private val routers = routes.map { it.router(moduleRoot) }
 
             override fun invoke(request: Request): HttpHandler? =
-                routers.fold<Router, HttpHandler?>(null, { memo, route ->
-                    memo ?: route(request)
-                })?.let(filter)
+                if (BasePath(request.uri.path).startsWith(moduleRoot)) {
+                    routers.fold<Router, HttpHandler?>(null, { memo, route ->
+                        memo ?: route(request)
+                    })?.let(filter)
+                } else null
 
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
         }

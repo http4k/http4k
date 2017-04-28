@@ -2,7 +2,6 @@ package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Filter
-import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
@@ -12,7 +11,6 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.ExtractionFailure
 import org.reekwest.kontrakt.HeaderLens
 import org.reekwest.kontrakt.Lens
-import org.reekwest.kontrakt.PathLens
 import org.reekwest.kontrakt.QueryLens
 import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
@@ -32,7 +30,20 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
 
     infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { Root }))
 
-    internal fun validationFilter(): Filter = ValidationFilter(this)
+    internal val validationFilter = Filter {
+        next ->
+        {
+            val errors = fold(emptyList<ExtractionFailure>()) { memo, next ->
+                try {
+                    next(it)
+                    memo
+                } catch (e: ContractBreach) {
+                    memo.plus(e.failures)
+                }
+            }
+            if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
+        }
+    }
 
     companion object {
         private data class Core(val name: String,
@@ -42,24 +53,5 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
                                 val consumes: kotlin.collections.Set<ContentType> = emptySet(),
                                 val requestParams: List<Lens<Request, *>> = emptyList(),
                                 val responses: List<RouteResponse> = emptyList())
-
-
-        private class ValidationFilter(private val route: Route) : Filter {
-            private fun validate(request: Request): List<ExtractionFailure> =
-                route.fold(emptyList<ExtractionFailure>()) { memo, next ->
-                    try {
-                        next(request)
-                        memo
-                    } catch (e: ContractBreach) {
-                        memo.plus(e.failures)
-                    }
-                }
-
-            override fun invoke(next: HttpHandler): HttpHandler = {
-                validate(it).let { errors ->
-                    if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
-                }
-            }
-        }
     }
 }
