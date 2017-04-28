@@ -9,7 +9,7 @@ import org.reekwest.kontrakt.PathLens
 
 class ServerRoute(val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath)?.let(toHandler) }
+    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(it, moduleRoot)?.let(toHandler) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
@@ -24,7 +24,7 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun match(request: Request, basePath: BasePath): ExtractedParts? {
+    internal fun extract(request: Request, basePath: BasePath): ExtractedParts? {
         val actualPath = BasePath(request.uri.path)
         return core.matches(request.method, basePath, actualPath).let { from(actualPath) }
     }
