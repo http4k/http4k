@@ -21,8 +21,8 @@ Features:
 Here's how to create and use a basic HTTP handling function:
 
 ```kotlin
-val app = { request: Request -> ok().bodyString("Hello, ${request.query("location")}!") }
-val get = get("/").query("location", "John Doe")
+val app = { request: Request -> ok().bodyString("Hello, ${request.query("name")}!") }
+val get = get("/").query("name", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
 assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
