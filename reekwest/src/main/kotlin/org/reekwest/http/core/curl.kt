@@ -2,7 +2,6 @@ package org.reekwest.http.core
 
 import org.reekwest.http.appendIfNotEmpty
 import org.reekwest.http.appendIfPresent
-import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.quoted
 
 fun Request.toCurl(): String =

@@ -5,10 +5,6 @@ import java.net.URLEncoder
 
 typealias Parameters = List<Parameter>
 
-fun HttpMessage.header(name: String): String? = headers.find { it.first.equals(name, true) }?.second
-
-fun HttpMessage.headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
-
 fun Uri.queries(): Parameters = query.toParameters()
 
 fun Parameters.toUrlEncoded(): String = this.map { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }.joinToString("&")

@@ -8,10 +8,10 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Request.Companion.post
+import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.ok
+import org.reekwest.http.core.bodyString
 
 class RoutedHandlerTest {
 

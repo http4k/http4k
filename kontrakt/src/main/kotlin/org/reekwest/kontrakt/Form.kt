@@ -3,9 +3,8 @@ package org.reekwest.kontrakt
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
-import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.copy
+import org.reekwest.http.core.toBody
 import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
 import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE

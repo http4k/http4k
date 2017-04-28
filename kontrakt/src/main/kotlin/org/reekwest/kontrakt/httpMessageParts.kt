@@ -7,7 +7,6 @@ import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.cookie.cookies
 import org.reekwest.http.core.header
-import org.reekwest.http.core.headerValues
 import org.reekwest.kontrakt.lens.BiDiLensSpec
 import org.reekwest.kontrakt.lens.Get
 import org.reekwest.kontrakt.lens.Lens

@@ -2,11 +2,11 @@ package org.reekwest.http.core
 
 data class Status(val code: Int, val description: String) {
     companion object {
-        val INFORMATIONAL = 100..199
+        private val INFORMATIONAL = 100..199
         val CONTINUE = status(100, "Continue")
         val SWITCHING_PROTOCOLS = status(101, "Switching Protocols")
 
-        val SUCCESSFUL = 200..299
+        private val SUCCESSFUL = 200..299
         val OK = status(200, "OK")
         val CREATED = status(201, "Created")
         val ACCEPTED = status(202, "Accepted")
@@ -15,7 +15,7 @@ data class Status(val code: Int, val description: String) {
         val RESET_CONTENT = status(205, "Reset Content")
         val PARTIAL_CONTENT = status(206, "Partial Content")
 
-        val REDIRECTION = 300..399
+        private val REDIRECTION = 300..399
         val MULTIPLE_CHOICES = status(300, "Multiple Choices")
         val MOVED_PERMANENTLY = status(301, "Moved Permanently")
         val FOUND = status(302, "Found")
@@ -24,7 +24,7 @@ data class Status(val code: Int, val description: String) {
         val USE_PROXY = status(305, "Use Proxy")
         val TEMPORARY_REDIRECT = status(307, "Temporary Redirect")
 
-        val CLIENT_ERROR = 400..499
+        private val CLIENT_ERROR = 400..499
         val BAD_REQUEST = status(400, "Bad Request")
         val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.copy(description = "Unsatisfiable Parameters")
         val UNAUTHORIZED = status(401, "Unauthorized")
@@ -46,7 +46,7 @@ data class Status(val code: Int, val description: String) {
         val EXPECTATION_FAILED = status(417, "Expectation Failed")
         val I_M_A_TEAPOT = status(418, "I'm a teapot") //RFC2324
 
-        val SERVER_ERROR = 500..599
+        private val SERVER_ERROR = 500..599
         val INTERNAL_SERVER_ERROR = status(500, "Internal Server Error")
         val NOT_IMPLEMENTED = status(501, "Not Implemented")
         val BAD_GATEWAY = status(502, "Bad Gateway")

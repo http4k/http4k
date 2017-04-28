@@ -6,8 +6,6 @@ import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.header
 import org.reekwest.http.core.with
 
 class HttpMessageTest {
