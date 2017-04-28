@@ -14,18 +14,6 @@ class ServerRoute internal constructor(internal val pathBinder: PathBinder, priv
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
 
-internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
-}
-
-internal operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
-
-internal fun Request.extract(lenses: List<PathLens<*>>): ExtractedParts? {
-    val path = this.basePath()
-    return if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
-}
-
 abstract class PathBinder internal constructor(internal val core: Core, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
@@ -74,28 +62,38 @@ class PathBinder1<out A> internal constructor(core: Core,
 class PathBinder2<out A, out B> internal constructor(core: Core,
                                                      private val psA: PathLens<A>,
                                                      private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
-    override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
+    override fun <T> div(next: PathLens<T>) = PathBinder3(core, psA, psB, next)
 
     infix fun bind(fn: (A, B) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB]) })
 }
-//
-//class PathBinder3<out A, out B, out C>(override val route: Route, override val pathFn: (BasePath) -> BasePath,
-//                                       private val psA: PathLens<A>,
-//                                       private val psB: PathLens<B>,
-//                                       private val psC: PathLens<C>) : PathBinder {
-//    override fun <T> div(next: PathLens<T>) = PathBinder4(route, pathFn, psA, psB, psC, next)
-//
-//    infix fun at(method: Method): RouteBinder<(A, B, C) -> HttpHandler> =
-//        RouteBinder(this, method, { fn, parts -> fn(parts[psA], parts[psB], parts[psC]) }, psA, psB, psC)
-//}
-//
-//class PathBinder4<out A, out B, out C, out D>(override val route: Route, override val pathFn: (BasePath) -> BasePath,
-//                                              private val psA: PathLens<A>,
-//                                              private val psB: PathLens<B>,
-//                                              private val psC: PathLens<C>,
-//                                              private val psD: PathLens<D>) : PathBinder {
-//    override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
-//
-//    infix fun at(method: Method): RouteBinder<(A, B, C, D) -> HttpHandler> =
-//        RouteBinder(this, method, { fn, parts -> fn(parts[psA], parts[psB], parts[psC], parts[psD]) }, psA, psB, psC, psD)
-//}
+
+class PathBinder3<out A, out B, out C> internal constructor(core: Core,
+                                                            private val psA: PathLens<A>,
+                                                            private val psB: PathLens<B>,
+                                                            private val psC: PathLens<C>) : PathBinder(core, psA, psB, psC) {
+    override fun <T> div(next: PathLens<T>) = PathBinder4(core, psA, psB, psC, next)
+
+    infix fun bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC]) })
+}
+
+class PathBinder4<out A, out B, out C, out D> internal constructor(core: Core,
+                                                            private val psA: PathLens<A>,
+                                                            private val psB: PathLens<B>,
+                                                            private val psC: PathLens<C>,
+                                                            private val psD: PathLens<D>) : PathBinder(core, psA, psB, psC, psD) {
+    override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
+
+    infix fun bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC], parts[psD]) })
+}
+
+internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
+}
+
+private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
+
+private fun Request.extract(lenses: List<PathLens<*>>): ExtractedParts? {
+    val path = this.basePath()
+    return if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
+}
