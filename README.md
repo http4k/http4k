@@ -63,6 +63,21 @@ routes(
 
 ## Filters
 
+Filters allow to add behaviour to existing handlers (or other Filters). 
+
+For instance, to add basic authentication to a server:
+
+```kotlin
+val handler = { _: Request -> ok() }
+val app = BasicAuthServer("my realm", "user", "password").then(handler)
+```
+
+Similarly, to add basic authentitcation to a client:
+
+```kotlin
+val client = BasicAuthClient("user", "password").then(ApacheHttClient())
+```
+
 ## Other features
 
 Creates `curl` command for a given request:
