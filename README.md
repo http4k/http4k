@@ -12,8 +12,8 @@ Features:
  * Same abstractions for client and server usage
  * Enables "HTTP application as a function"
  * Can be plugged to different libraries and containers. Current implementation includes:
-   * Client: ApacheHttpClient
-   * Server: Servlets, Jetty
+   * Client: [ApacheHttpClient](#using-as-a-client)
+   * Server: [Jetty](#using-as-a-server)
  * No 3rd party dependency required to start
 
 ## Getting started
