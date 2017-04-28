@@ -27,5 +27,5 @@ fun main(args: Array<String>) {
 
     val handler = RouteModule(Root / "foo", SimpleJson()).withRoute(asd).toHttpHandler()
     println(handler(Request(GET, uri("/foo/bob/hello/123"))))
-    println(handler(Request(GET, uri("/"))))
+    println(handler(Request(GET, uri("/foo"))))
 }

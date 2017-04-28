@@ -23,7 +23,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
         {
             if (core.matches(moduleRoot, it)) {
                 try {
-                    it.extract(pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
+                    it.extract(moduleRoot, pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
                 } catch (e: LensFailure) {
                     null
                 }
@@ -35,9 +35,8 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-            fun matches(moduleRoot: BasePath, request: Request): Boolean {
-                return request.method == method && BasePath(request.uri.path).startsWith(pathFn(moduleRoot))
-            }
+            fun matches(moduleRoot: BasePath, request: Request) =
+                request.method == method && request.basePath().startsWith(pathFn(moduleRoot))
         }
     }
 }
@@ -101,7 +100,7 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 
 private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-private fun Request.extract(lenses: List<PathLens<*>>): ExtractedParts? {
+private fun Request.extract(moduleRoot: BasePath, lenses: List<PathLens<*>>): ExtractedParts? {
     val path = this.basePath()
     return if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
 }
