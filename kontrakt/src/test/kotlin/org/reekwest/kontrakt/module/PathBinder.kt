@@ -9,7 +9,7 @@ import org.reekwest.kontrakt.PathLens
 
 class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(it, moduleRoot)?.let(toHandler) }
+    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(moduleRoot, it)?.let(toHandler) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
@@ -24,9 +24,8 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun extract(request: Request, basePath: BasePath): ExtractedParts? {
-        val actualPath = BasePath(request.uri.path)
-        return if (core.matches(request.method, basePath, actualPath)) from(actualPath) else null
+    internal fun extract(moduleRoot: BasePath, request: Request): ExtractedParts? {
+        return if (core.matches(moduleRoot, request)) from(BasePath(request.uri.path)) else null
     }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
@@ -42,8 +41,8 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-            fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) =
-                actualMethod == method && actualPath.startsWith(pathFn(basePath))
+            fun matches(moduleRoot: BasePath, request: Request): Boolean
+                = request.method == method && BasePath(request.uri.path).startsWith(pathFn(moduleRoot))
         }
     }
 }

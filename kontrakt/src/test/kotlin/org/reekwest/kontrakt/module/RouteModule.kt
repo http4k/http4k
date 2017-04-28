@@ -22,7 +22,7 @@ class RouteModule private constructor(private val core: ModuleRouter) : Module {
                                         val renderer: ModuleRenderer,
                                         val filter: Filter,
                                         val routes: List<ServerRoute> = emptyList()) : Router {
-            override fun invoke(request: Request): HttpHandler? =
+            override fun invoke(request: Request) =
                 routes.fold<ServerRoute, HttpHandler?>(null, { memo, serverRoute ->
                     val validator = filter.then(serverRoute.pathBinder.core.route.validationFilter())
                     memo ?: serverRoute.router(moduleRoot)(request)?.let { validator.then(it) }
