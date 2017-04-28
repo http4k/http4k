@@ -32,11 +32,9 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
 
     private fun from(path: BasePath): ExtractedParts? = try {
-        if (path.toList().size == pathLenses.size) {
+        if (path.toList().size == pathLenses.size)
             ExtractedParts(mapOf(*pathLenses.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
-        } else {
-            null
-        }
+        else null
     } catch (e: ContractBreach) {
         null
     }
