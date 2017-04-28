@@ -1,10 +1,7 @@
 package org.reekwest.kontrakt.lens
 
-import com.natpryce.hamkrest.absent
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.kontrakt.BiDiLensContract.checkContract
 import org.reekwest.kontrakt.boolean
 import org.reekwest.kontrakt.dateTime
 import org.reekwest.kontrakt.double
@@ -57,32 +54,5 @@ class BiDiLensSpecContract {
     @Test
     fun `zoned datetime`() = checkContract(spec.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
 
-    private fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
-        val optionalLens = spec.optional("hello")
-        assertThat(optionalLens(valueAsString), equalTo(tValue))
-        assertThat(optionalLens(""), absent())
-        assertThat({ optionalLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
-        assertThat(optionalLens(tValue, "original"), equalTo("original" + valueAsString))
-
-        val optionalMultiLens = spec.multi.optional("hello")
-        assertThat(optionalMultiLens(valueAsString), equalTo(listOf(tValue)))
-        assertThat(optionalMultiLens(""), absent())
-        assertThat({ optionalMultiLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
-        assertThat(optionalMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
-
-        val requiredLens = spec.required("hello")
-        assertThat(requiredLens(valueAsString), equalTo(tValue))
-        assertThat({ requiredLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
-        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
-        assertThat(requiredLens(tValue, "original"), equalTo("original" + valueAsString))
-
-        val requiredMultiLens = spec.multi.required("hello")
-        assertThat(requiredMultiLens(valueAsString), equalTo(listOf(tValue)))
-        assertThat({ requiredMultiLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
-        assertThat({ requiredMultiLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
-        assertThat(requiredMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
-
-    }
-
-
 }
+

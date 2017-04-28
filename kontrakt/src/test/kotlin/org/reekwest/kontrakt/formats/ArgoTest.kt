@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
+import org.reekwest.kontrakt.BiDiLensContract
+import org.reekwest.kontrakt.BiDiLensContract.spec
 import org.reekwest.kontrakt.Body
 import org.reekwest.kontrakt.formats.Argo.asCompact
 import org.reekwest.kontrakt.formats.Argo.asJson
@@ -38,13 +40,18 @@ class ArgoTest {
     }
 
     @Test
-    fun `can write body as Json`() {
+    fun `can write and read body as Json`() {
         val body = Body.json().required()
 
         val obj = Argo.obj("hello" to "world".asJson())
         val withBody = body(obj, get(""))
         assertThat(withBody.bodyString(), equalTo("""{"hello":"world"}"""))
         assertThat(body(withBody), equalTo(obj))
+    }
+
+    @Test
+    fun `can write and read query as Json`() {
+        BiDiLensContract.checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
     }
 
     @Test
