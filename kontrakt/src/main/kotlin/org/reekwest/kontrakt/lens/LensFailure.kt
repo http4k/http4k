@@ -35,3 +35,4 @@ object CatchContractBreach : Filter {
 
 fun Lens<*, *>.invalid() = Invalid(this.meta)
 fun Lens<*, *>.missing() = Missing(this.meta)
+fun Meta.missing() = Missing(this)
