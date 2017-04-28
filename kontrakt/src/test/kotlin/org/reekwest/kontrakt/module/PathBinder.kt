@@ -7,6 +7,19 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
+class ServerRoute(val pathBinder: PathBinder,
+                  private val invoker: (ExtractedParts) -> HttpHandler) {
+
+    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath)?.let { invoker(it) } }
+
+    fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
+}
+
+class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
+}
+
 abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
