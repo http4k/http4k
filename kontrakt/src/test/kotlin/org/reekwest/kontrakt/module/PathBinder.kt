@@ -14,7 +14,7 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
 
     internal fun match(request: Request, basePath: BasePath, invoker: (ExtractedParts) -> HttpHandler): HttpHandler? {
         val actualPath = BasePath(request.uri.path)
-        return core.matches(request.method, basePath, actualPath).let { from(actualPath)?.let { invoker(it) } }
+        return core.matches(request.method, basePath, actualPath).let { from(actualPath) }?.let { invoker(it) }
     }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
