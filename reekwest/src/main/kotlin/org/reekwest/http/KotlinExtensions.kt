@@ -1,6 +1,7 @@
 package org.reekwest.http
 
 import java.nio.ByteBuffer
+import java.util.*
 
 fun ByteBuffer.asString(): String = String(array())
 
@@ -21,3 +22,7 @@ fun StringBuilder.appendIf(condition: () -> Boolean, vararg toAppend: String): S
     if (condition()) toAppend.forEach { append(it) }
     return this
 }
+
+fun String.base64Decoded(): String = String(Base64.getDecoder().decode(this))
+
+fun String.base64Encode() = String(Base64.getEncoder().encode(toByteArray()))

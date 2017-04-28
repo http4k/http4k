@@ -2,8 +2,6 @@ package org.reekwest.http.core
 
 typealias HttpHandler = (Request) -> Response
 
-typealias HttpClient = HttpHandler
-
 interface Filter : (HttpHandler) -> HttpHandler {
     companion object {
         operator fun invoke(fn: (HttpHandler) -> HttpHandler): Filter = object : Filter {

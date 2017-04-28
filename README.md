@@ -9,8 +9,8 @@ A sensible implementation of HTTP for Kotlin
 
 Features:
  * Immutable Request/Response
- * Same abstractions for client and server usage
- * Enables "HTTP application as a function"
+ * Uses the same abstractions for client and server usage
+ * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
  * Can be plugged to different libraries and containers. Current implementation includes:
    * Client: [ApacheHttpClient](#using-as-a-client)
    * Server: [Jetty](#using-as-a-server)
@@ -21,8 +21,8 @@ Features:
 Here's how to create and use a basic HTTP handling function:
 
 ```kotlin
-val app = { request: Request -> ok().bodyString("Hello, ${request.query("location")}!") }
-val get = get("/").query("location", "John Doe")
+val app = { request: Request -> ok().bodyString("Hello, ${request.query("name")}!") }
+val get = get("/").query("name", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
 assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
@@ -59,4 +59,30 @@ routes(
     GET to "/hello/{location:*}" by { request: Request -> ok().bodyString("Hello, ${request.path("location")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
+```
+
+## Filters
+
+Filters allow to add behaviour to existing handlers (or other Filters). 
+
+For instance, to add basic authentication to a server:
+
+```kotlin
+val handler = { _: Request -> ok() }
+val app = BasicAuthServer("my realm", "user", "password").then(handler)
+```
+
+Similarly, to add basic authentitcation to a client:
+
+```kotlin
+val client = BasicAuthClient("user", "password").then(ApacheHttClient())
+```
+
+## Other features
+
+Creates `curl` command for a given request:
+
+```kotlin
+val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
+// curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
