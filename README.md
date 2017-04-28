@@ -60,3 +60,14 @@ routes(
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
 ```
+
+## Filters
+
+## Other features
+
+Creates `curl` command for a given request:
+
+```kotlin
+val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
+// curl -X POST --data "foo=bar" "http://httpbin.org/post"
+```
