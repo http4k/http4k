@@ -43,8 +43,7 @@ class PathBinder0(core: Core) : PathBinder(core) {
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder1(core, next)
 
-    infix fun bind(fn: HttpHandler): ServerRoute<*> =
-        ServerRoute(this, fn, { fn, _ -> fn })
+    infix fun bind(handler: HttpHandler): ServerRoute = ServerRoute(this, { handler })
 }
 
 class PathBinder1<out A>(core: Core,
@@ -52,7 +51,7 @@ class PathBinder1<out A>(core: Core,
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder2(core, psA, next)
 
-    infix fun bind(fn: (A) -> HttpHandler): ServerRoute<*> = ServerRoute(this, fn, { fn, parts -> fn(parts[psA]) })
+    infix fun bind(fn: (A) -> HttpHandler): ServerRoute = ServerRoute(this, { parts -> fn(parts[psA]) })
 }
 
 class PathBinder2<out A, out B>(core: Core,
@@ -60,7 +59,7 @@ class PathBinder2<out A, out B>(core: Core,
                                 private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
     override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
 
-    infix fun bind(fn: (A, B) -> HttpHandler): ServerRoute<*> = ServerRoute(this, fn, { fn, parts -> fn(parts[psA], parts[psB]) })
+    infix fun bind(fn: (A, B) -> HttpHandler): ServerRoute = ServerRoute(this, { parts -> fn(parts[psA], parts[psB]) })
 }
 //
 //class PathBinder3<out A, out B, out C>(override val route: Route, override val pathFn: (BasePath) -> BasePath,

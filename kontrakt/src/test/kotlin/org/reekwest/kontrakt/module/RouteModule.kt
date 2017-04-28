@@ -12,20 +12,20 @@ class RouteModule private constructor(private val core: Core) : Module {
 
     override fun toRouter(): Router = core.router
 
-    fun withRoute(new: ServerRoute<*>) = withRoutes(new)
-    fun withRoutes(vararg new: ServerRoute<*>) = withRoutes(new.toList())
-    fun withRoutes(new: Iterable<ServerRoute<*>>) = RouteModule(core.withRoutes(new.toList()))
+    fun withRoute(new: ServerRoute) = withRoutes(new)
+    fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
+    fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(core.withRoutes(new.toList()))
 
     companion object {
 
         private data class Core(val rootPath: BasePath,
-                                val routes: List<ServerRoute<*>>,
+                                val routes: List<ServerRoute>,
                                 val renderer: ModuleRenderer,
                                 val filter: Filter) {
-            fun withRoutes(new: List<ServerRoute<*>>) = copy(routes = routes + new)
+            fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
 
             val router: Router = {
-                routes.fold<ServerRoute<*>, HttpHandler?>(null, { memo, serverRoute ->
+                routes.fold<ServerRoute, HttpHandler?>(null, { memo, serverRoute ->
                     val validator = filter.then(serverRoute.pathBinder.core.route.validationFilter())
                     memo ?: serverRoute.router(rootPath)(it)?.let { validator.then(it) }
                 })
