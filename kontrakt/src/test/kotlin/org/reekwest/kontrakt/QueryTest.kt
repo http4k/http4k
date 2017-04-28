@@ -40,8 +40,6 @@ class QueryTest {
         assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(requiredMultiQuery.missing()))))
     }
 
-    data class Bob(val int: Int)
-
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
