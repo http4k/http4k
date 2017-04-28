@@ -9,8 +9,8 @@ A sensible implementation of HTTP for Kotlin
 
 Features:
  * Immutable Request/Response
- * Same abstractions for client and server usage
- * Enables "HTTP application as a function"
+ * Uses the same abstractions for client and server usage
+ * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
  * Can be plugged to different libraries and containers. Current implementation includes:
    * Client: [ApacheHttpClient](#using-as-a-client)
    * Server: [Jetty](#using-as-a-server)
