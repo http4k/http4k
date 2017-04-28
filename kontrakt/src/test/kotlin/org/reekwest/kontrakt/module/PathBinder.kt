@@ -8,13 +8,13 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
-class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
+class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
 
-abstract class PathBinder internal constructor(internal val core: Core, vararg val pathLenses: PathLens<*>) {
+abstract class PathBinder internal constructor(internal val core: Core, private vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
