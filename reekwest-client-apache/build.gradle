@@ -1,4 +1,4 @@
-archivesBaseName = 'reekwest-apache-httpclient'
+archivesBaseName = 'reekwest-client-apache'
 
 description = 'Reekwest HTTP Client built on top of apache-httpclient'
 
