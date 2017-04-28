@@ -14,15 +14,16 @@ class ServerRoute internal constructor(internal val pathBinder: PathBinder, priv
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
 
-internal class ExtractedParts private constructor(private val mapping: Map<PathLens<*>, *>) {
+internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
+}
 
-    companion object {
-        fun from(path: BasePath, lenses: List<PathLens<*>>) = if (path.toList().size == lenses.size)
-            ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap())
-        else null
-    }
+internal operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
+
+internal fun Request.extract(lenses: List<PathLens<*>>): ExtractedParts? {
+    val path = this.basePath()
+    return if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
 }
 
 abstract class PathBinder internal constructor(internal val core: Core, vararg val pathLenses: PathLens<*>) {
@@ -34,8 +35,7 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
         {
             if (core.matches(moduleRoot, it)) {
                 try {
-                    ExtractedParts.from(BasePath(it.uri.path), pathLenses.toList())
-                        ?.let { core.route.validationFilter.then(toHandler(it)) }
+                    it.extract(pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
                 } catch (e: ContractBreach) {
                     null
                 }

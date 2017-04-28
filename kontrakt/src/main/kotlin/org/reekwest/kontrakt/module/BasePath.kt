@@ -1,12 +1,12 @@
 package org.reekwest.kontrakt.module
 
+import org.reekwest.http.core.Request
+
 sealed class BasePath {
     abstract val parent: BasePath
     abstract fun toList(): List<String>
-    operator fun <T> invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
     abstract fun startsWith(other: BasePath): Boolean
-
     operator fun div(child: String): BasePath = Slash(this, child)
 
     companion object {
@@ -36,3 +36,7 @@ object Root : BasePath() {
     override fun toString(): String = ""
     override fun startsWith(other: BasePath): Boolean = other == Root
 }
+
+internal fun Request.isIn(moduleRoot: BasePath) = basePath().startsWith(moduleRoot)
+
+internal fun Request.basePath() = BasePath(uri.path)

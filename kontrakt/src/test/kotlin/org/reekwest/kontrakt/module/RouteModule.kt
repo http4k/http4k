@@ -6,16 +6,16 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.kontrakt.CatchContractBreach
 
-class RouteModule private constructor(private val core: ModuleRouter) : Module {
+class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
     constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(ModuleRouter(moduleRoot, renderer, CatchContractBreach.then(filter)))
 
-    override fun toRouter(): Router = core
+    override fun toRouter(): Router = router
 
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
-    fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(core.withRoutes(new.toList()))
+    fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(router.withRoutes(new.toList()))
 
     companion object {
         private data class ModuleRouter(val moduleRoot: BasePath,
@@ -25,10 +25,10 @@ class RouteModule private constructor(private val core: ModuleRouter) : Module {
             private val routers = routes.map { it.router(moduleRoot) }
 
             override fun invoke(request: Request): HttpHandler? =
-                if (BasePath(request.uri.path).startsWith(moduleRoot)) {
+                if (request.isIn(moduleRoot)) {
                     routers.fold<Router, HttpHandler?>(null, { memo, route ->
                         memo ?: route(request)
-                    })?.let(filter)
+                    })?.let { filter.then(it) }
                 } else null
 
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
