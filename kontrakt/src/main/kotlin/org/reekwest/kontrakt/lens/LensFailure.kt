@@ -19,13 +19,9 @@ sealed class Failure {
     abstract val meta: Meta
 }
 
-data class Missing(override val meta: Meta) : Failure() {
-    constructor(lens: Lens<*, *>) : this(lens.meta)
-}
+data class Missing(override val meta: Meta) : Failure()
 
-data class Invalid(override val meta: Meta) : Failure() {
-    constructor(lens: Lens<*, *>) : this(lens.meta)
-}
+data class Invalid(override val meta: Meta) : Failure()
 
 object CatchContractBreach : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = {
@@ -36,3 +32,6 @@ object CatchContractBreach : Filter {
         }
     }
 }
+
+fun Lens<*, *>.invalid() = Invalid(this.meta)
+fun Lens<*, *>.missing() = Missing(this.meta)

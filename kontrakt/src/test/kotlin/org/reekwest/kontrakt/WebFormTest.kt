@@ -10,9 +10,11 @@ import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.with
+import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
 import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.Missing
+import org.reekwest.kontrakt.lens.invalid
 
 class WebFormTest {
 
@@ -44,7 +46,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             )(request)
-        }, throws(equalTo(LensFailure(Invalid(Header.Common.CONTENT_TYPE)))))
+        }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid()))))
     }
 
     @Test

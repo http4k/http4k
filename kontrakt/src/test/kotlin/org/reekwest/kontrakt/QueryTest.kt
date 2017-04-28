@@ -9,9 +9,9 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.LensFailure
-import org.reekwest.kontrakt.lens.Missing
+import org.reekwest.kontrakt.lens.invalid
+import org.reekwest.kontrakt.lens.missing
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")
@@ -33,11 +33,11 @@ class QueryTest {
         assertThat(Query.optional("world")(request), absent())
 
         val requiredQuery = Query.required("world")
-        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(Missing(requiredQuery)))))
+        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(requiredQuery.missing()))))
 
         assertThat(Query.multi.optional("world")(request), absent())
-        val optionalMultiQuery = Query.multi.required("world")
-        assertThat({ optionalMultiQuery(request) }, throws(equalTo(LensFailure(Missing(optionalMultiQuery)))))
+        val requiredMultiQuery = Query.multi.required("world")
+        assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(requiredMultiQuery.missing()))))
     }
 
     data class Bob(val int: Int)
@@ -45,16 +45,16 @@ class QueryTest {
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
-        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(Invalid(requiredQuery)))))
+        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(requiredQuery.invalid()))))
 
         val optionalQuery = Query.map(String::toInt).optional("hello")
-        assertThat({ optionalQuery(request) }, throws(equalTo(LensFailure(Invalid(optionalQuery)))))
+        assertThat({ optionalQuery(request) }, throws(equalTo(LensFailure(optionalQuery.invalid()))))
 
         val requiredMultiQuery = Query.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(Invalid(requiredMultiQuery)))))
+        assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(requiredMultiQuery.invalid()))))
 
         val optionalMultiQuery = Query.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiQuery(request) }, throws(equalTo(LensFailure(Invalid(optionalMultiQuery)))))
+        assertThat({ optionalMultiQuery(request) }, throws(equalTo(LensFailure(optionalMultiQuery.invalid()))))
     }
 
     @Test

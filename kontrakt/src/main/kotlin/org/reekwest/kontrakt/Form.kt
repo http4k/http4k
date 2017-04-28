@@ -12,10 +12,10 @@ import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
 import org.reekwest.kontrakt.lens.BiDiLensSpec
 import org.reekwest.kontrakt.lens.Failure
 import org.reekwest.kontrakt.lens.Get
-import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.Lens
 import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.Set
+import org.reekwest.kontrakt.lens.invalid
 import java.net.URLDecoder
 
 typealias FormFields = Map<String, List<String>>
@@ -66,7 +66,7 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
     Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(Invalid(CONTENT_TYPE))
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(CONTENT_TYPE.invalid())
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target: HttpMessage ->

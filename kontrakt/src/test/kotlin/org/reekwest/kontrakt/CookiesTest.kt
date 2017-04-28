@@ -11,9 +11,9 @@ import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.cookie.Cookie
 import org.reekwest.http.core.cookie.cookie
-import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.LensFailure
-import org.reekwest.kontrakt.lens.Missing
+import org.reekwest.kontrakt.lens.invalid
+import org.reekwest.kontrakt.lens.missing
 
 class CookiesTest {
     private val request = Request(GET, uri(""))
@@ -36,11 +36,11 @@ class CookiesTest {
     fun `value missing`() {
         assertThat(Cookies.optional("world")(request), absent())
         val requiredCookies = Cookies.required("world")
-        assertThat({ requiredCookies(request) }, throws(equalTo(LensFailure(Missing(requiredCookies)))))
+        assertThat({ requiredCookies(request) }, throws(equalTo(LensFailure(requiredCookies.missing()))))
 
         assertThat(Cookies.multi.optional("world")(request), absent())
         val optionalMultiCookies = Cookies.multi.required("world")
-        assertThat({ optionalMultiCookies(request) }, throws(equalTo(LensFailure(Missing(optionalMultiCookies)))))
+        assertThat({ optionalMultiCookies(request) }, throws(equalTo(LensFailure(optionalMultiCookies.missing()))))
     }
 
     @Test
@@ -48,16 +48,16 @@ class CookiesTest {
         val asInt = Cookies.map { it.value.toInt() }
 
         val requiredCookies = asInt.required("hello")
-        assertThat({ requiredCookies(request) }, throws(equalTo(LensFailure(Invalid(requiredCookies)))))
+        assertThat({ requiredCookies(request) }, throws(equalTo(LensFailure(requiredCookies.invalid()))))
 
         val optionalCookies = asInt.optional("hello")
-        assertThat({ optionalCookies(request) }, throws(equalTo(LensFailure(Invalid(optionalCookies)))))
+        assertThat({ optionalCookies(request) }, throws(equalTo(LensFailure(optionalCookies.invalid()))))
 
         val requiredMultiCookies = asInt.multi.required("hello")
-        assertThat({ requiredMultiCookies(request) }, throws(equalTo(LensFailure(Invalid(requiredMultiCookies)))))
+        assertThat({ requiredMultiCookies(request) }, throws(equalTo(LensFailure(requiredMultiCookies.invalid()))))
 
         val optionalMultiCookies = asInt.multi.optional("hello")
-        assertThat({ optionalMultiCookies(request) }, throws(equalTo(LensFailure(Invalid(optionalMultiCookies)))))
+        assertThat({ optionalMultiCookies(request) }, throws(equalTo(LensFailure(optionalMultiCookies.invalid()))))
     }
 
     @Test

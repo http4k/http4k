@@ -6,8 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Ignore
 import org.junit.Test
-import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.LensFailure
+import org.reekwest.kontrakt.lens.invalid
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -37,7 +37,7 @@ class PathTest {
     @Test
     fun `invalid value`() {
         val path = Path.map(String::toInt).of("hello")
-        assertThat({ path("world") }, throws(equalTo(LensFailure(Invalid(path)))))
+        assertThat({ path("world") }, throws(equalTo(LensFailure(path.invalid()))))
     }
 
     @Test
@@ -84,6 +84,6 @@ class PathTest {
     private fun <T> checkContract(Path: PathSpec<String, T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))
-        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(Invalid(requiredLens)))))
+        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
     }
 }
