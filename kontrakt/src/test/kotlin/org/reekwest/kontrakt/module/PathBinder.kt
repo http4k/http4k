@@ -26,7 +26,7 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
 
     internal fun extract(request: Request, basePath: BasePath): ExtractedParts? {
         val actualPath = BasePath(request.uri.path)
-        return core.matches(request.method, basePath, actualPath).let { from(actualPath) }
+        return if (core.matches(request.method, basePath, actualPath)) from(actualPath) else null
     }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
@@ -42,7 +42,8 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-            fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) = actualMethod == method && actualPath == pathFn(basePath)
+            fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) =
+                actualMethod == method && actualPath.startsWith(pathFn(basePath))
         }
     }
 }

@@ -5,7 +5,7 @@ sealed class BasePath {
     abstract fun toList(): List<String>
     operator fun <T> invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-//    abstract fun startsWith(other: PathBuilder): Boolean
+    abstract fun startsWith(other: BasePath): Boolean
 
     operator fun div(child: String): BasePath = Slash(this, child)
 
@@ -24,15 +24,15 @@ sealed class BasePath {
 data class Slash(override val parent: BasePath, val child: String) : BasePath() {
     override fun toList(): List<String> = parent.toList().plus(child)
     override fun toString(): String = "$parent/$child"
-//    override fun startsWith(other: PathBuilder): Boolean {
-//        val components = other.toList()
-//        return toList().take(components.size) == components
-//    }
+    override fun startsWith(other: BasePath): Boolean {
+        val components = other.toList()
+        return toList().take(components.size) == components
+    }
 }
 
 object Root : BasePath() {
     override fun toList(): List<String> = emptyList()
     override val parent: BasePath = this
     override fun toString(): String = ""
-//    override fun startsWith(other: PathBuilder): Boolean = other == Root
+    override fun startsWith(other: BasePath): Boolean = other == Root
 }
