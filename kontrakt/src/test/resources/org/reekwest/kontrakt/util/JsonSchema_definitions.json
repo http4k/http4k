@@ -1,43 +1,43 @@
 {
-  "object-1377408998": {
+  "object-1692482481": {
     "type": "object",
     "properties": {
-      "anObject": {
-        "$ref": "#/definitions/object-1591148529"
+      "anotherString": {
+        "type": "StringParamType"
+      }
+    }
+  },
+  "object416674373": {
+    "type": "object",
+    "properties": {
+      "anInteger": {
+        "type": "IntegerParamType"
+      }
+    }
+  },
+  "object1630675836": {
+    "type": "object",
+    "properties": {
+      "aString": {
+        "type": "StringParamType"
+      },
+      "aNumber": {
+        "type": "NumberParamType"
+      },
+      "aBooleanTrue": {
+        "type": "BooleanParamType"
+      },
+      "aBooleanFalse": {
+        "type": "BooleanParamType"
       },
       "anArray": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/object1566645919"
+          "$ref": "#/definitions/object-1692482481"
         }
       },
-      "aBooleanFalse": {
-        "type": "boolean"
-      },
-      "aBooleanTrue": {
-        "type": "boolean"
-      },
-      "aNumber": {
-        "type": "number"
-      },
-      "aString": {
-        "type": "string"
-      }
-    }
-  },
-  "object-1591148529": {
-    "type": "object",
-    "properties": {
-      "anInteger": {
-        "type": "integer"
-      }
-    }
-  },
-  "object1566645919": {
-    "type": "object",
-    "properties": {
-      "anotherString": {
-        "type": "string"
+      "anObject": {
+        "$ref": "#/definitions/object416674373"
       }
     }
   }
