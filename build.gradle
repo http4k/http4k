@@ -129,8 +129,6 @@ allprojects {
 }
 
 dependencies {
-    testCompile project(":reekwest")
-    testCompile project(":kontrakt")
     provided kotlin_lib
 }
 
