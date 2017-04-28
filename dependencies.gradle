@@ -5,8 +5,6 @@ ext {
             "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     ]
 
-    servlet = ["javax.servlet:javax.servlet-api:3.1.0"]
-    
     testing = [
             "junit:junit:4.11",
             "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
