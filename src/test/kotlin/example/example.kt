@@ -1,4 +1,4 @@
-package org.reekwest.kontrakt.module
+package example
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
@@ -9,6 +9,9 @@ import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.Query
 import org.reekwest.kontrakt.int
+import org.reekwest.kontrakt.module.Root
+import org.reekwest.kontrakt.module.Route
+import org.reekwest.kontrakt.module.RouteModule
 
 fun main(args: Array<String>) {
 
@@ -24,4 +27,3 @@ fun main(args: Array<String>) {
     val handler = RouteModule(Root).withRoute(asd).toHttpHandler()
     println(handler(Request(GET, uri("/bob/123"))))
 }
-

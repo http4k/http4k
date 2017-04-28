@@ -7,19 +7,19 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
-class ServerRoute(val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
+class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
 
     fun router(moduleRoot: BasePath): Router = { pathBinder.extract(it, moduleRoot)?.let(toHandler) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
 
-class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
+internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
 }
 
-abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
+abstract class PathBinder internal constructor(internal val core: Core, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
@@ -40,14 +40,14 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
     }
 
     companion object {
-        data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
+        internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
             fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) = actualMethod == method && actualPath == pathFn(basePath)
         }
     }
 }
 
-class PathBinder0(core: Core) : PathBinder(core) {
+class PathBinder0 internal constructor(core: Core) : PathBinder(core) {
 
     override infix operator fun div(next: String) = PathBinder0(core / next)
 
@@ -56,17 +56,17 @@ class PathBinder0(core: Core) : PathBinder(core) {
     infix fun bind(handler: HttpHandler): ServerRoute = ServerRoute(this, { handler })
 }
 
-class PathBinder1<out A>(core: Core,
-                         private val psA: PathLens<A>) : PathBinder(core, psA) {
+class PathBinder1<out A> internal constructor(core: Core,
+                                              private val psA: PathLens<A>) : PathBinder(core, psA) {
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder2(core, psA, next)
 
     infix fun bind(fn: (A) -> HttpHandler): ServerRoute = ServerRoute(this, { parts -> fn(parts[psA]) })
 }
 
-class PathBinder2<out A, out B>(core: Core,
-                                private val psA: PathLens<A>,
-                                private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
+class PathBinder2<out A, out B> internal constructor(core: Core,
+                                                     private val psA: PathLens<A>,
+                                                     private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
     override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
 
     infix fun bind(fn: (A, B) -> HttpHandler): ServerRoute = ServerRoute(this, { parts -> fn(parts[psA], parts[psB]) })

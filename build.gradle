@@ -127,3 +127,9 @@ allprojects {
         }
     }
 }
+
+dependencies {
+    testCompile project(":kontrakt")
+    provided kotlin_lib
+}
+
