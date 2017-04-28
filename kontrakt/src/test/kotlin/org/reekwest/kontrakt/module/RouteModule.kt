@@ -5,6 +5,8 @@ import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
+import org.reekwest.http.core.with
+import org.reekwest.kontrakt.Header.Common.X_KONTRACT_ROUTE
 import org.reekwest.kontrakt.lens.CatchContractBreach
 import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
@@ -15,6 +17,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
 
     override fun toRouter(): Router = router
 
+    fun securedBy(new: Security) = RouteModule(router.securedBy(new))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
     fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(router.withRoutes(new.toList()))
@@ -23,21 +26,35 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
         private data class ModuleRouter(val moduleRoot: BasePath,
                                         val renderer: ModuleRenderer,
                                         val filter: Filter,
+                                        val security: Security = NoSecurity,
                                         val descriptionPath: (BasePath) -> BasePath = { it },
                                         val routes: List<ServerRoute> = emptyList()) : Router {
-            private val routers = routes.plus(
-                PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind {
-                    renderer.description(moduleRoot, routes)
-                }).map { it.router(moduleRoot) }
+            private val allRoutes = routes.plus(descriptionRoute())
 
             override fun invoke(request: Request): HttpHandler? =
                 if (request.isIn(moduleRoot)) {
-                    routers.fold<Router, HttpHandler?>(null, { memo, route ->
-                        memo ?: route(request)
-                    })?.let { filter.then(it) }
+                    allRoutes.fold<ServerRoute, Pair<ServerRoute, HttpHandler>?>(null, { memo, route ->
+                        memo ?: route.router(moduleRoot)(request)?.let { route to it}
+                    })?.let { (route, handler) -> security.filter.then(identify(route)).then(filter).then(handler) }
                 } else null
 
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
+            fun securedBy(new: Security) = copy(security = new)
+
+            private fun descriptionRoute(): ServerRoute =
+                PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind
+                    { renderer.description(moduleRoot, routes) }
+
+            private fun identify(route: ServerRoute): Filter {
+                val routeIdentity = route.describeFor(moduleRoot)
+                return Filter {
+                    { req ->
+                        it(req.with(X_KONTRACT_ROUTE to
+                            if (routeIdentity.isEmpty()) "/" else routeIdentity))
+                    }
+                }
+            }
+
         }
     }
 }

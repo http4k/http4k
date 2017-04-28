@@ -36,7 +36,8 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header",
     Set { name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }
 ) {
     object Common {
-        val CONTENT_TYPE = Header.map(::ContentType, { it.value }).optional("Content-Type")
+        val X_KONTRACT_ROUTE = Header.optional("x-kontrakt-route")
+        val CONTENT_TYPE = Header.map(::ContentType, { it.value }).optional("content-type")
     }
 }
 

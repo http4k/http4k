@@ -7,7 +7,9 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.kontrakt.Path
+import org.reekwest.kontrakt.Query
 import org.reekwest.kontrakt.int
+import org.reekwest.kontrakt.module.ApiKey
 import org.reekwest.kontrakt.module.Root
 import org.reekwest.kontrakt.module.Route
 import org.reekwest.kontrakt.module.RouteModule
@@ -15,7 +17,7 @@ import org.reekwest.kontrakt.module.SimpleJson
 
 fun main(args: Array<String>) {
 
-    fun hello(value: String, unused: String, i: Int): HttpHandler = { Response(OK) }
+    fun hello(value: String, unused: String, i: Int): HttpHandler = { Response(OK, headers = it.headers) }
 
     val anInt = Path.int().of("name")
 
@@ -25,7 +27,8 @@ fun main(args: Array<String>) {
 //        .query(Query.optional("goobas"))
         .at(GET) / Path.of("bob") / "hello" / anInt bind ::hello
 
-    val handler = RouteModule(Root / "foo", SimpleJson()).withRoute(asd).toHttpHandler()
-    println(handler(Request(GET, uri("/foo/bob/hello/123"))))
-    println(handler(Request(GET, uri("/foo"))))
+    val handler = RouteModule(Root / "foo", SimpleJson())
+        .securedBy(ApiKey(Query.int().required("api"), { it == 42}))
+        .withRoute(asd).toHttpHandler()
+    println(handler(Request(GET, uri("/foo/bob/hello/123?api=42"))))
 }
