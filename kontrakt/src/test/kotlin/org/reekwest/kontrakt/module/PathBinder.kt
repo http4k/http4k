@@ -1,11 +1,8 @@
 package org.reekwest.kontrakt.module
 
-import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
-import org.reekwest.http.core.Request
 import org.reekwest.kontrakt.ContractBreach
-import org.reekwest.kontrakt.ExtractionFailure
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
@@ -30,33 +27,11 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
         null
     }
 
-    fun validationFilter(): Filter = ValidationFilter(core.route)
-
     companion object {
         data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
             fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) = actualMethod == method && actualPath == pathFn(basePath)
         }
-
-        private class ValidationFilter(private val route: Route) : Filter {
-            private fun validate(request: Request): List<ExtractionFailure> =
-                route.fold(emptyList<ExtractionFailure>()) { memo, next ->
-                    try {
-                        next(request)
-                        memo
-                    } catch (e: ContractBreach) {
-                        memo.plus(e.failures)
-                    }
-                }
-
-            override fun invoke(next: HttpHandler): HttpHandler = {
-                validate(it).let { errors ->
-                    if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
-                }
-            }
-        }
-
-
     }
 }
 

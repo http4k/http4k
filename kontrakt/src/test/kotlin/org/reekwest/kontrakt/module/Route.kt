@@ -32,6 +32,8 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
 
     infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { Root }))
 
+    internal fun validationFilter(): Filter = ValidationFilter(this)
+
     companion object {
         private data class Core(val name: String,
                                 val description: String?,
@@ -40,6 +42,25 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
                                 val consumes: kotlin.collections.Set<ContentType> = emptySet(),
                                 val requestParams: List<Lens<Request, *>> = emptyList(),
                                 val responses: List<RouteResponse> = emptyList())
+
+
+        private class ValidationFilter(private val route: Route) : Filter {
+            private fun validate(request: Request): List<ExtractionFailure> =
+                route.fold(emptyList<ExtractionFailure>()) { memo, next ->
+                    try {
+                        next(request)
+                        memo
+                    } catch (e: ContractBreach) {
+                        memo.plus(e.failures)
+                    }
+                }
+
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                validate(it).let { errors ->
+                    if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
+                }
+            }
+        }
     }
 }
 
