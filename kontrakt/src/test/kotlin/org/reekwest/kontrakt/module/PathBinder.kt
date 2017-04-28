@@ -3,13 +3,15 @@ package org.reekwest.kontrakt.module
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
+import org.reekwest.http.core.then
 import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
 class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
+    private val validation = pathBinder.core.route.validationFilter()
 
-    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(moduleRoot, it)?.let(toHandler) }
+    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(moduleRoot, it)?.let { it -> validation.then(toHandler(it)) } }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
@@ -41,8 +43,9 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-            fun matches(moduleRoot: BasePath, request: Request): Boolean
-                = request.method == method && BasePath(request.uri.path).startsWith(pathFn(moduleRoot))
+            fun matches(moduleRoot: BasePath, request: Request): Boolean {
+                return request.method == method && BasePath(request.uri.path).startsWith(pathFn(moduleRoot))
+            }
         }
     }
 }

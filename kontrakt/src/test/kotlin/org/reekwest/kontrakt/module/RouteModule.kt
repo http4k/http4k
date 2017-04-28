@@ -8,10 +8,12 @@ import org.reekwest.kontrakt.CatchContractBreach
 
 class RouteModule private constructor(private val core: ModuleRouter) : Module {
 
-    constructor(path: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(ModuleRouter(path, renderer, CatchContractBreach.then(filter)))
+    constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
+        : this(ModuleRouter(moduleRoot, renderer, CatchContractBreach.then(filter)))
 
-    override fun toRouter(): Router = core
+    override fun toRouter(): Router = {
+        if (BasePath(it.uri.path).startsWith(core.moduleRoot)) core(it) else null
+    }
 
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
@@ -22,11 +24,12 @@ class RouteModule private constructor(private val core: ModuleRouter) : Module {
                                         val renderer: ModuleRenderer,
                                         val filter: Filter,
                                         val routes: List<ServerRoute> = emptyList()) : Router {
-            override fun invoke(request: Request) =
-                routes.fold<ServerRoute, HttpHandler?>(null, { memo, serverRoute ->
-                    val validator = filter.then(serverRoute.pathBinder.core.route.validationFilter())
-                    memo ?: serverRoute.router(moduleRoot)(request)?.let { validator.then(it) }
-                })
+            private val routers = routes.map { it.router(moduleRoot) }
+
+            override fun invoke(request: Request): HttpHandler? =
+                routers.fold<Router, HttpHandler?>(null, { memo, route ->
+                    memo ?: route(request)
+                })?.let(filter)
 
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
         }
