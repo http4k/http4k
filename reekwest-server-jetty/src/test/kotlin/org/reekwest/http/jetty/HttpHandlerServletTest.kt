@@ -1,4 +1,4 @@
-package org.reekwest.http.servlet
+package org.reekwest.http.jetty
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -11,8 +11,6 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.bodyString
-import org.reekwest.http.jetty.JettyServer
-import org.reekwest.http.jetty.startJettyServer
 import org.reekwest.http.routing.by
 import org.reekwest.http.routing.routes
 
