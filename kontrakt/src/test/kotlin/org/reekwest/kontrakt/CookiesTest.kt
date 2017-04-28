@@ -65,7 +65,6 @@ class CookiesTest {
         val cookie = Cookies.required("bob")
         val cookieInstance = Cookie("bob", "hello")
         val withCookies = cookie(cookieInstance, request)
-        println(withCookies)
         assertThat(cookie(withCookies), equalTo(cookieInstance))
     }
 

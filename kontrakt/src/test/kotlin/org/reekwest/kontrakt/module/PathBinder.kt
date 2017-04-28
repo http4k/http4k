@@ -101,7 +101,7 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
 private fun Request.extract(moduleRoot: BasePath, lenses: List<PathLens<*>>): ExtractedParts? =
-    BasePath(this.uri.path.replace(moduleRoot.toString(), "")).let {
+    without(moduleRoot).let {
         path ->
         if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
     }

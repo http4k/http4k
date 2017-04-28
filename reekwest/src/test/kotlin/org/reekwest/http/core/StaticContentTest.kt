@@ -86,7 +86,6 @@ class StaticContentTest {
     fun `cannot serve a directory`() {
         val handler = StaticContent("/svc", Classpath())
         val result = handler(Request(GET, uri("/svc/org")))
-        println(result)
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
