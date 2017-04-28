@@ -9,9 +9,7 @@ import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
 class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
-    private val validation = pathBinder.core.route.validationFilter
-
-    fun router(moduleRoot: BasePath): Router = { pathBinder.extract(moduleRoot, it)?.let { it -> validation.then(toHandler(it)) } }
+    fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
@@ -32,15 +30,17 @@ abstract class PathBinder internal constructor(internal val core: Core, vararg v
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun extract(moduleRoot: BasePath, request: Request): ExtractedParts? {
-        return if (core.matches(moduleRoot, request)) {
-            try {
-                ExtractedParts.from(BasePath(request.uri.path), pathLenses.toList())
-            } catch (e: ContractBreach) {
-                null
-            }
-        } else null
-    }
+    internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router =
+        {
+            if (core.matches(moduleRoot, it)) {
+                try {
+                    ExtractedParts.from(BasePath(it.uri.path), pathLenses.toList())
+                        ?.let { core.route.validationFilter.then(toHandler(it)) }
+                } catch (e: ContractBreach) {
+                    null
+                }
+            } else null
+        }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
 
