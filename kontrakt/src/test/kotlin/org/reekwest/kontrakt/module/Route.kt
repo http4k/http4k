@@ -45,13 +45,10 @@ class ServerRoute<T>(val pathBinder: PathBinder,
                      private val invoker: (T, ExtractedParts) -> HttpHandler) {
 
     fun match(rootPath: BasePath): (Method, BasePath) -> HttpHandler? =
-        {
-            actualMethod: Method, actualPath: BasePath ->
-            pathBinder.bob(actualMethod, rootPath, actualPath, x, invoker)
-        }
+        { actualMethod, actualPath -> pathBinder.match(actualMethod, rootPath, actualPath, x, invoker) }
 
 
-    fun describeFor(basePath: BasePath): String = (pathBinder.core.pathFn(basePath).toString()) + pathBinder.parts.map { it.toString() }.joinToString { "/" }
+    fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
 
 class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {

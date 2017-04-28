@@ -15,10 +15,12 @@ class RouteModule private constructor(private val core: Core) : Module {
 
     override fun toRouter(): Router = {
         core.routes.fold<ServerRoute<*>, HttpHandler?>(null, { memo, serverRoute ->
-            val validator = core.filter.then(ValidationFilter(serverRoute.pathBinder.core.route))
+            val validator = core.filter.then(validationFilter(serverRoute))
             memo ?: serverRoute.match(core.rootPath)(it.method, BasePath(it.uri.path))?.let { validator.then(it) }
         })
     }
+
+    private fun validationFilter(serverRoute: ServerRoute<*>) = ValidationFilter(serverRoute.pathBinder.core.route)
 
     fun withRoute(new: ServerRoute<*>) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute<*>) = withRoutes(new.toList())

@@ -6,20 +6,20 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
-abstract class PathBinder(val core: Core, vararg val parts: PathLens<*>) {
+abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun <X> bob(actualMethod: Method, basePath: BasePath, actualPath: BasePath, fn: X, invoker: (X, ExtractedParts) -> HttpHandler): HttpHandler? {
-        return core.matches(actualMethod, basePath, actualPath).let {
-            from(actualPath)?.let { invoker(fn, it) }
-        }
+    internal fun <T> match(actualMethod: Method, basePath: BasePath, actualPath: BasePath, input: T, invoker: (T, ExtractedParts) -> HttpHandler): HttpHandler? {
+        return core.matches(actualMethod, basePath, actualPath).let { from(actualPath)?.let { invoker(input, it) } }
     }
 
+    fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
+
     private fun from(path: BasePath): ExtractedParts? = try {
-        if (path.toList().size == parts.size) {
-            ExtractedParts(mapOf(*parts.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
+        if (path.toList().size == pathLenses.size) {
+            ExtractedParts(mapOf(*pathLenses.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
         } else {
             null
         }
@@ -42,7 +42,8 @@ class PathBinder0(core: Core) : PathBinder(core) {
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder1(core, next)
 
     infix fun bind(fn: HttpHandler): ServerRoute<*> =
-        ServerRoute(this, fn, { fn, _ -> fn }) }
+        ServerRoute(this, fn, { fn, _ -> fn })
+}
 
 class PathBinder1<out A>(core: Core,
                          private val psA: PathLens<A>) : PathBinder(core, psA) {
