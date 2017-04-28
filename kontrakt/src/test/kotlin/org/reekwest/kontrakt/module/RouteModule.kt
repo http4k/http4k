@@ -27,7 +27,7 @@ class RouteModule private constructor(private val core: Core) : Module {
             val router: Router = {
                 routes.fold<ServerRoute<*>, HttpHandler?>(null, { memo, serverRoute ->
                     val validator = filter.then(serverRoute.pathBinder.core.route.validationFilter())
-                    memo ?: serverRoute.match(rootPath)(it.method, BasePath(it.uri.path))?.let { validator.then(it) }
+                    memo ?: serverRoute.router(rootPath)(it)?.let { validator.then(it) }
                 })
             }
         }

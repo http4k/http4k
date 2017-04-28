@@ -2,6 +2,7 @@ package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
+import org.reekwest.http.core.Request
 import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
@@ -11,8 +12,9 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun <T> match(actualMethod: Method, basePath: BasePath, actualPath: BasePath, input: T, invoker: (T, ExtractedParts) -> HttpHandler): HttpHandler? {
-        return core.matches(actualMethod, basePath, actualPath).let { from(actualPath)?.let { invoker(input, it) } }
+    internal fun <T> match(request: Request, basePath: BasePath, input: T, invoker: (T, ExtractedParts) -> HttpHandler): HttpHandler? {
+        val actualPath = BasePath(request.uri.path)
+        return core.matches(request.method, basePath, actualPath).let { from(actualPath)?.let { invoker(input, it) } }
     }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }

@@ -68,9 +68,7 @@ class ServerRoute<T>(val pathBinder: PathBinder,
                      private val x: T,
                      private val invoker: (T, ExtractedParts) -> HttpHandler) {
 
-    fun match(rootPath: BasePath): (Method, BasePath) -> HttpHandler? =
-        { actualMethod, actualPath -> pathBinder.match(actualMethod, rootPath, actualPath, x, invoker) }
-
+    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath, x, invoker) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
