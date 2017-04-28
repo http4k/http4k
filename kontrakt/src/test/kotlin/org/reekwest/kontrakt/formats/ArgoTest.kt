@@ -13,6 +13,7 @@ import org.reekwest.kontrakt.formats.Argo.asCompact
 import org.reekwest.kontrakt.formats.Argo.asJson
 import org.reekwest.kontrakt.formats.Argo.asJsonArray
 import org.reekwest.kontrakt.formats.Argo.fromJson
+import org.reekwest.kontrakt.formats.Argo.json
 import java.math.BigDecimal
 import java.math.BigInteger
 

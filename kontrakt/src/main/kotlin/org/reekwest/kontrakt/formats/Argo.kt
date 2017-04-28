@@ -12,10 +12,12 @@ import argo.jdom.JsonNodeFactories.nullNode
 import argo.jdom.JsonNodeFactories.number
 import argo.jdom.JsonNodeFactories.string
 import argo.jdom.JsonRootNode
+import org.reekwest.kontrakt.BiDiBodySpec
 import org.reekwest.kontrakt.Body
 import org.reekwest.kontrakt.lens.BiDiLensSpec
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.ByteBuffer
 
 object Argo : Json<JsonRootNode, JsonNode> {
 
@@ -34,11 +36,9 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun <T : Iterable<JsonNode>> T.asJsonArray() = array(this)
     override fun JsonRootNode.asPretty(): String = pretty.format(this)
     override fun JsonRootNode.asCompact(): String = compact.format(this)
-    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJson(): JsonRootNode =
-        `object`(this.map { field(it.first, it.second) })
+    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJson(): JsonRootNode = `object`(this.map { field(it.first, it.second) })
+    override fun <IN> BiDiLensSpec<IN, String, String>.json(): BiDiLensSpec<IN, String, JsonRootNode> = this.map(Argo::parse, Argo::compact)
+    override fun Body.json(): BiDiBodySpec<ByteBuffer, JsonRootNode> = this.string.map(Argo::parse, Argo::compact)
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }
-
-fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map(Argo::parse, Argo::compact)
-fun Body.json() = this.string.map(Argo::parse, Argo::compact)

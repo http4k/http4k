@@ -1,7 +1,11 @@
 package org.reekwest.kontrakt.formats
 
+import org.reekwest.kontrakt.BiDiBodySpec
+import org.reekwest.kontrakt.Body
+import org.reekwest.kontrakt.lens.BiDiLensSpec
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.ByteBuffer
 
 interface Json<ROOT : NODE, NODE> {
     fun String.fromJson(): ROOT
@@ -16,6 +20,9 @@ interface Json<ROOT : NODE, NODE> {
     fun ROOT.asCompact(): String
     fun <T : Iterable<NODE>> T.asJsonArray(): ROOT
     fun <LIST : Iterable<Pair<String, NODE>>> LIST.asJson(): ROOT
+
+    fun <IN> BiDiLensSpec<IN, String, String>.json(): BiDiLensSpec<IN, String, ROOT>
+    fun Body.json(): BiDiBodySpec<ByteBuffer, ROOT>
 
     // TODO work out which ones of these we want to keep
     fun obj(fields: Iterable<Pair<String, NODE>>): ROOT = fields.asJson()
