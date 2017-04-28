@@ -40,11 +40,11 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
     }
 }
 
-abstract class ServerRoute(val pathBinder: PathBinder, vararg val pathParams: Lens<String, *>) {
+abstract class ServerRoute(val pathBinder: PathBinder) {
 
     abstract fun match(basePath: BasePath): (Method, BasePath) -> HttpHandler?
 
-    fun describeFor(basePath: BasePath): String = (pathBinder.core.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
+    fun describeFor(basePath: BasePath): String = (pathBinder.core.pathFn(basePath).toString()) + pathBinder.parts.map { it.toString() }.joinToString { "/" }
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {

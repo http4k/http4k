@@ -6,7 +6,7 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
-abstract class PathBinder(val core: Core, vararg private val parts: PathLens<*>) {
+abstract class PathBinder(val core: Core, vararg val parts: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
