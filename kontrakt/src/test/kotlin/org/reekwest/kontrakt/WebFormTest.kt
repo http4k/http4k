@@ -10,8 +10,8 @@ import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.with
-import org.reekwest.kontrakt.lens.ContractBreach
 import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.Missing
 
 class WebFormTest {
@@ -44,7 +44,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             )(request)
-        }, throws(equalTo(ContractBreach(Invalid(Header.Common.CONTENT_TYPE)))))
+        }, throws(equalTo(LensFailure(Invalid(Header.Common.CONTENT_TYPE)))))
     }
 
     @Test
@@ -84,7 +84,7 @@ class WebFormTest {
         val intRequiredField = FormField.int().required("another")
         assertThat(
             { Body.webForm(FormValidator.Strict, stringRequiredField, intRequiredField)(request) },
-            throws(equalTo(ContractBreach(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), status = NOT_ACCEPTABLE)))
+            throws(equalTo(LensFailure(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), status = NOT_ACCEPTABLE)))
         )
     }
 

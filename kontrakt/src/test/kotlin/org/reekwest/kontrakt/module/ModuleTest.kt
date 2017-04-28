@@ -10,7 +10,7 @@ import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.LensFailure
 
 class ModuleTest {
 
@@ -22,7 +22,7 @@ class ModuleTest {
 
     private val contractBreachModule = object : Module {
         override fun toRouter(): Router = {
-            { throw ContractBreach() }
+            { throw LensFailure() }
         }
     }
     private val okModule = object : Module {

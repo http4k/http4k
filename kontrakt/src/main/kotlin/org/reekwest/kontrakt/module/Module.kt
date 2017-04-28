@@ -5,7 +5,7 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.LensFailure
 
 typealias Router = (Request) -> HttpHandler?
 
@@ -25,7 +25,7 @@ interface Module {
             handlerMatcher(req)?.let {
                 try {
                     it(req)
-                } catch (e: ContractBreach) {
+                } catch (e: LensFailure) {
                     Response(BAD_REQUEST)
                 }
             } ?: Response(NOT_FOUND)

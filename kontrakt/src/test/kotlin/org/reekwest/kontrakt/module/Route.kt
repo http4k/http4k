@@ -9,9 +9,9 @@ import org.reekwest.http.core.Status
 import org.reekwest.kontrakt.BodyLens
 import org.reekwest.kontrakt.HeaderLens
 import org.reekwest.kontrakt.QueryLens
-import org.reekwest.kontrakt.lens.ContractBreach
-import org.reekwest.kontrakt.lens.ExtractionFailure
+import org.reekwest.kontrakt.lens.Failure
 import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
@@ -31,15 +31,15 @@ class Route private constructor(private val core: Core) {
     internal val validationFilter = Filter {
         next ->
         {
-            val errors = core.fold(emptyList<ExtractionFailure>()) { memo, next ->
+            val errors = core.fold(emptyList<Failure>()) { memo, next ->
                 try {
                     next(it)
                     memo
-                } catch (e: ContractBreach) {
+                } catch (e: LensFailure) {
                     memo.plus(e.failures)
                 }
             }
-            if (errors.isEmpty()) next(it) else throw ContractBreach(errors)
+            if (errors.isEmpty()) next(it) else throw LensFailure(errors)
         }
     }
 

@@ -6,7 +6,7 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
-import org.reekwest.kontrakt.lens.ContractBreach
+import org.reekwest.kontrakt.lens.LensFailure
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
@@ -24,7 +24,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
             if (core.matches(moduleRoot, it)) {
                 try {
                     it.extract(pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
-                } catch (e: ContractBreach) {
+                } catch (e: LensFailure) {
                     null
                 }
             } else null

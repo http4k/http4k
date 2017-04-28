@@ -10,11 +10,11 @@ import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
 import org.reekwest.kontrakt.Header.Common.CONTENT_TYPE
 import org.reekwest.kontrakt.lens.BiDiLensSpec
-import org.reekwest.kontrakt.lens.ContractBreach
-import org.reekwest.kontrakt.lens.ExtractionFailure
+import org.reekwest.kontrakt.lens.Failure
 import org.reekwest.kontrakt.lens.Get
 import org.reekwest.kontrakt.lens.Invalid
 import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.Set
 import java.net.URLDecoder
 
@@ -25,7 +25,7 @@ object FormField : BiDiLensSpec<WebForm, String, String>("form field",
     Set { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
 
-data class WebForm constructor(val fields: Map<String, List<String>>, val errors: List<ExtractionFailure>) {
+data class WebForm constructor(val fields: Map<String, List<String>>, val errors: List<Failure>) {
     operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
@@ -38,7 +38,7 @@ data class WebForm constructor(val fields: Map<String, List<String>>, val errors
 
 enum class FormValidator : (WebForm) -> WebForm {
     Strict {
-        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw ContractBreach(form.errors, NOT_ACCEPTABLE)
+        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw LensFailure(form.errors, NOT_ACCEPTABLE)
     },
     Feedback {
         override fun invoke(form: WebForm): WebForm = form
@@ -52,12 +52,12 @@ fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) 
     ).required()
 
 private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
-    val failures = formFields.fold(listOf<ExtractionFailure>()) {
+    val failures = formFields.fold(listOf<Failure>()) {
         memo, next ->
         try {
             next(webForm)
             memo
-        } catch (e: ContractBreach) {
+        } catch (e: LensFailure) {
             memo.plus(e.failures)
         }
     }
@@ -66,7 +66,7 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
     Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw ContractBreach(Invalid(CONTENT_TYPE))
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(Invalid(CONTENT_TYPE))
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
     Set { _, values, target: HttpMessage ->

@@ -18,6 +18,7 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
         operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): org.reekwest.kontrakt.lens.Set<IN, OUT, OUT> = org.reekwest.kontrakt.lens.Set(rootFn, { it })
     }
 }
+data class Meta(val required: Boolean, val location: String, val name: String, val description: String? = null)
 
 open class Lens<in IN, out FINAL>(val meta: Meta,
                                   private val get: (IN) -> FINAL) : (IN) -> FINAL {
@@ -28,10 +29,10 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
      */
     override operator fun invoke(target: IN): FINAL = try {
         get(target)
-    } catch (e: ContractBreach) {
+    } catch (e: LensFailure) {
         throw e
     } catch (e: Exception) {
-        throw ContractBreach(Invalid(this))
+        throw LensFailure(Invalid(this))
     }
 }
 

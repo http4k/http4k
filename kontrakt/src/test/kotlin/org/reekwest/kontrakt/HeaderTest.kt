@@ -10,8 +10,8 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
 import org.reekwest.http.core.header
-import org.reekwest.kontrakt.lens.ContractBreach
 import org.reekwest.kontrakt.lens.Invalid
+import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.Missing
 
 class HeaderTest {
@@ -33,26 +33,26 @@ class HeaderTest {
     fun `value missing`() {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
-        assertThat({ requiredHeader(request) }, throws(equalTo(ContractBreach(Missing(requiredHeader)))))
+        assertThat({ requiredHeader(request) }, throws(equalTo(LensFailure(Missing(requiredHeader)))))
 
         assertThat(Header.multi.optional("world")(request), absent())
         val optionalMultiHeader = Header.multi.required("world")
-        assertThat({ optionalMultiHeader(request) }, throws(equalTo(ContractBreach(Missing(optionalMultiHeader)))))
+        assertThat({ optionalMultiHeader(request) }, throws(equalTo(LensFailure(Missing(optionalMultiHeader)))))
     }
 
     @Test
     fun `invalid value`() {
         val requiredHeader = Header.map(String::toInt).required("hello")
-        assertThat({ requiredHeader(request) }, throws(equalTo(ContractBreach(Invalid(requiredHeader)))))
+        assertThat({ requiredHeader(request) }, throws(equalTo(LensFailure(Invalid(requiredHeader)))))
 
         val optionalHeader = Header.map(String::toInt).optional("hello")
-        assertThat({ optionalHeader(request) }, throws(equalTo(ContractBreach(Invalid(optionalHeader)))))
+        assertThat({ optionalHeader(request) }, throws(equalTo(LensFailure(Invalid(optionalHeader)))))
 
         val requiredMultiHeader = Header.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiHeader(request) }, throws(equalTo(ContractBreach(Invalid(requiredMultiHeader)))))
+        assertThat({ requiredMultiHeader(request) }, throws(equalTo(LensFailure(Invalid(requiredMultiHeader)))))
 
         val optionalMultiHeader = Header.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiHeader(request) }, throws(equalTo(ContractBreach(Invalid(optionalMultiHeader)))))
+        assertThat({ optionalMultiHeader(request) }, throws(equalTo(LensFailure(Invalid(optionalMultiHeader)))))
     }
 
     @Test
