@@ -8,8 +8,8 @@ import org.junit.Test
 import org.reekwest.http.apache.ApacheHttpClient
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.body.bodyString
-import org.reekwest.http.core.get
 import org.reekwest.http.core.headerValues
 import org.reekwest.http.core.ok
 import org.reekwest.http.jetty.JettyServer

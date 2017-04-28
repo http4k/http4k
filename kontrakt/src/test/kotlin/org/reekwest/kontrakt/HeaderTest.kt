@@ -7,8 +7,8 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Uri.Companion.uri
-import org.reekwest.http.core.get
 import org.reekwest.http.core.header
 
 class HeaderTest {

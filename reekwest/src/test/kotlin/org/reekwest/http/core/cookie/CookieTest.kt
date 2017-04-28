@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Parameters
-import org.reekwest.http.core.get
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.header
 import org.reekwest.http.core.ok
 import java.time.LocalDateTime

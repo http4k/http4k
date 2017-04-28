@@ -3,9 +3,9 @@ package org.reekwest.kontrakt
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.get
 
 class BodyTest {
 

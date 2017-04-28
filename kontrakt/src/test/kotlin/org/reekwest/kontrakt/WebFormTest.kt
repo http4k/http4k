@@ -5,10 +5,10 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.get
 import org.reekwest.http.core.with
 
 class WebFormTest {

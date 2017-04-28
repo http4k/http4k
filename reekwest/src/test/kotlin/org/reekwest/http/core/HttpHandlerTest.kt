@@ -3,6 +3,8 @@ package org.reekwest.http.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.Request.Companion.get
+import org.reekwest.http.core.Request.Companion.post
 import org.reekwest.http.core.body.bodyString
 import org.reekwest.http.core.body.form
 import org.reekwest.http.core.body.toBody
