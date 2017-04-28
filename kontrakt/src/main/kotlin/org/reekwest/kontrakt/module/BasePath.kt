@@ -33,7 +33,7 @@ data class Slash(override val parent: BasePath, val child: String) : BasePath() 
 object Root : BasePath() {
     override fun toList(): List<String> = emptyList()
     override val parent: BasePath = this
-    override fun toString(): String = ""
+    override fun toString(): String = "/"
     override fun startsWith(other: BasePath): Boolean = other == Root
 }
 

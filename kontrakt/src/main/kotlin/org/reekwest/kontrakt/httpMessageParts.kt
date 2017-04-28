@@ -10,7 +10,9 @@ import org.reekwest.http.core.header
 import org.reekwest.kontrakt.lens.BiDiLensSpec
 import org.reekwest.kontrakt.lens.Get
 import org.reekwest.kontrakt.lens.Lens
+import org.reekwest.kontrakt.lens.LensFailure
 import org.reekwest.kontrakt.lens.LensSpec
+import org.reekwest.kontrakt.lens.Meta
 import org.reekwest.kontrakt.lens.Set
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,15 +45,26 @@ object Cookies : BiDiLensSpec<Request, Cookie, Cookie>("cookie",
     Set { _, values, target -> values.fold(target, { m, (name, value) -> m.cookie(name, value) }) }
 )
 
-open class PathSpec<MID, out OUT>(private val delegate: LensSpec<String, String, OUT>) {
-    open fun of(name: String, description: String? = null): PathLens<OUT> = delegate.required(name, description)
+open class PathSpec<MID, out OUT>(internal val delegate: LensSpec<String, String, OUT>) {
+    open fun of(name: String, description: String? = null): PathLens<OUT> {
+        val getLens = delegate.get(name)
+        return object : Lens<String, OUT>(Meta(true, "path", name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
+            override fun toString(): String = "{$name}"
+        }
+    }
+
     fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
 }
 
 object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
     Get { _, target -> listOf(target) })) {
 
-    fun fixed(name: String) = of(name)
+    fun fixed(name: String): PathLens<String> {
+        val getLens = delegate.get(name)
+        return object : Lens<String, String>(Meta(true, "path", name), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
+            override fun toString(): String = name
+        }
+    }
 }
 
 fun Path.int() = map(String::toInt)

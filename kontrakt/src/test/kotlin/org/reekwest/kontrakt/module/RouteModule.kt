@@ -2,9 +2,11 @@ package org.reekwest.kontrakt.module
 
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
+import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.kontrakt.lens.CatchContractBreach
+import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
@@ -21,8 +23,12 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
         private data class ModuleRouter(val moduleRoot: BasePath,
                                         val renderer: ModuleRenderer,
                                         val filter: Filter,
+                                        val descriptionPath: (BasePath) -> BasePath = { it },
                                         val routes: List<ServerRoute> = emptyList()) : Router {
-            private val routers = routes.map { it.router(moduleRoot) }
+            private val routers = routes.plus(
+                PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind {
+                    renderer.description(moduleRoot, routes)
+                }).map { it.router(moduleRoot) }
 
             override fun invoke(request: Request): HttpHandler? =
                 if (request.isIn(moduleRoot)) {

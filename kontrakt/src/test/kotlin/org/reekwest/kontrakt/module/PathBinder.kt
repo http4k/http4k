@@ -17,7 +17,7 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
 abstract class PathBinder internal constructor(internal val core: Core, private vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
-    open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
+    open infix operator fun div(next: String) = div(Path.fixed(next))
 
     internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router =
         {
@@ -30,7 +30,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
             } else null
         }
 
-    fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
+    fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString("/")
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
@@ -54,6 +54,8 @@ class PathBinder0 internal constructor(core: Core) : PathBinder(core) {
 class PathBinder1<out A> internal constructor(core: Core,
                                               private val psA: PathLens<A>) : PathBinder(core, psA) {
 
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder2(core, psA, next)
 
     infix fun bind(fn: (A) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA]) })
@@ -62,6 +64,8 @@ class PathBinder1<out A> internal constructor(core: Core,
 class PathBinder2<out A, out B> internal constructor(core: Core,
                                                      private val psA: PathLens<A>,
                                                      private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
     override fun <T> div(next: PathLens<T>) = PathBinder3(core, psA, psB, next)
 
     infix fun bind(fn: (A, B) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB]) })
@@ -71,16 +75,20 @@ class PathBinder3<out A, out B, out C> internal constructor(core: Core,
                                                             private val psA: PathLens<A>,
                                                             private val psB: PathLens<B>,
                                                             private val psC: PathLens<C>) : PathBinder(core, psA, psB, psC) {
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
     override fun <T> div(next: PathLens<T>) = PathBinder4(core, psA, psB, psC, next)
 
     infix fun bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC]) })
 }
 
 class PathBinder4<out A, out B, out C, out D> internal constructor(core: Core,
-                                                            private val psA: PathLens<A>,
-                                                            private val psB: PathLens<B>,
-                                                            private val psC: PathLens<C>,
-                                                            private val psD: PathLens<D>) : PathBinder(core, psA, psB, psC, psD) {
+                                                                   private val psA: PathLens<A>,
+                                                                   private val psB: PathLens<B>,
+                                                                   private val psC: PathLens<C>,
+                                                                   private val psD: PathLens<D>) : PathBinder(core, psA, psB, psC, psD) {
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
     override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
 
     infix fun bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC], parts[psD]) })
