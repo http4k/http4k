@@ -16,7 +16,9 @@ Features:
    * Server: Servlets, Jetty
  * No 3rd party dependency required to start
 
-## Basic Usage
+## Getting started
+
+Here's how to create and use a basic HTTP handling function:
 
 ```kotlin
 val app = { request: Request -> ok().bodyString("Hello, ${request.query("location")}!") }
@@ -26,15 +28,9 @@ assertThat(response.status, equalTo(OK))
 assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
 ```
 
-## Using as a server
-
-```kotlin
-{ _: Request -> ok().bodyString("Hello World") }.startJettyServer()
-```
-
-That will make a server running on http://localhost:8000
-
 ## Using as a client
+
+[![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-client-apache/_latestVersion)
 
 ```kotlin
 val client = ApacheHttpClient()
@@ -44,9 +40,19 @@ assertThat(response.status, equalTo(OK))
 assertThat(response.bodyString(), containsSubstring("John Doe"))
 ```
 
-## Routing
+## Using as a server
 
-Reekwest comes with basic routing. It'pkg just another function where you can wrap handlers:
+[![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-server-jetty/_latestVersion)
+
+```kotlin
+{ _: Request -> ok().bodyString("Hello World") }.startJettyServer()
+```
+
+That will make a server running on http://localhost:8000
+
+### Routing
+
+Reekwest comes with basic routing:
 
 ```kotlin
 routes(
