@@ -14,14 +14,14 @@ import org.reekwest.kontrakt.util.ParamType.BooleanParamType
 
 class IllegalSchemaException(message: String) : Exception(message)
 
-data class Schema(val node: JsonNode, val definitions: Iterable<Pair<String, JsonNode>>)
+data class JsonSchema(val node: JsonNode, val definitions: Iterable<Pair<String, JsonNode>>)
 
-fun JsonNode.toSchema(): Schema = toSchema(Schema(this, emptyList()))
+fun JsonNode.toSchema(): JsonSchema = toSchema(JsonSchema(this, emptyList()))
 
-private fun toSchema(input: Schema): Schema =
-    if (input.node.type == STRING) Schema(paramTypeSchema(ParamType.StringParamType), input.definitions)
-    else if (input.node.type == TRUE) Schema(paramTypeSchema(BooleanParamType), input.definitions)
-    else if (input.node.type == FALSE) Schema(paramTypeSchema(BooleanParamType), input.definitions)
+private fun toSchema(input: JsonSchema): JsonSchema =
+    if (input.node.type == STRING) JsonSchema(paramTypeSchema(ParamType.StringParamType), input.definitions)
+    else if (input.node.type == TRUE) JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
+    else if (input.node.type == FALSE) JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
     else if (input.node.type == NUMBER) numberSchema(input)
     else if (input.node.type == ARRAY) arraySchema(input)
     else if (input.node.type == OBJECT) objectSchema(input)
@@ -30,19 +30,19 @@ private fun toSchema(input: Schema): Schema =
 
 private fun paramTypeSchema(paramType: ParamType): JsonNode = obj("type" to paramType.name.asJson())
 
-private fun numberSchema(input: Schema): Schema =
-    Schema(paramTypeSchema(if (input.node.text.contains(".")) ParamType.NumberParamType else ParamType.IntegerParamType), input.definitions)
+private fun numberSchema(input: JsonSchema): JsonSchema =
+    JsonSchema(paramTypeSchema(if (input.node.text.contains(".")) ParamType.NumberParamType else ParamType.IntegerParamType), input.definitions)
 
-private fun arraySchema(input: Schema): Schema {
-    val (node, definitions) = input.node.elements.getOrNull(0)?.let { toSchema(Schema(it, input.definitions)) } ?: throw
+private fun arraySchema(input: JsonSchema): JsonSchema {
+    val (node, definitions) = input.node.elements.getOrNull(0)?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
     IllegalSchemaException("Cannot use an empty list to generate a schema!")
-    return Schema(obj("type" to "array".asJson(), "items" to node), definitions)
+    return JsonSchema(obj("type" to "array".asJson(), "items" to node), definitions)
 }
 
-private fun objectSchema(input: Schema): Schema {
+private fun objectSchema(input: JsonSchema): JsonSchema {
     val (fields, subDefinitions) = input.node.fieldList.fold(listOf<Pair<String, JsonNode>>() to input.definitions, {
         (memoFields, memoDefinitions), nextField ->
-        val next = toSchema(Schema(nextField.value, memoDefinitions))
+        val next = toSchema(JsonSchema(nextField.value, memoDefinitions))
         memoFields.plus(nextField.name.text to next.node) to next.definitions
     })
 
@@ -50,7 +50,7 @@ private fun objectSchema(input: Schema): Schema {
     val newDefinition = obj("type" to "object".asJson(), "properties" to obj(fields))
     val definitionId = "object" + newDefinition.hashCode()
     val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
-    return Schema(obj("\$ref" to "#/definitions/$definitionId".asJson()), allDefinitions)
+    return JsonSchema(obj("\$ref" to "#/definitions/$definitionId".asJson()), allDefinitions)
 }
 
 
