@@ -40,28 +40,21 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
     }
 }
 
-abstract class ServerRoute(val pathBinder: PathBinder) {
+class ServerRoute<T>(val pathBinder: PathBinder,
+                     private val x: T,
+                     private val invoker: (T, ExtractedParts) -> HttpHandler) {
 
-    abstract fun match(basePath: BasePath): (Method, BasePath) -> HttpHandler?
+    fun match(rootPath: BasePath): (Method, BasePath) -> HttpHandler? =
+        {
+            actualMethod: Method, actualPath: BasePath ->
+            pathBinder.bob(actualMethod, rootPath, actualPath, x, invoker)
+        }
+
 
     fun describeFor(basePath: BasePath): String = (pathBinder.core.pathFn(basePath).toString()) + pathBinder.parts.map { it.toString() }.joinToString { "/" }
 }
 
-internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
+class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
-}
-
-class RouteBinder<in T> internal constructor(private val pathBinder: PathBinder,
-                                             private val invoker: (T, ExtractedParts) -> HttpHandler) {
-
-    fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder) {
-        override fun match(basePath: BasePath) =
-            {
-                actualMethod: Method, actualPath: BasePath ->
-                pathBinder.core.matches(actualMethod, basePath, actualPath).let {
-                    pathBinder.from(actualPath)?.let { invoker(fn, it) }
-                }
-            }
-    }
 }

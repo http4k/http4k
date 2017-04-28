@@ -11,7 +11,13 @@ abstract class PathBinder(val core: Core, vararg val parts: PathLens<*>) {
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun from(path: BasePath): ExtractedParts? = try {
+    internal fun <X> bob(actualMethod: Method, basePath: BasePath, actualPath: BasePath, fn: X, invoker: (X, ExtractedParts) -> HttpHandler): HttpHandler? {
+        return core.matches(actualMethod, basePath, actualPath).let {
+            from(actualPath)?.let { invoker(fn, it) }
+        }
+    }
+
+    private fun from(path: BasePath): ExtractedParts? = try {
         if (path.toList().size == parts.size) {
             ExtractedParts(mapOf(*parts.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
         } else {
@@ -35,16 +41,15 @@ class PathBinder0(core: Core) : PathBinder(core) {
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder1(core, next)
 
-    infix fun bind(fn: HttpHandler): ServerRoute = RouteBinder<() -> HttpHandler>(this, { fn, _ -> fn() }).bind({ fn })
-}
+    infix fun bind(fn: HttpHandler): ServerRoute<*> =
+        ServerRoute(this, fn, { fn, _ -> fn }) }
 
 class PathBinder1<out A>(core: Core,
                          private val psA: PathLens<A>) : PathBinder(core, psA) {
 
     override infix operator fun <T> div(next: PathLens<T>) = PathBinder2(core, psA, next)
 
-    infix fun bind(fn: (A) -> HttpHandler): ServerRoute =
-        RouteBinder<(A) -> HttpHandler>(this, { fn, parts -> fn(parts[psA]) }).bind(fn)
+    infix fun bind(fn: (A) -> HttpHandler): ServerRoute<*> = ServerRoute(this, fn, { fn, parts -> fn(parts[psA]) })
 }
 
 class PathBinder2<out A, out B>(core: Core,
@@ -52,8 +57,7 @@ class PathBinder2<out A, out B>(core: Core,
                                 private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
     override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
 
-    infix fun bind(fn: (A, B) -> HttpHandler): ServerRoute =
-        RouteBinder<(A, B) -> HttpHandler>(this, { fn, parts -> fn(parts[psA], parts[psB]) }).bind(fn)
+    infix fun bind(fn: (A, B) -> HttpHandler): ServerRoute<*> = ServerRoute(this, fn, { fn, parts -> fn(parts[psA], parts[psB]) })
 }
 //
 //class PathBinder3<out A, out B, out C>(override val route: Route, override val pathFn: (BasePath) -> BasePath,
