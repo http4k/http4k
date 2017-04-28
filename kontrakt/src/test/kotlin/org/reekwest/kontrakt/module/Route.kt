@@ -65,10 +65,10 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
 }
 
 class ServerRoute<T>(val pathBinder: PathBinder,
-                     private val x: T,
+                     private val t: T,
                      private val invoker: (T, ExtractedParts) -> HttpHandler) {
 
-    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath, x, invoker) }
+    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath, { invoker(t, it)}) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }

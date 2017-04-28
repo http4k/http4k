@@ -12,9 +12,9 @@ abstract class PathBinder(val core: Core, vararg val pathLenses: PathLens<*>) {
 
     open infix operator fun div(next: String): PathBinder = div(Path.fixed(next))
 
-    internal fun <T> match(request: Request, basePath: BasePath, input: T, invoker: (T, ExtractedParts) -> HttpHandler): HttpHandler? {
+    internal fun match(request: Request, basePath: BasePath, invoker: (ExtractedParts) -> HttpHandler): HttpHandler? {
         val actualPath = BasePath(request.uri.path)
-        return core.matches(request.method, basePath, actualPath).let { from(actualPath)?.let { invoker(input, it) } }
+        return core.matches(request.method, basePath, actualPath).let { from(actualPath)?.let { invoker(it) } }
     }
 
     fun describe(basePath: BasePath) = (core.pathFn(basePath).toString()) + pathLenses.map { it.toString() }.joinToString { "/" }
