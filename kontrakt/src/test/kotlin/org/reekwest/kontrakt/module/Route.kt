@@ -12,6 +12,7 @@ import org.reekwest.kontrakt.HeaderLens
 import org.reekwest.kontrakt.Lens
 import org.reekwest.kontrakt.PathLens
 import org.reekwest.kontrakt.QueryLens
+import org.reekwest.kontrakt.module.PathBinder.Companion.Core
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
@@ -27,8 +28,7 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
     fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
     fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))
 
-    infix operator fun div(next: String): PathBinder0 = PathBinder0(this, { Root / next })
-    infix operator fun <T> div(next: Lens<String, T>) = PathBinder0(this, { Root }) / next
+    infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { Root }))
 
     companion object {
         private data class Core(val name: String,
@@ -41,11 +41,11 @@ class Route private constructor(private val core: Core) : Iterable<Lens<Request,
     }
 }
 
-abstract class ServerRoute(val pathBuilder: PathBinder, val method: Method, vararg val pathParams: Lens<String, *>) {
+abstract class ServerRoute(val pathBinder: PathBinder, vararg val pathParams: Lens<String, *>) {
 
     abstract fun match(basePath: BasePath): (Method, BasePath) -> HttpHandler?
 
-    fun describeFor(basePath: BasePath): String = (pathBuilder.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
+    fun describeFor(basePath: BasePath): String = (pathBinder.core.pathFn(basePath).toString()) + pathParams.map { it.toString() }.joinToString { "/" }
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
@@ -54,17 +54,14 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 }
 
 class RouteBinder<in T> internal constructor(private val pathBinder: PathBinder,
-                                             private val method: Method,
                                              private val invoker: (T, ExtractedParts) -> HttpHandler,
                                              private vararg val pathLenses: PathLens<*>) {
 
-    private fun matches(actualMethod: Method, basePath: BasePath, actualPath: BasePath) = actualMethod == method && actualPath == pathBinder.pathFn(basePath)
-
-    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder, method) {
+    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder) {
         override fun match(basePath: BasePath) =
             {
                 actualMethod: Method, actualPath: BasePath ->
-                matches(actualMethod, basePath, actualPath)?.let {
+                pathBinder.core.matches(actualMethod, basePath, actualPath).let {
                     from(actualPath)?.let { invoker(fn, it) }
                 }
             }
