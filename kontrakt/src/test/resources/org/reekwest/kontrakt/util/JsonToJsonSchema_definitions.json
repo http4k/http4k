@@ -1,0 +1,44 @@
+{
+  "object-1377408998": {
+    "type": "object",
+    "properties": {
+      "anObject": {
+        "$ref": "#/definitions/object-1591148529"
+      },
+      "anArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/object1566645919"
+        }
+      },
+      "aBooleanFalse": {
+        "type": "boolean"
+      },
+      "aBooleanTrue": {
+        "type": "boolean"
+      },
+      "aNumber": {
+        "type": "number"
+      },
+      "aString": {
+        "type": "string"
+      }
+    }
+  },
+  "object-1591148529": {
+    "type": "object",
+    "properties": {
+      "anInteger": {
+        "type": "integer"
+      }
+    }
+  },
+  "object1566645919": {
+    "type": "object",
+    "properties": {
+      "anotherString": {
+        "type": "string"
+      }
+    }
+  }
+}
