@@ -12,8 +12,8 @@ Features:
  * Uses the same abstractions for client and server usage
  * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
  * Can be plugged to different libraries and containers. Current implementation includes:
-   * Client: [ApacheHttpClient](#using-as-a-client)
-   * Server: [Jetty](#using-as-a-server)
+   * [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-client-apache/_latestVersion) Client: [ApacheHttpClient](#using-as-a-client) 
+   * [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-server-jetty/_latestVersion) Server: [Jetty](#using-as-a-server)
  * No 3rd party dependency required to start
 
 ## Getting started
