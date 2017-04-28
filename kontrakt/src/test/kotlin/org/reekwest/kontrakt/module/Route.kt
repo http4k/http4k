@@ -7,7 +7,6 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Status
 import org.reekwest.kontrakt.BodyLens
-import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.HeaderLens
 import org.reekwest.kontrakt.Lens
 import org.reekwest.kontrakt.PathLens
@@ -54,26 +53,15 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 }
 
 class RouteBinder<in T> internal constructor(private val pathBinder: PathBinder,
-                                             private val invoker: (T, ExtractedParts) -> HttpHandler,
-                                             private vararg val pathLenses: PathLens<*>) {
+                                             private val invoker: (T, ExtractedParts) -> HttpHandler) {
 
-    infix fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder) {
+    fun bind(fn: T): ServerRoute = object : ServerRoute(pathBinder) {
         override fun match(basePath: BasePath) =
             {
                 actualMethod: Method, actualPath: BasePath ->
                 pathBinder.core.matches(actualMethod, basePath, actualPath).let {
-                    from(actualPath)?.let { invoker(fn, it) }
+                    pathBinder.from(actualPath)?.let { invoker(fn, it) }
                 }
             }
-    }
-
-    private fun from(path: BasePath) = try {
-        if (path.toList().size == pathLenses.size) {
-            ExtractedParts(mapOf(*pathLenses.mapIndexed { index, lens -> lens to path(index, lens) }.toTypedArray()))
-        } else {
-            null
-        }
-    } catch (e: ContractBreach) {
-        null
     }
 }
