@@ -7,10 +7,9 @@ import org.reekwest.kontrakt.ContractBreach
 import org.reekwest.kontrakt.Path
 import org.reekwest.kontrakt.PathLens
 
-class ServerRoute(val pathBinder: PathBinder,
-                  private val invoker: (ExtractedParts) -> HttpHandler) {
+class ServerRoute(val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath)?.let { invoker(it) } }
+    fun router(rootPath: BasePath): Router = { pathBinder.match(it, rootPath)?.let(toHandler) }
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
 }
