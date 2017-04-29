@@ -19,7 +19,6 @@ object BiDiLensContract {
     },
         Set.Companion { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
-
     fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(valueAsString), equalTo(tValue))
@@ -46,5 +45,3 @@ object BiDiLensContract {
         assertThat(requiredMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
     }
 }
-
-data class MyCustomBodyType(val value: String)
