@@ -1,5 +1,7 @@
 package org.reekwest.http.templates
 
+typealias TemplateRenderer = (View) -> String
+
 /**
  * Supported template implementations for templating engine implementations
  */
@@ -8,7 +10,7 @@ interface Templates {
     /**
      * Loads and caches templates from the compiled classpath
      *
-     * @param baseClasspathPackage the root package to load from (funaults to
+     * @param baseClasspathPackage the root package to load from (defaults to root)
      */
     fun CachingClasspath(baseClasspathPackage: String = ""): TemplateRenderer
 

@@ -1,15 +1,15 @@
 package org.reekwest.http.templates
 
 object NonExistent : View {
-    override val template = "bibble"
+    override fun template() = "bibble"
 }
 
 data class OnClasspath(val items: List<Item>) : View {
-    override val template = javaClass.name.replace('.', '/')
+    override fun template() = javaClass.name.replace('.', '/')
 }
 
 data class AtRoot(val items: List<Item>) : View {
-    override val template = "AtRootBob"
+    override fun template() = "AtRootBob"
 }
 
 data class Feature(val description: String)

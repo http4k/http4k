@@ -14,10 +14,10 @@ object HandlebarsTemplates : Templates {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
         private val handlebars = Handlebars(ClassPathTemplateLoader(baseClasspathPackage))
 
-        override fun toBody(view: View) =
+        override fun invoke(view: View) =
             safeRender {
                 view ->
-                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template) }).apply(view)
+                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template()) }).apply(view)
             }(view)
     }
 
@@ -25,20 +25,20 @@ object HandlebarsTemplates : Templates {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
         private val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
 
-        override fun toBody(view: View) =
+        override fun invoke(view: View) =
             safeRender {
                 view ->
-                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template) }).apply(view)
+                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template()) }).apply(view)
             }(view)
 
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
         val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
-        override fun toBody(view: View): String =
+        override fun invoke(view: View): String =
             safeRender {
                 view ->
-                handlebars.compile(view.template).apply(view)
+                handlebars.compile(view.template()).apply(view)
             }(view)
     }
 

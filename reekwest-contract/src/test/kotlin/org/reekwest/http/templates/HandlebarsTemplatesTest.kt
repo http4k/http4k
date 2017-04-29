@@ -40,14 +40,14 @@ class HandlebarsTemplatesTest {
     }
 
     private fun checkOnClasspath(renderer: TemplateRenderer) {
-        assertThat(renderer.toBody(OnClasspath(items)), equalTo("Name:item1Price:£1Feature:prettyName:item2Price:£3Feature:nasty"))
+        assertThat(renderer(OnClasspath(items)), equalTo("Name:item1Price:£1Feature:prettyName:item2Price:£3Feature:nasty"))
     }
 
     private fun checkAtRoot(renderer: TemplateRenderer) {
-        assertThat(renderer.toBody(AtRoot(items)), equalTo("AtRootName:item1Price:£1Feature:prettyAtRootName:item2Price:£3Feature:nasty"))
+        assertThat(renderer(AtRoot(items)), equalTo("AtRootName:item1Price:£1Feature:prettyAtRootName:item2Price:£3Feature:nasty"))
     }
 
     private fun checkNonExistent(renderer: TemplateRenderer) {
-        assertThat({ renderer.toBody(NonExistent) } , throws(equalTo(ViewNotFound(NonExistent))))
+        assertThat({ renderer(NonExistent) } , throws(equalTo(ViewNotFound(NonExistent))))
     }
 }
