@@ -11,24 +11,12 @@ Features:
  * Immutable Request/Response
  * Uses the same abstractions for client and server usage
  * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
- * Can be plugged to different libraries and containers. Current implementation includes:
-   * [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-client-apache/_latestVersion) Client: [ApacheHttpClient](#using-as-a-client) 
-   * [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-server-jetty/_latestVersion) Server: [Jetty](#using-as-a-server)
+ * Modular design so can be plugged to different libraries and containers. Current implementation includes:
+   * Client: [ApacheHttpClient](#using-as-a-client) 
+   * Server: [Jetty](#using-as-a-server)
+   * JSON: [Argo](#json)
+   * Templating: [Handlebars](#templating)
  * No 3rd party dependency required to start
-
-## Installation
-
-Core: ```compile 'org.reekwest:reekwest:0.0.25'```
-
-Apache client: ```compile 'org.reekwest:reekwest-client-apache:0.0.25'```
-
-Contracts: ```compile 'org.reekwest:reekwest-contract:0.0.25'```
-
-Argo JSON: ```compile 'org.reekwest:reekwest-formats-argo:0.0.25'```
-
-Handlebars: ```compile 'org.reekwest:reekwest-templates-handlebars:0.0.25'```
-
-Jetty Server: ```compile 'org.reekwest:reekwest-server-jetty:0.0.25'```
 
 ## Getting started
 
@@ -100,3 +88,25 @@ Creates `curl` command for a given request:
 val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
+
+## JSON
+
+coming soon...
+
+## Templating
+
+coming soon...
+
+## Installation
+
+Core: ```compile 'org.reekwest:reekwest:0.0.25'```
+
+Apache Client: ```compile 'org.reekwest:reekwest-client-apache:0.0.25'```
+
+Contracts: ```compile 'org.reekwest:reekwest-contract:0.0.25'```
+
+Argo JSON: ```compile 'org.reekwest:reekwest-formats-argo:0.0.25'```
+
+Handlebars: ```compile 'org.reekwest:reekwest-templates-handlebars:0.0.25'```
+
+Jetty Server: ```compile 'org.reekwest:reekwest-server-jetty:0.0.25'```
