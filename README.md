@@ -16,6 +16,20 @@ Features:
    * [![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-server-jetty/_latestVersion) Server: [Jetty](#using-as-a-server)
  * No 3rd party dependency required to start
 
+## Installation
+
+Core: ```compile 'org.reekwest:reekwest:0.0.25'```
+
+Apache client: ```compile 'org.reekwest:reekwest-client-apache:0.0.25'```
+
+Contracts: ```compile 'org.reekwest:reekwest-contract:0.0.25'```
+
+Argo JSON: ```compile 'org.reekwest:reekwest-formats-argo:0.0.25'```
+
+Handlebars: ```compile 'org.reekwest:reekwest-templates-handlebars:0.0.25'```
+
+Jetty Server: ```compile 'org.reekwest:reekwest-server-jetty:0.0.25'```
+
 ## Getting started
 
 Here's how to create and use a basic HTTP handling function:
