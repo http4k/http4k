@@ -12,8 +12,6 @@ import argo.jdom.JsonNodeFactories.nullNode
 import argo.jdom.JsonNodeFactories.number
 import argo.jdom.JsonNodeFactories.string
 import argo.jdom.JsonRootNode
-import org.reekwest.http.lens.BiDiLensSpec
-import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -35,8 +33,6 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun JsonRootNode.asPrettyJsonString() = pretty.format(this)
     override fun JsonRootNode.asCompactJsonString() = compact.format(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject() = `object`(this.map { field(it.first, it.second) })
-    override fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map(Argo::parse, Argo::compact)
-    override fun Body.json() = string.map(Argo::parse, Argo::compact)
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }
