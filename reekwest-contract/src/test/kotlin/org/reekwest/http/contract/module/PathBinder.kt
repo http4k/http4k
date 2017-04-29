@@ -30,7 +30,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
             } else null
         }
 
-    fun describe(basePath: BasePath) = "/${core.pathFn(basePath)}${pathLenses.joinToString("/")}"
+    fun describe(basePath: BasePath) = "${core.pathFn(basePath)}/${pathLenses.joinToString("/")}"
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {

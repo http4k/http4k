@@ -130,5 +130,12 @@ allprojects {
 
 dependencies {
     provided kotlin_lib
+
+    compile project(":reekwest")
+    compile project(":reekwest-client-apache")
+    compile project(":reekwest-contract")
+    compile project(":reekwest-formats-argo")
+    compile project(":reekwest-server-jetty")
+    compile project(":reekwest-templates-handlebars")
 }
 
