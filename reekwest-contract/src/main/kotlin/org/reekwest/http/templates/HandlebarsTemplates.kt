@@ -14,35 +14,32 @@ object HandlebarsTemplates : Templates {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
         private val handlebars = Handlebars(ClassPathTemplateLoader(baseClasspathPackage))
 
-        override fun invoke(view: View) =
+        override fun invoke(viewModel: ViewModel) =
             safeRender {
-                view ->
-                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template()) }).apply(view)
-            }(view)
+                classToTemplate.getOrPut(it.javaClass, { handlebars.compile(it.template()) }).apply(it)
+            }(viewModel)
     }
 
     override fun Caching(baseTemplateDir: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
         private val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
 
-        override fun invoke(view: View) =
+        override fun invoke(viewModel: ViewModel) =
             safeRender {
-                view ->
-                classToTemplate.getOrPut(view.javaClass, { handlebars.compile(view.template()) }).apply(view)
-            }(view)
+                classToTemplate.getOrPut(it.javaClass, { handlebars.compile(it.template()) }).apply(it)
+            }(viewModel)
 
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
         val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
-        override fun invoke(view: View): String =
+        override fun invoke(viewModel: ViewModel): String =
             safeRender {
-                view ->
-                handlebars.compile(view.template()).apply(view)
-            }(view)
+                handlebars.compile(it.template()).apply(it)
+            }(viewModel)
     }
 
-    private fun safeRender(fn: (View) -> String): (View) -> String = {
+    private fun safeRender(fn: (ViewModel) -> String): (ViewModel) -> String = {
         try {
             fn(it)
         } catch (e: FileNotFoundException) {

@@ -1,14 +1,14 @@
 package org.reekwest.http.templates
 
-object NonExistent : View {
+object NonExistent : ViewModel {
     override fun template() = "bibble"
 }
 
-data class OnClasspath(val items: List<Item>) : View {
+data class OnClasspath(val items: List<Item>) : ViewModel {
     override fun template() = javaClass.name.replace('.', '/')
 }
 
-data class AtRoot(val items: List<Item>) : View {
+data class AtRoot(val items: List<Item>) : ViewModel {
     override fun template() = "AtRootBob"
 }
 

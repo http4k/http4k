@@ -1,6 +1,6 @@
 package org.reekwest.http.templates
 
-typealias TemplateRenderer = (View) -> String
+typealias TemplateRenderer = (ViewModel) -> String
 
 /**
  * Supported template implementations for templating engine implementations
