@@ -1,5 +1,13 @@
 package example
 
+import org.reekwest.http.contract.Path
+import org.reekwest.http.contract.Query
+import org.reekwest.http.contract.int
+import org.reekwest.http.contract.module.ApiKey
+import org.reekwest.http.contract.module.Root
+import org.reekwest.http.contract.module.Route
+import org.reekwest.http.contract.module.RouteModule
+import org.reekwest.http.contract.module.SimpleJson
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request

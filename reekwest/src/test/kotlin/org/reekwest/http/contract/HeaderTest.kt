@@ -16,7 +16,7 @@ import org.reekwest.http.core.Uri.Companion.uri
 class HeaderTest {
     private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
 
-    @Test
+    @org.junit.Test
     fun `value present`() {
         assertThat(Header.optional("hello")(request), equalTo("world"))
         assertThat(Header.required("hello")(request), equalTo("world"))

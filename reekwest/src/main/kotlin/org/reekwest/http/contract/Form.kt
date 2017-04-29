@@ -64,11 +64,11 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 }
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
-    Get { _, target ->
+    Get.Companion { _, target ->
         if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(CONTENT_TYPE.invalid())
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
-    Set { _, values, target: HttpMessage ->
+    Set.Companion { _, values, target: HttpMessage ->
         values.fold(target, { memo, (fields) ->
             memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
         }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
