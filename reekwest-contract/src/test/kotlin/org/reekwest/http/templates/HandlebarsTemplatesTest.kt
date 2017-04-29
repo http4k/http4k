@@ -4,9 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.templates.HandlebarsTemplates.Caching
-import org.reekwest.http.templates.HandlebarsTemplates.CachingClasspath
-import org.reekwest.http.templates.HandlebarsTemplates.HotReload
 
 
 class HandlebarsTemplatesTest {
@@ -17,7 +14,7 @@ class HandlebarsTemplatesTest {
 
     @Test
     fun `caching classpath`() {
-        val renderer = CachingClasspath()
+        val renderer = HandlebarsTemplates().CachingClasspath()
         checkOnClasspath(renderer)
         checkAtRoot(renderer)
         checkNonExistent(renderer)
@@ -25,7 +22,7 @@ class HandlebarsTemplatesTest {
 
     @Test
     fun `caching file-based`() {
-        val renderer = Caching("src/test/resources")
+        val renderer = HandlebarsTemplates().Caching("src/test/resources")
         checkOnClasspath(renderer)
         checkAtRoot(renderer)
         checkNonExistent(renderer)
@@ -33,7 +30,7 @@ class HandlebarsTemplatesTest {
 
     @Test
     fun `hot reload`() {
-        val renderer = HotReload("src/test/resources")
+        val renderer = HandlebarsTemplates().HotReload("src/test/resources")
         checkOnClasspath(renderer)
         checkAtRoot(renderer)
         checkNonExistent(renderer)

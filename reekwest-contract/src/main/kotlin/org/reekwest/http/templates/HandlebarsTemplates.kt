@@ -8,11 +8,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap
 
-
-object HandlebarsTemplates : Templates {
+/**
+ * Handlebars templating support. Use the function in the constructor to configure the instance.
+ */
+class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { it }) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
-        private val handlebars = Handlebars(ClassPathTemplateLoader(baseClasspathPackage))
+        private val handlebars = configure(Handlebars(ClassPathTemplateLoader(baseClasspathPackage)))
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
@@ -22,7 +24,7 @@ object HandlebarsTemplates : Templates {
 
     override fun Caching(baseTemplateDir: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
-        private val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
+        private val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
@@ -32,7 +34,7 @@ object HandlebarsTemplates : Templates {
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
-        val handlebars = Handlebars(FileTemplateLoader(File(baseTemplateDir)))
+        val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
         override fun invoke(viewModel: ViewModel): String =
             safeRender {
                 handlebars.compile(it.template()).apply(it)
