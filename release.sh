@@ -21,4 +21,4 @@ upgrade `./tools/jq .reekwest.old version.json` $NEW_VERSION
     :reekwest-templates-handlebars:bintrayUpload \
     :reekwest-formats-argo:bintrayUpload
 
-echo ** Remember to commit the updated README.md file **
+echo Remember to commit the updated README.md file!!
