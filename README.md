@@ -101,14 +101,15 @@ coming soon...
 
 Add one or more of these module dependencies:
 
-Core: ```compile 'org.reekwest:reekwest:0.0.25'```
 
-Apache Client: ```compile 'org.reekwest:reekwest-client-apache:0.0.25'```
+Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.25"```
 
-Contracts: ```compile 'org.reekwest:reekwest-contract:0.0.25'```
+Apache Client: ```compile 'org.reekwest:reekwest-client-apache:26'compile group: "org.reekwest", name: "reekwest", version: "0.0.25"```
 
-Argo JSON: ```compile 'org.reekwest:reekwest-formats-argo:0.0.25'```
+Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.25"```
 
-Handlebars: ```compile 'org.reekwest:reekwest-templates-handlebars:0.0.25'```
+Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.25"```
 
-Jetty Server: ```compile 'org.reekwest:reekwest-server-jetty:0.0.25'```
+Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.25"'```
+
+Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.25"'```
