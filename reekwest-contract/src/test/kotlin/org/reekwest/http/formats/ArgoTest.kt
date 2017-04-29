@@ -1,19 +1,20 @@
-package org.reekwest.http.contract.formats
+package org.reekwest.http.formats
 
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.BiDiLensContract
+import org.reekwest.http.contract.BiDiLensContract.checkContract
 import org.reekwest.http.contract.BiDiLensContract.spec
-import org.reekwest.http.contract.formats.Argo.asCompact
-import org.reekwest.http.contract.formats.Argo.asJson
-import org.reekwest.http.contract.formats.Argo.asJsonArray
-import org.reekwest.http.contract.formats.Argo.fromJson
-import org.reekwest.http.contract.formats.Argo.json
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
+import org.reekwest.http.formats.Argo.asCompactJsonString
+import org.reekwest.http.formats.Argo.asJson
+import org.reekwest.http.formats.Argo.asJsonArray
+import org.reekwest.http.formats.Argo.asJsonObject
+import org.reekwest.http.formats.Argo.fromJsonString
+import org.reekwest.http.formats.Argo.json
 import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -36,16 +37,16 @@ class ArgoTest {
                 "".asJson(),
                 123.asJson()
             ).asJsonArray()
-        ).asJson()
+        ).asJsonObject()
         val expected = """{"string":"value","double":1,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"array":["",123]}"""
-        assertThat(input.asCompact(), equalTo(expected))
+        assertThat(input.asCompactJsonString(), equalTo(expected))
     }
 
     @Test
     fun `can write and read body as Json`() {
         val body = Body.json().required()
 
-        val obj = listOf("hello" to "world".asJson()).asJson()
+        val obj = listOf("hello" to "world".asJson()).asJsonObject()
 
         val request = get("/bob")
 
@@ -58,12 +59,12 @@ class ArgoTest {
 
     @Test
     fun `can write and read query as Json`() {
-        BiDiLensContract.checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
+        checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
     }
 
     @Test
     fun `invalid Json blows up parse`() {
-        assertThat({ "".fromJson() }, throws(anything))
+        assertThat({ "".fromJsonString() }, throws(anything))
     }
 
 }
