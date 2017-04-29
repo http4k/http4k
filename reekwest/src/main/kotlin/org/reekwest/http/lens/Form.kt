@@ -1,13 +1,5 @@
-package org.reekwest.http.contract
+package org.reekwest.http.lens
 
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
-import org.reekwest.http.contract.lens.BiDiLensSpec
-import org.reekwest.http.contract.lens.Failure
-import org.reekwest.http.contract.lens.Get
-import org.reekwest.http.contract.lens.Lens
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.Set
-import org.reekwest.http.contract.lens.invalid
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
@@ -15,7 +7,8 @@ import org.reekwest.http.core.copy
 import org.reekwest.http.core.toBody
 import org.reekwest.http.core.toUrlEncoded
 import org.reekwest.http.core.with
-import java.net.URLDecoder
+import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
+import java.net.URLDecoder.decode
 
 typealias FormFields = Map<String, List<String>>
 
@@ -64,14 +57,14 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
 }
 
 private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
-    Get.Companion { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(CONTENT_TYPE.invalid())
+    Get { _, target ->
+        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(Header.Common.CONTENT_TYPE.invalid())
         listOf(WebForm(formParametersFrom(target), emptyList()))
     },
-    Set.Companion { _, values, target: HttpMessage ->
+    Set { _, values, target: HttpMessage ->
         values.fold(target, { memo, (fields) ->
             memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
-        }).with(CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
+        }).with(Header.Common.CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
     }
 )
 
@@ -80,7 +73,7 @@ private fun formParametersFrom(target: HttpMessage): Map<String, List<String>> {
         .split("&")
         .filter { it.contains("=") }
         .map { it.split("=") }
-        .map { URLDecoder.decode(it[0], "UTF-8") to if (it.size > 1) URLDecoder.decode(it[1], "UTF-8") else "" }
+        .map { decode(it[0], "UTF-8") to if (it.size > 1) decode(it[1], "UTF-8") else "" }
         .groupBy { it.first }
         .mapValues { it.value.map { it.second } }
 }

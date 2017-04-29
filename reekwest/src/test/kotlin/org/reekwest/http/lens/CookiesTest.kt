@@ -1,13 +1,10 @@
-package org.reekwest.http.contract
+package org.reekwest.http.lens
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.invalid
-import org.reekwest.http.contract.lens.missing
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get

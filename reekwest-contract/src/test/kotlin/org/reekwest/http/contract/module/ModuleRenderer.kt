@@ -1,11 +1,11 @@
 package org.reekwest.http.contract.module
 
-import org.reekwest.http.contract.lens.Failure
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.bodyString
+import org.reekwest.http.lens.Failure
 
 interface ModuleRenderer {
     fun notFound(): Response

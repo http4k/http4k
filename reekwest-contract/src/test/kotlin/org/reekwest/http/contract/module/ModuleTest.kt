@@ -3,7 +3,6 @@ package org.reekwest.http.contract.module
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.contract.lens.LensFailure
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
@@ -11,6 +10,7 @@ import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.http.lens.LensFailure
 
 class ModuleTest {
 

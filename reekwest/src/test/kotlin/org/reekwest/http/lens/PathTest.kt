@@ -1,11 +1,9 @@
-package org.reekwest.http.contract
+package org.reekwest.http.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.invalid
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

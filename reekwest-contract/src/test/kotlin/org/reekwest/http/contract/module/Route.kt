@@ -1,11 +1,5 @@
 package org.reekwest.http.contract.module
 
-import org.reekwest.http.contract.BodyLens
-import org.reekwest.http.contract.HeaderLens
-import org.reekwest.http.contract.QueryLens
-import org.reekwest.http.contract.lens.Failure
-import org.reekwest.http.contract.lens.Lens
-import org.reekwest.http.contract.lens.LensFailure
 import org.reekwest.http.contract.module.PathBinder.Companion.Core
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Filter
@@ -13,6 +7,12 @@ import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Status
+import org.reekwest.http.lens.BodyLens
+import org.reekwest.http.lens.Failure
+import org.reekwest.http.lens.HeaderLens
+import org.reekwest.http.lens.Lens
+import org.reekwest.http.lens.LensFailure
+import org.reekwest.http.lens.QueryLens
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
@@ -47,8 +47,8 @@ class Route private constructor(private val core: Core) {
         private data class Core(val name: String,
                                 val description: String?,
                                 val body: BodyLens<*>?,
-                                val produces: kotlin.collections.Set<ContentType> = emptySet(),
-                                val consumes: kotlin.collections.Set<ContentType> = emptySet(),
+                                val produces: Set<ContentType> = emptySet(),
+                                val consumes: Set<ContentType> = emptySet(),
                                 val requestParams: List<Lens<Request, *>> = emptyList(),
                                 val responses: List<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
 

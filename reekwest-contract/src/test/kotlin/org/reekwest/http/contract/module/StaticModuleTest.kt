@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_XML
 import org.reekwest.http.core.Filter
@@ -13,6 +12,7 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.ResourceLoader.Companion.Classpath
 import org.reekwest.http.core.Status.Companion.EXPECTATION_FAILED
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
 
 class StaticModuleTest {
 

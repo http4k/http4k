@@ -7,7 +7,6 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.contract.BiDiLensContract
 import org.reekwest.http.contract.BiDiLensContract.spec
-import org.reekwest.http.contract.Body
 import org.reekwest.http.contract.formats.Argo.asCompact
 import org.reekwest.http.contract.formats.Argo.asJson
 import org.reekwest.http.contract.formats.Argo.asJsonArray
@@ -15,6 +14,7 @@ import org.reekwest.http.contract.formats.Argo.fromJson
 import org.reekwest.http.contract.formats.Argo.json
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
+import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
 

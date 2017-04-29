@@ -5,12 +5,12 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.reekwest.http.contract.lens.BiDiLensSpec
-import org.reekwest.http.contract.lens.Get
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.Set
-import org.reekwest.http.contract.lens.invalid
-import org.reekwest.http.contract.lens.missing
+import org.reekwest.http.lens.BiDiLensSpec
+import org.reekwest.http.lens.Get
+import org.reekwest.http.lens.LensFailure
+import org.reekwest.http.lens.Set
+import org.reekwest.http.lens.invalid
+import org.reekwest.http.lens.missing
 
 object BiDiLensContract {
 

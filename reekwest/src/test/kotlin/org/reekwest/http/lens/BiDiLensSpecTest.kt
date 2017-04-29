@@ -1,16 +1,7 @@
-package org.reekwest.http.contract.lens
+package org.reekwest.http.lens
 
 import org.junit.Test
-import org.reekwest.http.contract.BiDiLensContract.checkContract
-import org.reekwest.http.contract.boolean
-import org.reekwest.http.contract.dateTime
-import org.reekwest.http.contract.double
-import org.reekwest.http.contract.float
-import org.reekwest.http.contract.int
-import org.reekwest.http.contract.localDate
-import org.reekwest.http.contract.long
-import org.reekwest.http.contract.uuid
-import org.reekwest.http.contract.zonedDateTime
+import org.reekwest.http.lens.BiDiLensContract.checkContract
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

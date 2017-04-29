@@ -1,8 +1,8 @@
 package org.reekwest.http.contract.formats
 
-import org.reekwest.http.contract.BiDiBodySpec
-import org.reekwest.http.contract.Body
-import org.reekwest.http.contract.lens.BiDiLensSpec
+import org.reekwest.http.lens.BiDiBodySpec
+import org.reekwest.http.lens.BiDiLensSpec
+import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer

@@ -1,11 +1,11 @@
 package org.reekwest.http.contract.module
 
-import org.reekwest.http.contract.lens.Lens
-import org.reekwest.http.contract.lens.LensFailure
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.UNAUTHORIZED
+import org.reekwest.http.lens.Lens
+import org.reekwest.http.lens.LensFailure
 
 
 /**

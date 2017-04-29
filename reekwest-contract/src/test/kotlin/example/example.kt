@@ -1,8 +1,5 @@
 package example
 
-import org.reekwest.http.contract.Path
-import org.reekwest.http.contract.Query
-import org.reekwest.http.contract.int
 import org.reekwest.http.contract.module.ApiKey
 import org.reekwest.http.contract.module.Root
 import org.reekwest.http.contract.module.Route
@@ -14,6 +11,9 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Uri.Companion.uri
+import org.reekwest.http.lens.Path
+import org.reekwest.http.lens.Query
+import org.reekwest.http.lens.int
 
 fun main(args: Array<String>) {
 

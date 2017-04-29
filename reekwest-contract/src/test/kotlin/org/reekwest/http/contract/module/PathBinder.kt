@@ -1,12 +1,12 @@
 package org.reekwest.http.contract.module
 
-import org.reekwest.http.contract.Path
-import org.reekwest.http.contract.PathLens
-import org.reekwest.http.contract.lens.LensFailure
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
+import org.reekwest.http.lens.LensFailure
+import org.reekwest.http.lens.Path
+import org.reekwest.http.lens.PathLens
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)

@@ -1,16 +1,10 @@
-package org.reekwest.http.contract
+package org.reekwest.http.lens
 
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.reekwest.http.contract.lens.BiDiLensSpec
-import org.reekwest.http.contract.lens.Get
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.Set
-import org.reekwest.http.contract.lens.invalid
-import org.reekwest.http.contract.lens.missing
 
 object BiDiLensContract {
 

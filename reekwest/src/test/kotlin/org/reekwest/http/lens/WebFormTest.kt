@@ -1,19 +1,16 @@
-package org.reekwest.http.contract
+package org.reekwest.http.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.Header.Common.CONTENT_TYPE
-import org.reekwest.http.contract.lens.Invalid
-import org.reekwest.http.contract.lens.LensFailure
-import org.reekwest.http.contract.lens.Missing
-import org.reekwest.http.contract.lens.invalid
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.toBody
 import org.reekwest.http.core.with
+import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
+import org.reekwest.http.lens.WebForm
 
 class WebFormTest {
 
