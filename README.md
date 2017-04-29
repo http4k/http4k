@@ -104,7 +104,7 @@ Add one or more of these module dependencies:
 
 Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.25"```
 
-Apache Client: ```compile 'org.reekwest:reekwest-client-apache:26'compile group: "org.reekwest", name: "reekwest", version: "0.0.25"```
+Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.25"```
 
 Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.25"```
 
