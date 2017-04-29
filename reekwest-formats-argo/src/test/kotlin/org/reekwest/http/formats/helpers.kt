@@ -1,4 +1,4 @@
-package org.reekwest.http.contract
+package org.reekwest.http.formats
 
 
 import com.natpryce.hamkrest.absent

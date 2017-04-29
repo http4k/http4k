@@ -1,2 +1,7 @@
 rootProject.name = 'all'
-include 'reekwest', 'reekwest-server-jetty', 'reekwest-client-apache', 'reekwest-contract', 'reekwest-templates-handlebars'
+include 'reekwest'
+include 'reekwest-client-apache'
+include 'reekwest-contract'
+include 'reekwest-formats-argo'
+include 'reekwest-server-jetty'
+include 'reekwest-templates-handlebars'

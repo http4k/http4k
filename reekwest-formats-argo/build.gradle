@@ -1,12 +1,11 @@
-description = 'Typesafe HTTP contracts for Reekwest'
+description = 'Reekwest Argo JSON support'
 
 dependencies {
     provided kotlin_lib
 
     compile project(":reekwest")
-    compile project(":reekwest-formats-argo")
+    compile "net.sourceforge.argo:argo:3.40"
 
     testCompile testing
 }
-
 

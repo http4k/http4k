@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
-import org.reekwest.http.contract.BiDiLensContract.checkContract
-import org.reekwest.http.contract.BiDiLensContract.spec
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Argo.asCompactJsonString
@@ -15,6 +13,8 @@ import org.reekwest.http.formats.Argo.asJsonArray
 import org.reekwest.http.formats.Argo.asJsonObject
 import org.reekwest.http.formats.Argo.fromJsonString
 import org.reekwest.http.formats.Argo.json
+import org.reekwest.http.formats.BiDiLensContract.checkContract
+import org.reekwest.http.formats.BiDiLensContract.spec
 import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
