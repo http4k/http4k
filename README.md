@@ -99,6 +99,8 @@ coming soon...
 
 ## Installation
 
+Add one or more of these module dependencies:
+
 Core: ```compile 'org.reekwest:reekwest:0.0.25'```
 
 Apache Client: ```compile 'org.reekwest:reekwest-client-apache:0.0.25'```
