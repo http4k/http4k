@@ -2,7 +2,7 @@ package org.reekwest.http.lens
 
 typealias PathLens<T> = Lens<String, T>
 
-open class PathSpec<MID, out OUT>(internal val delegate: LensSpec<String, String, OUT>) {
+open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = delegate.get(name)
         return object : Lens<String, OUT>(Meta(true, "path", name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {

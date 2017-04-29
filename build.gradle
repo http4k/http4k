@@ -17,8 +17,8 @@ buildscript {
 
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
-    id 'net.saliman.cobertura' version '2.2.5'
-    id 'com.github.kt3k.coveralls' version '2.0.1'
+    id 'net.saliman.cobertura' version '2.4.0'
+    id 'com.github.kt3k.coveralls' version '2.8.1'
 }
 
 allprojects {

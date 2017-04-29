@@ -6,18 +6,18 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-interface MultiLensSpec<in IN, out OUT> {
-    fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
+interface MultiLensSpec<in IN, OUT> {
+    fun optional(name: String, description: String? = null, default: List<OUT>? = null): Lens<IN, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
 
-open class LensSpec<IN, MID, out OUT>(protected val location: String, internal val get: Get<IN, MID, OUT>) {
+open class LensSpec<IN, MID, OUT>(protected val location: String, internal val get: Get<IN, MID, OUT>) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
 
-    open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {
+    open fun optional(name: String, description: String? = null, default: OUT? = null): Lens<IN, OUT?> {
         val meta = Meta(false, location, name, description)
         val getLens = get(name)
-        return Lens(meta, { getLens(it).firstOrNull() })
+        return Lens(meta, { getLens(it).let { if (it.isEmpty()) default else it.first() } })
     }
 
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
@@ -27,10 +27,10 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, internal v
     }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): Lens<IN, List<OUT>?> {
+        override fun optional(name: String, description: String?, default: List<OUT>?): Lens<IN, List<OUT>?> {
             val meta = Meta(false, location, name, description)
             val getLens = get(name)
-            return Lens(meta, { getLens(it).let { if (it.isEmpty()) null else it } })
+            return Lens(meta, { getLens(it).let { if (it.isEmpty()) default else it } })
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
@@ -42,7 +42,7 @@ open class LensSpec<IN, MID, out OUT>(protected val location: String, internal v
 }
 
 interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
-    override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?>
+    override fun optional(name: String, description: String?, default: List<OUT>?): BiDiLens<IN, List<OUT>?>
     override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
 }
 
@@ -51,12 +51,12 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
 
-    override fun optional(name: String, description: String?): BiDiLens<IN, OUT?> {
+    override fun optional(name: String, description: String?, default: OUT?): BiDiLens<IN, OUT?> {
         val meta = Meta(false, location, name, description)
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(meta,
-            { getLens(it).firstOrNull() },
+            { getLens(it).let { if (it.isEmpty()) default else it.first() } },
             { out: OUT?, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
@@ -71,12 +71,12 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
     }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
-        override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?> {
+        override fun optional(name: String, description: String?, default: List<OUT>?): BiDiLens<IN, List<OUT>?> {
             val meta = Meta(false, location, name, description)
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(meta,
-                { getLens(it).let { if (it.isEmpty()) null else it } },
+                { getLens(it).let { if (it.isEmpty()) default else it } },
                 { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
         }
