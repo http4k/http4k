@@ -1,4 +1,4 @@
-package org.reekwest.http.templating
+package org.reekwest.http.templates
 
 /**
  * Supported template implementations for templating engine implementations

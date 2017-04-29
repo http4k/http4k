@@ -1,4 +1,4 @@
-package org.reekwest.http.templating
+package org.reekwest.http.templates
 
 import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Template

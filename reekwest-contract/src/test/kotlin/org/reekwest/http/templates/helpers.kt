@@ -1,4 +1,4 @@
-package org.reekwest.http.templating
+package org.reekwest.http.templates
 
 object NonExistent : View {
     override val template = "bibble"
