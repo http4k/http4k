@@ -5,6 +5,7 @@ dependencies {
 
     compile project(":reekwest")
     compile "net.sourceforge.argo:argo:3.40"
+    compile 'com.github.jknack:handlebars:4.0.6'
 
     testCompile testing
 }
