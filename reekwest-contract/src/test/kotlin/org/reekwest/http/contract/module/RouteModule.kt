@@ -1,5 +1,6 @@
 package org.reekwest.http.contract.module
 
+import org.reekwest.http.contract.X_REEKWEST_ROUTE_IDENTITY
 import org.reekwest.http.contract.module.PathBinder.Companion.Core
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
@@ -8,7 +9,6 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.http.core.with
 import org.reekwest.http.lens.CatchContractBreach
-import org.reekwest.http.lens.Header.Common.X_KONTRACT_ROUTE
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
@@ -49,7 +49,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                 val routeIdentity = route.describeFor(moduleRoot)
                 return Filter {
                     { req ->
-                        it(req.with(X_KONTRACT_ROUTE to
+                        it(req.with(X_REEKWEST_ROUTE_IDENTITY to
                             if (routeIdentity.isEmpty()) "/" else routeIdentity))
                     }
                 }

@@ -12,7 +12,6 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header",
     Set { name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }
 ) {
     object Common {
-        val X_KONTRACT_ROUTE = optional("x-http.contract-route")
         val CONTENT_TYPE = map(::ContentType, { it.value }).optional("content-type")
     }
 }
