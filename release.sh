@@ -2,7 +2,7 @@
 
 set -e
 
-NEW_VERSION=`./tools/jq .reekwest.new version.json`
+NEW_VERSION=`./tools/jq -r .reekwest.new version.json`
 
 echo Releasing and publishing v$NEW_VERSION
 
@@ -11,9 +11,9 @@ function upgrade {
     sed -i '' s/$1/$2/g README.md
 }
 
-upgrade `./tools/jq .reekwest.old version.json` $NEW_VERSION
+upgrade `./tools/jq -r .reekwest.old version.json` $NEW_VERSION
 
-./gradlew -PreleaseVersion=NEW_VERSION clean build \
+./gradlew -PreleaseVersion=$NEW_VERSION clean build \
     :reekwest:bintrayUpload \
     :reekwest-client-apache:bintrayUpload \
     :reekwest-server-jetty:bintrayUpload \
