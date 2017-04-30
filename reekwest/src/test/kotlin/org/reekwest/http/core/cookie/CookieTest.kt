@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Parameters
 import org.reekwest.http.core.Request.Companion.get
+import org.reekwest.http.core.Response
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.header
 import java.time.LocalDateTime
@@ -67,5 +68,14 @@ class CookieTest {
     fun multiple_request_cookies_are_stored_in_same_header() {
         val request = get("ignore").cookie("foo", "one").cookie("bar", "two")
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"one\"; bar=\"two\"; ") as Parameters))
+    }
+
+    @Test
+    fun extracts_cookies_from_response() {
+        val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").comment("also testing").maxAge(3))
+
+        val response = cookies.fold(ok(), Response::cookie)
+
+        assertThat(response.cookies(), equalTo(cookies))
     }
 }
