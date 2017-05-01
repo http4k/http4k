@@ -14,7 +14,7 @@ import org.reekwest.http.core.bodyString
 import org.reekwest.http.routing.by
 import org.reekwest.http.routing.routes
 
-class HttpHandlerServletTest {
+class JettyServerTest {
     var server: JettyServer? = null
     private val client = ApacheHttpClient()
 
