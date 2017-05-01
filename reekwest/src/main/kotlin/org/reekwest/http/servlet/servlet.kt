@@ -8,6 +8,7 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Uri
 import java.nio.ByteBuffer
+import java.nio.channels.Channels
 import java.util.*
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -23,7 +24,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        source.body?.let { destination.outputStream.write(it.array()) }
+        source.body?.let { Channels.newChannel(destination.outputStream).write(it) }
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
