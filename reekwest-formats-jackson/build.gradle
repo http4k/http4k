@@ -4,9 +4,11 @@ dependencies {
     provided kotlin_lib
 
     provided project(":reekwest")
-    compile "net.sourceforge.argo:argo:3.40"
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8'
 
     testCompile project(path: ":reekwest", configuration: 'testArtifacts')
     testCompile testing
 }
+
+
 

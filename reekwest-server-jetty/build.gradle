@@ -14,7 +14,7 @@ dependencies {
 
     compile jetty
 
-    compile project(":reekwest")
+    provided project(":reekwest")
 
     testCompile project(":reekwest-client-apache")
 

@@ -61,6 +61,19 @@ allprojects {
         from javadoc.destinationDir
     }
 
+    task testJar(type: Jar) {
+        classifier "test"
+        from sourceSets.test.output
+    }
+
+    configurations {
+        testArtifacts.extendsFrom testRuntime
+    }
+
+    artifacts {
+        testArtifacts testJar
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -131,11 +144,12 @@ allprojects {
 dependencies {
     provided kotlin_lib
 
-    compile project(":reekwest")
-    compile project(":reekwest-client-apache")
-    compile project(":reekwest-contract")
-    compile project(":reekwest-formats-argo")
-    compile project(":reekwest-server-jetty")
-    compile project(":reekwest-templates-handlebars")
+    provided project(":reekwest")
+    provided project(":reekwest-client-apache")
+    provided project(":reekwest-contract")
+    provided project(":reekwest-formats-argo")
+    provided project(":reekwest-formats-jackson")
+    provided project(":reekwest-server-jetty")
+    provided project(":reekwest-templates-handlebars")
 }
 

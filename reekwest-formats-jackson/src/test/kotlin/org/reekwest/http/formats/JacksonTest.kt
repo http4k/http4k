@@ -7,19 +7,19 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
-import org.reekwest.http.formats.Argo.asCompactJsonString
-import org.reekwest.http.formats.Argo.asJson
-import org.reekwest.http.formats.Argo.asJsonArray
-import org.reekwest.http.formats.Argo.asJsonObject
-import org.reekwest.http.formats.Argo.fromJsonString
-import org.reekwest.http.formats.Argo.json
+import org.reekwest.http.formats.Jackson.asCompactJsonString
+import org.reekwest.http.formats.Jackson.asJson
+import org.reekwest.http.formats.Jackson.asJsonArray
+import org.reekwest.http.formats.Jackson.asJsonObject
+import org.reekwest.http.formats.Jackson.fromJsonString
+import org.reekwest.http.formats.Jackson.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
 import org.reekwest.http.lens.BiDiLensContract.spec
 import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class ArgoTest {
+class JacksonTest {
 
     @Test
     fun `serializes object to json`() {
@@ -59,7 +59,7 @@ class ArgoTest {
 
     @Test
     fun `can write and read query as Json`() {
-        checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
+        checkContract(spec.json(), """{"hello":"world"}""", Jackson.obj("hello" to "world".asJson()))
     }
 
     @Test

@@ -3,7 +3,7 @@ description = 'Typesafe HTTP contracts for Reekwest'
 dependencies {
     provided kotlin_lib
 
-    compile project(":reekwest")
+    provided project(":reekwest")
     compile project(":reekwest-formats-argo")
 
     testCompile testing

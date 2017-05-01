@@ -9,7 +9,7 @@ dependencies {
 
     compile "org.apache.httpcomponents:httpclient:$apache_http_version"
 
-    compile project(":reekwest")
+    provided project(":reekwest")
 
     testCompile testing
 }
