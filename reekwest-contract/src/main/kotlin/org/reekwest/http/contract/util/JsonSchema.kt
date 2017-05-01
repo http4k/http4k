@@ -12,12 +12,13 @@ import org.reekwest.http.contract.util.ParamType.BooleanParamType
 import org.reekwest.http.contract.util.ParamType.IntegerParamType
 import org.reekwest.http.contract.util.ParamType.NumberParamType
 import org.reekwest.http.contract.util.ParamType.StringParamType
-import org.reekwest.http.formats.Argo.asJsonValue
-import org.reekwest.http.formats.Argo.obj
+import org.reekwest.http.formats.Argo
 
 class IllegalSchemaException(message: String) : Exception(message)
 
 data class JsonSchema<out NODE>(val node: NODE, val definitions: Iterable<Pair<String, NODE>>)
+
+private val json = Argo
 
 fun JsonNode.toSchema(): JsonSchema<JsonNode> = toSchema(JsonSchema(this, emptyList()))
 
@@ -31,7 +32,8 @@ private fun toSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> =
     else if (input.node.type == NULL) throw IllegalSchemaException("Cannot use a null value in a schema!")
     else throw IllegalSchemaException("unknown type")
 
-private fun paramTypeSchema(paramType: ParamType): JsonNode = obj("type" to paramType.name.asJsonValue())
+
+private fun paramTypeSchema(paramType: ParamType): JsonNode = json.obj("type" to json.string(paramType.name))
 
 private fun numberSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> =
     JsonSchema(paramTypeSchema(if (input.node.text.contains(".")) NumberParamType else IntegerParamType), input.definitions)
@@ -39,7 +41,7 @@ private fun numberSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> =
 private fun arraySchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
     val (node, definitions) = input.node.elements.getOrNull(0)?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
     IllegalSchemaException("Cannot use an empty list to generate a schema!")
-    return JsonSchema(obj("type" to "array".asJsonValue(), "items" to node), definitions)
+    return JsonSchema(json.obj("type" to json.string("array"), "items" to node), definitions)
 }
 
 private fun objectSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
@@ -49,10 +51,10 @@ private fun objectSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
         memoFields.plus(nextField.name.text to next.node) to next.definitions
     })
 
-    val newDefinition = obj("type" to "object".asJsonValue(), "properties" to obj(fields))
+    val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
     val definitionId = "object" + newDefinition.hashCode()
     val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
-    return JsonSchema(obj("\$ref" to "#/definitions/$definitionId".asJsonValue()), allDefinitions)
+    return JsonSchema(json.obj("\$ref" to json.string("#/definitions/$definitionId")), allDefinitions)
 }
 
 
