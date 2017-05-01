@@ -13,7 +13,7 @@ Features:
  * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
  * Modular design so can be plugged to different libraries and containers. Current implementation includes:
    * Client: [ApacheHttpClient](#using-as-a-client) 
-   * Server: [Jetty](#using-as-a-server)
+   * Server: [Jetty, Netty](#using-as-a-server)
    * JSON: [Argo, Jackson](#json)
    * Templating: [Handlebars](#templating)
  * No 3rd party dependency required to start
@@ -102,16 +102,18 @@ coming soon...
 Add one or more of these module dependencies:
 
 
-Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.29"```
+Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.30"```
 
-Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.29"```
+Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.30"```
 
-Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.29"```
+Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.30"```
 
-Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.29"```
+Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.30"```
 
-Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.0.29"```
+Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.0.30"```
 
-Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.29"'```
+Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.30"'```
 
-Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.29"'```
+Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.30"'```
+
+Netty Server: ```compile group: "org.reekwest", name: "reekwest-server-netty", version: "0.0.30"'```
