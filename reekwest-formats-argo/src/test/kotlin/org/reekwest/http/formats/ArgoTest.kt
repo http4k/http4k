@@ -18,7 +18,7 @@ class ArgoTest {
     val j = Argo
 
     @Test
-    fun `serializes object to j`() {
+    fun `serializes object to json`() {
         val input = j.obj(listOf(
             "string" to j.string("value"),
             "double" to j.number(1.0),
@@ -38,7 +38,7 @@ class ArgoTest {
     }
 
     @Test
-    fun `can write and read body as j`() {
+    fun `can write and read body as json`() {
         val body = Body.json().required()
 
         val obj = j.obj(listOf("hello" to j.string("world")))
@@ -53,12 +53,12 @@ class ArgoTest {
     }
 
     @Test
-    fun `can write and read spec as j`() {
+    fun `can write and read spec as json`() {
         checkContract(spec.json(), """{"hello":"world"}""", j.obj("hello" to j.string("world")))
     }
 
     @Test
-    fun `invalid j blows up parse`() {
+    fun `invalid json blows up parse`() {
         assertThat({ j.parse("") }, throws(anything))
     }
 
