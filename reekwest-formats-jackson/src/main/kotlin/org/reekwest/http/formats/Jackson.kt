@@ -48,7 +48,6 @@ object Jackson : Json<JsonNode, JsonNode> {
     }
 
     fun Any.asJsonObject(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
-    fun <T :Any> JsonNode.to(c: KClass<T>): T = mapper.convertValue(this, c.java)
-    fun <T :Any> String.fromJsonString(c: KClass<T>): T = this.fromJsonString().to(c)
+    fun <T :Any> String.fromJsonString(c: KClass<T>): T = mapper.convertValue(this.fromJsonString(), c.java)
     fun <T :Any> T.asJsonString(): String = this.asJsonObject().asCompactJsonString()
 }
