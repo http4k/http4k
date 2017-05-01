@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.reflect.KClass
 
 object Jackson : Json<JsonNode, JsonNode> {
     private val mapper = ObjectMapper()
@@ -45,4 +46,9 @@ object Jackson : Json<JsonNode, JsonNode> {
         root.setAll(mapOf(*this.toList().toTypedArray()))
         return root
     }
+
+    fun Any.asJsonObject(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
+    fun <T :Any> JsonNode.to(c: KClass<T>): T = mapper.convertValue(this, c.java)
+    fun <T :Any> String.fromJsonString(c: KClass<T>): T = this.fromJsonString().to(c)
+    fun <T :Any> T.asJsonString(): String = this.asJsonObject().asCompactJsonString()
 }

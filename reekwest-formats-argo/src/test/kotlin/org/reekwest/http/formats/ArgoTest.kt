@@ -58,7 +58,7 @@ class ArgoTest {
     }
 
     @Test
-    fun `can write and read query as Json`() {
+    fun `can write and read spec as Json`() {
         checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
     }
 

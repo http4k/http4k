@@ -11,6 +11,7 @@ import org.reekwest.http.formats.Jackson.asCompactJsonString
 import org.reekwest.http.formats.Jackson.asJson
 import org.reekwest.http.formats.Jackson.asJsonArray
 import org.reekwest.http.formats.Jackson.asJsonObject
+import org.reekwest.http.formats.Jackson.asJsonString
 import org.reekwest.http.formats.Jackson.fromJsonString
 import org.reekwest.http.formats.Jackson.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
@@ -58,13 +59,23 @@ class JacksonTest {
     }
 
     @Test
-    fun `can write and read query as Json`() {
+    fun `can write and read spec as Json`() {
         checkContract(spec.json(), """{"hello":"world"}""", Jackson.obj("hello" to "world".asJson()))
     }
 
     @Test
     fun `invalid Json blows up parse`() {
         assertThat({ "".fromJsonString() }, throws(anything))
+    }
+
+    data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
+
+    @Test
+    fun `roundtrip arbitary object to and from JSON string`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = obj.asJsonString()
+        assertThat(out, equalTo("""{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""))
+        assertThat(out.fromJsonString(ArbObject::class), equalTo(obj))
     }
 
 }
