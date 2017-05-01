@@ -50,5 +50,5 @@ object Jackson : Json<JsonNode, JsonNode> {
     fun Any.asJsonNode(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
     fun <T : Any> String.asA(c: KClass<T>): T = mapper.convertValue(this.asJsonObject(), c.java)
     inline fun <reified T : Any> String.asA(): T = asA(T::class)
-    fun <T :Any> T.asJsonString(): String = asJsonNode().asCompactJsonString()
+    fun Any.asJsonString(): String = asJsonNode().asCompactJsonString()
 }
