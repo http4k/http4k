@@ -15,6 +15,16 @@ import java.math.BigInteger
 abstract class JsonContract<ROOT : NODE, NODE>(val j: Json<ROOT, NODE>) {
 
     @Test
+    fun `looks up types`() {
+        assertThat(j.typeOf(j.string("")), equalTo(JsonType.String))
+        assertThat(j.typeOf(j.number(1)), equalTo(JsonType.Number))
+        assertThat(j.typeOf(j.boolean(true)), equalTo(JsonType.Boolean))
+        assertThat(j.typeOf(j.nullNode()), equalTo(JsonType.Null))
+        assertThat(j.typeOf(j.obj("name" to j.string(""))), equalTo(JsonType.Object))
+        assertThat(j.typeOf(j.array(listOf(j.string("")))), equalTo(JsonType.Array))
+    }
+
+    @Test
     fun `serializes object to json`() {
         val input = j.obj(listOf(
             "string" to j.string("value"),

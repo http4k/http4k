@@ -7,7 +7,7 @@ import org.junit.Test
 import org.reekwest.http.formats.Jackson.asA
 import org.reekwest.http.formats.Jackson.asJsonString
 
-class ArgoTest : JsonContract<JsonNode, JsonNode>(Jackson) {
+class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 
     data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 

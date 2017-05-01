@@ -22,7 +22,7 @@ class JsonSchemaTest {
             "aNumber" to json.number(BigDecimal(1.9)),
             "aBooleanTrue" to json.boolean(true),
             "aBooleanFalse" to json.boolean(false),
-            "anArray" to json.array(json.obj("anotherString" to json.string("yetAnotherString"))),
+            "anArray" to json.array(listOf(json.obj("anotherString" to json.string("yetAnotherString")))),
             "anObject" to json.obj("anInteger" to json.number(1))
         )
 

@@ -35,7 +35,6 @@ interface Json<ROOT : NODE, NODE> {
     fun typeOf(value: NODE): JsonType
 
     fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
-    fun <T : NODE> array(vararg value: T): ROOT = array(value.asList())
     fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()
     fun <T : NODE> obj(vararg fields: Pair<String, T>): ROOT = obj(fields.asIterable())
     fun parse(s: String): ROOT = s.asJsonObject()
