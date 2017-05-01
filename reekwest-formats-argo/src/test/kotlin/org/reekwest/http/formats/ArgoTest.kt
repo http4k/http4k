@@ -10,7 +10,6 @@ import org.reekwest.http.core.with
 import org.reekwest.http.formats.Argo.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
 import org.reekwest.http.lens.BiDiLensContract.spec
-import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -39,7 +38,7 @@ class ArgoTest {
 
     @Test
     fun `can write and read body as json`() {
-        val body = Body.json().required()
+        val body = j.body().required()
 
         val obj = j.obj(listOf("hello" to j.string("world")))
 

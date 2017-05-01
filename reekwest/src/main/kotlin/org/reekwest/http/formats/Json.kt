@@ -1,9 +1,11 @@
 package org.reekwest.http.formats
 
+import org.reekwest.http.lens.BiDiBodySpec
 import org.reekwest.http.lens.BiDiLensSpec
 import org.reekwest.http.lens.Body
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.ByteBuffer
 
 /**
  * This is the contract for all JSON implementations
@@ -38,7 +40,8 @@ interface Json<ROOT : NODE, NODE> {
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map({ parse(it) }, { compact(it) })
-    fun Body.json() = string.map({ parse(it) }, { compact(it) })
+    fun body(): BiDiBodySpec<ByteBuffer, ROOT> = Body.string.map({ parse(it) }, { compact(it) })
+    fun Body.json(): BiDiBodySpec<ByteBuffer, ROOT> = body()
 
     fun nullNode(): NODE {
         val i: Int? = null
