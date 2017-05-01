@@ -39,7 +39,9 @@ interface Json<ROOT : NODE, NODE> {
     fun parse(s: String): ROOT = s.asJsonObject()
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
-    fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map({ parse(it) }, { compact(it) })
+
+    fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
+    fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
     fun body(): BiDiBodySpec<ByteBuffer, ROOT> = Body.string.map({ parse(it) }, { compact(it) })
     fun Body.json(): BiDiBodySpec<ByteBuffer, ROOT> = body()
 
