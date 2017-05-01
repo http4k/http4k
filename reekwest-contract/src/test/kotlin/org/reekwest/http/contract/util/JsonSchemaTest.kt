@@ -6,8 +6,8 @@ import argo.jdom.JsonNodeFactories.number
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.formats.Argo.asJsonObject
 import org.reekwest.http.formats.Argo.asJsonValue
-import org.reekwest.http.formats.Argo.fromJsonString
 import org.reekwest.http.formats.Argo.obj
 import java.io.InputStream
 import java.math.BigDecimal
@@ -15,7 +15,7 @@ import java.math.BigDecimal
 class JsonSchemaTest {
 
     fun String.readResource(): InputStream = JsonSchemaTest::class.java.getResourceAsStream(this)
-    fun InputStream.asJsonValue() = String(this.readBytes()).fromJsonString()
+    fun InputStream.asJsonValue() = String(this.readBytes()).asJsonObject()
 
     @Test
     fun `renders all different types of json value as expected`() {

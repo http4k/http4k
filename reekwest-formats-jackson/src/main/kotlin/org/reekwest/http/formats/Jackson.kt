@@ -25,7 +25,7 @@ object Jackson : Json<JsonNode, JsonNode> {
         mapper.configure(USE_BIG_INTEGER_FOR_INTS, true)
     }
 
-    override fun String.fromJsonString(): JsonNode = mapper.readValue(this, JsonNode::class.java)
+    override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
     override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
     override fun Int?.asJsonValue(): JsonNode = this?.let { IntNode(this) } ?: NullNode.instance
     override fun Double?.asJsonValue(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
@@ -47,8 +47,8 @@ object Jackson : Json<JsonNode, JsonNode> {
         return root
     }
 
-    fun Any.asJsonObject(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
-    fun <T : Any> String.asA(c: KClass<T>): T = mapper.convertValue(this.fromJsonString(), c.java)
+    fun Any.asJsonNode(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
+    fun <T : Any> String.asA(c: KClass<T>): T = mapper.convertValue(this.asJsonObject(), c.java)
     inline fun <reified T : Any> String.asA(): T = asA(T::class)
-    fun <T :Any> T.asJsonString(): String = this.asJsonObject().asCompactJsonString()
+    fun <T :Any> T.asJsonString(): String = asJsonNode().asCompactJsonString()
 }

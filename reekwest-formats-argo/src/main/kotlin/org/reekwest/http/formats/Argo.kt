@@ -21,7 +21,7 @@ object Argo : Json<JsonRootNode, JsonNode> {
     private val compact = CompactJsonFormatter()
     private val jdomParser = JdomParser()
 
-    override fun String.fromJsonString(): JsonRootNode = this.let(jdomParser::parse)
+    override fun String.asJsonObject(): JsonRootNode = this.let(jdomParser::parse)
     override fun String?.asJsonValue(): JsonNode = this?.let { string(it) } ?: nullNode()
     override fun Int?.asJsonValue(): JsonNode = this?.let { number(it.toLong()) } ?: nullNode()
     override fun Double?.asJsonValue(): JsonNode = this?.let { number(BigDecimal(it)) } ?: nullNode()

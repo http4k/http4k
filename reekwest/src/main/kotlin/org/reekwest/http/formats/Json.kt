@@ -11,7 +11,7 @@ import java.math.BigInteger
 interface Json<ROOT : NODE, NODE> {
     fun ROOT.asPrettyJsonString(): String
     fun ROOT.asCompactJsonString(): String
-    fun String.fromJsonString(): ROOT
+    fun String.asJsonObject(): ROOT
     fun String?.asJsonValue(): NODE
     fun Int?.asJsonValue(): NODE
     fun Double?.asJsonValue(): NODE
@@ -26,7 +26,7 @@ interface Json<ROOT : NODE, NODE> {
     fun obj(fields: Iterable<Pair<String, NODE>>): ROOT = fields.asJsonObject()
 
     fun obj(vararg fields: Pair<String, NODE>): ROOT = obj(fields.asIterable())
-    fun parse(s: String): ROOT = s.fromJsonString()
+    fun parse(s: String): ROOT = s.asJsonObject()
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map({ parse(it) }, { compact(it) })

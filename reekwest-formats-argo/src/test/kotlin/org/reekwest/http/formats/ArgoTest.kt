@@ -11,7 +11,6 @@ import org.reekwest.http.formats.Argo.asCompactJsonString
 import org.reekwest.http.formats.Argo.asJsonArray
 import org.reekwest.http.formats.Argo.asJsonObject
 import org.reekwest.http.formats.Argo.asJsonValue
-import org.reekwest.http.formats.Argo.fromJsonString
 import org.reekwest.http.formats.Argo.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
 import org.reekwest.http.lens.BiDiLensContract.spec
@@ -64,7 +63,7 @@ class ArgoTest {
 
     @Test
     fun `invalid Json blows up parse`() {
-        assertThat({ "".fromJsonString() }, throws(anything))
+        assertThat({ "".asJsonObject() }, throws(anything))
     }
 
 }

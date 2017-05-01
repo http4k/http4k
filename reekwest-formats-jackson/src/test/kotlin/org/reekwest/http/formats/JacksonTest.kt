@@ -13,7 +13,6 @@ import org.reekwest.http.formats.Jackson.asJsonArray
 import org.reekwest.http.formats.Jackson.asJsonObject
 import org.reekwest.http.formats.Jackson.asJsonString
 import org.reekwest.http.formats.Jackson.asJsonValue
-import org.reekwest.http.formats.Jackson.fromJsonString
 import org.reekwest.http.formats.Jackson.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
 import org.reekwest.http.lens.BiDiLensContract.spec
@@ -66,7 +65,7 @@ class JacksonTest {
 
     @Test
     fun `invalid Json blows up parse`() {
-        assertThat({ "".fromJsonString() }, throws(anything))
+        assertThat({ "".asJsonObject() }, throws(anything))
     }
 
     data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
