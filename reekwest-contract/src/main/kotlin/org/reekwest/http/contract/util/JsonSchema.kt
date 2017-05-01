@@ -1,18 +1,12 @@
 package org.reekwest.http.contract.util
 
 import argo.jdom.JsonNode
-import argo.jdom.JsonNodeType.ARRAY
-import argo.jdom.JsonNodeType.FALSE
-import argo.jdom.JsonNodeType.NULL
-import argo.jdom.JsonNodeType.NUMBER
-import argo.jdom.JsonNodeType.OBJECT
-import argo.jdom.JsonNodeType.STRING
-import argo.jdom.JsonNodeType.TRUE
 import org.reekwest.http.contract.util.ParamType.BooleanParamType
 import org.reekwest.http.contract.util.ParamType.IntegerParamType
 import org.reekwest.http.contract.util.ParamType.NumberParamType
 import org.reekwest.http.contract.util.ParamType.StringParamType
 import org.reekwest.http.formats.Argo
+import org.reekwest.http.formats.JsonType
 
 class IllegalSchemaException(message: String) : Exception(message)
 
@@ -23,15 +17,15 @@ private val json = Argo
 fun JsonNode.toSchema(): JsonSchema<JsonNode> = toSchema(JsonSchema(this, emptyList()))
 
 private fun toSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> =
-    if (input.node.type == STRING) JsonSchema(paramTypeSchema(StringParamType), input.definitions)
-    else if (input.node.type == TRUE) JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
-    else if (input.node.type == FALSE) JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
-    else if (input.node.type == NUMBER) numberSchema(input)
-    else if (input.node.type == ARRAY) arraySchema(input)
-    else if (input.node.type == OBJECT) objectSchema(input)
-    else if (input.node.type == NULL) throw IllegalSchemaException("Cannot use a null value in a schema!")
-    else throw IllegalSchemaException("unknown type")
-
+    when (json.typeOf(input.node)) {
+        JsonType.Object -> objectSchema(input)
+        JsonType.Array -> arraySchema(input)
+        JsonType.String -> JsonSchema(paramTypeSchema(StringParamType), input.definitions)
+        JsonType.Number -> numberSchema(input)
+        JsonType.Boolean -> JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
+        JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
+        else -> throw IllegalSchemaException("unknown type")
+    }
 
 private fun paramTypeSchema(paramType: ParamType): JsonNode = json.obj("type" to json.string(paramType.name))
 

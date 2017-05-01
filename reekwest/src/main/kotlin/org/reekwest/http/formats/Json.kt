@@ -32,6 +32,8 @@ interface Json<ROOT : NODE, NODE> {
     fun number(value: BigInteger): NODE = value.asJsonValue()
     fun boolean(value: Boolean): NODE = value.asJsonValue()
 
+    fun typeOf(value: NODE): JsonType
+
     fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
     fun <T : NODE> array(vararg value: T): ROOT = array(value.asList())
     fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()
@@ -49,5 +51,8 @@ interface Json<ROOT : NODE, NODE> {
         val i: Int? = null
         return i.asJsonValue()
     }
+}
 
+enum class JsonType {
+    Object, Array, String, Number, Boolean, Null
 }

@@ -6,11 +6,23 @@ import argo.jdom.JdomParser
 import argo.jdom.JsonNode
 import argo.jdom.JsonNodeFactories
 import argo.jdom.JsonNodeFactories.`object`
+import argo.jdom.JsonNodeType
 import argo.jdom.JsonRootNode
 import java.math.BigDecimal
 import java.math.BigInteger
 
 object Argo : Json<JsonRootNode, JsonNode> {
+
+    override fun typeOf(value: JsonNode): JsonType =
+        if (value.type == JsonNodeType.STRING) JsonType.String
+        else if (value.type == JsonNodeType.TRUE) JsonType.Boolean
+        else if (value.type == JsonNodeType.FALSE) JsonType.Boolean
+        else if (value.type == JsonNodeType.NUMBER) JsonType.Number
+        else if (value.type == JsonNodeType.ARRAY) JsonType.Array
+        else if (value.type == JsonNodeType.OBJECT) JsonType.Object
+        else if (value.type == JsonNodeType.NULL) JsonType.Null
+        else throw IllegalArgumentException("Don't know now to translate $value")
+
 
     private val pretty = PrettyJsonFormatter()
     private val compact = CompactJsonFormatter()

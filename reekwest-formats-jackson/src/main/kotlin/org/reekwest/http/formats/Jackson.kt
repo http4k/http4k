@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.BigIntegerNode
 import com.fasterxml.jackson.databind.node.BooleanNode
 import com.fasterxml.jackson.databind.node.DecimalNode
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.LongNode
 import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.databind.node.NumericNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.math.BigDecimal
@@ -24,6 +27,17 @@ object Jackson : Json<JsonNode, JsonNode> {
         mapper.configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
         mapper.configure(USE_BIG_INTEGER_FOR_INTS, true)
     }
+
+    override fun typeOf(value: JsonNode): JsonType = when (value) {
+        is TextNode -> JsonType.String
+        is BooleanNode -> JsonType.Boolean
+        is NumericNode -> JsonType.Number
+        is ArrayNode -> JsonType.Array
+        is ObjectNode -> JsonType.Object
+        is NullNode -> JsonType.Null
+        else -> throw IllegalArgumentException("Don't know now to translate $value")
+    }
+
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
     override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
