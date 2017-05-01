@@ -9,6 +9,19 @@ import java.time.Duration.between
 
 object ResponseFilters {
 
+    /**
+     * Intercept the response after it is sent to the next service.
+     */
+    fun Tap(fn: (Response) -> Unit) = Filter {
+        next ->
+        {
+            next(it).let {
+                fn(it)
+                it
+            }
+        }
+    }
+
     fun ReportLatency(clock: Clock, recordFn: (Request, Response, Duration) -> Unit): Filter = Filter {
         next ->
         {
@@ -20,3 +33,4 @@ object ResponseFilters {
         }
     }
 }
+
