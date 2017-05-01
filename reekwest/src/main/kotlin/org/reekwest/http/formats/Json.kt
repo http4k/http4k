@@ -22,13 +22,27 @@ interface Json<ROOT : NODE, NODE> {
     fun <T : Iterable<NODE>> T.asJsonArray(): ROOT
     fun <LIST : Iterable<Pair<String, NODE>>> LIST.asJsonObject(): ROOT
 
-    // TODO work out which ones of these we want to keep
-    fun obj(fields: Iterable<Pair<String, NODE>>): ROOT = fields.asJsonObject()
+    fun string(value: String): NODE = value.asJsonValue()
+    fun number(value: Int): NODE = value.asJsonValue()
+    fun number(value: Double): NODE = value.asJsonValue()
+    fun number(value: Long): NODE = value.asJsonValue()
+    fun number(value: BigDecimal): NODE = value.asJsonValue()
+    fun number(value: BigInteger): NODE = value.asJsonValue()
+    fun boolean(value: Boolean): NODE = value.asJsonValue()
 
-    fun obj(vararg fields: Pair<String, NODE>): ROOT = obj(fields.asIterable())
+    fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
+    fun <T : NODE> array(vararg value: T): ROOT = array(value.asList())
+    fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()
+    fun <T : NODE> obj(vararg fields: Pair<String, T>): ROOT = obj(fields.asIterable())
     fun parse(s: String): ROOT = s.asJsonObject()
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> BiDiLensSpec<IN, String, String>.json() = this.map({ parse(it) }, { compact(it) })
     fun Body.json() = string.map({ parse(it) }, { compact(it) })
+
+    fun nullNode(): NODE {
+        val i: Int? = null
+        return i.asJsonValue()
+    }
+
 }
