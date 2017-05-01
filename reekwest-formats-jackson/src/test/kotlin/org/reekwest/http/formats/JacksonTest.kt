@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
+import org.reekwest.http.formats.Jackson.asA
 import org.reekwest.http.formats.Jackson.asCompactJsonString
 import org.reekwest.http.formats.Jackson.asJson
 import org.reekwest.http.formats.Jackson.asJsonArray
@@ -75,7 +76,7 @@ class JacksonTest {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = obj.asJsonString()
         assertThat(out, equalTo("""{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""))
-        assertThat(out.fromJsonString(ArbObject::class), equalTo(obj))
+        assertThat(out.asA<ArbObject>(), equalTo(obj))
     }
 
 }
