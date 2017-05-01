@@ -14,7 +14,7 @@ Features:
  * Modular design so can be plugged to different libraries and containers. Current implementation includes:
    * Client: [ApacheHttpClient](#using-as-a-client) 
    * Server: [Jetty](#using-as-a-server)
-   * JSON: [Argo](#json)
+   * JSON: [Argo, Jackson](#json)
    * Templating: [Handlebars](#templating)
  * No 3rd party dependency required to start
 
@@ -102,14 +102,16 @@ coming soon...
 Add one or more of these module dependencies:
 
 
-Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.28"```
+Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.29"```
 
-Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.28"```
+Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.29"```
 
-Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.28"```
+Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.29"```
 
-Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.28"```
+Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.29"```
 
-Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.28"'```
+Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.0.29"```
 
-Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.28"'```
+Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.29"'```
+
+Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.29"'```

@@ -19,6 +19,7 @@ upgrade `./tools/jq -r .reekwest.old version.json` $NEW_VERSION
     :reekwest-server-jetty:bintrayUpload \
     :reekwest-contract:bintrayUpload \
     :reekwest-templates-handlebars:bintrayUpload \
-    :reekwest-formats-argo:bintrayUpload
+    :reekwest-formats-argo:bintrayUpload \
+    :reekwest-formats-jackson:bintrayUpload
 
 echo Remember to commit the updated README.md file!!
