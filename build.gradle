@@ -150,6 +150,7 @@ dependencies {
     provided project(":reekwest-formats-argo")
     provided project(":reekwest-formats-jackson")
     provided project(":reekwest-server-jetty")
+    provided project(":reekwest-server-netty")
     provided project(":reekwest-templates-handlebars")
 }
 

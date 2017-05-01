@@ -17,6 +17,7 @@ upgrade `./tools/jq -r .reekwest.old version.json` $NEW_VERSION
     :reekwest:bintrayUpload \
     :reekwest-client-apache:bintrayUpload \
     :reekwest-server-jetty:bintrayUpload \
+    :reekwest-server-netty:bintrayUpload \
     :reekwest-contract:bintrayUpload \
     :reekwest-templates-handlebars:bintrayUpload \
     :reekwest-formats-argo:bintrayUpload \
