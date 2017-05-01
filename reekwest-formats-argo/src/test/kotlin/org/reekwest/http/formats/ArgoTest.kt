@@ -8,9 +8,9 @@ import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Argo.asCompactJsonString
-import org.reekwest.http.formats.Argo.asJson
 import org.reekwest.http.formats.Argo.asJsonArray
 import org.reekwest.http.formats.Argo.asJsonObject
+import org.reekwest.http.formats.Argo.asJsonValue
 import org.reekwest.http.formats.Argo.fromJsonString
 import org.reekwest.http.formats.Argo.json
 import org.reekwest.http.lens.BiDiLensContract.checkContract
@@ -25,17 +25,17 @@ class ArgoTest {
     fun `serializes object to json`() {
         val nullable: String? = null
         val input = listOf(
-            "string" to "value".asJson(),
-            "double" to 1.0.asJson(),
-            "long" to 10L.asJson(),
-            "boolean" to true.asJson(),
-            "bigDec" to BigDecimal(1.2).asJson(),
-            "bigInt" to BigInteger("12344").asJson(),
-            "null" to nullable.asJson(),
-            "int" to 2.asJson(),
+            "string" to "value".asJsonValue(),
+            "double" to 1.0.asJsonValue(),
+            "long" to 10L.asJsonValue(),
+            "boolean" to true.asJsonValue(),
+            "bigDec" to BigDecimal(1.2).asJsonValue(),
+            "bigInt" to BigInteger("12344").asJsonValue(),
+            "null" to nullable.asJsonValue(),
+            "int" to 2.asJsonValue(),
             "array" to listOf(
-                "".asJson(),
-                123.asJson()
+                "".asJsonValue(),
+                123.asJsonValue()
             ).asJsonArray()
         ).asJsonObject()
         val expected = """{"string":"value","double":1,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"array":["",123]}"""
@@ -46,7 +46,7 @@ class ArgoTest {
     fun `can write and read body as Json`() {
         val body = Body.json().required()
 
-        val obj = listOf("hello" to "world".asJson()).asJsonObject()
+        val obj = listOf("hello" to "world".asJsonValue()).asJsonObject()
 
         val request = get("/bob")
 
@@ -59,7 +59,7 @@ class ArgoTest {
 
     @Test
     fun `can write and read spec as Json`() {
-        checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJson()))
+        checkContract(spec.json(), """{"hello":"world"}""", Argo.obj("hello" to "world".asJsonValue()))
     }
 
     @Test

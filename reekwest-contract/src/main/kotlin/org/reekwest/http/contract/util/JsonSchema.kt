@@ -12,7 +12,7 @@ import org.reekwest.http.contract.util.ParamType.BooleanParamType
 import org.reekwest.http.contract.util.ParamType.IntegerParamType
 import org.reekwest.http.contract.util.ParamType.NumberParamType
 import org.reekwest.http.contract.util.ParamType.StringParamType
-import org.reekwest.http.formats.Argo.asJson
+import org.reekwest.http.formats.Argo.asJsonValue
 import org.reekwest.http.formats.Argo.obj
 
 class IllegalSchemaException(message: String) : Exception(message)
@@ -31,7 +31,7 @@ private fun toSchema(input: JsonSchema): JsonSchema =
     else if (input.node.type == NULL) throw IllegalSchemaException("Cannot use a null value in a schema!")
     else throw IllegalSchemaException("unknown type")
 
-private fun paramTypeSchema(paramType: ParamType): JsonNode = obj("type" to paramType.name.asJson())
+private fun paramTypeSchema(paramType: ParamType): JsonNode = obj("type" to paramType.name.asJsonValue())
 
 private fun numberSchema(input: JsonSchema): JsonSchema =
     JsonSchema(paramTypeSchema(if (input.node.text.contains(".")) NumberParamType else IntegerParamType), input.definitions)
@@ -39,7 +39,7 @@ private fun numberSchema(input: JsonSchema): JsonSchema =
 private fun arraySchema(input: JsonSchema): JsonSchema {
     val (node, definitions) = input.node.elements.getOrNull(0)?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
     IllegalSchemaException("Cannot use an empty list to generate a schema!")
-    return JsonSchema(obj("type" to "array".asJson(), "items" to node), definitions)
+    return JsonSchema(obj("type" to "array".asJsonValue(), "items" to node), definitions)
 }
 
 private fun objectSchema(input: JsonSchema): JsonSchema {
@@ -50,10 +50,10 @@ private fun objectSchema(input: JsonSchema): JsonSchema {
     })
 
 
-    val newDefinition = obj("type" to "object".asJson(), "properties" to obj(fields))
+    val newDefinition = obj("type" to "object".asJsonValue(), "properties" to obj(fields))
     val definitionId = "object" + newDefinition.hashCode()
     val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
-    return JsonSchema(obj("\$ref" to "#/definitions/$definitionId".asJson()), allDefinitions)
+    return JsonSchema(obj("\$ref" to "#/definitions/$definitionId".asJsonValue()), allDefinitions)
 }
 
 

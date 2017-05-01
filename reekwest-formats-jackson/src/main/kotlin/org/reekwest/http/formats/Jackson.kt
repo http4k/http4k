@@ -26,13 +26,13 @@ object Jackson : Json<JsonNode, JsonNode> {
     }
 
     override fun String.fromJsonString(): JsonNode = mapper.readValue(this, JsonNode::class.java)
-    override fun String?.asJson(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
-    override fun Int?.asJson(): JsonNode = this?.let { IntNode(this) } ?: NullNode.instance
-    override fun Double?.asJson(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
-    override fun Long?.asJson(): JsonNode = this?.let { LongNode(this) } ?: NullNode.instance
-    override fun BigDecimal?.asJson(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
-    override fun BigInteger?.asJson(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
-    override fun Boolean?.asJson(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
+    override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
+    override fun Int?.asJsonValue(): JsonNode = this?.let { IntNode(this) } ?: NullNode.instance
+    override fun Double?.asJsonValue(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
+    override fun Long?.asJsonValue(): JsonNode = this?.let { LongNode(this) } ?: NullNode.instance
+    override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
+    override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
+    override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode {
         val root = mapper.createArrayNode()
         root.addAll(this.toList())

@@ -12,13 +12,13 @@ interface Json<ROOT : NODE, NODE> {
     fun ROOT.asPrettyJsonString(): String
     fun ROOT.asCompactJsonString(): String
     fun String.fromJsonString(): ROOT
-    fun String?.asJson(): NODE
-    fun Int?.asJson(): NODE
-    fun Double?.asJson(): NODE
-    fun Long?.asJson(): NODE
-    fun BigDecimal?.asJson(): NODE
-    fun BigInteger?.asJson(): NODE
-    fun Boolean?.asJson(): NODE
+    fun String?.asJsonValue(): NODE
+    fun Int?.asJsonValue(): NODE
+    fun Double?.asJsonValue(): NODE
+    fun Long?.asJsonValue(): NODE
+    fun BigDecimal?.asJsonValue(): NODE
+    fun BigInteger?.asJsonValue(): NODE
+    fun Boolean?.asJsonValue(): NODE
     fun <T : Iterable<NODE>> T.asJsonArray(): ROOT
     fun <LIST : Iterable<Pair<String, NODE>>> LIST.asJsonObject(): ROOT
 
