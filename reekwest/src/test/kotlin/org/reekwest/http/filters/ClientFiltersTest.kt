@@ -22,7 +22,7 @@ class ClientFiltersTest {
             "/loop" -> movedTemporarily(listOf("location" to "/loop"))
             "/absolute-target" -> if (request.uri.host == "example.com") ok().body("absolute") else serverError()
             "/absolute-redirect" -> movedPermanently(listOf("location" to "http://example.com/absolute-target"))
-            else -> ok()
+            else -> ok().let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
 
@@ -52,6 +52,11 @@ class ClientFiltersTest {
     @Test
     fun `supports absolute redirects`() {
         assertThat(client(get("/absolute-redirect")), equalTo(ok().body("absolute")))
+    }
+
+    @Test
+    fun `discards query parameters in relative redirects`() {
+        assertThat(client(get("/redirect?foo=bar")), equalTo(ok()))
     }
 
     @Test

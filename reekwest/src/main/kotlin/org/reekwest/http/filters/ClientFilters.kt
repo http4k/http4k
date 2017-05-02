@@ -29,7 +29,7 @@ object ClientFilters {
     private fun Request.newLocation(location: String): Uri {
         val locationUri = Uri.uri(location)
         return if (locationUri.host.isBlank()) {
-            uri.copy(path = location)
+            locationUri.copy(uri.scheme, uri.authority, location)
         } else locationUri
     }
 
