@@ -27,6 +27,7 @@ interface Json<ROOT : NODE, NODE> {
     fun typeOf(value: NODE): JsonType
     fun fields(node: NODE): Iterable<Pair<String, NODE>>
     fun elements(value: NODE): Iterable<NODE>
+    fun text(value: NODE): String
 
     // Utility methods - used when we don't know which implementation we are using
     fun string(value: String): NODE = value.asJsonValue()
