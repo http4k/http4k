@@ -39,10 +39,10 @@ private fun arraySchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
 }
 
 private fun objectSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
-    val (fields, subDefinitions) = input.node.fieldList.fold(listOf<Pair<String, JsonNode>>() to input.definitions, {
-        (memoFields, memoDefinitions), nextField ->
-        val next = toSchema(JsonSchema(nextField.value, memoDefinitions))
-        memoFields.plus(nextField.name.text to next.node) to next.definitions
+    val (fields, subDefinitions) = Argo.fields(input.node).fold(listOf<Pair<String, JsonNode>>() to input.definitions, {
+        (memoFields, memoDefinitions), (first, second) ->
+        val next = toSchema(JsonSchema(second, memoDefinitions))
+        memoFields.plus(first to next.node) to next.definitions
     })
 
     val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
