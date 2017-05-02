@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 /**
  * This is the contract for all JSON implementations
  */
-interface Json<ROOT : NODE, NODE> {
+interface Json<ROOT : NODE, NODE: Any> {
     // Contract methods to be implemented
     fun ROOT.asPrettyJsonString(): String
     fun ROOT.asCompactJsonString(): String

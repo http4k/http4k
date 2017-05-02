@@ -9,10 +9,10 @@ import org.reekwest.http.formats.Argo.obj
 import java.io.InputStream
 import java.math.BigDecimal
 
-class JsonSchemaTest {
+class JsonToJsonSchemaTest {
     private val json = Argo
 
-    fun String.readResource(): InputStream = JsonSchemaTest::class.java.getResourceAsStream(this)
+    fun String.readResource(): InputStream = JsonToJsonSchemaTest::class.java.getResourceAsStream(this)
     fun InputStream.asJsonValue() = json.parse(String(this.readBytes()))
 
     @Test
@@ -26,7 +26,7 @@ class JsonSchemaTest {
             "anObject" to json.obj("anInteger" to json.number(1))
         )
 
-        val actual = model.toSchema()
+        val actual = JsonToJsonSchema(json).toSchema(model)
         val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
         val expectedDefs: JsonNode = "JsonSchema_definitions.json".readResource().asJsonValue()

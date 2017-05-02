@@ -12,7 +12,7 @@ import org.reekwest.http.lens.BiDiLensContract.spec
 import java.math.BigDecimal
 import java.math.BigInteger
 
-abstract class JsonContract<ROOT : NODE, NODE>(val j: Json<ROOT, NODE>) {
+abstract class JsonContract<ROOT : NODE, NODE: Any>(val j: Json<ROOT, NODE>) {
 
     @Test
     fun `looks up types`() {
