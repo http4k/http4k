@@ -9,6 +9,8 @@ fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(this.toByteArray())
 
 fun String.quoted() = "\"${this.replace("\"", "\\\"")}\""
 
+fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
+
 fun StringBuilder.appendIfNotBlank(valueToCheck: String, vararg toAppend: String): StringBuilder =
     appendIf({ valueToCheck.isNotBlank() }, *toAppend)
 

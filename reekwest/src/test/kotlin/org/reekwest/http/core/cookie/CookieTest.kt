@@ -78,4 +78,9 @@ class CookieTest {
 
         assertThat(response.cookies(), equalTo(cookies))
     }
+
+    @Test
+    fun parses_cookie_without_quotes(){
+        assertThat(Cookie.parse("foo=bar; Path=/"), equalTo(Cookie("foo", "bar").path("/")))
+    }
 }

@@ -11,6 +11,7 @@ import org.reekwest.http.core.cookie.CookieAttribute.Companion.PATH
 import org.reekwest.http.core.cookie.CookieAttribute.Companion.SECURE
 import org.reekwest.http.core.header
 import org.reekwest.http.core.replaceHeader
+import org.reekwest.http.unquoted
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -65,8 +66,6 @@ internal fun String.toCookieList(): List<Cookie> = split("; ").filter { it.trim(
 fun Request.cookies(): List<Cookie> = headers.find { it.first == "Cookie" }?.second?.toCookieList() ?: listOf()
 
 fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.attribute(PATH)?.length ?: 0 }.firstOrNull()
-
-private fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
 
 private fun List<Cookie>.toCookieString() = map(Cookie::toString).joinToString("")
 
