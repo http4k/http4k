@@ -66,6 +66,13 @@ abstract class JsonContract<ROOT : NODE, NODE>(val j: Json<ROOT, NODE>) {
     }
 
     @Test
+    fun `get elements`() {
+        val fields = listOf(j.string("world"), j.string("world2"))
+        val elements = j.elements(j.array(fields)).toList()
+        assertThat(elements, equalTo(fields))
+    }
+
+    @Test
     fun `can write and read spec as json`() {
         checkContract(j.lens(spec), """{"hello":"world"}""", j.obj("hello" to j.string("world")))
     }

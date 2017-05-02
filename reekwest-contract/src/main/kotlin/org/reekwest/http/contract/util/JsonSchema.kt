@@ -33,13 +33,13 @@ private fun numberSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> =
     JsonSchema(paramTypeSchema(if (input.node.text.contains(".")) NumberParamType else IntegerParamType), input.definitions)
 
 private fun arraySchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
-    val (node, definitions) = input.node.elements.getOrNull(0)?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
+    val (node, definitions) = json.elements(input.node).toList().firstOrNull()?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
     IllegalSchemaException("Cannot use an empty list to generate a schema!")
     return JsonSchema(json.obj("type" to json.string("array"), "items" to node), definitions)
 }
 
 private fun objectSchema(input: JsonSchema<JsonNode>): JsonSchema<JsonNode> {
-    val (fields, subDefinitions) = Argo.fields(input.node).fold(listOf<Pair<String, JsonNode>>() to input.definitions, {
+    val (fields, subDefinitions) = json.fields(input.node).fold(listOf<Pair<String, JsonNode>>() to input.definitions, {
         (memoFields, memoDefinitions), (first, second) ->
         val next = toSchema(JsonSchema(second, memoDefinitions))
         memoFields.plus(first to next.node) to next.definitions

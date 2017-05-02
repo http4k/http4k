@@ -20,6 +20,7 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 object Jackson : Json<JsonNode, JsonNode> {
+
     private val mapper = ObjectMapper()
 
     init {
@@ -68,6 +69,7 @@ object Jackson : Json<JsonNode, JsonNode> {
         }
         return fieldList
     }
+    override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
 
     fun Any.asJsonNode(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
     fun <T : Any> String.asA(c: KClass<T>): T = mapper.convertValue(this.asJsonObject(), c.java)

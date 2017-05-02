@@ -41,6 +41,7 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun JsonRootNode.asCompactJsonString(): String = compact.format(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonRootNode = `object`(this.map { field(it.first, it.second) })
     override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> = node.fieldList.map { it.name.text to it.value }
+    override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }
