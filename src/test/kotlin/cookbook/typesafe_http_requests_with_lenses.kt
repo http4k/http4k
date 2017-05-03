@@ -5,8 +5,8 @@ import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.then
 import org.reekwest.http.core.with
+import org.reekwest.http.filters.ServerFilters
 import org.reekwest.http.lens.Body
-import org.reekwest.http.lens.CatchLensFailure
 import org.reekwest.http.lens.Header
 import org.reekwest.http.lens.Query
 import org.reekwest.http.lens.int
@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
         )
     }
 
-    val app = CatchLensFailure.then(endpoint)
+    val app = ServerFilters.CatchLensFailure.then(endpoint)
 
     val goodRequest = get("http://localhost:9000").header("name", "Jane Doe").query("age", "25").body("rita,sue,bob")
 

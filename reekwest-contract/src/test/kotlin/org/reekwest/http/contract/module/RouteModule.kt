@@ -8,12 +8,12 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.http.core.with
-import org.reekwest.http.lens.CatchLensFailure
+import org.reekwest.http.filters.ServerFilters
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
     constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(ModuleRouter(moduleRoot, renderer, CatchLensFailure.then(filter)))
+        : this(ModuleRouter(moduleRoot, renderer, ServerFilters.CatchLensFailure.then(filter)))
 
     override fun toRouter(): Router = router
 
@@ -34,7 +34,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
             override fun invoke(request: Request): HttpHandler? =
                 if (request.isIn(moduleRoot)) {
                     allRoutes.fold<ServerRoute, Pair<ServerRoute, HttpHandler>?>(null, { memo, route ->
-                        memo ?: route.router(moduleRoot)(request)?.let { route to it}
+                        memo ?: route.router(moduleRoot)(request)?.let { route to it }
                     })?.let { (route, handler) -> security.filter.then(identify(route)).then(filter).then(handler) }
                 } else null
 

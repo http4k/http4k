@@ -26,7 +26,9 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
 
     /**
      * Lens operation to get the value from the target
+     * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
      */
+    @Throws(LensFailure::class)
     override operator fun invoke(target: IN): FINAL = try {
         get(target)
     } catch (e: LensFailure) {

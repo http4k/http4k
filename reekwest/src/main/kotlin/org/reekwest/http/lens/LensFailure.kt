@@ -1,8 +1,5 @@
 package org.reekwest.http.lens
 
-import org.reekwest.http.core.Filter
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 
@@ -23,15 +20,6 @@ data class Missing(override val meta: Meta) : Failure()
 
 data class Invalid(override val meta: Meta) : Failure()
 
-object CatchLensFailure : Filter {
-    override fun invoke(next: HttpHandler): HttpHandler = {
-        try {
-            next(it)
-        } catch (lensFailure: LensFailure) {
-            Response(lensFailure.status)
-        }
-    }
-}
 
 fun Lens<*, *>.invalid() = Invalid(this.meta)
 fun Lens<*, *>.missing() = Missing(this.meta)
