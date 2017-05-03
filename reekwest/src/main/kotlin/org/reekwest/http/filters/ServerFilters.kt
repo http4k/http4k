@@ -11,16 +11,6 @@ import org.reekwest.http.lens.LensFailure
 
 object ServerFilters {
 
-    object CatchLensFailure : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
-            try {
-                next(it)
-            } catch (lensFailure: LensFailure) {
-                Response(lensFailure.status)
-            }
-        }
-    }
-
     object BasicAuth {
         operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
             handler ->
@@ -36,10 +26,19 @@ object ServerFilters {
 
         operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
         operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm, { it == credentials })
+
+        private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
+
+        private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0, { "" }), it.getOrElse(1, { "" })) }
     }
 
-    private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
-
-    private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0, { "" }), it.getOrElse(1, { "" })) }
-
+    object CatchLensFailure : Filter {
+        override fun invoke(next: HttpHandler): HttpHandler = {
+            try {
+                next(it)
+            } catch (lensFailure: LensFailure) {
+                Response(lensFailure.status)
+            }
+        }
+    }
 }

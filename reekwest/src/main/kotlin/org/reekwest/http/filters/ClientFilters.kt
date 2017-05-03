@@ -11,32 +11,6 @@ import org.reekwest.http.core.Uri
 
 object ClientFilters {
 
-    fun FollowRedirects(): Filter = Filter { next -> { makeRequest(next, it) } }
-
-    private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response {
-        val response = next(request)
-        return if (response.isRedirection() && request.allowsRedirection()) {
-            if (attempt == 10) throw IllegalStateException("Too many redirection")
-            val location = response.header("location").orEmpty()
-            makeRequest(next, request.copy(uri = request.newLocation(location)), attempt + 1)
-        } else {
-            response
-        }
-    }
-
-    private fun Request.newLocation(location: String): Uri {
-        val locationUri = Uri.uri(location)
-        return if (locationUri.host.isBlank()) {
-            locationUri.copy(uri.scheme, uri.authority, location)
-        } else locationUri
-    }
-
-    private fun Response.isRedirection(): Boolean {
-        return status.redirection && header("location")?.let(String::isNotBlank) ?: false
-    }
-
-    private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
-
     object BasicAuth {
         operator fun invoke(provider: () -> Credentials): Filter = Filter {
             next ->
@@ -47,6 +21,34 @@ object ClientFilters {
         operator fun invoke(credentials: Credentials): Filter = BasicAuth({ credentials })
 
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
+    }
+
+    object FollowRedirects {
+        operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
+
+        private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response {
+            val response = next(request)
+            return if (response.isRedirection() && request.allowsRedirection()) {
+                if (attempt == 10) throw IllegalStateException("Too many redirection")
+                val location = response.header("location").orEmpty()
+                makeRequest(next, request.copy(uri = request.newLocation(location)), attempt + 1)
+            } else {
+                response
+            }
+        }
+
+        private fun Request.newLocation(location: String): Uri {
+            val locationUri = Uri.uri(location)
+            return if (locationUri.host.isBlank()) {
+                locationUri.copy(uri.scheme, uri.authority, location)
+            } else locationUri
+        }
+
+        private fun Response.isRedirection(): Boolean {
+            return status.redirection && header("location")?.let(String::isNotBlank) ?: false
+        }
+
+        private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
     }
 }
 
