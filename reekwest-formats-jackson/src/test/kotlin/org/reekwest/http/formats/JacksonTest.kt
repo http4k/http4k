@@ -19,3 +19,5 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
         assertThat(out.asA<ArbObject>(), equalTo(obj))
     }
 }
+
+class JacksonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
