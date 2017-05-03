@@ -23,7 +23,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
         {
             if (core.matches(moduleRoot, it)) {
                 try {
-                    it.extract(moduleRoot, pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
+                    it.without(core.pathFn(moduleRoot)).extract(pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
                 } catch (e: LensFailure) {
                     null
                 }
@@ -100,8 +100,5 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 
 private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-private fun Request.extract(moduleRoot: BasePath, lenses: List<PathLens<*>>): ExtractedParts? =
-    without(moduleRoot).let {
-        path ->
-        if (path.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to path(index, lens) }.toMap()) else null
-    }
+private fun BasePath.extract(lenses: List<PathLens<*>>): ExtractedParts? =
+    if (this.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens) }.toMap()) else null
