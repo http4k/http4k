@@ -21,13 +21,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
 
     internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router =
         {
-            if (core.matches(moduleRoot, it)) {
-                try {
-                    it.without(core.pathFn(moduleRoot)).extract(pathLenses.toList())?.let { core.route.validationFilter.then(toHandler(it)) }
-                } catch (e: LensFailure) {
-                    null
-                }
-            } else null
+            core.matches(moduleRoot, it, pathLenses.toList(), toHandler)
         }
 
     fun describe(moduleRoot: BasePath): String = "${core.pathFn(moduleRoot)}/${pathLenses.joinToString("/")}"
@@ -35,9 +29,17 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-            fun matches(moduleRoot: BasePath, request: Request) =
-                request.method == method && request.basePath().startsWith(pathFn(moduleRoot))
+
+            fun matches(moduleRoot: BasePath, request: Request, lenses: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
+                if (request.method == method && request.basePath().startsWith(pathFn(moduleRoot))) {
+                    try {
+                        request.without(pathFn(moduleRoot)).extract(lenses)?.let { route.validationFilter.then(toHandler(it)) }
+                    } catch (e: LensFailure) {
+                        null
+                    }
+                } else null
         }
+
     }
 }
 
