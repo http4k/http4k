@@ -20,7 +20,7 @@ class ModuleTest {
         }
     }
 
-    private val contractBreachModule = object : Module {
+    private val lensFailureModule = object : Module {
         override fun toRouter(): Router = {
             { throw LensFailure() }
         }
@@ -42,8 +42,8 @@ class ModuleTest {
     }
 
     @Test
-    fun `contract breach results in 400`() {
-        assertThat(contractBreachModule.toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(BAD_REQUEST)))
+    fun `lens failure results in 400`() {
+        assertThat(lensFailureModule.toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(BAD_REQUEST)))
     }
 
     @Test
