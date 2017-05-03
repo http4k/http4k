@@ -7,6 +7,7 @@ import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.templates.HandlebarsTemplates
 import org.reekwest.http.templates.ViewModel
 
+// this view has the default template path of: cookbook/Person.hbs, although that is overridable
 data class Person(val name: String, val age: Int) : ViewModel
 
 fun main(args: Array<String>) {
