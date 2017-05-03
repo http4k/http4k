@@ -16,7 +16,7 @@ import org.reekwest.http.lens.QueryLens
 
 data class RouteResponse(val status: Status, val description: String?, val example: String?)
 
-class Route private constructor(private val core: Core) {
+class Route private constructor(internal val core: Core) {
     constructor(name: String, description: String? = null) : this(Core(name, description, null))
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
@@ -44,7 +44,7 @@ class Route private constructor(private val core: Core) {
     }
 
     companion object {
-        private data class Core(val name: String,
+        internal data class Core(val name: String,
                                 val description: String?,
                                 val body: BodyLens<*>?,
                                 val produces: Set<ContentType> = emptySet(),

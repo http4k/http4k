@@ -5,6 +5,8 @@ import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.bodyString
+import org.reekwest.http.core.with
+import org.reekwest.http.formats.Json
 import org.reekwest.http.lens.Failure
 
 interface ModuleRenderer {
@@ -23,20 +25,22 @@ object NoRenderer : ModuleRenderer {
     override fun notFound(): Response = Response(NOT_FOUND)
 }
 
-class SimpleJson : ModuleRenderer {
+class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>) : ModuleRenderer {
+
     override fun notFound(): Response = Response(NOT_FOUND)
 
     override fun badRequest(failures: Iterable<Failure>) = Response(BAD_REQUEST).bodyString(failures.joinToString())
 
-    override fun description(basePath: BasePath, routes: Iterable<ServerRoute>) = Response(OK)
-        .bodyString(routes.map { it.describeFor(basePath) }.joinToString())
+    private fun render(basePath: BasePath, route: ServerRoute) =
+        route.pathBinder.core.method.toString() + ":" + route.describeFor(basePath) to
+            json.string(route.pathBinder.core.route.core.description ?: "")
+
+    override fun description(basePath: BasePath, routes: Iterable<ServerRoute>): Response {
+        return Response(OK)
+            .with(json.body().required() to json.obj("resources" to json.obj(routes.map { render(basePath, it) })))
+    }
 //    override def badRequest(badParameters: Seq[ExtractionError]): Response = JsonErrorResponseRenderer.badRequest(badParameters)
 //
 //    override def notFound(request: Request): Response = JsonErrorResponseRenderer.notFound()
-//
-//    private def render(basePath: Path, route: ServerRoute[_, _]): Field =
-//    route.method.toString() + ":" + route.describeFor(basePath) -> Argo.JsonFormat.string(route.routeSpec.summary)
-//
-//    override def description(basePath: Path, security: Security, routes: Seq[ServerRoute[_, _]]): Response = Ok(obj("resources" -> obj(routes.map(r => render(basePath, r)))))
 }
 

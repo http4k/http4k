@@ -15,9 +15,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.DefaultFullHttpRequest
 import io.netty.handler.codec.http.DefaultFullHttpResponse
 import io.netty.handler.codec.http.DefaultHttpRequest
+import io.netty.handler.codec.http.HttpHeaderNames.CONNECTION
+import io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH
 import io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE
-import io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION
-import io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH
 import io.netty.handler.codec.http.HttpResponseStatus.CONTINUE
 import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpServerCodec

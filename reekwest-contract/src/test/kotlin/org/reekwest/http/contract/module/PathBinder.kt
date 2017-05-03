@@ -8,7 +8,7 @@ import org.reekwest.http.lens.LensFailure
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.PathLens
 
-class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
+class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
     fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
