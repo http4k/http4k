@@ -2,7 +2,6 @@ package org.reekwest.http.contract.module
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_JSON
@@ -47,7 +46,6 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 
 
     @Test
-    @Ignore
     fun `renders as expected`() {
 
         val customBody = Body.json().required("the body of the message")

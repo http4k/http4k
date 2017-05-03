@@ -26,7 +26,7 @@ class Route private constructor(internal val core: Core) {
     fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
     fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))
 
-    infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { Root }))
+    infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { it }))
 
     internal val validationFilter = Filter {
         next ->
