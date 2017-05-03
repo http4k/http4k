@@ -7,7 +7,6 @@ import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
-import org.reekwest.http.core.header
 
 data class Credentials(val user: String, val password: String)
 

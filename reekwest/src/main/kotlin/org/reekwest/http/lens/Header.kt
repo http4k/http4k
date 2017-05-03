@@ -3,7 +3,6 @@ package org.reekwest.http.lens
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Request
-import org.reekwest.http.core.header
 
 typealias HeaderLens<T> = Lens<Request, T>
 

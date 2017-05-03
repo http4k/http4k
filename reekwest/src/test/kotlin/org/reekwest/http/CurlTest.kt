@@ -8,7 +8,6 @@ import org.reekwest.http.core.Request.Companion.post
 import org.reekwest.http.core.body
 import org.reekwest.http.core.body.toBody
 import org.reekwest.http.core.bodyString
-import org.reekwest.http.core.header
 import org.reekwest.http.core.toCurl
 
 class CurlTest {

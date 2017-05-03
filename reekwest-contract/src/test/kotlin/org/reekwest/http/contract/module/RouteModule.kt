@@ -8,12 +8,12 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.http.core.with
-import org.reekwest.http.lens.CatchContractBreach
+import org.reekwest.http.lens.CatchLensFailure
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
     constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(ModuleRouter(moduleRoot, renderer, CatchContractBreach.then(filter)))
+        : this(ModuleRouter(moduleRoot, renderer, CatchLensFailure.then(filter)))
 
     override fun toRouter(): Router = router
 

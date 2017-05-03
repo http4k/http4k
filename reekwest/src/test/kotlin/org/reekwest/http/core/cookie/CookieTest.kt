@@ -7,7 +7,6 @@ import org.reekwest.http.core.Parameters
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Response.Companion.ok
-import org.reekwest.http.core.header
 import java.time.LocalDateTime
 
 class CookieTest {

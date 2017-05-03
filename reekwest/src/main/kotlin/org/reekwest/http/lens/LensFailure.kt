@@ -23,7 +23,7 @@ data class Missing(override val meta: Meta) : Failure()
 
 data class Invalid(override val meta: Meta) : Failure()
 
-object CatchContractBreach : Filter {
+object CatchLensFailure : Filter {
     override fun invoke(next: HttpHandler): HttpHandler = {
         try {
             next(it)

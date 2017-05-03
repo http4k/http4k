@@ -15,6 +15,8 @@ sealed class HttpMessage {
 
     fun header(name: String): String? = headers.find { it.first.equals(name, true) }?.second
 
+    abstract fun header(name: String, value: String?): HttpMessage
+
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
     fun bodyString(): String = body.string()
@@ -30,20 +32,20 @@ enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
 
 data class Request(val method: Method, val uri: Uri, override val headers: Headers = listOf(), override val body: Body? = null) : HttpMessage() {
     companion object {
-        fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = get(Uri.uri(uri), headers, body)
-        fun get(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.GET, uri, headers, body)
-        fun post(uri: String, headers: Headers = listOf(), body: Body? = null) = post(Uri.uri(uri), headers, body)
-        fun post(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.POST, uri, headers, body)
-        fun put(uri: String, headers: Headers = listOf(), body: Body? = null) = put(Uri.uri(uri), headers, body)
-        fun put(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.PUT, uri, headers, body)
-        fun delete(uri: String, headers: Headers = listOf(), body: Body? = null) = delete(Uri.uri(uri), headers, body)
-        fun delete(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.DELETE, uri, headers, body)
-        fun options(uri: String, headers: Headers = listOf(), body: Body? = null) = options(Uri.uri(uri), headers, body)
-        fun options(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.OPTIONS, uri, headers, body)
-        fun trace(uri: String, headers: Headers = listOf(), body: Body? = null) = trace(Uri.uri(uri), headers, body)
-        fun trace(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.TRACE, uri, headers, body)
-        fun patch(uri: String, headers: Headers = listOf(), body: Body? = null) = patch(Uri.uri(uri), headers, body)
-        fun patch(uri: Uri, headers: Headers = listOf(), body: Body? = null) = Request(Method.PATCH, uri, headers, body)
+        fun get(uri: String, headers: Headers = listOf(), body: Body? = null): Request = get(Uri.uri(uri), headers, body)
+        fun get(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.GET, uri, headers, body)
+        fun post(uri: String, headers: Headers = listOf(), body: Body? = null): Request = post(Uri.uri(uri), headers, body)
+        fun post(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.POST, uri, headers, body)
+        fun put(uri: String, headers: Headers = listOf(), body: Body? = null): Request = put(Uri.uri(uri), headers, body)
+        fun put(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.PUT, uri, headers, body)
+        fun delete(uri: String, headers: Headers = listOf(), body: Body? = null): Request = delete(Uri.uri(uri), headers, body)
+        fun delete(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.DELETE, uri, headers, body)
+        fun options(uri: String, headers: Headers = listOf(), body: Body? = null): Request = options(Uri.uri(uri), headers, body)
+        fun options(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.OPTIONS, uri, headers, body)
+        fun trace(uri: String, headers: Headers = listOf(), body: Body? = null): Request = trace(Uri.uri(uri), headers, body)
+        fun trace(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.TRACE, uri, headers, body)
+        fun patch(uri: String, headers: Headers = listOf(), body: Body? = null): Request = patch(Uri.uri(uri), headers, body)
+        fun patch(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = Request(Method.PATCH, uri, headers, body)
     }
 
     fun query(name: String, value: String) = copy(uri = uri.query(name, value))
@@ -51,6 +53,8 @@ data class Request(val method: Method, val uri: Uri, override val headers: Heade
     fun query(name: String): String? = uri.queries().findSingle(name)
 
     fun queries(name: String): List<String?> = uri.queries().findMultiple(name)
+
+    override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
@@ -69,12 +73,12 @@ data class Response(val status: Status, override val headers: Headers = listOf()
         fun found(headers: Headers = listOf(), body: Body? = null) = Response(Status.FOUND, headers, body)
     }
 
+    override fun header(name: String, value: String?): Response = copy(headers = headers.plus(name to value))
+
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     override fun toString(): String = toMessage()
 }
-
-fun <T : HttpMessage> T.header(name: String, value: String?): T = copy(headers = headers.plus(name to value))
 
 fun <T : HttpMessage> T.replaceHeader(name: String, value: String?): T = copy(headers = headers.remove(name).plus(name to value))
 

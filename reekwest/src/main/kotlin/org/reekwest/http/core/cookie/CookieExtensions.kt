@@ -9,7 +9,6 @@ import org.reekwest.http.core.cookie.CookieAttribute.Companion.HTTP_ONLY
 import org.reekwest.http.core.cookie.CookieAttribute.Companion.MAX_AGE
 import org.reekwest.http.core.cookie.CookieAttribute.Companion.PATH
 import org.reekwest.http.core.cookie.CookieAttribute.Companion.SECURE
-import org.reekwest.http.core.header
 import org.reekwest.http.core.replaceHeader
 import org.reekwest.http.unquoted
 import java.time.LocalDateTime
