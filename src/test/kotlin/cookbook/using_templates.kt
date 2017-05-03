@@ -19,5 +19,6 @@ fun main(args: Array<String>) {
         Response(OK).body(renderedView)
     }
 
-    println(app(get("")))
+    println(app(get("/someUrl")))
 }
+
