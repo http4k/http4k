@@ -1,0 +1,40 @@
+package cookbook
+
+import org.reekwest.http.core.Request.Companion.get
+import org.reekwest.http.core.with
+import org.reekwest.http.formats.Jackson
+import org.reekwest.http.formats.Jackson.asJsonArray
+import org.reekwest.http.formats.Jackson.asJsonObject
+import org.reekwest.http.formats.Jackson.asJsonValue
+import org.reekwest.http.formats.Jackson.asPrettyJsonString
+import org.reekwest.http.formats.Jackson.json
+import org.reekwest.http.lens.Body
+
+fun main(args: Array<String>) {
+
+    val json = Jackson
+
+    val objectUsingExtensionFunctions =
+        listOf(
+            "thisIsAString" to "stringValue".asJsonValue(),
+            "thisIsANumber" to 12345.asJsonValue(),
+            "thisIsAList" to listOf(true.asJsonValue()).asJsonArray()
+        ).asJsonObject()
+
+    val objectUsingDirectApi = json.obj(
+        "thisIsAString" to json.string("stringValue"),
+        "thisIsANumber" to json.number(12345),
+        "thisIsAList" to json.array(listOf(json.boolean(true)))
+    )
+
+    println(objectUsingExtensionFunctions.asPrettyJsonString())
+
+    println(
+        get("http://pokeapi.co/api/v2/pokemon/").with(
+            Body.json().required() to
+                listOf(
+                    objectUsingDirectApi,
+                    objectUsingExtensionFunctions
+                ).asJsonArray())
+    )
+}
