@@ -1,5 +1,7 @@
 package org.reekwest.http.filters
 
+import org.reekwest.http.Credentials
+import org.reekwest.http.base64Encode
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method
@@ -9,11 +11,7 @@ import org.reekwest.http.core.Uri
 
 object ClientFilters {
 
-    fun FollowRedirects(): Filter = Filter { next ->
-        { request ->
-            makeRequest(next, request)
-        }
-    }
+    fun FollowRedirects(): Filter = Filter { next -> { makeRequest(next, it) } }
 
     private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response {
         val response = next(request)
@@ -38,6 +36,16 @@ object ClientFilters {
     }
 
     private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
+
+    fun BasicAuth(provider: () -> Credentials): Filter = Filter {
+        next ->
+        { next(it.header("Authorization", "Basic ${provider().base64Encoded()}")) }
+    }
+
+    fun BasicAuth(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
+    fun BasicAuth(credentials: Credentials): Filter = BasicAuth({ credentials })
+
+    private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
 }
 
 
