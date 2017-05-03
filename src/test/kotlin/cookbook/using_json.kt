@@ -1,6 +1,7 @@
 package cookbook
 
-import org.reekwest.http.core.Request.Companion.get
+import org.reekwest.http.core.Response
+import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Jackson
 import org.reekwest.http.formats.Jackson.asJsonArray
@@ -30,7 +31,7 @@ fun main(args: Array<String>) {
     println(objectUsingExtensionFunctions.asPrettyJsonString())
 
     println(
-        get("http://pokeapi.co/api/v2/pokemon/").with(
+        Response(OK).with(
             Body.json().required() to
                 listOf(
                     objectUsingDirectApi,
