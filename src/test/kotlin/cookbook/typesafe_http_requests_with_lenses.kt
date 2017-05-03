@@ -13,26 +13,33 @@ import org.reekwest.http.lens.int
 
 fun main(args: Array<String>) {
 
-    val nameQuery = Header.required("name")
-    val ageQuery = Query.int().required("age")
+    data class Child(val name: String)
 
-    val endpoint = { request: Request ->
+    val nameQuery = Header.required("name")
+    val ageQuery = Query.int().optional("age")
+    val childrenBody = Body.string.map({ it.split(",").map(::Child) }, { it.map { it.name }.joinToString() }).required()
+
+    val endpoint = {
+        request: Request ->
 
         val name: String = nameQuery(request)
-        val age: Int = ageQuery(request)
+        val age: Int? = ageQuery(request)
+        val children: List<Child> = childrenBody(request)
 
+        val msg = "$name is ${age ?: "unknown"} years old and has " +
+            "${children.size} children (${children.map { it.name }.joinToString()})"
         ok().with(
-            Body.string.required() to "$name is $age years old"
+            Body.string.required() to msg
         )
     }
 
     val app = CatchLensFailure.then(endpoint)
 
-    val goodRequest = get("http://localhost:9000").header("name", "Jane Doe").query("age", "25")
+    val goodRequest = get("http://localhost:9000").header("name", "Jane Doe").query("age", "25").body("rita,sue,bob")
 
-    println(listOf("","Request:", goodRequest, app(goodRequest)).joinToString("\n"))
+    println(listOf("", "Request:", goodRequest, app(goodRequest)).joinToString("\n"))
 
     val badRequest = get("http://localhost:9000").header("name", "John Doe").query("age", "too old!")
 
-    println(listOf("","Request:", badRequest, app(badRequest)).joinToString("\n"))
+    println(listOf("", "Request:", badRequest, app(badRequest)).joinToString("\n"))
 }
