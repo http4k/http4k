@@ -102,18 +102,18 @@ coming soon...
 Add one or more of these module dependencies:
 
 
-Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.38"```
+Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.0.39"```
 
-Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.38"```
+Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.0.39"```
 
-Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.38"```
+Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.0.39"```
 
-Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.38"```
+Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.0.39"```
 
-Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.0.38"```
+Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.0.39"```
 
-Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.38"'```
+Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.0.39"'```
 
-Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.38"'```
+Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.0.39"'```
 
-Netty Server: ```compile group: "org.reekwest", name: "reekwest-server-netty", version: "0.0.38"'```
+Netty Server: ```compile group: "org.reekwest", name: "reekwest-server-netty", version: "0.0.39"'```
