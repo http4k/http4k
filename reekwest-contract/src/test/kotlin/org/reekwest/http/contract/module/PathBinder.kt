@@ -11,7 +11,7 @@ import org.reekwest.http.lens.PathLens
 class ServerRoute internal constructor(internal val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
-    fun describeFor(basePath: BasePath): String = pathBinder.describe(basePath)
+    fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
 }
 
 abstract class PathBinder internal constructor(internal val core: Core, private vararg val pathLenses: PathLens<*>) {
@@ -30,7 +30,7 @@ abstract class PathBinder internal constructor(internal val core: Core, private 
             } else null
         }
 
-    fun describe(basePath: BasePath) = "${core.pathFn(basePath)}/${pathLenses.joinToString("/")}"
+    fun describe(moduleRoot: BasePath): String = "${core.pathFn(moduleRoot)}/${pathLenses.joinToString("/")}"
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {

@@ -7,7 +7,7 @@ import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.lens.Failure
 
 object NoRenderer : ModuleRenderer {
-    override fun description(basePath: BasePath, routes: List<ServerRoute>) = Response(OK)
+    override fun description(moduleRoot: BasePath, routes: List<ServerRoute>) = Response(OK)
 
     override fun badRequest(failures: List<Failure>): Response = Response(BAD_REQUEST)
 

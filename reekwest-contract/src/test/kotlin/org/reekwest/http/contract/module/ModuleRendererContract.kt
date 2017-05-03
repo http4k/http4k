@@ -2,17 +2,29 @@ package org.reekwest.http.contract.module
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.ContentType
-import org.reekwest.http.core.Method
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_JSON
+import org.reekwest.http.core.Method.GET
+import org.reekwest.http.core.Method.POST
+import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
-import org.reekwest.http.core.Status
+import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.formats.Argo.json
+import org.reekwest.http.formats.Argo.parse
+import org.reekwest.http.lens.Body
+import org.reekwest.http.lens.FormField
+import org.reekwest.http.lens.FormValidator.Strict
 import org.reekwest.http.lens.Header
 import org.reekwest.http.lens.Invalid
 import org.reekwest.http.lens.Meta
 import org.reekwest.http.lens.Missing
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.Query
+import org.reekwest.http.lens.boolean
+import org.reekwest.http.lens.int
+import org.reekwest.http.lens.webForm
 
 abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
     fun name(): String = this.javaClass.simpleName
@@ -35,37 +47,39 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 
 
     @Test
+    @Ignore
     fun `renders as expected`() {
 
-//        val customBody = Body.json().required("the body of the message", json.obj("anObject" to json.obj("notAStringField" to json.number(123))))
+        val customBody = Body.json().required("the body of the message")
+//        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)
             .securedBy(ApiKey(Query.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")
-                    .producing(ContentType.APPLICATION_JSON)
+                    .producing(APPLICATION_JSON)
                     .header(Header.optional("header", "description of the header"))
 //                    .returning(ResponseSpec.json(Status.Ok to "peachy", obj("anAnotherObject" to obj("aNumberField" to number(123)))))
 //        .returning(Status.Forbidden to "no way jose")
-                    .at(Method.GET) / "echo" / Path.of("message") bind { msg -> { Response(Status.OK).body(msg) } })
-//        .withRoute(
-//            RouteSpec("a post endpoint")
-//                .consuming(APPLICATION_ATOM_XML, APPLICATION_SVG_XML)
-//                .producing(APPLICATION_JSON)
+                    .at(GET) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
+            .withRoute(
+                Route("a post endpoint")
+                    .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
+                    .producing(APPLICATION_JSON)
 //                .returning(ResponseSpec.json(Status.Forbidden to "no way jose", obj("aString" to Argo.JsonFormat.string("a message of some kind"))))
-//        .taking(Query.required.int("query"))
-//            .body(customBody)
-//            .at(Post) / "echo" / Path.string("message") bindTo ((s: String) -> Echo(s)))
-//        .withRoute(
-//            RouteSpec("a friendly endpoint")
-//                .taking(Query.required.boolean("query", "description of the query"))
-//                .body(Body.form(FormField.required.int("form", "description of the form")))
-//                .at(Get) / "welcome" / Path.string("firstName") / "bertrand" / Path.string("secondName") bindTo ((x: String, y: String, z: String) -> Echo(x, y, z)))
+                    .query(Query.int().required("query"))
+                    .body(customBody)
+                    .at(POST) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
+            .withRoute(
+                Route("a friendly endpoint")
+                    .query(Query.boolean().required("query", "description of the query"))
+                    .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")))
+                    .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, b, c -> { Response(OK).body(a) } })
 
-//                    val expected = parse(Source.fromInputStream(this.getClass.getResourceAsStream("$name.json")).mkString)
-//
-//                    val actual = Await.result(module.toHtt(Request("/basepath"))).contentString
-//                    //                  println(actual)
-//                    parse(actual) shouldBe expected
+        val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
+        val actual = module.toHttpHandler()(get("/basepath?the_api_key=somevalue")).bodyString()
+        println(expected)
+        println(actual)
+        assertThat(parse(actual), equalTo(parse(expected)))
     }
 }
