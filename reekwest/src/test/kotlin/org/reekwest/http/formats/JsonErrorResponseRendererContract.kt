@@ -7,7 +7,7 @@ import org.reekwest.http.lens.Invalid
 import org.reekwest.http.lens.Meta
 import org.reekwest.http.lens.Missing
 
-open class JsonErrorResponseRendererContract<ROOT : NODE, NODE: Any>(val j: Json<ROOT, NODE>){
+abstract class JsonErrorResponseRendererContract<ROOT : NODE, NODE: Any>(val j: Json<ROOT, NODE>){
 
     @Test
     fun `can build 400`() {
