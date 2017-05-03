@@ -21,20 +21,22 @@ object ServerFilters {
         }
     }
 
-    fun BasicAuth(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
-        handler ->
-        {
-            val credentials = it.basicAuthenticationCredentials()
-            if (credentials == null || !authorize(credentials)) {
-                Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
-            } else {
-                handler(it)
+    object BasicAuth {
+        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
+            handler ->
+            {
+                val credentials = it.basicAuthenticationCredentials()
+                if (credentials == null || !authorize(credentials)) {
+                    Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+                } else {
+                    handler(it)
+                }
             }
         }
-    }
 
-    fun BasicAuth(realm: String, user: String, password: String): Filter = BasicAuth(realm, Credentials(user, password))
-    fun BasicAuth(realm: String, credentials: Credentials): Filter = BasicAuth(realm, { it == credentials })
+        operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
+        operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm, { it == credentials })
+    }
 
     private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
 

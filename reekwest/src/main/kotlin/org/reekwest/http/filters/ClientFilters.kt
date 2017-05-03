@@ -37,15 +37,17 @@ object ClientFilters {
 
     private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
 
-    fun BasicAuth(provider: () -> Credentials): Filter = Filter {
-        next ->
-        { next(it.header("Authorization", "Basic ${provider().base64Encoded()}")) }
+    object BasicAuth {
+        operator fun invoke(provider: () -> Credentials): Filter = Filter {
+            next ->
+            { next(it.header("Authorization", "Basic ${provider().base64Encoded()}")) }
+        }
+
+        operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
+        operator fun invoke(credentials: Credentials): Filter = BasicAuth({ credentials })
+
+        private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
-
-    fun BasicAuth(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
-    fun BasicAuth(credentials: Credentials): Filter = BasicAuth({ credentials })
-
-    private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
 }
 
 
