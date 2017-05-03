@@ -13,7 +13,7 @@ function upgrade {
 
 upgrade `./tools/jq -r .reekwest.old version.json` $NEW_VERSION
 
-./gradlew -PreleaseVersion=$NEW_VERSION clean build \
+./gradlew --debug -PreleaseVersion=$NEW_VERSION clean build \
     :reekwest:bintrayUpload \
     :reekwest-client-apache:bintrayUpload \
     :reekwest-server-jetty:bintrayUpload \

@@ -3,6 +3,8 @@ package org.reekwest.http.apache
 import org.apache.http.Header
 import org.apache.http.HttpEntity
 import org.apache.http.StatusLine
+import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpRequestBase
@@ -33,6 +35,9 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
                 uri = URI(request.uri.toString())
                 entity = ByteArrayEntity(request.body.toString().toByteArray())
                 request.headers.filter { it.first != "content-length" }.map { addHeader(it.first, it.second) }
+                config = RequestConfig.custom()
+                    .setRedirectsEnabled(false)
+                    .setCookieSpec(IGNORE_COOKIES).build()
             }
 
             override fun getMethod(): String = this@toApacheRequest.method.name

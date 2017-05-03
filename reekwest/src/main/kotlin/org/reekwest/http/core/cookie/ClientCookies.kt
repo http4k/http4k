@@ -10,7 +10,7 @@ interface CookieStorage {
     fun clear()
 }
 
-class ClientCookies(private val storage: CookieStorage = BasicCookieStorage) : Filter {
+class ClientCookies(private val storage: CookieStorage = BasicCookieStorage()) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
         val requestWithCookies = request.cookies(storage.retrieve())
         val response = handler(requestWithCookies)
@@ -19,7 +19,7 @@ class ClientCookies(private val storage: CookieStorage = BasicCookieStorage) : F
     }
 }
 
-object BasicCookieStorage : CookieStorage {
+class BasicCookieStorage : CookieStorage {
     val storage = ConcurrentHashMap<String, Cookie>()
 
     override fun store(cookies: List<Cookie>) = cookies.forEach { storage.put(it.name, it) }
