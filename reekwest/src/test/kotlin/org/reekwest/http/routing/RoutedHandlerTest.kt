@@ -11,7 +11,6 @@ import org.reekwest.http.core.Request.Companion.post
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
-import org.reekwest.http.core.bodyString
 
 class RoutedHandlerTest {
 
@@ -28,7 +27,7 @@ class RoutedHandlerTest {
     @Test
     fun method_not_allowed() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().bodyString("matched") }
+            GET to "/a/{route}" by { _: Request -> ok().body("matched") }
         )
 
         val response = routes(post("/a/something"))
@@ -39,7 +38,7 @@ class RoutedHandlerTest {
     @Test
     fun matches_uri_template_and_method() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().bodyString("matched") }
+            GET to "/a/{route}" by { _: Request -> ok().body("matched") }
         )
 
         val response = routes(get("/a/something"))
@@ -50,8 +49,8 @@ class RoutedHandlerTest {
     @Test
     fun matches_uses_first_match() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().bodyString("matched a") },
-            GET to "/a/{route}" by { _: Request -> ok().bodyString("matched b") }
+            GET to "/a/{route}" by { _: Request -> ok().body("matched a") },
+            GET to "/a/{route}" by { _: Request -> ok().body("matched b") }
         )
 
         val response = routes(get("/a/something"))
@@ -62,7 +61,7 @@ class RoutedHandlerTest {
     @Test
     fun path_parameters_are_available_in_request() {
         val routes = routes(
-            GET to "/{a}/{b}/{c}" by { req: Request -> ok().bodyString("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
+            GET to "/{a}/{b}/{c}" by { req: Request -> ok().body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
         )
 
         val response = routes(get("/x/y/z"))

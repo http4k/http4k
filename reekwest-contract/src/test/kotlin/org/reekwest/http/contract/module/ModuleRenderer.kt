@@ -4,7 +4,6 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.BAD_REQUEST
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
 import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.core.bodyString
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Json
 import org.reekwest.http.lens.Failure
@@ -29,7 +28,7 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
 
     override fun notFound(): Response = Response(NOT_FOUND)
 
-    override fun badRequest(failures: Iterable<Failure>) = Response(BAD_REQUEST).bodyString(failures.joinToString())
+    override fun badRequest(failures: Iterable<Failure>) = Response(BAD_REQUEST).body(failures.joinToString())
 
     private fun render(basePath: BasePath, route: ServerRoute) =
         route.pathBinder.core.method.toString() + ":" + route.describeFor(basePath) to

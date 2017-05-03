@@ -8,7 +8,6 @@ import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Status.Companion.UNAUTHORIZED
-import org.reekwest.http.core.body
 import org.reekwest.http.lens.Query
 import org.reekwest.http.lens.int
 

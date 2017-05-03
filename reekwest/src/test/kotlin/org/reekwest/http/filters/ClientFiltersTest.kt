@@ -12,7 +12,6 @@ import org.reekwest.http.core.Response.Companion.movedPermanently
 import org.reekwest.http.core.Response.Companion.movedTemporarily
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.Response.Companion.serverError
-import org.reekwest.http.core.body
 import org.reekwest.http.core.then
 
 class ClientFiltersTest {

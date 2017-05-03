@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
-import org.reekwest.http.core.bodyString
 import org.reekwest.http.core.toBody
 
 class BodyTest {
@@ -39,7 +38,7 @@ class BodyTest {
     @Test
     fun `can create a one way custom Body type`() {
         val customBody = Body.string.map(::MyCustomBodyType).required()
-        assertThat(customBody(emptyRequest.bodyString("hello world!")), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(customBody(emptyRequest.body("hello world!")), equalTo(MyCustomBodyType("hello world!")))
     }
 }
 

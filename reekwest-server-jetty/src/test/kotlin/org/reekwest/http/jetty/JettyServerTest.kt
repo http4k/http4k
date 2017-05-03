@@ -10,7 +10,6 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response.Companion.ok
-import org.reekwest.http.core.bodyString
 import org.reekwest.http.routing.by
 import org.reekwest.http.routing.routes
 
@@ -21,8 +20,8 @@ class JettyServerTest {
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _: Request -> ok().bodyString("Hello World") },
-            GET to "/request-headers" by { request: Request -> ok().bodyString(request.headerValues("foo").joinToString(", ")) }
+            GET to "/" by { _: Request -> ok().body("Hello World") },
+            GET to "/request-headers" by { request: Request -> ok().body(request.headerValues("foo").joinToString(", ")) }
         ).startJettyServer(block = false)
     }
 

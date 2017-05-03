@@ -5,9 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Request.Companion.post
-import org.reekwest.http.core.body
 import org.reekwest.http.core.body.toBody
-import org.reekwest.http.core.bodyString
 import org.reekwest.http.core.toCurl
 
 class CurlTest {
@@ -44,14 +42,14 @@ class CurlTest {
 
     @Test
     fun `escapes body string`() {
-        val curl = get("http://httpbin.org").bodyString("my \"quote\"").toCurl()
+        val curl = get("http://httpbin.org").body("my \"quote\"").toCurl()
         assertThat(curl, equalTo("""curl -X GET --data "my \"quote\"" "http://httpbin.org""""))
     }
 
     @Test
     fun `limits the entity if it's too large`() {
         val largeBody = (0..500).joinToString(" ")
-        val curl = get("http://httpbin.org").bodyString(largeBody).toCurl()
+        val curl = get("http://httpbin.org").body(largeBody).toCurl()
         val data = "data \"([^\"]+)\"".toRegex().find(curl)?.groupValues?.get(1)!!
         assertThat(data.length, equalTo(256 + "[truncated]".length))
     }

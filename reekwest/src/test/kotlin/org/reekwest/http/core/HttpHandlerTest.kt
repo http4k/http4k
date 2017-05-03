@@ -19,14 +19,14 @@ class HttpHandlerTest {
 
     @Test
     fun query_parameters() {
-        val handler = { request: Request -> ok().bodyString("Hello, ${request.query("name")}") }
+        val handler = { request: Request -> ok().body("Hello, ${request.query("name")}") }
         val response = handler(get("/").query("name", "John Doe"))
-        assertThat(response, equalTo(ok().bodyString("Hello, John Doe")))
+        assertThat(response, equalTo(ok().body("Hello, John Doe")))
     }
 
     @Test
     fun form_handling() {
-        val handler = { request: Request -> ok().bodyString("Hello, ${request.form("name")}") }
+        val handler = { request: Request -> ok().body("Hello, ${request.form("name")}") }
         val form = listOf("name" to "John Doe")
 
         val response = handler(post("irrelevant").body(form.toBody()))

@@ -17,6 +17,14 @@ sealed class HttpMessage {
 
     abstract fun header(name: String, value: String?): HttpMessage
 
+    abstract fun replaceHeader(name: String, value: String?): HttpMessage
+
+    abstract fun removeHeader(name: String): HttpMessage
+
+    abstract fun body(body: Body?): HttpMessage
+
+    abstract fun body(body: String): HttpMessage
+
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
     fun bodyString(): String = body.string()
@@ -55,6 +63,13 @@ data class Request(val method: Method, val uri: Uri, override val headers: Heade
     fun queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
+
+    override fun removeHeader(name: String) = copy(headers = headers.remove(name))
+
+    override fun body(body: Body?) = copy(body = body)
+
+    override fun body(body: String) = copy(body = body.toBody())
 
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
@@ -73,22 +88,20 @@ data class Response(val status: Status, override val headers: Headers = listOf()
         fun found(headers: Headers = listOf(), body: Body? = null) = Response(Status.FOUND, headers, body)
     }
 
-    override fun header(name: String, value: String?): Response = copy(headers = headers.plus(name to value))
+    override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+
+    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
+
+    override fun removeHeader(name: String) = copy(headers = headers.remove(name))
+
+    override fun body(body: Body?) = copy(body = body)
+
+    override fun body(body: String) = copy(body = body.toBody())
 
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     override fun toString(): String = toMessage()
 }
-
-fun <T : HttpMessage> T.replaceHeader(name: String, value: String?): T = copy(headers = headers.remove(name).plus(name to value))
-
-fun <T : HttpMessage> T.removeHeader(name: String): T = copy(headers = headers.remove(name))
-
-fun <T : HttpMessage> T.body(body: Body?): T = copy(body = body)
-
-fun <T : HttpMessage> T.body(body: String): T = copy(body = body.toBody())
-
-fun <T : HttpMessage> T.bodyString(body: String): T = body(body)
 
 fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body? = this.body): T = when (this) {
     is Request -> this.copy(headers = headers, body = body) as T
