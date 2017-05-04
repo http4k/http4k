@@ -10,3 +10,9 @@ ache:
   directories:
   - "$HOME/.m2"
   - "$HOME/.gradle"
+
+notifications:
+  slack: contractorscum:DiikH6t3ig2ZKfVMP1SQ9peR
+    template:
+      - "%{repository} (%{commit}) : %{message} %{foo} "
+      - "Build details: %{build_url}"
