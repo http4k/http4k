@@ -7,10 +7,7 @@ set -o nounset
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Parsing $DIR/version.json"
-cat $DIR/version.json
-
-LOCAL_VERSION=`jq -r .reekwest.new $DIR/version.json`
+LOCAL_VERSION=`jq -r .reekwest.version $DIR/version.json`
 
 BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/reekwest/maven/reekwest/versions/_latest | jq -r .name`
 
