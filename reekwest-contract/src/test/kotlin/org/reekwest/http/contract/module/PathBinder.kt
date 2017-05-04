@@ -8,16 +8,17 @@ import org.reekwest.http.lens.LensFailure
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.PathLens
 
+
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
-    val responses = pathBinder.core.route.core.responses
-    val method = pathBinder.core.method
-    val summary = pathBinder.core.route.core.summary
+    internal val core = pathBinder.core.route.core
+    internal val method = pathBinder.core.method
+    internal val allParams = core.requestParams.plus(pathBinder.pathLenses)
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
     fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
 }
 
-abstract class PathBinder internal constructor(internal val core: Core, private vararg val pathLenses: PathLens<*>) {
+abstract class PathBinder internal constructor(internal val core: Core, internal vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PathBinder
 
     open infix operator fun div(next: String) = div(Path.fixed(next))

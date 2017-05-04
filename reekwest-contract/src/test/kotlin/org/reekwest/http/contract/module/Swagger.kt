@@ -6,7 +6,9 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.formats.Json
 import org.reekwest.http.formats.JsonErrorResponseRenderer
+import org.reekwest.http.lens.BodyLens
 import org.reekwest.http.lens.Failure
+import org.reekwest.http.lens.Lens
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
@@ -29,31 +31,30 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     }
 
 
-    //    private fun render(parameters: Any, schema: JsonSchema<NODE>?): Iterable<NODE> {
-//        listOf()
-//    }
-//        parameters.map(
-//            parameter ->
-//    obj(
-//    "in" -> string(parameter.where),
-//    "name" -> string(parameter.name),
-//    "description" -> Option(parameter.description).map(string).getOrElse(nullNode()),
-//    "required" -> boolean(parameter.required),
-//    schema.map("schema" -> _.node).getOrElse("type" -> string(parameter.paramType.name))
-//    )
-//    )
-//
+    private fun render(parameters: Iterable<Lens<*, *>>, schema: JsonSchema<NODE>?) =
+        parameters.map {
+            json.obj(
+                "in" to json.string(it.meta.location),
+                "name" to json.string(it.meta.name),
+                "description" to (it.meta.description?.let(json::string) ?: json.nullNode()),
+                "required" to json.boolean(it.meta.required),
+                schema?.let { "schema" to it.node } ?: "type" to json.string(it.meta.name)
+            )
+        }
+
     private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
-            val (responses, responseDefinitions) = render(route.responses)
+        val (responses, responseDefinitions) = render(route.core.responses)
 //
-//            val bodyParameters = route.routeSpec.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
+        val bodyParams = route.core.body?.let { emptyList<BodyLens<*>>() } ?: emptyList()
+//        val bodyParameters = route.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
 //
-//            val bodyAndSchemaAndRendered = bodyParameters.map(p -> {
+//            val bodyAndSchemaAndRendered = bodyParams.map {p ->
 //                val exampleOption = p.example.flatMap(s -> Try (parse(s)).toOption).map(schemaGenerator.toSchema)
 //                (p, exampleOption, render(p, exampleOption))
 //            })
 //
-//            val allParams = route.pathParams.flatten++ route . routeSpec . requestParams
+        val nonBodyParams = route.allParams.map { render(listOf(it), null) }
+
 //            val nonBodyParams = allParams.flatMap(render(_, Option.empty))
 //
 //            val jsonRoute = route.method.toString().toLowerCase -> obj(
