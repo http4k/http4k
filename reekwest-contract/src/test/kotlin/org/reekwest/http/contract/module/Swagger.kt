@@ -42,9 +42,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 //    )
 //    )
 //
-    private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> = TODO()
-
-    //        {
+    private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
 //            val FieldsAndDefinitions(responses, responseDefinitions) = render(route.routeSpec.responses)
 //
 //            val bodyParameters = route.routeSpec.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
@@ -72,8 +70,10 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 //        })
 //            )
 //            FieldAndDefinitions(jsonRoute, responseDefinitions++ bodyAndSchemaAndRendered . flatMap (_._2).flatMap(_.definitions))
-//        }
-//
+        return FieldAndDefinitions<NODE>("" to json.obj(listOf()), emptyList())
+    }
+
+    //
 //    private fun render(responses: List<ResponseSpec>): FieldsAndDefinitions =
 //        responses.foldLeft(FieldsAndDefinitions())
 //        {
