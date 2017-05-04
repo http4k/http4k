@@ -9,7 +9,7 @@ import org.reekwest.http.formats.JsonType
 
 class IllegalSchemaException(message: String) : Exception(message)
 
-data class JsonSchema<out NODE>(val node: NODE, val definitions: Iterable<Pair<String, NODE>>)
+data class JsonSchema<out NODE>(val node: NODE, val definitions: List<Pair<String, NODE>>)
 
 class JsonToJsonSchema<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) {
     fun toSchema(node: NODE): JsonSchema<NODE> = toSchema(JsonSchema(node, emptyList()))

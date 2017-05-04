@@ -1,5 +1,6 @@
 package org.reekwest.http.contract.module
 
+import org.reekwest.http.contract.util.JsonSchema
 import org.reekwest.http.contract.util.JsonToJsonSchema
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
@@ -74,15 +75,19 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     }
 
     //
-//    private fun render(responses: List<ResponseSpec>): FieldsAndDefinitions =
-//        responses.foldLeft(FieldsAndDefinitions())
-//        {
-//            data(memo, nextResp) ->
-//            val newSchema = Try(parse(nextResp.example.get)).toOption.map(schemaGenerator.toSchema).getOrElse(Schema(nullNode(), Nil))
-//            val newField = nextResp.status.code.toString -> obj("description" -> string(nextResp.description), "schema" -> newSchema.node)
-//            memo.add(newField, newSchema.definitions)
-//        }
-//
+    private fun render(responses: List<Response>) =
+        responses.fold(FieldsAndDefinitions<NODE>(),
+            {
+                memo, nextResp ->
+                val newSchema = try {
+                    schemaGenerator.toSchema(json.parse(nextResp.bodyString()))
+                } catch (e: Exception) {
+                    JsonSchema(json.nullNode(), emptyList())
+                }
+                val newField = nextResp.status.code.toString() to json.obj("description" to json.string(""), "schema" to newSchema.node)
+                memo.add(newField, newSchema.definitions)
+            })
+
     private fun render(security: Security) = when (security) {
         is ApiKey<*> -> json.obj(
             "api_key" to json.obj("type" to json.string("apiKey"),
