@@ -4,7 +4,7 @@ jdk:
 script:
 - "./gradlew check"
 after_success:
-- "./gradlew cobertura coveralls"
+#- "./gradlew cobertura coveralls"
 - "./release-ci.sh"
 ache:
   directories:
