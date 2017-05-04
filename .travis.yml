@@ -12,4 +12,7 @@ cache:
   - "$HOME/.gradle"
 
 notifications:
-  slack: contractorscum:DiikH6t3ig2ZKfVMP1SQ9peR
+  slack:
+    rooms: contractorscum:DiikH6t3ig2ZKfVMP1SQ9peR
+    template:
+          - "%{repository} (%{commit}) : %{commit_message}. Build details: %{build_url}"
