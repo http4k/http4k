@@ -8,6 +8,7 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Request.Companion.post
+import org.reekwest.http.core.Response.Companion.notFound
 import org.reekwest.http.core.Response.Companion.ok
 import org.reekwest.http.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.reekwest.http.core.Status.Companion.NOT_FOUND
@@ -65,7 +66,35 @@ class RoutedHandlerTest {
         )
 
         val response = routes(get("/x/y/z"))
+
         assertThat(response.bodyString(), equalTo("matched x, y, z"))
+    }
+
+    @Test
+    fun matches_uri_with_query() {
+        val routes = routes(GET to "/a/b" by { ok() })
+
+        val response = routes(get("/a/b?foo=bar"))
+
+        assertThat(response, equalTo(ok()))
+    }
+
+    @Test
+    fun matches_request_with_extra_path_parts(){
+        val routes = routes(GET to "/a" by { ok() })
+
+        val response = routes(get("/a/b"))
+
+        assertThat(response, equalTo(ok()))
+    }
+
+    @Test
+    fun can_stop_matching_extra_parts(){
+        val routes = routes(GET to "/a{$}" by { ok() })
+
+        val response = routes(get("/a/b"))
+
+        assertThat(response, equalTo(notFound()))
     }
 
     @Test

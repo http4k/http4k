@@ -38,7 +38,7 @@ class RoutedHandler(vararg private val routes: Route) : HttpHandler {
         return MatchingResult.Match(remainingCandidates)
     }
 
-    private fun matchesTemplates(request: Request): RoutePredicate = { (_, template) -> template.matches(request.uri.toString()) }
+    private fun matchesTemplates(request: Request): RoutePredicate = { (_, template) -> template.matches(request.uri.path) }
     private fun matchesMethod(request: Request): RoutePredicate = { (method, _) -> method == request.method }
 
     private infix fun RoutePredicate.otherwise(fallbackStatus: Status): Pair<RoutePredicate, Status> = Pair(this, fallbackStatus)
