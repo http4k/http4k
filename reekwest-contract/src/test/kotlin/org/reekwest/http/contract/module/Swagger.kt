@@ -74,7 +74,6 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         return FieldAndDefinitions<NODE>("" to json.obj(listOf()), emptyList())
     }
 
-    //
     private fun render(responses: List<Response>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
             {
