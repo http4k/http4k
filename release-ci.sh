@@ -14,3 +14,13 @@ if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
     echo "Version has not changed"
     exit 0
 fi
+
+./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
+    :reekwest:bintrayUpload \
+    :reekwest-client-apache:bintrayUpload \
+    :reekwest-server-jetty:bintrayUpload \
+    :reekwest-server-netty:bintrayUpload \
+    :reekwest-contract:bintrayUpload \
+    :reekwest-templates-handlebars:bintrayUpload \
+    :reekwest-formats-argo:bintrayUpload \
+    :reekwest-formats-jackson:bintrayUpload
