@@ -1,6 +1,5 @@
 package org.reekwest.http.contract.module
 
-import argo.jdom.JsonNode
 import org.reekwest.http.contract.util.JsonToJsonSchema
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
@@ -9,8 +8,6 @@ import org.reekwest.http.formats.JsonErrorResponseRenderer
 import org.reekwest.http.lens.Failure
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
-
-typealias Field = Pair<String, JsonNode>
 
 class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ModuleRenderer {
 
@@ -21,17 +18,17 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     override fun notFound(): Response = errors.notFound()
 
-    private data class FieldAndDefinitions(val field: Field, val definitions: List<Field>)
+    private data class FieldAndDefinitions<out NODE : Any>(val field: Pair<String, NODE>, val definitions: List<Pair<String, NODE>>)
 
-    private data class FieldsAndDefinitions(val fields: List<Field> = emptyList(), val definitions: List<Field> = emptyList()) {
-        fun add(newField: Field, newDefinitions: List<Field>) = FieldsAndDefinitions(fields.plus(newField), newDefinitions.plus(definitions))
+    private data class FieldsAndDefinitions<NODE : Any>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: List<Pair<String, NODE>> = emptyList()) {
+        fun add(newField: Pair<String, NODE>, newDefinitions: List<Pair<String, NODE>>) = FieldsAndDefinitions(fields.plus(newField), newDefinitions.plus(definitions))
 
-        fun add(fieldAndDefinitions: FieldAndDefinitions) = FieldsAndDefinitions(fields.plus(fieldAndDefinitions.field),
+        fun add(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields.plus(fieldAndDefinitions.field),
             fieldAndDefinitions.definitions.plus(definitions))
     }
 
-    //
-//    private fun render(parameters: Any, schema: Schema?): Iterable<JsonNode> {
+
+    //    private fun render(parameters: Any, schema: JsonSchema<NODE>?): Iterable<NODE> {
 //        listOf()
 //    }
 //        parameters.map(
@@ -45,8 +42,9 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 //    )
 //    )
 //
-//    private fun render(basePath: Path, security: Security, route: ServerRoute<_, _>): FieldAndDefinitions =
-//        {
+    private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> = TODO()
+
+    //        {
 //            val FieldsAndDefinitions(responses, responseDefinitions) = render(route.routeSpec.responses)
 //
 //            val bodyParameters = route.routeSpec.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
@@ -85,42 +83,39 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 //            memo.add(newField, newSchema.definitions)
 //        }
 //
-//    private fun render(security: Security) = security match
-//        {
-//            data NoSecurity -> obj ()
-//            data ApiKey (param, _) -> obj(List(
-//            "api_key" -> obj(
-//            "type" -> string("apiKey"),
-//            "in" -> string(param.where),
-//            "name" -> string(param.name)
-//            )
-//            ))
-//        }
-//
+    private fun render(security: Security) = when (security) {
+        is ApiKey<*> -> json.obj(
+            "api_key" to json.obj("type" to json.string("apiKey"),
+                "in" to json.string(security.param.meta.location),
+                "name" to json.string(security.param.meta.name)
+            ))
+        else -> json.obj(listOf())
+    }
+
     private fun render(apiInfo: ApiInfo) =
         json.obj("title" to json.string(apiInfo.title),
             "version" to json.string(apiInfo.version),
             "description" to json.string(apiInfo.description ?: ""))
 
-    //
     override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
-//            val pathsAndDefinitions = routes
-//                .groupBy{ it.describeFor(basePath) }
-//                .fold(FieldsAndDefinitions()) {
-//                    data(memo, (path, routesForThisPath)) ->
-//                    val routeFieldsAndDefinitions = routesForThisPath.foldLeft(FieldsAndDefinitions()) {
-//                        data(memoFields, route) -> memoFields.add(render(basePath, security, route))
-//                    }
-//                    memo.add(path -> obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
-//                }
+        val pathsAndDefinitions = routes
+            .groupBy { it.describeFor(moduleRoot) }.entries
+            .fold(FieldsAndDefinitions<NODE>(), {
+                memo, (path, routes) ->
+                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), {
+                    memoFields, route ->
+                    memoFields.add(render(moduleRoot, security, route))
+                })
+                memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
+            })
 
         return Response(OK).body(json.pretty(json.obj(
             "swagger" to json.string("2.0"),
             "info" to render(apiInfo),
-            "basePath" to json.string("/")
-//            "paths" to obj(pathsAndDefinitions.fields),
-//            "securityDefinitions" to render(security),
-//            "definitions" to obj(pathsAndDefinitions.definitions)
+            "basePath" to json.string("/"),
+            "paths" to json.obj(pathsAndDefinitions.fields),
+            "securityDefinitions" to render(security),
+            "definitions" to json.obj(pathsAndDefinitions.definitions)
         )))
     }
 }
