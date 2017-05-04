@@ -1,10 +1,14 @@
 #!/bin/bash
 
+set -e
 set -o errexit
 set -o pipefail
 set -o nounset
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo "Parsing $DIR/version.json"
+cat $DIR/version.json
 
 LOCAL_VERSION=`jq -r .reekwest.new $DIR/version.json`
 
@@ -14,6 +18,8 @@ if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
     echo "Version has not changed"
     exit 0
 fi
+
+echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
     :reekwest:bintrayUpload \
