@@ -89,7 +89,8 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     private fun render(security: Security) = when (security) {
         is ApiKey<*> -> json.obj(
-            "api_key" to json.obj("type" to json.string("apiKey"),
+            "api_key" to json.obj(
+                "type" to json.string("apiKey"),
                 "in" to json.string(security.param.meta.location),
                 "name" to json.string(security.param.meta.name)
             ))
