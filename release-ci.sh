@@ -5,11 +5,10 @@ set -o pipefail
 set -o nounset
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-TOOLS="$DIR/tools"
 
-LOCAL_VERSION=`$TOOLS/jq -r .reekwest.new $DIR/version.json`
+LOCAL_VERSION=`jq -r .reekwest.new $DIR/version.json`
 
-BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/reekwest/maven/reekwest/versions/_latest | $TOOLS/jq -r .name`
+BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/reekwest/maven/reekwest/versions/_latest | jq -r .name`
 
 if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
     echo "Version has not changed"
