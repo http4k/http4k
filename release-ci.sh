@@ -14,5 +14,3 @@ if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
     echo "Version has not changed"
     exit 0
 fi
-
-echo "Version has changed. A new release should be triggered here..."
