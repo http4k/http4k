@@ -2,25 +2,17 @@
 
 set -e
 
-NEW_VERSION=`./tools/jq -r .reekwest.new version.json`
+NEW_VERSION=$1
 
-echo Releasing and publishing v$NEW_VERSION
+BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/reekwest/maven/reekwest/versions/_latest | jq -r .name`
 
-function upgrade {
-    echo Upgrade $1 to $2
-    sed -i '' s/$1/$2/g README.md
-}
+git stash
 
-upgrade `./tools/jq -r .reekwest.old version.json` $NEW_VERSION
+echo Upgrade from $BINTRAY_VERSION to $NEW_VERSION
 
-./gradlew -PreleaseVersion=$NEW_VERSION clean build \
-    :reekwest:bintrayUpload \
-    :reekwest-client-apache:bintrayUpload \
-    :reekwest-server-jetty:bintrayUpload \
-    :reekwest-server-netty:bintrayUpload \
-    :reekwest-contract:bintrayUpload \
-    :reekwest-templates-handlebars:bintrayUpload \
-    :reekwest-formats-argo:bintrayUpload \
-    :reekwest-formats-jackson:bintrayUpload
+sed -i '' s/$BINTRAY_VERSION/$NEW_VERSION/g README.md
+sed -i '' s/$BINTRAY_VERSION/$NEW_VERSION/g version.json
 
-echo Remember to commit the updated README.md file!!
+git commit -am"Release $NEW_VERSION"
+
+git stash apply
