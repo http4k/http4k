@@ -15,15 +15,19 @@ import org.reekwest.http.lens.Lens
 import org.reekwest.http.lens.LensFailure
 import org.reekwest.http.lens.QueryLens
 
-data class RouteResponse(val status: Status, val description: String?, val example: String?)
-
 class Route private constructor(internal val core: Core) {
     constructor(name: String, description: String? = null) : this(Core(name, description, null))
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
     fun body(new: Lens<HttpMessage, *>) = Route(core.copy(body = new))
-    fun returning(new: Status) = Route(core.copy(responses = core.responses.plus(Response(new))))
+
+    @JvmName("returningResponse")
+    fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new)))
+
+    @JvmName("returningStatus")
+    fun returning(new: Pair<String, Status>) = Route(core.copy(responses = core.responses.plus(new.first to Response(new.second))))
+
     fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
     fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))
 
@@ -51,7 +55,7 @@ class Route private constructor(internal val core: Core) {
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: List<Response> = emptyList()) : Iterable<Lens<Request, *>> {
+                                 val responses: List<Pair<String, Response>> = emptyList()) : Iterable<Lens<Request, *>> {
 
             override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
         }
