@@ -2,7 +2,7 @@ package org.reekwest.http.filters
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import junit.framework.Assert.fail
+import org.junit.Assert.fail
 import org.junit.Test
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
