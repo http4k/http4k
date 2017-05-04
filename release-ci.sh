@@ -18,7 +18,7 @@ fi
 
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew -PreleaseVersion=$LOCAL_VERSION \
+./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
     :reekwest:bintrayUpload \
     :reekwest-client-apache:bintrayUpload \
     :reekwest-server-jetty:bintrayUpload \
