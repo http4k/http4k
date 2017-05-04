@@ -8,6 +8,6 @@ interface ModuleRenderer {
 
     fun badRequest(failures: List<Failure>): Response
 
-    fun description(moduleRoot: BasePath, routes: List<ServerRoute>): Response
+    fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response
 }
 

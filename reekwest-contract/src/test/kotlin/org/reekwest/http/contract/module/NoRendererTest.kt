@@ -19,7 +19,7 @@ class NoRendererTest {
 
     @Test
     fun `renders description`() {
-        assertThat(NoRenderer.description(Root, listOf()), equalTo(Response(Status.OK)))
+        assertThat(NoRenderer.description(Root, NoSecurity, listOf()), equalTo(Response(Status.OK)))
     }
 
 }

@@ -43,7 +43,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
 
             private fun descriptionRoute(): ServerRoute =
                 PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind
-                    { renderer.description(moduleRoot, routes) }
+                    { renderer.description(moduleRoot, NoSecurity, routes) }
 
             private fun identify(route: ServerRoute): Filter {
                 val routeIdentity = route.describeFor(moduleRoot)

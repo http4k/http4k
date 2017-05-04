@@ -17,7 +17,7 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
         route.method.toString() + ":" + route.describeFor(basePath) to
             json.string(route.pathBinder.core.route.core.summary)
 
-    override fun description(moduleRoot: BasePath, routes: List<ServerRoute>): Response {
+    override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         return Response(OK)
             .with(json.body().required() to json.obj("resources" to json.obj(routes.map { render(moduleRoot, it) })))
     }
