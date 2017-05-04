@@ -27,3 +27,15 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :reekwest-templates-handlebars:bintrayUpload \
     :reekwest-formats-argo:bintrayUpload \
     :reekwest-formats-jackson:bintrayUpload
+
+function notify_slack {
+    local MESSAGE=$1
+    echo "Notifying on Slack..."
+    curl -X POST -H 'Content-type: application/json' --data "{'text':'$MESSAGE'}" $SLACK_WEBHOOK
+}
+
+if [ $? -ne 0 ]; then
+    notify_slack "Release has failed. Check <https://travis-ci.org/reekwest/reekwest/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
+else
+    notify_slack "Released version <https://bintray.com/reekwest/maven/reekwest/$LOCAL_VERSION|$LOCAL_VERSION>."
+fi
