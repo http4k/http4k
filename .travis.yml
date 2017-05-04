@@ -5,10 +5,10 @@ jdk:
 
 script:
 - ./gradlew check
-- ./release-ci.sh
 
 after_success:
 - ./gradlew cobertura coveralls
+- ./release-ci.sh
 
 ache:
   directories:
