@@ -1,4 +1,4 @@
-package org.reekwest.http.apache
+package org.reekwest.http.client
 
 import org.apache.http.Header
 import org.apache.http.HttpEntity

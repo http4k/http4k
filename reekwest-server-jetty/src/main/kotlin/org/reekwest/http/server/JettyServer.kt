@@ -1,4 +1,4 @@
-package org.reekwest.http.jetty
+package org.reekwest.http.server
 
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler

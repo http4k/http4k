@@ -1,11 +1,11 @@
-package org.reekwest.http.jetty
+package org.reekwest.http.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.reekwest.http.apache.ApacheHttpClient
+import org.reekwest.http.client.ApacheHttpClient
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get

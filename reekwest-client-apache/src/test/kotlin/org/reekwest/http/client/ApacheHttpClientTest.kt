@@ -1,4 +1,4 @@
-package org.reekwest.http.apache
+package org.reekwest.http.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring

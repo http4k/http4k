@@ -1,6 +1,6 @@
 package cookbook
 
-import org.reekwest.http.apache.ApacheHttpClient
+import org.reekwest.http.client.ApacheHttpClient
 import org.reekwest.http.core.Request.Companion.get
 
 fun main(args: Array<String>) {

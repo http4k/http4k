@@ -10,10 +10,10 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Argo
-import org.reekwest.http.jetty.asJettyServer
 import org.reekwest.http.lens.Body
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.int
+import org.reekwest.http.server.asJettyServer
 
 
 fun main(args: Array<String>) {
