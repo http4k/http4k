@@ -3,6 +3,10 @@ language: java
 jdk:
 - oraclejdk8
 
+script:
+- ./gradlew check
+- ./release-ci.sh
+
 after_success:
 - ./gradlew cobertura coveralls
 
