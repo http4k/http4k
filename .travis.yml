@@ -15,4 +15,4 @@ notifications:
   slack:
     rooms: contractorscum:DiikH6t3ig2ZKfVMP1SQ9peR
     template:
-          - "%{repository} (%{commit}) : %{commit_message}. Build details: %{build_url}"
+          - "*%{commit_message}*. Build: %{build_url}"
