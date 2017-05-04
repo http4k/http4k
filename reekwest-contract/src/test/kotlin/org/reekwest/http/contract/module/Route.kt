@@ -44,13 +44,13 @@ class Route private constructor(internal val core: Core) {
     }
 
     companion object {
-        internal data class Core(val name: String,
-                                val description: String?,
-                                val body: BodyLens<*>?,
-                                val produces: Set<ContentType> = emptySet(),
-                                val consumes: Set<ContentType> = emptySet(),
-                                val requestParams: List<Lens<Request, *>> = emptyList(),
-                                val responses: List<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
+        internal data class Core(val summary: String,
+                                 val description: String?,
+                                 val body: BodyLens<*>?,
+                                 val produces: Set<ContentType> = emptySet(),
+                                 val consumes: Set<ContentType> = emptySet(),
+                                 val requestParams: List<Lens<Request, *>> = emptyList(),
+                                 val responses: List<RouteResponse> = emptyList()) : Iterable<Lens<Request, *>> {
 
             override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
         }
