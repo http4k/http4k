@@ -74,16 +74,18 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         return FieldAndDefinitions<NODE>("" to json.obj(listOf()), emptyList())
     }
 
-    private fun render(responses: List<Response>) =
+    private fun render(responses: List<Pair<String, Response>>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
             {
-                memo, nextResp ->
+                memo, (reason, response) ->
                 val newSchema = try {
-                    schemaGenerator.toSchema(json.parse(nextResp.bodyString()))
+                    schemaGenerator.toSchema(json.parse(response.bodyString()))
                 } catch (e: Exception) {
                     JsonSchema(json.nullNode(), emptyList())
                 }
-                val newField = nextResp.status.code.toString() to json.obj("description" to json.string(""), "schema" to newSchema.node)
+                val newField = response.status.code.toString() to json.obj(
+                    "description" to json.string(reason),
+                    "schema" to newSchema.node)
                 memo.add(newField, newSchema.definitions)
             })
 
