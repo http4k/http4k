@@ -8,8 +8,13 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Uri
+import org.reekwest.http.filters.ZipkinTraces.Companion.THREAD_LOCAL
 
 object ClientFilters {
+
+    object RequestTracing : Filter {
+        override fun invoke(next: HttpHandler): HttpHandler = { next(ZipkinTraces(THREAD_LOCAL.get(), it)) }
+    }
 
     object BasicAuth {
         operator fun invoke(provider: () -> Credentials): Filter = Filter {

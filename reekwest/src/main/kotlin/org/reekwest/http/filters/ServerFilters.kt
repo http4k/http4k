@@ -11,6 +11,18 @@ import org.reekwest.http.lens.LensFailure
 
 object ServerFilters {
 
+    object RequestTracing : Filter {
+        override fun invoke(next: HttpHandler): HttpHandler = {
+            ZipkinTraces.THREAD_LOCAL.set(ZipkinTraces(it))
+            try {
+                ZipkinTraces(ZipkinTraces.THREAD_LOCAL.get(), next(it))
+            } finally {
+                ZipkinTraces.THREAD_LOCAL.remove()
+            }
+
+        }
+    }
+
     object BasicAuth {
         operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
             handler ->
