@@ -12,16 +12,19 @@ import org.reekwest.http.lens.LensFailure
 object ServerFilters {
 
     object RequestTracing {
-        operator fun invoke(): Filter = Filter {
+        operator fun invoke(
+            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter {
             next ->
             {
                 val fromRequest = ZipkinTraces(it)
-                ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(
-                    parentSpanId = fromRequest.spanId,
-                    spanId = TraceId.new()
-                ))
+                startReportFn(it, fromRequest)
+                ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(parentSpanId = fromRequest.spanId, spanId = TraceId.new()))
+
                 try {
-                    ZipkinTraces(fromRequest, next(it))
+                    val response = ZipkinTraces(fromRequest, next(it))
+                    endReportFn(it, response, fromRequest)
+                    response
                 } finally {
                     ZipkinTraces.THREAD_LOCAL.remove()
                 }

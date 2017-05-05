@@ -21,9 +21,10 @@ class RequestTracingTest {
 
     @Test
     fun `request traces are copied correctly from inbound to outbound requests`() {
-        val originalTraceId = TraceId.new()
-        val originalSpanId = TraceId.new()
-        val traces = ZipkinTraces(originalTraceId, originalSpanId, null)
+        val originalTraceId = TraceId("originalTrace")
+        val originalSpanId = TraceId("originalSpan")
+        val originalParentSpanId = TraceId("originalParentSpanId")
+        val traces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId)
 
         val client: HttpHandler = ClientFilters.RequestTracing().then {
             val actual = ZipkinTraces(it)

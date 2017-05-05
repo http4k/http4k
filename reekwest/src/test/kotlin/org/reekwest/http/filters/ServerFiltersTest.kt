@@ -1,6 +1,5 @@
 package org.reekwest.http.filters
 
-import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -10,7 +9,7 @@ import org.junit.Test
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
-import org.reekwest.http.core.Status
+import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.then
 
 class ServerFiltersTest {
@@ -25,34 +24,46 @@ class ServerFiltersTest {
         var newThreadLocal: ZipkinTraces? = null
         val svc = ServerFilters.RequestTracing().then {
             newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()
-
             newThreadLocal!!.spanId shouldMatch present()
 
-            Response(Status.OK)
+            Response(OK)
         }
 
         val received = ZipkinTraces(svc(Request.get("")))
 
-        received.traceId shouldMatch equalTo(newThreadLocal!!.traceId)
-        received.spanId shouldMatch equalTo(newThreadLocal!!.parentSpanId)
-        received.parentSpanId shouldMatch absent()
-   }
+        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.parentSpanId!!, null))
+    }
 
     @Test
     fun `uses existing request tracing from request and sets on outgoing response not present`() {
-        val originalTraceId = TraceId.new()
-        val originalSpanId = TraceId.new()
-        val originalTraces = ZipkinTraces(originalTraceId, originalSpanId, null)
+        val originalTraceId = TraceId("originalTrace")
+        val originalSpanId = TraceId("originalSpan")
+        val originalParentSpanId = TraceId("originalParentSpanId")
+        val originalTraces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId)
 
-        val svc = ServerFilters.RequestTracing().then {
+        var start: Pair<Request, ZipkinTraces>? = null
+        var end: Triple<Request, Response, ZipkinTraces>? = null
+
+        val svc = ServerFilters.RequestTracing(
+            { req, trace -> start = req to trace },
+            { req, resp, trace -> end = Triple(req, resp, trace) }
+        ).then {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
             actual.traceId shouldMatch equalTo(originalTraceId)
             actual.spanId shouldMatch present()
             actual.parentSpanId shouldMatch equalTo(originalSpanId)
-            Response(Status.OK)
+            Response(OK)
         }
 
-        val actual = svc(ZipkinTraces(originalTraces, get("")))
+        val originalRequest = ZipkinTraces(originalTraces, get(""))
+        val actual = svc(originalRequest)
         assertThat(ZipkinTraces(actual), equalTo(originalTraces))
+
+        assertThat(start!!.first, equalTo(originalRequest))
+        assertThat(start!!.second, equalTo(originalTraces))
+
+        assertThat(end!!.first, equalTo(originalRequest))
+        assertThat(end!!.second, equalTo(ZipkinTraces(originalTraces, Response(OK))))
+        assertThat(end!!.third, equalTo(originalTraces))
     }
 }

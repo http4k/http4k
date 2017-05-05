@@ -82,11 +82,19 @@ class ClientFiltersTest {
         val zipkinTraces = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new())
         ZipkinTraces.THREAD_LOCAL.set(zipkinTraces)
 
-        val svc = ClientFilters.RequestTracing().then { it ->
+        var start: Pair<Request, ZipkinTraces>? = null
+        var end: Triple<Request, Response, ZipkinTraces>? = null
+
+        val svc = ClientFilters.RequestTracing(
+            { req, trace -> start = req to trace },
+            { req, resp, trace -> end = Triple(req, resp, trace) }
+        ).then { it ->
             assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
             Response(OK)
         }
         assertThat(svc(get("")), equalTo(Response(OK)))
+        assertThat(start, equalTo(get("") to zipkinTraces))
+        assertThat(end, equalTo(Triple(get(""), Response(OK), zipkinTraces)))
     }
 
     @Test

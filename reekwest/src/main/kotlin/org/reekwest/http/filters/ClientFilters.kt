@@ -13,9 +13,17 @@ import org.reekwest.http.filters.ZipkinTraces.Companion.THREAD_LOCAL
 object ClientFilters {
 
     object RequestTracing {
-        operator fun invoke(): Filter = Filter {
+        operator fun invoke(
+            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter {
             next ->
-            { next(ZipkinTraces(THREAD_LOCAL.get(), it)) }
+            {
+                val traces = THREAD_LOCAL.get()
+                startReportFn(it, traces)
+                val response = next(ZipkinTraces(traces, it))
+                endReportFn(it, response, traces)
+                response
+            }
         }
     }
 
@@ -59,5 +67,3 @@ object ClientFilters {
         private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
     }
 }
-
-
