@@ -1,5 +1,6 @@
 package org.reekwest.http.formats
 
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
 import com.fasterxml.jackson.databind.JsonNode
@@ -19,15 +20,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-object Jackson : Json<JsonNode, JsonNode> {
-
-    private val mapper = ObjectMapper()
-
-    init {
-        mapper.registerModule(KotlinModule())
-        mapper.configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
-        mapper.configure(USE_BIG_INTEGER_FOR_INTS, true)
-    }
+open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode, JsonNode> {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
@@ -38,7 +31,6 @@ object Jackson : Json<JsonNode, JsonNode> {
         is NullNode -> JsonType.Null
         else -> throw IllegalArgumentException("Don't know now to translate $value")
     }
-
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
     override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
@@ -69,6 +61,7 @@ object Jackson : Json<JsonNode, JsonNode> {
         }
         return fieldList
     }
+
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
 
@@ -77,3 +70,10 @@ object Jackson : Json<JsonNode, JsonNode> {
     inline fun <reified T : Any> String.asA(): T = asA(T::class)
     fun Any.asJsonString(): String = asJsonNode().asCompactJsonString()
 }
+
+object Jackson : ConfigurableJackson(ObjectMapper()
+    .registerModule(KotlinModule())
+    .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+    .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+    .configure(USE_BIG_INTEGER_FOR_INTS, true)
+)
