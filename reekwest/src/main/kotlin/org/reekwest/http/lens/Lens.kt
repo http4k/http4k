@@ -1,23 +1,5 @@
 package org.reekwest.http.lens
 
-class Get<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
-    operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
-
-    fun <NEXT> map(nextFn: (OUT) -> NEXT) = Get(rootFn, { nextFn(fn(it)) })
-
-    companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): Get<IN, OUT, OUT> = Get(rootFn, { it })
-    }
-}
-
-class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
-    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
-    fun <NEXT> map(nextFn: (NEXT) -> OUT) = Set(rootFn, { value: NEXT -> fn(nextFn(value)) })
-
-    companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): Set<IN, OUT, OUT> = Set(rootFn, { it })
-    }
-}
 data class Meta(val required: Boolean, val location: String, val name: String, val description: String? = null)
 
 open class Lens<in IN, out FINAL>(val meta: Meta,

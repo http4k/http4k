@@ -6,6 +6,25 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+class Get<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
+    operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
+
+    fun <NEXT> map(nextFn: (OUT) -> NEXT) = Get(rootFn, { nextFn(fn(it)) })
+
+    companion object {
+        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): Get<IN, OUT, OUT> = Get(rootFn, { it })
+    }
+}
+
+class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
+    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
+    fun <NEXT> map(nextFn: (NEXT) -> OUT) = Set(rootFn, { value: NEXT -> fn(nextFn(value)) })
+
+    companion object {
+        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): Set<IN, OUT, OUT> = Set(rootFn, { it })
+    }
+}
+
 interface MultiLensSpec<in IN, OUT> {
     fun optional(name: String, description: String? = null, default: List<OUT>? = null): Lens<IN, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
@@ -106,4 +125,3 @@ internal fun safeBooleanFrom(value: String): Boolean =
     if (value.toUpperCase() == "TRUE") true
     else if (value.toUpperCase() == "FALSE") false
     else throw kotlin.IllegalArgumentException("illegal boolean")
-

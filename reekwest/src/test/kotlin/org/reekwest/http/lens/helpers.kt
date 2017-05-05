@@ -8,10 +8,10 @@ import com.natpryce.hamkrest.throws
 
 object BiDiLensContract {
 
-    val spec = BiDiLensSpec("location", Get.Companion { _: String, str: String ->
+    val spec = BiDiLensSpec("location", Get { _: String, str: String ->
         if (str.isBlank()) emptyList() else listOf(str)
     },
-        Set.Companion { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
+        Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
         val optionalLens = spec.optional("hello")

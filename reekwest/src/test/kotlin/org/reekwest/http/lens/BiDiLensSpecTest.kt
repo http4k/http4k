@@ -10,10 +10,10 @@ import java.util.*
 
 class BiDiLensSpecContract {
 
-    private val spec = BiDiLensSpec("location", Get.Companion { _: String, str: String ->
+    private val spec = BiDiLensSpec("location", Get { _: String, str: String ->
         if (str.isBlank()) emptyList() else listOf(str)
     },
-        Set.Companion { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
+        Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     @Test
     fun `int`() = checkContract(spec.int(), "123", 123)

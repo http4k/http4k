@@ -22,8 +22,8 @@ open class BiDiBodySpec<MID, OUT>(private val delegate: BiDiLensSpec<HttpMessage
 }
 
 object Body : BiDiBodySpec<ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
-    Get.Companion { _, target -> target.body?.let { listOf(it) } ?: emptyList() },
-    Set.Companion { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) } }
+    Get { _, target -> target.body?.let { listOf(it) } ?: emptyList() },
+    Set { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) } }
 )) {
     val string = map(ByteBuffer::asString, String::asByteBuffer)
     fun string(description: String? = null): BiDiBodyLens<String> = string.required(description)
