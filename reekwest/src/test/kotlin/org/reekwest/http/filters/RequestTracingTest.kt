@@ -2,6 +2,9 @@ package org.reekwest.http.filters
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.should.shouldMatch
+import org.junit.Before
 import org.junit.Test
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request.Companion.get
@@ -11,20 +14,31 @@ import org.reekwest.http.core.then
 
 class RequestTracingTest {
 
-    @Test
-    fun `request traces are copied from inbound to outbound requests`() {
+    @Before
+    fun before() {
+        ZipkinTraces.THREAD_LOCAL.remove()
+    }
 
-        val traces = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new())
+    @Test
+    fun `request traces are copied correctly from inbound to outbound requests`() {
+        val originalTraceId = TraceId.new()
+        val originalSpanId = TraceId.new()
+        val traces = ZipkinTraces(originalTraceId, originalSpanId, null)
 
         val client: HttpHandler = ClientFilters.RequestTracing.then {
-            assertThat(ZipkinTraces(it), equalTo(traces))
+            val actual = ZipkinTraces(it)
+
+            actual.traceId shouldMatch equalTo(originalTraceId)
+            actual.parentSpanId shouldMatch equalTo(originalSpanId)
+            actual.spanId shouldMatch present()
+
             Response(OK)
         }
+
         val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing.then { client(get("/somePath")) }
 
         val response = simpleProxyServer(ZipkinTraces(traces, get("")))
 
         assertThat(ZipkinTraces(response), equalTo(traces))
     }
-
 }

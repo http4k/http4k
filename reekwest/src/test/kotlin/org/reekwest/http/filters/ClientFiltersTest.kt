@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.junit.Assert.fail
+import org.junit.Before
 import org.junit.Test
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
@@ -71,6 +72,11 @@ class ClientFiltersTest {
         }
     }
 
+    @Before
+    fun before() {
+        ZipkinTraces.THREAD_LOCAL.remove()
+    }
+
     @Test
     fun `adds request tracing to outgoing request when already present`() {
         val zipkinTraces = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new())
@@ -85,7 +91,6 @@ class ClientFiltersTest {
 
     @Test
     fun `adds new request tracing to outgoing request when not present`() {
-        ZipkinTraces.THREAD_LOCAL.remove()
         val svc = ClientFilters.RequestTracing.then { it ->
             assertThat(ZipkinTraces(it), present())
             Response(OK)

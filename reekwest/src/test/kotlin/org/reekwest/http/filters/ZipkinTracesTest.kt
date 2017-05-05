@@ -1,5 +1,6 @@
 package org.reekwest.http.filters
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -31,7 +32,9 @@ class ZipkinTracesTest {
 
     @Test
     fun `generates a new set of traces from a request`() {
-        assertThat(ZipkinTraces(get("")), present())
+        val actual = ZipkinTraces(get(""))
+        assertThat(actual, present())
+        assertThat(actual.parentSpanId, absent())
     }
 
     @Test

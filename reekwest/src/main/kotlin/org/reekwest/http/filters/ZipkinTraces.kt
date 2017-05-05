@@ -24,7 +24,7 @@ data class TraceId(val value: String) {
     }
 }
 
-data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpanId: TraceId) {
+data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpanId: TraceId?) {
     companion object {
         private val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
         private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
@@ -35,7 +35,7 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
                 listOf(ZipkinTraces(
                     X_B3_TRACEID(target) ?: TraceId.new(),
                     X_B3_SPANID(target) ?: TraceId.new(),
-                    X_B3_PARENTSPANID(target) ?: TraceId.new()
+                    X_B3_PARENTSPANID(target)
                 ))
             },
             Set { _, values, target ->

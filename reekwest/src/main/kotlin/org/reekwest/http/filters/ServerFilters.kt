@@ -13,9 +13,13 @@ object ServerFilters {
 
     object RequestTracing : Filter {
         override fun invoke(next: HttpHandler): HttpHandler = {
-            ZipkinTraces.THREAD_LOCAL.set(ZipkinTraces(it))
+            val fromRequest = ZipkinTraces(it)
+            ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(
+                parentSpanId = fromRequest.spanId,
+                spanId = TraceId.new()
+            ))
             try {
-                ZipkinTraces(ZipkinTraces.THREAD_LOCAL.get(), next(it))
+                ZipkinTraces(fromRequest, next(it))
             } finally {
                 ZipkinTraces.THREAD_LOCAL.remove()
             }
