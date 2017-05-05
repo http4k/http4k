@@ -11,17 +11,20 @@ import org.reekwest.http.lens.LensFailure
 
 object ServerFilters {
 
-    object RequestTracing : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
-            val fromRequest = ZipkinTraces(it)
-            ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(
-                parentSpanId = fromRequest.spanId,
-                spanId = TraceId.new()
-            ))
-            try {
-                ZipkinTraces(fromRequest, next(it))
-            } finally {
-                ZipkinTraces.THREAD_LOCAL.remove()
+    object RequestTracing {
+        operator fun invoke(): Filter = Filter {
+            next ->
+            {
+                val fromRequest = ZipkinTraces(it)
+                ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(
+                    parentSpanId = fromRequest.spanId,
+                    spanId = TraceId.new()
+                ))
+                try {
+                    ZipkinTraces(fromRequest, next(it))
+                } finally {
+                    ZipkinTraces.THREAD_LOCAL.remove()
+                }
             }
 
         }
@@ -29,13 +32,13 @@ object ServerFilters {
 
     object BasicAuth {
         operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
-            handler ->
+            next ->
             {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
                     Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 } else {
-                    handler(it)
+                    next(it)
                 }
             }
         }

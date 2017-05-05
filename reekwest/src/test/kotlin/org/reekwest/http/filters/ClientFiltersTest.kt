@@ -82,7 +82,7 @@ class ClientFiltersTest {
         val zipkinTraces = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new())
         ZipkinTraces.THREAD_LOCAL.set(zipkinTraces)
 
-        val svc = ClientFilters.RequestTracing.then { it ->
+        val svc = ClientFilters.RequestTracing().then { it ->
             assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
             Response(OK)
         }
@@ -91,7 +91,7 @@ class ClientFiltersTest {
 
     @Test
     fun `adds new request tracing to outgoing request when not present`() {
-        val svc = ClientFilters.RequestTracing.then { it ->
+        val svc = ClientFilters.RequestTracing().then { it ->
             assertThat(ZipkinTraces(it), present())
             Response(OK)
         }

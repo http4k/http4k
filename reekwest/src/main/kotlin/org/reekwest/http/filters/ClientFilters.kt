@@ -12,8 +12,11 @@ import org.reekwest.http.filters.ZipkinTraces.Companion.THREAD_LOCAL
 
 object ClientFilters {
 
-    object RequestTracing : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = { next(ZipkinTraces(THREAD_LOCAL.get(), it)) }
+    object RequestTracing {
+        operator fun invoke(): Filter = Filter {
+            next ->
+            { next(ZipkinTraces(THREAD_LOCAL.get(), it)) }
+        }
     }
 
     object BasicAuth {

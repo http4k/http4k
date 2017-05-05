@@ -23,7 +23,7 @@ class ServerFiltersTest {
     @Test
     fun `initialises request tracing and sets on outgoing response when not present`() {
         var newThreadLocal: ZipkinTraces? = null
-        val svc = ServerFilters.RequestTracing.then {
+        val svc = ServerFilters.RequestTracing().then {
             newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()
 
             newThreadLocal!!.spanId shouldMatch present()
@@ -44,7 +44,7 @@ class ServerFiltersTest {
         val originalSpanId = TraceId.new()
         val originalTraces = ZipkinTraces(originalTraceId, originalSpanId, null)
 
-        val svc = ServerFilters.RequestTracing.then {
+        val svc = ServerFilters.RequestTracing().then {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
             actual.traceId shouldMatch equalTo(originalTraceId)
             actual.spanId shouldMatch present()

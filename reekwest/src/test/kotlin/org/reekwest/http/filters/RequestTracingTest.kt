@@ -25,7 +25,7 @@ class RequestTracingTest {
         val originalSpanId = TraceId.new()
         val traces = ZipkinTraces(originalTraceId, originalSpanId, null)
 
-        val client: HttpHandler = ClientFilters.RequestTracing.then {
+        val client: HttpHandler = ClientFilters.RequestTracing().then {
             val actual = ZipkinTraces(it)
 
             actual.traceId shouldMatch equalTo(originalTraceId)
@@ -35,7 +35,7 @@ class RequestTracingTest {
             Response(OK)
         }
 
-        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing.then { client(get("/somePath")) }
+        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then { client(get("/somePath")) }
 
         val response = simpleProxyServer(ZipkinTraces(traces, get("")))
 
