@@ -8,17 +8,15 @@ import java.time.ZoneOffset
 
 fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.toString())
 
-fun Response.removeCookie(name: String): Response = copy(headers = headers.filterNot { it.first == "Set-Cookie" && (it.second?.startsWith("$name=") ?: false) })
+fun Response.removeCookie(name: String): Response = copy(headers = headers.filterNot { it.first.equals("Set-Cookie", true) && (it.second?.startsWith("$name=") ?: false) })
 
 fun Response.replaceCookie(cookie: Cookie): Response = removeCookie(cookie.name).cookie(cookie)
 
 fun Request.cookie(name: String, value: String): Request = replaceHeader("Cookie", cookies().plus(Cookie(name, value)).toCookieString())
 
-fun Request.cookies(cookies: List<Cookie>) = cookies.fold(this, { request, cookie -> request.cookie(cookie.name, cookie.value) })
-
 internal fun String.toCookieList(): List<Cookie> = split("; ").filter { it.trim().isNotBlank() }.map { it.split("=").let { Cookie(it.elementAt(0), it.elementAtOrElse(1, { "\"\"" }).unquoted()) } }
 
-fun Request.cookies(): List<Cookie> = headers.find { it.first == "Cookie" }?.second?.toCookieList() ?: listOf()
+fun Request.cookies(): List<Cookie> = header("Cookie")?.toCookieList() ?: listOf()
 
 fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.path?.length ?: 0 }.firstOrNull()
 

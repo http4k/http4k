@@ -12,7 +12,7 @@ interface CookieStorage {
 
 class ClientCookies(private val storage: CookieStorage = BasicCookieStorage()) : Filter {
     override fun invoke(handler: HttpHandler): HttpHandler = { request ->
-        val requestWithCookies = request.cookies(storage.retrieve())
+        val requestWithCookies = storage.retrieve().fold(request, { r, cookie -> r.cookie(cookie.name, cookie.value) })
         val response = handler(requestWithCookies)
         storage.store(response.cookies())
         response
