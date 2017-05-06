@@ -9,8 +9,11 @@ import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.toBody
 import org.reekwest.http.core.with
+import org.reekwest.http.lens.FormValidator.Feedback
+import org.reekwest.http.lens.FormValidator.Strict
 import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
 import org.reekwest.http.lens.WebForm
+import org.reekwest.http.lens.WebForm.Companion.emptyForm
 
 class WebFormTest {
 
@@ -21,7 +24,7 @@ class WebFormTest {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")
 
-        val webForm = Body.webForm(FormValidator.Strict, stringField, intField)
+        val webForm = Body.webForm(Strict, stringField, intField)
 
         val populatedRequest = emptyRequest.with(
             webForm to WebForm.Companion.emptyForm().with(stringField to "world", intField to 123)
@@ -38,7 +41,7 @@ class WebFormTest {
             body = "hello=world&another=123".toBody())
 
         assertThat({
-            Body.webForm(FormValidator.Strict,
+            Body.webForm(Strict,
                 FormField.required("hello"),
                 FormField.int().required("another")
             )(request)
@@ -53,7 +56,7 @@ class WebFormTest {
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
-        assertThat(Body.webForm(FormValidator.Strict,
+        assertThat(Body.webForm(Strict,
             FormField.required("hello"),
             FormField.int().required("another")
         )(request), equalTo(WebForm(expected, emptyList())))
@@ -66,7 +69,7 @@ class WebFormTest {
             body = "another=123".toBody())
 
         val requiredString = FormField.required("hello")
-        assertThat(Body.webForm(FormValidator.Feedback,
+        assertThat(Body.webForm(Feedback,
             requiredString,
             FormField.int().required("another")
         )(request), equalTo(WebForm(mapOf("another" to listOf("123")), listOf(Missing(requiredString.meta)))))
@@ -81,7 +84,7 @@ class WebFormTest {
         val stringRequiredField = FormField.required("hello")
         val intRequiredField = FormField.int().required("another")
         assertThat(
-            { Body.webForm(FormValidator.Strict, stringRequiredField, intRequiredField)(request) },
+            { Body.webForm(Strict, stringRequiredField, intRequiredField)(request) },
             throws(equalTo(LensFailure(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), status = NOT_ACCEPTABLE)))
         )
     }
@@ -91,7 +94,7 @@ class WebFormTest {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")
 
-        val populated = WebForm.Companion.emptyForm()
+        val populated = emptyForm()
             .with(stringField to "world",
                 intField to 123)
 
