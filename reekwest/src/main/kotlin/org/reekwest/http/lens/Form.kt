@@ -1,13 +1,8 @@
 package org.reekwest.http.lens
 
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
-import org.reekwest.http.core.copy
-import org.reekwest.http.core.toBody
 import org.reekwest.http.core.toUrlEncoded
-import org.reekwest.http.core.with
-import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
 import java.net.URLDecoder.decode
 
 typealias FormFields = Map<String, List<String>>
@@ -37,8 +32,11 @@ enum class FormValidator : (WebForm) -> WebForm {
     };
 }
 
-fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) = BiDiBodySpec(formSpec)
-    .map(
+fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) =
+    Body.string(APPLICATION_FORM_URLENCODED).map(
+        { target -> WebForm(formParametersFrom(target), emptyList()) },
+        { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() }
+    ).map(
         { webForm -> validateFields(webForm, validator, *formFields) },
         { webForm -> validateFields(webForm, validator, *formFields) }
     ).required()
@@ -56,20 +54,8 @@ private fun validateFields(webForm: WebForm, validator: FormValidator, vararg fo
     return validator(webForm.copy(errors = failures))
 }
 
-private val formSpec = BiDiLensSpec<HttpMessage, WebForm, WebForm>("body",
-    Get { _, target ->
-        if (CONTENT_TYPE(target) != APPLICATION_FORM_URLENCODED) throw LensFailure(Header.Common.CONTENT_TYPE.invalid())
-        listOf(WebForm(formParametersFrom(target), emptyList()))
-    },
-    Set { _, values, target: HttpMessage ->
-        values.fold(target, { memo, (fields) ->
-            memo.copy(body = fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded().toBody())
-        }).with(Header.Common.CONTENT_TYPE to APPLICATION_FORM_URLENCODED)
-    }
-)
-
-private fun formParametersFrom(target: HttpMessage): Map<String, List<String>> {
-    return target.bodyString()
+private fun formParametersFrom(target: String): Map<String, List<String>> {
+    return target
         .split("&")
         .filter { it.contains("=") }
         .map { it.split("=") }

@@ -42,7 +42,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             )(request)
-        }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid()))))
+        }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
     }
 
     @Test

@@ -38,6 +38,8 @@ object Body {
     ))
 
     fun binary(contentType: ContentType) = root(contentType)
-    fun string(contentType: ContentType) = root(contentType).map(ByteBuffer::asString, String::asByteBuffer)
+    fun string(contentType: ContentType): BiDiBodySpec<ByteBuffer, String> {
+        return root(contentType).map(ByteBuffer::asString, String::asByteBuffer)
+    }
 }
 
