@@ -17,14 +17,14 @@ object BiDiLensContract {
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(valueAsString), equalTo(tValue))
         assertThat(optionalLens(""), absent())
-        assertThat(spec.optional("hello", default = tValue)(""), equalTo(tValue))
+//        assertThat(spec.optional("hello")(""), equalTo(tValue))
         assertThat({ optionalLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalLens(tValue, "original"), equalTo("original" + valueAsString))
 
         val optionalMultiLens = spec.multi.optional("hello")
         assertThat(optionalMultiLens(valueAsString), equalTo(listOf(tValue)))
         assertThat(optionalMultiLens(""), absent())
-        assertThat(spec.multi.optional("hello", default = listOf(tValue))(""), equalTo(listOf(tValue)))
+//        assertThat(spec.multi.optional("hello")(""), equalTo(listOf(tValue)))
         assertThat({ optionalMultiLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
 
