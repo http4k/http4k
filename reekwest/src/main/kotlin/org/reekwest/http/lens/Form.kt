@@ -34,11 +34,11 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) =
     Body.string(APPLICATION_FORM_URLENCODED).map(
-        { target -> WebForm(formParametersFrom(target), emptyList()) },
+        { WebForm(formParametersFrom(it), emptyList()) },
         { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() }
     ).map(
-        { webForm -> validateFields(webForm, validator, *formFields) },
-        { webForm -> validateFields(webForm, validator, *formFields) }
+        { validateFields(it, validator, *formFields) },
+        { validateFields(it, validator, *formFields) }
     ).required()
 
 private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
