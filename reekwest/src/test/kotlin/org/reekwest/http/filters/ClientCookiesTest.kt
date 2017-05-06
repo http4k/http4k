@@ -1,4 +1,4 @@
-package org.reekwest.http.core.cookie
+package org.reekwest.http.filters
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -7,7 +7,10 @@ import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Response.Companion.ok
+import org.reekwest.http.core.cookie.Cookie
+import org.reekwest.http.core.cookie.cookie
 import org.reekwest.http.core.then
+import org.reekwest.http.filters.cookie.BasicCookieStorage
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -18,7 +21,7 @@ class ClientCookiesTest {
     fun `can store and send cookies across multiple calls`() {
         val server = { request: Request -> ok().counterCookie(request.counterCookie() + 1) }
 
-        val client = ClientCookies().then(server)
+        val client = ClientFilters.Cookies().then(server)
 
         (0..3).forEach {
             val response = client(get("/"))
@@ -34,6 +37,7 @@ class ClientCookiesTest {
                 else -> ok().body(request.cookie("foo")?.value ?: "gone")
             }
         }
+
         val cookieStorage = BasicCookieStorage()
 
         val clock = object : Clock() {
@@ -46,7 +50,7 @@ class ClientCookiesTest {
             }
         }
 
-        val client = ClientCookies(clock, cookieStorage).then(server)
+        val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
 
         client(get("/set"))
 

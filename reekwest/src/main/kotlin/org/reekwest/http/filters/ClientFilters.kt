@@ -8,7 +8,14 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Uri
+import org.reekwest.http.core.cookie.cookie
+import org.reekwest.http.core.cookie.cookies
 import org.reekwest.http.filters.ZipkinTraces.Companion.THREAD_LOCAL
+import org.reekwest.http.filters.cookie.BasicCookieStorage
+import org.reekwest.http.filters.cookie.CookieStorage
+import org.reekwest.http.filters.cookie.LocalCookie
+import java.time.Clock
+import java.time.LocalDateTime
 
 object ClientFilters {
 
@@ -65,5 +72,28 @@ object ClientFilters {
         }
 
         private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
+    }
+
+    object Cookies {
+        operator fun invoke(clock: Clock = Clock.systemDefaultZone(),
+                            storage: CookieStorage = BasicCookieStorage()): Filter = Filter {
+            next ->
+            { request ->
+                val now = clock.now()
+                removeExpired(now, storage)
+                val response = next(request.withLocalCookies(storage))
+                storage.store(response.cookies().map { LocalCookie(it, now) })
+                response
+            }
+        }
+
+        private fun Request.withLocalCookies(storage: CookieStorage) = storage.retrieve()
+            .map { it.cookie }
+            .fold(this, { r, cookie -> r.cookie(cookie.name, cookie.value) })
+
+        private fun removeExpired(now: LocalDateTime, storage: CookieStorage)
+            = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
+
+        private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
     }
 }

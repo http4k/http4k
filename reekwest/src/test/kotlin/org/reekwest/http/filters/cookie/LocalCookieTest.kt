@@ -1,8 +1,9 @@
-package org.reekwest.http.core.cookie
+package org.reekwest.http.filters.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.cookie.Cookie
 import java.time.LocalDateTime
 
 class LocalCookieTest {
