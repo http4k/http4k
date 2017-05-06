@@ -25,12 +25,12 @@ class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List
     }
 }
 
-interface MultiLensSpec<in IN, OUT> {
+interface MultiLensSpec<in IN, out OUT> {
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
 
-open class LensSpec<IN, MID, OUT>(protected val location: String, internal val get: Get<IN, MID, OUT>) {
+open class LensSpec<IN, MID, out OUT>(protected val location: String, internal val get: Get<IN, MID, OUT>) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
 
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {
