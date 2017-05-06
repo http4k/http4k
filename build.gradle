@@ -21,9 +21,6 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.1'
 }
 
-println "bintray user = "+ System.getenv("BINTRAY_USER")
-println "sonatype user = "+ System.getenv("SONATYPE_USER")
-
 allprojects {
 
     repositories {
