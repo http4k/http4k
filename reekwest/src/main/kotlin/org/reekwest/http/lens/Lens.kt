@@ -3,7 +3,9 @@ package org.reekwest.http.lens
 data class Meta(val required: Boolean, val location: String, val name: String, val description: String? = null)
 
 open class Lens<in IN, out FINAL>(val meta: Meta,
-                                  private val get: (IN) -> FINAL) : (IN) -> FINAL {
+                                  private val get: (IN) -> FINAL) : (IN) -> FINAL, Iterable<Meta> {
+    override fun iterator(): Iterator<Meta> = listOf(meta).iterator()
+
     override fun toString(): String = "${if (meta.required) "Required" else "Optional"} ${meta.location} '${meta.name}'"
 
     /**
