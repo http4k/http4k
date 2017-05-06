@@ -2,25 +2,42 @@ package org.reekwest.http.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.junit.Ignore
 import org.junit.Test
 import org.reekwest.http.core.Parameters
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Response.Companion.ok
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class CookieTest {
     @Test
     fun creates_full_cookie() {
         val cookie = Cookie("my-cookie", "my-value")
-            .comment("a-comment")
-            .domain("google.com")
             .maxAge(37)
+            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            .domain("google.com")
+            .path("/")
             .secure()
             .httpOnly()
-            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
         assertThat(cookie.toString(),
-            equalTo("""my-cookie="my-value"; Comment=a-comment; Domain=google.com; Max-Age=37; Secure=; HttpOnly=; Expires=Sat, 11 Mar 2017 12:15:21 GMT"""))
+            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly"""))
+    }
+
+    @Test
+    fun parses_full_cookie() {
+        val original = Cookie("my-cookie", "my-value")
+            .maxAge(37)
+            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            .domain("google.com")
+            .path("/")
+            .secure()
+            .httpOnly()
+
+        val parsed = Cookie.parse(original.toString())
+
+        assertThat(parsed, equalTo(original))
     }
 
     @Test
@@ -71,7 +88,7 @@ class CookieTest {
 
     @Test
     fun extracts_cookies_from_response() {
-        val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").comment("also testing").maxAge(3))
+        val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").maxAge(3))
 
         val response = cookies.fold(ok(), Response::cookie)
 
@@ -82,4 +99,25 @@ class CookieTest {
     fun parses_cookie_without_quotes(){
         assertThat(Cookie.parse("foo=bar; Path=/"), equalTo(Cookie("foo", "bar").path("/")))
     }
+
+    @Test
+    fun invalidates_cookie() {
+        assertThat(Cookie("foo", "bar").invalidate(),
+            equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))))
+    }
+
+    @Test
+    fun cookie_without_time_info_is_never_expired() {
+        assertThat(Cookie("foo", "bar").expired(LocalDateTime.MAX, LocalDateTime.MIN), equalTo(false))
+    }
+
+    @Test
+    @Ignore("requires cookie to be better represented")
+    fun cookie_with_max_age_expiration() {
+        val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
+        assertThat(Cookie("foo", "bar").maxAge(5).expired(created, created.plusSeconds(4)), equalTo(false))
+        assertThat(Cookie("foo", "bar").maxAge(5).expired(created, created.plusSeconds(5)), equalTo(true))
+    }
 }
+
+private fun Cookie.expired(created: LocalDateTime, now: LocalDateTime): Boolean = false
