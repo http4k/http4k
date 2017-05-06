@@ -31,10 +31,7 @@ object Body {
             if (CONTENT_TYPE(target) != contentType) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
             target.body?.let { listOf(it) } ?: emptyList()
         },
-        Set { _, values, target ->
-            values.fold(target) { a, b -> a.copy(body = b) }
-                .with(CONTENT_TYPE to contentType)
-        }
+        Set { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) }.with(CONTENT_TYPE to contentType) }
     ))
 
     fun string(contentType: ContentType): BiDiBodySpec<ByteBuffer, String>
