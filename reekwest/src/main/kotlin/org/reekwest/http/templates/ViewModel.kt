@@ -2,7 +2,7 @@ package org.reekwest.http.templates
 
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.lens.BiDiBodyLens
-import org.reekwest.http.lens.BiDiBodySpec
+import org.reekwest.http.lens.BiDiBodyLensSpec
 import org.reekwest.http.lens.Body
 import java.nio.ByteBuffer
 
@@ -15,6 +15,6 @@ interface ViewModel {
 }
 
 fun Body.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> {
-    val viewModelBodySpec: BiDiBodySpec<ByteBuffer, ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
+    val viewModelBodySpec: BiDiBodyLensSpec<ByteBuffer, ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
     return viewModelBodySpec.required()
 }

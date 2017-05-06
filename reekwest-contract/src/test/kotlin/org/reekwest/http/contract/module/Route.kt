@@ -3,11 +3,11 @@ package org.reekwest.http.contract.module
 import org.reekwest.http.contract.module.PathBinder.Companion.Core
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Filter
-import org.reekwest.http.core.HttpMessage
 import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
+import org.reekwest.http.lens.BiDiBodyLens
 import org.reekwest.http.lens.BodyLens
 import org.reekwest.http.lens.Failure
 import org.reekwest.http.lens.HeaderLens
@@ -18,9 +18,9 @@ import org.reekwest.http.lens.QueryLens
 class Route private constructor(internal val core: Core) {
     constructor(name: String, description: String? = null) : this(Core(name, description, null))
 
-    fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
-    fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(new)))
-    fun body(new: Lens<HttpMessage, *>) = Route(core.copy(body = new))
+    fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
+    fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
+    fun body(new: BiDiBodyLens<*>) = Route(core.copy(body = new))
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new)))
@@ -36,7 +36,13 @@ class Route private constructor(internal val core: Core) {
     internal val validationFilter = Filter {
         next ->
         {
-            val errors = core.fold(emptyList<Failure>()) { memo, next ->
+            val bodyErrors = try {
+                core.body?.let { b -> b(it) }
+                emptyList<Failure>()
+            } catch (e: LensFailure) {
+                e.failures
+            }
+            val errors = core.requestParams.fold(bodyErrors) { memo, next ->
                 try {
                     next(it)
                     memo
@@ -55,9 +61,6 @@ class Route private constructor(internal val core: Core) {
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: List<Pair<String, Response>> = emptyList()) : Iterable<Lens<Request, *>> {
-
-            override fun iterator(): Iterator<Lens<Request, *>> = requestParams.plus(body?.let { listOf(it) } ?: emptyList<Lens<Request, *>>()).iterator()
-        }
+                                 val responses: List<Pair<String, Response>> = emptyList())
     }
 }
