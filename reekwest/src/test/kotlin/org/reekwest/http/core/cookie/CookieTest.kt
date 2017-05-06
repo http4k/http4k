@@ -122,26 +122,4 @@ class CookieTest {
         assertThat(Cookie("foo", "bar").invalidate(),
             equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))))
     }
-
-    @Test
-    fun `cookie without time attributes does not expire`() {
-        assertThat(cookie.isExpired(LocalDateTime.MAX, LocalDateTime.MIN), equalTo(false))
-    }
-
-    @Test
-    fun `expiration for cookie with maxAge only`() {
-        val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
-
-        assertThat(cookie.maxAge(5).isExpired(created, created.plusSeconds(5)), equalTo(false))
-        assertThat(cookie.maxAge(5).isExpired(created, created.plusSeconds(6)), equalTo(true))
-    }
-
-    @Test
-    fun `expiration for cookies with expires only`() {
-        val created = LocalDateTime.of(2017, 3, 11, 12, 15, 2)
-        val expires = created.plusSeconds(5)
-
-        assertThat(cookie.expires(expires).isExpired(created, created.plusSeconds(5)), equalTo(false))
-        assertThat(cookie.expires(expires).isExpired(created, created.plusSeconds(6)), equalTo(true))
-    }
 }

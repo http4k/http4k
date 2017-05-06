@@ -6,7 +6,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 data class Cookie(val name: String, val value: String,
                   val maxAge: Long? = null,
@@ -22,11 +21,6 @@ data class Cookie(val name: String, val value: String,
     fun secure() = copy(secure = true)
     fun httpOnly() = copy(httpOnly = true)
     fun expires(date: LocalDateTime): Cookie = copy(expires = date)
-
-    fun isExpired(created: LocalDateTime, now: LocalDateTime) =
-        maxAge?.let { maxAge -> ChronoUnit.SECONDS.between(created, now).dec() >= maxAge }
-            ?: expires?.let { expires -> ChronoUnit.SECONDS.between(created, now).dec() > ChronoUnit.SECONDS.between(created, expires).dec() }
-            ?: false
 
     override fun toString(): String = "$name=${value.quoted()}; ${attributes()}"
 
