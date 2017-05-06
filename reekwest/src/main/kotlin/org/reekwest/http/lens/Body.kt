@@ -26,7 +26,7 @@ open class BiDiBodySpec<MID, OUT>(private val delegate: BiDiLensSpec<HttpMessage
 }
 
 object Body {
-    private fun root(contentType: ContentType) = BiDiBodySpec<ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
+    fun binary(contentType: ContentType) = BiDiBodySpec<ByteBuffer, ByteBuffer>(BiDiLensSpec("body",
         Get { _, target ->
             if (CONTENT_TYPE(target) != contentType) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
             target.body?.let { listOf(it) } ?: emptyList()
@@ -37,8 +37,7 @@ object Body {
         }
     ))
 
-    fun binary(contentType: ContentType) = root(contentType)
     fun string(contentType: ContentType): BiDiBodySpec<ByteBuffer, String>
-        = root(contentType).map(ByteBuffer::asString, String::asByteBuffer)
+        = binary(contentType).map(ByteBuffer::asString, String::asByteBuffer)
 }
 
