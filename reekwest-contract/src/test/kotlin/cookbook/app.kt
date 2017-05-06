@@ -4,6 +4,7 @@ import org.reekwest.http.contract.module.Root
 import org.reekwest.http.contract.module.Route
 import org.reekwest.http.contract.module.RouteModule
 import org.reekwest.http.contract.module.SimpleJson
+import org.reekwest.http.core.ContentType.Companion.TEXT_PLAIN
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Response
@@ -20,13 +21,13 @@ fun main(args: Array<String>) {
 
     fun add(value1: Int, value2: Int): HttpHandler = {
         Response(OK).with(
-            Body.string.required() to (value1 + value2).toString()
+            Body.string(TEXT_PLAIN).required() to (value1 + value2).toString()
         )
     }
 
     fun echo(name: String, age: Int): HttpHandler = {
         Response(OK).with(
-            Body.string.required() to "hello $name you are $age"
+            Body.string(TEXT_PLAIN).required() to "hello $name you are $age"
         )
     }
 

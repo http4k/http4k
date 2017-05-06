@@ -1,5 +1,6 @@
 package cookbook
 
+import org.reekwest.http.core.ContentType.Companion.TEXT_PLAIN
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response.Companion.ok
@@ -17,7 +18,7 @@ fun main(args: Array<String>) {
 
     val nameQuery = Header.required("name")
     val ageQuery = Query.int().optional("age")
-    val childrenBody = Body.string.map({ it.split(",").map(::Child) }, { it.map { it.name }.joinToString() }).required()
+    val childrenBody = Body.string(TEXT_PLAIN).map({ it.split(",").map(::Child) }, { it.map { it.name }.joinToString() }).required()
 
     val endpoint = {
         request: Request ->
@@ -29,7 +30,7 @@ fun main(args: Array<String>) {
         val msg = "$name is ${age ?: "unknown"} years old and has " +
             "${children.size} children (${children.map { it.name }.joinToString()})"
         ok().with(
-            Body.string.required() to msg
+            Body.string(TEXT_PLAIN).required() to msg
         )
     }
 

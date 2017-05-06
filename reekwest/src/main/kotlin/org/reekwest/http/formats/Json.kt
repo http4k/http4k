@@ -1,5 +1,6 @@
 package org.reekwest.http.formats
 
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_JSON
 import org.reekwest.http.lens.BiDiBodySpec
 import org.reekwest.http.lens.BiDiLensSpec
 import org.reekwest.http.lens.Body
@@ -49,7 +50,7 @@ interface Json<ROOT : NODE, NODE: Any> {
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
-    fun body(): BiDiBodySpec<ByteBuffer, ROOT> = Body.string.map({ parse(it) }, { compact(it) })
+    fun body(): BiDiBodySpec<ByteBuffer, ROOT> = Body.string(APPLICATION_JSON).map({ parse(it) }, { compact(it) })
     fun Body.json(): BiDiBodySpec<ByteBuffer, ROOT> = body()
 }
 

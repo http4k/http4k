@@ -1,5 +1,6 @@
 package org.reekwest.http.contract.module
 
+import org.reekwest.http.core.ContentType.Companion.APPLICATION_JSON
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.with
@@ -18,6 +19,6 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
 
     override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         return Response(OK)
-            .with(json.body().required() to json.obj("resources" to json.obj(routes.map { render(moduleRoot, it) })))
+            .with(json.body(APPLICATION_JSON).required() to json.obj("resources" to json.obj(routes.map { render(moduleRoot, it) })))
     }
 }
