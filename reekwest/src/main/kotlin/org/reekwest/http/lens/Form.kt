@@ -12,15 +12,11 @@ object FormField : BiDiLensSpec<WebForm, String, String>("form field",
     Set { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
 
-data class WebForm constructor(val fields: Map<String, List<String>>, val errors: List<Failure>) {
+data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {
     operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
-
-    companion object {
-        fun emptyForm() = WebForm(emptyMap(), emptyList())
-    }
 }
 
 enum class FormValidator : (WebForm) -> WebForm {

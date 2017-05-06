@@ -61,7 +61,7 @@ class FormFieldTest {
         val custom = FormField.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
-        val formWithField = custom(instance, WebForm.Companion.emptyForm())
+        val formWithField = custom(instance, WebForm())
 
         assertThat(formWithField.fields["bob"], equalTo(listOf("hello world!")))
 

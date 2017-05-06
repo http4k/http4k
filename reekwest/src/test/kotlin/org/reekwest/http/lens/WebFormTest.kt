@@ -12,8 +12,6 @@ import org.reekwest.http.core.with
 import org.reekwest.http.lens.FormValidator.Feedback
 import org.reekwest.http.lens.FormValidator.Strict
 import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
-import org.reekwest.http.lens.WebForm
-import org.reekwest.http.lens.WebForm.Companion.emptyForm
 
 class WebFormTest {
 
@@ -27,7 +25,7 @@ class WebFormTest {
         val webForm = Body.webForm(Strict, stringField, intField)
 
         val populatedRequest = emptyRequest.with(
-            webForm to WebForm.Companion.emptyForm().with(stringField to "world", intField to 123)
+            webForm to WebForm().with(stringField to "world", intField to 123)
         )
 
         assertThat(Header.Common.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
@@ -94,7 +92,7 @@ class WebFormTest {
         val stringField = FormField.required("hello")
         val intField = FormField.int().required("another")
 
-        val populated = emptyForm()
+        val populated = WebForm()
             .with(stringField to "world",
                 intField to 123)
 
