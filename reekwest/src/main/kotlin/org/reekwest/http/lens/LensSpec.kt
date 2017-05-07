@@ -36,7 +36,9 @@ interface MultiLensSpec<in IN, OUT> {
 open class LensSpec<IN, MID, OUT>(protected val location: String,
                                   protected val paramMeta: ParamMeta,
                                   internal val get: Get<IN, MID, OUT>) {
-    fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, paramMeta, get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT) = mapWithNewMeta(nextIn, paramMeta)
+
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta) = LensSpec(location, paramMeta, get.map(nextIn))
 
     open fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT> {
         val meta = Meta(false, location, paramMeta, name, description)

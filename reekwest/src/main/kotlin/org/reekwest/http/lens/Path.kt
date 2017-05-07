@@ -1,5 +1,7 @@
 package org.reekwest.http.lens
 
+import org.reekwest.http.lens.ParamMeta.BooleanParam
+import org.reekwest.http.lens.ParamMeta.NumberParam
 import org.reekwest.http.lens.ParamMeta.StringParam
 
 typealias PathLens<T> = Lens<String, T>
@@ -13,6 +15,9 @@ open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OU
     }
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
+
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta): PathSpec<MID, NEXT> = PathSpec(delegate.mapWithNewMeta(nextIn, paramMeta))
+
 }
 
 object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", StringParam,
@@ -28,11 +33,11 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", 
     }
 }
 
-fun Path.int() = Path.map(String::toInt)
-fun Path.long() = Path.map(String::toLong)
-fun Path.double() = Path.map(String::toDouble)
-fun Path.float() = Path.map(String::toFloat)
-fun Path.boolean() = Path.map(::safeBooleanFrom)
+fun Path.int() = Path.mapWithNewMeta(String::toInt, NumberParam)
+fun Path.long() = Path.mapWithNewMeta(String::toLong, NumberParam)
+fun Path.double() = Path.mapWithNewMeta(String::toDouble, NumberParam)
+fun Path.float() = Path.mapWithNewMeta(String::toFloat, NumberParam)
+fun Path.boolean() = Path.mapWithNewMeta(::safeBooleanFrom, BooleanParam)
 fun Path.localDate() = Path.map(java.time.LocalDate::parse)
 fun Path.dateTime() = Path.map(java.time.LocalDateTime::parse)
 fun Path.zonedDateTime() = Path.map(java.time.ZonedDateTime::parse)
