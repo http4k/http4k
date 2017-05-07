@@ -17,6 +17,7 @@ object BiDiLensContract {
     fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(valueAsString), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.optional("hello"))(valueAsString), equalTo(tValue.toString()))
         assertThat(optionalLens(""), absent())
         assertThat({ optionalLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalLens(tValue, "original"), equalTo("original" + valueAsString))
@@ -29,6 +30,7 @@ object BiDiLensContract {
 
         val requiredLens = spec.required("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.required("hello"))(valueAsString), equalTo(tValue.toString()))
         assertThat({ requiredLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
         assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
         assertThat(requiredLens(tValue, "original"), equalTo("original" + valueAsString))
@@ -41,6 +43,7 @@ object BiDiLensContract {
 
         val defaultedLens = spec.defaulted("hello", tValue)
         assertThat(defaultedLens(valueAsString), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.defaulted("hello", "world"))(valueAsString), equalTo(tValue.toString()))
         assertThat(defaultedLens(""), equalTo(tValue))
         assertThat({ defaultedLens("hello") }, throws(equalTo(LensFailure(defaultedLens.invalid()))))
         assertThat(defaultedLens(tValue, "original"), equalTo("original" + valueAsString))
