@@ -30,11 +30,16 @@ allprojects {
 
     apply plugin: 'java'
     apply plugin: 'kotlin'
+    apply plugin: 'jacoco'
     apply plugin: 'cobertura'
     apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven-publish'
     apply plugin: 'provided-base'
+
+    jacoco {
+        toolVersion = '0.7.1.201405082137'
+    }
 
     cobertura.coverageFormats = ['html', 'xml']
     cobertura.coverageSourceDirs = ['src/main/kotlin']
@@ -138,6 +143,29 @@ allprojects {
                 }
             }
         }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+coveralls {
+    sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = subprojects.test
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+        xml.destination = "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 

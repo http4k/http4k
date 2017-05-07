@@ -4,7 +4,7 @@ jdk:
 script:
 - "./gradlew check"
 after_success:
-- "./gradlew cobertura coveralls"
+- "./gradlew jacocoTestReport coveralls"
 - "travis_wait 30 ./release-ci.sh"
 cache:
   directories:
