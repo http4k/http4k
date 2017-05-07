@@ -5,6 +5,7 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.then
 import org.reekwest.http.lens.LensFailure
+import org.reekwest.http.lens.Meta
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.PathLens
 
@@ -12,7 +13,9 @@ import org.reekwest.http.lens.PathLens
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal val core = pathBinder.core.route.core
     internal val method = pathBinder.core.method
-    internal val allParams = core.requestParams.plus(pathBinder.pathLenses)
+    internal val allParams =
+        core.requestParams.plus(pathBinder.pathLenses).map { it.meta }.plus(core.body?.metas ?: emptyList<Meta>())
+
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
     fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
