@@ -21,6 +21,7 @@ import org.reekwest.http.lens.Header
 import org.reekwest.http.lens.Invalid
 import org.reekwest.http.lens.Meta
 import org.reekwest.http.lens.Missing
+import org.reekwest.http.lens.ParamMeta.StringParam
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.Query
 import org.reekwest.http.lens.boolean
@@ -33,8 +34,8 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
     @Test
     fun `can build 400`() {
         val response = renderer.badRequest(listOf(
-            Missing(Meta(true, "location1", "name1")),
-            Invalid(Meta(false, "location2", "name2"))))
+            Missing(Meta(true, "location1", StringParam, "name1")),
+            Invalid(Meta(false, "location2", StringParam, "name2"))))
         assertThat(response.bodyString(),
             equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","required":true,"reason":"Missing"},{"name":"name2","type":"location2","required":false,"reason":"Invalid"}]}"""))
     }

@@ -8,6 +8,8 @@ import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.copy
 import org.reekwest.http.core.with
 import org.reekwest.http.lens.Header.Common.CONTENT_TYPE
+import org.reekwest.http.lens.ParamMeta.FileParam
+import org.reekwest.http.lens.ParamMeta.StringParam
 import java.nio.ByteBuffer
 import java.util.Collections.emptyList
 
@@ -69,9 +71,9 @@ object Body {
     )
 
     fun string(contentType: ContentType, description: String? = null): BiDiBodyLensSpec<ByteBuffer, String>
-        = root(listOf(Meta(true, "body", "body", description)), contentType).map(ByteBuffer::asString, String::asByteBuffer)
+        = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType).map(ByteBuffer::asString, String::asByteBuffer)
 
     fun binary(contentType: ContentType, description: String? = null): BiDiBodyLensSpec<ByteBuffer, ByteBuffer>
-        = root(listOf(Meta(true, "body", "body", description)), contentType)
+        = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType)
 }
 

@@ -1,6 +1,6 @@
 package org.reekwest.http.lens
 
-data class Meta(val required: Boolean, val location: String, val name: String, val description: String? = null)
+data class Meta(val required: Boolean, val location: String, val paramMeta: ParamMeta, val name: String, val description: String? = null)
 
 open class Lens<in IN, out FINAL>(val meta: Meta,
                                   private val get: (IN) -> FINAL) : (IN) -> FINAL, Iterable<Meta> {

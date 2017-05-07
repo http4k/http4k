@@ -7,7 +7,7 @@ typealias PathLens<T> = Lens<String, T>
 open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = delegate.get(name)
-        return object : Lens<String, OUT>(Meta(true, "path", name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
+        return object : Lens<String, OUT>(Meta(true, "path", StringParam, name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
             override fun toString(): String = "{$name}"
         }
     }
@@ -20,7 +20,7 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", 
 
     fun fixed(name: String): PathLens<String> {
         val getLens = delegate.get(name)
-        return object : Lens<String, String>(Meta(true, "path", name),
+        return object : Lens<String, String>(Meta(true, "path", StringParam, name),
             { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
             override fun toString(): String = name
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
