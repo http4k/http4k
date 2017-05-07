@@ -33,22 +33,6 @@ class Route private constructor(internal val core: Core) {
 
     infix fun at(method: Method): PathBinder0 = PathBinder0(Core(this, method, { it }))
 
-    internal val validationFilter = Filter {
-        next ->
-        {
-            val body = core.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
-            val errors = body.plus(core.requestParams).fold(emptyList<Failure>()) { memo, next ->
-                try {
-                    next(it)
-                    memo
-                } catch (e: LensFailure) {
-                    memo.plus(e.failures)
-                }
-            }
-            if (errors.isEmpty()) next(it) else throw LensFailure(errors)
-        }
-    }
-
     companion object {
         internal data class Core(val summary: String,
                                  val description: String?,
@@ -56,6 +40,23 @@ class Route private constructor(internal val core: Core) {
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: List<Pair<String, Response>> = emptyList())
+                                 val responses: List<Pair<String, Response>> = emptyList()) {
+
+            internal val validationFilter = Filter {
+                next ->
+                {
+                    val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+                    val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
+                        try {
+                            next(it)
+                            memo
+                        } catch (e: LensFailure) {
+                            memo.plus(e.failures)
+                        }
+                    }
+                    if (errors.isEmpty()) next(it) else throw LensFailure(errors)
+                }
+            }
+        }
     }
 }
