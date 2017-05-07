@@ -74,7 +74,7 @@ class PathBinder2<out A, out B> internal constructor(core: Core,
                                                      private val psB: PathLens<B>) : PathBinder(core, psA, psB) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override fun <T> div(next: PathLens<T>) = PathBinder3(core, psA, psB, next)
+    override infix operator fun <T> div(next: PathLens<T>) = PathBinder3(core, psA, psB, next)
 
     infix fun bind(fn: (A, B) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB]) })
 }
@@ -85,7 +85,7 @@ class PathBinder3<out A, out B, out C> internal constructor(core: Core,
                                                             private val psC: PathLens<C>) : PathBinder(core, psA, psB, psC) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override fun <T> div(next: PathLens<T>) = PathBinder4(core, psA, psB, psC, next)
+    override infix operator fun <T> div(next: PathLens<T>) = PathBinder4(core, psA, psB, psC, next)
 
     infix fun bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC]) })
 }
@@ -97,7 +97,7 @@ class PathBinder4<out A, out B, out C, out D> internal constructor(core: Core,
                                                                    private val psD: PathLens<D>) : PathBinder(core, psA, psB, psC, psD) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
+    override infix operator fun <T> div(next: PathLens<T>) = throw UnsupportedOperationException("No support for longer paths!")
 
     infix fun bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(this, { parts -> fn(parts[psA], parts[psB], parts[psC], parts[psD]) })
 }
