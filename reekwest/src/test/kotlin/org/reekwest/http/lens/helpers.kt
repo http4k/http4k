@@ -24,6 +24,7 @@ object BiDiLensContract {
 
         val optionalMultiLens = spec.multi.optional("hello")
         assertThat(optionalMultiLens(valueAsString), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.optional("hello"))(valueAsString), equalTo(listOf(tValue.toString())))
         assertThat(optionalMultiLens(""), absent())
         assertThat({ optionalMultiLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
@@ -37,6 +38,7 @@ object BiDiLensContract {
 
         val requiredMultiLens = spec.multi.required("hello")
         assertThat(requiredMultiLens(valueAsString), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.required("hello"))(valueAsString), equalTo(listOf(tValue.toString())))
         assertThat({ requiredMultiLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
         assertThat({ requiredMultiLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
         assertThat(requiredMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
@@ -50,6 +52,7 @@ object BiDiLensContract {
 
         val defaultedMultiLens = spec.multi.defaulted("hello", listOf(tValue))
         assertThat(defaultedMultiLens(valueAsString), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.defaulted("hello", listOf(tValue.toString())))(valueAsString), equalTo(listOf(tValue.toString())))
         assertThat(defaultedMultiLens(""), equalTo(listOf(tValue)))
         assertThat({ defaultedMultiLens("hello") }, throws(equalTo(LensFailure(defaultedMultiLens.invalid()))))
         assertThat(defaultedMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
