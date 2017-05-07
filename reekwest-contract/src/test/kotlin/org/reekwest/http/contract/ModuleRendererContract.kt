@@ -55,7 +55,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 //        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)
-//            .securedBy(ApiKey(BiDiLensSpec.required("the_api_key"), { true }))
+            .securedBy(ApiKey(Query.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
@@ -75,7 +75,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                 Route("a friendly endpoint")
                     .query(Query.boolean().required("query", "description of the query"))
                     .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")))
-                    .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, b, c -> { Response(OK).body(a) } })
+                    .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } })
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = module.toHttpHandler()(get("/basepath?the_api_key=somevalue")).bodyString()
