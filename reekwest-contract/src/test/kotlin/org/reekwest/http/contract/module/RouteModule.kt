@@ -45,7 +45,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
             fun securedBy(new: Security) = copy(security = new)
 
-            private fun descriptionRoute(): ServerRoute =
+            private fun descriptionRoute() =
                 PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind
                     { renderer.description(moduleRoot, NoSecurity, routes) }
 
