@@ -35,7 +35,8 @@ fun main(args: Array<String>) {
     }
 
     val handler = RouteModule(Root / "foo", SimpleJson(Argo), ResponseFilters.ReportRouteLatency(Clock.systemUTC(), {
-        name, latency -> println(name + " took " + latency)
+        name, latency ->
+        println(name + " took " + latency)
     }))
 //        .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
         .withRoute(Route("add").at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
@@ -43,5 +44,4 @@ fun main(args: Array<String>) {
         .toHttpHandler()
 
     handler.asJettyServer(8000).start().block()
-
 }
