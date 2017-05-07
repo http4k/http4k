@@ -30,14 +30,15 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                                         val descriptionPath: (BasePath) -> BasePath = { it },
                                         val routes: List<ServerRoute> = emptyList()) : Router {
 
-            private val routers = routes.plus(descriptionRoute()).map { it.router(moduleRoot) to it }
+            private val routers = routes.plus(descriptionRoute())
+                .map { it.router(moduleRoot) to security.filter.then(identify(it).then(filter)) }
 
-            private val start: HttpHandler? = null
+            private val noMatch: HttpHandler? = null
 
             override fun invoke(request: Request): HttpHandler? =
                 if (request.isIn(moduleRoot)) {
-                    routers.fold(start, { memo, (router, route) ->
-                        memo ?: router(request)?.let { security.filter.then(identify(route)).then(filter).then(it) }
+                    routers.fold(noMatch, { memo, (router, routeFilter) ->
+                        memo ?: router(request)?.let { routeFilter.then(it) }
                     })
                 } else null
 
