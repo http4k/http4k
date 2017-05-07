@@ -1,43 +1,43 @@
 {
-  "object-1692482481": {
+  "object1566645290": {
     "type": "object",
     "properties": {
       "anotherString": {
-        "type": "StringParamType"
+        "type": "string"
       }
     }
   },
-  "object416674373": {
+  "object-1591149158": {
     "type": "object",
     "properties": {
       "anInteger": {
-        "type": "IntegerParamType"
+        "type": "integer"
       }
     }
   },
-  "object1630675836": {
+  "object-1848014178": {
     "type": "object",
     "properties": {
       "aString": {
-        "type": "StringParamType"
+        "type": "string"
       },
       "aNumber": {
-        "type": "NumberParamType"
+        "type": "number"
       },
       "aBooleanTrue": {
-        "type": "BooleanParamType"
+        "type": "boolean"
       },
       "aBooleanFalse": {
-        "type": "BooleanParamType"
+        "type": "boolean"
       },
       "anArray": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/object-1692482481"
+          "$ref": "#/definitions/object1566645290"
         }
       },
       "anObject": {
-        "$ref": "#/definitions/object416674373"
+        "$ref": "#/definitions/object-1591149158"
       }
     }
   }

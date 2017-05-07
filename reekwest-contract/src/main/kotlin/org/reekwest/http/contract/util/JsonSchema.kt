@@ -1,11 +1,12 @@
 package org.reekwest.http.contract.util
 
-import org.reekwest.http.contract.util.ParamType.BooleanParamType
-import org.reekwest.http.contract.util.ParamType.IntegerParamType
-import org.reekwest.http.contract.util.ParamType.NumberParamType
-import org.reekwest.http.contract.util.ParamType.StringParamType
 import org.reekwest.http.formats.Json
 import org.reekwest.http.formats.JsonType
+import org.reekwest.http.lens.ParamMeta
+import org.reekwest.http.lens.ParamMeta.BooleanParam
+import org.reekwest.http.lens.ParamMeta.IntegerParam
+import org.reekwest.http.lens.ParamMeta.NumberParam
+import org.reekwest.http.lens.ParamMeta.StringParam
 
 class IllegalSchemaException(message: String) : Exception(message)
 
@@ -18,17 +19,17 @@ class JsonToJsonSchema<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NOD
         when (json.typeOf(input.node)) {
             JsonType.Object -> objectSchema(input)
             JsonType.Array -> arraySchema(input)
-            JsonType.String -> JsonSchema(paramTypeSchema(StringParamType), input.definitions)
+            JsonType.String -> JsonSchema(paramTypeSchema(StringParam), input.definitions)
             JsonType.Number -> numberSchema(input)
-            JsonType.Boolean -> JsonSchema(paramTypeSchema(BooleanParamType), input.definitions)
+            JsonType.Boolean -> JsonSchema(paramTypeSchema(BooleanParam), input.definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
             else -> throw IllegalSchemaException("unknown type")
         }
 
-    private fun paramTypeSchema(paramType: ParamType): NODE = json.obj("type" to json.string(paramType.name))
+    private fun paramTypeSchema(paramMeta: ParamMeta): NODE = json.obj("type" to json.string(paramMeta.value))
 
     private fun numberSchema(input: JsonSchema<NODE>): JsonSchema<NODE> =
-        JsonSchema(paramTypeSchema(if (json.text(input.node).contains(".")) NumberParamType else IntegerParamType), input.definitions)
+        JsonSchema(paramTypeSchema(if (json.text(input.node).contains(".")) NumberParam else IntegerParam), input.definitions)
 
     private fun arraySchema(input: JsonSchema<NODE>): JsonSchema<NODE> {
         val (node, definitions) = json.elements(input.node).toList().firstOrNull()?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw
