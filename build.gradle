@@ -146,6 +146,11 @@ allprojects {
     }
 }
 
+coveralls {
+    sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
 jacocoTestReport {
     reports {
         xml.enabled true
