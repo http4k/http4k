@@ -53,9 +53,14 @@ class RouteTest {
     }
 
     private fun checkMatching(route: ServerRoute, valid: String, expected: String) {
-        val router = route.router(Root)
-        assertThat(router(get("")), absent())
-        assertThat(router(post(valid)), absent())
-        assertThat(router(get(valid))?.invoke(get(valid))?.bodyString(), equalTo(expected))
+        val routerOnNoPrefix = route.router(Root)
+        assertThat(routerOnNoPrefix(get("")), absent())
+        assertThat(routerOnNoPrefix(post(valid)), absent())
+        assertThat(routerOnNoPrefix(get(valid))?.invoke(get(valid))?.bodyString(), equalTo(expected))
+
+        val routerOnPrefix = route.router(Root / "somePrefix")
+        assertThat(routerOnPrefix(get("/somePrefix")), absent())
+        assertThat(routerOnPrefix(post("/somePrefix/$valid")), absent())
+        assertThat(routerOnPrefix(get("/somePrefix/$valid"))?.invoke(get(valid))?.bodyString(), equalTo(expected))
     }
 }
