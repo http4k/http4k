@@ -36,13 +36,8 @@ class Route private constructor(internal val core: Core) {
     internal val validationFilter = Filter {
         next ->
         {
-            val bodyErrors = try {
-                core.body?.let { b -> b(it) }
-                emptyList<Failure>()
-            } catch (e: LensFailure) {
-                e.failures
-            }
-            val errors = core.requestParams.fold(bodyErrors) { memo, next ->
+            val body = core.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+            val errors = body.plus(core.requestParams).fold(emptyList<Failure>()) { memo, next ->
                 try {
                     next(it)
                     memo
