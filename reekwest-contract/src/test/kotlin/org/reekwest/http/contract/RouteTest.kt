@@ -83,6 +83,11 @@ class RouteTest {
         checkMatching(Route("").at(GET) / Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bind (::matched), "/value1/value2/value3/value4", "value1value2value3value4")
     }
 
+    @Test (expected = UnsupportedOperationException::class)
+    fun `5 parts - unsupported`() {
+        Route("").at(GET) / Path.of("value") / Path.of("value")/ Path.of("value") / Path.of("value")/ Path.of("value")
+    }
+
     private fun checkMatching(route: ServerRoute, valid: String, expected: String) {
         val routerOnNoPrefix = route.router(Root)
         assertThat(routerOnNoPrefix(get("")), absent())
