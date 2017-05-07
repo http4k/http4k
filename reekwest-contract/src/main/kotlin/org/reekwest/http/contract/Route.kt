@@ -7,7 +7,6 @@ import org.reekwest.http.core.Method
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status
-import org.reekwest.http.lens.BiDiBodyLens
 import org.reekwest.http.lens.BodyLens
 import org.reekwest.http.lens.Failure
 import org.reekwest.http.lens.HeaderLens
@@ -20,7 +19,7 @@ class Route private constructor(internal val core: Core) {
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
-    fun body(new: BiDiBodyLens<*>) = Route(core.copy(body = new))
+    fun body(new: BodyLens<*>) = Route(core.copy(body = new))
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new)))
