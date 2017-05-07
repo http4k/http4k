@@ -1,5 +1,6 @@
 package cookbook
 
+import org.reekwest.http.contract.ReportRouteLatency
 import org.reekwest.http.contract.module.Root
 import org.reekwest.http.contract.module.Route
 import org.reekwest.http.contract.module.RouteModule
@@ -10,11 +11,13 @@ import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.with
+import org.reekwest.http.filters.ResponseFilters
 import org.reekwest.http.formats.Argo
 import org.reekwest.http.lens.Body
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.int
 import org.reekwest.http.server.asJettyServer
+import java.time.Clock
 
 
 fun main(args: Array<String>) {
@@ -31,7 +34,9 @@ fun main(args: Array<String>) {
         )
     }
 
-    val handler = RouteModule(Root / "foo", SimpleJson(Argo))
+    val handler = RouteModule(Root / "foo", SimpleJson(Argo), ResponseFilters.ReportRouteLatency(Clock.systemUTC(), {
+        name, latency -> println(name + " took " + latency)
+    }))
 //        .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
         .withRoute(Route("add").at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
         .withRoute(Route("echo").at(GET) / "echo" / Path.of("name") / Path.int().of("age") bind ::echo)
