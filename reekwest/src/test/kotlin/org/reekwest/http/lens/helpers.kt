@@ -18,14 +18,12 @@ object BiDiLensContract {
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(valueAsString), equalTo(tValue))
         assertThat(optionalLens(""), absent())
-        assertThat(spec.defaulted("hello", tValue)(""), equalTo(tValue))
         assertThat({ optionalLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalLens(tValue, "original"), equalTo("original" + valueAsString))
 
         val optionalMultiLens = spec.multi.optional("hello")
         assertThat(optionalMultiLens(valueAsString), equalTo(listOf(tValue)))
         assertThat(optionalMultiLens(""), absent())
-        assertThat(spec.multi.defaulted("hello", listOf(tValue))(""), equalTo(listOf(tValue)))
         assertThat({ optionalMultiLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
         assertThat(optionalMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
 
@@ -40,6 +38,18 @@ object BiDiLensContract {
         assertThat({ requiredMultiLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
         assertThat({ requiredMultiLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
         assertThat(requiredMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
+
+        val defaultedLens = spec.defaulted("hello", tValue)
+        assertThat(defaultedLens(valueAsString), equalTo(tValue))
+        assertThat(defaultedLens(""), equalTo(tValue))
+        assertThat({ defaultedLens("hello") }, throws(equalTo(LensFailure(defaultedLens.invalid()))))
+        assertThat(defaultedLens(tValue, "original"), equalTo("original" + valueAsString))
+
+        val defaultedMultiLens = spec.multi.defaulted("hello", listOf(tValue))
+        assertThat(defaultedMultiLens(valueAsString), equalTo(listOf(tValue)))
+        assertThat(defaultedMultiLens(""), equalTo(listOf(tValue)))
+        assertThat({ defaultedMultiLens("hello") }, throws(equalTo(LensFailure(defaultedMultiLens.invalid()))))
+        assertThat(defaultedMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
     }
 }
 

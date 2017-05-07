@@ -13,16 +13,19 @@ import org.reekwest.http.core.Uri.Companion.uri
 class HeaderTest {
     private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
 
-    @org.junit.Test
+    @Test
     fun `value present`() {
         assertThat(Header.optional("hello")(request), equalTo("world"))
         assertThat(Header.required("hello")(request), equalTo("world"))
+        assertThat(Header.defaulted("hello", "moon")(request), equalTo("world"))
         assertThat(Header.map { it.length }.required("hello")(request), equalTo(5))
         assertThat(Header.map { it.length }.optional("hello")(request), equalTo(5))
+        assertThat(Header.map { it.length }.defaulted("hello", 2)(request), equalTo(5))
 
         val expected: List<String?> = listOf("world", "world2")
         assertThat(Header.multi.required("hello")(request), equalTo(expected))
         assertThat(Header.multi.optional("hello")(request), equalTo(expected))
+        assertThat(Header.multi.defaulted("hello", listOf("foo"))(request), equalTo(expected))
     }
 
     @Test
@@ -30,6 +33,10 @@ class HeaderTest {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
         assertThat({ requiredHeader(request) }, throws(equalTo(LensFailure(requiredHeader.missing()))))
+
+        assertThat(Header.defaulted("world", "bob")(request), equalTo("bob"))
+        val defaultedHeader = Header.defaulted("world", "bob")
+        assertThat(defaultedHeader(request), equalTo("bob"))
 
         assertThat(Header.multi.optional("world")(request), absent())
         val optionalMultiHeader = Header.multi.required("world")

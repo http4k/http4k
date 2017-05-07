@@ -9,8 +9,6 @@ import org.junit.Test
 class FormFieldTest {
     private val form = WebForm(mapOf("hello" to listOf("world", "world2")), emptyList())
 
-    private fun withFormFieldOf(s: String) = WebForm(mapOf("hello" to listOf(s)), listOf())
-
     @Test
     fun `value present`() {
         assertThat(FormField.optional("hello")(form), equalTo("world"))
