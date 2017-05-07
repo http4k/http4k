@@ -4,16 +4,47 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.reekwest.http.core.ContentType.Companion.TEXT_PLAIN
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Request.Companion.post
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
+import org.reekwest.http.core.with
+import org.reekwest.http.lens.Body
+import org.reekwest.http.lens.Header
+import org.reekwest.http.lens.LensFailure
 import org.reekwest.http.lens.Path
+import org.reekwest.http.lens.Query
+import org.reekwest.http.lens.missing
 
 class RouteTest {
+
+    @Test
+    fun `validates contract - success`() {
+        val header = Header.required("header")
+        val query = Query.required("query")
+        val body = Body.string(TEXT_PLAIN).required()
+        val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
+
+        assertThat((route.router(Root))(get("").with(header to "value", query to "value", body to "hello")), present())
+    }
+
+    @Test
+    fun `validates contract - failure`() {
+        val header = Header.required("header")
+        val query = Query.required("query")
+        val body = Body.string(TEXT_PLAIN).required()
+        val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
+
+        val invalidRequest = get("").with(header to "value", body to "hello")
+        assertThat((route.router(Root))(invalidRequest), present())
+        assertThat({ (route.router(Root))(invalidRequest)?.invoke(invalidRequest) },
+            throws(equalTo(LensFailure(query.meta.missing()))))
+    }
 
     @Test
     fun `0 parts - matches route`() {
