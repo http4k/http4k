@@ -21,6 +21,7 @@ object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
         return object : Lens<String, String>(Meta(true, "path", name),
             { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
             override fun toString(): String = name
+            override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
         }
     }
 }

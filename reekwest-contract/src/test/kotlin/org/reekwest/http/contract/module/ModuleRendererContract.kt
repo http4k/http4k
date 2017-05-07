@@ -1,5 +1,6 @@
 package org.reekwest.http.contract.module
 
+import argo.jdom.JsonRootNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
@@ -12,6 +13,7 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.formats.Argo.json
 import org.reekwest.http.formats.Argo.parse
+import org.reekwest.http.lens.BiDiBodyLens
 import org.reekwest.http.lens.Body
 import org.reekwest.http.lens.FormField
 import org.reekwest.http.lens.FormValidator.Strict
@@ -48,7 +50,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
     @Test
     fun `renders as expected`() {
 
-        val customBody = Body.json().required("the body of the message")
+        val customBody: BiDiBodyLens<JsonRootNode> = Body.json().required("the body of the message")
 //        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)

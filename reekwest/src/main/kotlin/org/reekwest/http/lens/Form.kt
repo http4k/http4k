@@ -1,9 +1,12 @@
 package org.reekwest.http.lens
 
+import org.reekwest.http.asByteBuffer
+import org.reekwest.http.asString
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.toUrlEncoded
 import java.net.URLDecoder.decode
+import java.nio.ByteBuffer
 
 typealias FormFields = Map<String, List<String>>
 
@@ -28,14 +31,16 @@ enum class FormValidator : (WebForm) -> WebForm {
     };
 }
 
-fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>) =
-    Body.string(APPLICATION_FORM_URLENCODED).map(
-        { WebForm(formParametersFrom(it), emptyList()) },
-        { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() }
-    ).map(
-        { validateFields(it, validator, *formFields) },
-        { validateFields(it, validator, *formFields) }
-    ).required()
+fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
+    root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED)
+        .map(ByteBuffer::asString, String::asByteBuffer)
+        .map(
+            { WebForm(formParametersFrom(it), emptyList()) },
+            { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
+        .map({ validateFields(it, validator, *formFields) },
+            { validateFields(it, validator, *formFields) })
+        .required()
+
 
 private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
     val failures = formFields.fold(listOf<Failure>()) {
