@@ -1,4 +1,4 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
@@ -34,7 +34,7 @@ class StaticModuleTest {
 
     @Test
     fun `can add a filter`() {
-        val handler = StaticModule(Root / "svc", Classpath(pkg), Filter {
+        val handler = StaticModule(Root / "svc", Classpath(pkg), Filter.Companion {
             next -> { next(it).copy(EXPECTATION_FAILED) }
         }).toHttpHandler()
 

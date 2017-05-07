@@ -1,7 +1,6 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
-import org.reekwest.http.contract.X_REEKWEST_ROUTE_IDENTITY
-import org.reekwest.http.contract.module.PathBinder.Companion.Core
+import org.reekwest.http.contract.PathBinder.Companion.Core
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET

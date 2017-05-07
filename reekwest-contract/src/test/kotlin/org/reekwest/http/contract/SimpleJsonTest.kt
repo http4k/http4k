@@ -1,4 +1,4 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
 import org.reekwest.http.formats.Argo
 

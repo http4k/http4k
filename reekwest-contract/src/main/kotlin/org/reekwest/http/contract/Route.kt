@@ -1,6 +1,6 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
-import org.reekwest.http.contract.module.PathBinder.Companion.Core
+import org.reekwest.http.contract.PathBinder.Companion.Core
 import org.reekwest.http.core.ContentType
 import org.reekwest.http.core.Filter
 import org.reekwest.http.core.Method

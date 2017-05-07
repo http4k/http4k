@@ -1,4 +1,4 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
 import argo.jdom.JsonRootNode
 import com.natpryce.hamkrest.assertion.assertThat
@@ -55,7 +55,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 //        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)
-            .securedBy(ApiKey(Query.required("the_api_key"), { true }))
+//            .securedBy(ApiKey(BiDiLensSpec.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)

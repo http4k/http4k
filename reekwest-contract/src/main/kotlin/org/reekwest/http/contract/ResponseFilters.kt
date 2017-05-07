@@ -1,7 +1,7 @@
-package org.reekwest.http.filters
+package org.reekwest.http.contract
 
-import org.reekwest.http.contract.X_REEKWEST_ROUTE_IDENTITY
 import org.reekwest.http.core.Filter
+import org.reekwest.http.filters.ResponseFilters
 import java.time.Clock
 import java.time.Duration
 

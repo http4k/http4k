@@ -1,4 +1,4 @@
-package org.reekwest.http.contract.module
+package org.reekwest.http.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

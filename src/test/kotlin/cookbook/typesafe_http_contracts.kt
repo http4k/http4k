@@ -1,16 +1,16 @@
 package cookbook
 
-import org.reekwest.http.contract.module.Root
-import org.reekwest.http.contract.module.Route
-import org.reekwest.http.contract.module.RouteModule
-import org.reekwest.http.contract.module.SimpleJson
+import org.reekwest.http.contract.ReportRouteLatency
+import org.reekwest.http.contract.Root
+import org.reekwest.http.contract.Route
+import org.reekwest.http.contract.RouteModule
+import org.reekwest.http.contract.SimpleJson
 import org.reekwest.http.core.ContentType.Companion.TEXT_PLAIN
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.with
-import org.reekwest.http.filters.ReportRouteLatency
 import org.reekwest.http.filters.ResponseFilters
 import org.reekwest.http.formats.Argo
 import org.reekwest.http.lens.Body
