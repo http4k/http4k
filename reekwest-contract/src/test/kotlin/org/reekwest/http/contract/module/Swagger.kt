@@ -6,9 +6,8 @@ import org.reekwest.http.core.Response
 import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.formats.Json
 import org.reekwest.http.formats.JsonErrorResponseRenderer
-import org.reekwest.http.lens.BodyLens
 import org.reekwest.http.lens.Failure
-import org.reekwest.http.lens.Lens
+import org.reekwest.http.lens.Meta
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
@@ -31,21 +30,20 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     }
 
 
-    private fun render(parameters: Iterable<Lens<*, *>>, schema: JsonSchema<NODE>?) =
+    private fun render(parameters: Iterable<Meta>, schema: JsonSchema<NODE>?) =
         parameters.map {
             json.obj(
-                "in" to json.string(it.meta.location),
-                "name" to json.string(it.meta.name),
-                "description" to (it.meta.description?.let(json::string) ?: json.nullNode()),
-                "required" to json.boolean(it.meta.required),
-                schema?.let { "schema" to it.node } ?: "type" to json.string(it.meta.name)
+                "in" to json.string(it.location),
+                "name" to json.string(it.name),
+                "description" to (it.description?.let(json::string) ?: json.nullNode()),
+                "required" to json.boolean(it.required),
+                schema?.let { "schema" to it.node } ?: "type" to json.string(it.name)
             )
         }
 
     private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses)
 //
-        val bodyParams = route.core.body?.let { emptyList<BodyLens<*>>() } ?: emptyList()
 //        val bodyParameters = route.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
 //
 //            val bodyAndSchemaAndRendered = bodyParams.map {p ->
