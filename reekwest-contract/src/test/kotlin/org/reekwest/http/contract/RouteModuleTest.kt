@@ -3,6 +3,7 @@ package org.reekwest.http.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import org.reekwest.http.core.Filter
 import org.reekwest.http.core.Method.GET
 import org.reekwest.http.core.Request.Companion.get
 import org.reekwest.http.core.Response
@@ -10,17 +11,32 @@ import org.reekwest.http.core.Status.Companion.OK
 import org.reekwest.http.core.Status.Companion.UNAUTHORIZED
 import org.reekwest.http.core.with
 import org.reekwest.http.formats.Argo
+import org.reekwest.http.lens.Header
 import org.reekwest.http.lens.Path
 import org.reekwest.http.lens.Query
 
 class RouteModuleTest {
-    private val routeModule = RouteModule(Root, SimpleJson(Argo))
+
+    private val header = Header.optional("FILTER")
+    private val routeModule = RouteModule(Root, SimpleJson(Argo), Filter {
+        next -> { next(it.with(header to "true")) }
+    })
 
     @Test
     fun `by default the description lives at the route`() {
         val response = routeModule.toHttpHandler()(get(""))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
+    }
+
+    @Test
+    fun `passes through module filter`() {
+        val response = routeModule.withRoute(Route("").at(GET) bind {
+                Response(OK).with(header to header(it))
+        }).toHttpHandler()(get(""))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(header(response), equalTo("true"))
     }
 
     @Test
