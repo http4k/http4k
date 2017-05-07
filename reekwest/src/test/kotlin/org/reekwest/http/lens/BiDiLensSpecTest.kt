@@ -2,6 +2,7 @@ package org.reekwest.http.lens
 
 import org.junit.Test
 import org.reekwest.http.lens.BiDiLensContract.checkContract
+import org.reekwest.http.lens.ParamMeta.StringParam
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -10,9 +11,10 @@ import java.util.*
 
 class BiDiLensSpecContract {
 
-    private val spec = BiDiLensSpec("location", Get { _: String, str: String ->
-        if (str.isBlank()) emptyList() else listOf(str)
-    },
+    private val spec = BiDiLensSpec("location", StringParam,
+        Get { _: String, str: String ->
+            if (str.isBlank()) emptyList() else listOf(str)
+        },
         Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     @Test

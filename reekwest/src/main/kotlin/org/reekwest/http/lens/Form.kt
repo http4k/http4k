@@ -5,12 +5,14 @@ import org.reekwest.http.asString
 import org.reekwest.http.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.reekwest.http.core.Status.Companion.NOT_ACCEPTABLE
 import org.reekwest.http.core.toUrlEncoded
+import org.reekwest.http.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
 
 typealias FormFields = Map<String, List<String>>
 
 object FormField : BiDiLensSpec<WebForm, String, String>("form field",
+    StringParam,
     Get { name, (fields) -> fields.getOrDefault(name, listOf()) },
     Set { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )

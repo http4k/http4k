@@ -1,5 +1,7 @@
 package org.reekwest.http.lens
 
+import org.reekwest.http.lens.ParamMeta.BooleanParam
+import org.reekwest.http.lens.ParamMeta.NumberParam
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -31,8 +33,10 @@ interface MultiLensSpec<in IN, OUT> {
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
 
-open class LensSpec<IN, MID, OUT>(protected val location: String, internal val get: Get<IN, MID, OUT>) {
-    fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, get.map(nextIn))
+open class LensSpec<IN, MID, OUT>(protected val location: String,
+                                  protected val paramMeta: ParamMeta,
+                                  internal val get: Get<IN, MID, OUT>) {
+    fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, paramMeta, get.map(nextIn))
 
     open fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT> {
         val meta = Meta(false, location, name, description)
@@ -79,10 +83,14 @@ interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
     override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
 }
 
-open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
-                                      private val set: Set<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, get) {
+open class BiDiLensSpec<IN, MID, OUT>(location: String,
+                                      paramMeta: ParamMeta,
+                                      get: Get<IN, MID, OUT>,
+                                      private val set: Set<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, paramMeta, get) {
 
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiLensSpec(location, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
+
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?): BiDiLens<IN, OUT> {
         val meta = Meta(false, location, name, description)
@@ -145,11 +153,11 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String, get: Get<IN, MID, OUT>,
     }
 }
 
-fun <IN> BiDiLensSpec<IN, String, String>.int() = this.map(String::toInt, Int::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.long() = this.map(String::toLong, Long::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.double() = this.map(String::toDouble, Double::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.float() = this.map(String::toFloat, Float::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.map(::safeBooleanFrom, Boolean::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
 fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
 fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)

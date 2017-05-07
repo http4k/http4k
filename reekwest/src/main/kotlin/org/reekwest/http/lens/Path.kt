@@ -1,5 +1,7 @@
 package org.reekwest.http.lens
 
+import org.reekwest.http.lens.ParamMeta.StringParam
+
 typealias PathLens<T> = Lens<String, T>
 
 open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OUT>) {
@@ -13,7 +15,7 @@ open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OU
     fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
 }
 
-object Path : PathSpec<String, String>(LensSpec<String, String, String>("path",
+object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", StringParam,
     Get { _, target -> listOf(target) })) {
 
     fun fixed(name: String): PathLens<String> {

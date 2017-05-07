@@ -5,10 +5,11 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.reekwest.http.lens.ParamMeta.StringParam
 
 object BiDiLensContract {
 
-    val spec = BiDiLensSpec("location", Get { _: String, str: String ->
+    val spec = BiDiLensSpec("location", StringParam, Get { _: String, str: String ->
         if (str.isBlank()) emptyList() else listOf(str)
     },
         Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })

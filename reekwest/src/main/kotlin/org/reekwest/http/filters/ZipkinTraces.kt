@@ -5,6 +5,7 @@ import org.reekwest.http.core.with
 import org.reekwest.http.lens.BiDiLensSpec
 import org.reekwest.http.lens.Get
 import org.reekwest.http.lens.Header
+import org.reekwest.http.lens.ParamMeta.StringParam
 import org.reekwest.http.lens.Set
 import java.util.*
 import kotlin.experimental.and
@@ -31,6 +32,7 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
         private val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
 
         private val lens = BiDiLensSpec<HttpMessage, ZipkinTraces, ZipkinTraces>("headers",
+            StringParam,
             Get { _, target ->
                 listOf(ZipkinTraces(
                     X_B3_TRACEID(target) ?: TraceId.new(),
