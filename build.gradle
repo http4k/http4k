@@ -48,7 +48,7 @@ allprojects {
     targetCompatibility = JavaVersion.VERSION_1_8
 
     version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
-    group = 'org.reekwest'
+    group = 'org.http4k'
 
     compileTestKotlin {
         kotlinOptions {
@@ -94,9 +94,9 @@ allprojects {
                                 .parent().parent()
                                 .appendNode('developer').appendNode('name', 'David Denton').parent().appendNode('email', 'mail@daviddenton.github.io')
                         asNode().appendNode('scm').
-                                appendNode('url', 'git@github.com:reekwest/' + archivesBaseName + '.git').parent().
-                                appendNode('connection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git').parent().
-                                appendNode('developerConnection', 'scm:git:git@github.com:reekwest/' + archivesBaseName + '.git')
+                                appendNode('url', 'git@github.com:http4k/' + archivesBaseName + '.git').parent().
+                                appendNode('connection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git').parent().
+                                appendNode('developerConnection', 'scm:git:git@github.com:http4k/' + archivesBaseName + '.git')
                         asNode().appendNode('licenses').appendNode('license').
                                 appendNode('name', 'Apache License, Version 2.0').parent().
                                 appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.html')
@@ -119,13 +119,13 @@ allprojects {
         publish = true
         pkg {
             repo = 'maven'
-            userOrg = 'reekwest'
+            userOrg = 'http4k'
             name = project.name
 
             desc = description
-            websiteUrl = 'https://github.com/reekwest/reekwest'
-            issueTrackerUrl = 'https://github.com/reekwest/reekwest/issues'
-            vcsUrl = 'https://github.com/reekwest/reekwest.git'
+            websiteUrl = 'https://github.com/http4k/http4k'
+            issueTrackerUrl = 'https://github.com/http4k/http4k/issues'
+            vcsUrl = 'https://github.com/http4k/http4k.git'
             licenses = ['Apache-2.0']
             labels = []
             publicDownloadNumbers = true
@@ -177,13 +177,13 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 dependencies {
     provided kotlin_lib
 
-    provided project(":reekwest")
-    provided project(":reekwest-client-apache")
-    provided project(":reekwest-contract")
-    provided project(":reekwest-formats-argo")
-    provided project(":reekwest-formats-jackson")
-    provided project(":reekwest-server-jetty")
-    provided project(":reekwest-server-netty")
-    provided project(":reekwest-templates-handlebars")
+    provided project(":http4k")
+    provided project(":http4k-client-apache")
+    provided project(":http4k-contract")
+    provided project(":http4k-format-argo")
+    provided project(":http4k-format-jackson")
+    provided project(":http4k-server-jetty")
+    provided project(":http4k-server-netty")
+    provided project(":http4k-template-handlebars")
 }
 

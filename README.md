@@ -1,9 +1,9 @@
-# reekwest
+# http4k
 
-[![coverage](https://coveralls.io/repos/reekwest/reekwest/badge.svg?branch=master)](https://coveralls.io/github/reekwest/reekwest?branch=master)
+[![coverage](https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master)](https://coveralls.io/github/http4k/http4k?branch=master)
 [![kotlin](https://img.shields.io/badge/kotlin-1.1.2-blue.svg)](http://kotlinlang.org)
-[![build status](https://travis-ci.org/reekwest/reekwest.svg?branch=master)](https://travis-ci.org/reekwest/reekwest)
-[![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest/_latestVersion)
+[![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
+[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k/_latestVersion)
 
 A sensible implementation of HTTP for Kotlin
 
@@ -32,7 +32,7 @@ assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
 
 ## Using as a client
 
-[![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-client-apache/_latestVersion)
+[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k-client-apache/_latestVersion)
 
 ```kotlin
 val client = ApacheHttpClient()
@@ -44,7 +44,7 @@ assertThat(response.bodyString(), containsSubstring("John Doe"))
 
 ## Using as a server
 
-[![bintray version](https://api.bintray.com/packages/reekwest/maven/reekwest/images/download.svg)](https://bintray.com/reekwest/maven/reekwest-server-jetty/_latestVersion)
+[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k-server-jetty/_latestVersion)
 
 ```kotlin
 { _: Request -> ok().bodyString("Hello World") }.startJettyServer()
@@ -102,18 +102,18 @@ coming soon...
 Add one or more of these module dependencies:
 
 
-Core: ```compile group: "org.reekwest", name: "reekwest", version: "0.11.0"```
+Core: ```compile group: "org.http4k", name: "http4k", version: "0.11.0"```
 
-Apache Client: ```compile group: "org.reekwest", name: "reekwest-client-apache", version: "0.11.0"```
+Apache Client: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.11.0"```
 
-Contracts: ```compile group: "org.reekwest", name: "reekwest-contract", version: "0.11.0"```
+Contracts: ```compile group: "org.http4k", name: "http4k-contract", version: "0.11.0"```
 
-Argo JSON: ```compile group: "org.reekwest", name: "reekwest-formats-argo", version: "0.11.0"```
+Argo JSON: ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.11.0"```
 
-Jackson JSON: ```compile group: "org.reekwest", name: "reekwest-formats-jackson", version: "0.11.0"```
+Jackson JSON: ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.11.0"```
 
-Handlebars: ```compile group: "org.reekwest", name: "reekwest-templates-handlebars", version: "0.11.0"'```
+Handlebars: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.11.0"'```
 
-Jetty Server: ```compile group: "org.reekwest", name: "reekwest-server-jetty", version: "0.11.0"'```
+Jetty Server: ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.11.0"'```
 
-Netty Server: ```compile group: "org.reekwest", name: "reekwest-server-netty", version: "0.11.0"'```
+Netty Server: ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.11.0"'```

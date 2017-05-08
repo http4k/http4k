@@ -7,9 +7,9 @@ set -o nounset
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-LOCAL_VERSION=`jq -r .reekwest.version $DIR/version.json`
+LOCAL_VERSION=`jq -r .http4k.version $DIR/version.json`
 
-BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/reekwest/maven/reekwest/versions/_latest | jq -r .name`
+BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/http4k/maven/http4k/versions/_latest | jq -r .name`
 
 if [[ "$LOCAL_VERSION" == "$BINTRAY_VERSION" ]]; then
     echo "Version has not changed"
@@ -19,14 +19,14 @@ fi
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
-    :reekwest:bintrayUpload \
-    :reekwest-client-apache:bintrayUpload \
-    :reekwest-server-jetty:bintrayUpload \
-    :reekwest-server-netty:bintrayUpload \
-    :reekwest-contract:bintrayUpload \
-    :reekwest-templates-handlebars:bintrayUpload \
-    :reekwest-formats-argo:bintrayUpload \
-    :reekwest-formats-jackson:bintrayUpload
+    :http4k:bintrayUpload \
+    :http4k-client-apache:bintrayUpload \
+    :http4k-server-jetty:bintrayUpload \
+    :http4k-server-netty:bintrayUpload \
+    :http4k-contract:bintrayUpload \
+    :http4k-template-handlebars:bintrayUpload \
+    :http4k-format-argo:bintrayUpload \
+    :http4k-format-jackson:bintrayUpload
 
 function notify_slack {
     local MESSAGE=$1
@@ -35,7 +35,7 @@ function notify_slack {
 }
 
 if [ $? -ne 0 ]; then
-    notify_slack "Release has failed. Check <https://travis-ci.org/reekwest/reekwest/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
+    notify_slack "Release has failed. Check <https://travis-ci.org/http4k/http4k/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
 else
-    notify_slack "Released version <https://bintray.com/reekwest/maven/reekwest/$LOCAL_VERSION|$LOCAL_VERSION>."
+    notify_slack "Released version <https://bintray.com/http4k/maven/http4k/$LOCAL_VERSION|$LOCAL_VERSION>."
 fi

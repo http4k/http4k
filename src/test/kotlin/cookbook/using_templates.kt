@@ -1,11 +1,11 @@
 package cookbook
 
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Request.Companion.get
-import org.reekwest.http.core.Response
-import org.reekwest.http.core.Status.Companion.OK
-import org.reekwest.http.templates.HandlebarsTemplates
-import org.reekwest.http.templates.ViewModel
+import org.http4k.http.core.HttpHandler
+import org.http4k.http.core.Request.Companion.get
+import org.http4k.http.core.Response
+import org.http4k.http.core.Status.Companion.OK
+import org.http4k.http.templates.HandlebarsTemplates
+import org.http4k.http.templates.ViewModel
 
 // this view has the default template path of: cookbook/Person.hbs, although that is overridable
 data class Person(val name: String, val age: Int) : ViewModel
