@@ -1,14 +1,15 @@
 package org.http4k.filter.cookie
 
 import org.http4k.core.cookie.Cookie
+import java.time.Duration
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.ConcurrentHashMap
 
 data class LocalCookie(val cookie: Cookie, val created: LocalDateTime) {
     fun isExpired(now: LocalDateTime) =
-        cookie.maxAge?.let { maxAge -> ChronoUnit.SECONDS.between(created, now).dec() >= maxAge }
-            ?: cookie.expires?.let { expires -> ChronoUnit.SECONDS.between(created, now).dec() > ChronoUnit.SECONDS.between(created, expires).dec() }
+        cookie.maxAge?.let { maxAge ->
+            Duration.between(created, now).seconds >= maxAge }
+            ?: cookie.expires?.let { expires -> Duration.between(created, now).seconds > Duration.between(created, expires).seconds }
             ?: false
 }
 
