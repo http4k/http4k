@@ -4,7 +4,7 @@ set -e
 
 NEW_VERSION=$1
 
-BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/http4k-core/maven/http4k/versions/_latest | tools/jq -r .name`
+BINTRAY_VERSION=`curl -s https://bintray.com/api/v1/packages/http4k-core/maven/http4k-core/versions/_latest | tools/jq -r .name`
 
 git stash
 
