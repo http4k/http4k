@@ -78,7 +78,6 @@ private fun DefaultHttpRequest.asRequest(): Request =
         })
 
 class NettyServer(private val port: Int, private val handler: HttpHandler) {
-    // FIXME ! threads
     private val masterGroup = NioEventLoopGroup()
     private val workerGroup = NioEventLoopGroup()
     private var closeFuture: ChannelFuture? = null

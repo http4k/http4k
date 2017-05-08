@@ -1,4 +1,4 @@
-description = 'Reekwest HTTP Server built on top of netty'
+description = 'Reekwest HTTP Server built on top of Netty'
 
 dependencies {
     provided kotlin_lib
@@ -6,6 +6,8 @@ dependencies {
     provided project(":http4k-core")
 
     compile "io.netty:netty-codec-http2:4.1.10.Final"
+
+    testCompile project(":http4k-client-apache")
 
     testCompile testing
 }
