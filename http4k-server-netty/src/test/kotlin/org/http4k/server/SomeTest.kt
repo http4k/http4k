@@ -1,4 +1,4 @@
-package org.http4k.server.netty
+package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

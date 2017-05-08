@@ -1,4 +1,4 @@
-package org.http4k.http.server
+package org.http4k.server
 
 
 import io.netty.bootstrap.ServerBootstrap
