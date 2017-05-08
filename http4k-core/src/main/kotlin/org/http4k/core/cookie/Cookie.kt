@@ -5,7 +5,7 @@ import org.http4k.unquoted
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 
 data class Cookie(val name: String, val value: String,
                   val maxAge: Long? = null,
@@ -48,11 +48,21 @@ data class Cookie(val name: String, val value: String,
         }
 
         private fun List<Pair<String, String?>>.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()
-        private fun List<Pair<String, String?>>.expires(): LocalDateTime? = find { it.first.equals("Expires", true) }?.second?.let { LocalDateTime.parse(it, RFC822) }
+        private fun List<Pair<String, String?>>.expires(): LocalDateTime? = find { it.first.equals("Expires", true) }?.second?.parseDate()
         private fun List<Pair<String, String?>>.domain(): String? = find { it.first.equals("Domain", true) }?.second
         private fun List<Pair<String, String?>>.path(): String? = find { it.first.equals("Path", true) }?.second
         private fun List<Pair<String, String?>>.secure(): Boolean = find { it.first.equals("secure", true) } != null
         private fun List<Pair<String, String?>>.httpOnly(): Boolean = find { it.first.equals("HttpOnly", true) } != null
+
+        private fun String.parseDate(): LocalDateTime? {
+            for (supportedFormat in supportedFormats) {
+                try {
+                    return LocalDateTime.parse(this, supportedFormat)
+                } catch(_: Exception) {
+                }
+            }
+            return null
+        }
     }
 
     private fun MutableList<String>.appendIfPresent(toCheck: Any?, toInclude: String) {
@@ -64,5 +74,12 @@ data class Cookie(val name: String, val value: String,
     }
 }
 
-private val RFC822 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
+private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
 
+private val supportedFormats = listOf(RFC822,
+    ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz"),
+    ofPattern("EEE, dd-MMM-yy HH:mm:ss zzz"),
+    ofPattern("EEE, dd MMM yy HH:mm:ss zzz"),
+    ofPattern("EEE MMM dd yy HH:mm:ss zzz"),
+    ofPattern("EEE MMM dd yyyy HH:mm:ss zzz")
+)

@@ -120,4 +120,17 @@ class CookieTest {
         assertThat(Cookie("foo", "bar").invalidate(),
             equalTo(Cookie("foo", "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))))
     }
+
+    @Test
+    fun `cookie with various expires date formats parsed`() {
+        val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+
+        assertThat(Cookie.parse("foo=bar; Expires=Sat, 11 Mar 2017 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=Sat, 11-Mar-2017 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=Sat, 11-Mar-17 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=Sat, 11 Mar 17 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=Sat Mar 11 17 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=Sat Mar 11 2017 12:15:21 GMT"), equalTo(expected))
+        assertThat(Cookie.parse("foo=bar; Expires=anything else"), equalTo(Cookie("foo", "bar")))
+    }
 }
