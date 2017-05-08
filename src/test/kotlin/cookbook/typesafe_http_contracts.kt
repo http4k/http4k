@@ -16,7 +16,7 @@ import org.http4k.http.formats.Argo
 import org.http4k.http.lens.Body
 import org.http4k.http.lens.Path
 import org.http4k.http.lens.int
-import org.http4k.http.server.asJettyServer
+import org.http4k.server.asJettyServer
 import java.time.Clock
 
 

@@ -1,4 +1,4 @@
-package org.http4k.http.server
+package org.http4k.server
 
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler

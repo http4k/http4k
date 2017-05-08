@@ -4,7 +4,7 @@ import org.http4k.http.client.ApacheHttpClient
 import org.http4k.http.core.Request
 import org.http4k.http.core.Request.Companion.get
 import org.http4k.http.core.Response.Companion.ok
-import org.http4k.http.server.asJettyServer
+import org.http4k.server.asJettyServer
 
 fun main(args: Array<String>) {
 
