@@ -1,5 +1,5 @@
 rootProject.name = 'all'
-include 'http4k'
+include 'http4k-core'
 include 'http4k-client-apache'
 include 'http4k-contract'
 include 'http4k-format-argo'

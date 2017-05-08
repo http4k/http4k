@@ -3,7 +3,7 @@ description = 'Typesafe HTTP contracts for Reekwest'
 dependencies {
     provided kotlin_lib
 
-    provided project(":http4k")
+    provided project(":http4k-core")
     testCompile project(":http4k-format-argo")
     testCompile project(":http4k-server-jetty")
 

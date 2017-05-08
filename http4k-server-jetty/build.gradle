@@ -14,7 +14,7 @@ dependencies {
 
     compile jetty
 
-    provided project(":http4k")
+    provided project(":http4k-core")
 
     testCompile project(":http4k-client-apache")
 

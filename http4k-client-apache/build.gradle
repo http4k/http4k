@@ -9,7 +9,7 @@ dependencies {
 
     compile "org.apache.httpcomponents:httpclient:$apache_http_version"
 
-    provided project(":http4k")
+    provided project(":http4k-core")
 
     testCompile testing
 }

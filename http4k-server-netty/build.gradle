@@ -3,7 +3,7 @@ description = 'Reekwest HTTP Server built on top of netty'
 dependencies {
     provided kotlin_lib
 
-    provided project(":http4k")
+    provided project(":http4k-core")
 
     compile "io.netty:netty-codec-http2:4.1.10.Final"
 
