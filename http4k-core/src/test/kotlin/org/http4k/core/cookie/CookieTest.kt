@@ -122,6 +122,12 @@ class CookieTest {
     }
 
     @Test
+    fun `cookie can be invalidate at response level`() {
+        assertThat(ok().cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
+            equalTo(Cookie("foo", "").invalidate()))
+    }
+
+    @Test
     fun `cookie with various expires date formats parsed`() {
         val expected = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
 
