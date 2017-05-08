@@ -10,7 +10,7 @@ import java.time.Duration
  * for identification. This is useful for logging metrics. Note that the passed function blocks the response from completing.
  */
 fun ResponseFilters.ReportRouteLatency(clock: Clock, recordFn: (String, Duration) -> Unit): Filter = ReportLatency(clock, {
-    req, (status), duration ->
+    req, response, duration ->
     val identify = X_REEKWEST_ROUTE_IDENTITY(req)?.replace('.', '_')?.replace(':', '.') ?: req.method.toString() + ".UNMAPPED"
-    recordFn(listOf(identify.replace('/', '_'), "${status.code / 100}xx", status.code.toString()).joinToString("."), duration)
+    recordFn(listOf(identify.replace('/', '_'), "${response.status.code / 100}xx", response.status.code.toString()).joinToString("."), duration)
 })

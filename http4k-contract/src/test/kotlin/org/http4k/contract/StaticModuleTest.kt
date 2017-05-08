@@ -9,7 +9,6 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.ResourceLoader.Companion.Classpath
-import org.http4k.core.Status.Companion.EXPECTATION_FAILED
 import org.http4k.core.Uri.Companion.uri
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
@@ -35,11 +34,12 @@ class StaticModuleTest {
     @Test
     fun `can add a filter`() {
         val handler = StaticModule(Root / "svc", Classpath(pkg), Filter.Companion {
-            next -> { next(it).copy(EXPECTATION_FAILED) }
+            next ->
+            { next(it).header("foo", "bar") }
         }).toHttpHandler()
 
         val result = handler(Request(GET, uri("/svc/StaticModule.js")))
-        assertThat(result.status, equalTo(EXPECTATION_FAILED))
+        assertThat(result.header("foo"), equalTo("bar"))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))
     }

@@ -34,9 +34,7 @@ class WebFormTest {
 
     @Test
     fun `web form blows up if not URL content type`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to "unknown"),
-            body = "hello=world&another=123".toBody())
+        val request = emptyRequest.header("Content-Type", "unknown").body("hello=world&another=123".toBody())
 
         assertThat({
             Body.webForm(Strict,
@@ -48,9 +46,7 @@ class WebFormTest {
 
     @Test
     fun `web form extracts ok form values`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
-            body = "hello=world&another=123".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("hello=world&another=123".toBody())
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
@@ -62,9 +58,7 @@ class WebFormTest {
 
     @Test
     fun `feedback web form extracts ok form values and errors`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
-            body = "another=123".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("another=123".toBody())
 
         val requiredString = FormField.required("hello")
         assertThat(Body.webForm(Feedback,
@@ -75,9 +69,7 @@ class WebFormTest {
 
     @Test
     fun `strict web form blows up with invalid form values`() {
-        val request = emptyRequest.copy(
-            headers = listOf("Content-Type" to APPLICATION_FORM_URLENCODED.value),
-            body = "another=notANumber".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("another=notANumber".toBody())
 
         val stringRequiredField = FormField.required("hello")
         val intRequiredField = FormField.int().required("another")

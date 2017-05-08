@@ -65,8 +65,8 @@ class CookieTest {
             .removeCookie("a-cookie")
 
         assertThat(response.headers, equalTo(listOf(
-            "Set-Cookie" to "other-cookie=\"other-value\"",
-            "Other-Header" to "other-value"
+            "Other-Header" to "other-value",
+            "Set-Cookie" to "other-cookie=\"other-value\""
         ) as Parameters))
     }
 
@@ -109,8 +109,6 @@ class CookieTest {
 
         assertThat(response.cookies(), equalTo(cookies))
     }
-
-    private val cookie = Cookie("foo", "bar")
 
     @Test
     fun `cookie without quoted value can be parsed`() {

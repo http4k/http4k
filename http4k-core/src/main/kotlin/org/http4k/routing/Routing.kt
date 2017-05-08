@@ -46,7 +46,7 @@ class RoutedHandler(vararg private val routes: Route) : HttpHandler {
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
 
-private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = copy(headers = headers.plus("x-uri-template" to uriTemplate.toString()))
+private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
 private fun Request.uriTemplate(): UriTemplate = headers.findSingle("x-uri-template")?.let { UriTemplate.uriTemplate(it) } ?: throw IllegalStateException("x-uri-template header not present in the request")
 

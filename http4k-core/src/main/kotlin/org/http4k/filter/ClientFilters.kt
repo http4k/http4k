@@ -54,7 +54,7 @@ object ClientFilters {
             return if (response.isRedirection() && request.allowsRedirection()) {
                 if (attempt == 10) throw IllegalStateException("Too many redirection")
                 val location = response.header("location").orEmpty()
-                makeRequest(next, request.copy(uri = request.newLocation(location)), attempt + 1)
+                makeRequest(next, request.uri(request.newLocation(location)), attempt + 1)
             } else {
                 response
             }

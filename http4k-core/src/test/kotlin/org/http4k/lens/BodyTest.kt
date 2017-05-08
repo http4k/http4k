@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Request.Companion.get
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
-import org.http4k.core.toBody
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
@@ -16,13 +15,13 @@ class BodyTest {
 
     @Test
     fun `can get string body`() {
-        val request = emptyRequest.header("Content-type", TEXT_PLAIN.value).copy(body = "some value".toBody())
+        val request = emptyRequest.header("Content-type", TEXT_PLAIN.value).body("some value")
         assertThat(Body.string(TEXT_PLAIN).required()(request), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid or missing content type`() {
-        val request = emptyRequest.copy(body = "some value".toBody())
+        val request = emptyRequest.body("some value")
         assertThat({ Body.string(TEXT_PLAIN).required()(request) },
             throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
     }
