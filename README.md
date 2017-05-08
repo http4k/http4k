@@ -3,7 +3,7 @@
 [![coverage](https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master)](https://coveralls.io/github/http4k/http4k?branch=master)
 [![kotlin](https://img.shields.io/badge/kotlin-1.1.2-blue.svg)](http://kotlinlang.org)
 [![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
-[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k/_latestVersion)
+[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg)](https://bintray.com/http4k/maven/http4k-core/_latestVersion)
 
 A sensible implementation of HTTP for Kotlin
 
