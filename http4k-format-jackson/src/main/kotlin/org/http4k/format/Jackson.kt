@@ -1,4 +1,4 @@
-package org.http4k.http.formats
+package org.http4k.format
 
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.http.formats.Json
+import org.http4k.http.formats.JsonType
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass

@@ -12,7 +12,7 @@ import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.core.with
 import org.http4k.http.filters.ResponseFilters
-import org.http4k.http.formats.Argo
+import org.http4k.format.Argo
 import org.http4k.http.lens.Body
 import org.http4k.http.lens.Path
 import org.http4k.http.lens.int

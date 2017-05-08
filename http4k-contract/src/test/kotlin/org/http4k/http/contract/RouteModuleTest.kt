@@ -9,7 +9,7 @@ import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.core.Status.Companion.UNAUTHORIZED
 import org.http4k.http.core.with
-import org.http4k.http.formats.Argo
+import org.http4k.format.Argo
 import org.http4k.http.lens.Header
 import org.http4k.http.lens.Path
 import org.http4k.http.lens.Query

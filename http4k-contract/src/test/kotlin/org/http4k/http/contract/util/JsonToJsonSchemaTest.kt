@@ -3,8 +3,8 @@ package org.http4k.http.contract.util
 import argo.jdom.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.formats.Argo
-import org.http4k.http.formats.Argo.obj
+import org.http4k.format.Argo
+import org.http4k.format.Argo.obj
 import org.junit.Test
 import java.io.InputStream
 import java.math.BigDecimal

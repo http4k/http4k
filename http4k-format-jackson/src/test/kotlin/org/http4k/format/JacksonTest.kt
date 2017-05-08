@@ -1,10 +1,12 @@
-package org.http4k.http.formats
+package org.http4k.format
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.formats.Jackson.asA
-import org.http4k.http.formats.Jackson.asJsonString
+import org.http4k.format.Jackson.asA
+import org.http4k.format.Jackson.asJsonString
+import org.http4k.http.formats.JsonContract
+import org.http4k.http.formats.JsonErrorResponseRendererContract
 import org.junit.Test
 
 class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
