@@ -23,7 +23,7 @@ Features:
 Here's how to create and use a basic HTTP handling function:
 
 ```kotlin
-val app = { request: Request -> ok().bodyString("Hello, ${request.query("name")}!") }
+val app = { request: Request -> ok().body("Hello, ${request.query("name")}!") }
 val get = get("/").query("name", "John Doe")
 val response = app(get)
 assertThat(response.status, equalTo(OK))
@@ -31,8 +31,6 @@ assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
 ```
 
 ## Using as a client
-
-[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k-client-apache/_latestVersion)
 
 ```kotlin
 val client = ApacheHttpClient()
@@ -44,10 +42,8 @@ assertThat(response.bodyString(), containsSubstring("John Doe"))
 
 ## Using as a server
 
-[![bintray version](https://api.bintray.com/packages/http4k/maven/http4k/images/download.svg)](https://bintray.com/http4k/maven/http4k-server-jetty/_latestVersion)
-
 ```kotlin
-{ _: Request -> ok().bodyString("Hello World") }.startJettyServer()
+{ _: Request -> ok().body("Hello World") }.startJettyServer()
 ```
 
 That will make a server running on http://localhost:8000
@@ -58,7 +54,7 @@ Reekwest comes with basic routing:
 
 ```kotlin
 routes(
-    GET to "/hello/{location:*}" by { request: Request -> ok().bodyString("Hello, ${request.path("location")}!") },
+    GET to "/hello/{name:*}" by { request: Request -> ok().body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
 ```
@@ -71,13 +67,13 @@ For instance, to add basic authentication to a server:
 
 ```kotlin
 val handler = { _: Request -> ok() }
-val app = BasicAuthServer("my realm", "user", "password").then(handler)
+val app = ServerFilters.BasicAuth("my realm", "user", "password").then(handler)
 ```
 
 Similarly, to add basic authentitcation to a client:
 
 ```kotlin
-val client = BasicAuthClient("user", "password").then(ApacheHttClient())
+val client = ClientFilters.BasicAuth("user", "password").then(ApacheHttClient())
 ```
 
 ## Other features
