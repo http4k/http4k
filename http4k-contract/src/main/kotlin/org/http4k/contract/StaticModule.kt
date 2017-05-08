@@ -1,4 +1,4 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import org.http4k.http.core.Filter
 import org.http4k.http.core.Request

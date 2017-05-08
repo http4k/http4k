@@ -1,10 +1,11 @@
 package cookbook
 
-import org.http4k.http.contract.ReportRouteLatency
-import org.http4k.http.contract.Root
-import org.http4k.http.contract.Route
-import org.http4k.http.contract.RouteModule
-import org.http4k.http.contract.SimpleJson
+import org.http4k.contract.Root
+import org.http4k.contract.Route
+import org.http4k.contract.RouteModule
+import org.http4k.contract.SimpleJson
+import org.http4k.filters.ReportRouteLatency
+import org.http4k.format.Argo
 import org.http4k.http.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.http.core.HttpHandler
 import org.http4k.http.core.Method.GET
@@ -12,7 +13,6 @@ import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.core.with
 import org.http4k.http.filters.ResponseFilters
-import org.http4k.format.Argo
 import org.http4k.http.lens.Body
 import org.http4k.http.lens.Path
 import org.http4k.http.lens.int

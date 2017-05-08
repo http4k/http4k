@@ -1,8 +1,10 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import argo.jdom.JsonRootNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.format.Argo.json
+import org.http4k.format.Argo.parse
 import org.http4k.http.core.ContentType
 import org.http4k.http.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.http.core.Method.GET
@@ -10,8 +12,6 @@ import org.http4k.http.core.Method.POST
 import org.http4k.http.core.Request.Companion.get
 import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
-import org.http4k.format.Argo.json
-import org.http4k.format.Argo.parse
 import org.http4k.http.lens.BiDiBodyLens
 import org.http4k.http.lens.Body
 import org.http4k.http.lens.FormField

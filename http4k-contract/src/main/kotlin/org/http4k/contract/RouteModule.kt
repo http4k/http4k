@@ -1,6 +1,6 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
-import org.http4k.http.contract.PathBinder.Companion.Core
+import org.http4k.contract.PathBinder.Companion.Core
 import org.http4k.http.core.Filter
 import org.http4k.http.core.HttpHandler
 import org.http4k.http.core.Method.GET

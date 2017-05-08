@@ -1,14 +1,14 @@
-package org.http4k.http.filters
+package org.http4k.filters
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.contract.ReportRouteLatency
-import org.http4k.http.contract.X_REEKWEST_ROUTE_IDENTITY
+import org.http4k.contract.X_REEKWEST_ROUTE_IDENTITY
 import org.http4k.http.core.Request.Companion.get
 import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.core.then
 import org.http4k.http.core.with
+import org.http4k.http.filters.ResponseFilters
 import org.junit.Test
 import java.time.Clock.systemUTC
 

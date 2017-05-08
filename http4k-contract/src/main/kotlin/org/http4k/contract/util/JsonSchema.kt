@@ -1,4 +1,4 @@
-package org.http4k.http.contract.util
+package util
 
 import org.http4k.http.formats.Json
 import org.http4k.http.formats.JsonType

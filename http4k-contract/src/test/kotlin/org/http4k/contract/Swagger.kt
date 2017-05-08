@@ -1,13 +1,13 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
-import org.http4k.http.contract.util.JsonSchema
-import org.http4k.http.contract.util.JsonToJsonSchema
 import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.formats.Json
 import org.http4k.http.formats.JsonErrorResponseRenderer
 import org.http4k.http.lens.Failure
 import org.http4k.http.lens.Meta
+import util.JsonSchema
+import util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 

@@ -1,4 +1,4 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat

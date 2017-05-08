@@ -1,4 +1,4 @@
-package org.http4k.http.contract.util
+package org.http4k.contract.util
 
 import argo.jdom.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Argo
 import org.http4k.format.Argo.obj
 import org.junit.Test
+import util.JsonToJsonSchema
 import java.io.InputStream
 import java.math.BigDecimal
 

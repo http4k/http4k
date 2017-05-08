@@ -1,8 +1,8 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Method
 import org.http4k.http.core.Request
+import org.http4k.http.core.Method
 import org.http4k.http.core.then
 import org.http4k.http.lens.LensFailure
 import org.http4k.http.lens.Meta

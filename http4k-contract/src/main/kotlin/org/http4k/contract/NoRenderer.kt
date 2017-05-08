@@ -1,4 +1,4 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.BAD_REQUEST

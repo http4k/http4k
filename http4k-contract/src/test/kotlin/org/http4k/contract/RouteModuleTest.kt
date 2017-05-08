@@ -1,7 +1,8 @@
-package org.http4k.http.contract
+package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.format.Argo
 import org.http4k.http.core.Filter
 import org.http4k.http.core.Method.GET
 import org.http4k.http.core.Request.Companion.get
@@ -9,7 +10,6 @@ import org.http4k.http.core.Response
 import org.http4k.http.core.Status.Companion.OK
 import org.http4k.http.core.Status.Companion.UNAUTHORIZED
 import org.http4k.http.core.with
-import org.http4k.format.Argo
 import org.http4k.http.lens.Header
 import org.http4k.http.lens.Path
 import org.http4k.http.lens.Query
@@ -32,7 +32,7 @@ class RouteModuleTest {
     @Test
     fun `passes through module filter`() {
         val response = routeModule.withRoute(Route("").at(GET) bind {
-                Response(OK).with(header to header(it))
+            Response(OK).with(header to header(it))
         }).toHttpHandler()(get(""))
 
         assertThat(response.status, equalTo(OK))
