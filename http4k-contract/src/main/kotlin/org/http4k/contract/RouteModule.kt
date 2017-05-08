@@ -7,7 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filters.ServerFilters
+import org.http4k.filter.ServerFilters
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 

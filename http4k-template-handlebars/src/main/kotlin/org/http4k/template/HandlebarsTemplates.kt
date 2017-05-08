@@ -4,10 +4,6 @@ import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader
 import com.github.jknack.handlebars.io.FileTemplateLoader
-import org.http4k.templates.TemplateRenderer
-import org.http4k.templates.Templates
-import org.http4k.templates.ViewModel
-import org.http4k.templates.ViewNotFound
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap

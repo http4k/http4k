@@ -6,7 +6,7 @@ import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response.Companion.ok
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filters.ServerFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.lens.Body
 import org.http4k.lens.Header
 import org.http4k.lens.Query

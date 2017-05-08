@@ -10,8 +10,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.filters.ReportRouteLatency
-import org.http4k.filters.ResponseFilters
+import org.http4k.filter.ReportRouteLatency
+import org.http4k.filter.ResponseFilters
 import org.http4k.format.Argo
 import org.http4k.lens.Body
 import org.http4k.lens.Path

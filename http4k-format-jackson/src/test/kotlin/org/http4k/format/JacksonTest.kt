@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.asJsonString
-import org.http4k.formats.JsonContract
-import org.http4k.formats.JsonErrorResponseRendererContract
 import org.junit.Test
 
 class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {

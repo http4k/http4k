@@ -1,7 +1,7 @@
 package util
 
-import org.http4k.formats.Json
-import org.http4k.formats.JsonType
+import org.http4k.format.Json
+import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
