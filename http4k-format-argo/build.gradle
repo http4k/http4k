@@ -1,0 +1,12 @@
+description = 'Reekwest Argo JSON support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k")
+    compile "net.sourceforge.argo:argo:3.40"
+
+    testCompile project(path: ":http4k", configuration: 'testArtifacts')
+    testCompile testing
+}
+

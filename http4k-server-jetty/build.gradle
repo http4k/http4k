@@ -1,0 +1,23 @@
+description = 'Reekwest HTTP Server built on top of jetty'
+
+ext{
+    ext.jetty_version = '9.3.16.v20170120'
+
+    jetty = [
+            "org.eclipse.jetty:jetty-server:$jetty_version",
+            "org.eclipse.jetty:jetty-servlet:$jetty_version",
+    ]
+}
+
+dependencies {
+    provided kotlin_lib
+
+    compile jetty
+
+    provided project(":http4k")
+
+    testCompile project(":http4k-client-apache")
+
+    testCompile testing
+}
+

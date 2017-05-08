@@ -1,0 +1,14 @@
+description = 'Reekwest Argo JSON support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k")
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8'
+
+    testCompile project(path: ":http4k", configuration: 'testArtifacts')
+    testCompile testing
+}
+
+
+

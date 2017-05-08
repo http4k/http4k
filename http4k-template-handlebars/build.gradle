@@ -1,0 +1,11 @@
+description = 'Reekwest Handlebars templating support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k")
+    compile 'com.github.jknack:handlebars:4.0.6'
+
+    testCompile testing
+}
+
