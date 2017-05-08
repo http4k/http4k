@@ -1,4 +1,4 @@
-package org.http4k.http.client
+package org.http4k.client
 
 import org.apache.http.Header
 import org.apache.http.HttpEntity

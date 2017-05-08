@@ -1,6 +1,6 @@
 package cookbook
 
-import org.http4k.http.client.ApacheHttpClient
+import org.http4k.client.ApacheHttpClient
 import org.http4k.http.core.Request.Companion.get
 
 fun main(args: Array<String>) {

@@ -1,6 +1,6 @@
 package cookbook
 
-import org.http4k.http.client.ApacheHttpClient
+import org.http4k.client.ApacheHttpClient
 import org.http4k.http.core.Request
 import org.http4k.http.core.Request.Companion.get
 import org.http4k.http.core.Response.Companion.ok

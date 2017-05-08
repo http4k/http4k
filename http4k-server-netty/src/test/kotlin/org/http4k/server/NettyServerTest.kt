@@ -2,7 +2,7 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.client.ApacheHttpClient
+import org.http4k.client.ApacheHttpClient
 import org.http4k.http.core.Method.GET
 import org.http4k.http.core.Request
 import org.http4k.http.core.Request.Companion.get

@@ -1,4 +1,4 @@
-package org.http4k.http.client
+package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
