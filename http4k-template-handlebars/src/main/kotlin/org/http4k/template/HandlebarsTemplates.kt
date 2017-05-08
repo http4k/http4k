@@ -1,9 +1,13 @@
-package org.http4k.http.templates
+package org.http4k.template
 
 import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader
 import com.github.jknack.handlebars.io.FileTemplateLoader
+import org.http4k.http.templates.TemplateRenderer
+import org.http4k.http.templates.Templates
+import org.http4k.http.templates.ViewModel
+import org.http4k.http.templates.ViewNotFound
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap

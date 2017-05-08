@@ -1,8 +1,10 @@
-package org.http4k.http.templates
+package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.http.templates.TemplateRenderer
+import org.http4k.http.templates.ViewNotFound
 import org.junit.Test
 
 
