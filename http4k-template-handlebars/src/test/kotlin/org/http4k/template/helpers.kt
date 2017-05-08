@@ -1,6 +1,6 @@
 package org.http4k.template
 
-import org.http4k.http.templates.ViewModel
+import org.http4k.templates.ViewModel
 
 object NonExistent : ViewModel {
     override fun template() = "bibble"

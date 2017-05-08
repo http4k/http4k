@@ -5,20 +5,20 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
-import org.http4k.http.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.http.core.Method.GET
-import org.http4k.http.core.Request
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Request.Companion.post
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.core.with
-import org.http4k.http.lens.Body
-import org.http4k.http.lens.Header
-import org.http4k.http.lens.LensFailure
-import org.http4k.http.lens.Path
-import org.http4k.http.lens.Query
-import org.http4k.http.lens.missing
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Request.Companion.post
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
+import org.http4k.lens.Body
+import org.http4k.lens.Header
+import org.http4k.lens.LensFailure
+import org.http4k.lens.Path
+import org.http4k.lens.Query
+import org.http4k.lens.missing
 import org.junit.Test
 
 class RouteTest {

@@ -1,11 +1,11 @@
 package cookbook
 
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.templates.ViewModel
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.template.HandlebarsTemplates
+import org.http4k.templates.ViewModel
 
 // this view has the default template path of: cookbook/Person.hbs, although that is overridable
 data class Person(val name: String, val age: Int) : ViewModel

@@ -1,15 +1,15 @@
 package cookbook
 
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.core.with
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asJsonArray
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asJsonValue
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.json
-import org.http4k.http.lens.Body
+import org.http4k.lens.Body
 
 fun main(args: Array<String>) {
 

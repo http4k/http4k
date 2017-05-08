@@ -1,12 +1,12 @@
 package util
 
-import org.http4k.http.formats.Json
-import org.http4k.http.formats.JsonType
-import org.http4k.http.lens.ParamMeta
-import org.http4k.http.lens.ParamMeta.BooleanParam
-import org.http4k.http.lens.ParamMeta.IntegerParam
-import org.http4k.http.lens.ParamMeta.NumberParam
-import org.http4k.http.lens.ParamMeta.StringParam
+import org.http4k.formats.Json
+import org.http4k.formats.JsonType
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.StringParam
 
 class IllegalSchemaException(message: String) : Exception(message)
 

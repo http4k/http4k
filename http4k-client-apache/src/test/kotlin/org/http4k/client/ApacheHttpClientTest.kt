@@ -3,8 +3,8 @@ package org.http4k.client
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Status.Companion.OK
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Status.Companion.OK
 import org.junit.Test
 
 class ApacheHttpClientTest {

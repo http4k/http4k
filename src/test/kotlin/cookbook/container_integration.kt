@@ -1,9 +1,9 @@
 package cookbook
 
 import org.http4k.client.ApacheHttpClient
-import org.http4k.http.core.Request
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response.Companion.ok
+import org.http4k.core.Request
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response.Companion.ok
 import org.http4k.server.asJettyServer
 
 fun main(args: Array<String>) {

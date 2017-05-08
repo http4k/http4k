@@ -12,12 +12,12 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils.toByteArray
-import org.http4k.http.core.Body
-import org.http4k.http.core.Headers
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Request
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status
+import org.http4k.core.Body
+import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 

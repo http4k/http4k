@@ -1,11 +1,11 @@
 package org.http4k.contract
 
-import org.http4k.http.core.Filter
-import org.http4k.http.core.Request
-import org.http4k.http.core.ResourceLoader
-import org.http4k.http.core.StaticContent
-import org.http4k.http.core.Status.Companion.NOT_FOUND
-import org.http4k.http.core.then
+import org.http4k.core.Filter
+import org.http4k.core.Request
+import org.http4k.core.ResourceLoader
+import org.http4k.core.StaticContent
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.then
 
 class StaticModule(basePath: BasePath,
                    resourceLoader: ResourceLoader = ResourceLoader.Classpath("/"),

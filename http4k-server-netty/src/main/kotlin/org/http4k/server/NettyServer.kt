@@ -24,11 +24,11 @@ import io.netty.handler.codec.http.HttpServerCodec
 import io.netty.handler.codec.http.HttpUtil.is100ContinueExpected
 import io.netty.handler.codec.http.HttpUtil.isKeepAlive
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Method
-import org.http4k.http.core.Request
-import org.http4k.http.core.Response
-import org.http4k.http.core.Uri
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Uri
 import java.nio.ByteBuffer
 
 private class RequestHandler(private val handler: HttpHandler) : ChannelInboundHandlerAdapter() {

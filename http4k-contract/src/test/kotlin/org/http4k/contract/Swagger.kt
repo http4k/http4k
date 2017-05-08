@@ -1,11 +1,11 @@
 package org.http4k.contract
 
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.formats.Json
-import org.http4k.http.formats.JsonErrorResponseRenderer
-import org.http4k.http.lens.Failure
-import org.http4k.http.lens.Meta
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.formats.Json
+import org.http4k.formats.JsonErrorResponseRenderer
+import org.http4k.lens.Failure
+import org.http4k.lens.Meta
 import util.JsonSchema
 import util.JsonToJsonSchema
 

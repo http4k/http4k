@@ -2,13 +2,13 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.lens.Query
-import org.http4k.http.lens.int
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.Query
+import org.http4k.lens.int
 
 class SecurityTest {
 

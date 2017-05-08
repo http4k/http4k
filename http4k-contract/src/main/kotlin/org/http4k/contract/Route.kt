@@ -1,18 +1,18 @@
 package org.http4k.contract
 
 import org.http4k.contract.PathBinder.Companion.Core
-import org.http4k.http.core.ContentType
-import org.http4k.http.core.Filter
-import org.http4k.http.core.Method
-import org.http4k.http.core.Request
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status
-import org.http4k.http.lens.BodyLens
-import org.http4k.http.lens.Failure
-import org.http4k.http.lens.HeaderLens
-import org.http4k.http.lens.Lens
-import org.http4k.http.lens.LensFailure
-import org.http4k.http.lens.QueryLens
+import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.lens.BodyLens
+import org.http4k.lens.Failure
+import org.http4k.lens.HeaderLens
+import org.http4k.lens.Lens
+import org.http4k.lens.LensFailure
+import org.http4k.lens.QueryLens
 
 class Route private constructor(internal val core: Core) {
     constructor(name: String, description: String? = null) : this(Core(name, description, null))

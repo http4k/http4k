@@ -2,8 +2,8 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.junit.Test
 
 class NoRendererTest {

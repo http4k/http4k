@@ -1,9 +1,9 @@
 package cookbook
 
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Request
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response.Companion.ok
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response.Companion.ok
 
 fun main(args: Array<String>) {
 

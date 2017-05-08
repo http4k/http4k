@@ -3,15 +3,15 @@ package org.http4k.contract
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.core.ContentType
-import org.http4k.http.core.ContentType.Companion.APPLICATION_XML
-import org.http4k.http.core.Filter
-import org.http4k.http.core.Method.GET
-import org.http4k.http.core.Request
-import org.http4k.http.core.ResourceLoader.Companion.Classpath
-import org.http4k.http.core.Status.Companion.EXPECTATION_FAILED
-import org.http4k.http.core.Uri.Companion.uri
-import org.http4k.http.lens.Header.Common.CONTENT_TYPE
+import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.Filter
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.ResourceLoader.Companion.Classpath
+import org.http4k.core.Status.Companion.EXPECTATION_FAILED
+import org.http4k.core.Uri.Companion.uri
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
 class StaticModuleTest {

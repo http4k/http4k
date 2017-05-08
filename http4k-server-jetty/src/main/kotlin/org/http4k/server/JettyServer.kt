@@ -3,8 +3,8 @@ package org.http4k.server
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.servlet.asServlet
+import org.http4k.core.HttpHandler
+import org.http4k.servlet.asServlet
 
 fun HttpHandler.asJettyServer(port: Int = 8000) = JettyServer(this, port)
 

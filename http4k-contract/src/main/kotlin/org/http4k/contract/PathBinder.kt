@@ -1,13 +1,13 @@
 package org.http4k.contract
 
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Request
-import org.http4k.http.core.Method
-import org.http4k.http.core.then
-import org.http4k.http.lens.LensFailure
-import org.http4k.http.lens.Meta
-import org.http4k.http.lens.Path
-import org.http4k.http.lens.PathLens
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.then
+import org.http4k.lens.LensFailure
+import org.http4k.lens.Meta
+import org.http4k.lens.Path
+import org.http4k.lens.PathLens
 
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {

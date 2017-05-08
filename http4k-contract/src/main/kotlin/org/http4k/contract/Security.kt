@@ -1,11 +1,11 @@
 package org.http4k.contract
 
-import org.http4k.http.core.Filter
-import org.http4k.http.core.Request
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.UNAUTHORIZED
-import org.http4k.http.lens.Lens
-import org.http4k.http.lens.LensFailure
+import org.http4k.core.Filter
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.lens.Lens
+import org.http4k.lens.LensFailure
 
 
 /**

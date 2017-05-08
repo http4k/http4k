@@ -1,7 +1,7 @@
 package org.http4k.contract
 
-import org.http4k.http.core.Response
-import org.http4k.http.lens.Failure
+import org.http4k.core.Response
+import org.http4k.lens.Failure
 
 interface ModuleRenderer {
     fun notFound(): Response

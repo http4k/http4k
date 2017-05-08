@@ -2,17 +2,17 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Filter
+import org.http4k.core.Method.GET
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.with
 import org.http4k.format.Argo
-import org.http4k.http.core.Filter
-import org.http4k.http.core.Method.GET
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.core.Status.Companion.UNAUTHORIZED
-import org.http4k.http.core.with
-import org.http4k.http.lens.Header
-import org.http4k.http.lens.Path
-import org.http4k.http.lens.Query
+import org.http4k.lens.Header
+import org.http4k.lens.Path
+import org.http4k.lens.Query
 import org.junit.Test
 
 class RouteModuleTest {

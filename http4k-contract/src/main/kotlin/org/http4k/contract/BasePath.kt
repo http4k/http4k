@@ -1,6 +1,6 @@
 package org.http4k.contract
 
-import org.http4k.http.core.Request
+import org.http4k.core.Request
 
 sealed class BasePath {
     abstract val parent: BasePath

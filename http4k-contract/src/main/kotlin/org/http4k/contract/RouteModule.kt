@@ -1,13 +1,13 @@
 package org.http4k.contract
 
 import org.http4k.contract.PathBinder.Companion.Core
-import org.http4k.http.core.Filter
-import org.http4k.http.core.HttpHandler
-import org.http4k.http.core.Method.GET
-import org.http4k.http.core.Request
-import org.http4k.http.core.then
-import org.http4k.http.core.with
-import org.http4k.http.filters.ServerFilters
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.filters.ServerFilters
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 

@@ -3,12 +3,11 @@ package org.http4k.filters
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.X_REEKWEST_ROUTE_IDENTITY
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.core.then
-import org.http4k.http.core.with
-import org.http4k.http.filters.ResponseFilters
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.core.with
 import org.junit.Test
 import java.time.Clock.systemUTC
 

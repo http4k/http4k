@@ -1,16 +1,16 @@
 package cookbook
 
-import org.http4k.http.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.http.core.Request
-import org.http4k.http.core.Request.Companion.get
-import org.http4k.http.core.Response.Companion.ok
-import org.http4k.http.core.then
-import org.http4k.http.core.with
-import org.http4k.http.filters.ServerFilters
-import org.http4k.http.lens.Body
-import org.http4k.http.lens.Header
-import org.http4k.http.lens.Query
-import org.http4k.http.lens.int
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Request
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response.Companion.ok
+import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.filters.ServerFilters
+import org.http4k.lens.Body
+import org.http4k.lens.Header
+import org.http4k.lens.Query
+import org.http4k.lens.int
 
 fun main(args: Array<String>) {
 

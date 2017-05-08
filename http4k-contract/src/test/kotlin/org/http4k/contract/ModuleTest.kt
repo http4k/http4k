@@ -2,14 +2,14 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.http.core.Method.GET
-import org.http4k.http.core.Request
-import org.http4k.http.core.Response
-import org.http4k.http.core.Status.Companion.BAD_REQUEST
-import org.http4k.http.core.Status.Companion.NOT_FOUND
-import org.http4k.http.core.Status.Companion.OK
-import org.http4k.http.core.Uri.Companion.uri
-import org.http4k.http.lens.LensFailure
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri.Companion.uri
+import org.http4k.lens.LensFailure
 import org.junit.Test
 
 class ModuleTest {
