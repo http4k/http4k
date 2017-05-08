@@ -102,18 +102,18 @@ coming soon...
 Add one or more of these module dependencies:
 
 
-Core: ```compile group: "org.http4k", name: "http4k", version: "0.11.0"```
+Core: ```compile group: "org.http4k", name: "http4k", version: "0.12.0"```
 
-Apache Client: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.11.0"```
+Apache Client: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.12.0"```
 
-Contracts: ```compile group: "org.http4k", name: "http4k-contract", version: "0.11.0"```
+Contracts: ```compile group: "org.http4k", name: "http4k-contract", version: "0.12.0"```
 
-Argo JSON: ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.11.0"```
+Argo JSON: ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.12.0"```
 
-Jackson JSON: ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.11.0"```
+Jackson JSON: ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.12.0"```
 
-Handlebars: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.11.0"'```
+Handlebars: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.12.0"'```
 
-Jetty Server: ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.11.0"'```
+Jetty Server: ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.12.0"'```
 
-Netty Server: ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.11.0"'```
+Netty Server: ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.12.0"'```
