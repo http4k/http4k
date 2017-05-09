@@ -50,3 +50,5 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 }
+
+fun CloseableHttpClient.asHttpHandler(): HttpHandler = ApacheHttpClient(this)

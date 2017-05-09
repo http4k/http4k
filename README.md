@@ -11,9 +11,9 @@ servers, clients, templating etc) that are then provided in a set of optional ad
 
 The core axioms of the toolkit are:
 
-* *Application as a Function:* Based on the famous [Twitter paper](https://monkey.org/~marius/funsrv.pdf), HTTP services can be composed of 2 types of simple function:
-    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a `Request`.
-    * Filter: `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
+* *Application as a Function:* Based on the famous [Twitter paper](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
+    * HttpHandler: `typealias HttpHandler = (Request) -> Response` - provides a remote call for processing a `Request`. 
+    * Filter: `interface Filter : (HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
     be applied to a `HttpHandler`.
 * *Immutablility:* All entities in the library are immutable unless their function explicitly disallows this.
 * *Symmetric:* The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
@@ -25,35 +25,51 @@ of services without HTTP container being required.
    * Message formats: [Argo JSON, Jackson JSON](#json)
    * Templating: [Handlebars](#templating)
 
-## Getting started
 
-Here's how to create and use a basic HTTP handling function:
+## Module: http4k-core
+Gradle: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
 
+The core module has 0 dependencies and provides the following:
+* Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
+* HTTP handler and filter abstraction which models services as simple, composable functions.
+* Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
+* Type-safe Lens mechanism for decomposition and composition of HTTP message entities.
+* Abstractions for Servers, Clients, messasge formats, Templating etc.
+
+### Getting started
+
+#### HttpHandlers (`typealias HttpHandler = (Request) -> Response`)
+Applications are modelled as functions. Note that we don't need a container to test this out:
 ```kotlin
-val app = { request: Request -> ok().body("Hello, ${request.query("name")}!") }
+val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 val get = get("/").query("name", "John Doe")
 val response = app(get)
-assertThat(response.status, equalTo(OK))
-assertThat(response.bodyString(), equalTo("Hello, John Doe!"))
+
+println(response.status)
+println(response.bodyString())
 ```
 
-## Using as a client
+To mount the HttpHandler in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
+### Filters (`interface Filter : (HttpHandler) -> HttpHandler`)
+Filters add extra processing to either the Request or Response and compose together to create reusable stacks of behaviour. For example, 
+to add Basic Auth and latency reporting to a service:
 ```kotlin
-val client = ApacheHttpClient()
-val request = get("http://httpbin.org/get").query("location", "John Doe")
-val response = client(request)
-assertThat(response.status, equalTo(OK))
-assertThat(response.bodyString(), containsSubstring("John Doe"))
+val handler = { _: Request -> Response(OK) }
+
+val myFilter = Filter {
+    nextHandler -> {
+        request: Request -> 
+            val start = System.currentTimeMillis()
+            val response = next(it)
+            val latency = System.currentTimeMillis() - start
+            println("I took $latency ms")
+            response
+    }
+}
+val latencyAndBasicAuth: HttpHandler = ServerFilters.BasicAuth("my realm", "user", "password").then(myFilter)
+val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
-
-## Using as a server
-
-```kotlin
-{ _: Request -> ok().body("Hello World") }.startJettyServer()
-```
-
-That will make a server running on http://localhost:8000
 
 ### Routing
 
@@ -66,24 +82,7 @@ routes(
 ).startJettyServer()
 ```
 
-## Filters
-
-Filters allow to add behaviour to existing handlers (or other Filters). 
-
-For instance, to add basic authentication to a server:
-
-```kotlin
-val handler = { _: Request -> ok() }
-val app = ServerFilters.BasicAuth("my realm", "user", "password").then(handler)
-```
-
-Similarly, to add basic authentitcation to a client:
-
-```kotlin
-val client = ClientFilters.BasicAuth("user", "password").then(ApacheHttClient())
-```
-
-## Other features
+### Other features
 
 Creates `curl` command for a given request:
 
@@ -92,31 +91,38 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
 
-## JSON
+## Module: http4k-server-<server name>
+Gradle: ```compile group: "org.http4k", name: "http4k-server-<jetty|netty>", version: "0.17.0"```
+
+Server modules provide extension functions to HttpHandler to mount them into the specified container:
+
+```kotlin
+{ _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
+```
+
+## Module: http4k-client-<client name>
+Gradle: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
+
+Client modules provide extension functions to HttpHandler to mount them into the specified container:
+
+```kotlin
+val client = HttpClients.createDefault().asHttpHandler()
+val request = get("http://httpbin.org/get").query("location", "John Doe")
+val response = client(request)
+println(response.status)
+println(response.bodyString())
+```
+
+## Module: http4k-format-<library name>
+Gradle: ```compile group: "org.http4k", name: "http4k-format-<argo|jackson>", version: "0.17.0"```
 
 coming soon...
 
-## Templating
+## Module: http4k-template-<library name>
+Gradle: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
 coming soon...
 
-## Installation
+## Module: http4k-contract
+Gradle: ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
-Add one or more of these module dependencies:
-
-
-Core: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
-
-Apache Client: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
-
-Contracts: ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
-
-Argo JSON: ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
-
-Jackson JSON: ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
-
-Handlebars: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"'```
-
-Jetty Server: ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"'```
-
-Netty Server: ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"'```

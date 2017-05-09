@@ -41,10 +41,15 @@ object ServerFilters {
                 if (credentials == null || !authorize(credentials)) {
                     Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 } else {
-                    next(it)
+                    val start = System.currentTimeMillis()
+                    val response = next(it)
+                    val latency = System.currentTimeMillis() - start
+                    println("I took $latency ms")
+                    response
                 }
             }
         }
+
 
         operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
         operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm, { it == credentials })
