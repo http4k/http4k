@@ -36,7 +36,7 @@ function notify_slack {
 }
 
 if [ $? -ne 0 ]; then
-    notify_slack "Release has failed. Check <https://travis-ci.org/http4k/http4k/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
+    notify_slack "Release has failed. Check <https://travis-ci.org/http4k/http4k-core/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
 else
-    notify_slack "Released version <https://bintray.com/http4k/maven/http4k/$LOCAL_VERSION|$LOCAL_VERSION>."
+    notify_slack "Released version <https://bintray.com/http4k/maven/http4k-core/$LOCAL_VERSION|$LOCAL_VERSION>."
 fi
