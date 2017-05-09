@@ -152,7 +152,15 @@ To use the Lens, simply apply it to an HTTP message, passing the value if we are
 ```kotlin
 val optionalHeader: Int? = optionalHeader(get(""))
 val customType: CustomType = requiredCustomQuery(get("?myCustomType=someValue"))
-val modifiedRequest: Request = get("").with(requiredQuery to customType.value)
+val modifiedRequest: Request = requiredQuery(get(""), customType.value)
+```
+
+Alternatively, multiple lenses can be used at once on a single HTTP message, which is useful for building both requests and responses without resorting to strings:
+```kotlin
+val modifiedRequest: Request = get("").with(
+    requiredQuery to customType.value,
+    optionalHeader to 123
+)
 ```
 
 ### Other features
@@ -190,7 +198,50 @@ println(response.bodyString())
 ## Contracts Module
 **Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
-coming soon...
+The `http4k-contract` module adds the facility to declare server-side `Routes` in a completely typesafe way leveraging the 
+lens functionality from the core module. These `Routes` are combined into `Modules`, which have the following features:
+* **Auto-validating** - the `Route`  contract is automatically validated on each call for required-fields, removing the requirement 
+for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 response (BAD_REQUEST)`. 
+* **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
+include [Swagger/OpenAPI](http://swagger.io/) documentation.
+* **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
+
+#### Defining a Route
+Firstly, create a route with the desired contract of headers, queries and body parameters. 
+```kotlin
+val ageQuery = Query.int().required("age")
+val body = Body.string(TEXT_PLAIN).required()
+
+val route = Route("echo").taking(ageQuery).body(body)
+```
+
+#### Dynamic binding of calls to an HttpHandler
+Next, define a dynamic path for this `Route` and then bind it to a function which creates an `HttpHandler` for each invocation,
+which receives the dynamic path elements from the path:
+```kotlin
+val ageQuery = Query.int().required("age")
+val body = Body.string(TEXT_PLAIN).required()
+
+fun echo(nameFromPath: String): HttpHandler = {
+    request: Request ->
+        val age = ageQuery(request)
+        val sentMessage = body(request)
+        Response(OK).with(
+            body to "hello $nameFromPath you are $age. You sent $sentMessage"
+        )
+}
+
+val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::echo
+```
+
+#### Combining Routes into Modules
+Finally, `ServerRoute`s are added into a reusable `Module` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
+```kotlin
+val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
+    .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
+    .withRoute(serverRoute)
+    .toHttpHandler()
+```
 
 ## Message Format Modules
 **Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
