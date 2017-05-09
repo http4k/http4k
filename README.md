@@ -85,8 +85,8 @@ typealias HttpHandler = (Request) -> Response
 ```
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
-flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example 
-- note that we don't need any special infrastructure to create an HttpHandler, neither do we need to launch a real HTTP container to exercise it:
+flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example - note that we don't need any special infrastructure to create an HttpHandler, neither do we 
+need to launch a real HTTP container to exercise it:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 val get = get("/").query("name", "John Doe")
