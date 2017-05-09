@@ -201,7 +201,7 @@ println(response.bodyString())
 The `http4k-contract` module adds the facility to declare server-side `Routes` in a completely typesafe way leveraging the 
 lens functionality from the core module. These `Routes` are combined into `RouteModules`, which have the following features:
 * **Auto-validating** - the `Route`  contract is automatically validated on each call for required-fields, removing the requirement 
-for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 response (BAD_REQUEST)`. 
+for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 (BAD_REQUEST)` response. 
 * **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
 include [Swagger/OpenAPI](http://swagger.io/) documentation.
 * **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
