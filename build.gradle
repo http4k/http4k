@@ -136,7 +136,7 @@ allprojects {
                     sign = true
                 }
                 mavenCentralSync {
-                    sync = true
+                    sync = false
                     user = System.getenv('SONATYPE_USER')
                     password = System.getenv('SONATYPE_KEY')
                     close = '1'
