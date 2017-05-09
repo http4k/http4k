@@ -199,7 +199,7 @@ println(response.bodyString())
 **Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
 The `http4k-contract` module adds the facility to declare server-side `Routes` in a completely typesafe way leveraging the 
-lens functionality from the core module. These `Routes` are combined into `Modules`, which have the following features:
+lens functionality from the core module. These `Routes` are combined into `RouteModules`, which have the following features:
 * **Auto-validating** - the `Route`  contract is automatically validated on each call for required-fields, removing the requirement 
 for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 response (BAD_REQUEST)`. 
 * **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
@@ -235,7 +235,7 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 ```
 
 #### Combining Routes into Modules
-Finally, `ServerRoute`s are added into a reusable `Module` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
+Finally, `ServerRoute`s are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
 val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
     .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
