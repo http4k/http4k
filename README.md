@@ -91,7 +91,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
 
-## Module: http4k-server-<server name>
+## Module: http4k-server-{server name}
 Gradle: ```compile group: "org.http4k", name: "http4k-server-<jetty|netty>", version: "0.17.0"```
 
 Server modules provide extension functions to HttpHandler to mount them into the specified container:
@@ -100,7 +100,7 @@ Server modules provide extension functions to HttpHandler to mount them into the
 { _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
 ```
 
-## Module: http4k-client-<client name>
+## Module: http4k-client-{client name}
 Gradle: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
 
 Client modules provide extension functions to HttpHandler to mount them into the specified container:
@@ -113,12 +113,12 @@ println(response.status)
 println(response.bodyString())
 ```
 
-## Module: http4k-format-<library name>
+## Module: http4k-format-{library name}
 Gradle: ```compile group: "org.http4k", name: "http4k-format-<argo|jackson>", version: "0.17.0"```
 
 coming soon...
 
-## Module: http4k-template-<library name>
+## Module: http4k-template-{library name}
 Gradle: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
 coming soon...
