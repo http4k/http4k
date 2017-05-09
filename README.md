@@ -32,7 +32,7 @@ TODO()
 ## Core Module
 Gradle: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
 
-The core module has 0 dependencies and provides the following:
+The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 * HTTP handler and filter abstraction which models services as simple, composable functions.
 * Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
