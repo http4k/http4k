@@ -13,7 +13,7 @@ servers, clients, templating etc) provided as optional add-on libraries.
 The principles of the toolkit are:
 
 * *Application as a Function:* Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
-    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a `Request`. 
+    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a Request. 
     * Filter: `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
     be applied to a `HttpHandler`.
 * *Immutablility:* All entities in the library are immutable unless their function explicitly disallows this.
@@ -26,9 +26,45 @@ of services without HTTP container being required.
    * Message formats: [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
    * Templating: [Handlebars](#user-content-module-http4k-template-library)
 
-### Getting started
-TODO()
+## Getting started
+This simple example demonstates how to serve and consume HTTP services using http4k. 
 
+To install: add these dependencies to your Gradle file:
+```groovy
+dependencies {
+    compile group: "org.http4k", name: "http4k-core", version: "0.17.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"
+}
+```
+
+The following creates a simple endpoint to as Jetty server, then starts, queries, and stops it.
+
+```kotlin
+import org.http4k.client.ApacheHttpClient
+import org.http4k.core.Request
+import org.http4k.core.Request.Companion.get
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.server.asJettyServer
+
+fun main(args: Array<String>) {
+
+    val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
+
+    val jettyServer = app.asJettyServer(9000)
+
+    jettyServer.start()
+
+    val request = get("http://localhost:9000").query("name", "John Doe")
+
+    val client = ApacheHttpClient()
+
+    println(client(request))
+
+    jettyServer.stop()
+}
+```
 ## Core Module
 Gradle: ```compile group: "org.http4k", name: "http4k-core", version: "0.17.0"```
 
@@ -40,8 +76,12 @@ The core module has ZERO dependencies and provides the following:
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
+In http4k, an HTTP service or handler is just a typealias of a simple function:
 `typealias HttpHandler = (Request) -> Response`
-Applications are modelled as functions. Note that we don't need a container to test this out:
+
+First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
+flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example 
+- note that we don't need any special infrastructure to create an HttpHandler, neither do we need to launch a real HTTP container to exercise it:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 val get = get("/").query("name", "John Doe")
@@ -85,7 +125,7 @@ routes(
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 
-A Lens is a bi-directional entity which can be used to either get or set a particular value on/from an HTTP message. Http4k provides a DSL to configure these lenses 
+A [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) is a bi-directional entity which can be used to either get or set a particular value on/from an HTTP message. Http4k provides a DSL to configure these lenses 
 to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
 
 ```kotlin
@@ -98,6 +138,7 @@ val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCust
 ```
 
 To use the Lens, simply apply it to an HTTP message, passing the value if we are modifying the message:
+
 ```kotlin
 val optionalHeader: Int? = optionalHeader(get(""))
 val customType: CustomType = requiredCustomQuery(get("?myCustomType=someValue"))
