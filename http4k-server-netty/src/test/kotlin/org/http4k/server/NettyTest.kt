@@ -12,23 +12,26 @@ import org.http4k.routing.routes
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.*
 
-class JettyServerTest {
-    var server: JettyServer? = null
+class NettyTest {
+    private var server: Http4kServer? = null
     private val client = ApacheClient()
+
+    private val port = Random().nextInt(1000) + 8000
 
     @Before
     fun before() {
         server = routes(
             GET to "/" by { _: Request -> ok().body("Hello World") },
             GET to "/request-headers" by { request: Request -> ok().body(request.headerValues("foo").joinToString(", ")) }
-        ).startJettyServer(block = false)
+        ).asServer(Netty(port)).start()
     }
 
     @Test
     fun can_use_as_servlet() {
         val client = client
-        val response = client(get("http://localhost:8000/"))
+        val response = client(get("http://localhost:$port/"))
 
         assertThat(response.bodyString(), equalTo("Hello World"))
     }
@@ -36,7 +39,7 @@ class JettyServerTest {
     @Test
     fun can_handle_multiple_request_headers() {
         val client = client
-        val response = client(get("http://localhost:8000/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
+        val response = client(get("http://localhost:$port/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
 
         assertThat(response.bodyString(), equalTo("one, two, three"))
     }

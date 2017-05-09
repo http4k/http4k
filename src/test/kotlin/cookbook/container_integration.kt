@@ -5,15 +5,14 @@ import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.server.asJettyServer
+import org.http4k.server.Jetty
+import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
 
     val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 
-    val jettyServer = app.asJettyServer(9000)
-
-    jettyServer.start()
+    val jettyServer = app.asServer(Jetty(9000)).start()
 
     val request = get("http://localhost:9000").query("name", "John Doe")
 

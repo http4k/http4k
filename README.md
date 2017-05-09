@@ -47,15 +47,13 @@ import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.server.asJettyServer
+import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
 
     val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 
-    val jettyServer = app.asJettyServer(9000)
-
-    jettyServer.start()
+    val jettyServer = app.asServer(Jetty(9000)).start()
 
     val request = get("http://localhost:9000").query("name", "John Doe")
 
@@ -179,7 +177,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 Server modules provide extension functions to `HttpHandler` to mount them into the specified container:
 
 ```kotlin
-{ _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
+{ _: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
 ```
 
 ## Client Modules

@@ -16,7 +16,8 @@ import org.http4k.format.Argo
 import org.http4k.lens.Body
 import org.http4k.lens.Path
 import org.http4k.lens.int
-import org.http4k.server.asJettyServer
+import org.http4k.server.Jetty
+import org.http4k.server.startServer
 import java.time.Clock
 
 
@@ -43,5 +44,5 @@ fun main(args: Array<String>) {
         .withRoute(Route("echo").at(GET) / "echo" / Path.of("name") / Path.int().of("age") bind ::echo)
         .toHttpHandler()
 
-    handler.asJettyServer(8000).start().block()
+    handler.startServer(Jetty(8000))
 }

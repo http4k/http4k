@@ -77,38 +77,41 @@ private fun DefaultHttpRequest.asRequest(): Request =
             else -> null
         })
 
-class NettyServer(private val port: Int, private val handler: HttpHandler) {
-    private val masterGroup = NioEventLoopGroup()
-    private val workerGroup = NioEventLoopGroup()
-    private var closeFuture: ChannelFuture? = null
+data class Netty(val port: Int = 8000) : ServerConfig {
+    override fun toServer(handler: HttpHandler): Http4kServer {
+        return object : Http4kServer {
+            private val masterGroup = NioEventLoopGroup()
+            private val workerGroup = NioEventLoopGroup()
+            private var closeFuture: ChannelFuture? = null
 
-    fun start(): NettyServer {
-        val bootstrap = ServerBootstrap()
-        bootstrap.group(masterGroup, workerGroup)
-            .channel(NioServerSocketChannel::class.java)
-            .childHandler(object : ChannelInitializer<SocketChannel>() {
-                public override fun initChannel(ch: SocketChannel) {
-                    ch.pipeline().addLast("codec", HttpServerCodec())
-                    ch.pipeline().addLast("handler", RequestHandler(handler))
-                }
-            })
-            .option(ChannelOption.SO_BACKLOG, 128)
-            .childOption(ChannelOption.SO_KEEPALIVE, true)
+            override fun start(): Http4kServer {
+                val bootstrap = ServerBootstrap()
+                bootstrap.group(masterGroup, workerGroup)
+                    .channel(NioServerSocketChannel::class.java)
+                    .childHandler(object : ChannelInitializer<SocketChannel>() {
+                        public override fun initChannel(ch: SocketChannel) {
+                            ch.pipeline().addLast("codec", HttpServerCodec())
+                            ch.pipeline().addLast("handler", RequestHandler(handler))
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-        closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
-        return this
-    }
+                closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
+                return this
+            }
 
-    fun block() {
-        closeFuture?.sync()
-    }
+            override fun block(): Http4kServer {
+                closeFuture?.sync()
+                return this
+            }
 
-    fun stop() {
-        // FIXME is this correct??!
-        closeFuture?.cancel(false)
-        workerGroup.shutdownGracefully()
-        masterGroup.shutdownGracefully()
+            override fun stop() {
+                // FIXME is this correct??!
+                closeFuture?.cancel(false)
+                workerGroup.shutdownGracefully()
+                masterGroup.shutdownGracefully()
+            }
+        }
     }
 }
-
-fun HttpHandler.asNettyServer(port: Int) = NettyServer(port, this)
