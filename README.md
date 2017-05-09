@@ -69,7 +69,7 @@ fun main(args: Array<String>) {
 # Modules
 
 ## Core Module
-Gradle: ```compile group: "org.http4k", name: "http4k-core", version: "0.17.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-core", version: "0.17.0"```
 
 The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
@@ -79,7 +79,7 @@ The core module has ZERO dependencies and provides the following:
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
-In **http4k*, an HTTP service or handler is just a typealias of a simple function:
+In **http4k**, an HTTP service or handler is just a typealias of a simple function:
 `typealias HttpHandler = (Request) -> Response`
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
@@ -167,7 +167,7 @@ Server modules provide extension functions to HttpHandler to mount them into the
 ```
 
 ## Client Modules
-Gradle: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
 
 Client modules provide extension functions to HttpHandler to mount them into the specified container:
 
@@ -180,16 +180,16 @@ println(response.bodyString())
 ```
 
 ## Message Format Modules
-Gradle: (Argo) ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
-Gradle: (Jackson) ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
+**Gradle:** (Argo) ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
+**Gradle:** (Jackson) ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
 
 coming soon...
 
 ## Templating Modules
-Gradle: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
 coming soon...
 
 ## Contracts Module
-Gradle: ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
