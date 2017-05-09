@@ -26,7 +26,7 @@ of services without HTTP container being required.
    * Message formats: [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
    * Templating: [Handlebars](#user-content-module-http4k-template-library)
 
-## Getting started
+# Getting started
 This simple example demonstates how to serve and consume HTTP services using http4k. 
 
 To install, add these dependencies to your Gradle file:
@@ -65,6 +65,9 @@ fun main(args: Array<String>) {
     jettyServer.stop()
 }
 ```
+
+# Modules
+
 ## Core Module
 Gradle: ```compile group: "org.http4k", name: "http4k-core", version: "0.17.0"```
 
