@@ -124,7 +124,7 @@ val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
 ### Routing
-Basic routing for mapping URL patterns to HttpHandlers:
+Basic routing for mapping a URL pattern to a `HttpHandler`:
 ```kotlin
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
