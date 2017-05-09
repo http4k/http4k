@@ -5,18 +5,25 @@
 [![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
 [![bintray version](https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg)](https://bintray.com/http4k/maven/http4k-core/_latestVersion)
 
-A sensible implementation of HTTP for Kotlin
+http4k is an HTTP toolkit written in Kotlin that provides the ability to serve and consume HTTP services in a sensible and consistent way. 
+It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
+servers, clients, templating etc) that are then provided in a set of optional add-on libraries.
 
-Features:
- * Immutable Request/Response
- * Uses the same abstractions for client and server usage
- * Enables "HTTP application as a function" (i.e. one can test a whole app without an actual server)
- * Modular design so can be plugged to different libraries and containers. Current implementation includes:
-   * Client: [ApacheHttpClient](#using-as-a-client) 
-   * Server: [Jetty, Netty](#using-as-a-server)
-   * JSON: [Argo, Jackson](#json)
+The core axioms of the toolkit are:
+
+* *Application as a Function:* Based on the famous [Twitter paper](https://monkey.org/~marius/funsrv.pdf), HTTP services can be composed of 2 types of simple function:
+    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a `Request`.
+    * Filter: `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
+    be applied to a `HttpHandler`.
+* *Immutablility:* All entities in the library are immutable unless their function explicitly disallows this.
+* *Symmetric:* The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
+of services without HTTP container being required.
+* *Dependency-lite:* The `http-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
+* *Modularity:* Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
+   * Clients: [ApacheHttpClient](#using-as-a-client) 
+   * Servers: [Jetty, Netty](#using-as-a-server)
+   * Message formats: [Argo JSON, Jackson JSON](#json)
    * Templating: [Handlebars](#templating)
- * No 3rd party dependency required to start
 
 ## Getting started
 
