@@ -13,8 +13,8 @@ servers, clients, templating etc) provided as optional add-on libraries.
 The principles of the toolkit are:
 
 * **Application as a Function:** Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
-    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a Request. 
-    * Filter: `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
+    * *HttpHandler:* `(Request) -> Response` - provides a remote call for processing a Request. 
+    * *Filter:* `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
     be applied to a `HttpHandler`.
 * **Immutablility:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
