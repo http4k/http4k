@@ -96,7 +96,7 @@ println(response.status)
 println(response.bodyString())
 ```
 
-To mount the HttpHandler in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
+To mount the `HttpHandler` in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
 ### Filters
 Filters add extra processing to either the Request or Response. In **http4k**, they are modelled as:
@@ -167,7 +167,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 
 **Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
 
-Server modules provide extension functions to HttpHandler to mount them into the specified container:
+Server modules provide extension functions to `HttpHandler` to mount them into the specified container:
 
 ```kotlin
 { _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
@@ -176,7 +176,7 @@ Server modules provide extension functions to HttpHandler to mount them into the
 ## Client Modules
 **Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
 
-Client modules provide extension functions to HttpHandler to mount them into the specified container:
+Client modules provide extension functions to `HttpHandler` to mount them into the specified container:
 
 ```kotlin
 val client = ApacheHttpClient().asHttpHandler()
