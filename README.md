@@ -20,10 +20,10 @@ The core axioms of the toolkit are:
 of services without HTTP container being required.
 * *Dependency-lite:* The `http-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * *Modularity:* Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * Clients: [ApacheHttpClient](#using-as-a-client) 
-   * Servers: [Jetty, Netty](#using-as-a-server)
-   * Message formats: [Argo JSON, Jackson JSON](#json)
-   * Templating: [Handlebars](#templating)
+   * Clients: [ApacheHttpClient](#user-content-module-http4k-client-library)
+   * Servers: [Jetty, Netty](#user-content-module-http4k-server-library)
+   * Message formats: [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
+   * Templating: [Handlebars](#user-content-module-http4k-template-library)
 
 
 ## Module: http4k-core
@@ -91,7 +91,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
 
-## Module: http4k-server-{server name}
+## Module: http4k-server-{library}
 Gradle: ```compile group: "org.http4k", name: "http4k-server-<jetty|netty>", version: "0.17.0"```
 
 Server modules provide extension functions to HttpHandler to mount them into the specified container:
@@ -100,7 +100,7 @@ Server modules provide extension functions to HttpHandler to mount them into the
 { _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
 ```
 
-## Module: http4k-client-{client name}
+## Module: http4k-client-{library}
 Gradle: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
 
 Client modules provide extension functions to HttpHandler to mount them into the specified container:
@@ -113,12 +113,12 @@ println(response.status)
 println(response.bodyString())
 ```
 
-## Module: http4k-format-{library name}
+## Module: http4k-format-{library}
 Gradle: ```compile group: "org.http4k", name: "http4k-format-<argo|jackson>", version: "0.17.0"```
 
 coming soon...
 
-## Module: http4k-template-{library name}
+## Module: http4k-template-{library}
 Gradle: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
 coming soon...
