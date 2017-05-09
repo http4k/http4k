@@ -177,6 +177,7 @@ dependencies {
     provided project(":http4k-client-apache")
     provided project(":http4k-contract")
     provided project(":http4k-format-argo")
+    provided project(":http4k-format-gson")
     provided project(":http4k-format-jackson")
     provided project(":http4k-server-jetty")
     provided project(":http4k-server-netty")

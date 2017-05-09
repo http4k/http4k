@@ -1,0 +1,14 @@
+description = 'Reekwest Argo JSON support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+    compile 'com.google.code.gson:gson:2.8.0'
+
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile testing
+}
+
+
+

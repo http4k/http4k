@@ -24,7 +24,7 @@ of services without HTTP container being required.
    * *Clients:* [ApacheClient](#user-content-client-modules)
    * *Servers:* [Jetty, Netty](#user-content-server-modules)
    * *Contracts:* [Typesafe, auto-validating, self-documenting HTTP services](#user-content-contracts-module)
-   * *Message formats:* [Argo JSON, Jackson JSON](#user-content-message-format-modules)
+   * *Message formats:* [Argo JSON, Gson JSON, Jackson JSON](#user-content-message-format-modules)
    * *Templating:* [Handlebars](#user-content-templating-modules)
 
 # Getting started
@@ -244,6 +244,8 @@ val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
 
 ## Message Format Modules
 **Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.19.0"```
+
+**Gradle (Gson):**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "0.19.0"```
 
 **Gradle (Jackson):** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.19.0"```
 

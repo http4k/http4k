@@ -26,6 +26,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-contract:bintrayUpload \
     :http4k-template-handlebars:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
+    :http4k-format-gson:bintrayUpload \
     :http4k-format-jackson:bintrayUpload
 
 function notify_slack {
