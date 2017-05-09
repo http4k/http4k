@@ -21,7 +21,7 @@ The principles of the toolkit are:
 of services without HTTP container being required.
 * **Dependency-lite:** The `http-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * *Clients:* [ApacheHttpClient](#user-content-client-modules)
+   * *Clients:* [ApacheClient](#user-content-client-modules)
    * *Servers:* [Jetty, Netty](#user-content-server-modules)
    * *Contracts:* [Typesafe, auto-validating, self-documenting HTTP services](#user-content-contracts-module)
    * *Message formats:* [Argo JSON, Jackson JSON](#user-content-message-format-modules)
@@ -42,7 +42,7 @@ dependencies {
 The following creates a simple endpoint to as Jetty server, then starts, queries, and stops it.
 
 ```kotlin
-import org.http4k.client.ApacheHttpClient
+import org.http4k.client.ApacheClient
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response
@@ -59,7 +59,7 @@ fun main(args: Array<String>) {
 
     val request = get("http://localhost:9000").query("name", "John Doe")
 
-    val client = ApacheHttpClient()
+    val client = ApacheClient()
 
     println(client(request))
 
@@ -188,7 +188,7 @@ Server modules provide extension functions to `HttpHandler` to mount them into t
 Client modules provide extension functions to `HttpHandler` to mount them into the specified container:
 
 ```kotlin
-val client = ApacheHttpClient()
+val client = ApacheClient()
 val request = get("http://httpbin.org/get").query("location", "John Doe")
 val response = client(request)
 println(response.status)

@@ -2,7 +2,7 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.ApacheHttpClient
+import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
@@ -15,7 +15,7 @@ import org.junit.Test
 
 class JettyServerTest {
     var server: JettyServer? = null
-    private val client = ApacheHttpClient()
+    private val client = ApacheClient()
 
     @Before
     fun before() {

@@ -1,6 +1,6 @@
 package cookbook
 
-import org.http4k.client.ApacheHttpClient
+import org.http4k.client.ApacheClient
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response
@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
 
     val request = get("http://localhost:9000").query("name", "John Doe")
 
-    val client = ApacheHttpClient()
+    val client = ApacheClient()
 
     println(client(request))
 

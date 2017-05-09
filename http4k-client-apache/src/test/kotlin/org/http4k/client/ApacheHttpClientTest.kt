@@ -7,8 +7,8 @@ import org.http4k.core.Request.Companion.get
 import org.http4k.core.Status.Companion.OK
 import org.junit.Test
 
-class ApacheHttpClientTest {
-    val client = ApacheHttpClient()
+class ApacheClientTest {
+    val client = ApacheClient()
 
     @Test
     fun basic_request() {

@@ -21,7 +21,7 @@ import org.http4k.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 
-class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefault()) : HttpHandler {
+class ApacheClient(val client: CloseableHttpClient = HttpClients.createDefault()) : HttpHandler {
 
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toUtterlyIdleResponse()
 
@@ -50,5 +50,3 @@ class ApacheHttpClient(val client: CloseableHttpClient = HttpClients.createDefau
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 }
-
-fun CloseableHttpClient.asHttpHandler(): HttpHandler = ApacheHttpClient(this)
