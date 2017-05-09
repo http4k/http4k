@@ -32,7 +32,7 @@ The core module has 0 dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 * HTTP handler and filter abstraction which models services as simple, composable functions.
 * Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
-* Type-safe Lens mechanism for decomposition and composition of HTTP message entities.
+* Type-safe Lens mechanism for destructuring and construction of HTTP message entities.
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 ### Getting started
@@ -78,6 +78,26 @@ routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
+```
+
+### Typesafe parameter destructuring/construction of HTTP messages with Lenses
+A Lens is a bi-directional entity which can be used to either get or set a particular value on/from an HTTP message. Http4k provides a DSL to configure these lenses 
+to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
+
+```kotlin
+val requiredQuery = Query.required("myQueryName")
+val optionalHeader = Header.int().optional("Content-Length")
+val requiredJsonBody = Body.string(APPLICATION_JSON)
+
+data class CustomType(val value: String)
+val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
+```
+
+To use the Lens, simply apply it to an HTTP message, passing the value if we are modifying the message:
+```kotlin
+val optionalHeader: Int? = optionalHeader(get(""))
+val customType: CustomType = requiredCustomQuery(get("?myCustomType=someValue"))
+val modifiedRequest: Request = get("").with(requiredQuery to customType.value)
 ```
 
 ### Other features

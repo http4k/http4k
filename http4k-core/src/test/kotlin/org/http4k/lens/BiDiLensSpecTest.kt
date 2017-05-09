@@ -9,7 +9,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-class BiDiLensSpecContract {
+class BiDiLensSpecTest {
 
     private val spec = BiDiLensSpec("location", StringParam,
         Get { _: String, str: String ->
