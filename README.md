@@ -198,15 +198,16 @@ println(response.bodyString())
 ## Contracts Module
 **Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
-The `http4k-contract` module adds the facility to declare server-side `Routes` in a completely typesafe way leveraging the 
-lens functionality from the core module. These `Routes` are combined into `RouteModules`, which have the following features:
-* **Auto-validating** - the `Route`  contract is automatically validated on each call for required-fields, removing the requirement 
+The `http4k-contract` module adds a much more sophisticated routing mechanism to what is available in `http4k-core` module. It adds the facility 
+to declare server-side `Routes` in a completely typesafe way, leveraging the Lens functionality from the core. These `Routes` are 
+combined into `RouteModules`, which have the following features:
+* **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement 
 for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 (BAD_REQUEST)` response. 
 * **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
 include [Swagger/OpenAPI](http://swagger.io/) documentation.
 * **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
 
-#### Defining a Route
+#### 1. Defining a Route
 Firstly, create a route with the desired contract of headers, queries and body parameters. 
 ```kotlin
 val ageQuery = Query.int().required("age")
@@ -215,7 +216,7 @@ val body = Body.string(TEXT_PLAIN).required()
 val route = Route("echo").taking(ageQuery).body(body)
 ```
 
-#### Dynamic binding of calls to an HttpHandler
+#### 2. Dynamic binding of calls to an HttpHandler
 Next, define a dynamic path for this `Route` and then bind it to a function which creates an `HttpHandler` for each invocation,
 which receives the dynamic path elements from the path:
 ```kotlin
@@ -234,7 +235,7 @@ fun echo(nameFromPath: String): HttpHandler = {
 val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::echo
 ```
 
-#### Combining Routes into Modules
+#### 3. Combining Routes into Modules
 Finally, `ServerRoute`s are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
 val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
