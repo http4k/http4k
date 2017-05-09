@@ -5,16 +5,16 @@
 [![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
 [![bintray version](https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg)](https://bintray.com/http4k/maven/http4k-core/_latestVersion)
 
-http4k is an HTTP toolkit written in Kotlin that provides the ability to serve and consume HTTP services in a sensible and consistent way. 
-It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
-servers, clients, templating etc) that are then provided in a set of optional add-on libraries.
+http4k is an HTTP toolkit written in Kotlin that allows serving and consuming HTTP services in a sensible and consistent way.
 
-The core axioms of the toolkit are:
+It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
+servers, clients, templating etc) provided as optional add-on libraries.
+
+The principles of the toolkit are:
 
 * *Application as a Function:* Based on the famous [Twitter paper](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
     * HttpHandler: `typealias HttpHandler = (Request) -> Response` - provides a remote call for processing a `Request`. 
-    * Filter: `interface Filter : (HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
-    be applied to a `HttpHandler`.
+    * Filter: `interface Filter : (HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then be applied to a `HttpHandler`.
 * *Immutablility:* All entities in the library are immutable unless their function explicitly disallows this.
 * *Symmetric:* The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
@@ -81,6 +81,7 @@ routes(
 ```
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
+
 A Lens is a bi-directional entity which can be used to either get or set a particular value on/from an HTTP message. Http4k provides a DSL to configure these lenses 
 to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
 
