@@ -12,9 +12,10 @@ servers, clients, templating etc) provided as optional add-on libraries.
 
 The principles of the toolkit are:
 
-* *Application as a Function:* Based on the famous [Twitter paper](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
-    * HttpHandler: `typealias HttpHandler = (Request) -> Response` - provides a remote call for processing a `Request`. 
-    * Filter: `interface Filter : (HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then be applied to a `HttpHandler`.
+* *Application as a Function:* Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
+    * HttpHandler: `(Request) -> Response` - provides a remote call for processing a `Request`. 
+    * Filter: `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
+    be applied to a `HttpHandler`.
 * *Immutablility:* All entities in the library are immutable unless their function explicitly disallows this.
 * *Symmetric:* The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
@@ -25,7 +26,10 @@ of services without HTTP container being required.
    * Message formats: [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
    * Templating: [Handlebars](#user-content-module-http4k-template-library)
 
-## Module: http4k-core
+### Getting started
+TODO()
+
+## Core Module
 Gradle: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
 
 The core module has 0 dependencies and provides the following:
@@ -35,9 +39,8 @@ The core module has 0 dependencies and provides the following:
 * Type-safe Lens mechanism for destructuring and construction of HTTP message entities.
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
-### Getting started
-
-#### HttpHandlers (`typealias HttpHandler = (Request) -> Response`)
+#### HttpHandlers 
+`typealias HttpHandler = (Request) -> Response`
 Applications are modelled as functions. Note that we don't need a container to test this out:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
@@ -50,7 +53,8 @@ println(response.bodyString())
 
 To mount the HttpHandler in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
-### Filters (`interface Filter : (HttpHandler) -> HttpHandler`)
+### Filters
+ `interface Filter : (HttpHandler) -> HttpHandler`
 Filters add extra processing to either the Request or Response and compose together to create reusable stacks of behaviour. For example, 
 to add Basic Auth and latency reporting to a service:
 ```kotlin
@@ -72,7 +76,6 @@ val app: HttpHandler = latencyAndBasicAuth.then(handler)
 
 ### Routing
 Basic routing for mapping URL patterns to HttpHandlers:
-
 ```kotlin
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
@@ -102,7 +105,6 @@ val modifiedRequest: Request = get("").with(requiredQuery to customType.value)
 ```
 
 ### Other features
-
 Creates `curl` command for a given request:
 
 ```kotlin
@@ -110,8 +112,9 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
 
-## Module: http4k-server-{library}
-Gradle: ```compile group: "org.http4k", name: "http4k-server-<jetty|netty>", version: "0.17.0"```
+## Server Modules
+Gradle (Jetty): ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"```
+Gradle (Netty): ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
 
 Server modules provide extension functions to HttpHandler to mount them into the specified container:
 
@@ -119,7 +122,7 @@ Server modules provide extension functions to HttpHandler to mount them into the
 { _: Request -> Response(OK).body("Hello World") }.asJettyServer(8000).start().block()
 ```
 
-## Module: http4k-client-{library}
+## Client Modules
 Gradle: ```compile group: "org.http4k", name: "http4k-client-apache", version: "0.17.0"```
 
 Client modules provide extension functions to HttpHandler to mount them into the specified container:
@@ -132,16 +135,17 @@ println(response.status)
 println(response.bodyString())
 ```
 
-## Module: http4k-format-{library}
-Gradle: ```compile group: "org.http4k", name: "http4k-format-<argo|jackson>", version: "0.17.0"```
+## Message Format Modules
+Gradle: (Argo) ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
+Gradle: (Jackson) ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
 
 coming soon...
 
-## Module: http4k-template-{library}
+## Templating Modules
 Gradle: ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
 coming soon...
 
-## Module: http4k-contract
+## Contracts Module
 Gradle: ```compile group: "org.http4k", name: "http4k-contract", version: "0.17.0"```
 
