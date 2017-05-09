@@ -181,9 +181,9 @@ println(response.bodyString())
 ```
 
 ## Message Format Modules
-**Gradle:** (Argo) ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
+**Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
 
-**Gradle:** (Jackson) ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
+**Gradle (Jackson):** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
 
 coming soon...
 
