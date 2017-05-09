@@ -15,7 +15,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.QueryLens
 
 class Route private constructor(internal val core: Core) {
-    constructor(name: String, description: String? = null) : this(Core(name, description, null))
+    constructor(name: String = "<unknown>", description: String? = null) : this(Core(name, description, null))
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
