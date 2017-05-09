@@ -188,7 +188,7 @@ Server modules provide extension functions to `HttpHandler` to mount them into t
 Client modules provide extension functions to `HttpHandler` to mount them into the specified container:
 
 ```kotlin
-val client = ApacheHttpClient().asHttpHandler()
+val client = ApacheHttpClient()
 val request = get("http://httpbin.org/get").query("location", "John Doe")
 val response = client(request)
 println(response.status)
