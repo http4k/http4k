@@ -36,7 +36,7 @@ The core module has 0 dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 * HTTP handler and filter abstraction which models services as simple, composable functions.
 * Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
-* Type-safe Lens mechanism for destructuring and construction of HTTP message entities.
+* Type-safe [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for destructuring and construction of HTTP message entities.
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
