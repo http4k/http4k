@@ -20,7 +20,7 @@ The principles of the toolkit are:
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
 * **Dependency-lite:** The `http-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
-* **Modularity*:* Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
+* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
    * *Clients:* [ApacheHttpClient](#user-content-module-http4k-client-library)
    * *Servers:* [Jetty, Netty](#user-content-module-http4k-server-library)
    * *Message formats:* [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
