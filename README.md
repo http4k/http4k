@@ -157,8 +157,9 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 ```
 
 ## Server Modules
-**Gradle** (Jetty): ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"```
-**Gradle** (Netty): ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
+**Gradle (Jetty):** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"```
+
+**Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
 
 Server modules provide extension functions to HttpHandler to mount them into the specified container:
 
@@ -181,6 +182,7 @@ println(response.bodyString())
 
 ## Message Format Modules
 **Gradle:** (Argo) ```compile group: "org.http4k", name: "http4k-format-argo", version: "0.17.0"```
+
 **Gradle:** (Jackson) ```compile group: "org.http4k", name: "http4k-format-jackson", version: "0.17.0"```
 
 coming soon...
