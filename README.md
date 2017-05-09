@@ -288,4 +288,21 @@ println(
 ## Templating Modules
 **Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "0.17.0"```
 
-coming soon...
+The pluggable `http4k` templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the following renderers for views that are:
+* Cached on the classpath
+* Cached from the filesystem
+* Hot-Reloading from the filesystem
+
+```kotlin
+data class Person(val name: String, val age: Int) : ViewModel
+
+val renderer = HandlebarsTemplates().HotReload("src/test/resources")
+
+val app: HttpHandler = {
+    val viewModel = Person("Bob", 45)
+    val renderedView = renderer(viewModel)
+    Response(OK).body(renderedView)
+}
+
+println(app(get("/someUrl")))
+```
