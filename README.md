@@ -25,7 +25,6 @@ of services without HTTP container being required.
    * Message formats: [Argo JSON, Jackson JSON](#user-content-module-http4k-format-library)
    * Templating: [Handlebars](#user-content-module-http4k-template-library)
 
-
 ## Module: http4k-core
 Gradle: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
 
@@ -72,12 +71,11 @@ val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
 ### Routing
-
-Reekwest comes with basic routing:
+Basic routing for mapping URL patterns to HttpHandlers:
 
 ```kotlin
 routes(
-    GET to "/hello/{name:*}" by { request: Request -> ok().body("Hello, ${request.path("name")}!") },
+    GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).startJettyServer()
 ```
