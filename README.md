@@ -5,7 +5,7 @@
 [![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
 [![bintray version](https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg)](https://bintray.com/http4k/maven/http4k-core/_latestVersion)
 
-http4k is an HTTP toolkit written in Kotlin that allows serving and consuming HTTP services in a sensible and consistent way.
+**http4k** is an HTTP toolkit written in Kotlin that allows serving and consuming HTTP services in a sensible and consistent way.
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
 servers, clients, templating etc) provided as optional add-on libraries.
@@ -79,7 +79,7 @@ The core module has ZERO dependencies and provides the following:
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
-In http4k, an HTTP service or handler is just a typealias of a simple function:
+In **http4k**, an HTTP service or handler is just a typealias of a simple function:
 `typealias HttpHandler = (Request) -> Response`
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
