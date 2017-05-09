@@ -29,7 +29,7 @@ of services without HTTP container being required.
 # Getting started
 This simple example demonstates how to serve and consume HTTP services using http4k. 
 
-To install, add these dependencies to your Gradle file:
+To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
     compile group: "org.http4k", name: "http4k-core", version: "0.17.0"
@@ -79,7 +79,7 @@ The core module has ZERO dependencies and provides the following:
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
-In **http4k**, an HTTP service or handler is just a typealias of a simple function:
+In **http4k*, an HTTP service or handler is just a typealias of a simple function:
 `typealias HttpHandler = (Request) -> Response`
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
@@ -157,8 +157,8 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 ```
 
 ## Server Modules
-Gradle (Jetty): ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"```
-Gradle (Netty): ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
+**Gradle** (Jetty): ```compile group: "org.http4k", name: "http4k-server-jetty", version: "0.17.0"```
+**Gradle** (Netty): ```compile group: "org.http4k", name: "http4k-server-netty", version: "0.17.0"```
 
 Server modules provide extension functions to HttpHandler to mount them into the specified container:
 
