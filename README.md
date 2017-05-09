@@ -99,11 +99,12 @@ println(response.bodyString())
 To mount the HttpHandler in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
 ### Filters
-Filters add extra processing to either the Request or Response and compose together to create reusable stacks of behaviour. In **http4k**, Filters 
-are modelled as:
+Filters add extra processing to either the Request or Response. In **http4k**, they are modelled as:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
 ``` 
+
+Filters are designed to simply compose together (using `then()`) to create reusable stacks of behaviour which can then be applied to any `HttpHandler`. 
 For example, to add Basic Auth and latency reporting to a service:
 ```kotlin
 val handler = { _: Request -> Response(OK) }
