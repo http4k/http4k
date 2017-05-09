@@ -8,7 +8,7 @@
 **http4k** is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that allows serving and consuming HTTP services in a sensible and consistent way.
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
-servers, clients, templating etc) provided as optional add-on libraries.
+servers, clients, templating etc) that are provided as optional add-on libraries.
 
 The principles of the toolkit are:
 
