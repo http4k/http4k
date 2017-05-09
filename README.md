@@ -236,7 +236,7 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 ```
 
 #### 3. Combining Routes into Modules
-Finally, `ServerRoute`s are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
+Finally, `ServerRoutes` are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
 val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
     .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
