@@ -80,7 +80,9 @@ The core module has ZERO dependencies and provides the following:
 
 #### HttpHandlers 
 In **http4k**, an HTTP service or handler is just a typealias of a simple function:
-`typealias HttpHandler = (Request) -> Response`
+```kotlin
+typealias HttpHandler = (Request) -> Response
+```
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
 flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example 
@@ -97,9 +99,12 @@ println(response.bodyString())
 To mount the HttpHandler in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
 ### Filters
- `interface Filter : (HttpHandler) -> HttpHandler`
-Filters add extra processing to either the Request or Response and compose together to create reusable stacks of behaviour. For example, 
-to add Basic Auth and latency reporting to a service:
+Filters add extra processing to either the Request or Response and compose together to create reusable stacks of behaviour. In **http4k**, Filters 
+are modelled as:
+```kotlin
+interface Filter : (HttpHandler) -> HttpHandler
+``` 
+For example, to add Basic Auth and latency reporting to a service:
 ```kotlin
 val handler = { _: Request -> Response(OK) }
 
