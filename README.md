@@ -30,7 +30,7 @@ of services without HTTP container being required.
 TODO()
 
 ## Core Module
-Gradle: ```compile group: "org.http4k", name: "http4k", version: "0.17.0"```
+Gradle: ```compile group: "org.http4k", name: "http4k-core", version: "0.17.0"```
 
 The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
