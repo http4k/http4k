@@ -35,8 +35,15 @@ function notify_slack {
     curl -X POST -H 'Content-type: application/json' --data "{'text':'$MESSAGE'}" $SLACK_WEBHOOK
 }
 
+function notify_gitter {
+    local MESSAGE=$1
+    echo "Notifying on Gitter..."
+    curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $GITTER_BEARER_TOKEN" "$GITTER_WEBHOOK"  -d '{"text":"$MESSAGE"}'
+}
+
 if [ $? -ne 0 ]; then
     notify_slack "Release has failed. Check <https://travis-ci.org/http4k/http4k-core/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
 else
     notify_slack "Released version <https://bintray.com/http4k/maven/http4k-core/$LOCAL_VERSION|$LOCAL_VERSION>."
+    notify_gitter "Released version <https://bintray.com/http4k/maven/http4k-core/$LOCAL_VERSION|$LOCAL_VERSION>."
 fi
