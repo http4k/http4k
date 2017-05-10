@@ -42,7 +42,7 @@ dependencies {
 }
 ```
 
-The following creates a simple endpoint to as Jetty server, then starts, queries, and stops it.
+The following creates a simple endpoint, binds it to a Jetty server then starts, queries, and stops it.
 
 ```kotlin
 import org.http4k.client.ApacheClient
