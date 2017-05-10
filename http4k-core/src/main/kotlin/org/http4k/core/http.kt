@@ -71,19 +71,19 @@ interface Request : HttpMessage {
 
     companion object {
         operator fun invoke(method: Method, uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(method, uri, headers, body)
-        fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = get(Uri.uri(uri), headers, body)
+        fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = get(Uri.of(uri), headers, body)
         fun get(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(GET, uri, headers, body)
-        fun post(uri: String, headers: Headers = listOf(), body: Body? = null) = post(Uri.uri(uri), headers, body)
+        fun post(uri: String, headers: Headers = listOf(), body: Body? = null) = post(Uri.of(uri), headers, body)
         fun post(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(POST, uri, headers, body)
-        fun put(uri: String, headers: Headers = listOf(), body: Body? = null) = put(Uri.uri(uri), headers, body)
+        fun put(uri: String, headers: Headers = listOf(), body: Body? = null) = put(Uri.of(uri), headers, body)
         fun put(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(PUT, uri, headers, body)
-        fun delete(uri: String, headers: Headers = listOf(), body: Body? = null) = delete(Uri.uri(uri), headers, body)
+        fun delete(uri: String, headers: Headers = listOf(), body: Body? = null) = delete(Uri.of(uri), headers, body)
         fun delete(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(DELETE, uri, headers, body)
-        fun options(uri: String, headers: Headers = listOf(), body: Body? = null) = options(Uri.uri(uri), headers, body)
+        fun options(uri: String, headers: Headers = listOf(), body: Body? = null) = options(Uri.of(uri), headers, body)
         fun options(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(OPTIONS, uri, headers, body)
-        fun trace(uri: String, headers: Headers = listOf(), body: Body? = null) = trace(Uri.uri(uri), headers, body)
+        fun trace(uri: String, headers: Headers = listOf(), body: Body? = null) = trace(Uri.of(uri), headers, body)
         fun trace(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(TRACE, uri, headers, body)
-        fun patch(uri: String, headers: Headers = listOf(), body: Body? = null) = patch(Uri.uri(uri), headers, body)
+        fun patch(uri: String, headers: Headers = listOf(), body: Body? = null) = patch(Uri.of(uri), headers, body)
         fun patch(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(PATCH, uri, headers, body)
     }
 }

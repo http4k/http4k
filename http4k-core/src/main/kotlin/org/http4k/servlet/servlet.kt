@@ -28,7 +28,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
-        Request(Method.valueOf(method), Uri.uri(requestURI + queryString.toQueryString()),
+        Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()),
             headerParameters(), ByteBuffer.wrap(inputStream.readBytes()))
 
     private fun HttpServletRequest.headerParameters(): Headers =

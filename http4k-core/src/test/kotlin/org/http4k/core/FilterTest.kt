@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.junit.Test
 
 class FilterTest {
@@ -17,7 +17,7 @@ class FilterTest {
     @Test
     fun `can manipulate value on way in and out of service`() {
         val svc = addRequestHeader.then(addResponseHeader).then(echoHeaders)
-        val response = svc(Request(GET, uri("/")))
+        val response = svc(Request(GET, of("/")))
         assertThat(response.header("hello"), equalTo("world"))
         assertThat(response.header("goodbye"), equalTo("cruel"))
     }
@@ -28,7 +28,7 @@ class FilterTest {
         val double = Filter { next -> { next(it.replaceHeader("hello", (it.header("hello")!!.toInt() * 2).toString())) } }
 
         val final = double.then(minus10).then(echoHeaders)
-        val response = final(Request(GET, uri("/")).header("hello", "10"))
+        val response = final(Request(GET, of("/")).header("hello", "10"))
         assertThat(response.header("hello"), equalTo("10"))
     }
 }

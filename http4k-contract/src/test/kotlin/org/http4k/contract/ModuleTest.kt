@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.LensFailure
 import org.junit.Test
 
@@ -33,22 +33,22 @@ class ModuleTest {
 
     @Test
     fun `can convert module to handler and call it`() {
-        assertThat(okModule.toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(OK)))
+        assertThat(okModule.toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(OK)))
     }
 
     @Test
     fun `falls back to 404 response`() {
-        assertThat(notFoundModule.toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(NOT_FOUND)))
+        assertThat(notFoundModule.toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(NOT_FOUND)))
     }
 
     @Test
     fun `lens failure results in 400`() {
-        assertThat(lensFailureModule.toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(BAD_REQUEST)))
+        assertThat(lensFailureModule.toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(BAD_REQUEST)))
     }
 
     @Test
     fun `can combine modules and call them as a handler`() {
-        assertThat(notFoundModule.then(okModule).toHttpHandler()(Request(GET, uri("/boo"))), equalTo(Response(OK)))
+        assertThat(notFoundModule.then(okModule).toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(OK)))
     }
 
 }

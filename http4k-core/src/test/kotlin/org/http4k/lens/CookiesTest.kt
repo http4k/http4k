@@ -7,13 +7,13 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.junit.Test
 
 class CookiesTest {
-    private val request = Request(GET, uri(""))
+    private val request = Request(GET, of(""))
         .cookie("hello", "world")
         .cookie("hello", "world2")
 

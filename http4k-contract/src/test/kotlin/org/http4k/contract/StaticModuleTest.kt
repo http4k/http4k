@@ -9,7 +9,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.ResourceLoader.Companion.Classpath
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
@@ -20,7 +20,7 @@ class StaticModuleTest {
     @Test
     fun `looks up contents of existing root file`() {
         val router = StaticModule(Root / "svc").toRouter()
-        val request = Request(GET, uri("/svc/mybob.xml"))
+        val request = Request(GET, of("/svc/mybob.xml"))
         val result = router(request)!!(request)
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
         assertThat(CONTENT_TYPE(result), equalTo(APPLICATION_XML))
@@ -28,7 +28,7 @@ class StaticModuleTest {
 
     @Test
     fun `looks up non existent-file`() {
-        assertThat((StaticModule(Root / "svc", Classpath()).toRouter())(Request(GET, uri("/svc/NotHere.xml"))), absent())
+        assertThat((StaticModule(Root / "svc", Classpath()).toRouter())(Request(GET, of("/svc/NotHere.xml"))), absent())
     }
 
     @Test
@@ -38,7 +38,7 @@ class StaticModuleTest {
             { next(it).header("foo", "bar") }
         }).toHttpHandler()
 
-        val result = handler(Request(GET, uri("/svc/StaticModule.js")))
+        val result = handler(Request(GET, of("/svc/StaticModule.js")))
         assertThat(result.header("foo"), equalTo("bar"))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))

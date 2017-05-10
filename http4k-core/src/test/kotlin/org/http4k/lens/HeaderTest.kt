@@ -7,11 +7,11 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.junit.Test
 
 class HeaderTest {
-    private val request = Request(GET, uri("/"), listOf("hello" to "world", "hello" to "world2"))
+    private val request = Request(GET, of("/"), listOf("hello" to "world", "hello" to "world2"))
 
     @Test
     fun `value present`() {

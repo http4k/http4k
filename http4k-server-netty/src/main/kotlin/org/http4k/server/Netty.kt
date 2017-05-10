@@ -70,7 +70,7 @@ private fun Response.asNettyResponse(): DefaultFullHttpResponse {
 
 private fun DefaultHttpRequest.asRequest(): Request =
     // FIXME - if the method is unknown
-    Request(Method.valueOf(method().name()), Uri.Companion.uri(uri()),
+    Request(Method.valueOf(method().name()), Uri.Companion.of(uri()),
         headers().map { entry -> entry.key to entry.value },
         when (this) {
             is DefaultFullHttpRequest -> ByteBuffer.wrap(this.content().array())

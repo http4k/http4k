@@ -23,16 +23,16 @@ class RequestTest {
 
     @Test
     fun can_create_using_method_and_uri_string() {
-        assertThat(get("/uri"), equalTo(Request(GET, Uri.uri("/uri"))))
-        assertThat(post("/uri"), equalTo(Request(Method.POST, Uri.uri("/uri"))))
-        assertThat(put("/uri"), equalTo(Request(Method.PUT, Uri.uri("/uri"))))
-        assertThat(delete("/uri"), equalTo(Request(Method.DELETE, Uri.uri("/uri"))))
-        assertThat(options("/uri"), equalTo(Request(Method.OPTIONS, Uri.uri("/uri"))))
-        assertThat(trace("/uri"), equalTo(Request(Method.TRACE, Uri.uri("/uri"))))
-        assertThat(patch("/uri"), equalTo(Request(Method.PATCH, Uri.uri("/uri"))))
+        assertThat(get("/uri"), equalTo(Request(GET, Uri.of("/uri"))))
+        assertThat(post("/uri"), equalTo(Request(Method.POST, Uri.of("/uri"))))
+        assertThat(put("/uri"), equalTo(Request(Method.PUT, Uri.of("/uri"))))
+        assertThat(delete("/uri"), equalTo(Request(Method.DELETE, Uri.of("/uri"))))
+        assertThat(options("/uri"), equalTo(Request(Method.OPTIONS, Uri.of("/uri"))))
+        assertThat(trace("/uri"), equalTo(Request(Method.TRACE, Uri.of("/uri"))))
+        assertThat(patch("/uri"), equalTo(Request(Method.PATCH, Uri.of("/uri"))))
     }
 
-    private fun requestWithQuery(query: String) = Request(GET, Uri.uri("http://ignore/?$query"))
+    private fun requestWithQuery(query: String) = Request(GET, Uri.of("http://ignore/?$query"))
 }
 
 

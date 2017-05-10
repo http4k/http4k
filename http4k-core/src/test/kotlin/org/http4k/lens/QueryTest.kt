@@ -7,7 +7,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Request.Companion.get
-import org.http4k.core.Uri.Companion.uri
+import org.http4k.core.Uri.Companion.of
 import org.junit.Test
 
 class QueryTest {
@@ -71,7 +71,7 @@ class QueryTest {
         assertThat(custom(reqWithQuery), equalTo(MyCustomBodyType("hello world!")))
     }
 
-    private fun withQueryOf(value: String) = Request(GET, uri(value))
+    private fun withQueryOf(value: String) = Request(GET, of(value))
 
     @Test
     fun `toString is ok`() {
