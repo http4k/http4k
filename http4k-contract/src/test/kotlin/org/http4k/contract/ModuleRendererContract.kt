@@ -76,6 +76,9 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                     .query(Query.boolean().required("query", "description of the query"))
                     .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")))
                     .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } })
+            .withRoute(
+                Route("a simple endpoint")
+                    .at(GET) / "simples" bind { Response(OK) })
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = module.toHttpHandler()(get("/basepath?the_api_key=somevalue")).bodyString()

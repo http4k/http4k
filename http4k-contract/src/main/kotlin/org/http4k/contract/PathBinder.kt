@@ -31,7 +31,9 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
             core.matches(moduleRoot, it, pathLenses.toList(), toHandler)
         }
 
-    fun describe(moduleRoot: BasePath): String = "${core.pathFn(moduleRoot)}/${pathLenses.joinToString("/")}"
+    fun describe(moduleRoot: BasePath): String {
+        return "${core.pathFn(moduleRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
+    }
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
