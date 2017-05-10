@@ -63,7 +63,7 @@ object ClientFilters {
         private fun Request.newLocation(location: String): Uri {
             val locationUri = Uri.of(location)
             return if (locationUri.host.isBlank()) {
-                locationUri.authority(uri.authority)
+                locationUri.authority(uri.authority).scheme(uri.scheme)
             } else locationUri
         }
 

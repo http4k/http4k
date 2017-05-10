@@ -21,7 +21,7 @@ import org.http4k.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 
-class ApacheClient(val client: CloseableHttpClient = HttpClients.createDefault()) : HttpHandler {
+class ApacheClient(val client: CloseableHttpClient = defaultApacheHttpClient) : HttpHandler {
 
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toUtterlyIdleResponse()
 
@@ -35,9 +35,6 @@ class ApacheClient(val client: CloseableHttpClient = HttpClients.createDefault()
                 uri = URI(request.uri.toString())
                 entity = ByteArrayEntity(request.body.toString().toByteArray())
                 request.headers.filter { it.first != "content-length" }.map { addHeader(it.first, it.second) }
-                config = RequestConfig.custom()
-                    .setRedirectsEnabled(false)
-                    .setCookieSpec(IGNORE_COOKIES).build()
             }
 
             override fun getMethod(): String = this@toApacheRequest.method.name
@@ -49,4 +46,12 @@ class ApacheClient(val client: CloseableHttpClient = HttpClients.createDefault()
     private fun HttpEntity.toTarget(): Body = ByteBuffer.wrap(toByteArray(this))
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
+
+    companion object {
+        private val defaultApacheHttpClient = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
+            .setRedirectsEnabled(false)
+            .setCookieSpec(IGNORE_COOKIES)
+            .build()).build()
+
+    }
 }
