@@ -8,22 +8,22 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class Get<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
+class LensGet<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
     operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
 
-    fun <NEXT> map(nextFn: (OUT) -> NEXT) = Get(rootFn, { nextFn(fn(it)) })
+    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet(rootFn, { nextFn(fn(it)) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): Get<IN, OUT, OUT> = Get(rootFn, { it })
+        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): LensGet<IN, OUT, OUT> = LensGet(rootFn, { it })
     }
 }
 
-class Set<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
+class LensSet<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
     operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
-    fun <NEXT> map(nextFn: (NEXT) -> OUT) = Set(rootFn, { value: NEXT -> fn(nextFn(value)) })
+    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet(rootFn, { value: NEXT -> fn(nextFn(value)) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): Set<IN, OUT, OUT> = Set(rootFn, { it })
+        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT, OUT> = LensSet(rootFn, { it })
     }
 }
 
@@ -35,7 +35,7 @@ interface MultiLensSpec<in IN, OUT> {
 
 open class LensSpec<IN, MID, OUT>(protected val location: String,
                                   protected val paramMeta: ParamMeta,
-                                  internal val get: Get<IN, MID, OUT>) {
+                                  internal val get: LensGet<IN, MID, OUT>) {
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = mapWithNewMeta(nextIn, paramMeta)
 
     internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta) = LensSpec(location, paramMeta, get.map(nextIn))
@@ -87,8 +87,8 @@ interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
 
 open class BiDiLensSpec<IN, MID, OUT>(location: String,
                                       paramMeta: ParamMeta,
-                                      get: Get<IN, MID, OUT>,
-                                      private val set: Set<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, paramMeta, get) {
+                                      get: LensGet<IN, MID, OUT>,
+                                      private val set: LensSet<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, paramMeta, get) {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
 

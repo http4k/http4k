@@ -21,7 +21,7 @@ open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OU
 }
 
 object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", StringParam,
-    Get { _, target -> listOf(target) })) {
+    LensGet { _, target -> listOf(target) })) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = delegate.get(name)

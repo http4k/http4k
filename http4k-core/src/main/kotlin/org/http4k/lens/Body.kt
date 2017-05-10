@@ -36,7 +36,7 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
 }
 
 
-open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal val get: Get<HttpMessage, MID, OUT>) {
+open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, MID, OUT>) {
     open fun required(description: String? = null): BodyLens<OUT> {
         val getLens = get("")
         return BodyLens(metas, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
@@ -46,8 +46,8 @@ open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal v
 }
 
 open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
-                                      get: Get<HttpMessage, MID, OUT>,
-                                      private val set: Set<HttpMessage, MID, OUT>) : BodyLensSpec<MID, OUT>(metas, get) {
+                                      get: LensGet<HttpMessage, MID, OUT>,
+                                      private val set: LensSet<HttpMessage, MID, OUT>) : BodyLensSpec<MID, OUT>(metas, get) {
 
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, get.map(nextIn), set.map(nextOut))
 
@@ -63,11 +63,11 @@ open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
 
 object Body {
     internal fun root(metas: List<Meta>, contentType: ContentType) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
-        Get { _, target ->
+        LensGet { _, target ->
             if (CONTENT_TYPE(target) != contentType) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
             target.body?.let { listOf(it) } ?: emptyList()
         },
-        Set { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) }.with(CONTENT_TYPE to contentType) }
+        LensSet { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) }.with(CONTENT_TYPE to contentType) }
     )
 
     fun string(contentType: ContentType, description: String? = null): BiDiBodyLensSpec<ByteBuffer, String>

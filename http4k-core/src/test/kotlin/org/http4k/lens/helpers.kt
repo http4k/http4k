@@ -9,10 +9,10 @@ import org.http4k.lens.ParamMeta.StringParam
 
 object BiDiLensContract {
 
-    val spec = BiDiLensSpec("location", StringParam, Get { _: String, str: String ->
+    val spec = BiDiLensSpec("location", StringParam, LensGet { _: String, str: String ->
         if (str.isBlank()) emptyList() else listOf(str)
     },
-        Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
+        LensSet { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
         val optionalLens = spec.optional("hello")

@@ -3,10 +3,10 @@ package org.http4k.filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Get
+import org.http4k.lens.LensGet
 import org.http4k.lens.Header
 import org.http4k.lens.ParamMeta.StringParam
-import org.http4k.lens.Set
+import org.http4k.lens.LensSet
 import java.util.*
 import kotlin.experimental.and
 
@@ -33,14 +33,14 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
 
         private val lens = BiDiLensSpec<HttpMessage, ZipkinTraces, ZipkinTraces>("headers",
             StringParam,
-            Get { _, target ->
+            LensGet { _, target ->
                 listOf(ZipkinTraces(
                     X_B3_TRACEID(target) ?: TraceId.new(),
                     X_B3_SPANID(target) ?: TraceId.new(),
                     X_B3_PARENTSPANID(target)
                 ))
             },
-            Set { _, values, target ->
+            LensSet { _, values, target ->
                 values.fold(target) { msg, (traceId, spanId, parentSpanId) ->
                     msg.with(X_B3_TRACEID to traceId, X_B3_SPANID to spanId, X_B3_PARENTSPANID to parentSpanId)
                 }

@@ -13,8 +13,8 @@ typealias FormFields = Map<String, List<String>>
 
 object FormField : BiDiLensSpec<WebForm, String, String>("form field",
     StringParam,
-    Get { name, (fields) -> fields.getOrDefault(name, listOf()) },
-    Set { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+    LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
+    LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
 
 data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {

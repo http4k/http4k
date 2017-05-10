@@ -12,10 +12,10 @@ import java.util.*
 class BiDiLensSpecTest {
 
     private val spec = BiDiLensSpec("location", StringParam,
-        Get { _: String, str: String ->
+        LensGet { _: String, str: String ->
             if (str.isBlank()) emptyList() else listOf(str)
         },
-        Set { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
+        LensSet { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     @Test
     fun `int`() = checkContract(spec.int(), "123", 123)
