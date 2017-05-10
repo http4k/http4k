@@ -72,19 +72,19 @@ fun main(args: Array<String>) {
 
 The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
-* HTTP handler and filter abstraction which models services as simple, composable functions.
+* HTTP handler and filter abstractions which models services as simple, composable functions.
 * Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
 * Type-safe [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for destructuring and construction of HTTP message entities.
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
-In **http4k**, an HTTP service or handler is just a typealias of a simple function:
+In **http4k**, an HTTP service is just a typealias of a simple function:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 
-flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example - note that we don't need any special infrastructure to create an HttpHandler, neither do we 
+flexibility in a language like Kotlin, since the conceptual barrier to service construction is reduced to effectively nil. Here is the simplest example - note that we don't need any special infrastructure to create an `HttpHandler`, neither do we 
 need to launch a real HTTP container to exercise it:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
@@ -103,13 +103,13 @@ Filters add extra processing to either the Request or Response. In **http4k**, t
 interface Filter : (HttpHandler) -> HttpHandler
 ``` 
 
-Filters are designed to simply compose together (using `then()`) to create reusable stacks of behaviour which can then be applied to any `HttpHandler`. 
+Filters are designed to simply compose together (using `then()`) , creating reusable stacks of behaviour which can then be applied to any `HttpHandler`. 
 For example, to add Basic Auth and latency reporting to a service:
 ```kotlin
 val handler = { _: Request -> Response(OK) }
 
 val myFilter = Filter {
-    nextHandler -> {
+    next: HttpHandler -> {
         request: Request -> 
             val start = System.currentTimeMillis()
             val response = next(it)
@@ -133,7 +133,7 @@ routes(
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 
-A [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) is a bi-directional entity which can be used to either get or set a particular value on/from an HTTP message. Http4k provides a DSL to configure these lenses 
+A [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) is a bi-directional entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL to configure these lenses 
 to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
 
 ```kotlin
@@ -145,7 +145,7 @@ data class CustomType(val value: String)
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
 ```
 
-To use the Lens, simply apply it to an HTTP message, passing the value if we are modifying the message:
+To use the Lens, simply apply it to an HTTP message to extract the value, or alternatively pass the value if we are modifying (via copy) the message:
 
 ```kotlin
 val optionalHeader: Int? = optionalHeader(get(""))
@@ -174,7 +174,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 
 **Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "1.0.0"```
 
-Server modules provide extension functions to `HttpHandler` to mount them into the specified container:
+Server modules provide extension functions to `HttpHandler` to mount them into the specified container, passing a `ServerConfig` implementation (in this case `Jetty`):
 
 ```kotlin
 { _: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
@@ -183,7 +183,7 @@ Server modules provide extension functions to `HttpHandler` to mount them into t
 ## Client Modules
 **Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.0.0"```
 
-Client modules provide extension functions to `HttpHandler` to mount them into the specified container:
+Supported HTTP client APIs are wrapped to provide an `HttpHandler` interface:
 
 ```kotlin
 val client = ApacheClient()
@@ -196,7 +196,7 @@ println(response.bodyString())
 ## Contracts Module
 **Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "1.0.0"```
 
-The `http4k-contract` module adds a much more sophisticated routing mechanism to what is available in `http4k-core` module. It adds the facility 
+The `http4k-contract` module adds a much more sophisticated routing mechanism to that available in `http4k-core`. It adds the facility 
 to declare server-side `Routes` in a completely typesafe way, leveraging the Lens functionality from the core. These `Routes` are 
 combined into `RouteModules`, which have the following features:
 * **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement 
@@ -288,7 +288,7 @@ println(
 ## Templating Modules
 **Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "1.0.0"```
 
-The pluggable **http4k** templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the following renderers for views that are:
+The pluggable **http4k** templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the a number of renderers for views:
 * Cached on the classpath
 * Cached from the filesystem
 * Hot-Reloading from the filesystem
