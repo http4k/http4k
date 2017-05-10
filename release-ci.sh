@@ -38,7 +38,7 @@ function notify_slack {
 function notify_gitter {
     local MESSAGE=$1
     echo "Notifying on Gitter..."
-    curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $GITTER_BEARER_TOKEN" "$GITTER_WEBHOOK"  -d '{"text":"$MESSAGE"}'
+    curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $GITTER_BEARER_TOKEN" "$GITTER_WEBHOOK"  -d "{'text':'$MESSAGE'}"
 }
 
 if [ $? -ne 0 ]; then
