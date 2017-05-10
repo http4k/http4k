@@ -36,9 +36,9 @@ This simple example demonstates how to serve and consume HTTP services using **h
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "1.0.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "1.0.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "1.0.0"
+    compile group: "org.http4k", name: "http4k-core", version: "1.1.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "1.1.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "1.1.0"
 }
 ```
 
@@ -71,7 +71,7 @@ fun main(args: Array<String>) {
 # Modules
 
 ## Core Module
-**Gradle:** ```compile group: "org.http4k", name: "http4k-core", version: "1.0.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-core", version: "1.1.0"```
 
 The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
@@ -173,9 +173,9 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 ```
 
 ## Server Modules
-**Gradle (Jetty):** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "1.0.0"```
+**Gradle (Jetty):** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "1.1.0"```
 
-**Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "1.0.0"```
+**Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "1.1.0"```
 
 Server modules provide extension functions to `HttpHandler` to mount them into the specified container, passing a `ServerConfig` implementation (in this case `Jetty`):
 
@@ -184,7 +184,7 @@ Server modules provide extension functions to `HttpHandler` to mount them into t
 ```
 
 ## Client Modules
-**Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.0.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.1.0"```
 
 Supported HTTP client APIs are wrapped to provide an `HttpHandler` interface:
 
@@ -197,7 +197,7 @@ println(response.bodyString())
 ```
 
 ## Contracts Module
-**Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "1.0.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "1.1.0"```
 
 The `http4k-contract` module adds a much more sophisticated routing mechanism to that available in `http4k-core`. It adds the facility 
 to declare server-side `Routes` in a completely typesafe way, leveraging the Lens functionality from the core. These `Routes` are 
@@ -246,11 +246,11 @@ val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
 ```
 
 ## Message Format Modules
-**Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "1.0.0"```
+**Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "1.1.0"```
 
-**Gradle (Gson):**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "1.0.0"```
+**Gradle (Gson):**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "1.1.0"```
 
-**Gradle (Jackson):** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "1.0.0"```
+**Gradle (Jackson):** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "1.1.0"```
 
 These modules add the ability to use JSON as a first-class citizen when reading from and to HTTP messages. Each implementation adds a set of 
 standard methods and extension methods for converting common types into native JSON objects, including custom Lens methods for each library so that 
@@ -289,7 +289,7 @@ println(
 ```
 
 ## Templating Modules
-**Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "1.0.0"```
+**Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "1.1.0"```
 
 The pluggable **http4k** templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the a number of renderers for views:
 * Cached on the classpath
