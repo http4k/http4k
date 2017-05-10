@@ -14,8 +14,8 @@ The principles of the toolkit are:
 
 * **Application as a Function:** Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed of 2 types of simple function:
     * *HttpHandler:* `(Request) -> Response` - provides a remote call for processing a Request. 
-    * *Filter:* `(HttpHandler) -> HttpHandler` - adds pre or post processing to a `HttpHandler`. These filters are composed to make stacks of reusable behaviour that can then 
-    be applied to a `HttpHandler`.
+    * *Filter:* `(HttpHandler) -> HttpHandler` - adds Request/Response pre/post processing. These filters are composed to make stacks of reusable behaviour that can then 
+    be applied to an `HttpHandler`.
 * **Immutablility:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
@@ -28,7 +28,7 @@ of services without HTTP container being required.
    * *Templating:* [Handlebars](#user-content-templating-modules)
 
 # Getting started
-This simple example demonstates how to serve and consume HTTP services using http4k. 
+This simple example demonstates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
@@ -123,7 +123,7 @@ val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
 ### Routing
-Basic routing for mapping a URL pattern to a `HttpHandler`:
+Basic routing for mapping a URL pattern to an `HttpHandler`:
 ```kotlin
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
@@ -288,7 +288,7 @@ println(
 ## Templating Modules
 **Gradle:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "1.0.0"```
 
-The pluggable `http4k` templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the following renderers for views that are:
+The pluggable **http4k** templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the following renderers for views that are:
 * Cached on the classpath
 * Cached from the filesystem
 * Hot-Reloading from the filesystem
