@@ -125,14 +125,16 @@ val latencyAndBasicAuth: HttpHandler = ServerFilters.BasicAuth("my realm", "user
 val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
-### Routing
+### Simple Routing
 Basic routing for mapping a URL pattern to an `HttpHandler`:
 ```kotlin
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
-).startJettyServer()
+).startServer(Jetty(8000))
 ```
+
+Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 
