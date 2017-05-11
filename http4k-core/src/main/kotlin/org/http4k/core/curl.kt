@@ -7,8 +7,8 @@ import org.http4k.quoted
 fun Request.toCurl(): String =
     StringBuilder("curl")
         .append(" -X $method")
-        .appendIfNotEmpty(headers, " " + headers.map { """-H "${it.first}:${it.second}"""" }.joinToString(" "))
-        .appendIfPresent(body, " --data ${bodyString().truncated().quoted()}")
+        .appendIfNotEmpty(headers, " " + headers.map { """-H ${(it.first + ":" + it.second).quoted()}""" }.joinToString(" "))
+        .appendIfPresent(body, " --data ${body.toString().truncated().quoted()}")
         .append(" \"$uri\"")
         .toString()
 

@@ -29,6 +29,12 @@ class CurlTest {
     }
 
     @Test
+    fun `deals with headers with quotes`(){
+        val curl = get("http://httpbin.org").header("foo", "my \"quoted\" header").toCurl()
+        assertThat(curl, equalTo("""curl -X GET -H "foo:my \"quoted\" header" "http://httpbin.org""""))
+    }
+
+    @Test
     fun `includes body data`() {
         val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
         assertThat(curl, equalTo("""curl -X POST --data "foo=bar" "http://httpbin.org/post""""))
