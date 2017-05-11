@@ -22,7 +22,7 @@ object ResponseFilters {
         }
     }
 
-    fun ReportLatency(clock: Clock, recordFn: (Request, Response, Duration) -> Unit): Filter = Filter {
+    fun ReportLatency(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter = Filter {
         next ->
         {
             val start = clock.instant()
