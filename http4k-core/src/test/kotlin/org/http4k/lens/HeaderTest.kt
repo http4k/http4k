@@ -11,7 +11,7 @@ import org.http4k.core.Uri.Companion.of
 import org.junit.Test
 
 class HeaderTest {
-    private val request = Request(GET, of("/"), listOf("hello" to "world", "hello" to "world2"))
+    private val request = Request(GET, of("/")).header("hello", "world").header("hello", "world2")
 
     @Test
     fun `value present`() {

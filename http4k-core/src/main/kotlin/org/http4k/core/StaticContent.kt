@@ -13,10 +13,10 @@ class StaticContent(private val basePath: String = "", private val resourceLoade
             url ->
             val lookupFor = ContentType.lookupFor(path)
             if (req.method == GET && lookupFor != OCTET_STREAM) {
-                Response(OK,
-                    listOf("Content-Type" to lookupFor.value),
-                    ByteBuffer.wrap(url.openStream().readBytes())
-                )
+                Response(OK)
+                    .header("Content-Type", lookupFor.value)
+                    .body(ByteBuffer.wrap(url.openStream().readBytes())
+                    )
             } else Response(NOT_FOUND)
         } ?: Response(NOT_FOUND)
     }

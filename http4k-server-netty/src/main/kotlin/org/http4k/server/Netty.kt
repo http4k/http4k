@@ -70,12 +70,15 @@ private fun Response.asNettyResponse(): DefaultFullHttpResponse {
 
 private fun DefaultHttpRequest.asRequest(): Request =
     // FIXME - if the method is unknown
-    Request(Method.valueOf(method().name()), Uri.Companion.of(uri()),
-        headers().map { entry -> entry.key to entry.value },
+    headers().fold(Request(Method.valueOf(method().name()), Uri.Companion.of(uri()))) {
+        memo, next ->
+        memo.header(next.key, next.value)
+    }.body(
         when (this) {
             is DefaultFullHttpRequest -> ByteBuffer.wrap(this.content().array())
             else -> null
-        })
+        }
+    )
 
 data class Netty(val port: Int = 8000) : ServerConfig {
     override fun toServer(handler: HttpHandler): Http4kServer {

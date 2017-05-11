@@ -28,8 +28,12 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
-        Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()),
-            headerParameters(), ByteBuffer.wrap(inputStream.readBytes()))
+        headerParameters().fold(
+            Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
+                .body(ByteBuffer.wrap(inputStream.readBytes()))) {
+            memo, (first, second) ->
+            memo.header(first, second)
+        }
 
     private fun HttpServletRequest.headerParameters(): Headers =
         headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })

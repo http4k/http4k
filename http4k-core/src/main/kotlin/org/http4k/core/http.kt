@@ -70,7 +70,7 @@ interface Request : HttpMessage {
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(method: Method, uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(method, uri, headers, body)
+        operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), null)
         fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = get(Uri.of(uri), headers, body)
         fun get(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(GET, uri, headers, body)
         fun post(uri: String, headers: Headers = listOf(), body: Body? = null) = post(Uri.of(uri), headers, body)
@@ -127,7 +127,7 @@ interface Response : HttpMessage {
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(status: Status, headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(status, headers, body)
+        operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), null)
         fun ok(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.OK, headers, body)
         fun notFound(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.NOT_FOUND, headers, body)
         fun badRequest(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.BAD_REQUEST, headers, body)
