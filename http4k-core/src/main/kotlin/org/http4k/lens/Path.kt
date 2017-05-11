@@ -42,4 +42,7 @@ fun Path.localDate() = Path.map(java.time.LocalDate::parse)
 fun Path.dateTime() = Path.map(java.time.LocalDateTime::parse)
 fun Path.zonedDateTime() = Path.map(java.time.ZonedDateTime::parse)
 fun Path.uuid() = Path.map(java.util.UUID::fromString)
-
+fun Path.regex(pattern: String, group: Int = 1): PathSpec<String, String> {
+    val regex = pattern.toRegex()
+    return this.map { regex.matchEntire(it)?.groupValues?.get(group)!! }
+}

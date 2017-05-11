@@ -1,5 +1,8 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.Test
@@ -34,6 +37,14 @@ class BiDiLensSpecTest {
 
     @Test
     fun `uuid`() = checkContract(spec.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
+
+    @Test
+    fun `regex`() {
+        val requiredLens = spec.regex("v(\\d+)", 1).required("hello")
+        assertThat(requiredLens("v123"), equalTo("123"))
+        assertThat((spec.regex("v(\\d+)", 1).map(String::toInt).required("hello"))("v123"), equalTo(123))
+        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
+    }
 
     @Test
     fun `boolean`() {

@@ -165,6 +165,10 @@ fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::pars
 fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
 fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String, String> {
+    val toRegex = pattern.toRegex()
+    return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
+}
 
 internal fun safeBooleanFrom(value: String): Boolean =
     if (value.toUpperCase() == "TRUE") true
