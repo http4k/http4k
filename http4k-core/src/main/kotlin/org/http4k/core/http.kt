@@ -14,7 +14,11 @@ import java.nio.ByteBuffer
 
 typealias Headers = Parameters
 
-typealias Body = ByteBuffer
+data class Body(val payload: ByteBuffer) {
+    constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+
+    override fun toString(): String = String(payload.array())
+}
 
 interface HttpMessage {
     val headers: Headers
@@ -36,7 +40,7 @@ interface HttpMessage {
 
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
-    fun bodyString(): String = body?.let { String(it.array()) } ?: ""
+    fun bodyString(): String = body?.toString() ?: ""
 
     companion object {
         val version = "HTTP/1.1"
@@ -105,7 +109,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun body(body: Body?) = copy(body = body)
 
-    override fun body(body: String) = copy(body = body.toBody())
+    override fun body(body: String) = copy(body = Body(body))
 
     override fun toString(): String = toMessage()
 
@@ -147,7 +151,7 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 
     override fun body(body: Body?) = copy(body = body)
 
-    override fun body(body: String) = copy(body = body.toBody())
+    override fun body(body: String) = copy(body = Body(body))
 
     override fun toString(): String = toMessage()
 }
@@ -160,7 +164,7 @@ fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body? = t
 
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
 
-fun String.toBody(): Body = ByteBuffer.wrap(toByteArray())
+fun String.toBody(): Body = Body(this)
 
 private fun Headers.remove(name: String) = filterNot { it.first.equals(name, true) }
 

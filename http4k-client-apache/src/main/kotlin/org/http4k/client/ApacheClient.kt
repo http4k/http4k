@@ -46,7 +46,7 @@ class ApacheClient(val client: CloseableHttpClient = defaultApacheHttpClient) : 
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun HttpEntity.toTarget(): Body = ByteBuffer.wrap(toByteArray(this))
+    private fun HttpEntity.toTarget(): Body = Body(ByteBuffer.wrap(toByteArray(this)))
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 

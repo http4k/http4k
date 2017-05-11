@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpServerCodec
 import io.netty.handler.codec.http.HttpUtil.is100ContinueExpected
 import io.netty.handler.codec.http.HttpUtil.isKeepAlive
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -61,7 +62,7 @@ private class RequestHandler(private val handler: HttpHandler) : ChannelInboundH
 
 private fun Response.asNettyResponse(): DefaultFullHttpResponse {
     val res = DefaultFullHttpResponse(HTTP_1_1, OK,
-        this.body?.let { wrappedBuffer(it) } ?: wrappedBuffer("".toByteArray())
+        body?.let { wrappedBuffer(it.payload) } ?: wrappedBuffer("".toByteArray())
     )
     headers.forEach { (key, value) -> res.headers().set(key, value) }
     res.headers().set(CONTENT_LENGTH, res.content().readableBytes())
@@ -75,7 +76,7 @@ private fun DefaultHttpRequest.asRequest(): Request =
         memo.header(next.key, next.value)
     }.body(
         when (this) {
-            is DefaultFullHttpRequest -> ByteBuffer.wrap(this.content().array())
+            is DefaultFullHttpRequest -> Body(ByteBuffer.wrap(this.content().array()))
             else -> null
         }
     )

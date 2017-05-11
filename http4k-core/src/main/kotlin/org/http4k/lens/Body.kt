@@ -5,7 +5,6 @@ import org.http4k.asString
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
-import org.http4k.core.copy
 import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
@@ -65,9 +64,9 @@ object Body {
     internal fun root(metas: List<Meta>, contentType: ContentType) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
         LensGet { _, target ->
             if (CONTENT_TYPE(target) != contentType) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
-            target.body?.let { listOf(it) } ?: emptyList()
+            target.body?.let { listOf(it.payload) } ?: emptyList()
         },
-        LensSet { _, values, target -> values.fold(target) { a, b -> a.copy(body = b) }.with(CONTENT_TYPE to contentType) }
+        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(org.http4k.core.Body(b)) }.with(CONTENT_TYPE to contentType) }
     )
 
     fun string(contentType: ContentType, description: String? = null): BiDiBodyLensSpec<ByteBuffer, String>

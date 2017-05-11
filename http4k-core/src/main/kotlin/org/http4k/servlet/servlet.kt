@@ -1,5 +1,6 @@
 package org.http4k.servlet
 
+import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -24,13 +25,13 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        source.body?.let { Channels.newChannel(destination.outputStream).write(it) }
+        source.body?.let { Channels.newChannel(destination.outputStream).write(it.payload) }
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =
         headerParameters().fold(
             Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-                .body(ByteBuffer.wrap(inputStream.readBytes()))) {
+                .body(Body(ByteBuffer.wrap(inputStream.readBytes())))) {
             memo, (first, second) ->
             memo.header(first, second)
         }
