@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.7.0
+- Added auto() to Jackson, so you can auto convert body objects into and out of Requests/Responses
+
 ### v1.6.0
 - Added CachingFilters
 
