@@ -3,8 +3,9 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -24,7 +25,7 @@ class RouteModuleTest {
 
     @Test
     fun `by default the description lives at the route`() {
-        val response = routeModule.toHttpHandler()(get(""))
+        val response = routeModule.toHttpHandler()(Request(Method.GET, ""))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
@@ -33,7 +34,7 @@ class RouteModuleTest {
     fun `passes through module filter`() {
         val response = routeModule.withRoute(Route("").at(GET) bind {
             Response(OK).with(header to header(it))
-        }).toHttpHandler()(get(""))
+        }).toHttpHandler()(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(OK))
         assertThat(header(response), equalTo("true"))
@@ -47,7 +48,7 @@ class RouteModuleTest {
             {
                 Response(OK).with(X_REEKWEST_ROUTE_IDENTITY to X_REEKWEST_ROUTE_IDENTITY(it))
             }
-        }).toHttpHandler()(get("/hello/planet"))
+        }).toHttpHandler()(Request(Method.GET, "/hello/planet"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(X_REEKWEST_ROUTE_IDENTITY(response), equalTo("/hello/{world}"))
@@ -57,7 +58,7 @@ class RouteModuleTest {
     fun `applies security and responds with a 401 to unauthorized requests`() {
         val response = routeModule
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
-            .toHttpHandler()(get("?key=sue"))
+            .toHttpHandler()(Request(Method.GET, "?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
@@ -65,7 +66,7 @@ class RouteModuleTest {
     fun `applies security and responds with a 200 to authorized requests`() {
         val response = routeModule
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
-            .toHttpHandler()(get("?key=bob"))
+            .toHttpHandler()(Request(Method.GET, "?key=bob"))
         assertThat(response.status, equalTo(OK))
     }
 

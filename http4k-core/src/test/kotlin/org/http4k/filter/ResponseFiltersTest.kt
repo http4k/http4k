@@ -3,7 +3,8 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import junit.framework.TestCase.assertTrue
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -19,14 +20,14 @@ class ResponseFiltersTest {
     fun `tap passes response through to function`() {
         var called = false
         val response = Response(OK)
-        ResponseFilters.Tap { called = true; assertThat(it, equalTo(response)) }.then(response.toHttpHandler())(get(""))
+        ResponseFilters.Tap { called = true; assertThat(it, equalTo(response)) }.then(response.toHttpHandler())(Request(Method.GET, ""))
         assertTrue(called)
     }
 
     @Test
     fun `reporting latency for request`() {
         var called = false
-        val request = get("")
+        val request = Request(Method.GET, "")
         val response = Response(OK)
 
         ReportLatency(TickingClock, { req, resp, duration ->

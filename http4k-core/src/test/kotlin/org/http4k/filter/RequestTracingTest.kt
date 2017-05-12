@@ -5,7 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -36,9 +37,9 @@ class RequestTracingTest {
             Response(OK)
         }
 
-        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then { client(get("/somePath")) }
+        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then { client(Request(Method.GET, "/somePath")) }
 
-        val response = simpleProxyServer(ZipkinTraces(traces, get("")))
+        val response = simpleProxyServer(ZipkinTraces(traces, Request(Method.GET, "")))
 
         assertThat(ZipkinTraces(response), equalTo(traces))
     }

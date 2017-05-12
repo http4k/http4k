@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.BiDiLensContract.checkContract
@@ -51,7 +52,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
 
         val obj = j.obj("hello" to j.string("world"))
 
-        val request = Request.get("/bob")
+        val request = Request(Method.GET, "/bob")
 
         val requestWithBody = request.with(body to obj)
 

@@ -4,9 +4,9 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
 import org.http4k.core.Uri.Companion.of
 import org.junit.Test
 
@@ -64,7 +64,7 @@ class QueryTest {
         val custom = Query.map(::MyCustomBodyType, { it.value }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
-        val reqWithQuery = custom(instance, get(""))
+        val reqWithQuery = custom(instance, Request(Method.GET, ""))
 
         assertThat(reqWithQuery.query("bob"), equalTo("hello world!"))
 

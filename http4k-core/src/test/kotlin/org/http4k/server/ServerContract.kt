@@ -6,6 +6,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.routing.by
 import org.http4k.routing.routes
 import org.junit.After
@@ -21,15 +22,15 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Before
     fun before() {
         server = routes(
-            Method.GET to "/" by { _: Request -> Response.Companion.ok().body("Hello World") },
-            Method.GET to "/request-headers" by { request: Request -> Response.Companion.ok().body(request.headerValues("foo").joinToString(", ")) }
+            Method.GET to "/" by { _: Request -> Response(Status.OK).body("Hello World") },
+            Method.GET to "/request-headers" by { request: Request -> Response(Status.OK).body(request.headerValues("foo").joinToString(", ")) }
         ).asServer(serverConfig(port)).start()
     }
 
     @Test
     fun can_use_as_servlet() {
         val client = client
-        val response = client(Request.get("http://localhost:$port/"))
+        val response = client(Request(Method.GET, "http://localhost:$port/"))
 
         assertThat(response.bodyString(), equalTo("Hello World"))
     }
@@ -37,7 +38,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Test
     fun can_handle_multiple_request_headers() {
         val client = client
-        val response = client(Request.get("http://localhost:$port/request-headers", listOf("foo" to "one", "foo" to "two", "foo" to "three")))
+        val response = client(Request(Method.GET, "http://localhost:$port/request-headers").header("foo", "one").header("foo", "two").header("foo", "three"))
 
         assertThat(response.bodyString(), equalTo("one, two, three"))
     }

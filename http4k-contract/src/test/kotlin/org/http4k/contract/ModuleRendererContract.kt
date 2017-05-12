@@ -6,9 +6,10 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Argo.json
@@ -81,7 +82,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                     .at(GET) / "simples" bind { Response(OK) })
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
-        val actual = module.toHttpHandler()(get("/basepath?the_api_key=somevalue")).bodyString()
+        val actual = module.toHttpHandler()(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
         println(expected)
         println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))

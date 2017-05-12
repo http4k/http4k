@@ -5,14 +5,15 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
 class BodyTest {
 
-    private val emptyRequest = get("")
+    private val emptyRequest = Request(Method.GET, "")
 
     @Test
     fun `can get string body`() {

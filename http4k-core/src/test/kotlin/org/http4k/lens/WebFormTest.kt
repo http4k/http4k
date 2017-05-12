@@ -5,7 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toBody
 import org.http4k.core.with
@@ -16,7 +17,7 @@ import org.junit.Test
 
 class WebFormTest {
 
-    private val emptyRequest = get("")
+    private val emptyRequest = Request(Method.GET, "")
 
     @Test
     fun `web form serialized into request`() {

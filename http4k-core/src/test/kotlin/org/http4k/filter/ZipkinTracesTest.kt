@@ -4,7 +4,8 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.junit.Test
 import java.util.*
 
@@ -23,7 +24,7 @@ class TraceIdTest {
 
 class ZipkinTracesTest {
 
-    private val requestWithTraces = get("")
+    private val requestWithTraces = Request(Method.GET, "")
         .header("x-b3-traceid", "somevalue1")
         .header("x-b3-spanid", "somevalue2")
         .header("x-b3-parentspanid", "somevalue3")
@@ -32,7 +33,7 @@ class ZipkinTracesTest {
 
     @Test
     fun `generates a new set of traces from a request`() {
-        val actual = ZipkinTraces(get(""))
+        val actual = ZipkinTraces(Request(Method.GET, ""))
         assertThat(actual, present())
         assertThat(actual.parentSpanId, absent())
     }
@@ -45,7 +46,7 @@ class ZipkinTracesTest {
 
     @Test
     fun `puts expected things onto a request`() {
-        assertThat(ZipkinTraces(expected, get("")), equalTo(requestWithTraces))
+        assertThat(ZipkinTraces(expected, Request(Method.GET, "")), equalTo(requestWithTraces))
     }
 
 }

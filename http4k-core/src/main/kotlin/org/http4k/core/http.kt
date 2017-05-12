@@ -3,13 +3,6 @@
 package org.http4k.core
 
 import org.http4k.core.HttpMessage.Companion.version
-import org.http4k.core.Method.DELETE
-import org.http4k.core.Method.GET
-import org.http4k.core.Method.OPTIONS
-import org.http4k.core.Method.PATCH
-import org.http4k.core.Method.POST
-import org.http4k.core.Method.PUT
-import org.http4k.core.Method.TRACE
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
@@ -77,20 +70,7 @@ interface Request : HttpMessage {
 
     companion object {
         operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), null)
-        fun get(uri: String, headers: Headers = listOf(), body: Body? = null) = get(Uri.of(uri), headers, body)
-        fun get(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(GET, uri, headers, body)
-        fun post(uri: String, headers: Headers = listOf(), body: Body? = null) = post(Uri.of(uri), headers, body)
-        fun post(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(POST, uri, headers, body)
-        fun put(uri: String, headers: Headers = listOf(), body: Body? = null) = put(Uri.of(uri), headers, body)
-        fun put(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(PUT, uri, headers, body)
-        fun delete(uri: String, headers: Headers = listOf(), body: Body? = null) = delete(Uri.of(uri), headers, body)
-        fun delete(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(DELETE, uri, headers, body)
-        fun options(uri: String, headers: Headers = listOf(), body: Body? = null) = options(Uri.of(uri), headers, body)
-        fun options(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(OPTIONS, uri, headers, body)
-        fun trace(uri: String, headers: Headers = listOf(), body: Body? = null) = trace(Uri.of(uri), headers, body)
-        fun trace(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(TRACE, uri, headers, body)
-        fun patch(uri: String, headers: Headers = listOf(), body: Body? = null) = patch(Uri.of(uri), headers, body)
-        fun patch(uri: Uri, headers: Headers = listOf(), body: Body? = null): Request = MemoryRequest(PATCH, uri, headers, body)
+        operator fun invoke(method: Method, uri: String): Request = MemoryRequest(method, Uri.of(uri), listOf(), null)
     }
 }
 
@@ -134,13 +114,6 @@ interface Response : HttpMessage {
 
     companion object {
         operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), null)
-        fun ok(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.OK, headers, body)
-        fun notFound(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.NOT_FOUND, headers, body)
-        fun badRequest(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.BAD_REQUEST, headers, body)
-        fun serverError(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.INTERNAL_SERVER_ERROR, headers, body)
-        fun movedPermanently(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.MOVED_PERMANENTLY, headers, body)
-        fun movedTemporarily(headers: Headers = listOf(), body: Body? = null) = found(headers, body)
-        fun found(headers: Headers = listOf(), body: Body? = null): Response = MemoryResponse(Status.FOUND, headers, body)
     }
 }
 

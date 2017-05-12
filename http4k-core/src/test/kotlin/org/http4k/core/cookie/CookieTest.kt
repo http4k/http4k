@@ -2,10 +2,11 @@ package org.http4k.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method
 import org.http4k.core.Parameters
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Response.Companion.ok
+import org.http4k.core.Status
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -51,14 +52,14 @@ class CookieTest {
     fun `cookies can be added to the response`() {
         val cookie = Cookie("my-cookie", "my value")
 
-        val response = ok().cookie(cookie)
+        val response = Response(Status.OK).cookie(cookie)
 
         assertThat(response.headers, equalTo(listOf("Set-Cookie" to cookie.toString()) as Parameters))
     }
 
     @Test
     fun `cookies can be removed from the response`() {
-        val response = ok()
+        val response = Response(Status.OK)
             .header("Set-Cookie", "other-cookie=\"other-value\"")
             .header("Set-Cookie", "a-cookie=\"a-value\"")
             .header("Other-Header", "other-value")
@@ -75,28 +76,28 @@ class CookieTest {
         val cookie = Cookie("my-cookie", "my value")
         val replacement = Cookie("my-cookie", "my second value")
 
-        val response = ok().cookie(cookie).replaceCookie(replacement)
+        val response = Response(Status.OK).cookie(cookie).replaceCookie(replacement)
 
         assertThat(response.headers, equalTo(listOf("Set-Cookie" to replacement.toString()) as Parameters))
     }
 
     @Test
     fun `cookes can be stored in request`() {
-        val request = get("ignore").cookie("foo", "bar")
+        val request = Request(Method.GET, "ignore").cookie("foo", "bar")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"; ") as Parameters))
     }
 
     @Test
     fun `cookes can be retrieved from request`() {
-        val request = get("ignore").header("Cookie", "foo=\"bar\"; ")
+        val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"; ")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
     }
 
     @Test
     fun `request stores multiple cookies in single header`() {
-        val request = get("ignore").cookie("foo", "one").cookie("bar", "two")
+        val request = Request(Method.GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"one\"; bar=\"two\"; ") as Parameters))
     }
@@ -105,7 +106,7 @@ class CookieTest {
     fun `cookies can be extracted from response`() {
         val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").maxAge(3))
 
-        val response = cookies.fold(ok(), Response::cookie)
+        val response = cookies.fold(Response(Status.OK), Response::cookie)
 
         assertThat(response.cookies(), equalTo(cookies))
     }
@@ -123,7 +124,7 @@ class CookieTest {
 
     @Test
     fun `cookie can be invalidate at response level`() {
-        assertThat(ok().cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
+        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
             equalTo(Cookie("foo", "").invalidate()))
     }
 

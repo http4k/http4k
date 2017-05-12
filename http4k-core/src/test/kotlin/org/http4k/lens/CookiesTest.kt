@@ -4,9 +4,9 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
@@ -70,7 +70,7 @@ class CookiesTest {
         val custom = Cookies.map({ MyCustomBodyType(it.value) }, { Cookie("bob", it.value) }).required("bob")
 
         val instance = MyCustomBodyType("hello world!")
-        val reqWithCookies = custom(instance, get(""))
+        val reqWithCookies = custom(instance, Request(Method.GET, ""))
 
         assertThat(reqWithCookies.cookie("bob"), equalTo(Cookie("bob", "hello world!")))
 

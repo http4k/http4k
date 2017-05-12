@@ -2,12 +2,11 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
-import org.http4k.core.Request.Companion.post
-import org.http4k.core.Response.Companion.notFound
-import org.http4k.core.Response.Companion.ok
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.junit.Assert.fail
@@ -19,7 +18,7 @@ class RoutedHandlerTest {
     fun not_found() {
         val routes = routes()
 
-        val response = routes(get("/a/something"))
+        val response = routes(Request(Method.GET, "/a/something"))
 
         assertThat(response.status, equalTo(NOT_FOUND))
         assertThat(response.status.description, equalTo("Route not found"))
@@ -28,10 +27,10 @@ class RoutedHandlerTest {
     @Test
     fun method_not_allowed() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().body("matched") }
+            GET to "/a/{route}" by { _: Request -> Response(Status.OK).body("matched") }
         )
 
-        val response = routes(post("/a/something"))
+        val response = routes(Request(Method.POST, "/a/something"))
 
         assertThat(response.status, equalTo(METHOD_NOT_ALLOWED))
     }
@@ -39,10 +38,10 @@ class RoutedHandlerTest {
     @Test
     fun matches_uri_template_and_method() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().body("matched") }
+            GET to "/a/{route}" by { _: Request -> Response(Status.OK).body("matched") }
         )
 
-        val response = routes(get("/a/something"))
+        val response = routes(Request(Method.GET, "/a/something"))
 
         assertThat(response.bodyString(), equalTo("matched"))
     }
@@ -50,11 +49,11 @@ class RoutedHandlerTest {
     @Test
     fun matches_uses_first_match() {
         val routes = routes(
-            GET to "/a/{route}" by { _: Request -> ok().body("matched a") },
-            GET to "/a/{route}" by { _: Request -> ok().body("matched b") }
+            GET to "/a/{route}" by { _: Request -> Response(Status.OK).body("matched a") },
+            GET to "/a/{route}" by { _: Request -> Response(Status.OK).body("matched b") }
         )
 
-        val response = routes(get("/a/something"))
+        val response = routes(Request(Method.GET, "/a/something"))
 
         assertThat(response.bodyString(), equalTo("matched a"))
     }
@@ -62,45 +61,45 @@ class RoutedHandlerTest {
     @Test
     fun path_parameters_are_available_in_request() {
         val routes = routes(
-            GET to "/{a}/{b}/{c}" by { req: Request -> ok().body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
+            GET to "/{a}/{b}/{c}" by { req: Request -> Response(Status.OK).body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
         )
 
-        val response = routes(get("/x/y/z"))
+        val response = routes(Request(Method.GET, "/x/y/z"))
 
         assertThat(response.bodyString(), equalTo("matched x, y, z"))
     }
 
     @Test
     fun matches_uri_with_query() {
-        val routes = routes(GET to "/a/b" by { ok() })
+        val routes = routes(GET to "/a/b" by { Response(Status.OK) })
 
-        val response = routes(get("/a/b?foo=bar"))
+        val response = routes(Request(Method.GET, "/a/b?foo=bar"))
 
-        assertThat(response, equalTo(ok()))
+        assertThat(response, equalTo(Response(Status.OK)))
     }
 
     @Test
     fun matches_request_with_extra_path_parts(){
-        val routes = routes(GET to "/a" by { ok() })
+        val routes = routes(GET to "/a" by { Response(Status.OK) })
 
-        val response = routes(get("/a/b"))
+        val response = routes(Request(Method.GET, "/a/b"))
 
-        assertThat(response, equalTo(ok()))
+        assertThat(response, equalTo(Response(Status.OK)))
     }
 
     @Test
     fun can_stop_matching_extra_parts(){
-        val routes = routes(GET to "/a{$}" by { ok() })
+        val routes = routes(GET to "/a{$}" by { Response(Status.OK) })
 
-        val response = routes(get("/a/b"))
+        val response = routes(Request(Method.GET, "/a/b"))
 
-        assertThat(response, equalTo(notFound()))
+        assertThat(response, equalTo(Response(NOT_FOUND)))
     }
 
     @Test
     fun breaks_if_trying_to_access_path_parameters_without_header_present() {
         try {
-            get("/").path("abc")
+            Request(Method.GET, "/").path("abc")
             fail("Expected exception")
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("x-uri-template header not present in the request"))

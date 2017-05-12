@@ -3,7 +3,8 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
@@ -17,7 +18,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(get("?name=1"))
+        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, "?name=1"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
@@ -28,7 +29,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(get(""))
+        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
@@ -38,7 +39,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(get("?name=asdasd"))
+        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, "?name=asdasd"))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
@@ -48,14 +49,14 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { false }).filter(next)(get("?name=1"))
+        val response = ApiKey(param, { false }).filter(next)(Request(Method.GET, "?name=1"))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
 
     @org.junit.Test
     fun `no security is rather lax`() {
-        val response = (NoSecurity.filter({ Response(OK).body("hello") }))(get(""))
+        val response = (NoSecurity.filter({ Response(OK).body("hello") }))(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))

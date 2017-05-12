@@ -3,15 +3,10 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
-import org.http4k.core.Request.Companion.post
-import org.http4k.core.Request.Companion.put
 import org.http4k.core.Response
-import org.http4k.core.Response.Companion.movedPermanently
-import org.http4k.core.Response.Companion.movedTemporarily
-import org.http4k.core.Response.Companion.ok
-import org.http4k.core.Response.Companion.serverError
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.junit.Assert.fail
@@ -21,11 +16,11 @@ import org.junit.Test
 class ClientFiltersTest {
     val server = { request: Request ->
         when (request.uri.path) {
-            "/redirect" -> movedTemporarily(listOf("location" to "/ok"))
-            "/loop" -> movedTemporarily(listOf("location" to "/loop"))
-            "/absolute-target" -> if (request.uri.host == "example.com") ok().body("absolute") else serverError()
-            "/absolute-redirect" -> movedPermanently(listOf("location" to "http://example.com/absolute-target"))
-            else -> ok().let { if (request.query("foo") != null) it.body("with query") else it }
+            "/redirect" -> Response(Status.FOUND).header("location", "/ok")
+            "/loop" -> Response(Status.FOUND).header("location", "/loop")
+            "/absolute-target" -> if (request.uri.host == "example.com") Response(Status.OK).body("absolute") else Response(Status.INTERNAL_SERVER_ERROR)
+            "/absolute-redirect" -> Response(Status.MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
+            else -> Response(Status.OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
 
@@ -34,38 +29,38 @@ class ClientFiltersTest {
     @Test
     fun `does not follow redirect by default`() {
         val defaultClient = server
-        assertThat(defaultClient(get("/redirect")), equalTo(movedTemporarily(listOf("location" to "/ok"))))
+        assertThat(defaultClient(Request(Method.GET, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `follows redirect for temporary redirect response`() {
-        assertThat(followRedirects(get("/redirect")), equalTo(ok()))
+        assertThat(followRedirects(Request(Method.GET, "/redirect")), equalTo(Response(Status.OK)))
     }
 
     @Test
     fun `does not follow redirect for post`() {
-        assertThat(followRedirects(post("/redirect")), equalTo(movedTemporarily(listOf("location" to "/ok"))))
+        assertThat(followRedirects(Request(Method.POST, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `does not follow redirect for put`() {
-        assertThat(followRedirects(put("/redirect")), equalTo(movedTemporarily(listOf("location" to "/ok"))))
+        assertThat(followRedirects(Request(Method.PUT, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `supports absolute redirects`() {
-        assertThat(followRedirects(get("/absolute-redirect")), equalTo(ok().body("absolute")))
+        assertThat(followRedirects(Request(Method.GET, "/absolute-redirect")), equalTo(Response(Status.OK).body("absolute")))
     }
 
     @Test
     fun `discards query parameters in relative redirects`() {
-        assertThat(followRedirects(get("/redirect?foo=bar")), equalTo(ok()))
+        assertThat(followRedirects(Request(Method.GET, "/redirect?foo=bar")), equalTo(Response(Status.OK)))
     }
 
     @Test
     fun `prevents redirection loop after 10 redirects`() {
         try {
-            followRedirects(get("/loop"))
+            followRedirects(Request(Method.GET, "/loop"))
             fail("should have looped")
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("Too many redirection"))
@@ -92,9 +87,9 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
             Response(OK)
         }
-        assertThat(svc(get("")), equalTo(Response(OK)))
-        assertThat(start, equalTo(get("") to zipkinTraces))
-        assertThat(end, equalTo(Triple(get(""), Response(OK), zipkinTraces)))
+        assertThat(svc(Request(Method.GET, "")), equalTo(Response(OK)))
+        assertThat(start, equalTo(Request(Method.GET, "") to zipkinTraces))
+        assertThat(end, equalTo(Triple(Request(Method.GET, ""), Response(OK), zipkinTraces)))
     }
 
     @Test
@@ -103,6 +98,6 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), present())
             Response(OK)
         }
-        assertThat(svc(get("")), equalTo(Response(OK)))
+        assertThat(svc(Request(Method.GET, "")), equalTo(Response(OK)))
     }
 }

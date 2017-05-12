@@ -1,7 +1,8 @@
 package cookbook
 
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.template.HandlebarsTemplates
@@ -20,6 +21,6 @@ fun main(args: Array<String>) {
         Response(OK).body(renderedView)
     }
 
-    println(app(get("/someUrl")))
+    println(app(Request(Method.GET, "/someUrl")))
 }
 

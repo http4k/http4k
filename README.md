@@ -47,7 +47,8 @@ The following creates a simple endpoint, binds it to a Jetty server then starts,
 ```kotlin
 import org.http4k.client.ApacheClient
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
+import org.http4k.core.Method
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.server.asServer
@@ -58,7 +59,7 @@ fun main(args: Array<String>) {
 
     val jettyServer = app.asServer(Jetty(9000)).start()
 
-    val request = get("http://localhost:9000").query("name", "John Doe")
+    val request = Request(Method.GET, "http://localhost:9000").query("name", "John Doe")
 
     val client = ApacheClient()
 
@@ -91,7 +92,7 @@ flexibility in a language like Kotlin, since the conceptual barrier to service c
 need to launch a real HTTP container to exercise it:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
-val get = get("/").query("name", "John Doe")
+val get = Request(Method.GET, "/").query("name", "John Doe")
 val response = app(get)
 
 println(response.status)
@@ -153,14 +154,14 @@ val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCust
 To use the Lens, simply apply it to an HTTP message to extract the value, or alternatively pass the value if we are modifying (via copy) the message:
 
 ```kotlin
-val optionalHeader: Int? = optionalHeader(get(""))
-val customType: CustomType = requiredCustomQuery(get("?myCustomType=someValue"))
-val modifiedRequest: Request = requiredQuery(get(""), customType.value)
+val optionalHeader: Int? = optionalHeader(Request(Method.GET, ""))
+val customType: CustomType = requiredCustomQuery(Request(Method.GET, "?myCustomType=someValue"))
+val modifiedRequest: Request = requiredQuery(Request(Method.GET, ""), customType.value)
 ```
 
 Alternatively, multiple lenses can be used at once on a single HTTP message, which is useful for building both requests and responses without resorting to strings:
 ```kotlin
-val modifiedRequest: Request = get("").with(
+val modifiedRequest: Request = Request(Method.GET, "").with(
     requiredQuery to customType.value,
     optionalHeader to 123
 )
@@ -192,7 +193,7 @@ Supported HTTP client APIs are wrapped to provide an `HttpHandler` interface:
 
 ```kotlin
 val client = ApacheClient()
-val request = get("http://httpbin.org/get").query("location", "John Doe")
+val request = Request(Method.GET, "http://httpbin.org/get").query("location", "John Doe")
 val response = client(request)
 println(response.status)
 println(response.bodyString())
@@ -309,7 +310,7 @@ val app: HttpHandler = {
     Response(OK).body(renderedView)
 }
 
-println(app(get("/someUrl")))
+println(app(Request(Method.GET, "/someUrl")))
 ```
 
 ## Acknowledgments

@@ -4,8 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Request.Companion.get
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -29,7 +29,7 @@ class ServerFiltersTest {
             Response(OK)
         }
 
-        val received = ZipkinTraces(svc(Request.get("")))
+        val received = ZipkinTraces(svc(Request(Method.GET, "")))
 
         received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.parentSpanId!!, null))
     }
@@ -55,7 +55,7 @@ class ServerFiltersTest {
             Response(OK)
         }
 
-        val originalRequest = ZipkinTraces(originalTraces, get(""))
+        val originalRequest = ZipkinTraces(originalTraces, Request(Method.GET, ""))
         val actual = svc(originalRequest)
         assertThat(ZipkinTraces(actual), equalTo(originalTraces))
 
