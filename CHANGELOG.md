@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v1.5.0
 - Merge `org.http4k.core.Body` and `org.http4k.lens.Body`
+- Add Request/Response message parsers
 
 ### v1.4.0
 - Turn Body into ByteBuffer wrapper rather than typealias. That should make .toString() behave as most people would expected.
