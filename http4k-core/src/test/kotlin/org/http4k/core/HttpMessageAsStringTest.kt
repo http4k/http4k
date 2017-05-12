@@ -6,8 +6,9 @@ import org.http4k.core.Status.Companion.OK
 import org.junit.Test
 
 class HttpMessageAsStringTest {
+
     @Test
-    fun represents_request_to_string() {
+    fun `represents request as string`() {
         val request = Request(Method.GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one").header("bar", "two").body("body".toBody())
         assertThat(request.toString(), equalTo("""
@@ -19,7 +20,7 @@ class HttpMessageAsStringTest {
     }
 
     @Test
-    fun represents_response_to_string() {
+    fun `represents response as string`() {
         val request = Response(OK)
             .header("foo", "one").header("bar", "two").body("body".toBody())
         assertThat(request.toString(), equalTo("""
