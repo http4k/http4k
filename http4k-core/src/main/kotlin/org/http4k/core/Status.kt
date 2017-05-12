@@ -56,7 +56,7 @@ data class Status(val code: Int, val description: String) {
         val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.copy(description = "Client Timeout")
         val HTTP_VERSION_NOT_SUPPORTED = status(505, "HTTP Version Not Supported")
 
-        private fun status(code: Int, description: String) = Status(code, description)
+        fun status(code: Int, description: String) = Status(code, description)
     }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
