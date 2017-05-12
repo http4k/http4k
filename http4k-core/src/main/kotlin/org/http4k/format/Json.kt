@@ -40,6 +40,7 @@ interface Json<ROOT : NODE, NODE: Any> {
     fun number(value: BigInteger): NODE = value.asJsonValue()
     fun boolean(value: Boolean): NODE = value.asJsonValue()
     fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
+    fun obj(): ROOT = obj(emptyList())
     fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()
     fun <T : NODE> obj(vararg fields: Pair<String, T>): ROOT = obj(fields.asIterable())
     fun nullNode(): NODE {
