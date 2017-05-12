@@ -4,6 +4,7 @@ import org.http4k.contract.Root
 import org.http4k.contract.Route
 import org.http4k.contract.RouteModule
 import org.http4k.contract.SimpleJson
+import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -13,13 +14,12 @@ import org.http4k.core.with
 import org.http4k.filter.ReportRouteLatency
 import org.http4k.filter.ResponseFilters
 import org.http4k.format.Argo
-import org.http4k.lens.Body
 import org.http4k.lens.Path
 import org.http4k.lens.int
+import org.http4k.lens.string
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
 import java.time.Clock
-
 
 fun main(args: Array<String>) {
 

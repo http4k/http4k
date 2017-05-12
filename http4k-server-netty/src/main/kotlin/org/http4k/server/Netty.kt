@@ -62,7 +62,7 @@ private class RequestHandler(private val handler: HttpHandler) : ChannelInboundH
 
 private fun Response.asNettyResponse(): DefaultFullHttpResponse {
     val res = DefaultFullHttpResponse(HTTP_1_1, OK,
-        body?.let { wrappedBuffer(it.payload) } ?: wrappedBuffer("".toByteArray())
+        body?.let { (payload) -> wrappedBuffer(payload) } ?: wrappedBuffer("".toByteArray())
     )
     headers.forEach { (key, value) -> res.headers().set(key, value) }
     res.headers().set(CONTENT_LENGTH, res.content().readableBytes())

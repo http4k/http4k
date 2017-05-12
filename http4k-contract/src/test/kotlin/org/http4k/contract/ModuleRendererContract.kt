@@ -3,6 +3,7 @@ package org.http4k.contract
 import argo.jdom.JsonRootNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
@@ -13,7 +14,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Argo.json
 import org.http4k.format.Argo.parse
 import org.http4k.lens.BiDiBodyLens
-import org.http4k.lens.Body
 import org.http4k.lens.FormField
 import org.http4k.lens.FormValidator.Strict
 import org.http4k.lens.Header

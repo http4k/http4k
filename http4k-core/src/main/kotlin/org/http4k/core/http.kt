@@ -18,6 +18,8 @@ data class Body(val payload: ByteBuffer) {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
 
     override fun toString(): String = String(payload.array())
+
+    companion object
 }
 
 interface HttpMessage {

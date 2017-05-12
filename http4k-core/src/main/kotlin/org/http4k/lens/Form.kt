@@ -2,6 +2,7 @@ package org.http4k.lens
 
 import org.http4k.asByteBuffer
 import org.http4k.asString
+import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toUrlEncoded
@@ -33,7 +34,7 @@ enum class FormValidator : (WebForm) -> WebForm {
     };
 }
 
-fun Body.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
+fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
     root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED)
         .map(ByteBuffer::asString, String::asByteBuffer)
         .map(

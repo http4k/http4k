@@ -1,9 +1,10 @@
 package org.http4k.format
 
+import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Body
+import org.http4k.lens.string
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer
@@ -51,7 +52,7 @@ interface Json<ROOT : NODE, NODE: Any> {
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
     fun body(): BiDiBodyLensSpec<ByteBuffer, ROOT> = Body.string(APPLICATION_JSON).map({ parse(it) }, { compact(it) })
-    fun Body.json(): BiDiBodyLensSpec<ByteBuffer, ROOT> = body()
+    fun Body.Companion.json(): BiDiBodyLensSpec<ByteBuffer, ROOT> = body()
 }
 
 enum class JsonType {
