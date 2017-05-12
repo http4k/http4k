@@ -291,11 +291,8 @@ val objectUsingDirectApi = json.obj(
 
 println(
     Response(OK).with(
-        Body.json().required() to
-            listOf(
-                objectUsingDirectApi,
-                objectUsingExtensionFunctions
-            ).asJsonArray())
+        Body.json().required() to json.array(objectUsingDirectApi, objectUsingExtensionFunctions)
+    )
 )
 ```
 
