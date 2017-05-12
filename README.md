@@ -126,6 +126,14 @@ val latencyAndBasicAuth: HttpHandler = ServerFilters.BasicAuth("my realm", "user
 val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
+The `http4k-core` module comes with a set of handy Filters for application to both Server and Client `HttpHandlers`, covering common things like:
+* Request tracing headers (x-b3-traceid etc)
+* Basic Auth
+* Cookie handling
+* Debugging request and responses
+
+Check out the `org.http4k.filter` package for the exact list.
+
 ### Simple Routing
 Basic routing for mapping a URL pattern to an `HttpHandler`:
 ```kotlin
