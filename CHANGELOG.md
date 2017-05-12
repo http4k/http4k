@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.6.0
+- Added CachingFilters
+
 ### v1.5.0
 - Removed static factory methods for Request/Response. They were confusing/incomplete and users can easily recreate them via extension functions.
 - Merge `org.http4k.core.Body` and `org.http4k.lens.Body`.
