@@ -12,9 +12,10 @@ import java.nio.ByteBuffer
 /**
  * This is the contract for all JSON implementations
  */
-interface Json<ROOT : NODE, NODE: Any> {
+interface Json<ROOT : NODE, NODE : Any> {
     // Contract methods to be implemented
     fun ROOT.asPrettyJsonString(): String
+
     fun ROOT.asCompactJsonString(): String
     fun String.asJsonObject(): ROOT
     fun String?.asJsonValue(): NODE
@@ -33,6 +34,7 @@ interface Json<ROOT : NODE, NODE: Any> {
 
     // Utility methods - used when we don't know which implementation we are using
     fun string(value: String): NODE = value.asJsonValue()
+
     fun number(value: Int): NODE = value.asJsonValue()
     fun number(value: Double): NODE = value.asJsonValue()
     fun number(value: Long): NODE = value.asJsonValue()
@@ -47,6 +49,7 @@ interface Json<ROOT : NODE, NODE: Any> {
         val i: Int? = null
         return i.asJsonValue()
     }
+
     fun parse(s: String): ROOT = s.asJsonObject()
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
