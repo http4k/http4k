@@ -4,11 +4,17 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.junit.Before
 import org.junit.Test
 
@@ -29,7 +35,7 @@ class ServerFiltersTest {
             Response(OK)
         }
 
-        val received = ZipkinTraces(svc(Request(Method.GET, "")))
+        val received = ZipkinTraces(svc(Request(GET, "")))
 
         received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.parentSpanId!!, null))
     }
@@ -55,7 +61,7 @@ class ServerFiltersTest {
             Response(OK)
         }
 
-        val originalRequest = ZipkinTraces(originalTraces, Request(Method.GET, ""))
+        val originalRequest = ZipkinTraces(originalTraces, Request(GET, ""))
         val actual = svc(originalRequest)
         assertThat(ZipkinTraces(actual), equalTo(originalTraces))
 
@@ -66,4 +72,25 @@ class ServerFiltersTest {
         assertThat(end!!.second, equalTo(ZipkinTraces(originalTraces, Response(OK))))
         assertThat(end!!.third, equalTo(originalTraces))
     }
+
+    @Test
+    fun `GET - Cors headers are set correctly`() {
+        val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT)}
+        val response = handler(Request(GET, "/"))
+        assertThat(response.status, equalTo(I_M_A_TEAPOT))
+        assertThat(response.header("access-control-allow-origin"), equalTo("*"))
+        assertThat(response.header("access-control-allow-headers"), equalTo("content-type"))
+        assertThat(response.header("access-control-allow-methods"), equalTo("GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH"))
+    }
+
+    @Test
+    fun `OPTIONS - requests are intercepted and returned with expected headers`() {
+        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR)}
+        val response = handler(Request(OPTIONS, "/"))
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.header("access-control-allow-origin"), equalTo("foo, bar"))
+        assertThat(response.header("access-control-allow-headers"), equalTo("rita, sue, bob"))
+        assertThat(response.header("access-control-allow-methods"), equalTo("DELETE, POST"))
+    }
+
 }

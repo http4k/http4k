@@ -4,12 +4,42 @@ import org.http4k.Credentials
 import org.http4k.base64Decoded
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.with
+import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 
+data class CorsPolicy(val origins: List<String>,
+                      val headers: List<String>,
+                      val methods: List<Method>) {
+
+    companion object {
+        val UnsafeGlobalPermissive = CorsPolicy(listOf("*"), listOf("content-type"), Method.values().toList())
+    }
+}
+
 object ServerFilters {
+
+    object Cors {
+        private fun List<String>.joined() = this.joinToString(", ")
+
+        operator fun invoke(policy: CorsPolicy) = Filter {
+            next ->
+            {
+                val response = if (it.method == OPTIONS) Response(OK) else next(it)
+                response.with(
+                    Header.required("access-control-allow-origin") to policy.origins.joined(),
+                    Header.required("access-control-allow-headers") to policy.headers.joined(),
+                    Header.required("access-control-allow-methods") to policy.methods.map { it.name }.joined()
+                )
+            }
+        }
+    }
 
     object RequestTracing {
         operator fun invoke(
@@ -39,7 +69,7 @@ object ServerFilters {
             {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
-                    Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+                    Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
                 } else {
                     val start = System.currentTimeMillis()
                     val response = next(it)

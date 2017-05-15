@@ -130,6 +130,7 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 * Request tracing headers (x-b3-traceid etc)
 * Basic Auth
 * Cache Control
+* CORS
 * Cookie handling
 * Debugging request and responses
 
