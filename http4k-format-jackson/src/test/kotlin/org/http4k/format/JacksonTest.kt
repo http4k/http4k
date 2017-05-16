@@ -37,4 +37,4 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
 
-class GenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Jackson)
+class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Jackson)

@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.9.0
+- Added `GenerateDataClasses` so you can generate Kotlin data classes from JSON messages.
+
 ### v1.8.0
 - Added CORs support
 

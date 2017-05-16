@@ -1,8 +1,8 @@
 package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.containsSubstring
-import org.http4k.core.Method
+import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -33,18 +33,29 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
             ),
             "array" to j.array(listOf(
                 j.string(""),
-                j.number(123)
+                j.number(123),
+                j.obj(
+                    "nullNode" to j.nullNode(),
+                    "long" to j.number(10L)
+                )
             ))
         )
         val os = ByteArrayOutputStream()
 
-        val handler = GenerateDataClasses(j, PrintStream(os)).then { Response(OK).with(j.body().required() to input) }
+        val handler = GenerateDataClasses(j, PrintStream(os), { 1 }).then { Response(OK).with(j.body().required() to input) }
 
-        handler(Request(Method.GET, "/"))
+        handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
-        assertThat(actual, containsSubstring("""data class Empty()
-data class NonEmpty(val double: Number, val long: Number)
+        assertThat(actual, equalTo("""// result generated from /bob
+
+data class Array1(val nullNode: Any, val long: Number)
+
 data class Base(val string: String, val double: Number, val long: Number, val boolean: Boolean, val bigDec: Number, val nullNode: Any, val int: Number, val empty: Empty, val nonEmpty: NonEmpty, val array: List<String>)
+
+data class Empty()
+
+data class NonEmpty(val double: Number, val long: Number)
+
 """))
     }
 }
