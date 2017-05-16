@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -93,4 +94,22 @@ class ServerFiltersTest {
         assertThat(response.header("access-control-allow-methods"), equalTo("DELETE, POST"))
     }
 
+    @Test
+    fun `copy headers from request to response`() {
+        val handler = ServerFilters.CopyHeaders("foo", "bar").then { Response(OK) }
+
+        val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
+
+        assertThat(response.header("foo"), equalTo("one"))
+        assertThat(response.header("bar"), equalTo("two"))
+    }
+
+    @Test
+    fun `copy only headers specified in filter`(){
+        val handler = ServerFilters.CopyHeaders("a", "b").then { Response(OK) }
+
+        val response = handler(Request(GET, "/").header("b", "2").header("c", "3"))
+
+        assertThat(response.headers, equalTo(listOf("b" to "2") as Headers))
+    }
 }

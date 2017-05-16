@@ -74,7 +74,6 @@ object ServerFilters {
                     val start = System.currentTimeMillis()
                     val response = next(it)
                     val latency = System.currentTimeMillis() - start
-                    println("I took $latency ms")
                     response
                 }
             }
@@ -95,6 +94,18 @@ object ServerFilters {
                 next(it)
             } catch (lensFailure: LensFailure) {
                 Response(lensFailure.status)
+            }
+        }
+    }
+
+    object CopyHeaders {
+        operator fun invoke(vararg headers: String): Filter = Filter {
+            next ->
+            {
+                request ->
+                val response = next(request)
+                headers.fold(response,
+                    { memo, name -> request.header(name)?.let { memo.header(name, it) } ?: memo })
             }
         }
     }
