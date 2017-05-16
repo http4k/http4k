@@ -21,9 +21,9 @@ class DebuggingFiltersTest {
         val resp = Response(OK)
         PrintRequestAndResponse(PrintStream(os))
             .then(resp.toHttpHandler())(req)
-        val output = String(os.toByteArray())
-        assertThat(output, containsSubstring(req.toString()))
-        assertThat(String(os.toByteArray()), containsSubstring(resp.toString()))
+        val actual = String(os.toByteArray())
+        assertThat(actual, containsSubstring(req.toString()))
+        assertThat(actual, containsSubstring(resp.toString()))
     }
 
 }

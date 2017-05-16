@@ -12,6 +12,6 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header", StringParam,
     LensSet { name, values, target -> values.fold(target, { m, next -> m.header(name, next) }) }
 ) {
     object Common {
-        val CONTENT_TYPE = map(::ContentType, { it.value }).optional("content-type")
+        val CONTENT_TYPE = map({ ContentType(it.takeWhile { it != ';' }) }, { it.value }).optional("content-type")
     }
 }
