@@ -2,7 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.Credentials
+import org.http4k.core.Credentials
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response

@@ -1,7 +1,7 @@
 package org.http4k.filter
 
-import org.http4k.Credentials
 import org.http4k.base64Decoded
+import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
