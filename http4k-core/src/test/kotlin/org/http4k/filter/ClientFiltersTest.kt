@@ -3,11 +3,14 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.junit.Assert.fail
 import org.junit.Before
@@ -29,38 +32,38 @@ class ClientFiltersTest {
     @Test
     fun `does not follow redirect by default`() {
         val defaultClient = server
-        assertThat(defaultClient(Request(Method.GET, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+        assertThat(defaultClient(Request(GET, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `follows redirect for temporary redirect response`() {
-        assertThat(followRedirects(Request(Method.GET, "/redirect")), equalTo(Response(Status.OK)))
+        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(Status.OK)))
     }
 
     @Test
     fun `does not follow redirect for post`() {
-        assertThat(followRedirects(Request(Method.POST, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `does not follow redirect for put`() {
-        assertThat(followRedirects(Request(Method.PUT, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
     }
 
     @Test
     fun `supports absolute redirects`() {
-        assertThat(followRedirects(Request(Method.GET, "/absolute-redirect")), equalTo(Response(Status.OK).body("absolute")))
+        assertThat(followRedirects(Request(GET, "/absolute-redirect")), equalTo(Response(Status.OK).body("absolute")))
     }
 
     @Test
     fun `discards query parameters in relative redirects`() {
-        assertThat(followRedirects(Request(Method.GET, "/redirect?foo=bar")), equalTo(Response(Status.OK)))
+        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(Status.OK)))
     }
 
     @Test
     fun `prevents redirection loop after 10 redirects`() {
         try {
-            followRedirects(Request(Method.GET, "/loop"))
+            followRedirects(Request(GET, "/loop"))
             fail("should have looped")
         } catch (e: IllegalStateException) {
             assertThat(e.message, equalTo("Too many redirection"))
@@ -87,9 +90,9 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
             Response(OK)
         }
-        assertThat(svc(Request(Method.GET, "")), equalTo(Response(OK)))
-        assertThat(start, equalTo(Request(Method.GET, "") to zipkinTraces))
-        assertThat(end, equalTo(Triple(Request(Method.GET, ""), Response(OK), zipkinTraces)))
+        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
+        assertThat(start, equalTo(Request(GET, "") to zipkinTraces))
+        assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), zipkinTraces)))
     }
 
     @Test
@@ -98,6 +101,14 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), present())
             Response(OK)
         }
-        assertThat(svc(Request(Method.GET, "")), equalTo(Response(OK)))
+        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
     }
+
+    @Test
+    fun `set host on client`() {
+        val aasdasd = "http://localhost:8080/asdlkjasdlk"
+        val handler = ClientFilters.SetHostFrom(Uri.of(aasdasd)).then { Response(OK).body(it.uri.toString()) }
+        assertThat(handler(Request(GET, "/loop")).bodyString(), equalTo("//localhost/loop"))
+    }
+
 }

@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.10.0
+- Moved `Credentials` to `org.http4k.core` package.
+- Add various filters, including `SetHostFrom` and `CatchAll`.
+
 ### v1.9.0
 - Added `GenerateDataClasses` so you can generate Kotlin data classes from JSON messages.
 

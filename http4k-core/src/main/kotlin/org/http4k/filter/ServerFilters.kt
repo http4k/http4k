@@ -8,11 +8,14 @@ import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
+import java.io.PrintWriter
+import java.io.StringWriter
 
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
@@ -70,12 +73,7 @@ object ServerFilters {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
                     Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
-                } else {
-                    val start = System.currentTimeMillis()
-                    val response = next(it)
-                    val latency = System.currentTimeMillis() - start
-                    response
-                }
+                } else next(it)
             }
         }
 
@@ -96,6 +94,22 @@ object ServerFilters {
                 Response(lensFailure.status)
             }
         }
+    }
+
+    object CatchAll {
+        operator fun invoke(errorStatus: Status = Status.INTERNAL_SERVER_ERROR): Filter = Filter {
+            next ->
+            {
+                try {
+                    next(it)
+                } catch (e: Exception) {
+                    val sw = StringWriter()
+                    e.printStackTrace(PrintWriter(sw))
+                    Response(errorStatus).body(sw.toString())
+                }
+            }
+        }
+
     }
 
     object CopyHeaders {

@@ -18,6 +18,8 @@ import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.junit.Before
 import org.junit.Test
+import java.io.PrintWriter
+import java.io.StringWriter
 
 class ServerFiltersTest {
 
@@ -92,6 +94,20 @@ class ServerFiltersTest {
         assertThat(response.header("access-control-allow-origin"), equalTo("foo, bar"))
         assertThat(response.header("access-control-allow-headers"), equalTo("rita, sue, bob"))
         assertThat(response.header("access-control-allow-methods"), equalTo("DELETE, POST"))
+    }
+
+    @Test
+    fun `catch all exceptions`() {
+        val e = RuntimeException("boom!")
+        val handler = ServerFilters.CatchAll(I_M_A_TEAPOT).then { throw e }
+
+        val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
+
+        val sw = StringWriter()
+        e.printStackTrace(PrintWriter(sw))
+
+        assertThat(response.status, equalTo(I_M_A_TEAPOT))
+        assertThat(response.bodyString(), equalTo(sw.toString()))
     }
 
     @Test

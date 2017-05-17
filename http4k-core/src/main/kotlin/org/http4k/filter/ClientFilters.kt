@@ -34,6 +34,13 @@ object ClientFilters {
         }
     }
 
+    object SetHostFrom {
+        operator fun invoke(uri: Uri): Filter = Filter {
+            next ->
+            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))) }
+        }
+    }
+
     object BasicAuth {
         operator fun invoke(provider: () -> Credentials): Filter = Filter {
             next ->
