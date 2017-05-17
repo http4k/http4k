@@ -106,9 +106,8 @@ class ClientFiltersTest {
 
     @Test
     fun `set host on client`() {
-        val aasdasd = "http://localhost:8080/asdlkjasdlk"
-        val handler = ClientFilters.SetHostFrom(Uri.of(aasdasd)).then { Response(OK).body(it.uri.toString()) }
-        assertThat(handler(Request(GET, "/loop")).bodyString(), equalTo("//localhost/loop"))
+        val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:8080")).then { Response(OK).body(it.uri.toString()) }
+        assertThat(handler(Request(GET, "/loop")).bodyString(), equalTo("http://localhost:8080/loop"))
     }
 
 }
