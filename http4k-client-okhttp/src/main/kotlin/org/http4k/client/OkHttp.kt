@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import java.nio.ByteBuffer.wrap
 
-class OkHttp(private val client: OkHttpClient = OkHttpClient()) : HttpHandler {
+class OkHttp(private val client: OkHttpClient = defaultOkHttpClient) : HttpHandler {
 
     private fun Request.asOkHttp(): okhttp3.Request =
         headers.fold(okhttp3.Request.Builder()
@@ -33,4 +33,10 @@ class OkHttp(private val client: OkHttpClient = OkHttpClient()) : HttpHandler {
     }
 
     override fun invoke(request: Request): Response = client.newCall(request.asOkHttp()).execute().asHttp4k()
+
+    companion object {
+        val defaultOkHttpClient = OkHttpClient.Builder()
+            .followRedirects(false)
+            .build()
+    }
 }

@@ -24,7 +24,7 @@ The principles of the toolkit are:
 of services without HTTP container being required.
 * **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * *Clients:* [ApacheClient](#user-content-client-modules)
+   * *Clients:* [Apache, OkHttp](#user-content-client-modules)
    * *Servers:* [Jetty, Netty](#user-content-server-modules)
    * *Contracts:* [Typesafe, auto-validating, self-documenting HTTP services](#user-content-contracts-module)
    * *Message formats:* [Argo JSON, Gson JSON, Jackson JSON](#user-content-message-format-modules)
@@ -202,7 +202,8 @@ Server modules provide extension functions to `HttpHandler` to mount them into t
 ```
 
 ## Client Modules
-**Gradle:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.11.0"```
+**Gradle (Apache):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.11.0"```
+**Gradle (OkHttp):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "1.11.0"```
 
 Supported HTTP client APIs are wrapped to provide an `HttpHandler` interface:
 
@@ -262,6 +263,8 @@ val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
     .withRoute(serverRoute)
     .toHttpHandler()
 ```
+
+For a more extended example, see the: [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
 
 ## Message Format Modules
 **Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "1.11.0"```
