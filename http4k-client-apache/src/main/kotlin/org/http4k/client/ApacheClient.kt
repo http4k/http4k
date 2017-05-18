@@ -26,7 +26,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toUtterlyIdleResponse()
 
     private fun CloseableHttpResponse.toUtterlyIdleResponse(): Response =
-        allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity.toTarget())) {
+        allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity?.toTarget())) {
             memo, (first, second) ->
             memo.header(first, second)
         }
@@ -36,8 +36,8 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
             init {
                 val request = this@toApacheRequest
                 uri = URI(request.uri.toString())
-                entity = ByteArrayEntity(request.body.toString().toByteArray())
-                request.headers.filter { it.first != "content-length" }.map { addHeader(it.first, it.second) }
+                entity = ByteArrayEntity(request.bodyString().toByteArray())
+                request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
             }
 
             override fun getMethod(): String = this@toApacheRequest.method.name
