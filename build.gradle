@@ -114,7 +114,7 @@ allprojects {
         key = System.getenv('BINTRAY_KEY')
 
         publications = ['mavenJava']
-        dryRun = false
+        dryRun = true
         publish = true
         pkg {
             repo = 'maven'
@@ -172,6 +172,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 dependencies {
     provided kotlin_lib
 
+    provided project(":http4k-aws")
     provided project(":http4k-core")
     provided project(":http4k-client-apache")
     provided project(":http4k-client-okhttp")

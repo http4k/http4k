@@ -1,4 +1,5 @@
 rootProject.name = 'http4k'
+include 'http4k-aws'
 include 'http4k-core'
 include 'http4k-client-apache'
 include 'http4k-client-okhttp'
