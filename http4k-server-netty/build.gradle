@@ -1,4 +1,4 @@
-description = 'Reekwest HTTP Server built on top of Netty'
+description = 'Http4k HTTP Server built on top of Netty'
 
 dependencies {
     provided kotlin_lib

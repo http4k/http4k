@@ -1,4 +1,4 @@
-description = 'Reekwest Argo JSON support'
+description = 'Http4k Argo JSON support'
 
 dependencies {
     provided kotlin_lib

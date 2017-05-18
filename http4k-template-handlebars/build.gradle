@@ -1,4 +1,4 @@
-description = 'Reekwest Handlebars templating support'
+description = 'Http4k Handlebars templating support'
 
 dependencies {
     provided kotlin_lib

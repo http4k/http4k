@@ -21,7 +21,7 @@ import org.http4k.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 
-class ApacheClient(val client: CloseableHttpClient = defaultApacheHttpClient) : HttpHandler {
+class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient) : HttpHandler {
 
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toUtterlyIdleResponse()
 

@@ -1,4 +1,4 @@
-description = 'Reekwest HTTP Client built on top of apache-httpclient'
+description = 'Http4k HTTP Client built on top of apache-httpclient'
 
 ext{
     ext.apache_http_version = '4.5.3'
@@ -10,6 +10,8 @@ dependencies {
     compile "org.apache.httpcomponents:httpclient:$apache_http_version"
 
     provided project(":http4k-core")
+
+    testCompile project(":http4k-server-jetty")
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
 
