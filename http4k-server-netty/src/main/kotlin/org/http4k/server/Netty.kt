@@ -32,7 +32,10 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import java.nio.ByteBuffer
 
-private class RequestHandler(private val handler: HttpHandler) : ChannelInboundHandlerAdapter() {
+/**
+ * Exposed to allow for insertion into a customised Netty server instance
+ */
+class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHandlerAdapter() {
 
     override fun channelRead(ctx: ChannelHandlerContext, request: Any) {
         if (request is DefaultHttpRequest) {
@@ -58,28 +61,27 @@ private class RequestHandler(private val handler: HttpHandler) : ChannelInboundH
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
         ctx.close()
     }
-}
 
-private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-    val res = DefaultFullHttpResponse(HTTP_1_1, OK,
-        body?.let { (payload) -> wrappedBuffer(payload) } ?: wrappedBuffer("".toByteArray())
-    )
-    headers.forEach { (key, value) -> res.headers().set(key, value) }
-    res.headers().set(CONTENT_LENGTH, res.content().readableBytes())
-    return res
-}
+    private fun Response.asNettyResponse(): DefaultFullHttpResponse {
+        val res = DefaultFullHttpResponse(HTTP_1_1, OK,
+            body?.let { (payload) -> wrappedBuffer(payload) } ?: wrappedBuffer("".toByteArray())
+        )
+        headers.forEach { (key, value) -> res.headers().set(key, value) }
+        res.headers().set(CONTENT_LENGTH, res.content().readableBytes())
+        return res
+    }
 
-private fun DefaultHttpRequest.asRequest(): Request =
-    // FIXME - if the method is unknown
-    headers().fold(Request(Method.valueOf(method().name()), Uri.Companion.of(uri()))) {
-        memo, next ->
-        memo.header(next.key, next.value)
-    }.body(
-        when (this) {
-            is DefaultFullHttpRequest -> Body(ByteBuffer.wrap(this.content().array()))
-            else -> null
-        }
-    )
+    private fun DefaultHttpRequest.asRequest(): Request =
+        headers().fold(Request(Method.valueOf(method().name()), Uri.Companion.of(uri()))) {
+            memo, next ->
+            memo.header(next.key, next.value)
+        }.body(
+            when (this) {
+                is DefaultFullHttpRequest -> Body(ByteBuffer.wrap(this.content().array()))
+                else -> null
+            }
+        )
+}
 
 data class Netty(val port: Int = 8000) : ServerConfig {
     override fun toServer(handler: HttpHandler): Http4kServer {
@@ -95,7 +97,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                     .childHandler(object : ChannelInitializer<SocketChannel>() {
                         public override fun initChannel(ch: SocketChannel) {
                             ch.pipeline().addLast("codec", HttpServerCodec())
-                            ch.pipeline().addLast("handler", RequestHandler(handler))
+                            ch.pipeline().addLast("handler", Http4kChannelHandler(handler))
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
