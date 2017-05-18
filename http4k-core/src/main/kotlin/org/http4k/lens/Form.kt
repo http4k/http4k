@@ -6,6 +6,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toUrlEncoded
+import org.http4k.lens.ContentNegotiation.Strict
 import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
@@ -35,7 +36,7 @@ enum class FormValidator : (WebForm) -> WebForm {
 }
 
 fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
-    root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, true)
+    root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, Strict)
         .map(ByteBuffer::asString, String::asByteBuffer)
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },

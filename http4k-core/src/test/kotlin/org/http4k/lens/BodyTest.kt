@@ -24,11 +24,13 @@ class BodyTest {
 
     @Test
     fun `rejects invalid or missing content type when strict`() {
-        val strictBody = Body.string(TEXT_PLAIN, enforceContentType = true).required()
+        val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).required()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
-        assertThat({ strictBody(emptyRequest
-            .header("content-type", "text/bob")
-            .body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
+        assertThat({
+            strictBody(emptyRequest
+                .header("content-type", "text/bob")
+                .body("some value"))
+        }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
     }
 
     @Test

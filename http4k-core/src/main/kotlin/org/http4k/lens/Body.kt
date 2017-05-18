@@ -91,21 +91,35 @@ open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
     }
 }
 
-internal fun root(metas: List<Meta>, acceptedContentType: ContentType, enforceContentType: Boolean) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
+internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
     LensGet { _, target ->
-        val actualContentType = CONTENT_TYPE(target)
-        if (enforceContentType && actualContentType != acceptedContentType ||
-            (actualContentType != null && actualContentType != acceptedContentType)) {
-            throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
-        }
+        contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
         target.body?.let { listOf(it.payload) } ?: emptyList()
     },
-    LensSet { _, values, target -> values.fold(target) { a, b -> a.body(org.http4k.core.Body(b)) }.with(CONTENT_TYPE to acceptedContentType) }
+    LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE to acceptedContentType) }
 )
 
+/**
+ * Modes for determining if a passed content type is acceptable.
+ */
+enum class ContentNegotiation {
+    Strict {
+        override fun invoke(expected: ContentType, actual: ContentType?) {
+            if (actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+        }
+    },
+    NonStrict {
+        override fun invoke(expected: ContentType, actual: ContentType?) {
+            if (actual != null && actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+        }
+    };
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, enforceContentType: Boolean = false): BiDiBodyLensSpec<ByteBuffer, String>
-    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, enforceContentType).map(ByteBuffer::asString, String::asByteBuffer)
+    @Throws(LensFailure::class)
+    abstract operator fun invoke(expected: ContentType, actual: ContentType?)
+}
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, enforceContentType: Boolean = false): BiDiBodyLensSpec<ByteBuffer, ByteBuffer>
-    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, enforceContentType)
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.NonStrict): BiDiBodyLensSpec<ByteBuffer, String>
+    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
+
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.NonStrict): BiDiBodyLensSpec<ByteBuffer, ByteBuffer>
+    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
