@@ -23,7 +23,7 @@ class AwsClientTest {
 
     val audit = AuditHandler()
 
-    private val client = AwsHttpClient(clock, scope, credentials).then(audit)
+    private val client = AwsHttpClient(scope, credentials, clock).then(audit)
 
     @Test
     fun `adds authorization header`() {

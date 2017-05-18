@@ -15,9 +15,9 @@ class AwsCredentials(val accessKey: String, val secretKey: String)
 
 data class AwsCredentialScope(val region: String, val service: String)
 
-class AwsHttpClient(private val clock: Clock,
-                    private val scope: AwsCredentialScope,
-                    private val credentials: AwsCredentials) : Filter {
+class AwsHttpClient(private val scope: AwsCredentialScope,
+                    private val credentials: AwsCredentials,
+                    private val clock: Clock = Clock.systemDefaultZone()) : Filter {
     companion object {
         val ALGORITHM = "AWS4-HMAC-SHA256"
     }
