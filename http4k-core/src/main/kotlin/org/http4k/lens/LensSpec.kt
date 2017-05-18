@@ -20,6 +20,7 @@ class LensGet<in IN, MID, out OUT> private constructor(private val rootFn: (Stri
 
 class LensSet<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
     operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
+
     fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet(rootFn, { value: NEXT -> fn(nextFn(value)) })
 
     companion object {
@@ -27,15 +28,25 @@ class LensSet<IN, MID, in OUT> private constructor(private val rootFn: (String, 
     }
 }
 
+/**
+ * Represents a uni-directional extraction of a list of entities from a target.
+ */
 interface MultiLensSpec<in IN, OUT> {
     fun defaulted(name: String, default: List<OUT>, description: String? = null): Lens<IN, List<OUT>>
     fun optional(name: String, description: String? = null): Lens<IN, List<OUT>?>
     fun required(name: String, description: String? = null): Lens<IN, List<OUT>>
 }
 
+/**
+ * Represents a uni-directional extraction of an entity from a target.
+ */
 open class LensSpec<IN, MID, OUT>(protected val location: String,
                                   protected val paramMeta: ParamMeta,
                                   internal val get: LensGet<IN, MID, OUT>) {
+    /**
+     * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
+     * used to extract the final type from a target.
+     */
     fun <NEXT> map(nextIn: (OUT) -> NEXT) = mapWithNewMeta(nextIn, paramMeta)
 
     internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta) = LensSpec(location, paramMeta, get.map(nextIn))
@@ -79,17 +90,27 @@ open class LensSpec<IN, MID, OUT>(protected val location: String,
     }
 }
 
+/**
+ * Represents a bi-directional extraction of a list of entities from a target, or an insertion into a target.
+ */
 interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
     override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>>
     override fun optional(name: String, description: String?): BiDiLens<IN, List<OUT>?>
     override fun required(name: String, description: String?): BiDiLens<IN, List<OUT>>
 }
 
+/**
+ * Represents a bi-directional extraction of an entity from a target, or an insertion into a target.
+ */
 open class BiDiLensSpec<IN, MID, OUT>(location: String,
                                       paramMeta: ParamMeta,
                                       get: LensGet<IN, MID, OUT>,
                                       private val set: LensSet<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, paramMeta, get) {
 
+    /**
+     * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
+     * used to extract or insert the final type from/into a target.
+     */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = mapWithNewMeta(nextIn, nextOut, paramMeta)
 
     internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))

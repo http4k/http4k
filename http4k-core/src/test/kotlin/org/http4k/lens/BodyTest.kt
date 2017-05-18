@@ -16,16 +16,19 @@ class BodyTest {
     private val emptyRequest = Request(Method.GET, "")
 
     @Test
-    fun `can get string body`() {
-        val request = emptyRequest.header("Content-type", TEXT_PLAIN.value).body("some value")
-        assertThat(Body.string(TEXT_PLAIN).required()(request), equalTo("some value"))
+    fun `can get string body when lax`() {
+        val laxContentType = Body.string(TEXT_PLAIN).required()
+        assertThat(laxContentType(emptyRequest.body("some value")), equalTo("some value"))
+        assertThat(laxContentType(emptyRequest.header("Content-type", TEXT_PLAIN.value).body("some value")), equalTo("some value"))
     }
 
     @Test
-    fun `rejects invalid or missing content type`() {
-        val request = emptyRequest.body("some value")
-        assertThat({ Body.string(TEXT_PLAIN).required()(request) },
-            throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
+    fun `rejects invalid or missing content type when strict`() {
+        val strictBody = Body.string(TEXT_PLAIN, enforceContentType = true).required()
+        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
+        assertThat({ strictBody(emptyRequest
+            .header("content-type", "text/bob")
+            .body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
     }
 
     @Test

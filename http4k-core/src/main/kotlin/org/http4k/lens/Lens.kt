@@ -2,6 +2,9 @@ package org.http4k.lens
 
 data class Meta(val required: Boolean, val location: String, val paramMeta: ParamMeta, val name: String, val description: String? = null)
 
+/**
+ * A Lens provides the uni-directional extraction of an entity from a target.
+ */
 open class Lens<in IN, out FINAL>(val meta: Meta,
                                   private val get: (IN) -> FINAL) : (IN) -> FINAL, Iterable<Meta> {
     override fun iterator(): Iterator<Meta> = listOf(meta).iterator()
@@ -22,6 +25,10 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
     }
 }
 
+/**
+ * A BiDiLens provides the bi-directional extraction of an entity from a target, or the insertion of an entity
+ * into a target.
+ */
 class BiDiLens<in IN, FINAL>(meta: Meta,
                              get: (IN) -> FINAL,
                              private val set: (FINAL, IN) -> IN) : Lens<IN, FINAL>(meta, get) {

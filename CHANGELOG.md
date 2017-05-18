@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.11.0
+- Added option for Body content-negotiation to be strict or non-strict (the default). Always be strict in what you send, relaxed in what you will accept. :)
+
 ### v1.10.0
 - Moved `Credentials` to `org.http4k.core` package.
 - Add various filters, including `SetHostFrom` and `CatchAll`.

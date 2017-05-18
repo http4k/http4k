@@ -69,6 +69,11 @@ fun main(args: Array<String>) {
 }
 ```
 
+# See it in action:
+* [Cookbook example code](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook)
+* [Todo backend (simple version)](https://github.com/http4k/http4k-todo-backend)
+* [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
+
 # Modules
 
 ## Core Module

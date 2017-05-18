@@ -11,6 +11,9 @@ import org.http4k.template.ViewModel
 // this view has the default template path of: cookbook/Person.hbs, although that is overridable
 data class Person(val name: String, val age: Int) : ViewModel
 
+/**
+ * Example showing how to use the Templating modules - in this case Handlebars
+ */
 fun main(args: Array<String>) {
 
     val renderer = HandlebarsTemplates().HotReload("src/test/resources")

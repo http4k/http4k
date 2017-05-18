@@ -8,6 +8,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
+/**
+ * This example shows how to convert an HttpHandler to a
+ */
 fun main(args: Array<String>) {
 
     val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }

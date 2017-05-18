@@ -35,7 +35,7 @@ enum class FormValidator : (WebForm) -> WebForm {
 }
 
 fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
-    root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED)
+    root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, true)
         .map(ByteBuffer::asString, String::asByteBuffer)
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
