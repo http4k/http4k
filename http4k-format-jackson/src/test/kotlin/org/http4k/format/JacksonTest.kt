@@ -27,7 +27,7 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 
     @Test
     fun `roundtrip arbitary object to and from object`() {
-        val body = Body.auto<ArbObject>()
+        val body = Body.auto<ArbObject>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 

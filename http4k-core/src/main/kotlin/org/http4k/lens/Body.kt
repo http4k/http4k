@@ -81,6 +81,9 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, get.map(nextIn), set.map(nextOut))
 
+    /**
+     * Create a lens for this Spec
+     */
     override fun toLens(): BiDiBodyLens<OUT> {
         val getLens = get("")
         val setLens = set("")
