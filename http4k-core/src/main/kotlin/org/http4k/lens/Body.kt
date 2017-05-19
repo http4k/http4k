@@ -49,6 +49,9 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
     @Suppress("UNCHECKED_CAST")
     operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
 
+    /**
+     * Bind this Lens to a value, so we can set it into a target
+     */
     infix fun <R : HttpMessage> of(value: FINAL): (R) -> R = { invoke(value, it) }
 }
 
@@ -56,6 +59,9 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
  * Represents a uni-directional extraction of an entity from a target Body.
  */
 open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, ByteBuffer, OUT>) {
+    /**
+     * Create a lens for this Spec
+     */
     open fun toLens(): BodyLens<OUT> {
         val getLens = get("")
         return BodyLens(metas, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
