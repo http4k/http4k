@@ -17,14 +17,14 @@ class BodyTest {
 
     @Test
     fun `can get string body when lax`() {
-        val laxContentType = Body.string(TEXT_PLAIN).required()
+        val laxContentType = Body.string(TEXT_PLAIN).toLens()
         assertThat(laxContentType(emptyRequest.body("some value")), equalTo("some value"))
         assertThat(laxContentType(emptyRequest.header("Content-type", TEXT_PLAIN.value).body("some value")), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid or missing content type when strict`() {
-        val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).required()
+        val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
         assertThat({
             strictBody(emptyRequest
@@ -35,7 +35,7 @@ class BodyTest {
 
     @Test
     fun `sets value on request`() {
-        val body = Body.string(TEXT_PLAIN).required()
+        val body = Body.string(TEXT_PLAIN).toLens()
         val withBody = body("hello", emptyRequest)
         assertThat(body(withBody), equalTo("hello"))
         assertThat(CONTENT_TYPE(withBody), equalTo(TEXT_PLAIN))
@@ -43,7 +43,7 @@ class BodyTest {
 
     @Test
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType, { it.value }).required()
+        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType, { it.value }).toLens()
 
         val custom = MyCustomBodyType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)
@@ -55,7 +55,7 @@ class BodyTest {
 
     @Test
     fun `can create a one way custom Body type`() {
-        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType).required()
+        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType).toLens()
         assertThat(customBody(emptyRequest
             .header("Content-type", TEXT_PLAIN.value)
             .body("hello world!")), equalTo(MyCustomBodyType("hello world!")))

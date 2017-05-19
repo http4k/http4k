@@ -31,7 +31,7 @@ class ResponseFiltersTest {
         val filter = ResponseFilters.ReportRouteLatency(systemUTC(), { identity, _ -> called = identity })
         val handler = filter.then { Response(OK) }
 
-        handler(Request(Method.GET, "").with(X_REEKWEST_ROUTE_IDENTITY to "GET:/path/dir/someFile.html"))
+        handler(Request(Method.GET, "").with(X_REEKWEST_ROUTE_IDENTITY of "GET:/path/dir/someFile.html"))
 
         assertThat(called, equalTo("GET._path_dir_someFile_html.2xx.200"))
     }

@@ -42,7 +42,7 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
         )
         val os = ByteArrayOutputStream()
 
-        val handler = GenerateDataClasses(j, PrintStream(os), { 1 }).then { Response(OK).with(j.body().toLens() to input) }
+        val handler = GenerateDataClasses(j, PrintStream(os), { 1 }).then { Response(OK).with(j.body().toLens() of input) }
 
         handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())

@@ -19,9 +19,9 @@ class HttpMessageTest {
     @Test
     fun `can bind many objects to a request`() {
         val populated = emptyRequest.with(
-            Body.string(TEXT_PLAIN).required() to "the body",
-            Header.int().required("intHeader") to 123,
-            Query.boolean().required("boolean") to true
+            Body.string(TEXT_PLAIN).toLens() of "the body",
+            Header.int().required("intHeader") of 123,
+            Query.boolean().required("boolean") of true
         )
 
         assertThat(populated.bodyString(), equalTo("the body"))
@@ -33,8 +33,8 @@ class HttpMessageTest {
     @Test
     fun `can bind many objects to a response`() {
         val populated = Response(OK).with(
-            Body.string(TEXT_PLAIN).required() to "the body",
-            Header.int().required("intHeader") to 123
+            Body.string(TEXT_PLAIN).toLens() of "the body",
+            Header.int().required("intHeader") of 123
         )
 
         assertThat(populated.bodyString(), equalTo("the body"))

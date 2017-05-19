@@ -35,7 +35,7 @@ enum class FormValidator : (WebForm) -> WebForm {
     };
 }
 
-fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLens<WebForm> =
+fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, Strict)
         .map(ByteBuffer::asString, String::asByteBuffer)
         .map(
@@ -43,8 +43,6 @@ fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<Web
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
         .map({ validateFields(it, validator, *formFields) },
             { validateFields(it, validator, *formFields) })
-        .toLens()
-
 
 private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
     val failures = formFields.fold(listOf<Failure>()) {

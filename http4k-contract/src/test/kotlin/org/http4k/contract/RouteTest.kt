@@ -27,20 +27,20 @@ class RouteTest {
     fun `validates contract - success`() {
         val header = Header.required("header")
         val query = Query.required("query")
-        val body = Body.string(TEXT_PLAIN).required()
+        val body = Body.string(TEXT_PLAIN).toLens()
         val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
 
-        assertThat((route.router(Root))(Request(Method.GET, "").with(header to "value", query to "value", body to "hello")), present())
+        assertThat((route.router(Root))(Request(Method.GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
 
     @Test
     fun `validates contract - failure`() {
         val header = Header.required("header")
         val query = Query.required("query")
-        val body = Body.string(TEXT_PLAIN).required()
+        val body = Body.string(TEXT_PLAIN).toLens()
         val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
 
-        val invalidRequest = Request(Method.GET, "").with(header to "value", body to "hello")
+        val invalidRequest = Request(Method.GET, "").with(header of "value", body of "hello")
         assertThat((route.router(Root))(invalidRequest), present())
         assertThat({ (route.router(Root))(invalidRequest)?.invoke(invalidRequest) },
             throws(equalTo(LensFailure(query.meta.missing()))))

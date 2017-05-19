@@ -7,7 +7,6 @@ import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.string
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.nio.ByteBuffer
 
 /**
  * This is the contract for all JSON implementations
@@ -55,8 +54,8 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
-    fun body(): BiDiBodyLensSpec<ByteBuffer, ROOT> = Body.string(APPLICATION_JSON).map({ parse(it) }, { compact(it) })
-    fun Body.Companion.json(): BiDiBodyLensSpec<ByteBuffer, ROOT> = body()
+    fun body(): BiDiBodyLensSpec<ROOT> = Body.string(APPLICATION_JSON).map({ parse(it) }, { compact(it) })
+    fun Body.Companion.json(): BiDiBodyLensSpec<ROOT> = body()
 }
 
 enum class JsonType {

@@ -45,5 +45,5 @@ class BiDiLens<in IN, FINAL>(meta: Meta,
     /**
      * Bind this Lens to a value, so we can set it into a target
      */
-    infix fun <R : IN> to(value: FINAL): (R) -> R = { invoke(value, it) }
+    infix fun <R : IN> of(value: FINAL): (R) -> R = { invoke(value, it) }
 }

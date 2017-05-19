@@ -5,7 +5,6 @@ import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.string
-import java.nio.ByteBuffer
 
 interface ViewModel {
     /**
@@ -16,6 +15,6 @@ interface ViewModel {
 }
 
 fun Body.Companion.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> {
-    val viewModelBodySpec: BiDiBodyLensSpec<ByteBuffer, ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
+    val viewModelBodySpec: BiDiBodyLensSpec<ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
     return viewModelBodySpec.toLens()
 }

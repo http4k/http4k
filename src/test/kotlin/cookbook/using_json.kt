@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
 
     println(
         Response(OK).with(
-            Body.json().toLens() to
+            Body.json().toLens() of
                 listOf(
                     objectUsingDirectApi,
                     objectUsingExtensionFunctions

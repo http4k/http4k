@@ -177,8 +177,8 @@ val modifiedRequest: Request = requiredQuery(Request(Method.GET, ""), customType
 Alternatively, multiple lenses can be used at once on a single HTTP message, which is useful for building both requests and responses without resorting to strings:
 ```kotlin
 val modifiedRequest: Request = Request(Method.GET, "").with(
-    requiredQuery to customType.value,
-    optionalHeader to 123
+    requiredQuery of customType.value,
+    optionalHeader of 123
 )
 ```
 

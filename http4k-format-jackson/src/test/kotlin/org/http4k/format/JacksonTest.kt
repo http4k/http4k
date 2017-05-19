@@ -27,11 +27,11 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 
     @Test
     fun `roundtrip arbitary object to and from object`() {
-        val body = Body.auto<ArbObject>().required()
+        val body = Body.auto<ArbObject>()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
-        assertThat(body(Response(OK).with(body to obj)), equalTo(obj))
+        assertThat(body(Response(OK).with(body of obj)), equalTo(obj))
     }
 }
 

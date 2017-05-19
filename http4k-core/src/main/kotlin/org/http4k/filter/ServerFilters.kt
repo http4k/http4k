@@ -36,9 +36,9 @@ object ServerFilters {
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
                 response.with(
-                    Header.required("access-control-allow-origin") to policy.origins.joined(),
-                    Header.required("access-control-allow-headers") to policy.headers.joined(),
-                    Header.required("access-control-allow-methods") to policy.methods.map { it.name }.joined()
+                    Header.required("access-control-allow-origin") of policy.origins.joined(),
+                    Header.required("access-control-allow-headers") of policy.headers.joined(),
+                    Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
                 )
             }
         }

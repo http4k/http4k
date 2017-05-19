@@ -20,7 +20,7 @@ class RouteModuleTest {
 
     private val header = Header.optional("FILTER")
     private val routeModule = RouteModule(Root, SimpleJson(Argo), Filter {
-        next -> { next(it.with(header to "true")) }
+        next -> { next(it.with(header of "true")) }
     })
 
     @Test
@@ -33,7 +33,7 @@ class RouteModuleTest {
     @Test
     fun `passes through module filter`() {
         val response = routeModule.withRoute(Route("").at(GET) bind {
-            Response(OK).with(header to header(it))
+            Response(OK).with(header of header(it))
         }).toHttpHandler()(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(OK))
@@ -46,7 +46,7 @@ class RouteModuleTest {
         val response = routeModule.withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
             _, _ ->
             {
-                Response(OK).with(X_REEKWEST_ROUTE_IDENTITY to X_REEKWEST_ROUTE_IDENTITY(it))
+                Response(OK).with(X_REEKWEST_ROUTE_IDENTITY of X_REEKWEST_ROUTE_IDENTITY(it))
             }
         }).toHttpHandler()(Request(Method.GET, "/hello/planet"))
 

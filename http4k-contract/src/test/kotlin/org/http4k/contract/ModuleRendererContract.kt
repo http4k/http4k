@@ -75,7 +75,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
             .withRoute(
                 Route("a friendly endpoint")
                     .query(Query.boolean().required("query", "description of the query"))
-                    .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")))
+                    .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens())
                     .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } })
             .withRoute(
                 Route("a simple endpoint")

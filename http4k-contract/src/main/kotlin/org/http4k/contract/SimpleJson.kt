@@ -18,6 +18,6 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
 
     override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         return Response(OK)
-            .with(json.body().toLens() to json.obj("resources" to json.obj(routes.map { render(moduleRoot, it) })))
+            .with(json.body().toLens() of json.obj("resources" to json.obj(routes.map { render(moduleRoot, it) })))
     }
 }

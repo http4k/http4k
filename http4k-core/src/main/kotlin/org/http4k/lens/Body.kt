@@ -49,13 +49,13 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
     @Suppress("UNCHECKED_CAST")
     operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
 
-    infix fun <R : HttpMessage> to(value: FINAL): (R) -> R = { invoke(value, it) }
+    infix fun <R : HttpMessage> of(value: FINAL): (R) -> R = { invoke(value, it) }
 }
 
 /**
  * Represents a uni-directional extraction of an entity from a target Body.
  */
-open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, MID, OUT>) {
+open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, ByteBuffer, OUT>) {
     open fun toLens(): BodyLens<OUT> {
         val getLens = get("")
         return BodyLens(metas, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
@@ -65,15 +65,15 @@ open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal v
      * Create another BodyLensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a Body.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodyLensSpec<MID, NEXT> = BodyLensSpec(metas, get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodyLensSpec<NEXT> = BodyLensSpec(metas, get.map(nextIn))
 }
 
 /**
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target Body.
  */
-open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
-                                      get: LensGet<HttpMessage, MID, OUT>,
-                                      private val set: LensSet<HttpMessage, MID, OUT>) : BodyLensSpec<MID, OUT>(metas, get) {
+open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
+                                      get: LensGet<HttpMessage, ByteBuffer, OUT>,
+                                      private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -91,12 +91,12 @@ open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
     }
 }
 
-internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
+internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) = BiDiBodyLensSpec(metas,
     LensGet { _, target ->
         contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
         target.body.let { listOf(it.payload) }
     },
-    LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE to acceptedContentType) }
+    LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE of acceptedContentType) }
 )
 
 /**
@@ -118,8 +118,8 @@ enum class ContentNegotiation {
     abstract operator fun invoke(expected: ContentType, actual: ContentType?)
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLens<String>
-    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer).toLens()
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<String>
+    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLens<ByteBuffer>
-    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation).toLens()
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ByteBuffer>
+    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)

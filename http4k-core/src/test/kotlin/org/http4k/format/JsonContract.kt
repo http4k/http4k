@@ -54,7 +54,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
 
         val request = Request(Method.GET, "/bob")
 
-        val requestWithBody = request.with(body to obj)
+        val requestWithBody = request.with(body of obj)
 
         assertThat(requestWithBody.bodyString(), equalTo("""{"hello":"world"}"""))
 

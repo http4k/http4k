@@ -52,7 +52,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                 val routeIdentity = route.describeFor(moduleRoot)
                 return Filter {
                     { req ->
-                        it(req.with(X_REEKWEST_ROUTE_IDENTITY to
+                        it(req.with(X_REEKWEST_ROUTE_IDENTITY of
                             if (routeIdentity.isEmpty()) "/" else routeIdentity))
                     }
                 }
