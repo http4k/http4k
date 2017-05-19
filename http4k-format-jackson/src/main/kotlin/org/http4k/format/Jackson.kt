@@ -74,7 +74,7 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode
     inline fun <reified T : Any> String.asA(): T = asA(T::class)
     inline fun <reified T : Any> JsonNode.asA(): T = asA(T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BiDiBodyLens<T> = Body.json().map({ it.asA<T>() }, { it.asJsonNode() }).toLens()
+    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BiDiBodyLens<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonNode() }).toLens()
 
     fun Any.asJsonString(): String = asJsonNode().asCompactJsonString()
 }

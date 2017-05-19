@@ -54,8 +54,8 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
-    fun body(): BiDiBodyLensSpec<ROOT> = Body.string(APPLICATION_JSON).map({ parse(it) }, { compact(it) })
-    fun Body.Companion.json(): BiDiBodyLensSpec<ROOT> = body()
+    fun body(description: String? = null): BiDiBodyLensSpec<ROOT> = Body.string(APPLICATION_JSON, description).map({ parse(it) }, { compact(it) })
+    fun Body.Companion.json(description: String? = null): BiDiBodyLensSpec<ROOT> = body(description)
 }
 
 enum class JsonType {
