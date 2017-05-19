@@ -9,10 +9,10 @@ typealias PathLens<T> = Lens<String, T>
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathSpec<OUT>(internal val delegate: LensSpec<String, String, OUT>) {
+open class PathSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
-        val getLens = delegate.get(name)
-        return object : Lens<String, OUT>(Meta(true, "path", StringParam, name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
+        val getLens = get(name)
+        return object : Lens<String, OUT>(Meta(true, "path", paramMeta, name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
             override fun toString(): String = "{$name}"
         }
     }
@@ -21,17 +21,16 @@ open class PathSpec<OUT>(internal val delegate: LensSpec<String, String, OUT>) {
      * Create another PathSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<NEXT> = PathSpec(delegate.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<NEXT> = PathSpec(paramMeta, get.map(nextIn))
 
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta): PathSpec<NEXT> = PathSpec(delegate.mapWithNewMeta(nextIn, paramMeta))
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, newMeta: ParamMeta): PathSpec<NEXT> = PathSpec(newMeta, get.map(nextIn))
 
 }
 
-object Path : PathSpec<String>(LensSpec<String, String, String>("path", StringParam,
-    LensGet { _, target -> listOf(target) })) {
+object Path : PathSpec<String>(StringParam, LensGet { _, target -> listOf(target) }) {
 
     fun fixed(name: String): PathLens<String> {
-        val getLens = delegate.get(name)
+        val getLens = get(name)
         return object : Lens<String, String>(Meta(true, "path", StringParam, name),
             { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
             override fun toString(): String = name
