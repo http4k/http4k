@@ -17,10 +17,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
-import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BodyLens
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 
 open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode, JsonNode> {
@@ -75,7 +74,7 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode
     inline fun <reified T : Any> String.asA(): T = asA(T::class)
     inline fun <reified T : Any> JsonNode.asA(): T = asA(T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(): BiDiBodyLensSpec<ByteBuffer, T> = Body.json().map({ it.asA<T>() }, { it.asJsonNode() })
+    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BodyLens<T> = Body.json().map({ it.asA<T>() }, { it.asJsonNode() }).toLens()
 
     fun Any.asJsonString(): String = asJsonNode().asCompactJsonString()
 }

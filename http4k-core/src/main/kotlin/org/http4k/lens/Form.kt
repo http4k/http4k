@@ -43,7 +43,7 @@ fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<Web
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
         .map({ validateFields(it, validator, *formFields) },
             { validateFields(it, validator, *formFields) })
-        .required()
+        .toLens()
 
 
 private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {

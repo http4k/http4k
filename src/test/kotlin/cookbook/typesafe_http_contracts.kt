@@ -34,13 +34,13 @@ fun main(args: Array<String>) {
 
     fun add(value1: Int, value2: Int): HttpHandler = {
         Response(OK).with(
-            Body.string(TEXT_PLAIN).required() to (value1 + value2).toString()
+            Body.string(TEXT_PLAIN) to (value1 + value2).toString()
         )
     }
 
     fun echo(name: String, age: Int): HttpHandler = {
         Response(OK).with(
-            Body.string(TEXT_PLAIN).required() to "hello $name you are $age"
+            Body.string(TEXT_PLAIN) to "hello $name you are $age"
         )
     }
 

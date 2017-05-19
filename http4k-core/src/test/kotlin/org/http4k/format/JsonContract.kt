@@ -48,7 +48,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
 
     @Test
     fun `can write and read body as json`() {
-        val body = j.body().required()
+        val body = j.body().toLens()
 
         val obj = j.obj("hello" to j.string("world"))
 

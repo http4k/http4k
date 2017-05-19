@@ -7,6 +7,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.with
+import org.http4k.lens.ContentNegotiation.NonStrict
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -55,7 +56,7 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
  * Represents a uni-directional extraction of an entity from a target Body.
  */
 open class BodyLensSpec<MID, out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, MID, OUT>) {
-    open fun required(description: String? = null): BodyLens<OUT> {
+    open fun toLens(): BodyLens<OUT> {
         val getLens = get("")
         return BodyLens(metas, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
     }
@@ -80,7 +81,7 @@ open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, get.map(nextIn), set.map(nextOut))
 
-    override fun required(description: String?): BiDiBodyLens<OUT> {
+    override fun toLens(): BiDiBodyLens<OUT> {
         val getLens = get("")
         val setLens = set("")
         return BiDiBodyLens(metas,
@@ -117,8 +118,8 @@ enum class ContentNegotiation {
     abstract operator fun invoke(expected: ContentType, actual: ContentType?)
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.NonStrict): BiDiBodyLensSpec<ByteBuffer, String>
-    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLens<String>
+    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer).toLens()
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.NonStrict): BiDiBodyLensSpec<ByteBuffer, ByteBuffer>
-    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLens<ByteBuffer>
+    = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation).toLens()

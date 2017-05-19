@@ -17,7 +17,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
         { req ->
             val response = next(req)
             out.println("// result generated from ${req.uri}\n")
-            process("Base", json.body().required()(response))
+            process("Base", json.body().toLens()(response))
                 .flatMap { it }
                 .toSet()
                 .mapNotNull(Gen::asDefinitionString)

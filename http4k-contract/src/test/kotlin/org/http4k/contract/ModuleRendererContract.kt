@@ -52,7 +52,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
     @Test
     fun `renders as expected`() {
 
-        val customBody: BiDiBodyLens<JsonRootNode> = Body.json().required("the body of the message")
+        val customBody: BiDiBodyLens<JsonRootNode> = Body.json().toLens()
 //        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)
