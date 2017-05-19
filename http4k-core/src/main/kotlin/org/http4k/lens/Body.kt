@@ -42,9 +42,6 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
 
     /**
      * Lens operation to set the value into the target
-     *
-     * The arguments to this method are in this specific order so we can partially apply several functions
-     * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
     operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
@@ -78,8 +75,8 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val ge
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target Body.
  */
 open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
-                                      get: LensGet<HttpMessage, ByteBuffer, OUT>,
-                                      private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, get) {
+                                 get: LensGet<HttpMessage, ByteBuffer, OUT>,
+                                 private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be

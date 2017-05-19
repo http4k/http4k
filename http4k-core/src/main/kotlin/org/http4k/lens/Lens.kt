@@ -35,9 +35,6 @@ class BiDiLens<in IN, FINAL>(meta: Meta,
 
     /**
      * Lens operation to set the value into the target
-     *
-     * The arguments to this method are in this specific order so we can partially apply several functions
-     * and then fold them over a single target to modify.
      */
     @Suppress("UNCHECKED_CAST")
     operator fun <R : IN> invoke(value: FINAL, target: R): R = set(value, target) as R
