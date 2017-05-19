@@ -11,7 +11,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class AwsCredentials(val accessKey: String, val secretKey: String)
+data class AwsCredentials(val accessKey: String, val secretKey: String)
 
 data class AwsCredentialScope(val region: String, val service: String)
 
