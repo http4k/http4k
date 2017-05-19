@@ -39,6 +39,7 @@ object Path : PathSpec<String>(StringParam, LensGet { _, target -> listOf(target
     }
 }
 
+fun Path.string() = this
 fun Path.int() = Path.mapWithNewMeta(String::toInt, NumberParam)
 fun Path.long() = Path.mapWithNewMeta(String::toLong, NumberParam)
 fun Path.double() = Path.mapWithNewMeta(String::toDouble, NumberParam)
