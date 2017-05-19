@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.with
 import org.junit.Test
 
 class QueryTest {
@@ -55,7 +56,7 @@ class QueryTest {
     @Test
     fun `sets value on request`() {
         val query = Query.required("bob")
-        val withQuery = query("hello", request)
+        val withQuery = request.with(query of "hello")
         assertThat(query(withQuery), equalTo("hello"))
     }
 

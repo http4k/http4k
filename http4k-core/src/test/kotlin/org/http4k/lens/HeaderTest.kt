@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.with
 import org.junit.Test
 
 class HeaderTest {
@@ -61,7 +62,7 @@ class HeaderTest {
     @Test
     fun `sets value on request`() {
         val header = Header.required("bob")
-        val withHeader = header("hello", request)
+        val withHeader = request.with(header of "hello")
         assertThat(header(withHeader), equalTo("hello"))
     }
 

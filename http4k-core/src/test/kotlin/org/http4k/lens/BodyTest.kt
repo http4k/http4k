@@ -8,6 +8,7 @@ import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
+import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
@@ -36,7 +37,7 @@ class BodyTest {
     @Test
     fun `sets value on request`() {
         val body = Body.string(TEXT_PLAIN).toLens()
-        val withBody = body("hello", emptyRequest)
+        val withBody = emptyRequest.with(body of "hello")
         assertThat(body(withBody), equalTo("hello"))
         assertThat(CONTENT_TYPE(withBody), equalTo(TEXT_PLAIN))
     }
