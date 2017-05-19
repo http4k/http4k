@@ -231,7 +231,7 @@ include [Swagger/OpenAPI](http://swagger.io/) documentation.
 Firstly, create a route with the desired contract of headers, queries and body parameters. 
 ```kotlin
 val ageQuery = Query.int().required("age")
-val body = Body.string(TEXT_PLAIN).required()
+val body = Body.string(TEXT_PLAIN).toLens()
 
 val route = Route("echo").taking(ageQuery).body(body)
 ```
@@ -241,7 +241,7 @@ Next, define a dynamic path for this `Route` and then bind it to a function whic
 which receives the dynamic path elements from the path:
 ```kotlin
 val ageQuery = Query.int().required("age")
-val body = Body.string(TEXT_PLAIN).required()
+val body = Body.string(TEXT_PLAIN).toLens()
 
 fun echo(nameFromPath: String): HttpHandler = {
     request: Request ->
@@ -301,7 +301,7 @@ val objectUsingDirectApi = json.obj(
 
 println(
     Response(OK).with(
-        Body.json().required() to json.array(objectUsingDirectApi, objectUsingExtensionFunctions)
+        Body.json().toLens() to json.array(objectUsingDirectApi, objectUsingExtensionFunctions)
     )
 )
 ```
