@@ -5,7 +5,7 @@ dependencies {
 
     provided project(":http4k-core")
 
-    compile "io.netty:netty-codec-http2:4.1.10.Final"
+    compile "io.netty:netty-codec-http2:4.1.11.Final"
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(":http4k-client-apache")
