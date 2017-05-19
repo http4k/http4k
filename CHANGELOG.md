@@ -3,6 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v1.14.0
+- Body is now non-nullable (use `Body.EMPTY` instead)
 - Rename methods `BodyLens` API for consistency and clarity. `required()` is now `toLens()`. `to()' binding method is now `of().
 
 ### v1.13.0
