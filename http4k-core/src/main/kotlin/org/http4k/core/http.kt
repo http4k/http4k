@@ -2,6 +2,7 @@
 
 package org.http4k.core
 
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.version
 import java.nio.ByteBuffer
 
@@ -12,12 +13,14 @@ data class Body(val payload: ByteBuffer) {
 
     override fun toString(): String = String(payload.array())
 
-    companion object
+    companion object {
+        val EMPTY = Body("")
+    }
 }
 
 interface HttpMessage {
     val headers: Headers
-    val body: Body?
+    val body: Body
 
     fun toMessage(): String
 
@@ -29,13 +32,13 @@ interface HttpMessage {
 
     fun removeHeader(name: String): HttpMessage
 
-    fun body(body: Body?): HttpMessage
+    fun body(body: Body): HttpMessage
 
     fun body(body: String): HttpMessage
 
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
-    fun bodyString(): String = body?.toString() ?: ""
+    fun bodyString(): String = body.toString()
 
     companion object {
         val version = "HTTP/1.1"
@@ -62,19 +65,19 @@ interface Request : HttpMessage {
 
     override fun removeHeader(name: String): Request
 
-    override fun body(body: Body?): Request
+    override fun body(body: Body): Request
 
     override fun body(body: String): Request
 
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), null)
-        operator fun invoke(method: Method, uri: String): Request = MemoryRequest(method, Uri.of(uri), listOf(), null)
+        operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), EMPTY)
+        operator fun invoke(method: Method, uri: String): Request = MemoryRequest(method, Uri.of(uri), listOf(), EMPTY)
     }
 }
 
-data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body? = null) : Request {
+data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
     override fun uri(uri: Uri) = copy(uri = uri)
 
     override fun query(name: String, value: String) = copy(uri = uri.query(name, value))
@@ -89,7 +92,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun removeHeader(name: String) = copy(headers = headers.remove(name))
 
-    override fun body(body: Body?) = copy(body = body)
+    override fun body(body: Body) = copy(body = body)
 
     override fun body(body: String) = copy(body = Body(body))
 
@@ -106,32 +109,32 @@ interface Response : HttpMessage {
 
     override fun removeHeader(name: String): Response
 
-    override fun body(body: Body?): Response
+    override fun body(body: Body): Response
 
     override fun body(body: String): Response
 
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), null)
+        operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), EMPTY)
     }
 }
 
-data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body? = null) : Response {
+data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
 
     override fun removeHeader(name: String) = copy(headers = headers.remove(name))
 
-    override fun body(body: Body?) = copy(body = body)
+    override fun body(body: Body) = copy(body = body)
 
     override fun body(body: String) = copy(body = Body(body))
 
     override fun toString(): String = toMessage()
 }
 
-fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body? = this.body): T = when (this) {
+fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body = this.body): T = when (this) {
     is MemoryRequest -> this.copy(headers = headers, body = body) as T
     is MemoryResponse -> this.copy(headers = headers, body = body) as T
     else -> throw IllegalStateException("Unknown class $this")

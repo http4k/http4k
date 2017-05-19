@@ -11,7 +11,6 @@ import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
 import java.nio.ByteBuffer
-import java.util.Collections.emptyList
 
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
@@ -94,7 +93,7 @@ open class BiDiBodyLensSpec<MID, OUT>(metas: List<Meta>,
 internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) = BiDiBodyLensSpec<ByteBuffer, ByteBuffer>(metas,
     LensGet { _, target ->
         contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
-        target.body?.let { listOf(it.payload) } ?: emptyList()
+        target.body.let { listOf(it.payload) }
     },
     LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE to acceptedContentType) }
 )

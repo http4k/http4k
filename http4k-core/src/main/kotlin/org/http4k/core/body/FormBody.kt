@@ -13,4 +13,4 @@ fun Request.form(name: String): String? = form().findSingle(name)
 
 fun Form.toBody(): Body = Body(toUrlEncoded())
 
-fun Request.form(): Form = body?.toString()?.toParameters() ?: emptyList()
+fun Request.form(): Form = body.toString().toParameters()

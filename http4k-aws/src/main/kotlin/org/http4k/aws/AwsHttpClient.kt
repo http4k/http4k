@@ -81,8 +81,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .sorted()
                 .joinToString("&")
 
-        private fun Request.payloadHash(): String =
-            (body?.payload?.array() ?: "".toByteArray()).let { AwsHmacSha256.hash(it) }
+        private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.payload.array())
     }
 }
 

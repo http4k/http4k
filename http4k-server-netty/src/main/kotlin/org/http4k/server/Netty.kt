@@ -64,7 +64,7 @@ class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHan
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse {
         val res = DefaultFullHttpResponse(HTTP_1_1, OK,
-            body?.let { (payload) -> wrappedBuffer(payload) } ?: wrappedBuffer("".toByteArray())
+            body.let { (payload) -> wrappedBuffer(payload) }
         )
         headers.forEach { (key, value) -> res.headers().set(key, value) }
         res.headers().set(CONTENT_LENGTH, res.content().readableBytes())
@@ -78,7 +78,7 @@ class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHan
         }.body(
             when (this) {
                 is DefaultFullHttpRequest -> Body(ByteBuffer.wrap(this.content().array()))
-                else -> null
+                else -> Body.EMPTY
             }
         )
 }

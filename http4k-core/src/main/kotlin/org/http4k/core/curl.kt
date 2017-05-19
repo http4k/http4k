@@ -1,14 +1,14 @@
 package org.http4k.core
 
+import org.http4k.appendIfNotBlank
 import org.http4k.appendIfNotEmpty
-import org.http4k.appendIfPresent
 import org.http4k.quoted
 
 fun Request.toCurl(): String =
     StringBuilder("curl")
         .append(" -X $method")
         .appendIfNotEmpty(headers, " " + headers.map { """-H ${(it.first + ":" + it.second).quoted()}""" }.joinToString(" "))
-        .appendIfPresent(body, " --data ${body.toString().truncated().quoted()}")
+        .appendIfNotBlank(bodyString(), " --data ${body.toString().truncated().quoted()}")
         .append(" \"$uri\"")
         .toString()
 

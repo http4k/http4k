@@ -14,10 +14,12 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient) : HttpHandl
     private fun Request.asOkHttp(): okhttp3.Request =
         headers.fold(okhttp3.Request.Builder()
             .url(uri.toString())
-            .method(method.toString(), body?.let { create(null, it.payload.array()) })) {
+            .method(method.toString(), requestBody())) {
             memo, (first, second) ->
             memo.addHeader(first, second)
         }.build()
+
+    private fun Request.requestBody() = if (body != Body.EMPTY) create(null, body.payload.array()) else null
 
     private fun okhttp3.Response.asHttp4k(): Response {
         val initial = body()?.let {
