@@ -114,7 +114,7 @@ allprojects {
         key = System.getenv('BINTRAY_KEY')
 
         publications = ['mavenJava']
-        dryRun = true
+        dryRun = false
         publish = true
         pkg {
             repo = 'maven'
