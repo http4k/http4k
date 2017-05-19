@@ -9,7 +9,7 @@ typealias PathLens<T> = Lens<String, T>
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OUT>) {
+open class PathSpec<OUT>(internal val delegate: LensSpec<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = delegate.get(name)
         return object : Lens<String, OUT>(Meta(true, "path", StringParam, name, description), { getLens(it).firstOrNull() ?: throw LensFailure() }) {
@@ -21,13 +21,13 @@ open class PathSpec<MID, OUT>(internal val delegate: LensSpec<String, String, OU
      * Create another PathSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<MID, NEXT> = PathSpec(delegate.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): PathSpec<NEXT> = PathSpec(delegate.map(nextIn))
 
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta): PathSpec<MID, NEXT> = PathSpec(delegate.mapWithNewMeta(nextIn, paramMeta))
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta): PathSpec<NEXT> = PathSpec(delegate.mapWithNewMeta(nextIn, paramMeta))
 
 }
 
-object Path : PathSpec<String, String>(LensSpec<String, String, String>("path", StringParam,
+object Path : PathSpec<String>(LensSpec<String, String, String>("path", StringParam,
     LensGet { _, target -> listOf(target) })) {
 
     fun fixed(name: String): PathLens<String> {
@@ -49,7 +49,7 @@ fun Path.localDate() = Path.map(java.time.LocalDate::parse)
 fun Path.dateTime() = Path.map(java.time.LocalDateTime::parse)
 fun Path.zonedDateTime() = Path.map(java.time.ZonedDateTime::parse)
 fun Path.uuid() = Path.map(java.util.UUID::fromString)
-fun Path.regex(pattern: String, group: Int = 1): PathSpec<String, String> {
+fun Path.regex(pattern: String, group: Int = 1): PathSpec<String> {
     val regex = pattern.toRegex()
     return this.map { regex.matchEntire(it)?.groupValues?.get(group)!! }
 }
