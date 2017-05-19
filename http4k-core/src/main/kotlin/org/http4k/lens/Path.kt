@@ -8,13 +8,14 @@ import org.http4k.lens.ParamMeta.StringParam
 
 typealias PathLens<T> = Lens<String, T>
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL) -> String) : Lens<String, FINAL>(meta, get) {
+class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : Lens<String, FINAL>(meta, get) {
+    override fun toString(): String = "{${meta.name}}"
 
     /**
      * Lens operation to set the value into the target url
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : Request> invoke(value: FINAL, target: R): R = target.uri(Uri.of(target.uri.path.replaceFirst("{${meta.name}}", set(value)))) as R
+    operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
 
     /**
      * Bind this Lens to a value, so we can set it into a target
@@ -46,7 +47,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
 
 open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
                                  get: LensGet<String, String, OUT>,
-                                 private val set: LensSet<String, String, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
+                                 private val set: LensSet<Request, String, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
 
     /**
      * Create another BiDiPathLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -64,14 +65,14 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
 
         return BiDiPathLens(meta,
             { getLens(it).firstOrNull() ?: throw LensFailure() },
-            { it: OUT -> setLens(listOf(it), "") })
+            { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
     LensGet { _, target -> listOf(target) },
-    LensSet { _, values, _ -> values.first() }) {
+    LensSet { name, values, target -> target.uri(Uri.of(target.uri.path.replaceFirst("{$name}", values.first()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
