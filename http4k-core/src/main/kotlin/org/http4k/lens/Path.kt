@@ -5,6 +5,11 @@ import org.http4k.core.Uri
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 typealias PathLens<T> = Lens<String, T>
 
@@ -40,9 +45,6 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
      * used to extract the final type from a target path segment.
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT): PathLensSpec<NEXT> = PathLensSpec(paramMeta, get.map(nextIn))
-
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, newMeta: ParamMeta): PathLensSpec<NEXT> = PathLensSpec(newMeta, get.map(nextIn))
-
 }
 
 open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
@@ -54,6 +56,8 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
      * used to extract or insert the final type from/into a path segment.
      */
     fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiPathLensSpec(paramMeta, get.map(nextIn), set.map(nextOut))
+
+    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, newMeta: ParamMeta): BiDiPathLensSpec<NEXT> = BiDiPathLensSpec(newMeta, get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -85,16 +89,16 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.int() = Path.mapWithNewMeta(String::toInt, NumberParam)
-fun Path.long() = Path.mapWithNewMeta(String::toLong, NumberParam)
-fun Path.double() = Path.mapWithNewMeta(String::toDouble, NumberParam)
-fun Path.float() = Path.mapWithNewMeta(String::toFloat, NumberParam)
-fun Path.boolean() = Path.mapWithNewMeta(::safeBooleanFrom, BooleanParam)
-fun Path.localDate() = Path.map(java.time.LocalDate::parse)
-fun Path.dateTime() = Path.map(java.time.LocalDateTime::parse)
-fun Path.zonedDateTime() = Path.map(java.time.ZonedDateTime::parse)
-fun Path.uuid() = Path.map(java.util.UUID::fromString)
+fun Path.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
+fun Path.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun Path.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun Path.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun Path.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun Path.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
+fun Path.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+fun Path.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+fun Path.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
 fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> {
-    val regex = pattern.toRegex()
-    return this.map { regex.matchEntire(it)?.groupValues?.get(group)!! }
+    val toRegex = pattern.toRegex()
+    return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
 }

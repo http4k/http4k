@@ -47,9 +47,7 @@ open class LensSpec<IN, MID, OUT>(protected val location: String,
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT) = mapWithNewMeta(nextIn, paramMeta)
-
-    internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, paramMeta: ParamMeta) = LensSpec(location, paramMeta, get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT) = LensSpec(location, paramMeta, get.map(nextIn))
 
     /**
      * Make a concrete Lens for this spec that falls back to the default value if no value is found in the target.

@@ -3,6 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method.GET
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,6 +44,13 @@ class PathTest {
     fun `can create a custom type and get it`() {
         val path = Path.map(::MyCustomBodyType).of("bob")
         assertThat(path("hello world!"), equalTo(MyCustomBodyType("hello world!")))
+    }
+
+    @Test
+    fun `sets value on request`() {
+        val pathParam = Path.int().of("bob")
+        val withQuery = org.http4k.core.Request(GET, "/first/{bob}/second")
+        assertThat(pathParam(1234, withQuery), equalTo(org.http4k.core.Request(GET, "/first/1234/second")))
     }
 
     @Test
