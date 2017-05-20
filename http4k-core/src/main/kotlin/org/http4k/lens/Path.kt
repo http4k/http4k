@@ -1,8 +1,10 @@
 package org.http4k.lens
 
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.decode
 import org.http4k.core.encode
+import org.http4k.core.with
+import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -13,14 +15,15 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-open class PathLens<out FINAL>(meta: Meta, get: (String) -> FINAL) : Lens<String, FINAL>(meta, get) {
+open class PathLens<out FINAL>(meta: Meta, get: (Request) -> FINAL) : Lens<Request, FINAL>(meta, get) {
+
     @Throws(LensFailure::class)
-    operator fun invoke(target: Request): FINAL = target.path(meta.name)?.let { invoke(it) } ?: throw LensFailure(listOf(meta.missing()))
+    operator fun invoke(target: String) = super.invoke(Request(GET, target).with(X_URI_TEMPLATE of "{${meta.name}}"))
 
     override fun toString(): String = "{${meta.name}}"
 }
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
+class BiDiPathLens<FINAL>(meta: Meta, get: (Request) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target url
@@ -37,11 +40,11 @@ class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, String, OUT>) {
+open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<Request, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
-        val meta = Meta(true, "path", paramMeta, name, description)
-        return PathLens(meta, { getLens(it).firstOrNull() ?: throw LensFailure() })
+        return PathLens(Meta(true, "path", paramMeta, name, description),
+            { getLens(it).firstOrNull() ?: throw LensFailure() })
     }
 
     /**
@@ -52,7 +55,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
 }
 
 open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
-                                 get: LensGet<String, String, OUT>,
+                                 get: LensGet<Request, String, OUT>,
                                  private val set: LensSet<Request, String, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
 
     /**
@@ -67,25 +70,25 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
      * Create a lens for this Spec
      */
     override fun of(name: String, description: String?): BiDiPathLens<OUT> {
-        val meta = Meta(true, "path", paramMeta, name, description)
         val getLens = get(name)
         val setLens = set(name)
 
-        return BiDiPathLens(meta,
+        return BiDiPathLens(Meta(true, "path", paramMeta, name, description),
             { getLens(it).firstOrNull() ?: throw LensFailure() },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
-    LensGet { _, target -> listOf(target.decode()) },
+    LensGet { name, target -> target.path(name)?.let(::listOf) ?: emptyList() },
     LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().encode()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
         return object : PathLens<String>(Meta(true, "path", StringParam, name),
-            { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
+            { getLens(it).find { it == name } ?: throw LensFailure() }) {
             override fun toString(): String = name
+
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
         }
     }
