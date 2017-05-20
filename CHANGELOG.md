@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.15.0
+- Path lenses are now bidirectional, so can be used to populate requests as well as bodies an headers etc.
+
 ### v1.14.0
 - Body is now non-nullable (use `Body.EMPTY` instead)
 - Rename methods `BodyLens` API for consistency and clarity. `required()` is now `toLens()`. `to()' binding method is now `of().
