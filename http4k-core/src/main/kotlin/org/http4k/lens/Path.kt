@@ -6,16 +6,21 @@ import org.http4k.core.encode
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.routing.path
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-typealias PathLens<T> = Lens<String, T>
+open class PathLens<out FINAL>(meta: Meta, get: (String) -> FINAL) : Lens<String, FINAL>(meta, get) {
+    @Throws(LensFailure::class)
+    operator fun invoke(target: Request): FINAL = target.path(meta.name)?.let { invoke(it) } ?: throw LensFailure(listOf(meta.missing()))
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : Lens<String, FINAL>(meta, get) {
     override fun toString(): String = "{${meta.name}}"
+}
+
+class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target url
@@ -36,9 +41,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         val meta = Meta(true, "path", paramMeta, name, description)
-        return object : Lens<String, OUT>(meta, { getLens(it).firstOrNull() ?: throw LensFailure() }) {
-            override fun toString(): String = "{$name}"
-        }
+        return PathLens(meta, { getLens(it).firstOrNull() ?: throw LensFailure() })
     }
 
     /**
@@ -80,7 +83,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
-        return object : Lens<String, String>(Meta(true, "path", StringParam, name),
+        return object : PathLens<String>(Meta(true, "path", StringParam, name),
             { getLens(it).let { if (it == listOf(name)) name else throw LensFailure() } }) {
             override fun toString(): String = name
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()

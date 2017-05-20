@@ -3,6 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -35,6 +36,14 @@ class PathTest {
     fun `value present`() {
         assertThat(Path.of("hello")("world"), equalTo("world"))
         assertThat(Path.map { it.length }.of("hello")("world"), equalTo(5))
+    }
+
+    @Test
+    fun `value present in request when it has been pre-parsed`() {
+        val target = Request(Method.GET, "/some/world").header("x-uri-template", "/some/{hello}")
+
+        assertThat(Path.of("hello")(target), equalTo("world"))
+        assertThat(Path.map { it.length }.of("hello")(target), equalTo(5))
     }
 
     @Test
