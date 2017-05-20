@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.16.0
+- Further work on Path Lenses. They are now fully supported and consistent for both simple and contract routing scenarios.
+
 ### v1.15.0
 - Path lenses are now bidirectional, so can be used to populate requests as well as bodies an headers etc.
 - Routes can now create shell Requests for themselves, using `route.newRequest()`
