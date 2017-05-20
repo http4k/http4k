@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v1.15.0
 - Path lenses are now bidirectional, so can be used to populate requests as well as bodies an headers etc.
+- Routes can now create shell Requests for themselves, using `route.newRequest()`
 
 ### v1.14.0
 - Body is now non-nullable (use `Body.EMPTY` instead)

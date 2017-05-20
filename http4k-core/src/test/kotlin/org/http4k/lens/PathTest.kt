@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.junit.Test
 import java.time.LocalDate
@@ -51,8 +52,8 @@ class PathTest {
     @Test
     fun `sets value on request uri with proper encoding`() {
         val pathParam = Path.string().of("bob")
-        val updated = Request(GET, "/first/{bob}/second").with(pathParam of "123 456")
-        assertThat(updated, equalTo(Request(GET, "/first/123+456/second")))
+        val updated = Request(GET, Uri.of("http://bob.com/first/{bob}/second")).with(pathParam of "123 456")
+        assertThat(updated, equalTo(Request(GET, "http://bob.com/first/123+456/second")))
         assertThat(pathParam("123+456"), equalTo("123 456"))
     }
 

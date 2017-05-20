@@ -3,12 +3,12 @@ package org.http4k.contract
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
-
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal val core = pathBinder.core.route.core
@@ -34,6 +34,8 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
     fun describe(moduleRoot: BasePath): String {
         return "${core.pathFn(moduleRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
     }
+
+    fun newRequest(baseUri: Uri = Uri.of("")): Request = Request(core.method, "").uri(baseUri.path(describe(Root)))
 
     companion object {
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
