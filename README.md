@@ -73,6 +73,7 @@ fun main(args: Array<String>) {
 * [Cookbook example code](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook)
 * [Todo backend (simple version)](https://github.com/http4k/http4k-todo-backend)
 * [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
+* [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
 
 # Modules
 
@@ -153,31 +154,42 @@ routes(
 Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
-
-A [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) is a bi-directional entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL to configure these lenses 
-to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
+Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). A Lens is a bi-directional entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
 
 ```kotlin
 val requiredQuery = Query.required("myQueryName")
 val optionalHeader = Header.int().optional("Content-Length")
-val requiredJsonBody = Body.string(APPLICATION_JSON)
+val pathLocalDate = Path.localDate().of("date")
+val responseBody = Body.string(PLAIN_TEXT).toLens()
 
 data class CustomType(val value: String)
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
 ```
 
-To use the Lens, simply apply it to an HTTP message to extract the value, or alternatively pass the value if we are modifying (via copy) the message:
+To use the Lens, simply `invoke()` it using an HTTP message to extract the value, or alternatively `invoke()` it with the value if we are modifying (via copy) the message:
 
 ```kotlin
-val optionalHeader: Int? = optionalHeader(Request(Method.GET, ""))
-val customType: CustomType = requiredCustomQuery(Request(Method.GET, "?myCustomType=someValue"))
-val modifiedRequest: Request = requiredQuery(Request(Method.GET, ""), customType.value)
+val handler = routes(
+    GET to "/hello/{date:*}" by { request: Request -> 
+         val pathDate: LocalDate = pathLocalDate(request)
+         val customType: CustomType = requiredCustomQuery(request)
+         val anIntHeader: Int? = optionalHeader(request)
+
+         val baseResponse = Response(OK)
+         val responseWithHeader = optionalHeader(anIntHeader(baseResponse)
+         responseBody("you sent $pathDate and $customType", responseWithHeader) 
+      }
+)
+
+handler(Request(Method.GET, "/hello/2000-01-01?myCustomType=someValue"))
 ```
+Note that no validation is required when using Lenses, as **http4** automatically handles invalid requests by returning a BAD_REQUEST (400) response.
 
-Alternatively, multiple lenses can be used at once on a single HTTP message, which is useful for building both requests and responses without resorting to strings:
+More convieniently for construction of HTTP messages, multiple lenses can be used at once to modify a message, which is useful for properly building both requests and responses in a typesafe way without resorting to string values (especially in URLs which should never be constructed using String concatenation):
 ```kotlin
-val modifiedRequest: Request = Request(Method.GET, "").with(
-    requiredQuery of customType.value,
+val modifiedRequest: Request = Request(Method.GET, "http://google.com/{pathLocalDate}").with(
+    pathLocalDate of LocalDate.now(),
+    requiredQuery of "myAmazingString",
     optionalHeader of 123
 )
 ```
