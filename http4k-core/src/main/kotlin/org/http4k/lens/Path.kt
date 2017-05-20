@@ -1,10 +1,8 @@
 package org.http4k.lens
 
-import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.decode
 import org.http4k.core.encode
-import org.http4k.core.with
-import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -15,15 +13,24 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-open class PathLens<out FINAL>(meta: Meta, get: (Request) -> FINAL) : Lens<Request, FINAL>(meta, get) {
-
+open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
+    it.path(meta.name)?.let(get) ?: throw LensFailure(meta.missing())
+}) {
+    /**
+     * Lens operation to get the value from the target path segment
+     * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
+     */
     @Throws(LensFailure::class)
-    operator fun invoke(target: String) = super.invoke(Request(GET, target).with(X_URI_TEMPLATE of "{${meta.name}}"))
+    operator fun invoke(target: String) = try {
+        get(target)
+    } catch (e: Exception) {
+        throw LensFailure(map { it.invalid() })
+    }
 
     override fun toString(): String = "{${meta.name}}"
 }
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (Request) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
+class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
 
     /**
      * Lens operation to set the value into the target url
@@ -40,7 +47,7 @@ class BiDiPathLens<FINAL>(meta: Meta, get: (Request) -> FINAL, private val set: 
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<Request, String, OUT>) {
+open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         return PathLens(Meta(true, "path", paramMeta, name, description),
@@ -55,7 +62,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
 }
 
 open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
-                                 get: LensGet<Request, String, OUT>,
+                                 get: LensGet<String, String, OUT>,
                                  private val set: LensSet<Request, String, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
 
     /**
@@ -80,7 +87,7 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
-    LensGet { name, target -> target.path(name)?.let(::listOf) ?: emptyList() },
+    LensGet { _, target -> listOf(target.decode()) },
     LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().encode()))) }) {
 
     fun fixed(name: String): PathLens<String> {
