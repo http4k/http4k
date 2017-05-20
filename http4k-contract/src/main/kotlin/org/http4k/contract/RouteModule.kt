@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
+import org.http4k.lens.Header.X_URI_TEMPLATE
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
@@ -52,8 +53,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                 val routeIdentity = route.describeFor(moduleRoot)
                 return Filter {
                     { req ->
-                        it(req.with(X_REEKWEST_ROUTE_IDENTITY of
-                            if (routeIdentity.isEmpty()) "/" else routeIdentity))
+                        it(req.with(X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity))
                     }
                 }
             }

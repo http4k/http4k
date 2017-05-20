@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.lens.Header
+import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.junit.Test
@@ -46,12 +47,12 @@ class RouteModuleTest {
         val response = routeModule.withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
             _, _ ->
             {
-                Response(OK).with(X_REEKWEST_ROUTE_IDENTITY of X_REEKWEST_ROUTE_IDENTITY(it))
+                Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it))
             }
         }).toHttpHandler()(Request(Method.GET, "/hello/planet"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(X_REEKWEST_ROUTE_IDENTITY(response), equalTo("/hello/{world}"))
+        assertThat(X_URI_TEMPLATE(response), equalTo("/hello/{world}"))
     }
 
     @Test

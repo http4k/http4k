@@ -14,4 +14,6 @@ object Header : BiDiLensSpec<HttpMessage, String, String>("header", StringParam,
     object Common {
         val CONTENT_TYPE = map({ ContentType(it.takeWhile { it != ';' }) }, { it.value }).optional("content-type")
     }
+
+    val X_URI_TEMPLATE = optional("x-uri-template")
 }
