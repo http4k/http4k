@@ -25,7 +25,7 @@ import java.time.Clock
 
 /**
  * This contract example shows:
- * - 2 endpoints with typesafe contracts (marshalling of path parameters and Body's)
+ * - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)
  * - Custom filters (latency)
  * - API key security via a typesafe Query parameter (this can be a header or a body parameter as well)
  * - simple API documentation
