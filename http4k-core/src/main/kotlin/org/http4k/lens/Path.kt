@@ -2,6 +2,8 @@ package org.http4k.lens
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.decode
+import org.http4k.core.encode
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -71,12 +73,11 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
             { getLens(it).firstOrNull() ?: throw LensFailure() },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
-
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
-    LensGet { _, target -> listOf(target) },
-    LensSet { name, values, target -> target.uri(Uri.of(target.uri.path.replaceFirst("{$name}", values.first()))) }) {
+    LensGet { _, target -> listOf(target.decode()) },
+    LensSet { name, values, target -> target.uri(Uri.of(target.uri.path.replaceFirst("{$name}", values.first().encode()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)

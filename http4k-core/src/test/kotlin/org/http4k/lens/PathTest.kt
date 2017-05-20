@@ -49,10 +49,11 @@ class PathTest {
     }
 
     @Test
-    fun `sets value on request`() {
-        val pathParam = Path.int().of("bob")
-        val updated = Request(GET, "/first/{bob}/second").with(pathParam of 1234)
-        assertThat(updated, equalTo(Request(GET, "/first/1234/second")))
+    fun `sets value on request uri with proper encoding`() {
+        val pathParam = Path.string().of("bob")
+        val updated = Request(GET, "/first/{bob}/second").with(pathParam of "123 456")
+        assertThat(updated, equalTo(Request(GET, "/first/123+456/second")))
+        assertThat(pathParam("123+456"), equalTo("123 456"))
     }
 
     @Test

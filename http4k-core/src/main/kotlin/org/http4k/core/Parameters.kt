@@ -17,8 +17,8 @@ internal fun Parameters.findMultiple(name: String) = filter { it.first == name }
 
 private fun String.toParameter(): Parameter = split("=").map(String::decode).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
 
-private fun String.decode() = URLDecoder.decode(this, "UTF-8")
+internal fun String.decode() = URLDecoder.decode(this, "UTF-8")
 
-private fun String.encode() = URLEncoder.encode(this, "UTF-8")
+internal fun String.encode() = URLEncoder.encode(this, "UTF-8")
 
 private typealias Parameter = Pair<String, String?>
