@@ -55,12 +55,6 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             route.core.body?.metas?.map { renderMeta(it, schemaFor(route.core.request)) }
         } else route.core.body?.metas?.map { renderMeta(it, null) }
 
-            route.nonBodyParams.flatMap {
-                listOf(it).map {
-                    renderMeta(it, null)
-                }
-            }
-
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it, null) }
 
         val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString())) else route.core.tags.toList().sortedBy { it.name }
