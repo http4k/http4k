@@ -193,19 +193,22 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String,
 }
 
 fun <IN> BiDiLensSpec<IN, String, String>.string() = this
-fun <IN> BiDiLensSpec<IN, String, String>.int() = string().mapWithNewMeta(String::toInt, Int::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.long() = string().mapWithNewMeta(String::toLong, Long::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.double() = string().mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.float() = string().mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.boolean() = string().mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun <IN> BiDiLensSpec<IN, String, String>.localDate() = string().map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
-fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = string().map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = string().map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.uuid() = string().map(UUID::fromString, java.util.UUID::toString)
+fun <IN> BiDiLensSpec<IN, String, String>.nonEmptyString() = this.map(::nonEmpty, { it })
+fun <IN> BiDiLensSpec<IN, String, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
+fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
 fun <IN> BiDiLensSpec<IN, String, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String, String> {
     val toRegex = pattern.toRegex()
-    return string().map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
+    return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
 }
+
+internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
 
 internal fun safeBooleanFrom(value: String): Boolean =
     if (value.toUpperCase() == "TRUE") true

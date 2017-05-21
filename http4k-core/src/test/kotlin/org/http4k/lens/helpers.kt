@@ -7,6 +7,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.lens.ParamMeta.StringParam
 
+data class Container(val s: String?)
+
 object BiDiLensContract {
 
     val spec = BiDiLensSpec("location", StringParam, LensGet { _: String, str: String ->
@@ -14,48 +16,48 @@ object BiDiLensContract {
     },
         LensSet { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
-    fun <T> checkContract(spec: BiDiLensSpec<String, String, T>, valueAsString: String, tValue: T) {
+    fun <IN, T> checkContract(spec: BiDiLensSpec<IN, String, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN, s: IN, modifiedValue: IN, listModifiedValue: IN) {
         val optionalLens = spec.optional("hello")
-        assertThat(optionalLens(valueAsString), equalTo(tValue))
-        assertThat((spec.map { it.toString() }.optional("hello"))(valueAsString), equalTo(tValue.toString()))
-        assertThat(optionalLens(""), absent())
-        assertThat({ optionalLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
-        assertThat(optionalLens(tValue, "original"), equalTo("original" + valueAsString))
+        assertThat(optionalLens(validValue), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.optional("hello"))(validValue), equalTo(tValue.toString()))
+        assertThat(optionalLens(nullValue), absent())
+        assertThat({ optionalLens(invalidValue) }, throws(equalTo(LensFailure(optionalLens.invalid()))))
+        assertThat(optionalLens(tValue, s), equalTo(modifiedValue))
 
         val optionalMultiLens = spec.multi.optional("hello")
-        assertThat(optionalMultiLens(valueAsString), equalTo(listOf(tValue)))
-        assertThat((spec.map { it.toString() }.multi.optional("hello"))(valueAsString), equalTo(listOf(tValue.toString())))
-        assertThat(optionalMultiLens(""), absent())
-        assertThat({ optionalMultiLens("hello") }, throws(equalTo(LensFailure(optionalLens.invalid()))))
-        assertThat(optionalMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
+        assertThat(optionalMultiLens(validValue), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.optional("hello"))(validValue), equalTo(listOf(tValue.toString())))
+        assertThat(optionalMultiLens(nullValue), absent())
+        assertThat({ optionalMultiLens(invalidValue) }, throws(equalTo(LensFailure(optionalLens.invalid()))))
+        assertThat(optionalMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
 
         val requiredLens = spec.required("hello")
-        assertThat(requiredLens(valueAsString), equalTo(tValue))
-        assertThat((spec.map { it.toString() }.required("hello"))(valueAsString), equalTo(tValue.toString()))
-        assertThat({ requiredLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
-        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
-        assertThat(requiredLens(tValue, "original"), equalTo("original" + valueAsString))
+        assertThat(requiredLens(validValue), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.required("hello"))(validValue), equalTo(tValue.toString()))
+        assertThat({ requiredLens(nullValue) }, throws(equalTo(LensFailure(requiredLens.missing()))))
+        assertThat({ requiredLens(invalidValue) }, throws(equalTo(LensFailure(requiredLens.invalid()))))
+        assertThat(requiredLens(tValue, s), equalTo(modifiedValue))
 
         val requiredMultiLens = spec.multi.required("hello")
-        assertThat(requiredMultiLens(valueAsString), equalTo(listOf(tValue)))
-        assertThat((spec.map { it.toString() }.multi.required("hello"))(valueAsString), equalTo(listOf(tValue.toString())))
-        assertThat({ requiredMultiLens("") }, throws(equalTo(LensFailure(requiredLens.missing()))))
-        assertThat({ requiredMultiLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
-        assertThat(requiredMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
+        assertThat(requiredMultiLens(validValue), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.required("hello"))(validValue), equalTo(listOf(tValue.toString())))
+        assertThat({ requiredMultiLens(nullValue) }, throws(equalTo(LensFailure(requiredLens.missing()))))
+        assertThat({ requiredMultiLens(invalidValue) }, throws(equalTo(LensFailure(requiredLens.invalid()))))
+        assertThat(requiredMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
 
         val defaultedLens = spec.defaulted("hello", tValue)
-        assertThat(defaultedLens(valueAsString), equalTo(tValue))
-        assertThat((spec.map { it.toString() }.defaulted("hello", "world"))(valueAsString), equalTo(tValue.toString()))
-        assertThat(defaultedLens(""), equalTo(tValue))
-        assertThat({ defaultedLens("hello") }, throws(equalTo(LensFailure(defaultedLens.invalid()))))
-        assertThat(defaultedLens(tValue, "original"), equalTo("original" + valueAsString))
+        assertThat(defaultedLens(validValue), equalTo(tValue))
+        assertThat((spec.map { it.toString() }.defaulted("hello", "world"))(validValue), equalTo(tValue.toString()))
+        assertThat(defaultedLens(nullValue), equalTo(tValue))
+        assertThat({ defaultedLens(invalidValue) }, throws(equalTo(LensFailure(defaultedLens.invalid()))))
+        assertThat(defaultedLens(tValue, s), equalTo(modifiedValue))
 
         val defaultedMultiLens = spec.multi.defaulted("hello", listOf(tValue))
-        assertThat(defaultedMultiLens(valueAsString), equalTo(listOf(tValue)))
-        assertThat((spec.map { it.toString() }.multi.defaulted("hello", listOf(tValue.toString())))(valueAsString), equalTo(listOf(tValue.toString())))
-        assertThat(defaultedMultiLens(""), equalTo(listOf(tValue)))
-        assertThat({ defaultedMultiLens("hello") }, throws(equalTo(LensFailure(defaultedMultiLens.invalid()))))
-        assertThat(defaultedMultiLens(listOf(tValue, tValue), "original"), equalTo("original" + valueAsString + valueAsString))
+        assertThat(defaultedMultiLens(validValue), equalTo(listOf(tValue)))
+        assertThat((spec.map { it.toString() }.multi.defaulted("hello", listOf(tValue.toString())))(validValue), equalTo(listOf(tValue.toString())))
+        assertThat(defaultedMultiLens(nullValue), equalTo(listOf(tValue)))
+        assertThat({ defaultedMultiLens(invalidValue) }, throws(equalTo(LensFailure(defaultedMultiLens.invalid()))))
+        assertThat(defaultedMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
     }
 }
 

@@ -102,16 +102,17 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.int() = string().mapWithNewMeta(String::toInt, Int::toString, NumberParam)
-fun Path.long() = string().mapWithNewMeta(String::toLong, Long::toString, NumberParam)
-fun Path.double() = string().mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun Path.float() = string().mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun Path.boolean() = string().mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun Path.localDate() = string().map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
-fun Path.dateTime() = string().map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-fun Path.zonedDateTime() = string().map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-fun Path.uuid() = string().map(UUID::fromString, java.util.UUID::toString)
+fun Path.nonEmptyString() = this.map(::nonEmpty, { it })
+fun Path.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
+fun Path.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun Path.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun Path.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun Path.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun Path.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
+fun Path.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+fun Path.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+fun Path.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
 fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> {
     val toRegex = pattern.toRegex()
-    return string().map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
+    return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
 }

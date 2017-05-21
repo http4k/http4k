@@ -81,7 +81,8 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
 
     @Test
     fun `can write and read spec as json`() {
-        checkContract(j.lens(spec), """{"hello":"world"}""", j.obj("hello" to j.string("world")))
+        val validValue = """{"hello":"world"}"""
+        checkContract(j.lens(spec), j.obj("hello" to j.string("world")), validValue, "", "hello", "o", "o$validValue", "o$validValue$validValue")
     }
 
     @Test
