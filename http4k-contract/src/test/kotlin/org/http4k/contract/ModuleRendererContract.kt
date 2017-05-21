@@ -11,7 +11,10 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
+import org.http4k.format.Argo
 import org.http4k.format.Argo.json
 import org.http4k.format.Argo.parse
 import org.http4k.lens.BiDiBodyLens
@@ -61,14 +64,14 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                 Route("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
                     .header(Header.optional("header", "description of the header"))
-//                    .returning(ResponseSpec.json(Status.Ok to "peachy", obj("anAnotherObject" to obj("aNumberField" to number(123)))))
-//        .returning(Status.Forbidden to "no way jose")
+                    .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                    .returning("no way jose" to FORBIDDEN)
                     .at(GET) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
             .withRoute(
                 Route("a post endpoint")
                     .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
                     .producing(APPLICATION_JSON)
-//                .returning(ResponseSpec.json(Status.Forbidden to "no way jose", obj("aString" to Argo.JsonFormat.string("a message of some kind"))))
+                    .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
                     .query(Query.int().required("query"))
                     .body(customBody)
                     .at(POST) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })

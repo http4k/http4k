@@ -41,7 +41,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             )
         }
 
-    private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
+    private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 //
 //        val bodyParameters = route.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
@@ -55,22 +55,23 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
 //            val nonBodyParams = allParams.flatMap(render(_, Option.empty))
 //
-//            val jsonRoute = route.method.toString().toLowerCase -> obj(
-//            "tags" -> array(string(basePath.toString)),
-//            "summary" -> string(route.routeSpec.summary),
-//            "description" -> route.routeSpec.description.map(string).getOrElse(nullNode()),
-//            "produces" -> array(route.routeSpec.produces.map(m -> string(m.value))),
-//            "consumes" -> array(route.routeSpec.consumes.map(m -> string(m.value))),
-//            "parameters" -> array(nonBodyParams++bodyAndSchemaAndRendered.flatMap(_._3)),
-//            "responses" -> obj(responses),
-//            "supportedContentTypes" -> array(route.routeSpec.produces.map(m -> string(m.value))),
-//            "security" -> array(security match {
-//            data NoSecurity -> Nil
-//                data ApiKey (_, _) -> List(obj("api_key" -> array()))
-//        })
-//            )
+        val jsonRoute = json.obj(
+            "tags" to json.array(listOf(json.string(basePath.toString()))),
+            "summary" to json.string(route.core.summary),
+            "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
+            "produces" to json.array(route.core.produces.map { json.string(it.value) }),
+            "consumes" to json.array(route.core.consumes.map { json.string(it.value) }),
+            //            //            "parameters" to array(nonBodyParams++ bodyAndSchemaAndRendered . flatMap (_._3)),
+            "responses" to json.obj(responses),
+            "supportedContentTypes" to json.array(route.core.produces.map { json.string(it.value) }),
+            "security" to json.array(when (security) {
+                is ApiKey<*> -> listOf(json.obj("api_key" to json.array(emptyList())))
+                else -> emptyList<NODE>()
+            })
+        )
+
 //            FieldAndDefinitions(jsonRoute, responseDefinitions++ bodyAndSchemaAndRendered . flatMap (_._2).flatMap(_.definitions))
-        return FieldAndDefinitions<NODE>("" to json.obj(listOf()), emptyList())
+        return FieldAndDefinitions <NODE>(route.method.toString().toLowerCase() to jsonRoute, emptyList())
     }
 
     private fun render(responses: List<Pair<String, Response>>) =
