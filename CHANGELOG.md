@@ -2,8 +2,11 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.18.0
+- Add `nonEmptyString()` lens type to all request parts.
+
 ### v1.17.0
-- Automatically handle lens failure in basic routing
+- General rework
 
 ### v1.16.0
 - Further work on Path Lenses. They are now fully supported and consistent for both simple and contract routing scenarios.

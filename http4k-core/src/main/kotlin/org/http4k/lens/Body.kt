@@ -124,8 +124,11 @@ enum class ContentNegotiation {
     abstract operator fun invoke(expected: ContentType, actual: ContentType?)
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<String>
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
     = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ByteBuffer>
+fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
+    = string(contentType, description, contentNegotiation).map(::nonEmpty, { it })
+
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
     = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
