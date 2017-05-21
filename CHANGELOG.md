@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.19.0
+- Add `Swagger` module rendering to `http4k-contract`.
+
 ### v1.18.0
 - Add `nonEmptyString()` lens type to all request parts.
 

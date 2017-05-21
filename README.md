@@ -26,7 +26,7 @@ of services without HTTP container being required.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
    * *Clients:* [Apache, OkHttp](#user-content-client-modules)
    * *Servers:* [Jetty, Netty](#user-content-server-modules)
-   * *Contracts:* [Typesafe, auto-validating, self-documenting HTTP services](#user-content-contracts-module)
+   * *Contracts:* [Typesafe, auto-validating, self-documenting (via Swagger) HTTP services](#user-content-contracts-module)
    * *Message formats:* [Argo JSON, Gson JSON, Jackson JSON](#user-content-message-format-modules)
    * *Templating:* [Handlebars](#user-content-templating-modules)
 
@@ -148,7 +148,7 @@ Basic routing for mapping a URL pattern to an `HttpHandler`:
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
-).startServer(Jetty(8000))
+).asServer(Jetty(8000)).start()
 ```
 
 Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
@@ -278,11 +278,13 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 #### 3. Combining Routes into Modules
 Finally, `ServerRoutes` are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
-val handler: HttpHandler = RouteModule(Root / "context", SimpleJson(Argo))
+val handler: HttpHandler = RouteModule(Root / "context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
     .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
     .withRoute(serverRoute)
     .toHttpHandler()
 ```
+
+When launched, Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
 For a more extended example, see the: [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
 
