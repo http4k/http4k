@@ -14,9 +14,11 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
     internal val method = pathBinder.core.method
     internal val nonBodyParams = core.requestParams.plus(pathBinder.pathLenses).flatMap { it }
 
-    fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
+    internal fun tags(moduleRoot: BasePath) = if (core.tags.isEmpty()) listOf(Tag(moduleRoot.toString())) else core.tags.sortedBy { it.name }
 
-    fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
+    internal fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
+
+    internal fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
 }
 
 abstract class PathBinder internal constructor(internal val core: Core, internal vararg val pathLenses: PathLens<*>) {
@@ -29,7 +31,7 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
             core.matches(moduleRoot, it, pathLenses.toList(), toHandler)
         }
 
-    fun describe(moduleRoot: BasePath): String {
+    internal fun describe(moduleRoot: BasePath): String {
         return "${core.pathFn(moduleRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
     }
 

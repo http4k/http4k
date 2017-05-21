@@ -32,7 +32,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             fieldAndDefinitions.definitions.plus(definitions))
     }
 
-    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>?): ROOT = json.obj(
+    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): ROOT = json.obj(
         "in" to json.string(it.location),
         "name" to json.string(it.name),
         "description" to (it.description?.let(json::string) ?: json.nullNode()),
@@ -40,27 +40,19 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
     )
 
-    private fun <T> T?.asList() = this?.let { listOf(it) } ?: listOf()
-
-    private fun fetchTags(routes: List<ServerRoute>) = routes.flatMap { it.core.tags }.toSet().sortedBy { it.name }
-
-    private fun renderTags(tags: List<Tag>) = json.array(tags.map {
-        json.obj(listOf("name" to json.string(it.name)).plus(it.description?.let { "description" to json.string(it) }.asList()))
-    })
+    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap { it.core.tags }.toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 
         val bodyParamNodes = if (route.core.request?.let { CONTENT_TYPE(it) } == APPLICATION_JSON) {
-            route.core.body?.metas?.map { renderMeta(it, schemaFor(route.core.request)) }
-        } else route.core.body?.metas?.map { renderMeta(it, null) }
+            route.core.body?.metas?.map { renderMeta(it, route.core.request.asSchema()) }
+        } else route.core.body?.metas?.map { renderMeta(it) }
 
-        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it, null) }
-
-        val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString())) else route.core.tags.toList().sortedBy { it.name }
+        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val jsonRoute = json.obj(
-            "tags" to json.array(tags.map { json.string(it.name) }),
+            "tags" to json.array(route.tags(basePath).map { json.string(it.name) }),
             "summary" to json.string(route.core.summary),
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
@@ -74,7 +66,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             })
         )
 
-        val definitions = route.core.request.asList().flatMap { schemaFor(it).definitions }.plus(responseDefinitions)
+        val definitions = route.core.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions)
 
         return FieldAndDefinitions(route.method.toString().toLowerCase() to jsonRoute, definitions.distinct())
     }
@@ -83,33 +75,12 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         responses.fold(FieldsAndDefinitions<NODE>(),
             {
                 memo, (reason, response) ->
-                val newSchema = schemaFor(response)
+                val newSchema = response.asSchema()
                 val newField = response.status.code.toString() to json.obj(
                     "description" to json.string(reason),
                     "schema" to newSchema.node)
                 memo.add(newField, newSchema.definitions)
             })
-
-    private fun schemaFor(message: HttpMessage): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(message.bodyString()))
-    } catch (e: Exception) {
-        JsonSchema(json.nullNode(), emptyList())
-    }
-
-    private fun render(security: Security) = when (security) {
-        is ApiKey<*> -> json.obj(
-            "api_key" to json.obj(
-                "type" to json.string("apiKey"),
-                "in" to json.string(security.param.meta.location),
-                "name" to json.string(security.param.meta.name)
-            ))
-        else -> json.obj(listOf())
-    }
-
-    private fun render(apiInfo: ApiInfo) =
-        json.obj("title" to json.string(apiInfo.title),
-            "version" to json.string(apiInfo.version),
-            "description" to json.string(apiInfo.description ?: ""))
 
     override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         val pathsAndDefinitions = routes
@@ -125,12 +96,34 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         return Response(OK).body(json.pretty(json.obj(
             "swagger" to json.string("2.0"),
-            "info" to render(apiInfo),
+            "info" to apiInfo.asJson(),
             "basePath" to json.string("/"),
-            "tags" to renderTags(fetchTags(routes)),
+            "tags" to json.array(renderTags(routes)),
             "paths" to json.obj(pathsAndDefinitions.fields),
-            "securityDefinitions" to render(security),
+            "securityDefinitions" to security.asJson(),
             "definitions" to json.obj(pathsAndDefinitions.definitions)
         )))
     }
+
+    private fun Security.asJson() = when (this) {
+        is ApiKey<*> -> json.obj(
+            "api_key" to json.obj(
+                "type" to json.string("apiKey"),
+                "in" to json.string(param.meta.location),
+                "name" to json.string(param.meta.name)
+            ))
+        else -> json.obj(listOf())
+    }
+
+    private fun HttpMessage.asSchema(): JsonSchema<NODE> = try {
+        schemaGenerator.toSchema(json.parse(bodyString()))
+    } catch (e: Exception) {
+        JsonSchema(json.nullNode(), emptyList())
+    }
+
+    private fun ApiInfo.asJson() = json.obj("title" to json.string(title), "version" to json.string(version), "description" to json.string(description ?: ""))
+
+    private fun Tag.asJson() = json.obj(listOf("name" to json.string(name)).plus(description?.let { "description" to json.string(it) }.asList()))
 }
+
+private fun <T> T?.asList() = this?.let { listOf(it) } ?: listOf()
