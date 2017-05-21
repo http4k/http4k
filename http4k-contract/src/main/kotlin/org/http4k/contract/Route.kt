@@ -18,6 +18,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.QueryLens
 
 data class Tag(val name: String, val description: String? = null)
+
 class Route private constructor(internal val core: Core) {
     constructor(name: String = "<unknown>", description: String? = null) : this(Core(name, description, null))
 
