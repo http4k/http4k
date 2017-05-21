@@ -7,8 +7,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.lens.ParamMeta.StringParam
 
-data class Container(val s: String?)
-
 object BiDiLensContract {
 
     val spec = BiDiLensSpec("location", StringParam, LensGet { _: String, str: String ->
