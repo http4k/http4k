@@ -1,8 +1,241 @@
 {
-  "resources": {
-    "GET:/basepath/echo/{message}": "summary of this route",
-    "POST:/basepath/echo/{message}": "a post endpoint",
-    "GET:/basepath/welcome/{firstName}/bertrand/{secondName}": "a friendly endpoint",
-    "GET:/basepath/simples": "a simple endpoint"
+  "swagger": "2.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "basePath": "/",
+  "paths": {
+    "/basepath/echo/{message}": {
+      "get": {
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "summary": "summary of this route",
+        "description": "some rambling description of what this thing actually does",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message",
+            "description": null,
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "header",
+            "description": "description of the header",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "schema": null
+          },
+          "202": {
+            "description": "peachy",
+            "schema": {
+              "$ref": "#/definitions/object730416582"
+            }
+          },
+          "200": {
+            "description": "peachy",
+            "schema": {
+              "$ref": "#/definitions/object730416582"
+            }
+          }
+        },
+        "supportedContentTypes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "tag1",
+          "tag2"
+        ],
+        "summary": "a post endpoint",
+        "description": null,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/atom+xml",
+          "application/svg+xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message",
+            "description": null,
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "description": null,
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "the body of the message",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object26492172"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "schema": {
+              "$ref": "#/definitions/object-610697343"
+            }
+          }
+        },
+        "supportedContentTypes": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/welcome/{firstName}/bertrand/{secondName}": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "a friendly endpoint",
+        "description": null,
+        "produces": [],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "firstName",
+            "description": null,
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "secondName",
+            "description": null,
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "description": "description of the query",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "in": "form",
+            "name": "form",
+            "description": "description of the form",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {},
+        "supportedContentTypes": [],
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/simples": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "a simple endpoint",
+        "description": null,
+        "produces": [],
+        "consumes": [],
+        "responses": {},
+        "supportedContentTypes": [],
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "the_api_key"
+    }
+  },
+  "definitions": {
+    "object-610697343": {
+      "type": "object",
+      "properties": {
+        "aString": {
+          "type": "string"
+        }
+      }
+    },
+    "object26492172": {
+      "type": "object",
+      "properties": {
+        "anObject": {
+          "$ref": "#/definitions/object-126230811"
+        }
+      }
+    },
+    "object-945611728": {
+      "type": "object",
+      "properties": {
+        "aNumberField": {
+          "type": "integer"
+        }
+      }
+    },
+    "object730416582": {
+      "type": "object",
+      "properties": {
+        "anAnotherObject": {
+          "$ref": "#/definitions/object-945611728"
+        }
+      }
+    },
+    "object-126230811": {
+      "type": "object",
+      "properties": {
+        "notAStringField": {
+          "type": "integer"
+        }
+      }
+    }
   }
 }

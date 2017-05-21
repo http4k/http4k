@@ -16,7 +16,7 @@ import java.nio.ByteBuffer
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
  */
-open class BodyLens<out FINAL>(val metas: List<Meta>, private val get: (HttpMessage) -> FINAL) : (HttpMessage) -> FINAL {
+open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val get: (HttpMessage) -> FINAL) : (HttpMessage) -> FINAL {
 
     /**
      * Lens operation to get the value from the target
@@ -37,8 +37,9 @@ open class BodyLens<out FINAL>(val metas: List<Meta>, private val get: (HttpMess
  * into a target body.
  */
 class BiDiBodyLens<FINAL>(metas: List<Meta>,
+                          contentType: ContentType,
                           get: (HttpMessage) -> FINAL,
-                          private val set: (FINAL, HttpMessage) -> HttpMessage) : BodyLens<FINAL>(metas, get) {
+                          private val set: (FINAL, HttpMessage) -> HttpMessage) : BodyLens<FINAL>(metas, contentType, get) {
 
     /**
      * Lens operation to set the value into the target
@@ -55,34 +56,35 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
 /**
  * Represents a uni-directional extraction of an entity from a target Body.
  */
-open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val get: LensGet<HttpMessage, ByteBuffer, OUT>) {
+open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, ByteBuffer, OUT>) {
     /**
      * Create a lens for this Spec
      */
     open fun toLens(): BodyLens<OUT> {
         val getLens = get("")
-        return BodyLens(metas, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
+        return BodyLens(metas, contentType, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
     }
 
     /**
      * Create another BodyLensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a Body.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodyLensSpec<NEXT> = BodyLensSpec(metas, get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): BodyLensSpec<NEXT> = BodyLensSpec(metas, contentType, get.map(nextIn))
 }
 
 /**
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target Body.
  */
 open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
+                                 contentType: ContentType,
                                  get: LensGet<HttpMessage, ByteBuffer, OUT>,
-                                 private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, get) {
+                                 private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a Body.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiBodyLensSpec(metas, contentType, get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -90,20 +92,21 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
     override fun toLens(): BiDiBodyLens<OUT> {
         val getLens = get("")
         val setLens = set("")
-        return BiDiBodyLens(metas,
+        return BiDiBodyLens(metas, contentType,
             { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing)) else it.first() } },
             { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: kotlin.collections.emptyList(), target) }
         )
     }
 }
 
-internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) = BiDiBodyLensSpec(metas,
-    LensGet { _, target ->
-        contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
-        target.body.let { listOf(it.payload) }
-    },
-    LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE of acceptedContentType) }
-)
+internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) =
+    BiDiBodyLensSpec(metas, acceptedContentType,
+        LensGet { _, target ->
+            contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
+            target.body.let { listOf(it.payload) }
+        },
+        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE of acceptedContentType) }
+    )
 
 /**
  * Modes for determining if a passed content type is acceptable.

@@ -9,6 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Failure
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.HeaderLens
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
@@ -19,13 +20,16 @@ class Route private constructor(internal val core: Core) {
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
-    fun body(new: BodyLens<*>) = Route(core.copy(body = new))
+    fun body(new: BodyLens<*>) = Route(core.copy(body = new, consumes = core.consumes.plus(new.contentType)))
 
     @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new.second.status to new)))
+    fun returning(new: Pair<String, Response>) =
+        Route(core.copy(
+            produces = core.produces.plus(CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
+            responses = core.responses.plus(new.second.status to new)))
 
     @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = Route(core.copy(responses = core.responses.plus(new.second to (new.first to Response(new.second)))))
+    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
 
     fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
     fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))

@@ -51,7 +51,6 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
             equalTo("""{"message":"No route found on this path. Have you used the correct HTTP verb?"}"""))
     }
 
-
     @Test
     fun `renders as expected`() {
 
@@ -86,8 +85,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = module.toHttpHandler()(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-        println(expected)
-        println(actual)
+//        assertEquals(expected, actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }
