@@ -10,14 +10,12 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.UriTemplate.Companion.uriTemplate
 import org.http4k.core.findSingle
-import org.http4k.core.then
-import org.http4k.filter.ServerFilters.CatchLensFailure
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, uriTemplate(second), action)
 
-fun routes(vararg routes: Route): HttpHandler = CatchLensFailure.then(RoutedHandler(*routes))
+fun routes(vararg routes: Route): HttpHandler = RoutedHandler(*routes)
 
 class RoutedHandler(vararg private val routes: Route) : HttpHandler {
     override fun invoke(request: Request): Response {

@@ -7,10 +7,8 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
-import org.http4k.lens.LensFailure
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -107,16 +105,4 @@ class RoutedHandlerTest {
             assertThat(e.message, equalTo("x-uri-template header not present in the request"))
         }
     }
-
-    @Test
-    fun converts_lens_failure_to_400() {
-        val routes = routes(Method.GET to "/" by { throw LensFailure() })
-
-        val response = routes(Request(Method.GET, "/"))
-
-        assertThat(response.status, equalTo(BAD_REQUEST))
-        assertThat(response.status.description, equalTo("Bad Request"))
-    }
-
-
 }
