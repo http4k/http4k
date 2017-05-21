@@ -29,9 +29,11 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                                         val security: Security = NoSecurity,
                                         val descriptionPath: (BasePath) -> BasePath = { it },
                                         val routes: List<ServerRoute> = emptyList()) : Router {
+            private val descriptionRoute = descriptionRoute()
 
-            private val routers = routes.plus(descriptionRoute())
-                .map { it.router(moduleRoot) to security.filter.then(identify(it).then(filter)) }
+            private val routers = routes
+                .map { it.router(moduleRoot) to security.filter.then(identify(it)).then(filter) }
+                .plus(descriptionRoute.router(moduleRoot) to identify(descriptionRoute).then(filter))
 
             private val noMatch: HttpHandler? = null
 
@@ -45,7 +47,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
             fun withRoutes(new: List<ServerRoute>) = copy(routes = routes + new)
             fun securedBy(new: Security) = copy(security = new)
 
-            private fun descriptionRoute() =
+            private fun descriptionRoute(): ServerRoute =
                 PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind
                     { renderer.description(moduleRoot, security, routes) }
 

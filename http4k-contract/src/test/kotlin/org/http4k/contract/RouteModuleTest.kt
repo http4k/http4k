@@ -59,7 +59,8 @@ class RouteModuleTest {
     fun `applies security and responds with a 401 to unauthorized requests`() {
         val response = routeModule
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
-            .toHttpHandler()(Request(Method.GET, "?key=sue"))
+            .withRoute(Route().at(GET) / "bob" bind { Response(OK)})
+            .toHttpHandler()(Request(Method.GET, "/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
@@ -67,7 +68,8 @@ class RouteModuleTest {
     fun `applies security and responds with a 200 to authorized requests`() {
         val response = routeModule
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
-            .toHttpHandler()(Request(Method.GET, "?key=bob"))
+            .withRoute(Route().at(GET) / "bob" bind { Response(OK)})
+            .toHttpHandler()(Request(Method.GET, "/bob?key=bob"))
         assertThat(response.status, equalTo(OK))
     }
 
