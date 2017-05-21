@@ -1,13 +1,11 @@
 package org.http4k.contract
 
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
-import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.Meta
 import util.JsonSchema
 import util.JsonToJsonSchema
@@ -60,9 +58,9 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 
-        val schema = if (route.core.request?.let { CONTENT_TYPE(it) } == APPLICATION_JSON) route.core.request.asSchema() else null
+        val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.core.body?.metas?.map { renderMeta(it, schema) }
+        val bodyParamNodes = route.core.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
@@ -72,7 +70,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
             "consumes" to json.array(route.core.consumes.map { json.string(it.value) }),
-            "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes ?: emptyList())),
+            "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes)),
             "responses" to json.obj(responses),
             "supportedContentTypes" to json.array(route.core.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {

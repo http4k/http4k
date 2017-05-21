@@ -1,10 +1,12 @@
 package org.http4k.contract
 
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
@@ -13,6 +15,8 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
     internal val core = pathBinder.core.route.core
     internal val method = pathBinder.core.method
     internal val nonBodyParams = core.requestParams.plus(pathBinder.pathLenses).flatMap { it }
+
+    internal val jsonRequest: Request? = core.request?.let { if (Header.Common.CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) it else null }
 
     internal fun tags(moduleRoot: BasePath) = if (core.tags.isEmpty()) listOf(Tag(moduleRoot.toString())) else core.tags.sortedBy { it.name }
 
