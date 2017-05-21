@@ -40,8 +40,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             .fold(FieldsAndDefinitions<NODE>(), {
                 memo, (path, routes) ->
                 val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), {
-                    memoFields, route ->
-                    memoFields.add(render(moduleRoot, security, route))
+                    memoFields, route -> memoFields.add(render(moduleRoot, security, route))
                 })
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
             })
