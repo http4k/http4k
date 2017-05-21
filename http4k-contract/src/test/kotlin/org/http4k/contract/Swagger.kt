@@ -41,6 +41,21 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             )
         }
 
+    private fun <T> T?.asList() = this?.let { listOf(it) } ?: listOf()
+
+    private fun fetchTags(routes: List<ServerRoute>) = routes
+        .flatMap { it.core.tags }
+        .toSet()
+        .sortedBy { it.name }
+
+    private fun renderTags(tags: List<Tag>) = json.array(tags.map {
+        json.obj(listOf("name" to json.string(it.name)).plus(it.description?.let { "description" to json.string(it) }.asList()))
+    })
+
+    //    routes
+//    .flatMap(_.routeSpec.tags)
+//    .distinct
+//    .sortBy(_.name)
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 //
@@ -55,8 +70,11 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
 //            val nonBodyParams = allParams.flatMap(render(_, Option.empty))
 //
+        val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString()))
+        else route.core.tags.toList().sortedBy { it.name }
+
         val jsonRoute = json.obj(
-            "tags" to json.array(listOf(json.string(basePath.toString()))),
+            "tags" to json.array(tags.map { json.string(it.name) }),
             "summary" to json.string(route.core.summary),
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
@@ -120,6 +138,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "swagger" to json.string("2.0"),
             "info" to render(apiInfo),
             "basePath" to json.string("/"),
+            "tags" to renderTags(fetchTags(routes)),
             "paths" to json.obj(pathsAndDefinitions.fields),
             "securityDefinitions" to render(security),
             "definitions" to json.obj(pathsAndDefinitions.definitions)

@@ -6,6 +6,18 @@
     "description": "module description"
   },
   "basePath": "/",
+  "tags": [
+    {
+      "name": "tag1"
+    },
+    {
+      "name": "tag2",
+      "description": "description of tag"
+    },
+    {
+      "name": "tag3"
+    }
+  ],
   "paths": {
     "/basepath/echo/{message}": {
       "get": {
@@ -73,8 +85,7 @@
           "application/json"
         ],
         "consumes": [
-          "application/atom+xml",
-          "application/svg+xml",
+          "application/xml",
           "application/json"
         ],
         "parameters": [

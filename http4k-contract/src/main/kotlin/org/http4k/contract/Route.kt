@@ -15,12 +15,15 @@ import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.QueryLens
 
+data class Tag(val name: String, val description: String? = null)
 class Route private constructor(internal val core: Core) {
     constructor(name: String = "<unknown>", description: String? = null) : this(Core(name, description, null))
 
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun body(new: BodyLens<*>) = Route(core.copy(body = new, consumes = core.consumes.plus(new.contentType)))
+    fun taggedWith(tag: String) = taggedWith(Tag(tag))
+    fun taggedWith(vararg tags: Tag) = Route(core.copy(tags = core.tags.plus(tags)))
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) =
@@ -40,6 +43,7 @@ class Route private constructor(internal val core: Core) {
         internal data class Core(val summary: String,
                                  val description: String?,
                                  val body: BodyLens<*>?,
+                                 val tags: Set<Tag> = emptySet(),
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
