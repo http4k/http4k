@@ -19,6 +19,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
     fun `looks up types`() {
         assertThat(j.typeOf(j.string("")), equalTo(JsonType.String))
         assertThat(j.typeOf(j.number(1)), equalTo(JsonType.Number))
+        assertThat(j.typeOf(j.number(1.0)), equalTo(JsonType.Number))
         assertThat(j.typeOf(j.boolean(true)), equalTo(JsonType.Boolean))
         assertThat(j.typeOf(j.nullNode()), equalTo(JsonType.Null))
         assertThat(j.typeOf(j.obj("name" to j.string(""))), equalTo(JsonType.Object))

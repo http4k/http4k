@@ -58,6 +58,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
                 ArrayGen(json.elements(node).flatMap { process(arrayName, it) }.toSet())
             }
             JsonType.String -> Primitives.StringValue
+            JsonType.Integer -> Primitives.Number
             JsonType.Number -> Primitives.Number
             JsonType.Boolean -> Primitives.Boolean
             JsonType.Null -> Primitives.Null

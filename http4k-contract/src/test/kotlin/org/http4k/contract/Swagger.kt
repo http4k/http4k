@@ -37,7 +37,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
                 "name" to json.string(it.name),
                 "description" to (it.description?.let(json::string) ?: json.nullNode()),
                 "required" to json.boolean(it.required),
-                schema?.let { "schema" to it.node } ?: "type" to json.string(it.name)
+                schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
             )
         }
 
@@ -66,9 +66,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 //                (p, exampleOption, render(p, exampleOption))
 //            })
 //
-        val nonBodyParams = route.allParams.map { render(listOf(it), null) }
-
-//            val nonBodyParams = allParams.flatMap(render(_, Option.empty))
+        val nonBodyParams = route.allParams.flatMap { render(listOf(it), null) }
 //
         val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString()))
         else route.core.tags.toList().sortedBy { it.name }
@@ -79,7 +77,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
             "consumes" to json.array(route.core.consumes.map { json.string(it.value) }),
-            //            //            "parameters" to array(nonBodyParams++ bodyAndSchemaAndRendered . flatMap (_._3)),
+            "parameters" to json.array(nonBodyParams),
             "responses" to json.obj(responses),
             "supportedContentTypes" to json.array(route.core.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {

@@ -13,7 +13,7 @@ import java.nio.ByteBuffer
 
 typealias FormFields = Map<String, List<String>>
 
-object FormField : BiDiLensSpec<WebForm, String, String>("form field",
+object FormField : BiDiLensSpec<WebForm, String, String>("form",
     StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }

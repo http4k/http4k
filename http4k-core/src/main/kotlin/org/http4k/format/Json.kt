@@ -59,5 +59,5 @@ interface Json<ROOT : NODE, NODE : Any> {
 }
 
 enum class JsonType {
-    Object, Array, String, Number, Boolean, Null
+    Object, Array, String, Integer, Number, Boolean, Null
 }

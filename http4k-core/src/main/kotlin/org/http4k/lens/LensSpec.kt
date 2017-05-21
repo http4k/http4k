@@ -1,6 +1,7 @@
 package org.http4k.lens
 
 import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -194,8 +195,8 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String,
 
 fun <IN> BiDiLensSpec<IN, String, String>.string() = this
 fun <IN> BiDiLensSpec<IN, String, String>.nonEmptyString() = this.map(::nonEmpty, { it })
-fun <IN> BiDiLensSpec<IN, String, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
+fun <IN> BiDiLensSpec<IN, String, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
 fun <IN> BiDiLensSpec<IN, String, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
 fun <IN> BiDiLensSpec<IN, String, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
 fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
