@@ -32,7 +32,7 @@ import java.time.Clock
  * - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)
  * - Custom filters (latency)
  * - API key security via a typesafe Query parameter (this can be a header or a body parameter as well)
- * - Swagger API documentation - Run this example and point a browser at http://petstore.swagger.io/?url=http://localhost:8000/context
+ * - Swagger API documentation - Run this example and point a browser at http://petstore.swagger.io/?url=http://localhost:8000/context/swagger.json
  */
 fun main(args: Array<String>) {
 
@@ -52,6 +52,7 @@ fun main(args: Array<String>) {
         name, latency ->
         println(name + " took " + latency)
     }))
+        .withDescriptionPath { it / "swagger.json" }
         .securedBy(ApiKey(Query.int().required("apiKey"), { it == 42 }))
         .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
         .withRoute(Route("echo").at(GET) / "echo" / Path.of("name") / Path.int().of("age") bind ::echo)

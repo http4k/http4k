@@ -18,6 +18,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
     override fun toRouter(): Router = router
 
     fun securedBy(new: Security) = RouteModule(router.securedBy(new))
+    fun withDescriptionPath(fn: (BasePath) -> BasePath) = RouteModule(router.copy(descriptionPath = fn))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
     fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(router.withRoutes(new.toList()))

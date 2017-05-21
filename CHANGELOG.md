@@ -2,11 +2,14 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.20.0
+- `http4k-contracts`: Add option to change the route of the module description route
+
 ### v1.19.1
-- Fix for contract module description routes not being authenticated via security filter
+- `http4k-contracts`: Fix for contract module description routes not being authenticated via security filter
 
 ### v1.19.0
-- Add `Swagger` module rendering to `http4k-contract`.
+- `http4k-contracts`: Add `Swagger` module rendering with JSON schema models for messages.
 
 ### v1.18.0
 - Add `nonEmptyString()` lens type to all request parts.

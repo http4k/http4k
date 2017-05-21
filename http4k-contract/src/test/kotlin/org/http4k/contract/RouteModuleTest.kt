@@ -73,4 +73,12 @@ class RouteModuleTest {
         assertThat(response.status, equalTo(OK))
     }
 
+    @Test
+    fun `can change path to description route`() {
+        val response = routeModule
+            .withDescriptionPath { it / "docs" / "swagger.json" }
+            .toHttpHandler()(Request(Method.GET, "/docs/swagger.json"))
+        assertThat(response.status, equalTo(OK))
+    }
+
 }
