@@ -154,14 +154,22 @@ routes(
 Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
-Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). A Lens is a bi-directional entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). Some examples of declarations are:
+Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
+For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). A Lens is a bi-directional 
+entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL 
+to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement 
+for those parts (i.e. mandatory or optional). Some examples of declarations are:
 
 ```kotlin
-val requiredQuery = Query.required("myQueryName")
-val optionalHeader = Header.int().optional("Content-Length")
 val pathLocalDate = Path.localDate().of("date")
+val requiredQuery = Query.required("myQueryName")
+val nonEmptyQuery = Query.nonEmptyString().required("myNonEmptyQuery")
+val optionalHeader = Header.int().optional("Content-Length")
 val responseBody = Body.string(PLAIN_TEXT).toLens()
+```
 
+Most of the useful common JDK types are covered. However, if we want to use our own types, we can just use `map()`
+```kotlin
 data class CustomType(val value: String)
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
 ```
