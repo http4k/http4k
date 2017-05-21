@@ -14,7 +14,7 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
     internal val core = pathBinder.core.route.core
     internal val method = pathBinder.core.method
     internal val allParams =
-        core.requestParams.plus(pathBinder.pathLenses).map { it.meta }.plus(core.body?.metas ?: emptyList<Meta>())
+        core.requestParams.plus(pathBinder.pathLenses).flatMap { it }.plus(core.body?.metas ?: emptyList<Meta>())
 
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 

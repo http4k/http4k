@@ -11,6 +11,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -54,7 +55,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
     @Test
     fun `renders as expected`() {
 
-        val customBody: BiDiBodyLens<JsonRootNode> = Body.json().toLens()
+        val customBody: BiDiBodyLens<JsonRootNode> = Body.json("the body of the message").toLens()
 //        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
 
         val module = RouteModule(Root / "basepath", renderer)
@@ -64,6 +65,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                     .producing(APPLICATION_JSON)
                     .header(Header.optional("header", "description of the header"))
                     .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                    .returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
                     .returning("no way jose" to FORBIDDEN)
                     .taggedWith("tag3")
                     .taggedWith("tag1")
