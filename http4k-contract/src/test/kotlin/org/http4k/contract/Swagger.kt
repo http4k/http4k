@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.core.HttpMessage
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Json
@@ -52,24 +53,12 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         json.obj(listOf("name" to json.string(it.name)).plus(it.description?.let { "description" to json.string(it) }.asList()))
     })
 
-    //    routes
-//    .flatMap(_.routeSpec.tags)
-//    .distinct
-//    .sortBy(_.name)
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
-//
-//        val bodyParameters = route.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
-//
-//            val bodyAndSchemaAndRendered = bodyParams.map {p ->
-//                val exampleOption = p.example.flatMap(s -> Try (parse(s)).toOption).map(schemaGenerator.toSchema)
-//                (p, exampleOption, render(p, exampleOption))
-//            })
-//
+
         val nonBodyParams = route.allParams.flatMap { render(listOf(it), null) }
-//
-        val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString()))
-        else route.core.tags.toList().sortedBy { it.name }
+
+        val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString())) else route.core.tags.toList().sortedBy { it.name }
 
         val jsonRoute = json.obj(
             "tags" to json.array(tags.map { json.string(it.name) }),
@@ -86,24 +75,27 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             })
         )
 
-//            FieldAndDefinitions(jsonRoute, responseDefinitions++ bodyAndSchemaAndRendered . flatMap (_._2).flatMap(_.definitions))
-        return FieldAndDefinitions <NODE>(route.method.toString().toLowerCase() to jsonRoute, emptyList())
+        val definitions = route.core.request.asList().flatMap { schemaFor(it).definitions }.plus(responseDefinitions)
+
+        return FieldAndDefinitions(route.method.toString().toLowerCase() to jsonRoute, definitions.distinct())
     }
 
     private fun render(responses: List<Pair<String, Response>>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
             {
                 memo, (reason, response) ->
-                val newSchema = try {
-                    schemaGenerator.toSchema(json.parse(response.bodyString()))
-                } catch (e: Exception) {
-                    JsonSchema(json.nullNode(), emptyList())
-                }
+                val newSchema = schemaFor(response)
                 val newField = response.status.code.toString() to json.obj(
                     "description" to json.string(reason),
                     "schema" to newSchema.node)
                 memo.add(newField, newSchema.definitions)
             })
+
+    private fun schemaFor(message: HttpMessage): JsonSchema<NODE> = try {
+        schemaGenerator.toSchema(json.parse(message.bodyString()))
+    } catch (e: Exception) {
+        JsonSchema(json.nullNode(), emptyList())
+    }
 
     private fun render(security: Security) = when (security) {
         is ApiKey<*> -> json.obj(

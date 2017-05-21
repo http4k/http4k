@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import argo.jdom.JsonRootNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
@@ -18,7 +17,6 @@ import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.format.Argo.json
 import org.http4k.format.Argo.parse
-import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.FormField
 import org.http4k.lens.FormValidator.Strict
 import org.http4k.lens.Header
@@ -54,9 +52,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 
     @Test
     fun `renders as expected`() {
-
-        val customBody: BiDiBodyLens<JsonRootNode> = Body.json("the body of the message").toLens()
-//        , Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
+        val customBody = Body.json("the body of the message").toLens()
 
         val module = RouteModule(Root / "basepath", renderer)
             .securedBy(ApiKey(Query.required("the_api_key"), { true }))
@@ -78,7 +74,7 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
                     .taggedWith("tag1")
                     .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
                     .query(Query.int().required("query"))
-                    .body(customBody)
+                    .body(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
                     .at(POST) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
             .withRoute(
                 Route("a friendly endpoint")

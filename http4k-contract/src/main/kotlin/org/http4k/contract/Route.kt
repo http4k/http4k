@@ -7,6 +7,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.with
+import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.Common.CONTENT_TYPE
@@ -22,6 +24,8 @@ class Route private constructor(internal val core: Core) {
     fun header(new: HeaderLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun query(new: QueryLens<*>) = Route(core.copy(requestParams = core.requestParams.plus(listOf(new))))
     fun body(new: BodyLens<*>) = Route(core.copy(body = new, consumes = core.consumes.plus(new.contentType)))
+    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): Route = Route(core.copy(request = Request(Method.GET, "").with(new.first of new.second))).body(new.first)
+
     fun taggedWith(tag: String) = taggedWith(Tag(tag))
     fun taggedWith(vararg tags: Tag) = Route(core.copy(tags = core.tags.plus(tags)))
 
@@ -43,6 +47,7 @@ class Route private constructor(internal val core: Core) {
         internal data class Core(val summary: String,
                                  val description: String?,
                                  val body: BodyLens<*>?,
+                                 val request: Request? = null,
                                  val tags: Set<Tag> = emptySet(),
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),

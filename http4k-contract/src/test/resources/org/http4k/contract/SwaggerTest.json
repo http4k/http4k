@@ -209,7 +209,23 @@
     }
   },
   "definitions": {
-    "object-610697343": {
+    "object-126231440": {
+      "type": "object",
+      "properties": {
+        "notAStringField": {
+          "type": "integer"
+        }
+      }
+    },
+    "object26517582": {
+      "type": "object",
+      "properties": {
+        "anObject": {
+          "$ref": "#/definitions/object-126231440"
+        }
+      }
+    },
+    "object-610697972": {
       "type": "object",
       "properties": {
         "aString": {
@@ -217,15 +233,7 @@
         }
       }
     },
-    "object26492172": {
-      "type": "object",
-      "properties": {
-        "anObject": {
-          "$ref": "#/definitions/object-126230811"
-        }
-      }
-    },
-    "object-945611728": {
+    "object-945612357": {
       "type": "object",
       "properties": {
         "aNumberField": {
@@ -233,19 +241,11 @@
         }
       }
     },
-    "object730416582": {
+    "object730441992": {
       "type": "object",
       "properties": {
         "anAnotherObject": {
-          "$ref": "#/definitions/object-945611728"
-        }
-      }
-    },
-    "object-126230811": {
-      "type": "object",
-      "properties": {
-        "notAStringField": {
-          "type": "integer"
+          "$ref": "#/definitions/object-945612357"
         }
       }
     }

@@ -1,12 +1,19 @@
 package org.http4k.format
 
+import org.http4k.asByteBuffer
+import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.string
+import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.ContentNegotiation.NonStrict
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.root
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.ByteBuffer
 
 /**
  * This is the contract for all JSON implementations
@@ -54,8 +61,12 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
-    fun body(description: String? = null): BiDiBodyLensSpec<ROOT> = Body.string(APPLICATION_JSON, description).map({ parse(it) }, { compact(it) })
-    fun Body.Companion.json(description: String? = null): BiDiBodyLensSpec<ROOT> = body(description)
+    fun body(description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ROOT> =
+        root(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
+            .map(ByteBuffer::asString, String::asByteBuffer)
+            .map({ parse(it) }, { compact(it) })
+
+    fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
 }
 
 enum class JsonType {
