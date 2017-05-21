@@ -19,12 +19,23 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private val schemaGenerator = JsonToJsonSchema(json)
     private val errors = JsonErrorResponseRenderer(json)
 
-    override fun badRequest(failures: List<Failure>): Response = errors.badRequest(failures)
+    override fun badRequest(failures: List<Failure>) = errors.badRequest(failures)
 
-    override fun notFound(): Response = errors.notFound()
+    override fun notFound() = errors.notFound()
 
-    override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
-        val pathsAndDefinitions = routes
+    override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>) =
+        Response(OK).body(json.pretty(json.obj(
+            "swagger" to json.string("2.0"),
+            "info" to apiInfo.asJson(),
+            "basePath" to json.string("/"),
+            "tags" to json.array(renderTags(routes)),
+            "paths" to json.obj(renderPaths(routes, moduleRoot, security).fields),
+            "securityDefinitions" to security.asJson(),
+            "definitions" to json.obj(renderPaths(routes, moduleRoot, security).definitions)
+        )))
+
+    private fun renderPaths(routes: List<ServerRoute>, moduleRoot: BasePath, security: Security): FieldsAndDefinitions<NODE> {
+        return routes
             .groupBy { it.describeFor(moduleRoot) }.entries
             .fold(FieldsAndDefinitions<NODE>(), {
                 memo, (path, routes) ->
@@ -34,16 +45,6 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
                 })
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
             })
-
-        return Response(OK).body(json.pretty(json.obj(
-            "swagger" to json.string("2.0"),
-            "info" to apiInfo.asJson(),
-            "basePath" to json.string("/"),
-            "tags" to json.array(renderTags(routes)),
-            "paths" to json.obj(pathsAndDefinitions.fields),
-            "securityDefinitions" to security.asJson(),
-            "definitions" to json.obj(pathsAndDefinitions.definitions)
-        )))
     }
 
     private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): ROOT = json.obj(
