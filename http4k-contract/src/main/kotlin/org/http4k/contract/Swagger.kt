@@ -55,7 +55,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
     )
 
-    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap { it.tags }.toSet().sortedBy { it.name }.map { it.asJson() }
+    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap(ServerRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
@@ -87,8 +87,6 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         return FieldAndDefinitions(route.method.toString().toLowerCase() to pathJson, definitions)
     }
 
-    private fun ServerRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
-
     private fun render(responses: List<Pair<String, Response>>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
             {
@@ -115,6 +113,8 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     } catch (e: Exception) {
         JsonSchema(json.nullNode(), emptyList())
     }
+
+    private fun ServerRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
 
     private fun ApiInfo.asJson() = json.obj("title" to json.string(title), "version" to json.string(version), "description" to json.string(description ?: ""))
 
