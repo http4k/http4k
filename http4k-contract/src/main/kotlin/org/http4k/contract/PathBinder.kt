@@ -18,7 +18,7 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
 
     internal val jsonRequest: Request? = core.request?.let { if (Header.Common.CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) it else null }
 
-    internal fun tags(moduleRoot: BasePath) = if (core.tags.isEmpty()) listOf(Tag(moduleRoot.toString())) else core.tags.sortedBy { it.name }
+    internal val tags = core.tags.toSet().sortedBy { it.name }
 
     internal fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 

@@ -12,6 +12,8 @@ import util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
+private typealias ReasonToResponse = Pair<String, Response>
+
 class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ModuleRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
@@ -53,7 +55,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
     )
 
-    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap { it.core.tags }.toSet().sortedBy { it.name }.map { it.asJson() }
+    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap { it.tags }.toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
@@ -64,8 +66,9 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
-        val jsonRoute = json.obj(
-            "tags" to json.array(route.tags(basePath).map { json.string(it.name) }),
+        val routeTags = if(route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
+        val pathJson = json.obj(
+            "tags" to json.array(routeTags),
             "summary" to json.string(route.core.summary),
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
@@ -81,8 +84,10 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         val definitions = route.core.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
 
-        return FieldAndDefinitions(route.method.toString().toLowerCase() to jsonRoute, definitions)
+        return FieldAndDefinitions(route.method.toString().toLowerCase() to pathJson, definitions)
     }
+
+    private fun ServerRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
 
     private fun render(responses: List<Pair<String, Response>>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
