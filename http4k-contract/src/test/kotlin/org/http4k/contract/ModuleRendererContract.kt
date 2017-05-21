@@ -87,7 +87,6 @@ abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = module.toHttpHandler()(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        assertEquals(expected, actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }

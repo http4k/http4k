@@ -1,11 +1,13 @@
 package org.http4k.contract
 
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.Meta
 import util.JsonSchema
 import util.JsonToJsonSchema
@@ -30,24 +32,17 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             fieldAndDefinitions.definitions.plus(definitions))
     }
 
-
-    private fun render(parameters: Iterable<Meta>, schema: JsonSchema<NODE>?) =
-        parameters.map {
-            json.obj(
-                "in" to json.string(it.location),
-                "name" to json.string(it.name),
-                "description" to (it.description?.let(json::string) ?: json.nullNode()),
-                "required" to json.boolean(it.required),
-                schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
-            )
-        }
+    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>?): ROOT = json.obj(
+        "in" to json.string(it.location),
+        "name" to json.string(it.name),
+        "description" to (it.description?.let(json::string) ?: json.nullNode()),
+        "required" to json.boolean(it.required),
+        schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
+    )
 
     private fun <T> T?.asList() = this?.let { listOf(it) } ?: listOf()
 
-    private fun fetchTags(routes: List<ServerRoute>) = routes
-        .flatMap { it.core.tags }
-        .toSet()
-        .sortedBy { it.name }
+    private fun fetchTags(routes: List<ServerRoute>) = routes.flatMap { it.core.tags }.toSet().sortedBy { it.name }
 
     private fun renderTags(tags: List<Tag>) = json.array(tags.map {
         json.obj(listOf("name" to json.string(it.name)).plus(it.description?.let { "description" to json.string(it) }.asList()))
@@ -56,7 +51,17 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 
-        val nonBodyParams = route.allParams.flatMap { render(listOf(it), null) }
+        val bodyParamNodes = if (route.core.request?.let { CONTENT_TYPE(it) } == APPLICATION_JSON) {
+            route.core.body?.metas?.map { renderMeta(it, schemaFor(route.core.request)) }
+        } else route.core.body?.metas?.map { renderMeta(it, null) }
+
+            route.nonBodyParams.flatMap {
+                listOf(it).map {
+                    renderMeta(it, null)
+                }
+            }
+
+        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it, null) }
 
         val tags = if (route.core.tags.isEmpty()) listOf(Tag(basePath.toString())) else route.core.tags.toList().sortedBy { it.name }
 
@@ -66,7 +71,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
             "produces" to json.array(route.core.produces.map { json.string(it.value) }),
             "consumes" to json.array(route.core.consumes.map { json.string(it.value) }),
-            "parameters" to json.array(nonBodyParams),
+            "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes ?: emptyList())),
             "responses" to json.obj(responses),
             "supportedContentTypes" to json.array(route.core.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {

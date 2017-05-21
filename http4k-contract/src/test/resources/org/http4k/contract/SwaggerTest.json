@@ -109,7 +109,7 @@
             "description": "the body of the message",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/object26492172"
+              "$ref": "#/definitions/object26517582"
             }
           }
         ],

@@ -6,15 +6,13 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.LensFailure
-import org.http4k.lens.Meta
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal val core = pathBinder.core.route.core
     internal val method = pathBinder.core.method
-    internal val allParams =
-        core.requestParams.plus(pathBinder.pathLenses).flatMap { it }.plus(core.body?.metas ?: emptyList<Meta>())
+    internal val nonBodyParams = core.requestParams.plus(pathBinder.pathLenses).flatMap { it }
 
     fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
 
