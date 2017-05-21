@@ -22,10 +22,10 @@ class Route private constructor(internal val core: Core) {
     fun body(new: BodyLens<*>) = Route(core.copy(body = new))
 
     @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new)))
+    fun returning(new: Pair<String, Response>) = Route(core.copy(responses = core.responses.plus(new.second.status to new)))
 
     @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = Route(core.copy(responses = core.responses.plus(new.first to Response(new.second))))
+    fun returning(new: Pair<String, Status>) = Route(core.copy(responses = core.responses.plus(new.second to (new.first to Response(new.second)))))
 
     fun producing(vararg new: ContentType) = Route(core.copy(produces = core.produces.plus(new)))
     fun consuming(vararg new: ContentType) = Route(core.copy(consumes = core.consumes.plus(new)))
@@ -39,7 +39,7 @@ class Route private constructor(internal val core: Core) {
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: List<Pair<String, Response>> = emptyList()) {
+                                 val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
 
             internal val validationFilter = Filter {
                 next ->

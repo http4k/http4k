@@ -42,7 +42,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         }
 
     private fun render(moduleRoot: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
-        val (responses, responseDefinitions) = render(route.core.responses)
+        val (responses, responseDefinitions) = render(route.core.responses.values.toList())
 //
 //        val bodyParameters = route.body.flatMap(p -> Option (p.toList)).getOrElse(Nil)
 //
