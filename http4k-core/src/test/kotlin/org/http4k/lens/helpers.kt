@@ -15,8 +15,13 @@ object BiDiLensContract {
         LensSet { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
 
     fun <IN, T> checkContract(spec: BiDiLensSpec<IN, String, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN, s: IN, modifiedValue: IN, listModifiedValue: IN) {
+        //synonym methods
+        assertThat(spec.required("hello").extract(validValue), equalTo(tValue))
+        assertThat(spec.required("hello").inject(tValue, s), equalTo(modifiedValue))
+
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(validValue), equalTo(tValue))
+        assertThat(optionalLens.extract(validValue), equalTo(tValue))
         assertThat((spec.map { it.toString() }.optional("hello"))(validValue), equalTo(tValue.toString()))
         assertThat(optionalLens(nullValue), absent())
         assertThat({ optionalLens(invalidValue) }, throws(equalTo(LensFailure(optionalLens.invalid()))))

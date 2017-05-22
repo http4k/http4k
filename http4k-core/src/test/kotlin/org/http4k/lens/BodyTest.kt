@@ -50,6 +50,14 @@ class BodyTest {
     }
 
     @Test
+    fun `synonym methods roundtrip`() {
+        val body = Body.string(TEXT_PLAIN).toLens()
+        body.inject("hello", emptyRequest)
+        val withBody = emptyRequest.with(body of "hello")
+        assertThat(body.extract(withBody), equalTo("hello"))
+    }
+
+    @Test
     fun `can create a custom Body type and get and set on request`() {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType, { it.value }).toLens()
 

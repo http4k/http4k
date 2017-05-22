@@ -16,13 +16,8 @@ import java.nio.ByteBuffer
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
  */
-open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val get: (HttpMessage) -> FINAL) : (HttpMessage) -> FINAL {
+open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val get: (HttpMessage) -> FINAL) : LensExtractor<HttpMessage, FINAL> {
 
-    /**
-     * Lens operation to get the value from the target
-     * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
-     */
-    @Throws(LensFailure::class)
     override operator fun invoke(target: HttpMessage): FINAL = try {
         get(target)
     } catch (e: LensFailure) {
@@ -39,18 +34,11 @@ open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentTy
 class BiDiBodyLens<FINAL>(metas: List<Meta>,
                           contentType: ContentType,
                           get: (HttpMessage) -> FINAL,
-                          private val set: (FINAL, HttpMessage) -> HttpMessage) : BodyLens<FINAL>(metas, contentType, get) {
+                          private val set: (FINAL, HttpMessage) -> HttpMessage)
+    : LensInjector<HttpMessage, FINAL>, BodyLens<FINAL>(metas, contentType, get) {
 
-    /**
-     * Lens operation to set the value into the target
-     */
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
-
-    /**
-     * Bind this Lens to a value, so we can set it into a target
-     */
-    infix fun <R : HttpMessage> of(value: FINAL): (R) -> R = { invoke(value, it) }
+    override operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
 }
 
 /**

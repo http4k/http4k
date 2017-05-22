@@ -43,6 +43,7 @@ class PathTest {
         val target = Request(Method.GET, "/some/world").header("x-uri-template", "/some/{hello}")
 
         assertThat(Path.of("hello")(target), equalTo("world"))
+        assertThat(Path.of("hello").extract(target), equalTo("world"))
         assertThat(Path.map { it.length }.of("hello")(target), equalTo(5))
     }
 

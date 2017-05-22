@@ -56,18 +56,18 @@ class Route private constructor(internal val core: Core) {
                                  val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
 
             internal val validationFilter = Filter {
-                next ->
+                nextHandler ->
                 {
                     val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
                     val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
-                        try {
+                    try {
                             next(it)
                             memo
                         } catch (e: LensFailure) {
                             memo.plus(e.failures)
                         }
                     }
-                    if (errors.isEmpty()) next(it) else throw LensFailure(errors)
+                    if (errors.isEmpty()) nextHandler(it) else throw LensFailure(errors)
                 }
             }
         }

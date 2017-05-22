@@ -16,11 +16,7 @@ import java.util.*
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
     it.path(meta.name)?.let(get) ?: throw LensFailure(meta.missing())
 }) {
-    /**
-     * Lens operation to get the value from the target path segment
-     * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
-     */
-    @Throws(LensFailure::class)
+
     operator fun invoke(target: String) = try {
         get(target)
     } catch (e: Exception) {
@@ -30,18 +26,10 @@ open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) :
     override fun toString(): String = "{${meta.name}}"
 }
 
-class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request) : PathLens<FINAL>(meta, get) {
-
-    /**
-     * Lens operation to set the value into the target url
-     */
+class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (FINAL, Request) -> Request)
+    : LensInjector<Request, FINAL>, PathLens<FINAL>(meta, get) {
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
-
-    /**
-     * Bind this Lens to a value, so we can set it into a target
-     */
-    infix fun <R : Request> of(value: FINAL): (R) -> R = { invoke(value, it) }
+    override operator fun <R : Request> invoke(value: FINAL, target: R): R = set(value, target) as R
 }
 
 /**
