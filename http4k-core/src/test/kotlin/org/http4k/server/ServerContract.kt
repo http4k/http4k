@@ -3,10 +3,12 @@ package org.http4k.server
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.by
 import org.http4k.routing.routes
 import org.junit.After
@@ -22,24 +24,32 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Before
     fun before() {
         server = routes(
-            Method.GET to "/" by { _: Request -> Response(Status.OK).body("Hello World") },
-            Method.GET to "/request-headers" by { request: Request -> Response(Status.OK).body(request.headerValues("foo").joinToString(", ")) }
-        ).asServer(serverConfig(port)).start()
+            GET to "/" by { _ : Request -> Response(ACCEPTED).body("Hello World") },
+            GET to "/request-headers" by { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+            GET to "/boom" by { _ : Request -> throw IllegalArgumentException("BOOM!") }
+            ).asServer(serverConfig(port)).start()
     }
 
     @Test
-    fun can_use_as_servlet() {
-        val client = client
-        val response = client(Request(Method.GET, "http://localhost:$port/"))
+    fun `can call an endpoint`() {
+        val response = client(Request(GET, "http://localhost:$port/"))
 
+        assertThat(response.status, equalTo(ACCEPTED))
         assertThat(response.bodyString(), equalTo("Hello World"))
     }
 
     @Test
-    fun can_handle_multiple_request_headers() {
-        val client = client
-        val response = client(Request(Method.GET, "http://localhost:$port/request-headers").header("foo", "one").header("foo", "two").header("foo", "three"))
+    fun `endpoint that blows up results in 500`() {
+        val response = client(Request(GET, "http://localhost:$port/boom"))
 
+        assertThat(response.status, equalTo(INTERNAL_SERVER_ERROR))
+    }
+
+    @Test
+    fun `can handle multiple request headers`() {
+        val response = client(Request(GET, "http://localhost:$port/request-headers").header("foo", "one").header("foo", "two").header("foo", "three"))
+
+        assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("one, two, three"))
     }
 

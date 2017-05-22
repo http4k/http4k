@@ -18,8 +18,8 @@ import io.netty.handler.codec.http.DefaultHttpRequest
 import io.netty.handler.codec.http.HttpHeaderNames.CONNECTION
 import io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH
 import io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE
+import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.HttpResponseStatus.CONTINUE
-import io.netty.handler.codec.http.HttpResponseStatus.OK
 import io.netty.handler.codec.http.HttpServerCodec
 import io.netty.handler.codec.http.HttpUtil.is100ContinueExpected
 import io.netty.handler.codec.http.HttpUtil.isKeepAlive
@@ -30,12 +30,16 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import java.nio.ByteBuffer
 
 /**
  * Exposed to allow for insertion into a customised Netty server instance
  */
-class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHandlerAdapter() {
+class Http4kChannelHandler(handler: HttpHandler) : ChannelInboundHandlerAdapter() {
+
+    private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead(ctx: ChannelHandlerContext, request: Any) {
         if (request is DefaultHttpRequest) {
@@ -43,7 +47,7 @@ class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHan
                 ctx.write(DefaultFullHttpResponse(HTTP_1_1, CONTINUE))
             }
 
-            val res = handler(request.asRequest()).asNettyResponse()
+            val res = safeHandler(request.asRequest()).asNettyResponse()
 
             if (isKeepAlive(request)) {
                 res.headers().set(CONNECTION, KEEP_ALIVE)
@@ -63,7 +67,7 @@ class Http4kChannelHandler(private val handler: HttpHandler) : ChannelInboundHan
     }
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-        val res = DefaultFullHttpResponse(HTTP_1_1, OK,
+        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description),
             body.let { (payload) -> wrappedBuffer(payload) }
         )
         headers.forEach { (key, value) -> res.headers().set(key, value) }
