@@ -174,17 +174,23 @@ data class CustomType(val value: String)
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
 ```
 
-To use the Lens, simply `invoke()` it using an HTTP message to extract the value, or alternatively `invoke()` it with the value if we are modifying (via copy) the message:
+To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
 
 ```kotlin
 val handler = routes(
     GET to "/hello/{date:*}" by { request: Request -> 
-         val pathDate: LocalDate = pathLocalDate(request)
+         val pathDate: LocalDate = pathLocalDate(request) 
+         // SAME AS: 
+         // val pathDate: LocalDate = pathLocalDate.extract(request)
+         
          val customType: CustomType = requiredCustomQuery(request)
          val anIntHeader: Int? = optionalHeader(request)
 
          val baseResponse = Response(OK)
-         val responseWithHeader = optionalHeader(anIntHeader(baseResponse)
+         val responseWithHeader = optionalHeader(anIntHeader, baseResponse)
+         // SAME AS:
+         // val responseWithHeader = optionalHeader.inject(anIntHeader, baseResponse)
+         
          responseBody("you sent $pathDate and $customType", responseWithHeader) 
       }
 )
@@ -244,7 +250,7 @@ combined into `RouteModules`, which have the following features:
 * **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement 
 for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 (BAD_REQUEST)` response. 
 * **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
-include [Swagger/OpenAPI](http://swagger.io/) documentation.
+include [Swagger/OpenAPI](http://swagger.io/) documentation, including generation of [JSON schema](http://json-schema.org/) models for messages.
 * **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
 
 #### 1. Defining a Route
