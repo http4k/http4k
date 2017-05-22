@@ -134,12 +134,6 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun toString(): String = toMessage()
 }
 
-fun <T : HttpMessage> T.copy(headers: Parameters = this.headers, body: Body = this.body): T = when (this) {
-    is MemoryRequest -> this.copy(headers = headers, body = body) as T
-    is MemoryResponse -> this.copy(headers = headers, body = body) as T
-    else -> throw IllegalStateException("Unknown class $this")
-}
-
 fun <T : HttpMessage> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
 
 fun String.toBody(): Body = Body(this)
