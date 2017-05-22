@@ -292,7 +292,10 @@ val handler: HttpHandler = RouteModule(Root / "context", Swagger(ApiInfo("My gre
 
 When launched, Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
-For a more extended example, see the: [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
+For a more extended example, see the following example apps: 
+* [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
+* [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
+
 
 ## Message Format Modules
 **Gradle (Argo):**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "1.21.0"```
