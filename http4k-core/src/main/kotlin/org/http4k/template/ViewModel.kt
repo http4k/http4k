@@ -15,6 +15,6 @@ interface ViewModel {
 }
 
 fun Body.Companion.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> {
-    val viewModelBodySpec: BiDiBodyLensSpec<ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
-    return viewModelBodySpec.toLens()
+    val map: BiDiBodyLensSpec<ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
+    return map.toLens()
 }
