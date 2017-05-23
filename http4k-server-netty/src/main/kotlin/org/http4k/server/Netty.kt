@@ -2,6 +2,7 @@ package org.http4k.server
 
 
 import io.netty.bootstrap.ServerBootstrap
+import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.Unpooled.wrappedBuffer
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
@@ -26,7 +27,9 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import java.nio.charset.Charset
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.nio.ByteBuffer
 
 
 /**
@@ -51,12 +54,17 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         return res
     }
 
-    private fun FullHttpRequest.asRequest(): Request {
-        return headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) {
+    private fun InputStream.readAll(estimatedSize: Int = DEFAULT_BUFFER_SIZE): ByteArray {
+        val buffer = ByteArrayOutputStream(Math.max(estimatedSize, this.available()))
+        copyTo(buffer)
+        return buffer.toByteArray()
+    }
+
+    private fun FullHttpRequest.asRequest(): Request =
+        headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) {
             memo, next ->
             memo.header(next.key, next.value)
-        }.body(Body(content().toString(Charset.defaultCharset())))
-    }
+        }.body(Body(ByteBuffer.wrap(ByteBufInputStream(content()).readAll())))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
