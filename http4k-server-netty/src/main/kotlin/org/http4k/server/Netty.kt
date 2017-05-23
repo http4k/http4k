@@ -4,87 +4,59 @@ package org.http4k.server
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.Unpooled.wrappedBuffer
 import io.netty.channel.ChannelFuture
-import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
-import io.netty.channel.ChannelInboundHandlerAdapter
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
+import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.handler.codec.http.DefaultFullHttpRequest
+import io.netty.handler.codec.DecoderResult.SUCCESS
 import io.netty.handler.codec.http.DefaultFullHttpResponse
-import io.netty.handler.codec.http.DefaultHttpRequest
-import io.netty.handler.codec.http.HttpHeaderNames.CONNECTION
-import io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH
-import io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE
+import io.netty.handler.codec.http.FullHttpRequest
+import io.netty.handler.codec.http.HttpObjectAggregator
 import io.netty.handler.codec.http.HttpResponseStatus
-import io.netty.handler.codec.http.HttpResponseStatus.CONTINUE
 import io.netty.handler.codec.http.HttpServerCodec
-import io.netty.handler.codec.http.HttpUtil.is100ContinueExpected
-import io.netty.handler.codec.http.HttpUtil.isKeepAlive
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import java.nio.ByteBuffer
+import java.nio.charset.Charset
+
 
 /**
  * Exposed to allow for insertion into a customised Netty server instance
  */
-class Http4kChannelHandler(handler: HttpHandler) : ChannelInboundHandlerAdapter() {
+class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<FullHttpRequest>() {
 
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
-    override fun channelRead(ctx: ChannelHandlerContext, request: Any) {
-        if (request is DefaultHttpRequest) {
-            if (is100ContinueExpected(request)) {
-                ctx.write(DefaultFullHttpResponse(HTTP_1_1, CONTINUE))
-            }
-
-            val res = safeHandler(request.asRequest()).asNettyResponse()
-
-            if (isKeepAlive(request)) {
-                res.headers().set(CONNECTION, KEEP_ALIVE)
-                ctx.write(res)
-            } else {
-                ctx.write(res).addListener(ChannelFutureListener.CLOSE)
-            }
+    override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest): Unit {
+        if (request.decoderResult() != SUCCESS) {
+            ctx.close()
+        } else {
+            ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse())
+            ctx.close()
         }
     }
 
-    override fun channelReadComplete(ctx: ChannelHandlerContext) {
-        ctx.flush()
-    }
-
-    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        ctx.close()
-    }
-
     private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description),
-            body.let { (payload) -> wrappedBuffer(payload) }
-        )
+        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), wrappedBuffer(body.payload))
         headers.forEach { (key, value) -> res.headers().set(key, value) }
-        res.headers().set(CONTENT_LENGTH, res.content().readableBytes())
         return res
     }
 
-    private fun DefaultHttpRequest.asRequest(): Request =
-        headers().fold(Request(Method.valueOf(method().name()), Uri.Companion.of(uri()))) {
+    private fun FullHttpRequest.asRequest(): Request {
+        return headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) {
             memo, next ->
             memo.header(next.key, next.value)
-        }.body(
-            when (this) {
-                is DefaultFullHttpRequest -> Body(ByteBuffer.wrap(this.content().array()))
-                else -> Body.EMPTY
-            }
-        )
+        }.body(Body(content().toString(Charset.defaultCharset())))
+    }
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
@@ -101,6 +73,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                     .childHandler(object : ChannelInitializer<SocketChannel>() {
                         public override fun initChannel(ch: SocketChannel) {
                             ch.pipeline().addLast("codec", HttpServerCodec())
+                            ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
                             ch.pipeline().addLast("handler", Http4kChannelHandler(handler))
                         }
                     })

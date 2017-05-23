@@ -14,7 +14,6 @@ import org.http4k.routing.by
 import org.http4k.routing.routes
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import java.util.*
 
@@ -42,7 +41,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
-    @Ignore
     fun `gets the body from the request`() {
         val response = client(Request(POST, "http://localhost:$port/echo").body("hello mum"))
 
