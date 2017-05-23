@@ -6,7 +6,7 @@ import io.undertow.server.handlers.BlockingHandler
 import io.undertow.util.HttpString
 import org.apache.commons.io.IOUtils
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -31,9 +31,10 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
 
     private fun HttpServerExchange.asRequest(): Request {
         val uri = Uri.of(this.relativePath + "?" + this.queryString)
-        return requestHeaders.fold(Request(GET, uri)) {
-            memo, next ->
-            memo.header(next.first, next.last)
+        return requestHeaders
+            .flatMap { header -> header.map { header.headerName to it } }
+            .fold(Request(Method.valueOf(this.requestMethod.toString()), uri)) {
+                memo, (first, second) -> memo.header(first.toString(), second)
         }.body(IOUtils.toString(inputStream, Charset.defaultCharset()))
     }
 
