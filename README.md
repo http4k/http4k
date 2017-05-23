@@ -25,7 +25,7 @@ of services without HTTP container being required.
 * **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
    * *Clients:* [Apache, OkHttp](#user-content-client-modules)
-   * *Servers:* [Jetty, Netty](#user-content-server-modules)
+   * *Servers:* [Jetty, Netty, Undertow](#user-content-server-modules)
    * *Contracts:* [Typesafe, auto-validating, self-documenting (via Swagger) HTTP services](#user-content-contracts-module)
    * *Message formats:* [Argo JSON, Gson JSON, Jackson JSON](#user-content-message-format-modules)
    * *Templating:* [Handlebars](#user-content-templating-modules)
@@ -220,6 +220,8 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 **Gradle (Jetty):** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "1.22.0"```
 
 **Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "1.22.0"```
+
+**Gradle (Undertow):** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "1.22.0"```
 
 Server modules provide extension functions to `HttpHandler` to mount them into the specified container, passing a `ServerConfig` implementation (in this case `Jetty`):
 
