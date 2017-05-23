@@ -27,18 +27,18 @@ class BodyTest {
     fun `non empty string`() {
         val nonEmpty = Body.nonEmptyString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
-        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(equalTo(LensFailure(Meta(true, "body", ParamMeta.StringParam, "body").invalid()))))
+        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(lensFailureWith(Meta(true, "body", ParamMeta.StringParam, "body").invalid())))
     }
 
     @Test
     fun `rejects invalid or missing content type when strict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
-        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
+        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
         assertThat({
             strictBody(emptyRequest
                 .header("content-type", "text/bob")
                 .body("some value"))
-        }, throws(equalTo(LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE))))
+        }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
     }
 
     @Test

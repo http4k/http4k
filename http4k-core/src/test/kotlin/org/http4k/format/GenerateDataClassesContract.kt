@@ -48,13 +48,13 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
         val actual = String(os.toByteArray())
         assertThat(actual, equalTo("""// result generated from /bob
 
-data class Array1(val nullNode: Any, val long: Number)
+data class Array1(val nullNode: Any?, val long: Number?)
 
-data class Base(val string: String, val double: Number, val long: Number, val boolean: Boolean, val bigDec: Number, val nullNode: Any, val int: Number, val empty: Empty, val nonEmpty: NonEmpty, val array: List<String>)
+data class Base(val string: String?, val double: Number?, val long: Number?, val boolean: Boolean?, val bigDec: Number?, val nullNode: Any?, val int: Number?, val empty: Empty?, val nonEmpty: NonEmpty?, val array: List<String>?)
 
 data class Empty()
 
-data class NonEmpty(val double: Number, val long: Number)
+data class NonEmpty(val double: Number?, val long: Number?)
 
 """))
     }

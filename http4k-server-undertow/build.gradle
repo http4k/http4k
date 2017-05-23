@@ -1,0 +1,23 @@
+description = 'Http4k HTTP Server built on top of Undertow'
+
+ext {
+    ext.undertow_version = '1.4.12.Final'
+
+    undertow = [
+        "io.undertow:undertow-core:$undertow_version",
+        "io.undertow:undertow-servlet:$undertow_version"
+    ]
+}
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+    compile undertow
+    compile "commons-io:commons-io:2.5"
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile project(":http4k-client-apache")
+    testCompile testing
+}
+
+

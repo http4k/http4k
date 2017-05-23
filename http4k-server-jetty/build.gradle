@@ -1,6 +1,6 @@
 description = 'Http4k HTTP Server built on top of jetty'
 
-ext{
+ext {
     ext.jetty_version = '9.3.16.v20170120'
 
     jetty = [

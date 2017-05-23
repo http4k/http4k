@@ -25,26 +25,26 @@ class FormFieldTest {
     fun `value missing`() {
         assertThat(FormField.optional("world")(form), absent())
         val requiredFormField = FormField.required("world")
-        assertThat({ requiredFormField(form) }, throws(equalTo(LensFailure(requiredFormField.missing()))))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith(requiredFormField.missing())))
 
         assertThat(FormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = FormField.multi.required("world")
-        assertThat({ optionalMultiFormField(form) }, throws(equalTo(LensFailure(optionalMultiFormField.missing()))))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(optionalMultiFormField.missing())))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormField = FormField.map(String::toInt).required("hello")
-        assertThat({ requiredFormField(form) }, throws(equalTo(LensFailure(requiredFormField.invalid()))))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith(requiredFormField.invalid())))
 
         val optionalFormField = FormField.map(String::toInt).optional("hello")
-        assertThat({ optionalFormField(form) }, throws(equalTo(LensFailure(optionalFormField.invalid()))))
+        assertThat({ optionalFormField(form) }, throws(lensFailureWith(optionalFormField.invalid())))
 
         val requiredMultiFormField = FormField.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormField(form) }, throws(equalTo(LensFailure(requiredMultiFormField.invalid()))))
+        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith(requiredMultiFormField.invalid())))
 
         val optionalMultiFormField = FormField.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormField(form) }, throws(equalTo(LensFailure(optionalMultiFormField.invalid()))))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(optionalMultiFormField.invalid())))
     }
 
     @Test

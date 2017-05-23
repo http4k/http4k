@@ -31,26 +31,26 @@ class QueryTest {
         assertThat(Query.optional("world")(request), absent())
 
         val requiredQuery = Query.required("world")
-        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(requiredQuery.missing()))))
+        assertThat({ requiredQuery(request) }, throws(lensFailureWith(requiredQuery.missing())))
 
         assertThat(Query.multi.optional("world")(request), absent())
         val requiredMultiQuery = Query.multi.required("world")
-        assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(requiredMultiQuery.missing()))))
+        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(requiredMultiQuery.missing())))
     }
 
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
-        assertThat({ requiredQuery(request) }, throws(equalTo(LensFailure(requiredQuery.invalid()))))
+        assertThat({ requiredQuery(request) }, throws(lensFailureWith(requiredQuery.invalid())))
 
         val optionalQuery = Query.map(String::toInt).optional("hello")
-        assertThat({ optionalQuery(request) }, throws(equalTo(LensFailure(optionalQuery.invalid()))))
+        assertThat({ optionalQuery(request) }, throws(lensFailureWith(optionalQuery.invalid())))
 
         val requiredMultiQuery = Query.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiQuery(request) }, throws(equalTo(LensFailure(requiredMultiQuery.invalid()))))
+        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(requiredMultiQuery.invalid())))
 
         val optionalMultiQuery = Query.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiQuery(request) }, throws(equalTo(LensFailure(optionalMultiQuery.invalid()))))
+        assertThat({ optionalMultiQuery(request) }, throws(lensFailureWith(optionalMultiQuery.invalid())))
     }
 
     @Test

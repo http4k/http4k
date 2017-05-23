@@ -20,7 +20,7 @@ open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) :
     operator fun invoke(target: String) = try {
         get(target)
     } catch (e: Exception) {
-        throw LensFailure(map { it.invalid() })
+        throw LensFailure(map { it.invalid() }, cause = e)
     }
 
     override fun toString(): String = "{${meta.name}}"

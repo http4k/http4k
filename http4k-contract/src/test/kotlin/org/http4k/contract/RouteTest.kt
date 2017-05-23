@@ -16,10 +16,10 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header
-import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
+import org.http4k.lens.lensFailureWith
 import org.http4k.lens.missing
 import org.http4k.lens.string
 import org.junit.Test
@@ -46,7 +46,7 @@ class RouteTest {
         val invalidRequest = Request(Method.GET, "").with(header of "value", body of "hello")
         assertThat((route.router(Root))(invalidRequest), present())
         assertThat({ (route.router(Root))(invalidRequest)?.invoke(invalidRequest) },
-            throws(equalTo(LensFailure(query.meta.missing()))))
+            throws(lensFailureWith(query.meta.missing())))
     }
 
     @Test

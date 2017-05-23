@@ -33,7 +33,7 @@ class HeaderTest {
     fun `value missing`() {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
-        assertThat({ requiredHeader(request) }, throws(equalTo(LensFailure(requiredHeader.missing()))))
+        assertThat({ requiredHeader(request) }, throws(lensFailureWith(requiredHeader.missing())))
 
         assertThat(Header.defaulted("world", "bob")(request), equalTo("bob"))
         val defaultedHeader = Header.defaulted("world", "bob")
@@ -41,22 +41,22 @@ class HeaderTest {
 
         assertThat(Header.multi.optional("world")(request), absent())
         val optionalMultiHeader = Header.multi.required("world")
-        assertThat({ optionalMultiHeader(request) }, throws(equalTo(LensFailure(optionalMultiHeader.missing()))))
+        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith(optionalMultiHeader.missing())))
     }
 
     @Test
     fun `invalid value`() {
         val requiredHeader = Header.map(String::toInt).required("hello")
-        assertThat({ requiredHeader(request) }, throws(equalTo(LensFailure(requiredHeader.invalid()))))
+        assertThat({ requiredHeader(request) }, throws(lensFailureWith(requiredHeader.invalid())))
 
         val optionalHeader = Header.map(String::toInt).optional("hello")
-        assertThat({ optionalHeader(request) }, throws(equalTo(LensFailure(optionalHeader.invalid()))))
+        assertThat({ optionalHeader(request) }, throws(lensFailureWith(optionalHeader.invalid())))
 
         val requiredMultiHeader = Header.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiHeader(request) }, throws(equalTo(LensFailure(requiredMultiHeader.invalid()))))
+        assertThat({ requiredMultiHeader(request) }, throws(lensFailureWith(requiredMultiHeader.invalid())))
 
         val optionalMultiHeader = Header.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiHeader(request) }, throws(equalTo(LensFailure(optionalMultiHeader.invalid()))))
+        assertThat({ optionalMultiHeader(request) }, throws(lensFailureWith(optionalMultiHeader.invalid())))
     }
 
     @Test

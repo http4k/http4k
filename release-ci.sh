@@ -20,15 +20,16 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
     :http4k-core:bintrayUpload \
-    :http4k-client-apache:bintrayUpload \
-    :http4k-client-okhttp:bintrayUpload \
-    :http4k-server-jetty:bintrayUpload \
-    :http4k-server-netty:bintrayUpload \
     :http4k-contract:bintrayUpload \
     :http4k-template-handlebars:bintrayUpload \
+    :http4k-client-apache:bintrayUpload \
+    :http4k-client-okhttp:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
     :http4k-format-gson:bintrayUpload \
-    :http4k-format-jackson:bintrayUpload
+    :http4k-format-jackson:bintrayUpload \
+    :http4k-server-jetty:bintrayUpload \
+    :http4k-server-netty:bintrayUpload \
+    :http4k-server-undertow:bintrayUpload
 
 function notify_slack {
     local MESSAGE=$1

@@ -24,7 +24,7 @@ class PathTest {
 
     @Test
     fun `fixed value mismatch`() {
-        assertThat({ (Path.fixed("hello"))("world") }, throws(equalTo(LensFailure())))
+        assertThat({ (Path.fixed("hello"))("world") }, throws(lensFailureWith()))
     }
 
     @Test
@@ -50,7 +50,7 @@ class PathTest {
     @Test
     fun `invalid value`() {
         val path = Path.map(String::toInt).of("hello")
-        assertThat({ path("world") }, throws(equalTo(LensFailure(path.invalid()))))
+        assertThat({ path("world") }, throws(lensFailureWith(path.invalid())))
     }
 
     @Test
@@ -108,6 +108,6 @@ class PathTest {
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))
-        assertThat({ requiredLens("hello") }, throws(equalTo(LensFailure(requiredLens.invalid()))))
+        assertThat({ requiredLens("hello") }, throws(lensFailureWith(requiredLens.invalid())))
     }
 }

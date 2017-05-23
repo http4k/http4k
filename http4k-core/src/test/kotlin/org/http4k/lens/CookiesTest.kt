@@ -33,11 +33,11 @@ class CookiesTest {
     fun `value missing`() {
         assertThat(Cookies.optional("world")(request), absent())
         val required = Cookies.required("world")
-        assertThat({ required(request) }, throws(equalTo(LensFailure(required.missing()))))
+        assertThat({ required(request) }, throws(lensFailureWith(required.missing())))
 
         assertThat(Cookies.multi.optional("world")(request), absent())
         val optionalMulti = Cookies.multi.required("world")
-        assertThat({ optionalMulti(request) }, throws(equalTo(LensFailure(optionalMulti.missing()))))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith(optionalMulti.missing())))
     }
 
     @Test
@@ -45,16 +45,16 @@ class CookiesTest {
         val asInt = Cookies.map { it.value.toInt() }
 
         val required = asInt.required("hello")
-        assertThat({ required(request) }, throws(equalTo(LensFailure(required.invalid()))))
+        assertThat({ required(request) }, throws(lensFailureWith(required.invalid())))
 
         val optional = asInt.optional("hello")
-        assertThat({ optional(request) }, throws(equalTo(LensFailure(optional.invalid()))))
+        assertThat({ optional(request) }, throws(lensFailureWith(optional.invalid())))
 
         val requiredMulti = asInt.multi.required("hello")
-        assertThat({ requiredMulti(request) }, throws(equalTo(LensFailure(requiredMulti.invalid()))))
+        assertThat({ requiredMulti(request) }, throws(lensFailureWith(requiredMulti.invalid())))
 
         val optionalMulti = asInt.multi.optional("hello")
-        assertThat({ optionalMulti(request) }, throws(equalTo(LensFailure(optionalMulti.invalid()))))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith(optionalMulti.invalid())))
     }
 
     @Test

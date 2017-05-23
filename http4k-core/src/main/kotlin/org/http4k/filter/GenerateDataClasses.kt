@@ -47,7 +47,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
     data class ObjectGen(val clazz: String = "", val fields: Map<String, Gen> = emptyMap()) : Gen {
         override fun asClassName(): String = clazz.capitalize()
         override fun iterator(): Iterator<Gen> = fields.map { it.value }.plus(listOf(this)).toSet().iterator()
-        override fun asDefinitionString(): String = """data class ${clazz.capitalize()}(${fields.map { "val ${it.key}: ${it.value.asClassName()}" }.joinToString(", ")})"""
+        override fun asDefinitionString(): String = """data class ${clazz.capitalize()}(${fields.map { "val ${it.key}: ${it.value.asClassName()}?" }.joinToString(", ")})"""
     }
 
     private fun process(name: String, node: NODE): Gen {
