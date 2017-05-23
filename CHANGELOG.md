@@ -3,7 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v1.22.0
+- New module with Undertow.io support `http4k-server-undertow`
 - Jackson implementation now ignores unknown properties in incoming messages
+- Netty implementation tidied up
 
 ### v1.21.1
 - Fix for #11. Netty implementation returns incorrect status codes.
