@@ -24,11 +24,11 @@ The principles of the toolkit are:
 of services without HTTP container being required.
 * **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * *Client:* [HTTP client adapters for Apache and OkHttp](#user-content-http-client-adapter-modules)
-   * *Server:* [Single LOC Server spinup for Jetty, Netty and Undertow](#user-content-server-backend-odules)
-   * *Contracts:* [Typesafe, auto-validating, self-documenting (via Swagger) HTTP services](#user-content-contracts-module)
-   * *Message formats:* [HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)](#user-content-message-format-modules)
-   * *Templating:* [Caching and Hot-Reload engine support for Handlebars](#user-content-templating-modules)
+   * [Client:](#user-content-http-client-adapter-modules) HTTP client adapters for Apache and OkHttp
+   * [Server:](#user-content-server-backend-modules) Single LOC Server spinup for Jetty, Netty and Undertow
+   * [Contracts:](#user-content-contracts-module) Typesafe, auto-validating, self-documenting (via Swagger) HTTP services
+   * [Message formats:](#user-content-message-format-modules) HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
+   * [Templating:](#user-content-templating-modules) Caching and Hot-Reload engine support for Handlebars
 
 # Getting started
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 
