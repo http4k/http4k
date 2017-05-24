@@ -23,19 +23,20 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
 
     private fun Response.into(exchange: HttpServerExchange) {
         exchange.statusCode = status.code
-        exchange.responseSender.send(body.payload)
-        this.headers.forEach {
-            exchange.responseHeaders.put(HttpString(it.first), it.second)
+        headers.forEach {
+            exchange.responseHeaders.put(HttpString(it.first), it.second + "; charset=utf-8")
         }
+        exchange.responseSender.send(body.payload)
     }
 
     private fun HttpServerExchange.asRequest(): Request {
-        val uri = Uri.of(this.relativePath + "?" + this.queryString)
+        val uri = Uri.of(relativePath + "?" + queryString)
         return requestHeaders
             .flatMap { header -> header.map { header.headerName to it } }
-            .fold(Request(Method.valueOf(this.requestMethod.toString()), uri)) {
-                memo, (first, second) -> memo.header(first.toString(), second)
-        }.body(IOUtils.toString(inputStream, Charset.defaultCharset()))
+            .fold(Request(Method.valueOf(requestMethod.toString()), uri)) {
+                memo, (first, second) ->
+                memo.header(first.toString(), second)
+            }.body(IOUtils.toString(inputStream, Charset.defaultCharset()))
     }
 
     override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)

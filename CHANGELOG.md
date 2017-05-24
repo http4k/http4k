@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.22.1
+- Fix for #12. Undertow not constructing response correctly.
+
 ### v1.22.0
 - New module with Undertow.io support `http4k-server-undertow`
 - Jackson implementation now ignores unknown properties in incoming messages

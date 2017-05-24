@@ -2,6 +2,8 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.startsWith
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -25,11 +27,16 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _ : Request -> Response(ACCEPTED).body("Hello World") },
-            POST to "/echo" by { req : Request -> Response(OK).body(req.bodyString()) },
+            GET to "/" by { _: Request ->
+                Response(ACCEPTED)
+                    .header("content-type", "text/plain")
+                    .body("Hello World")
+            },
+            POST to "/echo" by { req: Request -> Response(OK).body(req.bodyString()) },
             GET to "/request-headers" by { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-            GET to "/boom" by { _ : Request -> throw IllegalArgumentException("BOOM!") }
-            ).asServer(serverConfig(port)).start()
+            GET to "/uri" by { req: Request -> Response(OK).body(req.uri.toString()) },
+            GET to "/boom" by { _: Request -> throw IllegalArgumentException("BOOM!") }
+        ).asServer(serverConfig(port)).start()
     }
 
     @Test
@@ -37,6 +44,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         val response = client(Request(GET, "http://localhost:$port/"))
 
         assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.header("content-type"), present(startsWith("text/plain")))
         assertThat(response.bodyString(), equalTo("Hello World"))
     }
 
@@ -46,6 +54,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello mum"))
+    }
+
+    @Test
+    fun `gets the uri from the request`() {
+        val response = client(Request(GET, "http://localhost:$port/uri?bob=bill"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("/uri?bob=bill"))
     }
 
     @Test
