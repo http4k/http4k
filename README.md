@@ -24,11 +24,11 @@ The principles of the toolkit are:
 of services without HTTP container being required.
 * **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * *Clients:* [Apache, OkHttp](#user-content-client-modules)
-   * *Servers:* [Jetty, Netty, Undertow](#user-content-server-modules)
+   * *Client:* [HTTP client adapters for Apache and OkHttp](#user-content-http-client-adapter-modules)
+   * *Server:* [Single LOC Server spinup for Jetty, Netty and Undertow](#user-content-server-backend-odules)
    * *Contracts:* [Typesafe, auto-validating, self-documenting (via Swagger) HTTP services](#user-content-contracts-module)
-   * *Message formats:* [Argo JSON, Gson JSON, Jackson JSON](#user-content-message-format-modules)
-   * *Templating:* [Handlebars](#user-content-templating-modules)
+   * *Message formats:* [HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)](#user-content-message-format-modules)
+   * *Templating:* [Caching and Hot-Reload engine support for Handlebars](#user-content-templating-modules)
 
 # Getting started
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 
@@ -84,7 +84,7 @@ The core module has ZERO dependencies and provides the following:
 * Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 * HTTP handler and filter abstractions which models services as simple, composable functions.
 * Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
-* Type-safe [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for destructuring and construction of HTTP message entities.
+* [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
 * Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
@@ -216,24 +216,25 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
 
-## Server Modules
+## Server-backend Modules
 **Gradle (Jetty):** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "1.22.2"```
 
 **Gradle (Netty):** ```compile group: "org.http4k", name: "http4k-server-netty", version: "1.22.2"```
 
 **Gradle (Undertow):** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "1.22.2"```
 
-Server modules provide extension functions to `HttpHandler` to mount them into the specified container, passing a `ServerConfig` implementation (in this case `Jetty`):
+Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
 
 ```kotlin
 { _: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
 ```
+Alteratively, all server-backend modules allow for plugging **http4k** handlers into the relevant server API, which allows for custom Server configuration.
 
-## Client Modules
+## HTTP Client Adapter Modules
 **Gradle (Apache):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "1.22.2"```
 **Gradle (OkHttp):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "1.22.2"```
 
-Supported HTTP client APIs are wrapped to provide an `HttpHandler` interface:
+Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC:
 
 ```kotlin
 val client = ApacheClient()
@@ -242,6 +243,8 @@ val response = client(request)
 println(response.status)
 println(response.bodyString())
 ```
+
+Alteratively, all client adapter modules allow for custom configuration of the relevant Client configuration.
 
 ## Contracts Module
 **Gradle:** ```compile group: "org.http4k", name: "http4k-contract", version: "1.22.2"```
