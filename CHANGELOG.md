@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.23.0
+- Netty sets content-length header.
+
 ### v1.22.2
 - Fix for #12. Undertow not constructing response correctly.
 
