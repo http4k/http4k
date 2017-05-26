@@ -65,6 +65,8 @@ data class Status(val code: Int, val description: String) {
     val clientError by lazy { CLIENT_ERROR.contains(code) }
     val serverError by lazy { SERVER_ERROR.contains(code) }
 
+    fun description(description: String) = copy(description = description)
+
     override fun equals(other: Any?): Boolean = other != null && other is Status && other.code == code
     override fun hashCode(): Int = code.hashCode()
     override fun toString(): String = "$code $description"

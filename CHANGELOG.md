@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.24.0
+- Introduce `Status.description()`
+
 ### v1.23.0
 - Netty sets content-length header.
 
