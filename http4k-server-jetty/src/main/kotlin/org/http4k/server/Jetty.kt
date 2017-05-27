@@ -28,11 +28,6 @@ data class Jetty(val port: Int = 8000) : ServerConfig {
                 return this
             }
 
-            override fun block(): Http4kServer {
-                Thread.currentThread().join()
-                return this
-            }
-
             override fun stop() = server.stop()
         }
     }

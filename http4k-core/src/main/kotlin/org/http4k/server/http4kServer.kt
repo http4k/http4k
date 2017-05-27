@@ -3,10 +3,11 @@ package org.http4k.server
 import org.http4k.core.HttpHandler
 
 interface Http4kServer {
-    fun startAndBlock(): Http4kServer = start().block()
+    fun startAndBlock() = start().block()
     fun start(): Http4kServer
     fun stop()
-    fun block(): Http4kServer
+    fun block() = Thread.currentThread().join()
+
 }
 
 interface ServerConfig {
@@ -15,7 +16,8 @@ interface ServerConfig {
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 
-fun HttpHandler.startServer(config: ServerConfig, block: Boolean = true): Http4kServer {
-    val asServer = asServer(config)
-    return if(block) asServer.startAndBlock() else asServer.start()
-}
+fun HttpHandler.startServer(config: ServerConfig, block: Boolean = true): Http4kServer =
+    asServer(config).let {
+        if (block) it.startAndBlock()
+        it.start()
+    }

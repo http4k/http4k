@@ -94,11 +94,6 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                 return this
             }
 
-            override fun block(): Http4kServer {
-                closeFuture?.sync()
-                return this
-            }
-
             override fun stop() {
                 // FIXME is this correct??!
                 closeFuture?.cancel(false)
