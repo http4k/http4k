@@ -24,6 +24,15 @@ class StaticContentTest {
     }
 
     @Test
+    fun `can register custom mime types`() {
+        val handler = StaticContent("/svc", ResourceLoader.Classpath(), "myxml" to APPLICATION_XML)
+        val result = handler(Request(GET, of("/svc/mybob.myxml")))
+        assertThat(result.status, equalTo(Status.OK))
+        assertThat(result.bodyString(), equalTo("<myxml>content</myxml>"))
+        assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
+    }
+
+    @Test
     fun `defaults to index html if is no route`() {
         val handler = StaticContent("/svc")
         val result = handler(Request(GET, of("/svc")))

@@ -9,6 +9,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.ResourceLoader.Companion.Classpath
+import org.http4k.core.Status
 import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
@@ -24,6 +25,16 @@ class StaticModuleTest {
         val result = router(request)!!(request)
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
         assertThat(CONTENT_TYPE(result), equalTo(APPLICATION_XML))
+    }
+
+    @Test
+    fun `can register custom mime types`() {
+        val router = StaticModule(Root / "svc", Classpath(), extraPairs = "myxml" to APPLICATION_XML).toRouter()
+        val request = Request(GET, of("/svc/mybob.myxml"))
+        val result = router(request)!!(request)
+        assertThat(result.status, equalTo(Status.OK))
+        assertThat(result.bodyString(), equalTo("<myxml>content</myxml>"))
+        assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
     }
 
     @Test
