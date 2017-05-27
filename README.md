@@ -364,6 +364,35 @@ val app: HttpHandler = {
 println(app(Request(Method.GET, "/someUrl")))
 ```
 
+## Application Testing
+The creators of **http4k** takes testing very seriously - so seriously that there really isn't that much to say here! 
+The API has been designed to make it as simple as possible to test both individual endpoints and entire applications in a consistent fashion, which is aided by remembering that:
+
+1. Input and output `Request/Response` objects are immutable objects.
+2. `HttpHandler` endpoints are just functions.
+3. An entire **http4k** application is *just* an `HttpHandler`.
+
+Because of the above, there really isn't much required in the way of "testing infrastructure" - no magic containers or test fixtures that you might find in other frameworks. 
+Testing is just matter of calling the correct function!
+
+That said: Instead, most useful thing is to probably explain the ways that we have developed to test effectively. 
+
+## Application Design
+What follows is a guide to *how* we build **http4k** applications test first to provide excellent test coverage driven by decoupled tests. 
+
+For this example, we will use an example of a Maths app with the following requirements:
+* The app must add 2 numbers together via an HTTP call
+* Calls to the service will be logged (via HTTP POST) to another server, the Counter.
+
+Apps can generally be split into 3 tiers:
+
+1. Endpoint: `HttpHandlers` are constructed individually, by providing a builder function which takes the business-level dependencies. 
+2. Application: Builder function which takes the transport-level dependencies, and converts them into business-level dependencies. All routes are constructed and collected in this tier.
+3. Server: Builder function which takes the configuration for environmental concerns such as ports and downstream urls.
+
+* [Example code for all 3 tiers are here](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook/test_driven_apps.kt)
+
+
 ## Acknowledgments
 
 * [Dan Bodart](https://twitter.com/DanielBodart)'s [utterlyidle](https://github.com/bodar/utterlyidle)
