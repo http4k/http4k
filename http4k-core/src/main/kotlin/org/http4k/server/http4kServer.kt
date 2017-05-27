@@ -7,7 +7,6 @@ interface Http4kServer {
     fun start(): Http4kServer
     fun stop()
     fun block() = Thread.currentThread().join()
-
 }
 
 interface ServerConfig {
