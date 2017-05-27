@@ -50,18 +50,16 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
         override fun asDefinitionString(): String = """data class ${clazz.capitalize()}(${fields.map { "val ${it.key}: ${it.value.asClassName()}?" }.joinToString(", ")})"""
     }
 
-    private fun process(name: String, node: NODE): Gen {
-        return when (json.typeOf(node)) {
-            Object -> ObjectGen(name, json.fields(node).map { it.first to process(it.first, it.second) }.toMap())
-            Array -> {
-                val arrayName = name.capitalize() + idGenerator()
-                ArrayGen(json.elements(node).flatMap { process(arrayName, it) }.toSet())
-            }
-            JsonType.String -> Primitives.StringValue
-            JsonType.Integer -> Primitives.Number
-            JsonType.Number -> Primitives.Number
-            JsonType.Boolean -> Primitives.Boolean
-            JsonType.Null -> Primitives.Null
+    private fun process(name: String, node: NODE): Gen = when (json.typeOf(node)) {
+        Object -> ObjectGen(name, json.fields(node).map { it.first to process(it.first, it.second) }.toMap())
+        Array -> {
+            val arrayName = name.capitalize() + idGenerator()
+            ArrayGen(json.elements(node).map { process(arrayName, it) }.toSet())
         }
+        JsonType.String -> Primitives.StringValue
+        JsonType.Integer -> Primitives.Number
+        JsonType.Number -> Primitives.Number
+        JsonType.Boolean -> Primitives.Boolean
+        JsonType.Null -> Primitives.Null
     }
 }

@@ -38,7 +38,14 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
                     "nullNode" to j.nullNode(),
                     "long" to j.number(10L)
                 )
-            ))
+            )),
+            "singleTypeArray" to j.array(
+                listOf(j.obj(
+                    "string" to j.string("someString"),
+                    "list" to j.array(listOf(j.obj("id" to j.string("someValue"))))
+                )
+                )
+            )
         )
         val os = ByteArrayOutputStream()
 
@@ -50,11 +57,13 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
 
 data class Array1(val nullNode: Any?, val long: Number?)
 
-data class Base(val string: String?, val double: Number?, val long: Number?, val boolean: Boolean?, val bigDec: Number?, val nullNode: Any?, val int: Number?, val empty: Empty?, val nonEmpty: NonEmpty?, val array: List<String>?)
+data class Base(val string: String?, val double: Number?, val long: Number?, val boolean: Boolean?, val bigDec: Number?, val nullNode: Any?, val int: Number?, val empty: Empty?, val nonEmpty: NonEmpty?, val array: List<String>?, val singleTypeArray: List<SingleTypeArray1>?)
 
 data class Empty()
 
 data class NonEmpty(val double: Number?, val long: Number?)
+
+data class SingleTypeArray1(val string: String?, val list: List<List1>?)
 
 """))
     }
