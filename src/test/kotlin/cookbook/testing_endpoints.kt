@@ -66,7 +66,7 @@ class FakeRecorderHttp : HttpHandler {
     override fun invoke(p1: Request): Response = app(p1)
 }
 
-class ApplicationUnitTest {
+class FunctionalTest {
 
     private val recorderHttp = FakeRecorderHttp()
     private val app = MyMathsApp(recorderHttp)
@@ -91,7 +91,7 @@ fun MyMathServer(port: Int, recorderUri: Uri): Http4kServer {
     return MyMathsApp(recorderHttp).asServer(Jetty(port))
 }
 
-class ServerIntegrationTest {
+class EndToEndTest {
     private val client = OkHttp()
     private val recorderHttp = FakeRecorderHttp()
     private val recorder = recorderHttp.asServer(Jetty(8001))
