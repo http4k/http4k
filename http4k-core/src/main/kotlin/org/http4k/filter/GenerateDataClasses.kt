@@ -40,7 +40,11 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
     }
 
     data class ArrayGen(val elements: Set<Gen>) : Gen {
-        override fun asClassName(): String = "List<${(elements.firstOrNull() ?: Primitives.Null).asClassName()}>"
+        override fun asClassName(): String {
+            val arrayType = if (elements.size == 1) elements.first()
+            else Primitives.Null
+            return "List<${arrayType.asClassName()}>"
+        }
         override fun iterator(): Iterator<Gen> = elements.iterator()
     }
 

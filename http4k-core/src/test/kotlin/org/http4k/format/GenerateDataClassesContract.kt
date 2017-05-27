@@ -57,7 +57,7 @@ abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<
 
 data class Array1(val nullNode: Any?, val long: Number?)
 
-data class Base(val string: String?, val double: Number?, val long: Number?, val boolean: Boolean?, val bigDec: Number?, val nullNode: Any?, val int: Number?, val empty: Empty?, val nonEmpty: NonEmpty?, val array: List<String>?, val singleTypeArray: List<SingleTypeArray1>?)
+data class Base(val string: String?, val double: Number?, val long: Number?, val boolean: Boolean?, val bigDec: Number?, val nullNode: Any?, val int: Number?, val empty: Empty?, val nonEmpty: NonEmpty?, val array: List<Any>?, val singleTypeArray: List<SingleTypeArray1>?)
 
 data class Empty()
 
