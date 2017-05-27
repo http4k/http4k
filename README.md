@@ -51,14 +51,14 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.server.startServer
+import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
 
     val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 
-    val jettyServer = app.startServer(Jetty(9000))
-    
+    val jettyServer = app.asServer(Jetty(9000)).start()
+
     val request = Request(Method.GET, "http://localhost:9000").query("name", "John Doe")
 
     val client = ApacheClient()
@@ -148,7 +148,7 @@ Basic routing for mapping a URL pattern to an `HttpHandler`:
 routes(
     GET to "/hello/{name:*}" by { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
     POST to "/fail" by { request: Request -> Response(INTERNAL_SERVER_ERROR) }
-).startServer(Jetty(8000))
+).asServer(Jetty(8000)).start()
 ```
 
 Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
@@ -226,7 +226,7 @@ val curl = post("http://httpbin.org/post").body(listOf("foo" to "bar").toBody())
 Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
 
 ```kotlin
-{ _: Request -> Response(OK).body("Hello World") }.startServer(Jetty(8000))
+{ _: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
 ```
 Alteratively, all server-backend modules allow for plugging **http4k** handlers into the relevant server API, which allows for custom Server configuration.
 
