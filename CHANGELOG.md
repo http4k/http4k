@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.25.0
+- Can add custom mime types to Static Content
+
 ### v1.24.0
 - Remove `HttpHandler.asServer` in favour of `HttpHandler.startServer` to avoid confusion.
 - Introduce `Status.description()`.
