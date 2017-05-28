@@ -383,7 +383,7 @@ What follows is a guide to *how* we build **http4k** applications test first to 
 
 For this example, we will use an example of a Maths app with the following requirements:
 * The app must add 2 numbers together via an HTTP call
-* Calls to the service will be logged (via HTTP POST) to another server, the Counter.
+* Calls to the service will be logged (via HTTP POST) to another server, the Recorder.
 
 Apps can generally be split into 3 tiers:
 
