@@ -375,7 +375,7 @@ The API has been designed to make it as simple as possible to test both individu
 Because of the above, there really isn't much required in the way of "testing infrastructure" - no magic containers or test fixtures that you might find in other frameworks. 
 Testing is just matter of calling the correct function!
 
-That said: Instead, most useful thing is to probably explain the ways that we have developed to test effectively. 
+That said, possibly the most useful thing is explain the ways that we have developed to test effectively...
 
 ## Application Design
 What follows is a guide to *how* we build **http4k** applications test first to provide excellent test coverage driven by decoupled tests. 

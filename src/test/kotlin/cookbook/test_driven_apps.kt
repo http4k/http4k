@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -12,6 +13,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
+import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.by
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -28,7 +31,7 @@ import org.junit.Test
 
 class AnswerRecorder(private val httpClient: HttpHandler) : (Int) -> Unit {
     override fun invoke(answer: Int): Unit {
-        httpClient(Request(GET, "/" + answer.toString()))
+        httpClient(Request(POST, "/" + answer.toString()))
     }
 }
 
@@ -52,18 +55,18 @@ class EndpointUnitTest {
 }
 
 fun MyMathsApp(recorderHttp: HttpHandler) =
-    routes(
+    ServerFilters.CatchAll().then(routes(
         GET to "/add" by myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
-    )
+    ))
 
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()
 
     private val app = routes(
-        GET to "/{answer}" by { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
+        POST to "/{answer}" by { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
     )
 
-    override fun invoke(p1: Request): Response = app(p1)
+    override fun invoke(request: Request): Response = app(request)
 }
 
 class FunctionalTest {
@@ -92,7 +95,7 @@ fun MyMathServer(port: Int, recorderUri: Uri): Http4kServer {
 }
 
 class EndToEndTest {
-    private val client = OkHttp()
+    private val client = DebuggingFilters.PrintRequest().then(OkHttp())
     private val recorderHttp = FakeRecorderHttp()
     private val recorder = recorderHttp.asServer(Jetty(8001))
     private val server = MyMathServer(8000, Uri.of("http://localhost:8001"))
