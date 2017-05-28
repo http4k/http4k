@@ -30,7 +30,6 @@ import worked_example._4_adding_an_external_dependency.Matchers.answerShouldBe
 import worked_example._4_adding_an_external_dependency.Matchers.statusShouldBe
 
 
-/** TESTS **/
 object Matchers {
     fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
 
