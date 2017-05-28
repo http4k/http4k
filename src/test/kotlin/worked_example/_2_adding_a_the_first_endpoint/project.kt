@@ -47,8 +47,9 @@ object Matchers {
 }
 
 class EndToEndTest {
-    val client = OkHttp()
-    val server = MyMathServer(8000)
+    private val port = 8000
+    private val client = OkHttp()
+    private val server = MyMathServer(port)
 
     @Before
     fun setup(): Unit {
@@ -62,8 +63,8 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(GET, "http://localhost:8000/ping")).statusShouldBe(OK)
-        client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
+        client(Request(GET, "http://localhost:$port/ping")).statusShouldBe(OK)
+        client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
     }
 }
 

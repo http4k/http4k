@@ -29,8 +29,9 @@ import org.junit.Test
 
 /** TESTS **/
 class EndToEndTest {
+    private val port = 8000
     private val client = OkHttp()
-    private val server = MyMathServer(8000)
+    private val server = MyMathServer(port)
 
     @Before
     fun setup(): Unit {
@@ -44,7 +45,7 @@ class EndToEndTest {
 
     @Test
     fun `responds to ping`() {
-        client(Request(GET, "http://localhost:8000/ping")).status shouldMatch equalTo(OK)
+        client(Request(GET, "http://localhost:$port/ping")).status shouldMatch equalTo(OK)
     }
 }
 

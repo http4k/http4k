@@ -43,8 +43,9 @@ object Matchers {
 }
 
 class EndToEndTest {
-    val client = OkHttp()
-    val server = MyMathServer(8000)
+    private val port = 8000
+    private val client = OkHttp()
+    private val server = MyMathServer(port)
 
     @Before
     fun setup(): Unit {
@@ -58,9 +59,9 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(GET, "http://localhost:8000/ping")).statusShouldBe(OK)
-        client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
-        client(Request(GET, "http://localhost:8000/multiply?value=2&value=4")).answerShouldBe(8)
+        client(Request(GET, "http://localhost:$port/ping")).statusShouldBe(OK)
+        client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
+        client(Request(GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
     }
 }
 
@@ -119,7 +120,7 @@ private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
     return {
         request: Request ->
         val valuesToCalc = values.extract(request)
-        val answer = if(valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
+        val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
         Response(OK).body(answer.toString())
     }
 }
