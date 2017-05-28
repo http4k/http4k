@@ -376,8 +376,8 @@ The API has been designed to make it as simple as possible to test both individu
 Because of the above, there really isn't much required in the way of "testing infrastructure" - no magic containers or test fixtures that you might find in other frameworks. 
 Testing is just matter of calling the correct function!
 
-That said, possibly the most useful thing is thoroughly explain the process that we have developed to test micro-services. A (quite contrived) example of the development process can be found [here](https://github
-.com/http4k/http4k/tree/master/src/test/kotlin/worked_example)
+That said, possibly the most useful thing is thoroughly explain the process that we have developed to test micro-services. A (quite contrived) example of the development process can be found 
+[here](https://github.com/http4k/http4k/tree/master/src/test/kotlin/worked_example)
 
 ## Acknowledgments
 
