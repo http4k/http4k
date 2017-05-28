@@ -31,7 +31,7 @@ fun MyMathsApp(recorderHttp: HttpHandler): HttpHandler {
     val recorder = Recorder(recorderHttp)
     return CatchLensFailure.then(
         routes(
-            GET to "/ping" by { _: Request -> Response.Companion(OK) },
+            GET to "/ping" by { _: Request -> Response(OK) },
             GET to "/add" by calculate(recorder) { it.sum() },
             GET to "/multiply" by calculate(recorder) { it.fold(1) { memo, next -> memo * next } }
         )

@@ -7,6 +7,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.OK
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -17,7 +19,7 @@ object Matchers {
     fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
 
     fun Response.answerShouldBe(expected: Int) {
-        statusShouldBe(Status.OK)
+        statusShouldBe(OK)
         bodyString().toInt() shouldMatch equalTo(expected)
     }
 }
@@ -39,7 +41,7 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(Method.GET, "http://localhost:$port/ping")).statusShouldBe(Status.OK)
+        client(Request(Method.GET, "http://localhost:$port/ping")).statusShouldBe(OK)
         client(Request(Method.GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
         client(Request(Method.GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
     }
@@ -60,7 +62,7 @@ class AddFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        client(Request(Method.GET, "/add?value=1&value=notANumber")).statusShouldBe(Status.BAD_REQUEST)
+        client(Request(Method.GET, "/add?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
     }
 }
 
@@ -79,6 +81,6 @@ class MultiplyFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        client(Request(Method.GET, "/multiply?value=1&value=notANumber")).statusShouldBe(Status.BAD_REQUEST)
+        client(Request(Method.GET, "/multiply?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
     }
 }
