@@ -56,6 +56,18 @@ object Matchers {
     }
 }
 
+abstract class RecorderContract {
+    abstract val client: HttpHandler
+
+    @Test
+    fun `records answer`() {
+        Recorder(client).record(123)
+        checkAnswerRecorded()
+    }
+
+    open fun checkAnswerRecorded(): Unit {}
+}
+
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()
 
@@ -70,25 +82,7 @@ class FakeRecorderHttp : HttpHandler {
     override fun invoke(request: Request): Response = app(request)
 }
 
-interface RecorderContract {
-
-    val client: HttpHandler
-
-    @Test
-    fun `records answer`() {
-        client(Request(POST, "/123")).statusShouldBe(ACCEPTED)
-        checkAnswerRecorded()
-    }
-
-    fun checkAnswerRecorded(): Unit {}
-
-    @Test
-    fun `non-numeric answer is bad request`() {
-        client(Request(POST, "/notANumber")).statusShouldBe(BAD_REQUEST)
-    }
-}
-
-class FakeRecorderTest : RecorderContract {
+class FakeRecorderTest : RecorderContract() {
     override val client = FakeRecorderHttp()
 
     override fun checkAnswerRecorded() {
@@ -97,7 +91,7 @@ class FakeRecorderTest : RecorderContract {
 }
 
 @Ignore // this obviously doesn't exist, so we ignore it here
-class RealRecorderTest : RecorderContract {
+class RealRecorderTest : RecorderContract() {
     override val client = SetHostFrom(Uri.of("http://realrecorder")).then(OkHttp())
 }
 
@@ -185,7 +179,8 @@ fun MyMathServer(port: Int, recorderBaseUri: Uri): Http4kServer =
 
 class Recorder(private val client: HttpHandler) {
     fun record(value: Int): Unit {
-        client(Request(POST, "/$value"))
+        val response = client(Request(POST, "/$value"))
+        if (response.status != ACCEPTED) throw RuntimeException("recorder returned ${response.status}")
     }
 }
 
