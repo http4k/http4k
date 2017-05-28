@@ -26,7 +26,7 @@ import worked_example._3_adding_another_endpoint.Matchers.answerShouldBe
 import worked_example._3_adding_another_endpoint.Matchers.statusShouldBe
 
 /**
- * 3. Refactoring towards another business story.
+ * 3. REFACTORING TOWARDS ANOTHER BUSINESS STORY.
  *
  * REQUIREMENTS:
  * - Implement a "multiply" service, which will find the product of a number of integer values.

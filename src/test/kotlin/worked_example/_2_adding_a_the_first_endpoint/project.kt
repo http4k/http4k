@@ -26,7 +26,7 @@ import worked_example._2_adding_a_the_first_endpoint.Matchers.answerShouldBe
 import worked_example._2_adding_a_the_first_endpoint.Matchers.statusShouldBe
 
 /**
- * 2. Adding the first business-level story.
+ * 2. ADDING THE FIRST BUSINESS-LEVEL STORY.
  * Starting with another EndToEnd test, we can then drill-down into the functional behaviour of the system by introducing
  * OCT (Out of Container) tests and converting the e2e test to just test endpoint wiring (so far). The common assertions have
  * also been converted to reusable extension methods on Response.
