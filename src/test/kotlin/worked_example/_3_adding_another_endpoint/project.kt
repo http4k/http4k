@@ -1,4 +1,4 @@
-package worked_example._2_adding_a_business_endpoint
+package worked_example._3_adding_another_endpoint
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
@@ -22,20 +22,27 @@ import org.http4k.server.asServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import worked_example._2_adding_a_business_endpoint.Matchers.answerShouldBe
-import worked_example._2_adding_a_business_endpoint.Matchers.statusShouldBe
+import worked_example._3_adding_another_endpoint.Matchers.answerShouldBe
+import worked_example._3_adding_another_endpoint.Matchers.statusShouldBe
 
 /**
- * 2. Adding the first business-level story.
- * Starting with another EndToEnd test, we can then drill-down into the functional behaviour of the system by introducing
- * OCT (Out of Container) tests
+ * 3. Refactoring towards another business story.
  *
  * REQUIREMENTS:
- * - Implement an "add" service, which will sum a number of integer values.
+ * - Implement a "multiply" service, which will find the product of a number of integer values.
  */
 
 /** TESTS **/
-abstract class EndToEndTest {
+object Matchers {
+    fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
+
+    fun Response.answerShouldBe(expected: Int) {
+        statusShouldBe(OK)
+        bodyString().toInt() shouldMatch equalTo(expected)
+    }
+}
+
+class EndToEndTest {
     val client = OkHttp()
     val server = MyMathServer(8000)
 
@@ -48,22 +55,12 @@ abstract class EndToEndTest {
     fun teardown(): Unit {
         server.stop()
     }
-}
 
-object Matchers {
-    fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
-
-    fun Response.answerShouldBe(expected: Int) {
-        statusShouldBe(OK)
-        bodyString().toInt() shouldMatch equalTo(expected)
-    }
-}
-
-class NonFunctionalRequirementsTest : EndToEndTest() {
     @Test
     fun `all endpoints are mounted correctly`() {
         client(Request(GET, "http://localhost:8000/ping")).statusShouldBe(OK)
         client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
+        client(Request(GET, "http://localhost:8000/multiply?value=2&value=4")).answerShouldBe(8)
     }
 }
 
@@ -86,16 +83,43 @@ class AddFunctionalTest {
     }
 }
 
+class MultiplyFunctionalTest {
+    private val client = MyMathsApp()
+
+    @Test
+    fun `products values together`() {
+        client(Request(GET, "/multiply?value=2&value=4")).answerShouldBe(8)
+    }
+
+    @Test
+    fun `answer is zero when no values`() {
+        client(Request(GET, "/multiply")).answerShouldBe(0)
+    }
+
+    @Test
+    fun `bad request when some values are not numbers`() {
+        client(Request(GET, "/multiply?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
+    }
+}
+
 /** PRODUCTION **/
 fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
         GET to "/ping" by { _: Request -> Response(OK) },
-        GET to "/add" by { request: Request ->
-            val valuesToAdd = Query.int().multi.defaulted("value", listOf()).extract(request)
-            Response(OK).body(valuesToAdd.sum().toString())
-        }
+        GET to "/add" by calculate { it.sum() },
+        GET to "/multiply" by calculate { it.fold(1) { memo, next -> memo * next } }
     )
 )
 
+private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
+    val values = Query.int().multi.defaulted("value", listOf())
+
+    return {
+        request: Request ->
+        val valuesToCalc = values.extract(request)
+        val answer = if(valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
+        Response(OK).body(answer.toString())
+    }
+}
