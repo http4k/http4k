@@ -376,23 +376,8 @@ The API has been designed to make it as simple as possible to test both individu
 Because of the above, there really isn't much required in the way of "testing infrastructure" - no magic containers or test fixtures that you might find in other frameworks. 
 Testing is just matter of calling the correct function!
 
-That said, possibly the most useful thing is explain the ways that we have developed to test effectively...
-
-## Application Design
-What follows is a guide to *how* we build **http4k** applications test first to provide excellent test coverage driven by decoupled tests. 
-
-For this example, we will use an example of a Maths app with the following requirements:
-* The app must add 2 numbers together via an HTTP call
-* Calls to the service will be logged (via HTTP POST) to another server, the Recorder.
-
-Apps can generally be split into 3 tiers:
-
-1. Endpoint: `HttpHandlers` are constructed individually, by providing a builder function which takes the business-level dependencies. 
-2. Application: Builder function which takes the transport-level dependencies, and converts them into business-level dependencies. All routes are constructed and collected in this tier.
-3. Server: Builder function which takes the configuration for environmental concerns such as ports and downstream urls.
-
-* [Example code for all 3 tiers are here](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook/test_driven_apps.kt)
-
+That said, possibly the most useful thing is thoroughly explain the process that we have developed to test micro-services. A (quite contrived) example of the development process can be found [here](https://github
+.com/http4k/http4k/tree/master/src/test/kotlin/worked_example)
 
 ## Acknowledgments
 
