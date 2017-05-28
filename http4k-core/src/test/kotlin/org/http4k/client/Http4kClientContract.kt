@@ -4,10 +4,13 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.server.Http4kServer
@@ -26,7 +29,7 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     @Before
     fun before() {
         server = { request: Request ->
-            Response(Status.OK)
+            Response(OK)
                 .header("uri", request.uri.toString())
                 .header("header", request.header("header"))
                 .header("query", request.query("query"))
@@ -41,11 +44,11 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
 
     @Test
     fun `can make call`() {
-        val response = client(Request(Method.POST, "http://localhost:$port/someUri")
+        val response = client(Request(POST, "http://localhost:$port/someUri")
             .query("query", "123")
             .header("header", "value").body("body"))
 
-        assertThat(response.status, equalTo(Status.OK))
+        assertThat(response.status, equalTo(OK))
         assertThat(response.header("uri"), equalTo("/someUri?query=123"))
         assertThat(response.header("query"), equalTo("123"))
         assertThat(response.header("header"), equalTo("value"))
@@ -53,16 +56,32 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     }
 
     @Test
-    fun `performs simple request`() {
-        val response = client(Request(Method.GET, "http://httpbin.org/get").query("name", "John Doe"))
+    fun `performs simple GET request`() {
+        val response = client(Request(GET, "http://httpbin.org/get").query("name", "John Doe"))
 
-        assertThat(response.status, equalTo(Status.OK))
+        assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), containsSubstring("John Doe"))
     }
 
     @Test
+    fun `performs simple POST request`() {
+        val response = client(Request(POST, "http://httpbin.org/post"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), containsSubstring(""))
+    }
+
+    @Test
+    fun `performs simple DELETE request`() {
+        val response = client(Request(DELETE, "http://httpbin.org/delete"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), containsSubstring(""))
+    }
+
+    @Test
     fun `does not follow redirects`() {
-        val response = client(Request(Method.GET, "http://httpbin.org/redirect-to").query("url", "/destination"))
+        val response = client(Request(GET, "http://httpbin.org/redirect-to").query("url", "/destination"))
 
         assertThat(response.status, equalTo(Status.FOUND))
         assertThat(response.header("location"), equalTo("/destination"))
@@ -70,9 +89,9 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
 
     @Test
     fun `does not store cookies`() {
-        client(Request(Method.GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
+        client(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
 
-        val response = client(Request(Method.GET, "http://httpbin.org/cookies"))
+        val response = client(Request(GET, "http://httpbin.org/cookies"))
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), !containsSubstring("foo"))
@@ -82,7 +101,7 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     fun `filters enable cookies and redirects`() {
         val enhancedClient = ClientFilters.FollowRedirects().then(ClientFilters.Cookies()).then(client)
 
-        val response = enhancedClient(Request(Method.GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
+        val response = enhancedClient(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), containsSubstring("foo"))

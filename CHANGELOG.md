@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.25.1
+- Fix for #15. OkHttp client handling of POSTs with no body.
+
 ### v1.25.0
 - Can add custom mime types to Static Content
 - GenerateDataClasses is capable of more complex object graphs

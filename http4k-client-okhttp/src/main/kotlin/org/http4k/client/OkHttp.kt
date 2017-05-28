@@ -2,6 +2,7 @@ package org.http4k.client
 
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.create
+import okhttp3.internal.http.HttpMethod.permitsRequestBody
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -19,7 +20,9 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient) : HttpHandl
             memo.addHeader(first, second)
         }.build()
 
-    private fun Request.requestBody() = if (body != Body.EMPTY) create(null, body.payload.array()) else null
+    private fun Request.requestBody() =
+        if (permitsRequestBody(method.toString())) create(null, body.payload.array())
+        else null
 
     private fun okhttp3.Response.asHttp4k(): Response {
         val initial = body()?.let {
