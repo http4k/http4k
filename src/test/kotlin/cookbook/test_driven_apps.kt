@@ -13,7 +13,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.by
 import org.http4k.routing.path
@@ -95,7 +94,7 @@ fun MyMathServer(port: Int, recorderUri: Uri): Http4kServer {
 }
 
 class EndToEndTest {
-    private val client = DebuggingFilters.PrintRequest().then(OkHttp())
+    private val client = OkHttp()
     private val recorderHttp = FakeRecorderHttp()
     private val recorder = recorderHttp.asServer(Jetty(8001))
     private val server = MyMathServer(8000, Uri.of("http://localhost:8001"))
