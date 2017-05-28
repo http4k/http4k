@@ -3,6 +3,7 @@ package worked_example._2_adding_a_business_endpoint
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.client.OkHttp
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -24,6 +25,16 @@ import org.junit.Test
 import worked_example._2_adding_a_business_endpoint.Matchers.answerShouldBe
 import worked_example._2_adding_a_business_endpoint.Matchers.statusShouldBe
 
+/**
+ * 2. Adding the first business-level story.
+ * Starting with another EndToEnd test, we can then drill-down into the functional behaviour of the system by introducing
+ * OCT (Out of Container) tests
+ *
+ * REQUIREMENTS:
+ * - Implement an "add" service, which will sum a number of integer values.
+ */
+
+/** TESTS **/
 abstract class EndToEndTest {
     val client = OkHttp()
     val server = MyMathServer(8000)
@@ -50,36 +61,41 @@ object Matchers {
 
 class NonFunctionalRequirementsTest : EndToEndTest() {
     @Test
-    fun `responds to ping`() {
+    fun `all endpoints are mounted correctly`() {
         client(Request(GET, "http://localhost:8000/ping")).statusShouldBe(OK)
+        client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
     }
 }
 
-class AddTest : EndToEndTest() {
+class AddFunctionalTest {
+    private val client = MyMathsApp()
+
     @Test
     fun `adds values together`() {
-        client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
+        client(Request(GET, "/add?value=1&value=2")).answerShouldBe(3)
     }
 
     @Test
     fun `answer is zero when no values`() {
-        client(Request(GET, "http://localhost:8000/add")).answerShouldBe(0)
+        client(Request(GET, "/add")).answerShouldBe(0)
     }
 
     @Test
     fun `bad request when some values are not numbers`() {
-        client(Request(GET, "http://localhost:8000/add?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
+        client(Request(GET, "/add?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
     }
 }
 
-fun MyMathServer(port: Int): Http4kServer {
-    val app = routes(
+/** PRODUCTION **/
+fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
+
+fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
+    routes(
         GET to "/ping" by { _: Request -> Response(OK) },
         GET to "/add" by { request: Request ->
             val valuesToAdd = Query.int().multi.defaulted("value", listOf()).extract(request)
             Response(OK).body(valuesToAdd.sum().toString())
         }
     )
-    return CatchLensFailure.then(app).asServer(Jetty(port))
-}
+)
 
