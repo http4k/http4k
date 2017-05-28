@@ -1,4 +1,4 @@
-package worked_example.`_2_adding_multiple_endpoints`
+package worked_example._2_adding_a_business_endpoint
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
@@ -21,6 +21,8 @@ import org.http4k.server.asServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import worked_example._2_adding_a_business_endpoint.Matchers.answerShouldBe
+import worked_example._2_adding_a_business_endpoint.Matchers.statusShouldBe
 
 abstract class EndToEndTest {
     val client = OkHttp()
@@ -37,21 +39,23 @@ abstract class EndToEndTest {
     }
 }
 
-class NonFunctionalRequirementsTest : EndToEndTest() {
-    @Test
-    fun `responds to ping`() {
-        client(Request(GET, "http://localhost:8000/ping")).status shouldMatch equalTo(OK)
-    }
-}
+object Matchers {
+    fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
 
-class AddsTest : EndToEndTest() {
-    private fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
-
-    private fun Response.answerShouldBe(expected: Int) {
+    fun Response.answerShouldBe(expected: Int) {
         statusShouldBe(OK)
         bodyString().toInt() shouldMatch equalTo(expected)
     }
+}
 
+class NonFunctionalRequirementsTest : EndToEndTest() {
+    @Test
+    fun `responds to ping`() {
+        client(Request(GET, "http://localhost:8000/ping")).statusShouldBe(OK)
+    }
+}
+
+class AddTest : EndToEndTest() {
     @Test
     fun `adds values together`() {
         client(Request(GET, "http://localhost:8000/add?value=1&value=2")).answerShouldBe(3)
