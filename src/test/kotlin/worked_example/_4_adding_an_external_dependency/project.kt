@@ -20,9 +20,6 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
-fun MyMathServer(port: Int, recorderBaseUri: Uri): Http4kServer =
-    MyMathsApp(SetHostFrom(recorderBaseUri).then(OkHttp())).asServer(Jetty(port))
-
 class Recorder(private val client: HttpHandler) {
     fun record(value: Int): Unit {
         val response = client(Request(POST, "/$value"))
@@ -52,3 +49,7 @@ private fun calculate(recorder: Recorder, fn: (List<Int>) -> Int): (Request) -> 
         Response(OK).body(answer.toString())
     }
 }
+
+fun MyMathServer(port: Int, recorderBaseUri: Uri): Http4kServer =
+    MyMathsApp(SetHostFrom(recorderBaseUri).then(OkHttp())).asServer(Jetty(port))
+
