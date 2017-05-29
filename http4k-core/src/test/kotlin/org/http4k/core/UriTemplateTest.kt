@@ -2,7 +2,7 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.UriTemplate.Companion.uriTemplate
+import org.http4k.core.UriTemplate.Companion.from
 import org.junit.Test
 
 class UriTemplateTest {
@@ -10,7 +10,7 @@ class UriTemplateTest {
     @Test
     @Throws(Exception::class)
     fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
-        val template = uriTemplate("properties/{name}")
+        val template = from("properties/{name}")
 
         assertThat(
             template.generate(pathParameters(pair("name", "a name with spaces"))),
@@ -23,7 +23,7 @@ class UriTemplateTest {
 
     @Test
     fun supportsMultiplePathParams() {
-        val template = uriTemplate("properties/{id}/{name}")
+        val template = from("properties/{id}/{name}")
         assertThat(template.matches("properties/123/bob"), equalTo(true))
         val parameters = template.extract("properties/123/bob")
         assertThat(parameters.getValue("id"), equalTo("123"))
@@ -33,10 +33,10 @@ class UriTemplateTest {
 
     @Test
     fun canCaptureEnd() {
-        val template1 = uriTemplate("path")
+        val template1 = from("path")
         assertThat(template1.matches("path/123"), equalTo(true))
         assertThat(template1.extract("path/123").getValue("$"), equalTo("/123"))
-        val template = uriTemplate("path/{id}")
+        val template = from("path/{id}")
         assertThat(template.matches("path/123/someotherpath"), equalTo(true))
         assertThat(template.extract("path/123/someotherpath").getValue("$"), equalTo("/someotherpath"))
         assertThat(template.matches("path/123"), equalTo(true))
@@ -45,7 +45,7 @@ class UriTemplateTest {
 
     @Test
     fun supportsCustomRegex() {
-        val template = uriTemplate("path/{id:\\d}")
+        val template = from("path/{id:\\d}")
         assertThat(template.matches("path/foo"), equalTo(false))
         assertThat(template.matches("path/1"), equalTo(true))
         assertThat(template.extract("path/1").getValue("id"), equalTo("1"))
@@ -53,28 +53,28 @@ class UriTemplateTest {
 
     @Test
     fun canMatch() {
-        assertThat(uriTemplate("path/{id}").matches("path/foo"), equalTo(true))
-        assertThat(uriTemplate("/path/{id}").matches("/path/foo"), equalTo(true))
-        assertThat(uriTemplate("/path/{id}/").matches("/path/foo"), equalTo(true))
-        assertThat(uriTemplate("/path/{id}/").matches("path/foo"), equalTo(true))
-        assertThat(uriTemplate("path/{id}").matches("/path/foo"), equalTo(true))
+        assertThat(from("path/{id}").matches("path/foo"), equalTo(true))
+        assertThat(from("/path/{id}").matches("/path/foo"), equalTo(true))
+        assertThat(from("/path/{id}/").matches("/path/foo"), equalTo(true))
+        assertThat(from("/path/{id}/").matches("path/foo"), equalTo(true))
+        assertThat(from("path/{id}").matches("/path/foo"), equalTo(true))
     }
 
     @Test
     fun canExtractFromUri() {
-        val template = uriTemplate("path/{id}")
+        val template = from("path/{id}")
         assertThat(template.extract("path/foo").getValue("id"), equalTo("foo"))
     }
 
     @Test
     fun canExtractFromUriWithEncodedSpace() {
-        val template = uriTemplate("path/{id1}")
+        val template = from("path/{id1}")
         assertThat(template.extract("path/foo+bar").getValue("id1"), equalTo("foo bar"))
     }
 
     @Test
     fun canGenerateUri() {
-        val template = uriTemplate("path/{id}")
+        val template = from("path/{id}")
         assertThat(template.generate(pathParameters(pair("id", "foo"))), equalTo("path/foo"))
     }
 

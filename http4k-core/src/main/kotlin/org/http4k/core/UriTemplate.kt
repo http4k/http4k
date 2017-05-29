@@ -4,7 +4,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.regex.Pattern
 
-class UriTemplate(private val template: String) {
+class UriTemplate private constructor(private val template: String) {
     private val templateWithSuffix = "$template{$:(/.*)?}"
     private val templateRegex: Regex
     private val matches: Sequence<MatchResult>
@@ -19,8 +19,8 @@ class UriTemplate(private val template: String) {
     }
 
     companion object {
-        private val URI_TEMPLATE_FORMAT = "\\{([^\\}]+?)(?::([^\\}]+))?\\}".toRegex()
-        fun uriTemplate(template: String) = UriTemplate(template.trimSlashes())
+        private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?}".toRegex()
+        fun from(template: String) = UriTemplate(template.trimSlashes())
 
         fun String.trimSlashes() = "^(/)?(.*?)(/)?$".toRegex().replace(this, { result -> result.groupValues[2] })
     }
@@ -54,5 +54,5 @@ class UriTemplate(private val template: String) {
 
     override fun toString(): String = template
 
-    fun prefixedWith(prefix: String): UriTemplate = UriTemplate("$prefix/$template")
+    fun prefixedWith(prefix: String): UriTemplate = UriTemplate.from("$prefix/$template")
 }
