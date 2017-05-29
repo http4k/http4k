@@ -27,7 +27,7 @@ data class RoutesRouter(internal val routes: List<Route>): Router, HttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
-    override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: Response(NOT_FOUND)
+    override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: Response(NOT_FOUND.description("Route not found"))
 
     override fun match(request: Request): HttpHandler? = routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
 }
