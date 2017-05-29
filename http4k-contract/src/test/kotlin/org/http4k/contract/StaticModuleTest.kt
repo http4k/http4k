@@ -22,7 +22,7 @@ class StaticModuleTest {
     fun `looks up contents of existing root file`() {
         val router = StaticModule(Root / "svc").toRouter()
         val request = Request(GET, of("/svc/mybob.xml"))
-        val result = router(request)!!(request)
+        val result = router.match(request)!!(request)
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
         assertThat(CONTENT_TYPE(result), equalTo(APPLICATION_XML))
     }
@@ -31,7 +31,7 @@ class StaticModuleTest {
     fun `can register custom mime types`() {
         val router = StaticModule(Root / "svc", Classpath(), extraPairs = "myxml" to APPLICATION_XML).toRouter()
         val request = Request(GET, of("/svc/mybob.myxml"))
-        val result = router(request)!!(request)
+        val result = router.match(request)!!(request)
         assertThat(result.status, equalTo(Status.OK))
         assertThat(result.bodyString(), equalTo("<myxml>content</myxml>"))
         assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
@@ -39,7 +39,7 @@ class StaticModuleTest {
 
     @Test
     fun `looks up non existent-file`() {
-        assertThat((StaticModule(Root / "svc", Classpath()).toRouter())(Request(GET, of("/svc/NotHere.xml"))), absent())
+        assertThat(StaticModule(Root / "svc", Classpath()).toRouter().match(Request(GET, of("/svc/NotHere.xml"))), absent())
     }
 
     @Test

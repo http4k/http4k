@@ -33,7 +33,7 @@ class RouteTest {
         val body = Body.string(TEXT_PLAIN).toLens()
         val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
 
-        assertThat((route.router(Root))(Request(Method.GET, "").with(header of "value", query of "value", body of "hello")), present())
+        assertThat(route.router(Root).match(Request(Method.GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
 
     @Test
@@ -44,8 +44,8 @@ class RouteTest {
         val route = Route("").header(header).query(query).body(body).at(GET).bind { _: Request -> Response(OK) }
 
         val invalidRequest = Request(Method.GET, "").with(header of "value", body of "hello")
-        assertThat((route.router(Root))(invalidRequest), present())
-        assertThat({ (route.router(Root))(invalidRequest)?.invoke(invalidRequest) },
+        assertThat(route.router(Root).match(invalidRequest), present())
+        assertThat({ route.router(Root).match(invalidRequest)?.invoke(invalidRequest) },
             throws(lensFailureWith(query.meta.missing())))
     }
 
@@ -65,9 +65,9 @@ class RouteTest {
     fun `0 parts - matches route`() {
         val route = Route("").at(GET).bind({ _: Request -> Response(OK) })
         val router = route.router(Root)
-        assertThat(router(Request(Method.GET, "")), present())
-        assertThat(router(Request(Method.POST, "")), absent())
-        assertThat(router(Request(Method.GET, "/bob")), absent())
+        assertThat(router.match(Request(Method.GET, "")), present())
+        assertThat(router.match(Request(Method.POST, "")), absent())
+        assertThat(router.match(Request(Method.GET, "/bob")), absent())
     }
 
     @Test
@@ -105,13 +105,13 @@ class RouteTest {
 
     private fun checkMatching(route: ServerRoute, valid: String, expected: String) {
         val routerOnNoPrefix = route.router(Root)
-        assertThat(routerOnNoPrefix(Request(Method.GET, "")), absent())
-        assertThat(routerOnNoPrefix(Request(Method.POST, valid)), absent())
-        assertThat(routerOnNoPrefix(Request(Method.GET, valid))?.invoke(Request(Method.GET, valid))?.bodyString(), equalTo(expected))
+        assertThat(routerOnNoPrefix.match(Request(Method.GET, "")), absent())
+        assertThat(routerOnNoPrefix.match(Request(Method.POST, valid)), absent())
+        assertThat(routerOnNoPrefix.match(Request(Method.GET, valid))?.invoke(Request(Method.GET, valid))?.bodyString(), equalTo(expected))
 
         val routerOnPrefix = route.router(Root / "somePrefix")
-        assertThat(routerOnPrefix(Request(Method.GET, "/somePrefix")), absent())
-        assertThat(routerOnPrefix(Request(Method.POST, "/somePrefix/$valid")), absent())
-        assertThat(routerOnPrefix(Request(Method.GET, "/somePrefix/$valid"))?.invoke(Request(Method.GET, valid))?.bodyString(), equalTo(expected))
+        assertThat(routerOnPrefix.match(Request(Method.GET, "/somePrefix")), absent())
+        assertThat(routerOnPrefix.match(Request(Method.POST, "/somePrefix/$valid")), absent())
+        assertThat(routerOnPrefix.match(Request(Method.GET, "/somePrefix/$valid"))?.invoke(Request(Method.GET, valid))?.bodyString(), equalTo(expected))
     }
 }

@@ -31,10 +31,9 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router =
-        {
-            core.matches(moduleRoot, it, pathLenses.toList(), toHandler)
-        }
+    internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
+        override fun match(request: Request): HttpHandler? = core.matches(moduleRoot, request, pathLenses.toList(), toHandler)
+    }
 
     internal fun describe(moduleRoot: BasePath): String {
         return "${core.pathFn(moduleRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"

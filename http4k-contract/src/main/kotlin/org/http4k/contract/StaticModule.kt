@@ -2,6 +2,7 @@ package org.http4k.contract
 
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.ResourceLoader
 import org.http4k.core.StaticContent
@@ -17,7 +18,8 @@ class StaticModule(basePath: BasePath,
 
     private val staticContent = moduleFilter.then(StaticContent(basePath.toString(), resourceLoader, *extraPairs))
 
-    override fun toRouter(): Router = {
-        staticContent(it).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
+    override fun toRouter(): Router = object : Router {
+        override fun match(request: Request): HttpHandler? =
+            staticContent(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
     }
 }

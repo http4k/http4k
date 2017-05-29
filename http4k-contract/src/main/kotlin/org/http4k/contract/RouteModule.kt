@@ -40,10 +40,10 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
 
             private val noMatch: HttpHandler? = null
 
-            override fun invoke(request: Request): HttpHandler? =
+            override fun match(request: Request): HttpHandler? =
                 if (request.isIn(moduleRoot)) {
                     routers.fold(noMatch, { memo, (router, routeFilter) ->
-                        memo ?: router(request)?.let { routeFilter.then(it) }
+                        memo ?: router.match(request)?.let { routeFilter.then(it) }
                     })
                 } else null
 

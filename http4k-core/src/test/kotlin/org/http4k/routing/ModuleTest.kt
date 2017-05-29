@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,19 +16,19 @@ import org.junit.Test
 class ModuleTest {
 
     private val notFoundModule = object : Module {
-        override fun toRouter(): Router = {
-            null
+        override fun toRouter(): Router = object : Router {
+            override fun match(request: Request): HttpHandler? = null
         }
     }
 
     private val lensFailureModule = object : Module {
-        override fun toRouter(): Router = {
-            { throw LensFailure() }
+        override fun toRouter(): Router = object : Router {
+            override fun match(request: Request): HttpHandler? = throw LensFailure()
         }
     }
     private val okModule = object : Module {
-        override fun toRouter(): Router = {
-            { Response(OK) }
+        override fun toRouter(): Router = object : Router {
+            override fun match(request: Request): HttpHandler? = { Response(OK) }
         }
     }
 

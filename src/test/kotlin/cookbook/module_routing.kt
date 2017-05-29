@@ -9,16 +9,21 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.by
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import org.http4k.routing.routesMk2
 
 fun main(args: Array<String>) {
 
+    val routesMk2 = routes(
+        GET to "/get/{name}" by { req: Request -> Response(OK).body(req.path("name")!!) },
+        POST to "/post/{name}" by { _: Request -> Response(OK) }
+    )
+    println(routesMk2(Request(GET, "/get/value")))
+
     val app = routes(
-        "/bob" by routesMk2(
+        "/bob" by routes(
             GET to "/get/{name}" by { req: Request -> Response(OK).body(req.path("name")!!) },
             POST to "/post/{name}" by { _: Request -> Response(OK) }
         ),
-        "/rita" by routesMk2(
+        "/rita" by routes(
             DELETE to "/delete/{name}" by { _: Request -> Response(OK) },
             POST to "/post/{name}" by { _: Request -> Response(OK) }
         )
