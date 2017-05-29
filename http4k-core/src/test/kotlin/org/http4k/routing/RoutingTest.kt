@@ -122,4 +122,17 @@ class RoutingTest {
         assertThat(response.bodyString(), equalTo("matched"))
     }
 
+    @Test
+    fun `route grouping prefix can contain a dynamic segment`() {
+        val subRoutes = routes(
+            GET to "/a/{route}" by { Response(OK).body(it.path("name") + it.path("route")) }
+        )
+
+        val app = routes("/{name:\\d+}" by subRoutes)
+
+        assertThat(app(Request(GET, "/123/a/something")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/123/a/something")).bodyString(), equalTo("123something"))
+        assertThat(app(Request(GET, "/asd/a/something")).status, equalTo(NOT_FOUND))
+    }
+
 }

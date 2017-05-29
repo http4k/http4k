@@ -23,7 +23,7 @@ infix fun String.by(router: RoutesRouter): Module = object : Module {
     override fun toRouter(): Router = RoutesRouter(router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
 }
 
-data class RoutesRouter(internal val routes: List<Route>): Router, HttpHandler {
+data class RoutesRouter(internal val routes: List<Route>) : Router, HttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
@@ -33,11 +33,10 @@ data class RoutesRouter(internal val routes: List<Route>): Router, HttpHandler {
 }
 
 private fun Route.asRouter(): Router = object : Router {
-    override fun match(request: Request): HttpHandler? {
-        return if (template.matches(request.uri.path) && method == request.method) {
+    override fun match(request: Request): HttpHandler? =
+        if (template.matches(request.uri.path) && method == request.method) {
             { req: Request -> handler(req.withUriTemplate(template)) }
         } else null
-    }
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
