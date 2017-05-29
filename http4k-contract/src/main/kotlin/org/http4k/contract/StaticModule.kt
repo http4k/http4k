@@ -7,6 +7,8 @@ import org.http4k.core.ResourceLoader
 import org.http4k.core.StaticContent
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.then
+import org.http4k.routing.Module
+import org.http4k.routing.Router
 
 class StaticModule(basePath: BasePath,
                    resourceLoader: ResourceLoader = ResourceLoader.Classpath("/"),

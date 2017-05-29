@@ -10,6 +10,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
+import org.http4k.routing.Router
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal val core = pathBinder.core.route.core

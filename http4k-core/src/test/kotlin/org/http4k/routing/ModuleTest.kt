@@ -1,4 +1,4 @@
-package org.http4k.contract
+package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

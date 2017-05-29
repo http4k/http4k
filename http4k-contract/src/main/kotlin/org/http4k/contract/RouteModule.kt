@@ -9,6 +9,8 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.X_URI_TEMPLATE
+import org.http4k.routing.Module
+import org.http4k.routing.Router
 
 class RouteModule private constructor(private val router: ModuleRouter) : Module {
 
@@ -32,7 +34,7 @@ class RouteModule private constructor(private val router: ModuleRouter) : Module
                                         val routes: List<ServerRoute> = emptyList()) : Router {
             private val descriptionRoute = descriptionRoute()
 
-            private val routers = routes
+            private val routers: List<Pair<Router, Filter>> = routes
                 .map { it.router(moduleRoot) to security.filter.then(identify(it)).then(filter) }
                 .plus(descriptionRoute.router(moduleRoot) to identify(descriptionRoute).then(filter))
 
