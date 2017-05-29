@@ -19,16 +19,13 @@ interface Module {
         }
     }
 
-    fun toHttpHandler(): HttpHandler {
-        val handlerMatcher = toRouter()
-        return { req ->
-            handlerMatcher(req)?.let {
-                try {
-                    it(req)
-                } catch (e: LensFailure) {
-                    Response(BAD_REQUEST)
-                }
-            } ?: Response(NOT_FOUND)
+    fun toHttpHandler(): HttpHandler = toRouter().let { router ->
+        { req ->
+            try {
+                router(req)?.invoke(req) ?: Response(NOT_FOUND)
+            } catch (e: LensFailure) {
+                Response(BAD_REQUEST)
+            }
         }
     }
 
