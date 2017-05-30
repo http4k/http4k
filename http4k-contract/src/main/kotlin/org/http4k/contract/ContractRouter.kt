@@ -14,8 +14,8 @@ import org.http4k.routing.Router
 class ContractRouter private constructor(private val router: ModuleRouter) : Router {
     override fun match(request: Request): HttpHandler? = router.match(request)
 
-    constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
-        : this(ModuleRouter(moduleRoot, renderer, ServerFilters.CatchLensFailure.then(filter)))
+    constructor(contractRoot: BasePath, renderer: ContractRenderer = NoRenderer, filter: Filter = Filter { it })
+        : this(ModuleRouter(contractRoot, renderer, ServerFilters.CatchLensFailure.then(filter)))
 
     fun securedBy(new: Security) = ContractRouter(router.securedBy(new))
     fun withDescriptionPath(fn: (BasePath) -> BasePath) = ContractRouter(router.copy(descriptionPath = fn))
@@ -24,8 +24,8 @@ class ContractRouter private constructor(private val router: ModuleRouter) : Rou
     fun withRoutes(new: Iterable<ServerRoute>) = ContractRouter(router.withRoutes(new.toList()))
 
     companion object {
-        private data class ModuleRouter(val moduleRoot: BasePath,
-                                        val renderer: ModuleRenderer,
+        private data class ModuleRouter(val contractRoot: BasePath,
+                                        val renderer: ContractRenderer,
                                         val filter: Filter,
                                         val security: Security = NoSecurity,
                                         val descriptionPath: (BasePath) -> BasePath = { it },
@@ -33,13 +33,13 @@ class ContractRouter private constructor(private val router: ModuleRouter) : Rou
             private val descriptionRoute = descriptionRoute()
 
             private val routers: List<Pair<Router, Filter>> = routes
-                .map { it.router(moduleRoot) to security.filter.then(identify(it)).then(filter) }
-                .plus(descriptionRoute.router(moduleRoot) to identify(descriptionRoute).then(filter))
+                .map { it.router(contractRoot) to security.filter.then(identify(it)).then(filter) }
+                .plus(descriptionRoute.router(contractRoot) to identify(descriptionRoute).then(filter))
 
             private val noMatch: HttpHandler? = null
 
             override fun match(request: Request): HttpHandler? =
-                if (request.isIn(moduleRoot)) {
+                if (request.isIn(contractRoot)) {
                     routers.fold(noMatch, { memo, (router, routeFilter) ->
                         memo ?: router.match(request)?.let { routeFilter.then(it) }
                     })
@@ -50,10 +50,10 @@ class ContractRouter private constructor(private val router: ModuleRouter) : Rou
 
             private fun descriptionRoute(): ServerRoute =
                 PathBinder0(Core(Route("description route"), GET, descriptionPath)) bind
-                    { renderer.description(moduleRoot, security, routes) }
+                    { renderer.description(contractRoot, security, routes) }
 
             private fun identify(route: ServerRoute): Filter {
-                val routeIdentity = route.describeFor(moduleRoot)
+                val routeIdentity = route.describeFor(contractRoot)
                 return Filter {
                     { req ->
                         it(req.with(X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity))

@@ -49,7 +49,7 @@ class StaticRouterTest {
             { next(it).header("foo", "bar") }
         }).toHttpHandler()
 
-        val result = handler(Request(GET, of("/svc/StaticModule.js")))
+        val result = handler(Request(GET, of("/svc/StaticRouter.js")))
         assertThat(result.header("foo"), equalTo("bar"))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(CONTENT_TYPE(result), equalTo(ContentType("application/javascript")))

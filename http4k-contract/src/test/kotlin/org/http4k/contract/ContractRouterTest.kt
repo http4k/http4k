@@ -32,7 +32,7 @@ class ContractRouterTest {
     }
 
     @Test
-    fun `passes through module filter`() {
+    fun `passes through contract filter`() {
         val response = contractRouter.withRoute(Route("").at(GET) bind {
             Response(OK).with(header of header(it))
         }).toHttpHandler()(Request(Method.GET, ""))

@@ -31,7 +31,7 @@ import org.http4k.lens.int
 import org.http4k.lens.webForm
 import org.junit.Test
 
-abstract class ModuleRendererContract(private val renderer: ModuleRenderer) {
+abstract class ContractRendererContract(private val renderer: ContractRenderer) {
     fun name(): String = this.javaClass.simpleName
 
     @Test

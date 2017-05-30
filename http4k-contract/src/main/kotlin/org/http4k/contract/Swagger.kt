@@ -14,7 +14,7 @@ data class ApiInfo(val title: String, val version: String, val description: Stri
 
 private typealias ReasonToResponse = Pair<String, Response>
 
-class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ModuleRenderer {
+class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
     private val errors = JsonErrorResponseRenderer(json)
@@ -23,24 +23,24 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     override fun notFound() = errors.notFound()
 
-    override fun description(moduleRoot: BasePath, security: Security, routes: List<ServerRoute>) =
+    override fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>) =
         Response(OK).body(json.pretty(json.obj(
             "swagger" to json.string("2.0"),
             "info" to apiInfo.asJson(),
             "basePath" to json.string("/"),
             "tags" to json.array(renderTags(routes)),
-            "paths" to json.obj(renderPaths(routes, moduleRoot, security).fields),
+            "paths" to json.obj(renderPaths(routes, contractRoot, security).fields),
             "securityDefinitions" to security.asJson(),
-            "definitions" to json.obj(renderPaths(routes, moduleRoot, security).definitions)
+            "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
         )))
 
-    private fun renderPaths(routes: List<ServerRoute>, moduleRoot: BasePath, security: Security): FieldsAndDefinitions<NODE> {
+    private fun renderPaths(routes: List<ServerRoute>, contractRoot: BasePath, security: Security): FieldsAndDefinitions<NODE> {
         return routes
-            .groupBy { it.describeFor(moduleRoot) }.entries
+            .groupBy { it.describeFor(contractRoot) }.entries
             .fold(FieldsAndDefinitions<NODE>(), {
                 memo, (path, routes) ->
                 val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), {
-                    memoFields, route -> memoFields.add(render(moduleRoot, security, route))
+                    memoFields, route -> memoFields.add(render(contractRoot, security, route))
                 })
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
             })

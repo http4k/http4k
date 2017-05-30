@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.26.0
+- Added stacking of parent and child Routers
+- Merging of Modules and Routers. `Router` is the new `Module`! `RouteModule` is now `ContractRouter`
+
 ### v1.25.1
 - Fix for #15. OkHttp client handling of POSTs with no body.
 

@@ -252,7 +252,7 @@ Alteratively, all client adapter modules allow for custom configuration of the r
 
 The `http4k-contract` module adds a much more sophisticated routing mechanism to that available in `http4k-core`. It adds the facility 
 to declare server-side `Routes` in a completely typesafe way, leveraging the Lens functionality from the core. These `Routes` are 
-combined into `RouteModules`, which have the following features:
+combined into a `ContractRouter`, which have the following features:
 * **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement 
 for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 (BAD_REQUEST)` response. 
 * **Self-describing:** - a generated endpoint is provided which describes all of the `Routes`  in that module. Implementations 
@@ -288,9 +288,9 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 ```
 
 #### 3. Combining Routes into Modules
-Finally, `ServerRoutes` are added into a reusable `RouteModule` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
+Finally, `ServerRoutes` are added into a reusable `ContractRouter` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
-val handler: HttpHandler = RouteModule(Root / "context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
+val handler: HttpHandler = ContractRouter(Root / "context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
     .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
     .withRoute(serverRoute)
     .toHttpHandler()
