@@ -60,7 +60,7 @@ class StaticContentTest {
     @Test
     fun `looks up contents of existing subdir file - non-root context`() {
         val handler = StaticContent("/svc")
-        val result = handler(Request(GET, of("/svc/$pkg/StaticModule.js")))
+        val result = handler(Request(GET, of("/svc/$pkg/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(result.header("Content-Type"), equalTo("application/javascript"))
@@ -69,7 +69,7 @@ class StaticContentTest {
     @Test
     fun `looks up contents of existing subdir file`() {
         val handler = StaticContent("")
-        val result = handler(Request(GET, of("/$pkg/StaticModule.js")))
+        val result = handler(Request(GET, of("/$pkg/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(result.header("Content-Type"), equalTo("application/javascript"))
@@ -78,7 +78,7 @@ class StaticContentTest {
     @Test
     fun `can alter the root path`() {
         val handler = StaticContent("/svc", Classpath(pkg))
-        val result = handler(Request(GET, of("/svc/StaticModule.js")))
+        val result = handler(Request(GET, of("/svc/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
         assertThat(result.header("Content-Type"), equalTo("application/javascript"))
@@ -101,7 +101,7 @@ class StaticContentTest {
     @Test
     fun `looks up non existent path`() {
         val handler = StaticContent("/svc")
-        val result = handler(Request(GET, of("/bob/StaticModule.js")))
+        val result = handler(Request(GET, of("/bob/StaticRouter.js")))
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
