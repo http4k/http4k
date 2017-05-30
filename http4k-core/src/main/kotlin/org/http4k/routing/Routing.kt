@@ -13,7 +13,7 @@ import org.http4k.core.then
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
-fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(routes.asList())
+fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(null, routes.asList())
 
 fun routes(module: Router, vararg then: Router): HttpHandler = then.fold(module) { memo, next -> memo.then(next) }.toHttpHandler()
 
@@ -21,19 +21,22 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
-infix fun String.by(router: RoutingHttpHandler): Router = RoutingHttpHandler(
-    router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
+infix fun String.by(router: RoutingHttpHandler): Router = router.prefixWith(this)
 
-
-data class RoutingHttpHandler(internal val routes: List<Route>, internal val filter: Filter? = null) : Router, HttpHandler {
+data class RoutingHttpHandler(private val groupTemplate: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : Router, HttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
-    override fun invoke(request: Request) = match(request)
+    internal fun prefixWith(groupPrefix: String) = RoutingHttpHandler(from(groupPrefix),
+        routes.map { it.copy(template = it.template.prefixedWith(groupPrefix)) })
+
+    override fun invoke(request: Request): Response = match(request)
         ?.let { handler -> (filter?.then(handler) ?: handler).invoke(request) }
         ?: Response(NOT_FOUND.description("Route not found"))
 
-    override fun match(request: Request): HttpHandler? = routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+    override fun match(request: Request): HttpHandler? =
+        if (groupTemplate?.matches(request.uri.path) ?: true) routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+        else null
 }
 
 private fun Route.asRouter(): Router = object : Router {

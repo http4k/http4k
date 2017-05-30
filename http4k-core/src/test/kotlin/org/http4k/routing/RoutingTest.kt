@@ -125,6 +125,16 @@ class RoutingTest {
     }
 
     @Test
+    fun `group router shortcuts if parent prefix does not match`() {
+        val app = routes("/prefix" by routes(
+            GET to "/{.*}" by { Response(OK).body("matched") }
+        ))
+
+        assertThat(app(Request(GET, "/prefix/a/something")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/notprefix/a/something")).status, equalTo(NOT_FOUND))
+    }
+
+    @Test
     fun `route grouping prefix can contain a dynamic segment`() {
         val subRoutes = routes(
             GET to "/a/{route}" by { Response(OK).body(it.path("name") + it.path("route")) }
