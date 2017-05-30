@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.lens.Invalid
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
+import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.Test
 
@@ -14,9 +15,9 @@ abstract class JsonErrorResponseRendererContract<ROOT : NODE, NODE: Any>(val j: 
     fun `can build 400`() {
         val response = JsonErrorResponseRenderer(j).badRequest(listOf(
             Missing(Meta(true, "location1", StringParam, "name1")),
-            Invalid(Meta(false, "location2", StringParam, "name2"))))
+            Invalid(Meta(false, "location2", NumberParam, "name2"))))
         assertThat(response.bodyString(),
-            equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","required":true,"reason":"Missing"},{"name":"name2","type":"location2","required":false,"reason":"Invalid"}]}"""))
+            equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","datatype":"string","required":true,"reason":"Missing"},{"name":"name2","type":"location2","datatype":"number","required":false,"reason":"Invalid"}]}"""))
     }
 
     @Test

@@ -14,7 +14,7 @@ class JsonErrorResponseRenderer<ROOT : NODE, out NODE : Any>(private val json: J
                         json.obj(
                             "name" to json.string(it.meta.name),
                             "type" to json.string(it.meta.location),
-                            //        "datatype" to json.string(p.meta.paramType.name),
+                            "datatype" to json.string(it.meta.paramMeta.value),
                             "required" to json.boolean(it.meta.required),
                             "reason" to json.string(it.javaClass.simpleName))
                     }))))
