@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -8,10 +9,11 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.UriTemplate.Companion.from
 import org.http4k.core.findSingle
+import org.http4k.core.then
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
-fun routes(vararg routes: Route): RoutesRouter = RoutesRouter(routes.asList())
+fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(routes.asList())
 
 fun routes(module: Module, vararg then: Module): HttpHandler = then.fold(module) { memo, next -> memo.then(next) }.toHttpHandler()
 
@@ -19,15 +21,17 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
-infix fun String.by(router: RoutesRouter): Module = object : Module {
-    override fun toRouter(): Router = RoutesRouter(router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
+infix fun String.by(router: RoutingHttpHandler): Module = object : Module {
+    override fun toRouter(): Router = RoutingHttpHandler(router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
 }
 
-data class RoutesRouter(internal val routes: List<Route>) : Router, HttpHandler {
+data class RoutingHttpHandler(internal val routes: List<Route>, internal val filter: Filter? = null) : Router, HttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
-    override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: Response(NOT_FOUND.description("Route not found"))
+    override fun invoke(request: Request) = match(request)
+        ?.let { handler -> (filter?.then(handler) ?: handler).invoke(request) }
+        ?: Response(NOT_FOUND.description("Route not found"))
 
     override fun match(request: Request): HttpHandler? = routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
 }

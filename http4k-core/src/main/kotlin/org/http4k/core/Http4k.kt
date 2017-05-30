@@ -1,5 +1,7 @@
 package org.http4k.core
 
+import org.http4k.routing.RoutingHttpHandler
+
 typealias HttpHandler = (Request) -> Response
 
 interface Filter : (HttpHandler) -> HttpHandler {
@@ -9,6 +11,8 @@ interface Filter : (HttpHandler) -> HttpHandler {
         }
     }
 }
+
+fun Filter.then(router: RoutingHttpHandler): RoutingHttpHandler = router.copy(filter = this)
 
 fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 
