@@ -16,12 +16,11 @@ interface Router {
         }
     }
 
-    fun toHttpHandler(): HttpHandler =
-        { req ->
-            try {
-                match(req)?.invoke(req) ?: Response(Status.NOT_FOUND)
-            } catch (e: LensFailure) {
-                Response(Status.BAD_REQUEST)
-            }
+    fun toHttpHandler(): HttpHandler = {
+        try {
+            match(it)?.invoke(it) ?: Response(Status.NOT_FOUND)
+        } catch (e: LensFailure) {
+            Response(Status.BAD_REQUEST)
         }
+    }
 }
