@@ -14,13 +14,13 @@ import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
-class StaticModuleTest {
+class StaticRouterTest {
 
     private val pkg = this::class.java.`package`.name.replace('.', '/')
 
     @Test
     fun `looks up contents of existing root file`() {
-        val router = StaticModule(Root / "svc").toRouter()
+        val router = StaticRouter(Root / "svc")
         val request = Request(GET, of("/svc/mybob.xml"))
         val result = router.match(request)!!(request)
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
@@ -29,7 +29,7 @@ class StaticModuleTest {
 
     @Test
     fun `can register custom mime types`() {
-        val router = StaticModule(Root / "svc", Classpath(), extraPairs = "myxml" to APPLICATION_XML).toRouter()
+        val router = StaticRouter(Root / "svc", Classpath(), extraPairs = "myxml" to APPLICATION_XML)
         val request = Request(GET, of("/svc/mybob.myxml"))
         val result = router.match(request)!!(request)
         assertThat(result.status, equalTo(Status.OK))
@@ -39,12 +39,12 @@ class StaticModuleTest {
 
     @Test
     fun `looks up non existent-file`() {
-        assertThat(StaticModule(Root / "svc", Classpath()).toRouter().match(Request(GET, of("/svc/NotHere.xml"))), absent())
+        assertThat(StaticRouter(Root / "svc", Classpath()).match(Request(GET, of("/svc/NotHere.xml"))), absent())
     }
 
     @Test
     fun `can add a filter`() {
-        val handler = StaticModule(Root / "svc", Classpath(pkg), Filter.Companion {
+        val handler = StaticRouter(Root / "svc", Classpath(pkg), Filter.Companion {
             next ->
             { next(it).header("foo", "bar") }
         }).toHttpHandler()

@@ -15,15 +15,15 @@ data class Route(val method: Method, val template: UriTemplate, val handler: Htt
 
 fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(routes.asList())
 
-fun routes(module: Module, vararg then: Module): HttpHandler = then.fold(module) { memo, next -> memo.then(next) }.toHttpHandler()
+fun routes(module: Router, vararg then: Router): HttpHandler = then.fold(module) { memo, next -> memo.then(next) }.toHttpHandler()
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
-infix fun String.by(router: RoutingHttpHandler): Module = object : Module {
-    override fun toRouter(): Router = RoutingHttpHandler(router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
-}
+infix fun String.by(router: RoutingHttpHandler): Router = RoutingHttpHandler(
+    router.routes.map { it.copy(template = it.template.prefixedWith(this@by)) })
+
 
 data class RoutingHttpHandler(internal val routes: List<Route>, internal val filter: Filter? = null) : Router, HttpHandler {
     private val routers = routes.map(Route::asRouter)

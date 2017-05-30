@@ -17,23 +17,23 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.junit.Test
 
-class RouteModuleTest {
+class ContractRouterTest {
 
     private val header = Header.optional("FILTER")
-    private val routeModule = RouteModule(Root, SimpleJson(Argo), Filter {
+    private val contractRouter = ContractRouter(Root, SimpleJson(Argo), Filter {
         next -> { next(it.with(header of "true")) }
     })
 
     @Test
     fun `by default the description lives at the route`() {
-        val response = routeModule.toHttpHandler()(Request(Method.GET, ""))
+        val response = contractRouter.toHttpHandler()(Request(Method.GET, ""))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
 
     @Test
     fun `passes through module filter`() {
-        val response = routeModule.withRoute(Route("").at(GET) bind {
+        val response = contractRouter.withRoute(Route("").at(GET) bind {
             Response(OK).with(header of header(it))
         }).toHttpHandler()(Request(Method.GET, ""))
 
@@ -44,7 +44,7 @@ class RouteModuleTest {
     @Test
     fun `identifies called route using identity header on request`() {
 
-        val response = routeModule.withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
+        val response = contractRouter.withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
             _, _ ->
             {
                 Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it))
@@ -57,7 +57,7 @@ class RouteModuleTest {
 
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
-        val response = routeModule
+        val response = contractRouter
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK)})
             .toHttpHandler()(Request(Method.GET, "/bob?key=sue"))
@@ -66,7 +66,7 @@ class RouteModuleTest {
 
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
-        val response = routeModule
+        val response = contractRouter
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK)})
             .toHttpHandler()(Request(Method.GET, "/bob?key=bob"))
@@ -75,7 +75,7 @@ class RouteModuleTest {
 
     @Test
     fun `can change path to description route`() {
-        val response = routeModule
+        val response = contractRouter
             .withDescriptionPath { it / "docs" / "swagger.json" }
             .toHttpHandler()(Request(Method.GET, "/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))

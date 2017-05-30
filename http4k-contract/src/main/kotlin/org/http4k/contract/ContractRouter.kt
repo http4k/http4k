@@ -9,21 +9,19 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.X_URI_TEMPLATE
-import org.http4k.routing.Module
 import org.http4k.routing.Router
 
-class RouteModule private constructor(private val router: ModuleRouter) : Module {
+class ContractRouter private constructor(private val router: ModuleRouter) : Router {
+    override fun match(request: Request): HttpHandler? = router.match(request)
 
     constructor(moduleRoot: BasePath, renderer: ModuleRenderer = NoRenderer, filter: Filter = Filter { it })
         : this(ModuleRouter(moduleRoot, renderer, ServerFilters.CatchLensFailure.then(filter)))
 
-    override fun toRouter(): Router = router
-
-    fun securedBy(new: Security) = RouteModule(router.securedBy(new))
-    fun withDescriptionPath(fn: (BasePath) -> BasePath) = RouteModule(router.copy(descriptionPath = fn))
+    fun securedBy(new: Security) = ContractRouter(router.securedBy(new))
+    fun withDescriptionPath(fn: (BasePath) -> BasePath) = ContractRouter(router.copy(descriptionPath = fn))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
-    fun withRoutes(new: Iterable<ServerRoute>) = RouteModule(router.withRoutes(new.toList()))
+    fun withRoutes(new: Iterable<ServerRoute>) = ContractRouter(router.withRoutes(new.toList()))
 
     companion object {
         private data class ModuleRouter(val moduleRoot: BasePath,

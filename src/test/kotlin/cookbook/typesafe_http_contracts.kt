@@ -2,9 +2,9 @@ package cookbook
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
+import org.http4k.contract.ContractRouter
 import org.http4k.contract.Root
 import org.http4k.contract.Route
-import org.http4k.contract.RouteModule
 import org.http4k.contract.Swagger
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
         )
     }
 
-    val handler = RouteModule(Root / "context", Swagger(ApiInfo("my great api", "v1.0"), Argo), ResponseFilters.ReportRouteLatency(Clock.systemUTC(), {
+    val handler = ContractRouter(Root / "context", Swagger(ApiInfo("my great api", "v1.0"), Argo), ResponseFilters.ReportRouteLatency(Clock.systemUTC(), {
         name, latency ->
         println(name + " took " + latency)
     }))
@@ -63,4 +63,4 @@ fun main(args: Array<String>) {
 
 // Adding 2 numbers:      curl -v "http://localhost:8000/context/add/123/564?apiKey=42"
 // API Key enforcement:   curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
-// Swagger documentation: curl -v "http://localhost:8000/context"
+// Swagger documentation: curl -v "http://localhost:8000/context/swagger.json"
