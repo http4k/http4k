@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v1.26.0
 - Added nestable Routers.
-- Merging of Modules and Routers. `Router` is the new `Module`! `RouteModule` is now `ContractRouter`
+- Merging of Modules and Routers. `Router` is the new `Module`! `RouteModule` is now `ContractRouter`, so rename in code will be required.
 
 ### v1.25.1
 - Fix for #15. OkHttp client handling of POSTs with no body.
