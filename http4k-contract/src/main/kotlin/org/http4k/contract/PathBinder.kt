@@ -10,6 +10,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
+import org.http4k.routing.Router
 
 class ServerRoute internal constructor(private val pathBinder: PathBinder, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal val core = pathBinder.core.route.core
@@ -20,9 +21,9 @@ class ServerRoute internal constructor(private val pathBinder: PathBinder, priva
 
     internal val tags = core.tags.toSet().sortedBy { it.name }
 
-    internal fun router(moduleRoot: BasePath): Router = pathBinder.toRouter(moduleRoot, toHandler)
+    internal fun router(contractRoot: BasePath): Router = pathBinder.toRouter(contractRoot, toHandler)
 
-    internal fun describeFor(moduleRoot: BasePath): String = pathBinder.describe(moduleRoot)
+    internal fun describeFor(contractRoot: BasePath): String = pathBinder.describe(contractRoot)
 }
 
 abstract class PathBinder internal constructor(internal val core: Core, internal vararg val pathLenses: PathLens<*>) {
@@ -30,13 +31,12 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    internal fun toRouter(moduleRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router =
-        {
-            core.matches(moduleRoot, it, pathLenses.toList(), toHandler)
-        }
+    internal fun toRouter(contractRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
+        override fun match(request: Request): HttpHandler? = core.matches(contractRoot, request, pathLenses.toList(), toHandler)
+    }
 
-    internal fun describe(moduleRoot: BasePath): String {
-        return "${core.pathFn(moduleRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
+    internal fun describe(contractRoot: BasePath): String {
+        return "${core.pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
     }
 
     fun newRequest(baseUri: Uri = Uri.of("")): Request = Request(core.method, "").uri(baseUri.path(describe(Root)))
@@ -45,10 +45,10 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
         internal data class Core(val route: Route, val method: Method, val pathFn: (BasePath) -> BasePath) {
             infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
 
-            fun matches(moduleRoot: BasePath, request: Request, lenses: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
-                if (request.method == method && request.basePath().startsWith(pathFn(moduleRoot))) {
+            fun matches(contractRoot: BasePath, request: Request, lenses: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
+                if (request.method == method && request.basePath().startsWith(pathFn(contractRoot))) {
                     try {
-                        request.without(pathFn(moduleRoot)).extract(lenses)?.let { route.core.validationFilter.then(toHandler(it)) }
+                        request.without(pathFn(contractRoot)).extract(lenses)?.let { route.core.validationFilter.then(toHandler(it)) }
                     } catch (e: LensFailure) {
                         null
                     }

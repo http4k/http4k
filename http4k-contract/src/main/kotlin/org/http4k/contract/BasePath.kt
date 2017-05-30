@@ -34,7 +34,7 @@ object Root : BasePath() {
     override fun startsWith(other: BasePath): Boolean = other == Root
 }
 
-internal fun Request.isIn(moduleRoot: BasePath) = basePath().startsWith(moduleRoot)
+internal fun Request.isIn(contractRoot: BasePath) = basePath().startsWith(contractRoot)
 
 internal fun Request.basePath() = BasePath(uri.path)
 internal fun Request.without(basePath: BasePath) = BasePath(this.uri.path.replace(basePath.toString(), ""))
