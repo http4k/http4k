@@ -43,6 +43,11 @@ class CookieTest {
     }
 
     @Test
+    fun `can parse cookie with ending with semicolon`() {
+        assertThat(Cookie.parse("foo=bar;"), equalTo(Cookie("foo", "bar")))
+    }
+
+    @Test
     fun `cookie values are quoted`() {
         assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
             equalTo("""my-cookie="my \"quoted\" value"; """))

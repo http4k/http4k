@@ -39,8 +39,9 @@ data class Cookie(val name: String, val value: String,
         fun parse(cookieValue: String): Cookie? {
             val pair = cookieValue.split("=", limit = 2)
             if (pair.size < 2) return null
-            val valueAndAttributes = pair[1].split("; ")
+            val valueAndAttributes = pair[1].split(";")
             val attributes = valueAndAttributes.drop(1)
+                .map { it.trimStart() }
                 .map { attrString -> attrString.split("=").let { it[0] to it.getOrNull(1) } }
             return Cookie(pair[0], valueAndAttributes[0].unquoted(),
                 attributes.maxAge(), attributes.expires(), attributes.domain(),
