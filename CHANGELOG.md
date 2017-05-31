@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.26.1
+- Fix for #17. Cookie can now parse a cookie without attributes and ending in semicolon.
+
 ### v1.26.0
 - Added nestable Routers.
 - Merging of Modules and Routers. `Router` is the new `Module`! `RouteModule` is now `ContractRouter`, so rename in code will be required.
