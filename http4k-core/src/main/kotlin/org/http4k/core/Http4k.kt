@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.routing.RouterHttpHandler
 import org.http4k.routing.RoutingHttpHandler
 
 typealias HttpHandler = (Request) -> Response
@@ -18,3 +19,10 @@ fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
 
 fun Filter.then(next: HttpHandler): HttpHandler = { this(next)(it) }
 
+fun Filter.then(router: RouterHttpHandler): RouterHttpHandler = this.then(router.toHttpHandler()).let {
+    routerAsHandler ->
+    object : RouterHttpHandler {
+        override fun invoke(request: Request): Response = routerAsHandler(request)
+        override fun match(request: Request): HttpHandler? = router.match(request)?.let { this@then.then(routerAsHandler) }
+    }
+}

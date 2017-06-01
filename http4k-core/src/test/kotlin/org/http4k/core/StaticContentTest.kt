@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
@@ -13,7 +14,7 @@ import org.junit.Test
 
 class StaticContentTest {
 
-    private val pkg = this.javaClass.`package`.name.replace('.','/')
+    private val pkg = this.javaClass.`package`.name.replace('.', '/')
 
     @Test
     fun `looks up contents of existing root file`() {
@@ -111,4 +112,27 @@ class StaticContentTest {
         assertThat(handler(Request(GET, of("/svc/../svc/Bob.xml"))).status, equalTo(NOT_FOUND))
         assertThat(handler(Request(GET, of("/svc/~/.bashrc"))).status, equalTo(NOT_FOUND))
     }
+
+    @Test
+    fun `as a router when does not fine file`() {
+        assertThat(StaticContent("/svc").match(Request(GET, of("/svc/../svc/Bob.xml"))), absent())
+    }
+
+    @Test
+    fun `as a router finds file`() {
+        val handler = StaticContent("/svc")
+        val req = Request(GET, of("/svc/mybob.xml"))
+        assertThat(handler.match(req)?.invoke(req)?.status, equalTo(OK))
+    }
+
+    @Test
+    fun `can add filter`() {
+        val changePathFilter = Filter {
+            next -> { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+        }
+        val handler = changePathFilter.then(StaticContent("/svc"))
+        val req = Request(GET, of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
+    }
+
 }

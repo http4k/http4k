@@ -23,7 +23,9 @@ infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, fro
 
 infix fun String.by(router: RoutingHttpHandler): Router = router.prefixWith(this)
 
-data class RoutingHttpHandler(private val groupTemplate: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : Router, HttpHandler {
+interface RouterHttpHandler : Router, HttpHandler
+
+data class RoutingHttpHandler(private val groupTemplate: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RouterHttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 

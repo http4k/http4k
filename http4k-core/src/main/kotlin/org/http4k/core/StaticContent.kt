@@ -4,10 +4,12 @@ import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.routing.RouterHttpHandler
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
-class StaticContent(private val basePath: String = "", private val resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>) : HttpHandler {
+class StaticContent(private val basePath: String = "", private val resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>) : RouterHttpHandler {
+    override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
     private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
 
@@ -35,5 +37,4 @@ class StaticContent(private val basePath: String = "", private val resourceLoade
         val resolved = if (newPath.isBlank()) "/index.html" else newPath
         return resolved.replaceFirst("/", "")
     }
-
 }
