@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.27.0
+- Merged StaticContent and StaticRouter and repackage of contract API into other packages
+
 ### v1.26.2
 - Extend fix for #17 to request `Cookie` header.
 

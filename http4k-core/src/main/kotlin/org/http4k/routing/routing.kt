@@ -15,7 +15,7 @@ data class Route(val method: Method, val template: UriTemplate, val handler: Htt
 
 fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(null, routes.asList())
 
-fun routes(module: Router, vararg then: Router): HttpHandler = then.fold(module) { memo, next -> memo.then(next) }.toHttpHandler()
+fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.toHttpHandler()
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
 

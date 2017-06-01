@@ -291,7 +291,7 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 #### 3. Combining Routes into Modules
 Finally, `ServerRoutes` are added into a reusable `ContractRouter` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
 ```kotlin
-val handler: HttpHandler = ContractRouter(Root / "context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
+val handler: HttpHandler = contractRoutes("/context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
     .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
     .withRoute(serverRoute)
     .toHttpHandler()

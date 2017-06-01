@@ -54,15 +54,18 @@ fun main(args: Array<String>) {
         name, latency ->
         println(name + " took " + latency)
     })
-    val contracts = contractRoutes("/context", Swagger(ApiInfo("my great api", "v1.0"), Argo), filter)
+
+    val contractRoutes = contractRoutes("/context", Swagger(ApiInfo("my great api", "v1.0"), Argo))
         .withDescriptionPath("/docs/swagger.json")
         .securedBy(ApiKey(Query.int().required("apiKey"), { it == 42 }))
         .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
         .withRoute(Route("echo").at(GET) / "echo" / Path.of("name") / Path.int().of("age") bind ::echo)
 
-    val static = CachingFilters.Response.NoCache().then(StaticContent("/static"))
+    val contractRouter = filter.then(contractRoutes)
 
-    val handler = contracts.then(static).toHttpHandler()
+    val staticRouter = CachingFilters.Response.NoCache().then(StaticContent("/static"))
+
+    val handler = contractRouter.then(staticRouter).toHttpHandler()
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
 }
