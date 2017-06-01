@@ -48,6 +48,16 @@ class CookieTest {
     }
 
     @Test
+    fun `cookies can be extracted from request`(){
+        assertThat(Request(Method.GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+    }
+
+    @Test
+    fun `cookies with ending semicolon can be extracted from request`(){
+        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+    }
+
+    @Test
     fun `cookie values are quoted`() {
         assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
             equalTo("""my-cookie="my \"quoted\" value"; """))

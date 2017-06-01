@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.26.2
+- Extend fix for #17 to request `Cookie` header.
+
 ### v1.26.1
 - Fix for #17. Cookie can now parse a cookie without attributes and ending in semicolon.
 
