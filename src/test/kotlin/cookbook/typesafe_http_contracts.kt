@@ -10,7 +10,6 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
-import org.http4k.core.StaticContent
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
@@ -24,7 +23,10 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
+import org.http4k.routing.ResourceLoader
+import org.http4k.routing.by
 import org.http4k.routing.contractRoutes
+import org.http4k.routing.static
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
 import java.time.Clock
@@ -63,7 +65,7 @@ fun main(args: Array<String>) {
 
     val contractRouter = filter.then(contractRoutes)
 
-    val staticRouter = CachingFilters.Response.NoCache().then(StaticContent("/static"))
+    val staticRouter = CachingFilters.Response.NoCache().then("/static" by static(ResourceLoader.Classpath("cookbook")))
 
     val handler = contractRouter.then(staticRouter).toHttpHandler()
 

@@ -11,9 +11,9 @@ import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.routing.by
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.routing.static
 
 fun main(args: Array<String>) {
-
     val routes =
         PrintRequestAndResponse().then(
             routes(
@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
 
     val app = routes(
         "/bob" by routes,
+        "/static" by static(),
         "/rita" by routes(
             DELETE to "/delete/{name}" by { _: Request -> Response(OK) },
             POST to "/post/{name}" by { _: Request -> Response(OK) }
@@ -32,4 +33,5 @@ fun main(args: Array<String>) {
     )
 
     println(app(Request(GET, "/bob/get/value")))
+    println(app(Request(GET, "/static/someStaticFile.txt")))
 }

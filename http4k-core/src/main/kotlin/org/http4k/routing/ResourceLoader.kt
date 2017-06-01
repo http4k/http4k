@@ -1,4 +1,4 @@
-package org.http4k.core
+package org.http4k.routing
 
 import java.io.File
 import java.net.URL

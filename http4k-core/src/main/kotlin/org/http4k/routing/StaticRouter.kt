@@ -1,14 +1,24 @@
-package org.http4k.core
+package org.http4k.routing
 
+import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.RouterHttpHandler
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
-class StaticContent(private val basePath: String = "", private val resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>) : RouterHttpHandler {
+fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): Static = Static(resourceLoader, extraPairs.asList().toMap())
+
+class Static internal constructor(internal val resourceLoader: ResourceLoader, internal val extraPairs: Map<String, ContentType>)
+
+infix fun String.by(static: Static): StaticRouter = StaticRouter(this, static.resourceLoader, static.extraPairs)
+
+class StaticRouter(private val basePath: String, private val resourceLoader: ResourceLoader, extraPairs: Map<String, ContentType>) : RouterHttpHandler {
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
     private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
