@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.lens.Header
@@ -20,10 +21,7 @@ import org.junit.Test
 class ContractRouterTest {
 
     private val header = Header.optional("FILTER")
-    private val contractRouter = contractRoutes("/root", SimpleJson(Argo), Filter {
-        next ->
-        { next(it.with(header of "true")) }
-    })
+    private val contractRouter = contractRoutes("/root", SimpleJson(Argo))
 
     @Test
     fun `by default the description lives at the route`() {
@@ -34,9 +32,16 @@ class ContractRouterTest {
 
     @Test
     fun `passes through contract filter`() {
-        val response = contractRouter.withRoute(Route("").at(GET) bind {
+        val filter = Filter {
+            next ->
+            { next(it.with(header of "true")) }
+        }
+
+        val withRoute = filter.then(contractRouter.withRoute(Route("").at(GET) bind {
             Response(OK).with(header of header(it))
-        }).toHttpHandler()(Request(GET, "/root"))
+        }))
+
+        val response = withRoute.toHttpHandler()(Request(GET, "/root"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(header(response), equalTo("true"))
