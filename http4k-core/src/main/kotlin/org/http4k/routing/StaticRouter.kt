@@ -18,7 +18,7 @@ class Static internal constructor(internal val resourceLoader: ResourceLoader, i
 
 infix fun String.by(static: Static): StaticRouter = StaticRouter(this, static.resourceLoader, static.extraPairs)
 
-class StaticRouter(private val basePath: String, private val resourceLoader: ResourceLoader, extraPairs: Map<String, ContentType>) : RouterHttpHandler {
+class StaticRouter(private val basePath: String, private val resourceLoader: ResourceLoader, extraPairs: Map<String, ContentType>) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
     private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))

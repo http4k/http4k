@@ -13,7 +13,7 @@ import org.http4k.core.then
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
-fun routes(vararg routes: Route): RoutingHttpHandler = RoutingHttpHandler(null, routes.asList())
+fun routes(vararg routes: Route): GroupRoutingHttpHandler = GroupRoutingHttpHandler(null, routes.asList())
 
 fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.toHttpHandler()
 
@@ -21,15 +21,15 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
-infix fun String.by(router: RoutingHttpHandler): Router = router.prefixWith(this)
+infix fun String.by(router: GroupRoutingHttpHandler): Router = router.withBasePath(this)
 
-interface RouterHttpHandler : Router, HttpHandler
+interface RoutingHttpHandler : Router, HttpHandler
 
-data class RoutingHttpHandler(private val groupTemplate: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RouterHttpHandler {
+data class GroupRoutingHttpHandler(private val basePath: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RoutingHttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
-    internal fun prefixWith(groupPrefix: String) = RoutingHttpHandler(from(groupPrefix),
+    internal fun withBasePath(groupPrefix: String) = GroupRoutingHttpHandler(from(groupPrefix),
         routes.map { it.copy(template = it.template.prefixedWith(groupPrefix)) })
 
     override fun invoke(request: Request): Response = match(request)
@@ -37,7 +37,7 @@ data class RoutingHttpHandler(private val groupTemplate: UriTemplate? = null, pr
         ?: Response(NOT_FOUND.description("Route not found"))
 
     override fun match(request: Request): HttpHandler? =
-        if (groupTemplate?.matches(request.uri.path) ?: true) routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+        if (basePath?.matches(request.uri.path) ?: true) routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
         else null
 }
 
