@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.junit.Ignore
 import org.junit.Test
 
 class StaticRouterTest {
@@ -131,7 +132,19 @@ class StaticRouterTest {
     }
 
     @Test
-    fun `can add filter`() {
+    @Ignore
+    fun `can add filter to router`() {
+        val changePathFilter = Filter {
+            next ->
+            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+        }
+        val handler = "/svc" by changePathFilter.then(static())
+        val req = Request(GET, of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
+    }
+
+    @Test
+    fun `can add filter to a RoutingHttpHandler`() {
         val changePathFilter = Filter {
             next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }

@@ -10,6 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.junit.Assert.fail
 import org.junit.Ignore
@@ -145,6 +146,41 @@ class RoutingTest {
         assertThat(app(Request(GET, "/123/a/something")).status, equalTo(OK))
         assertThat(app(Request(GET, "/123/a/something")).bodyString(), equalTo("123something"))
         assertThat(app(Request(GET, "/asd/a/something")).status, equalTo(NOT_FOUND))
+    }
+
+
+    @Test
+    @Ignore
+    fun `can add filter to router`() {
+        val changePathFilter = Filter {
+            next ->
+            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+        }
+        val handler = "/svc" by changePathFilter.then(static())
+        val req = Request(GET, Uri.of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
+    }
+
+    @Test
+    fun `can add filter to a RoutingHttpHandler`() {
+        val changePathFilter = Filter {
+            next ->
+            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+        }
+        val handler = changePathFilter.then("/svc" by static())
+        val req = Request(GET, Uri.of("/svc/notmybob.xml"))
+        assertThat(handler(req).status, equalTo(OK))
+    }
+
+    @Test
+    fun `can apply a filter to a RoutingHttpHandler`() {
+        val routes = Filter { next -> { next(it.header("name", "value")) } }
+            .then({ Response(OK).body(it.header("name")!!) })
+
+        val routingHttpHandler = routes(
+            GET to "/a/thing" by routes
+        )
+        assertThat(routingHttpHandler(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
     }
 
     @Test
