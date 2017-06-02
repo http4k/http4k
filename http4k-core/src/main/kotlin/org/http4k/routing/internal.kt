@@ -16,10 +16,10 @@ import org.http4k.core.then
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
-class StaticRouter constructor(private val httpHandler: StaticRouter.Companion.Handler) : RoutingHttpHandler {
-    override fun withFilter(filter: Filter): RoutingHttpHandler = StaticRouter(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
+    override fun withFilter(filter: Filter): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
 
-    override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRouter(httpHandler.copy(basePath = basePath + httpHandler.basePath))
+    override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(basePath = basePath + httpHandler.basePath))
 
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 

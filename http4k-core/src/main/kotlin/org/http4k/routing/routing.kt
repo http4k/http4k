@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.UriTemplate.Companion.from
 import org.http4k.routing.GroupRoutingHttpHandler.Companion.Handler
-import org.http4k.routing.StaticRouter.Companion.Handler as StaticHandler
+import org.http4k.routing.StaticRoutingHttpHandler.Companion.Handler as StaticHandler
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
@@ -30,7 +30,7 @@ fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) {
 }
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
-    StaticRouter(StaticHandler("", resourceLoader, extraPairs.asList().toMap()))
+    StaticRoutingHttpHandler(StaticHandler("", resourceLoader, extraPairs.asList().toMap()))
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
 

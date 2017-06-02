@@ -19,7 +19,7 @@ import org.http4k.routing.by
 import org.http4k.routing.contract
 import org.junit.Test
 
-class ContractRouterTest {
+class ContractRoutingHttpHandlerTest {
 
     private val header = Header.optional("FILTER")
 

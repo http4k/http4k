@@ -15,7 +15,7 @@ import org.http4k.core.then
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.Test
 
-class StaticRouterTest {
+class StaticRoutingHttpHandlerTest {
 
     private val pkg = this.javaClass.`package`.name.replace('.', '/')
 

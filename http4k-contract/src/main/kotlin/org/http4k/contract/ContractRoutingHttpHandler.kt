@@ -13,16 +13,16 @@ import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
-class ContractRouter internal constructor(val httpHandler: ContractRouter.Companion.Handler) : RoutingHttpHandler {
+class ContractRoutingHttpHandler internal constructor(val httpHandler: ContractRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     override fun invoke(request: Request): Response = httpHandler(request)
 
-    override fun withBasePath(basePath: String): ContractRouter = ContractRouter(httpHandler.copy(rootAsString = basePath + httpHandler.rootAsString))
-    override fun withFilter(filter: Filter): RoutingHttpHandler = ContractRouter(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+    override fun withBasePath(basePath: String): ContractRoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.copy(rootAsString = basePath + httpHandler.rootAsString))
+    override fun withFilter(filter: Filter): RoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
-    fun withRoutes(new: Iterable<ServerRoute>) = ContractRouter(httpHandler.copy(routes = httpHandler.routes + new))
+    fun withRoutes(new: Iterable<ServerRoute>) = ContractRoutingHttpHandler(httpHandler.copy(routes = httpHandler.routes + new))
 
     companion object {
         internal data class Handler(internal val rootAsString: String,
