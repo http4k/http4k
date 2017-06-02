@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.31.0
+- Rework `http4k-contract` routing to be mounted in the same way as other `RoutingHttpHandlers`
+
 ### v1.30.0
 - Filters are now applied consistently to all Routers
 
