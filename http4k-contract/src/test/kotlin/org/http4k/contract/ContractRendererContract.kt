@@ -30,7 +30,8 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
-import org.http4k.routing.contractRoutes
+import org.http4k.routing.by
+import org.http4k.routing.contract
 import org.junit.Test
 
 abstract class ContractRendererContract(private val renderer: ContractRenderer) {
@@ -56,7 +57,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val router = contractRoutes("/basepath", renderer)
+        val router = "/basepath" by contract(renderer)
             .securedBy(ApiKey(Query.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")

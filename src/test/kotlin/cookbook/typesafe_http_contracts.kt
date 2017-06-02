@@ -24,9 +24,10 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader
-import org.http4k.routing.contractRoutes
+import org.http4k.routing.by
+import org.http4k.routing.contract
 import org.http4k.routing.routes
-import org.http4k.routing.staticRoutes
+import org.http4k.routing.static
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
 import java.time.Clock
@@ -58,19 +59,15 @@ fun main(args: Array<String>) {
         println(name + " took " + latency)
     })
 
-    val contractRoutes = contractRoutes("/context", Swagger(ApiInfo("my great api", "v1.0"), Argo))
+    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo))
         .withDescriptionPath("/docs/swagger.json")
         .securedBy(ApiKey(Query.int().required("apiKey"), { it == 42 }))
         .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
         .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
 
-    val contractRouter = filter.then(contractRoutes)
-
-    val staticRouter = CachingFilters.Response.NoCache().then(staticRoutes("/static", ResourceLoader.Classpath("cookbook")))
-
     val handler = routes(
-        contractRouter,
-        staticRouter
+        "/context" by filter.then(contract),
+        "/static" by CachingFilters.Response.NoCache().then(static(ResourceLoader.Classpath("cookbook")))
     )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))

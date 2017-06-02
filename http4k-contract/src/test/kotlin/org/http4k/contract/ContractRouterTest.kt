@@ -15,13 +15,14 @@ import org.http4k.lens.Header
 import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.routing.contractRoutes
+import org.http4k.routing.by
+import org.http4k.routing.contract
 import org.junit.Test
 
 class ContractRouterTest {
 
     private val header = Header.optional("FILTER")
-    private val contractRouter = contractRoutes("/root", SimpleJson(Argo))
+    private val contractRouter = "/root" by contract(SimpleJson(Argo))
 
     @Test
     fun `by default the description lives at the route`() {
