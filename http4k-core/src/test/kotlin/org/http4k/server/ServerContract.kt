@@ -46,7 +46,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         assertThat(response.status, equalTo(ACCEPTED))
         assertThat(response.header("content-type"), present(startsWith("text/plain")))
         assertThat(response.bodyString(), equalTo("Hello World"))
-        assertThat(response.header("content-length"), equalTo("11"))
     }
 
     @Test
