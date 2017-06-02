@@ -18,7 +18,7 @@ fun routes(vararg routes: Route): RoutingHttpHandler = GroupRoutingHttpHandler(n
 fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.toHttpHandler()
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
-    StaticRouter("", resourceLoader, extraPairs.asList().toMap(), null)
+    StaticRouter(StaticHttpHandler("", resourceLoader, extraPairs.asList().toMap()))
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
 

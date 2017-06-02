@@ -16,15 +16,10 @@ import org.http4k.core.then
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
-class StaticRouter constructor(private val basePath: String,
-                               private val resourceLoader: ResourceLoader,
-                               private val extraPairs: Map<String, ContentType>,
-                               private val filter: Filter?) : RoutingHttpHandler {
-
-    override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRouter(basePath + this.basePath, resourceLoader, extraPairs, filter)
-
-    override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
-
+data class StaticHttpHandler(val basePath: String,
+                             val resourceLoader: ResourceLoader,
+                             val extraPairs: Map<String, ContentType>
+) : HttpHandler {
     private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
 
     init {
@@ -34,20 +29,16 @@ class StaticRouter constructor(private val basePath: String,
     }
 
     override fun invoke(req: Request): Response {
-        val handler: HttpHandler = {
-            val path = convertPath(req.uri.path)
-            resourceLoader.load(path)?.let {
-                url ->
-                val lookupType = ContentType(extMap.getContentType(path))
-                if (req.method == GET && lookupType != OCTET_STREAM) {
-                    Response(OK)
-                        .header("Content-Type", lookupType.value)
-                        .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
-                } else Response(NOT_FOUND)
-            } ?: Response(NOT_FOUND)
-
-        }
-        return (filter?.then(handler) ?: handler).invoke(req)
+        val path = convertPath(req.uri.path)
+        return resourceLoader.load(path)?.let {
+            url ->
+            val lookupType = ContentType(extMap.getContentType(path))
+            if (req.method == GET && lookupType != OCTET_STREAM) {
+                Response(OK)
+                    .header("Content-Type", lookupType.value)
+                    .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
+            } else Response(NOT_FOUND)
+        } ?: Response(NOT_FOUND)
     }
 
     private fun convertPath(path: String): String {
@@ -55,6 +46,15 @@ class StaticRouter constructor(private val basePath: String,
         val resolved = if (newPath.isBlank()) "/index.html" else newPath
         return resolved.replaceFirst("/", "")
     }
+}
+
+class StaticRouter constructor(private val httpHandler: StaticHttpHandler) : RoutingHttpHandler {
+
+    override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRouter(httpHandler.copy(basePath = basePath + httpHandler.basePath))
+
+    override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
+
+    override fun invoke(req: Request): Response = httpHandler(req)
 }
 
 internal data class GroupRoutingHttpHandler(private val basePath: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RoutingHttpHandler {
