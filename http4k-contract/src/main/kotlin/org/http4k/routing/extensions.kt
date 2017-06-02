@@ -10,5 +10,5 @@ import org.http4k.core.Filter
 fun contractRoutes(contractRoot: String, renderer: ContractRenderer = NoRenderer) =
     ContractRouter(contractRoot, renderer, Filter { it }, NoSecurity, "", emptyList())
 
-fun staticRoutes(root: String, resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>) =
+fun staticRoutes(root: String, resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
     StaticRouter(root, resourceLoader, extraPairs.asList().toMap(), null)
