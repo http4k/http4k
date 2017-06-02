@@ -57,8 +57,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val router = "/basepath" by contract(renderer)
-            .securedBy(ApiKey(Query.required("the_api_key"), { true }))
+        val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)

@@ -20,18 +20,16 @@ class ContractRouter internal constructor(val httpHandler: ContractRouter.Compan
 
     override fun withBasePath(basePath: String): ContractRouter = ContractRouter(httpHandler.copy(rootAsString = basePath + httpHandler.rootAsString))
     override fun withFilter(filter: Filter): RoutingHttpHandler = ContractRouter(httpHandler.copy(filter = httpHandler.filter.then(filter)))
-    fun withDescriptionPath(path: String) = ContractRouter(httpHandler.copy(descriptionPath = path))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
     fun withRoutes(new: Iterable<ServerRoute>) = ContractRouter(httpHandler.copy(routes = httpHandler.routes + new))
-    fun securedBy(new: Security) = ContractRouter(httpHandler.copy(security = new))
 
     companion object {
         internal data class Handler(internal val rootAsString: String,
                                     private val renderer: ContractRenderer,
                                     internal val filter: Filter,
-                                    private val security: Security,
-                                    private val descriptionPath: String,
+                                    private val security: Security = NoSecurity,
+                                    private val descriptionPath: String = "",
                                     internal val routes: List<ServerRoute>) : HttpHandler {
             private val contractRoot = BasePath(rootAsString)
 

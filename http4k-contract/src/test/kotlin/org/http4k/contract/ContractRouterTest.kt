@@ -22,11 +22,11 @@ import org.junit.Test
 class ContractRouterTest {
 
     private val header = Header.optional("FILTER")
-    private val contractRouter = "/root" by contract(SimpleJson(Argo))
 
     @Test
     fun `by default the description lives at the route`() {
-        val response = contractRouter(Request(GET, "/root"))
+        Request(GET, "/root")
+        val response = ("/root" by contract(SimpleJson(Argo)))(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
@@ -38,7 +38,7 @@ class ContractRouterTest {
             { next(it.with(header of "true")) }
         }
 
-        val withRoute = filter.then(contractRouter.withRoute(Route("").at(GET) bind {
+        val withRoute = filter.then(("/root" by contract(SimpleJson(Argo))).withRoute(Route("").at(GET) bind {
             Response(OK).with(header of header(it))
         }))
 
@@ -50,7 +50,7 @@ class ContractRouterTest {
 
     @Test
     fun `identifies called route using identity header on request`() {
-        val response = contractRouter.withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
+        val response = ("/root" by contract(SimpleJson(Argo))).withRoute(Route("").at(GET) / Path.fixed("hello") / Path.of("world") bind {
             _, _ ->
             {
                 Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it))
@@ -63,8 +63,7 @@ class ContractRouterTest {
 
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
-        val response = contractRouter
-            .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
+        val response = ("/root" by contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" })))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK) })
             .invoke(Request(GET, "/root/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -72,8 +71,7 @@ class ContractRouterTest {
 
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
-        val response = contractRouter
-            .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
+        val response = ("/root" by contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" })))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK) })
             .invoke(Request(GET, "/root/bob?key=bob"))
         assertThat(response.status, equalTo(OK))
@@ -81,8 +79,7 @@ class ContractRouterTest {
 
     @Test
     fun `can change path to description route`() {
-        val response = contractRouter
-            .withDescriptionPath("/docs/swagger.json")
+        val response = ("/root" by contract(SimpleJson(Argo), "/docs/swagger.json"))
             .invoke(Request(GET, "/root/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
     }
