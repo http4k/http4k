@@ -13,7 +13,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.junit.Ignore
 import org.junit.Test
 
 class StaticRouterTest {
@@ -132,7 +131,6 @@ class StaticRouterTest {
     }
 
     @Test
-    @Ignore
     fun `can add filter to router`() {
         val changePathFilter = Filter {
             next ->

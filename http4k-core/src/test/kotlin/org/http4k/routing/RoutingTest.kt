@@ -149,7 +149,6 @@ class RoutingTest {
     }
 
     @Test
-    @Ignore
     fun `can add filter to router`() {
         val changePathFilter = Filter {
             next ->

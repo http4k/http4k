@@ -17,6 +17,7 @@ import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
 class StaticRouter constructor(private val httpHandler: StaticRouter.Companion.Handler) : RoutingHttpHandler {
+    override fun withFilter(filter: Filter): RoutingHttpHandler = StaticRouter(httpHandler.copy(filter = httpHandler.filter.then(filter)))
 
     override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRouter(httpHandler.copy(basePath = basePath + httpHandler.basePath))
 
@@ -66,6 +67,8 @@ class StaticRouter constructor(private val httpHandler: StaticRouter.Companion.H
 }
 
 internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
+    override fun withFilter(filter: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+
     override fun withBasePath(basePath: String): RoutingHttpHandler = GroupRoutingHttpHandler(
         httpHandler.copy(basePath = UriTemplate.from(basePath + httpHandler.basePath?.toString().orEmpty()),
             routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$basePath/${it.template}")) }
