@@ -14,7 +14,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.findSingle
 import org.http4k.core.then
-import org.http4k.lens.LensFailure
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
@@ -113,11 +112,7 @@ internal fun Router.then(that: Router): Router {
 }
 
 internal fun Router.toHttpHandler(): HttpHandler = {
-    try {
-        match(it)?.invoke(it) ?: Response(Status.NOT_FOUND)
-    } catch (e: LensFailure) {
-        Response(Status.BAD_REQUEST)
-    }
+    match(it)?.invoke(it) ?: Response(Status.NOT_FOUND)
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
