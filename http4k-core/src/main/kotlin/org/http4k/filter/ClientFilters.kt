@@ -60,7 +60,7 @@ object ClientFilters {
             val response = next(request)
             return if (response.isRedirection() && request.allowsRedirection()) {
                 if (attempt == 10) throw IllegalStateException("Too many redirection")
-                val location = response.header("location").orEmpty()
+                val location = response.header("location")?.removeCharset().orEmpty()
                 makeRequest(next, request.uri(request.newLocation(location)), attempt + 1)
             } else {
                 response
@@ -79,6 +79,8 @@ object ClientFilters {
         }
 
         private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
+
+        private fun String.removeCharset(): String = this.replace(";\\s*charset=.*$".toRegex(), "")
     }
 
     object Cookies {

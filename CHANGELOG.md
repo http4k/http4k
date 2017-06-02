@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.28.1
+- Fix for #18: FollowRedirect will now work if location header includes charset information.  
+
 ### v1.28.0
 - New DSL for defining StaticRouters
 

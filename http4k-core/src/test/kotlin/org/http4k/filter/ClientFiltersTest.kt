@@ -23,6 +23,8 @@ class ClientFiltersTest {
             "/loop" -> Response(Status.FOUND).header("location", "/loop")
             "/absolute-target" -> if (request.uri.host == "example.com") Response(Status.OK).body("absolute") else Response(Status.INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(Status.MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
+            "/redirect-with-charset" -> Response(Status.MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
+            "/destination" -> Response(OK).body("destination")
             else -> Response(Status.OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
@@ -58,6 +60,11 @@ class ClientFiltersTest {
     @Test
     fun `discards query parameters in relative redirects`() {
         assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(Status.OK)))
+    }
+
+    @Test
+    fun `discards charset from location header`(){
+        assertThat(followRedirects(Request(GET, "/redirect-with-charset")), equalTo(Response(Status.OK).body("destination")))
     }
 
     @Test
