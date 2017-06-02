@@ -5,6 +5,8 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.UriTemplate.Companion.from
 import org.http4k.routing.GroupRoutingHttpHandler.Companion.Handler
@@ -23,7 +25,9 @@ interface RoutingHttpHandler : Router, HttpHandler {
 
 fun routes(vararg routes: Route): RoutingHttpHandler = GroupRoutingHttpHandler(Handler(null, routes.asList()))
 
-fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.toHttpHandler()
+fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.let {
+    fold -> { request: Request -> fold.match(request)?.invoke(request) ?: Response(NOT_FOUND) }
+}
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
     StaticRouter(StaticHandler("", resourceLoader, extraPairs.asList().toMap()))

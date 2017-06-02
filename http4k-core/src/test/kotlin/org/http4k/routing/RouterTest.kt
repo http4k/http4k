@@ -18,22 +18,22 @@ class RouterTest {
     }
 
     private val okRouter = object : Router {
-            override fun match(request: Request): HttpHandler? = { Response(OK) }
+        override fun match(request: Request): HttpHandler? = { Response(OK) }
     }
 
     @Test
     fun `can convert router to handler and call it`() {
-        assertThat(okRouter.toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(OK)))
+        assertThat(routes(okRouter)(Request(GET, of("/boo"))), equalTo(Response(OK)))
     }
 
     @Test
     fun `falls back to 404 response`() {
-        assertThat(notFoundRouter.toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(NOT_FOUND)))
+        assertThat(routes(notFoundRouter)(Request(GET, of("/boo"))), equalTo(Response(NOT_FOUND)))
     }
 
     @Test
     fun `can combine routers and call them as a handler`() {
-        assertThat(notFoundRouter.then(okRouter).toHttpHandler()(Request(GET, of("/boo"))), equalTo(Response(OK)))
+        assertThat(routes(notFoundRouter.then(okRouter))(Request(GET, of("/boo"))), equalTo(Response(OK)))
     }
 
 }

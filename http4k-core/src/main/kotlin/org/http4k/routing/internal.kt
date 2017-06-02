@@ -8,7 +8,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
@@ -109,10 +108,6 @@ internal fun Router.then(that: Router): Router {
     return object : Router {
         override fun match(request: Request): HttpHandler? = originalMatch(request) ?: that.match(request)
     }
-}
-
-internal fun Router.toHttpHandler(): HttpHandler = {
-    match(it)?.invoke(it) ?: Response(Status.NOT_FOUND)
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
