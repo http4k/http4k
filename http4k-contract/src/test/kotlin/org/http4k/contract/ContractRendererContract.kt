@@ -56,7 +56,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val module = contractRoutes("/basepath", renderer)
+        val router = contractRoutes("/basepath", renderer)
             .securedBy(ApiKey(Query.required("the_api_key"), { true }))
             .withRoute(
                 Route("summary of this route", "some rambling description of what this thing actually does")
@@ -88,7 +88,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .at(GET) / "simples" bind { Response(OK) })
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
-        val actual = module.toHttpHandler()(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
+        val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }

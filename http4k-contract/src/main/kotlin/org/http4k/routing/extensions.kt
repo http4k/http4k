@@ -9,8 +9,8 @@ import org.http4k.filter.ServerFilters
 import org.http4k.routing.StaticRouter.Companion.Handler
 import org.http4k.contract.ContractRouter.Companion.Handler as ContractHandler
 
-fun contractRoutes(contractRoot: String, renderer: ContractRenderer = NoRenderer): ContractRouter =
-    ContractRouter(ContractHandler(contractRoot, renderer, ServerFilters.CatchLensFailure, NoSecurity, "", emptyList()))
+fun contractRoutes(root: String, renderer: ContractRenderer = NoRenderer): ContractRouter =
+    ContractRouter(ContractHandler(root, renderer, ServerFilters.CatchLensFailure, NoSecurity, "", emptyList()))
 
 fun staticRoutes(root: String, resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
     StaticRouter(Handler(root, resourceLoader, extraPairs.asList().toMap()))

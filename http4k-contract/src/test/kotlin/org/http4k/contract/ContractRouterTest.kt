@@ -25,7 +25,7 @@ class ContractRouterTest {
 
     @Test
     fun `by default the description lives at the route`() {
-        val response = contractRouter.toHttpHandler()(Request(GET, "/root"))
+        val response = contractRouter(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
@@ -41,7 +41,7 @@ class ContractRouterTest {
             Response(OK).with(header of header(it))
         }))
 
-        val response = withRoute.toHttpHandler()(Request(GET, "/root"))
+        val response = withRoute.invoke(Request(GET, "/root"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(header(response), equalTo("true"))
@@ -54,7 +54,7 @@ class ContractRouterTest {
             {
                 Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it))
             }
-        }).toHttpHandler()(Request(GET, "/root/hello/planet"))
+        }).invoke(Request(GET, "/root/hello/planet"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(X_URI_TEMPLATE(response), equalTo("/root/hello/{world}"))
@@ -65,7 +65,7 @@ class ContractRouterTest {
         val response = contractRouter
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK) })
-            .toHttpHandler()(Request(GET, "/root/bob?key=sue"))
+            .invoke(Request(GET, "/root/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
@@ -74,7 +74,7 @@ class ContractRouterTest {
         val response = contractRouter
             .securedBy(ApiKey(Query.required("key"), { it == "bob" }))
             .withRoute(Route().at(GET) / "bob" bind { Response(OK) })
-            .toHttpHandler()(Request(GET, "/root/bob?key=bob"))
+            .invoke(Request(GET, "/root/bob?key=bob"))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -82,7 +82,7 @@ class ContractRouterTest {
     fun `can change path to description route`() {
         val response = contractRouter
             .withDescriptionPath("/docs/swagger.json")
-            .toHttpHandler()(Request(GET, "/root/docs/swagger.json"))
+            .invoke(Request(GET, "/root/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
     }
 

@@ -8,11 +8,13 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.findSingle
 import org.http4k.core.then
+import org.http4k.lens.LensFailure
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
@@ -100,6 +102,22 @@ private fun Route.asRouter(): Router = object : Router {
         if (template.matches(request.uri.path) && method == request.method) {
             { req: Request -> handler(req.withUriTemplate(template)) }
         } else null
+}
+
+
+internal fun Router.then(that: Router): Router {
+    val originalMatch = this::match
+    return object : Router {
+        override fun match(request: Request): HttpHandler? = originalMatch(request) ?: that.match(request)
+    }
+}
+
+internal fun Router.toHttpHandler(): HttpHandler = {
+    try {
+        match(it)?.invoke(it) ?: Response(Status.NOT_FOUND)
+    } catch (e: LensFailure) {
+        Response(Status.BAD_REQUEST)
+    }
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())

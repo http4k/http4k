@@ -12,6 +12,10 @@ import org.http4k.routing.StaticRouter.Companion.Handler as StaticHandler
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
 
+interface Router {
+    fun match(request: Request): HttpHandler?
+}
+
 interface RoutingHttpHandler : Router, HttpHandler {
     fun withFilter(filter: Filter): RoutingHttpHandler
     fun withBasePath(basePath: String): RoutingHttpHandler
@@ -29,3 +33,4 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
 infix fun String.by(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
+

@@ -25,6 +25,7 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.contractRoutes
+import org.http4k.routing.routes
 import org.http4k.routing.staticRoutes
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
@@ -67,7 +68,10 @@ fun main(args: Array<String>) {
 
     val staticRouter = CachingFilters.Response.NoCache().then(staticRoutes("/static", ResourceLoader.Classpath("cookbook")))
 
-    val handler = contractRouter.then(staticRouter).toHttpHandler()
+    val handler = routes(
+        contractRouter,
+        staticRouter
+    )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
 }
