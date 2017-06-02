@@ -84,4 +84,17 @@ class ContractRoutingHttpHandlerTest {
         assertThat(response.status, equalTo(OK))
     }
 
+    @Test
+    fun `only calls filters once`() {
+        val filter = Filter {
+            next ->
+            {
+                next(it.header("foo", "bar"))
+            }
+        }
+        val contract = filter.then(contract().withRoute(Route().at(GET) / "test" bind { Response(OK).body(it.headerValues("foo").toString())}))
+        val response = contract(Request(GET, "/test"))
+        assertThat(response.bodyString(), equalTo("[bar]"))
+    }
+
 }

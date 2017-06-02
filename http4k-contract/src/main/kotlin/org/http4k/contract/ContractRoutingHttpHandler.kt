@@ -33,7 +33,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: ContractR
                                     internal val routes: List<ServerRoute>) : HttpHandler {
             private val contractRoot = BasePath(rootAsString)
 
-            private val handler: HttpHandler = filter.then { match(it)?.invoke(it) ?: Response(Status.NOT_FOUND.description("Route not found")) }
+            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(Status.NOT_FOUND.description("Route not found")) }
 
             override fun invoke(request: Request): Response = handler(request)
 
