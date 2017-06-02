@@ -67,7 +67,9 @@ fun main(args: Array<String>) {
 
     val handler = routes(
         "/context" by filter.then(contract),
-        "/static" by CachingFilters.Response.NoCache().then(static(ResourceLoader.Classpath("cookbook")))
+        "/static" by CachingFilters.Response.NoCache().then(static(ResourceLoader.Classpath("cookbook"))),
+        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))
+            .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
     )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
@@ -78,3 +80,4 @@ fun main(args: Array<String>) {
 // API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
 // Static content:          curl -v "http://localhost:8000/static/someStaticFile.txt"
 // Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
+// Echo endpoint (at root): curl -v "http://localhost:8000/echo/hello?age=123"
