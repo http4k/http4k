@@ -289,12 +289,16 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 ```
 
 #### 3. Combining Routes into Modules
-Finally, `ServerRoutes` are added into a reusable `ContractRouter` (several of which can be combined) and then this is turned into a standard `HttpHandler`.
+Finally, `ServerRoutes` are added into a reusable `Contract` in the standard way:
 ```kotlin
-val handler: HttpHandler = contractRoutes("/context", Swagger(ApiInfo("My great API", "v1.0"), Argo))
-    .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
-    .withRoute(serverRoute)
-    .toHttpHandler()
+val handler = routes(
+    "/api/v1" by contract(Swagger(ApiInfo("My great API", "v1.0"), Argo))
+                      .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
+                      .withRoute(serverRoute),
+    "/api/v2" by contract(Swagger(ApiInfo("My great API", "v2.0"), Argo))
+                      .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
+                      .withRoute(serverRoute)
+)
 ```
 
 When launched, Swagger format documentation (including JSON schema models) can be found at the route of the module.
