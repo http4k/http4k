@@ -45,9 +45,10 @@ fun main(args: Array<String>) {
         )
     }
 
-    fun echo(name: String, age: Int): HttpHandler = {
+    val ageQuery = Query.int().required("age")
+    fun echo(name: String): HttpHandler = {
         Response(OK).with(
-            Body.string(TEXT_PLAIN).toLens() of "hello $name you are $age"
+            Body.string(TEXT_PLAIN).toLens() of "hello $name you are ${ageQuery(it)}"
         )
     }
 
@@ -60,7 +61,7 @@ fun main(args: Array<String>) {
         .withDescriptionPath("/docs/swagger.json")
         .securedBy(ApiKey(Query.int().required("apiKey"), { it == 42 }))
         .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
-        .withRoute(Route("echo").at(GET) / "echo" / Path.of("name") / Path.int().of("age") bind ::echo)
+        .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
 
     val contractRouter = filter.then(contractRoutes)
 
@@ -71,7 +72,8 @@ fun main(args: Array<String>) {
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
 }
 
-// Adding 2 numbers:      curl -v "http://localhost:8000/context/add/123/564?apiKey=42"
-// API Key enforcement:   curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
-// Static content:        curl -v "http://localhost:8000/static/someStaticFile.txt"
-// Swagger documentation: curl -v "http://localhost:8000/context/docs/swagger.json"
+// Adding 2 numbers:        curl -v "http://localhost:8000/context/add/123/564?apiKey=42"
+// Echo (fail):             curl -v "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42"
+// API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
+// Static content:          curl -v "http://localhost:8000/static/someStaticFile.txt"
+// Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
