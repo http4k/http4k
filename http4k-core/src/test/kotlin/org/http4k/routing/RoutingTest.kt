@@ -148,7 +148,6 @@ class RoutingTest {
         assertThat(app(Request(GET, "/asd/a/something")).status, equalTo(NOT_FOUND))
     }
 
-
     @Test
     @Ignore
     fun `can add filter to router`() {
