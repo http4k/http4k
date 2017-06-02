@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.32.0
+- More work on `http4k-contract` contract API
+
 ### v1.31.0
 - Rework `http4k-contract` routing to be mounted in the same way as other `RoutingHttpHandlers`
 

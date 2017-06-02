@@ -291,12 +291,11 @@ val serverRoute: ServerRoute = route.at(GET) / "echo" / Path.of("name") bind ::e
 #### 3. Combining Routes into Modules
 Finally, `ServerRoutes` are added into a reusable `Contract` in the standard way:
 ```kotlin
+val security = ApiKey(Query.int().required("api"), { it == 42 })
 val handler = routes(
-    "/api/v1" by contract(Swagger(ApiInfo("My great API", "v1.0"), Argo))
-                      .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
+    "/api/v1" by contract(Swagger(ApiInfo("My great API", "v1.0"), Argo), "", security)
                       .withRoute(serverRoute),
-    "/api/v2" by contract(Swagger(ApiInfo("My great API", "v2.0"), Argo))
-                      .securedBy(ApiKey(Query.int().required("api"), { it == 42 }))
+    "/api/v2" by contract(Swagger(ApiInfo("My great API", "v2.0"), Argo), "", security)
                       .withRoute(serverRoute)
 )
 ```
