@@ -3,6 +3,8 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,6 +12,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.CorsPolicy
+import org.http4k.filter.ServerFilters
 import org.http4k.format.Argo
 import org.http4k.lens.Header
 import org.http4k.lens.Header.X_URI_TEMPLATE
@@ -17,6 +21,8 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.routing.by
 import org.http4k.routing.contract
+import org.http4k.routing.routes
+import org.junit.Ignore
 import org.junit.Test
 
 class ContractRoutingHttpHandlerTest {
@@ -96,5 +102,16 @@ class ContractRoutingHttpHandlerTest {
         val response = contract(Request(GET, "/test"))
         assertThat(response.bodyString(), equalTo("[bar]"))
     }
+
+    @Test
+    @Ignore
+    fun `only calls filters once - in various combos`() {
+        val filter = ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive)
+        val contract = contract().withRoute(Route().at(GET) / "test" bind { Response(OK).body(it.headerValues("foo").toString()) })
+        checkCallOnlyOnce(filter.then(contract))
+        checkCallOnlyOnce(routes(filter.then(contract)))
+    }
+
+    private fun checkCallOnlyOnce(httpHandler: HttpHandler) = assertThat(httpHandler(Request(Method.OPTIONS, "/test")).status, equalTo(OK))
 
 }

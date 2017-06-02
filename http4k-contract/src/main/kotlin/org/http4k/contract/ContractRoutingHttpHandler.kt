@@ -10,7 +10,6 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header.X_URI_TEMPLATE
-import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
 class ContractRoutingHttpHandler internal constructor(val httpHandler: ContractRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
@@ -40,7 +39,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: ContractR
             private val descriptionRoute = PathBinder0(Core(Route("description route"), GET, { BasePath("$it$descriptionPath") })) bind
                 { renderer.description(contractRoot, security, routes) }
 
-            private val routers: List<Pair<Router, Filter>> = routes
+            private val routers = routes
                 .map { it.router(contractRoot) to security.filter.then(identify(it)).then(filter) }
                 .plus(descriptionRoute.router(contractRoot) to identify(descriptionRoute).then(filter))
 
