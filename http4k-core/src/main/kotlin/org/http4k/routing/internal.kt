@@ -3,7 +3,6 @@ package org.http4k.routing
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -12,65 +11,77 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.findSingle
-import org.http4k.core.then
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
-data class StaticHttpHandler(val basePath: String,
-                             val resourceLoader: ResourceLoader,
-                             val extraPairs: Map<String, ContentType>
-) : HttpHandler {
-    private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
-
-    init {
-        extMap.addMimeTypes(extraPairs
-            .map { (first, second) -> second.value + "\t\t\t" + first }.joinToString("\n")
-        )
-    }
-
-    override fun invoke(req: Request): Response {
-        val path = convertPath(req.uri.path)
-        return resourceLoader.load(path)?.let {
-            url ->
-            val lookupType = ContentType(extMap.getContentType(path))
-            if (req.method == GET && lookupType != OCTET_STREAM) {
-                Response(OK)
-                    .header("Content-Type", lookupType.value)
-                    .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
-            } else Response(NOT_FOUND)
-        } ?: Response(NOT_FOUND)
-    }
-
-    private fun convertPath(path: String): String {
-        val newPath = if (basePath == "/" || basePath == "") path else path.replace(basePath, "")
-        val resolved = if (newPath.isBlank()) "/index.html" else newPath
-        return resolved.replaceFirst("/", "")
-    }
-}
-
-class StaticRouter constructor(private val httpHandler: StaticHttpHandler) : RoutingHttpHandler {
+class StaticRouter constructor(private val httpHandler: StaticRouter.Companion.Handler) : RoutingHttpHandler {
 
     override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRouter(httpHandler.copy(basePath = basePath + httpHandler.basePath))
 
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
     override fun invoke(req: Request): Response = httpHandler(req)
+
+    companion object {
+        data class Handler(val basePath: String,
+                           val resourceLoader: ResourceLoader,
+                           val extraPairs: Map<String, ContentType>
+        ) : HttpHandler {
+            private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
+
+            init {
+                extMap.addMimeTypes(extraPairs
+                    .map { (first, second) -> second.value + "\t\t\t" + first }.joinToString("\n")
+                )
+            }
+
+            override fun invoke(req: Request): Response {
+                val path = convertPath(req.uri.path)
+                return resourceLoader.load(path)?.let {
+                    url ->
+                    val lookupType = ContentType(extMap.getContentType(path))
+                    if (req.method == GET && lookupType != OCTET_STREAM) {
+                        Response(OK)
+                            .header("Content-Type", lookupType.value)
+                            .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
+                    } else Response(NOT_FOUND)
+                } ?: Response(NOT_FOUND)
+            }
+
+            private fun convertPath(path: String): String {
+                val newPath = if (basePath == "/" || basePath == "") path else path.replace(basePath, "")
+                val resolved = if (newPath.isBlank()) "/index.html" else newPath
+                return resolved.replaceFirst("/", "")
+            }
+        }
+
+    }
 }
 
-internal data class GroupRoutingHttpHandler(private val basePath: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RoutingHttpHandler {
-    private val routers = routes.map(Route::asRouter)
-    private val noMatch: HttpHandler? = null
+internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
+    override fun withBasePath(basePath: String): RoutingHttpHandler = GroupRoutingHttpHandler(
+        httpHandler.copy(basePath = UriTemplate.from(basePath + httpHandler.basePath?.toString().orEmpty()),
+            routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$basePath/${it.template}")) }
+        )
+    )
 
-    override fun withBasePath(basePath: String) = GroupRoutingHttpHandler(UriTemplate.from(basePath),
-        routes.map { it.copy(template = it.template.prefixedWith(basePath)) })
+    override fun invoke(request: Request): Response = httpHandler(request)
 
-    override fun invoke(request: Request): Response = match(request)
-        ?.let { handler -> (filter?.then(handler) ?: handler).invoke(request) }
-        ?: Response(NOT_FOUND.description("Route not found"))
+    override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
-    override fun match(request: Request): HttpHandler? =
-        if (basePath?.matches(request.uri.path) ?: true) routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
-        else null
+    companion object {
+        internal data class Handler(internal val basePath: UriTemplate? = null, internal val routes: List<Route>) : HttpHandler {
+            private val routers = routes.map(Route::asRouter)
+            private val noMatch: HttpHandler? = null
+
+            fun match(request: Request): HttpHandler? =
+                if (basePath?.matches(request.uri.path) ?: true)
+                    routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+                else null
+
+            override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: Response(NOT_FOUND.description("Route not found"))
+        }
+    }
 }
 
 private fun Route.asRouter(): Router = object : Router {
