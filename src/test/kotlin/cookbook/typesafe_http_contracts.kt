@@ -24,9 +24,8 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader
-import org.http4k.routing.by
 import org.http4k.routing.contractRoutes
-import org.http4k.routing.static
+import org.http4k.routing.staticRoutes
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
 import java.time.Clock
@@ -65,7 +64,7 @@ fun main(args: Array<String>) {
 
     val contractRouter = filter.then(contractRoutes)
 
-    val staticRouter = CachingFilters.Response.NoCache().then("/static" by static(ResourceLoader.Classpath("cookbook")))
+    val staticRouter = CachingFilters.Response.NoCache().then(staticRoutes("/static", ResourceLoader.Classpath("cookbook")))
 
     val handler = contractRouter.then(staticRouter).toHttpHandler()
 

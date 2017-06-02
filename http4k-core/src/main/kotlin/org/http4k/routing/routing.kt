@@ -21,16 +21,18 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[
 
 infix fun Pair<Method, String>.by(action: HttpHandler): Route = Route(first, from(second), action)
 
-infix fun String.by(router: GroupRoutingHttpHandler): Router = router.withBasePath(this)
+infix fun String.by(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
 
-interface RoutingHttpHandler : Router, HttpHandler
+interface RoutingHttpHandler : Router, HttpHandler {
+    fun withBasePath(basePath: String): RoutingHttpHandler
+}
 
 data class GroupRoutingHttpHandler(private val basePath: UriTemplate? = null, private val routes: List<Route>, private val filter: Filter? = null) : RoutingHttpHandler {
     private val routers = routes.map(Route::asRouter)
     private val noMatch: HttpHandler? = null
 
-    internal fun withBasePath(groupPrefix: String) = GroupRoutingHttpHandler(from(groupPrefix),
-        routes.map { it.copy(template = it.template.prefixedWith(groupPrefix)) })
+    override fun withBasePath(basePath: String) = GroupRoutingHttpHandler(from(basePath),
+        routes.map { it.copy(template = it.template.prefixedWith(basePath)) })
 
     override fun invoke(request: Request): Response = match(request)
         ?.let { handler -> (filter?.then(handler) ?: handler).invoke(request) }
