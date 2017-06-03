@@ -51,26 +51,22 @@ class ServerRoute2 internal constructor(private val sbb: SBB, private val toHand
     internal fun describeFor(contractRoot: BasePath): String = sbb.core.pb.describe(contractRoot)
 }
 
-abstract class PB internal constructor(val core: PCore, vararg val pathLenses: PathLens<*>) {
+abstract class PB internal constructor(val pathFn: (BasePath) -> BasePath, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PB
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    internal fun describe(contractRoot: BasePath): String = "${core.pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
-
-    internal data class PCore(val pathFn: (BasePath) -> BasePath) {
-        infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
-    }
+    internal fun describe(contractRoot: BasePath): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 }
 
-class PB0 internal constructor(pathFn: (BasePath) -> BasePath) : PB(PCore(pathFn)) {
+class PB0 internal constructor(pathFn: (BasePath) -> BasePath) : PB(pathFn) {
 
     override infix operator fun div(next: String) = PB0 { it }
 
-    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PB1(core, next)
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PB1(pathFn, next)
 }
 
-class PB1<out A> internal constructor(core: PCore, val a: PathLens<A>) : PB(core) {
+class PB1<out A> internal constructor(pathFn: (BasePath) -> BasePath, val a: PathLens<A>) : PB(pathFn) {
     override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")
@@ -92,9 +88,9 @@ abstract class SBB(val core: Core, val desc: Desc) {
                                  validationFilter: Filter,
                                  lenses: List<PathLens<*>>,
                                  toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
-                if (request.method == method && request.basePath().startsWith(pb.core.pathFn(contractRoot))) {
+                if (request.method == method && request.basePath().startsWith(pb.pathFn(contractRoot))) {
                     try {
-                        request.without(pb.core.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
+                        request.without(pb.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
                     } catch (e: LensFailure) {
                         null
                     }
