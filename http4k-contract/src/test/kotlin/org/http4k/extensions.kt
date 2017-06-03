@@ -47,13 +47,17 @@ fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", 
 
 class ServerRoute2 internal constructor(private val sbb: SBB, private val toHandler: (ExtractedParts) -> HttpHandler) {
     internal fun router(contractRoot: BasePath): Router = sbb.toRouter(contractRoot, toHandler)
-    fun describeFor(contractRoot: BasePath): String = ""
+
+    internal fun describeFor(contractRoot: BasePath): String = sbb.core.pb.describe(contractRoot)
 }
 
 abstract class PB internal constructor(val core: PCore, vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): PB
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
+
+    internal fun describe(contractRoot: BasePath): String = "${core.pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
+
     internal data class PCore(val pathFn: (BasePath) -> BasePath) {
         infix operator fun div(next: String) = copy(pathFn = { pathFn(it) / next })
     }
