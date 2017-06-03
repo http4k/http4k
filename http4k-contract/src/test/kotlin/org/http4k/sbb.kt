@@ -33,14 +33,24 @@ abstract class SBB(val method: Method, val pathDef: PathDef, val desc: Desc) {
         } else null
 }
 
-class SBB0(method: Method, pathDef: PathDef, desc: Desc, private val fn: HttpHandler) : SBB(method, pathDef, desc) {
-    override infix fun describedBy(new: Desc): SBB = SBB0(method, pathDef, desc, fn)
+class SBB0(method: Method, private val pd: PathDef0, private val fn: HttpHandler, desc: Desc = Desc()) : SBB(method, pd, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB0(method, pd, fn, desc)
     override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { fn })
 }
 
-class SBB1<A>(method: Method, pathDef: PathDef, desc: Desc, private val fn: (A) -> HttpHandler, private val psA: PathLens<A>) : SBB(method, pathDef, desc) {
-    override infix fun describedBy(new: Desc): SBB = SBB1(method, pathDef, desc, fn, psA)
-    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { parts -> fn(parts[psA]) })
+class SBB1<A>(method: Method, private val pd: PathDef1<A>, private val fn: (A) -> HttpHandler, desc: Desc = Desc()) : SBB(method, pd, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB1(method, pd, fn, desc)
+    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { fn(it[pd.a]) })
+}
+
+class SBB2<A, B>(method: Method, private val pd: PathDef2<A, B>, private val fn: (A, B) -> HttpHandler, desc: Desc = Desc()) : SBB(method, pd, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB2(method, pd, fn, desc)
+    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { fn(it[pd.a], it[pd.b]) })
+}
+
+class SBB3<A, B, C>(method: Method, private val pd: PathDef3<A, B, C>, private val fn: (A, B, C) -> HttpHandler, desc: Desc = Desc()) : SBB(method, pd, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB3(method, pd, fn, desc)
+    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { fn(it[pd.a], it[pd.b], it[pd.c]) })
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
