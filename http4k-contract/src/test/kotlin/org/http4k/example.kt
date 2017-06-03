@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
         )
     )
 
-    println(app(Request(GET, "/contract")))
+//    println(app(Request(GET, "/contract")))
 //    println(app(Request(GET, "/contract/value")))
     println(app(Request(GET, "/contract/value/123")))
     println(app(Request(GET, "/contract/value/123/asd")))

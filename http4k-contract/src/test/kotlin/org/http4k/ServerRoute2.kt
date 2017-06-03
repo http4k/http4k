@@ -34,7 +34,6 @@ class ServerRoute2 internal constructor(private val method: Method,
                     val extract = without.extract(pathDef.pathLenses.toList())
                     extract?.let { desc.core.then(toHandler(it)) }
                 } catch (e: LensFailure) {
-                    println(e)
                     null
                 }
             } else null
