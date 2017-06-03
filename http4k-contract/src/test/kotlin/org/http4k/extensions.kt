@@ -37,13 +37,9 @@ interface ContractBuilder {
 
 fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity) =
     object : ContractBuilder {
-        override fun invoke(vararg sbbs: SBB): Another {
-            val routes = sbbs.map { it.toServerRoute() }
-            val filter = Filter { { req -> it(req) } }
-            return Another(Another.Companion.Handler(
-                renderer, security, descriptionPath, "", routes, filter
+        override fun invoke(vararg sbbs: SBB): Another = Another(Another.Companion.Handler(
+                renderer, security, descriptionPath, "", sbbs.map { it.toServerRoute() }, Filter { { req -> it(req) } }
             ))
-        }
     }
 
 class ServerRoute2 internal constructor(private val sbb: SBB, private val toHandler: (ExtractedParts) -> HttpHandler) {
