@@ -2,6 +2,7 @@ package org.http4k
 
 import org.http4k.core.ContentType
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -51,23 +52,20 @@ class Desc private constructor(internal val core: Core) {
                                  val produces: Set<ContentType> = emptySet(),
                                  val consumes: Set<ContentType> = emptySet(),
                                  val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
-
-            internal val validationFilter = Filter {
-                nextHandler ->
-                {
+                                 val responses: Map<Status, Pair<String, Response>> = emptyMap()) : Filter {
+            override fun invoke(nextHandler: HttpHandler): HttpHandler =
+                { req ->
                     val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
                     val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
                         try {
-                            next(it)
+                            next(req)
                             memo
                         } catch (e: LensFailure) {
                             memo.plus(e.failures)
                         }
                     }
-                    if (errors.isEmpty()) nextHandler(it) else throw LensFailure(errors)
+                    if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
                 }
-            }
         }
     }
 }

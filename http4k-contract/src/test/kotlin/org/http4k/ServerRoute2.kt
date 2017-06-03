@@ -30,7 +30,9 @@ class ServerRoute2 internal constructor(private val method: Method,
         override fun match(request: Request): HttpHandler? =
             if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
                 try {
-                    request.without(pathDef.pathFn(contractRoot)).extract(pathDef.pathLenses.toList())?.let { desc.core.validationFilter.then(toHandler(it)) }
+                    val without = request.without(pathDef.pathFn(contractRoot))
+                    val extract = without.extract(pathDef.pathLenses.toList())
+                    extract?.let { desc.core.then(toHandler(it)) }
                 } catch (e: LensFailure) {
                     println(e)
                     null
