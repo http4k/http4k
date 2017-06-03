@@ -31,10 +31,10 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
                                     private val rootAsString: String = "",
                                     private val routes: List<ServerRoute2> = emptyList(),
                                     private val filter: Filter = ServerFilters.CatchLensFailure
-        ) : HttpHandler {
+        ) : RoutingHttpHandler {
             private val contractRoot = BasePath(rootAsString)
-            internal fun withFilter(new: Filter) = copy(filter = filter.then(new))
-            internal fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
+            override fun withFilter(new: Filter) = copy(filter = filter.then(new))
+            override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
             private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(Status.NOT_FOUND.description("Route not found")) }
 
@@ -48,7 +48,7 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
 
             private val noMatch: HttpHandler? = null
 
-            fun match(request: Request): HttpHandler? =
+            override fun match(request: Request): HttpHandler? =
                 if (request.isIn(contractRoot)) {
                     routers.fold(noMatch, { memo, (router, routeFilter) ->
                         memo ?: router.match(request)?.let { routeFilter.then(it) }
