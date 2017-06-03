@@ -21,6 +21,7 @@ abstract class SBB(val method: Method, val pathDef: PathDef, val desc: Desc) {
                 try {
                     request.without(pathDef.pathFn(contractRoot)).extract(pathDef.pathLenses.toList())?.let { desc.core.validationFilter.then(toHandler(it)) }
                 } catch (e: LensFailure) {
+                    println(e)
                     null
                 }
             } else null

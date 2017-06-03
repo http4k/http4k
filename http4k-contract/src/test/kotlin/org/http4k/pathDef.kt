@@ -13,7 +13,6 @@ abstract class PathDef internal constructor(val pathFn: (BasePath) -> BasePath, 
 }
 
 class PathDef0 internal constructor(pathFn: (BasePath) -> BasePath) : PathDef(pathFn) {
-
     override infix operator fun div(next: String) = PathDef0 { it / next }
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PathDef1(pathFn, next)
@@ -30,7 +29,6 @@ class PathDef2<out A, out B> internal constructor(pathFn: (BasePath) -> BasePath
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PathDef3(pathFn, a, b, next)
 }
-
 
 class PathDef3<out A, out B, out C> internal constructor(pathFn: (BasePath) -> BasePath, val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : PathDef(pathFn, a, b, c) {
     override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
