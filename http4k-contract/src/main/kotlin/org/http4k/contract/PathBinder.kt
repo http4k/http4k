@@ -48,7 +48,8 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
             fun matches(contractRoot: BasePath, request: Request, lenses: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
                 if (request.method == method && request.basePath().startsWith(pathFn(contractRoot))) {
                     try {
-                        request.without(pathFn(contractRoot)).extract(lenses)?.let { route.core.validationFilter.then(toHandler(it)) }
+                        val without = request.without(pathFn(contractRoot))
+                        without.extract(lenses)?.let { route.core.validationFilter.then(toHandler(it)) }
                     } catch (e: LensFailure) {
                         null
                     }

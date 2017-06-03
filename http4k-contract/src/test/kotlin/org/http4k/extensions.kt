@@ -29,15 +29,17 @@ fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", 
 
 operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it } / next
 
-
 infix fun String.by(router: Contract): Contract = router.withBasePath(this)
 
 infix fun Pair<Method, String>.bindTo(fn: HttpHandler): ServerRoute2 = ServerRoute2(first, PathDef0 { it / second }, { fn })
 
-@JvmName("bind0")
+@JvmName("bindPathDef0")
 infix fun Pair<Method, PathDef0>.bindTo(fn: HttpHandler) = ServerRoute2(first, second, { fn })
 
 @JvmName("bind1")
+infix fun <A> Pair<Method, PathLens<A>>.bindTo(fn: (A) -> HttpHandler) = first to PathDef1({ it }, second) bindTo fn
+
+@JvmName("bind1Def")
 infix fun <A> Pair<Method, PathDef1<A>>.bindTo(fn: (A) -> HttpHandler) = ServerRoute2(first, second, { fn(it[second.a]) })
 
 @JvmName("bind2")
