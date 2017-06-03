@@ -43,8 +43,8 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
             private val descriptionRoute = GET to PathDef0 { BasePath("$it$descriptionPath") } bindTo { Response(Status.OK) }
 
             private val routers = routes
-                .map { it.router(contractRoot) to security.filter.then(identify(it)).then(filter) }
-                .plus(descriptionRoute.router(contractRoot) to identify(descriptionRoute).then(filter))
+                .map { it.toRouter(contractRoot) to security.filter.then(identify(it)).then(filter) }
+                .plus(descriptionRoute.toRouter(contractRoot) to identify(descriptionRoute).then(filter))
 
             private val noMatch: HttpHandler? = null
 
