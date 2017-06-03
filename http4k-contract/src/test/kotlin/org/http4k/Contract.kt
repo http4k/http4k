@@ -6,6 +6,7 @@ import org.http4k.contract.Security
 import org.http4k.contract.isIn
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -39,8 +40,11 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
 
             override fun invoke(request: Request): Response = handler(request)
 
+            private val descriptionRoute = SBB0(GET, PathDef0({ BasePath("$it$descriptionPath") }), Desc(), { Response(Status.OK) }).toServerRoute()
+
             private val routers = routes
                 .map { it.router(contractRoot) to security.filter.then(identify(it)).then(filter) }
+                .plus(descriptionRoute.router(contractRoot) to identify(descriptionRoute).then(filter))
 
             private val noMatch: HttpHandler? = null
 

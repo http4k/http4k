@@ -1,6 +1,7 @@
 package org.http4k
 
 
+import org.http4k.Contract.Companion.Handler
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoutingHttpHandler
 import org.http4k.contract.NoRenderer
@@ -21,7 +22,7 @@ interface ContractBuilder {
 
 fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity) =
     object : ContractBuilder {
-        override fun invoke(vararg sbbs: SBB): Contract = Contract(Contract.Companion.Handler(
+        override fun invoke(vararg sbbs: SBB): Contract = Contract(Handler(
             renderer, security, descriptionPath, "", sbbs.map { it.toServerRoute() }, Filter { { req -> it(req) } }
         ))
     }
