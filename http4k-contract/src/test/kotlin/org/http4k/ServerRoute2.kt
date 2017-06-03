@@ -27,7 +27,7 @@ class ServerRoute2 internal constructor(private val method: Method,
     internal val tags = desc.core.tags.toSet().sortedBy { it.name }
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
-        override fun match(request: Request): HttpHandler? =
+        override fun match(request: Request) =
             if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
                 try {
                     val without = request.without(pathDef.pathFn(contractRoot))
