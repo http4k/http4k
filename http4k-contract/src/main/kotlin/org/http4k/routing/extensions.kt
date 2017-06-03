@@ -28,7 +28,8 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
-infix fun Pair<Method, String>.bindTo(handler: HttpHandler): ServerRoute = ServerRoute(first, PathDef0 { it / second }, { handler })
+infix fun Pair<Method, String>.bindTo(handler: HttpHandler): ServerRoute =
+    ServerRoute(first, PathDef0 { it / second.trimStart('/') }, { handler })
 
 @JvmName("bindPathDef0")
 infix fun Pair<Method, PathDef0>.bindTo(handler: HttpHandler) = ServerRoute(first, second, { handler })

@@ -26,12 +26,14 @@ class ServerRoute internal constructor(val method: Method,
     internal val tags = desc.core.tags.toSet().sortedBy { it.name }
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
-        override fun match(request: Request) =
+        override fun match(request: Request): HttpHandler? =
             if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
                 try {
-                    val without = request.without(pathDef.pathFn(contractRoot))
-                    val extract = without.extract(pathDef.pathLenses.toList())
-                    extract?.let { desc.core.then(toHandler(it)) }
+                    request.without(pathDef.pathFn(contractRoot))
+                        .extract(pathDef.pathLenses.toList())
+                        ?.let {
+                            desc.core.then(toHandler(it))
+                        }
                 } catch (e: LensFailure) {
                     null
                 }

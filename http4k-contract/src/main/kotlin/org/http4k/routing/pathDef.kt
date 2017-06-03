@@ -13,7 +13,7 @@ abstract class PathDef internal constructor(val pathFn: (BasePath) -> BasePath, 
 }
 
 class PathDef0 internal constructor(pathFn: (BasePath) -> BasePath) : PathDef(pathFn) {
-    override infix operator fun div(next: String) = org.http4k.routing.PathDef0 { it / next }
+    override infix operator fun div(next: String) = PathDef0 { it / next }
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PathDef1(pathFn, next)
 }

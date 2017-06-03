@@ -39,12 +39,11 @@ class ContractRoutingHttpHandlerTest {
             { next(it.with(header of "true")) }
         }
 
-        val root = "/root" by contract(SimpleJson(Argo))(
-            GET to "/" bindTo { Response(OK).with(header of header(it)) }
-        )
+        val root = "/root" by contract(SimpleJson(Argo), "/docs")(
+            GET to "/" bindTo { Response(OK).with(header of header(it)) })
         val withRoute = filter.then(root)
 
-        val response = withRoute.invoke(Request(GET, "/root"))
+        val response = withRoute(Request(GET, "/root"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(header(response), equalTo("true"))
