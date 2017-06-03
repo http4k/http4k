@@ -15,13 +15,13 @@ fun bob(i: Int): HttpHandler = TODO()
 
 fun main(args: Array<String>) {
 
-    val a = routes(
+    val app = routes(
         "/contract" by cont(NoRenderer)(
             GET to "/" bindTo { request: Request -> Response(OK) } describedBy Desc(),
-            GET to "value" / Path.of("hello") / Path.int().of("world") bindTo ::bob describedBy Desc(),
-            GET to "value2" / Path.of("hello") / Path.int().of("world") bindTo ::bob
+            GET to "value" / Path.int().of("world") bindTo ::bob describedBy Desc(),
+            GET to "value2" / Path.int().of("world") bindTo ::bob
         )
     )
 
-    a(Request(GET, "/contract/value2/bob/bob2"))
+    app(Request(GET, "/contract/value2/bob/bob2"))
 }
