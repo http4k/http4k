@@ -64,7 +64,7 @@ abstract class SBB(val core: Core, val desc: Desc) {
     }
 
     companion object {
-        data class Core(val method: Method)
+        data class Core(val method: Method, val pb: PB)
     }
 }
 
@@ -78,13 +78,13 @@ class SBB1<A>(core: Core, desc: Desc, private val fn: (A) -> HttpHandler) : SBB(
     override fun toServerRoute(): ServerRoute2 = TODO()
 }
 
-infix fun Pair<Method, String>.bindTo(fn: HttpHandler): SBB = SBB0(Core(first), Desc(), fn)
+infix fun Pair<Method, String>.bindTo(fn: HttpHandler): SBB = SBB0(Core(first, PB0 { it / second }), Desc(), fn)
 
 @JvmName("bind0")
-infix fun Pair<Method, PB0>.bindTo(fn: HttpHandler): SBB = SBB0(Core(first), Desc(), fn)
+infix fun Pair<Method, PB0>.bindTo(fn: HttpHandler): SBB = SBB0(Core(first, second), Desc(), fn)
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, PB1<A>>.bindTo(fn: (A) -> HttpHandler): SBB = SBB1(Core(first), Desc(), fn)
+infix fun <A> Pair<Method, PB1<A>>.bindTo(fn: (A) -> HttpHandler): SBB = SBB1(Core(first, second), Desc(), fn)
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
