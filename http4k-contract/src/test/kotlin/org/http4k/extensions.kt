@@ -27,7 +27,7 @@ fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", 
         ))
     }
 
-operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it } / next
+operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it / this } / next
 
 infix fun String.by(router: Contract): Contract = router.withBasePath(this)
 

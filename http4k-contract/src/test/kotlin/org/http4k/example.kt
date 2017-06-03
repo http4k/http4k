@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
             pair bindTo ::bob describedBy Desc(),
             GET to Path.int().of("world") bindTo ::bob,
             GET to "value" / Path.int().of("world") bindTo ::bob,
-            GET to "value" / Path.int().of("world") / "" bindTo ::bob2,
+            GET to "value" / Path.int().of("world") / "asd" bindTo ::bob2,
             GET to "/" bindTo { _: Request -> Response(OK) } describedBy Desc()
         )
     )
@@ -29,6 +29,5 @@ fun main(args: Array<String>) {
     println(app(Request(GET, "/contract")))
     println(app(Request(GET, "/contract/123")))
     println(app(Request(GET, "/contract/value/123")))
-//    println(app(Request(GET, "/contract/value/123/asd")))
-//    println(app(Request(GET, "/")))
+    println(app(Request(GET, "/contract/value/123/asd")))
 }
