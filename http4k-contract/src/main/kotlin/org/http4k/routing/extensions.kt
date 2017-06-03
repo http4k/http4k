@@ -30,23 +30,23 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
-infix fun Pair<Method, String>.bindTo(handler: HttpHandler) =
+infix fun Pair<Method, String>.bind(handler: HttpHandler) =
     ServerRoute(first, PathDef0 { if(BasePath(second) == Root) it else it /second  }, { handler })
 
 @JvmName("bindPathDef0")
-infix fun Pair<Method, PathDef0>.bindTo(handler: HttpHandler) = ServerRoute(first, second, { handler })
+infix fun Pair<Method, PathDef0>.bind(handler: HttpHandler) = ServerRoute(first, second, { handler })
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, PathLens<A>>.bindTo(fn: (A) -> HttpHandler) = first to PathDef1({ it }, second) bindTo fn
+infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to PathDef1({ it }, second) bind fn
 
 @JvmName("bind1Def")
-infix fun <A> Pair<Method, PathDef1<A>>.bindTo(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
+infix fun <A> Pair<Method, PathDef1<A>>.bind(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
 
 @JvmName("bind2")
-infix fun <A, B> Pair<Method, PathDef2<A, B>>.bindTo(fn: (A, B) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b]) })
+infix fun <A, B> Pair<Method, PathDef2<A, B>>.bind(fn: (A, B) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b]) })
 
 @JvmName("bind3")
-infix fun <A, B, C> Pair<Method, PathDef3<A, B, C>>.bindTo(fn: (A, B, C) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c]) })
+infix fun <A, B, C> Pair<Method, PathDef3<A, B, C>>.bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c]) })
 
 @JvmName("bind4")
-infix fun <A, B, C, D> Pair<Method, PathDef4<A, B, C, D>>.bindTo(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c], it[second.d]) })
+infix fun <A, B, C, D> Pair<Method, PathDef4<A, B, C, D>>.bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c], it[second.d]) })

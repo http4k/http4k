@@ -29,7 +29,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" bindTo { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
+        val route = GET to "/" bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
@@ -39,7 +39,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" bindTo { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
+        val route = GET to "/" bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
 
         val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
         assertThat(route.toRouter(Root).match(invalidRequest), present())
@@ -52,7 +52,7 @@ class ServerRouteTest {
 //        val path1 = Path.int().of("sue")
 //        val path2 = Path.string().of("bob")
 //
-//        val route = GET to  path1 / path2 bindTo { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
+//        val route = GET to  path1 / path2 bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
 //        val request = route.newRequest(Uri.of("http://rita.com"))
 //
 //        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(
@@ -62,7 +62,7 @@ class ServerRouteTest {
 
     @Test
     fun `0 parts - matches route`() {
-        val route = GET to "/" bindTo { Response(OK) }
+        val route = GET to "/" bind { Response(OK) }
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
@@ -73,28 +73,28 @@ class ServerRouteTest {
     fun `1 part - matches route`() {
         fun matched(value: String) = { _: Request -> Response(OK).body(value) }
 
-        checkMatching(GET to Path.of("value") bindTo ::matched, "/value", "value")
+        checkMatching(GET to Path.of("value") bind ::matched, "/value", "value")
     }
 
     @Test
     fun `2 parts - matches route`() {
         fun matched(value1: String, value2: String) = { _: Request -> Response(OK).body(value1 + value2) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") bindTo ::matched, "/value1/value2", "value1value2")
+        checkMatching(GET to Path.of("value") / Path.of("value2") bind ::matched, "/value1/value2", "value1value2")
     }
 
     @Test
     fun `3 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String) = { _: Request -> Response(OK).body(value1 + value2 + value3) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") bindTo ::matched, "/value1/value2/value3", "value1value2value3")
+        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") bind ::matched, "/value1/value2/value3", "value1value2value3")
     }
 
     @Test
     fun `4 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String) = { _: Request -> Response(OK).body(value1 + value2 + value3 + value4) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bindTo ::matched, "/value1/value2/value3/value4", "value1value2value3value4")
+        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bind ::matched, "/value1/value2/value3/value4", "value1value2value3value4")
     }
 
     @Test(expected = UnsupportedOperationException::class)

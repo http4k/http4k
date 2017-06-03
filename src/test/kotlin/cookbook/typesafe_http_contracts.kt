@@ -2,7 +2,6 @@ package cookbook
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
-import org.http4k.contract.Route
 import org.http4k.contract.Swagger
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -23,9 +22,12 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
+import org.http4k.routing.Desc
 import org.http4k.routing.ResourceLoader
+import org.http4k.routing.bind
 import org.http4k.routing.by
 import org.http4k.routing.contract
+import org.http4k.routing.div
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.server.Jetty
@@ -61,15 +63,18 @@ fun main(args: Array<String>) {
 
     val security = ApiKey(Query.int().required("apiKey"), { it == 42 })
 
-    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)
-        .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
-        .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
+    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)(
+        GET to "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add
+            describedBy Desc("add", "Adds 2 numbers together").returning("The result" to OK),
+        GET to "echo" / Path.of("name") bind ::echo describedBy Desc("echo").query(ageQuery)
+    )
 
     val handler = routes(
         "/context" by filter.then(contract),
         "/static" by CachingFilters.Response.NoCache().then(static(ResourceLoader.Classpath("cookbook"))),
-        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))
-            .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
+        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
+            GET to "echo" / Path.of("name") bind ::echo describedBy Desc("echo").query(ageQuery)
+        )
     )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
