@@ -10,7 +10,6 @@ import org.http4k.lens.Path
 import org.http4k.lens.int
 import org.http4k.routing.routes
 
-
 fun bob(i: Int): HttpHandler = TODO()
 
 fun main(args: Array<String>) {
@@ -23,5 +22,5 @@ fun main(args: Array<String>) {
         )
     )
 
-    println(app(Request(GET, "/contract/value2/bob2")))
+    println(app(Request(GET, "/contract")))
 }
