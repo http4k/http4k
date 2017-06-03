@@ -40,7 +40,7 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
 
             override fun invoke(request: Request): Response = handler(request)
 
-            private val descriptionRoute = SBB0(GET, PathDef0({ BasePath("$it$descriptionPath") }), { Response(Status.OK) }, Desc()).toServerRoute()
+            private val descriptionRoute = GET to PathDef0 { BasePath("$it$descriptionPath") } bindTo { Response(Status.OK) }
 
             private val routers = routes
                 .map { it.router(contractRoot) to security.filter.then(identify(it)).then(filter) }
