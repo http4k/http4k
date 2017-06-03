@@ -6,6 +6,7 @@ import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
+import org.http4k.routing.ServerRoute
 
 class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>) : ContractRenderer {
 
@@ -14,7 +15,7 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
     override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
 
     private fun render(basePath: BasePath, route: ServerRoute) =
-        route.method.toString() + ":" + route.describeFor(basePath) to json.string(route.core.summary)
+        route.method.toString() + ":" + route.describeFor(basePath) to json.string(route.desc.core.summary)
 
     override fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         return Response(OK)

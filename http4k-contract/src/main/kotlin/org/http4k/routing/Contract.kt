@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.routing
 
 import org.http4k.contract.BasePath
 import org.http4k.contract.ContractRenderer
@@ -14,9 +14,8 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
-import org.http4k.routing.RoutingHttpHandler
 
-class Contract internal constructor(val httpHandler: Contract.Companion.Handler) : RoutingHttpHandler {
+class Contract internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     override fun invoke(request: Request): Response = httpHandler(request)
@@ -29,7 +28,7 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
                                     private val security: Security,
                                     private val descriptionPath: String,
                                     private val rootAsString: String = "",
-                                    private val routes: List<ServerRoute2> = emptyList(),
+                                    private val routes: List<org.http4k.routing.ServerRoute> = emptyList(),
                                     private val filter: Filter = ServerFilters.CatchLensFailure
         ) : RoutingHttpHandler {
             private val contractRoot = BasePath(rootAsString)
@@ -40,7 +39,7 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
 
             override fun invoke(request: Request): Response = handler(request)
 
-            private val descriptionRoute = GET to PathDef0 { BasePath("$it$descriptionPath") } bindTo { Response(Status.OK) }
+            private val descriptionRoute = GET to org.http4k.routing.PathDef0 { BasePath("$it$descriptionPath") } bindTo { Response(Status.OK) }
 
             private val routers = routes
                 .map { it.toRouter(contractRoot) to security.filter.then(identify(it)).then(filter) }
@@ -55,7 +54,7 @@ class Contract internal constructor(val httpHandler: Contract.Companion.Handler)
                     })
                 } else null
 
-            private fun identify(route: ServerRoute2): Filter =
+            private fun identify(route: org.http4k.routing.ServerRoute): Filter =
                 route.describeFor(contractRoot).let { routeIdentity ->
                     Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
                 }

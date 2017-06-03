@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.routing
 
 import org.http4k.contract.BasePath
 import org.http4k.lens.Path
@@ -13,7 +13,7 @@ abstract class PathDef internal constructor(val pathFn: (BasePath) -> BasePath, 
 }
 
 class PathDef0 internal constructor(pathFn: (BasePath) -> BasePath) : PathDef(pathFn) {
-    override infix operator fun div(next: String) = PathDef0 { it / next }
+    override infix operator fun div(next: String) = org.http4k.routing.PathDef0 { it / next }
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PathDef1(pathFn, next)
 }
@@ -31,6 +31,12 @@ class PathDef2<out A, out B> internal constructor(pathFn: (BasePath) -> BasePath
 }
 
 class PathDef3<out A, out B, out C> internal constructor(pathFn: (BasePath) -> BasePath, val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : PathDef(pathFn, a, b, c) {
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = PathDef4(pathFn, a, b, c, next)
+}
+
+class PathDef4<out A, out B, out C, out D> internal constructor(pathFn: (BasePath) -> BasePath, val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>) : PathDef(pathFn, a, b, c, c) {
     override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")

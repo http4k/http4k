@@ -2,6 +2,7 @@ package org.http4k.contract
 
 import org.http4k.core.Response
 import org.http4k.lens.Failure
+import org.http4k.routing.ServerRoute
 
 interface ContractRenderer {
     fun notFound(): Response

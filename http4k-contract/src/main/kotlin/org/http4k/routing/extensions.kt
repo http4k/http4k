@@ -1,13 +1,49 @@
 package org.http4k.routing
 
+
 import org.http4k.contract.ContractRenderer
-import org.http4k.contract.ContractRoutingHttpHandler
 import org.http4k.contract.NoRenderer
 import org.http4k.contract.NoSecurity
 import org.http4k.contract.Security
-import org.http4k.contract.ContractRoutingHttpHandler.Companion.Handler as ContractHandler
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.lens.PathLens
+import org.http4k.routing.Contract.Companion.Handler
 
-infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
+interface ContractBuilder {
+    operator fun invoke(vararg serverRoutes: ServerRoute): Contract
+}
 
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity) =
-    ContractRoutingHttpHandler(ContractHandler(renderer, security, descriptionPath))
+    object : ContractBuilder {
+        override fun invoke(vararg serverRoutes: ServerRoute): Contract = Contract(Handler(
+            renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }
+        ))
+    }
+
+operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it / this } / next
+
+operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef1({ it }, this) / next
+
+infix fun String.by(router: Contract): Contract = router.withBasePath(this)
+
+infix fun Pair<Method, String>.bindTo(handler: HttpHandler): ServerRoute = ServerRoute(first, PathDef0 { it / second }, { handler })
+
+@JvmName("bindPathDef0")
+infix fun Pair<Method, PathDef0>.bindTo(handler: HttpHandler) = ServerRoute(first, second, { handler })
+
+@JvmName("bind1")
+infix fun <A> Pair<Method, PathLens<A>>.bindTo(fn: (A) -> HttpHandler) = first to PathDef1({ it }, second) bindTo fn
+
+@JvmName("bind1Def")
+infix fun <A> Pair<Method, PathDef1<A>>.bindTo(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
+
+@JvmName("bind2")
+infix fun <A, B> Pair<Method, PathDef2<A, B>>.bindTo(fn: (A, B) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b]) })
+
+@JvmName("bind3")
+infix fun <A, B, C> Pair<Method, PathDef3<A, B, C>>.bindTo(fn: (A, B, C) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c]) })
+
+@JvmName("bind4")
+infix fun <A, B, C, D> Pair<Method, PathDef4<A, B, C, D>>.bindTo(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c], it[second.d]) })

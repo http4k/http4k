@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.routing
 
 import org.http4k.contract.BasePath
 import org.http4k.contract.basePath
@@ -11,14 +11,13 @@ import org.http4k.core.then
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
-import org.http4k.routing.Router
 
-class ServerRoute2 internal constructor(private val method: Method,
-                                        private val pathDef: PathDef,
-                                        private val toHandler: (ExtractedParts) -> HttpHandler,
-                                        private val desc: Desc = Desc()) {
+class ServerRoute internal constructor(val method: Method,
+                                       private val pathDef: org.http4k.routing.PathDef,
+                                       private val toHandler: (ExtractedParts) -> HttpHandler,
+                                       val desc: Desc = Desc()) {
 
-    infix fun describedBy(new: Desc) = ServerRoute2(method, pathDef, toHandler, new)
+    infix fun describedBy(new: Desc) = ServerRoute(method, pathDef, toHandler, new)
 
     internal val nonBodyParams = desc.core.requestParams.plus(pathDef.pathLenses).flatMap { it }
 

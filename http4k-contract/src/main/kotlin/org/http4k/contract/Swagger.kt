@@ -7,6 +7,8 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Meta
+import org.http4k.routing.ServerRoute
+import org.http4k.routing.Tag
 import util.JsonSchema
 import util.JsonToJsonSchema
 
@@ -40,7 +42,8 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             .fold(FieldsAndDefinitions<NODE>(), {
                 memo, (path, routes) ->
                 val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), {
-                    memoFields, route -> memoFields.add(render(contractRoot, security, route))
+                    memoFields, route ->
+                    memoFields.add(render(contractRoot, security, route))
                 })
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
             })
@@ -57,31 +60,31 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun renderTags(routes: List<ServerRoute>) = routes.flatMap(ServerRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
-        val (responses, responseDefinitions) = render(route.core.responses.values.toList())
+        val (responses, responseDefinitions) = render(route.desc.core.responses.values.toList())
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.core.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.desc.core.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
-        val routeTags = if(route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
+        val routeTags = if (route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
         val pathJson = json.obj(
             "tags" to json.array(routeTags),
-            "summary" to json.string(route.core.summary),
-            "description" to (route.core.description?.let(json::string) ?: json.nullNode()),
-            "produces" to json.array(route.core.produces.map { json.string(it.value) }),
-            "consumes" to json.array(route.core.consumes.map { json.string(it.value) }),
+            "summary" to json.string(route.desc.core.summary),
+            "description" to (route.desc.core.description?.let(json::string) ?: json.nullNode()),
+            "produces" to json.array(route.desc.core.produces.map { json.string(it.value) }),
+            "consumes" to json.array(route.desc.core.consumes.map { json.string(it.value) }),
             "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes)),
             "responses" to json.obj(responses),
-            "supportedContentTypes" to json.array(route.core.produces.map { json.string(it.value) }),
+            "supportedContentTypes" to json.array(route.desc.core.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {
                 is ApiKey<*> -> listOf(json.obj("api_key" to json.array(emptyList())))
                 else -> emptyList<NODE>()
             })
         )
 
-        val definitions = route.core.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
+        val definitions = route.desc.core.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
 
         return FieldAndDefinitions(route.method.toString().toLowerCase() to pathJson, definitions)
     }
