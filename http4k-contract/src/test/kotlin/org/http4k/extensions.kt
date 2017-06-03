@@ -13,21 +13,24 @@ import org.http4k.core.Method
 import org.http4k.lens.PathLens
 import org.http4k.contract.ContractRoutingHttpHandler.Companion.Handler as ContractHandler
 
-infix fun String.by(router: Contract): Contract = router.withBasePath(this)
+// TO GO!
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
 interface ContractBuilder {
-    operator fun invoke(vararg sbbs: ServerRoute2): Contract
+    operator fun invoke(vararg serverRoutes: ServerRoute2): Contract
 }
 
 fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity) =
     object : ContractBuilder {
-        override fun invoke(vararg sbbs: ServerRoute2): Contract = Contract(Handler(
-            renderer, security, descriptionPath, "", sbbs.map { it }, Filter { { req -> it(req) } }
+        override fun invoke(vararg serverRoutes: ServerRoute2): Contract = Contract(Handler(
+            renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }
         ))
     }
 
 operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it } / next
+
+
+infix fun String.by(router: Contract): Contract = router.withBasePath(this)
 
 infix fun Pair<Method, String>.bindTo(fn: HttpHandler): ServerRoute2 = ServerRoute2(first, PathDef0 { it / second }, { fn })
 
