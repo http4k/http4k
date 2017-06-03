@@ -1,7 +1,9 @@
-package org.http4k.contract
+package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.ApiKey
+import org.http4k.contract.SimpleJson
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -14,10 +16,6 @@ import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.lens.Header
 import org.http4k.lens.Query
-import org.http4k.routing.bindTo
-import org.http4k.routing.by
-import org.http4k.routing.contract
-import org.http4k.routing.routes
 import org.junit.Test
 
 class ContractRoutingHttpHandlerTest {

@@ -1,10 +1,11 @@
-package org.http4k.contract
+package org.http4k.routing
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
+import org.http4k.contract.Root
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.GET
@@ -19,10 +20,6 @@ import org.http4k.lens.Query
 import org.http4k.lens.lensFailureWith
 import org.http4k.lens.missing
 import org.http4k.lens.string
-import org.http4k.routing.Desc
-import org.http4k.routing.ServerRoute
-import org.http4k.routing.bindTo
-import org.http4k.routing.div
 import org.junit.Test
 
 class ServerRouteTest {

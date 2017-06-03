@@ -1,9 +1,11 @@
 package org.http4k.routing
 
 
+import org.http4k.contract.BasePath
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.NoRenderer
 import org.http4k.contract.NoSecurity
+import org.http4k.contract.Root
 import org.http4k.contract.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -28,8 +30,8 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
-infix fun Pair<Method, String>.bindTo(handler: HttpHandler): ServerRoute =
-    ServerRoute(first, PathDef0 { it / second.trimStart('/') }, { handler })
+infix fun Pair<Method, String>.bindTo(handler: HttpHandler) =
+    ServerRoute(first, PathDef0 { if(BasePath(second) == Root) it else it /second  }, { handler })
 
 @JvmName("bindPathDef0")
 infix fun Pair<Method, PathDef0>.bindTo(handler: HttpHandler) = ServerRoute(first, second, { handler })
