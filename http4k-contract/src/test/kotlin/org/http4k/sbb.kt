@@ -3,7 +3,6 @@ package org.http4k
 import org.http4k.contract.BasePath
 import org.http4k.contract.basePath
 import org.http4k.contract.without
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -17,20 +16,15 @@ abstract class SBB(val method: Method, val pathDef: PathDef, val desc: Desc) {
     abstract fun toServerRoute(): ServerRoute2
 
     internal fun toRouter(contractRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
-        override fun match(request: Request): HttpHandler? = matches(contractRoot, request, desc.core.validationFilter, pathDef.pathLenses.toList(), toHandler)
+        override fun match(request: Request): HttpHandler? =
+            if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
+                try {
+                    request.without(pathDef.pathFn(contractRoot)).extract(pathDef.pathLenses.toList())?.let { desc.core.validationFilter.then(toHandler(it)) }
+                } catch (e: LensFailure) {
+                    null
+                }
+            } else null
     }
-
-    internal fun matches(contractRoot: BasePath, request: Request,
-                         validationFilter: Filter,
-                         lenses: List<PathLens<*>>,
-                         toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
-        if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
-            try {
-                request.without(pathDef.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
-            } catch (e: LensFailure) {
-                null
-            }
-        } else null
 }
 
 class SBB0(method: Method, private val pd: PathDef0, private val fn: HttpHandler, desc: Desc = Desc()) : SBB(method, pd, desc) {
