@@ -54,7 +54,6 @@ abstract class PathBinder internal constructor(internal val core: Core, internal
                     }
                 } else null
         }
-
     }
 }
 
