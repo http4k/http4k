@@ -28,7 +28,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
                                     private val security: Security,
                                     private val descriptionPath: String,
                                     private val rootAsString: String = "",
-                                    private val routes: List<org.http4k.routing.ServerRoute> = emptyList(),
+                                    private val routes: List<ServerRoute> = emptyList(),
                                     private val filter: Filter = ServerFilters.CatchLensFailure
         ) : RoutingHttpHandler {
             private val contractRoot = BasePath(rootAsString)
@@ -54,7 +54,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
                     })
                 } else null
 
-            private fun identify(route: org.http4k.routing.ServerRoute): Filter =
+            private fun identify(route: ServerRoute): Filter =
                 route.describeFor(contractRoot).let { routeIdentity ->
                     Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
                 }
