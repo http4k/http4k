@@ -76,11 +76,15 @@ abstract class SBB(val core: Core, val desc: Desc) {
     abstract fun toServerRoute(): ServerRoute2
 
     internal fun toRouter(contractRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
-        override fun match(request: Request): HttpHandler? = TODO()
+        override fun match(request: Request): HttpHandler? = core.matches(contractRoot, request, core.pb.pathLenses.toList(), toHandler)
     }
 
     companion object {
-        data class Core(val method: Method, val pb: PB)
+        data class Core(val method: Method, val pb: PB) {
+            internal fun matches(contractRoot: BasePath, request: Request, toList: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? {
+                TODO("not implemented")
+            }
+        }
     }
 }
 
