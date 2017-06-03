@@ -7,7 +7,9 @@ import org.http4k.contract.ContractRoutingHttpHandler
 import org.http4k.contract.NoRenderer
 import org.http4k.contract.NoSecurity
 import org.http4k.contract.Security
+import org.http4k.contract.basePath
 import org.http4k.contract.isIn
+import org.http4k.contract.without
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -18,6 +20,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
+import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
@@ -76,14 +79,22 @@ abstract class SBB(val core: Core, val desc: Desc) {
     abstract fun toServerRoute(): ServerRoute2
 
     internal fun toRouter(contractRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
-        override fun match(request: Request): HttpHandler? = core.matches(contractRoot, request, core.pb.pathLenses.toList(), toHandler)
+        override fun match(request: Request): HttpHandler? = core.matches(contractRoot, request, desc.core.validationFilter, core.pb.pathLenses.toList(), toHandler)
     }
 
     companion object {
         data class Core(val method: Method, val pb: PB) {
-            internal fun matches(contractRoot: BasePath, request: Request, toList: List<PathLens<*>>, toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? {
-                TODO("not implemented")
-            }
+            internal fun matches(contractRoot: BasePath, request: Request,
+                                 validationFilter: Filter,
+                                 lenses: List<PathLens<*>>,
+                                 toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
+                if (request.method == method && request.basePath().startsWith(pb.core.pathFn(contractRoot))) {
+                    try {
+                        request.without(pb.core.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
+                    } catch (e: LensFailure) {
+                        null
+                    }
+                } else null
         }
     }
 }
@@ -152,15 +163,10 @@ class Another internal constructor(val httpHandler: Another.Companion.Handler) :
                     })
                 } else null
 
-            private fun identify(route: ServerRoute2): Filter {
-                val routeIdentity = route.describeFor(contractRoot)
-                return Filter {
-                    { req ->
-                        it(req.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity))
-                    }
+            private fun identify(route: ServerRoute2): Filter =
+                route.describeFor(contractRoot).let { routeIdentity ->
+                    Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
                 }
-            }
-
         }
     }
 
