@@ -10,6 +10,7 @@ import org.http4k.contract.Security
 import org.http4k.contract.basePath
 import org.http4k.contract.isIn
 import org.http4k.contract.without
+import org.http4k.core.ContentType
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -46,6 +47,15 @@ fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", 
     }
 
 class ServerRoute2 internal constructor(private val sbb: SBB, private val toHandler: (ExtractedParts) -> HttpHandler) {
+
+    internal val core = sbb.desc.core
+    internal val method = sbb.core.method
+    internal val nonBodyParams = core.requestParams.plus(sbb.core.pb.pathLenses).flatMap { it }
+
+    internal val jsonRequest: Request? = core.request?.let { if (Header.Common.CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) it else null }
+
+    internal val tags = core.tags.toSet().sortedBy { it.name }
+
     internal fun router(contractRoot: BasePath): Router = sbb.toRouter(contractRoot, toHandler)
 
     internal fun describeFor(contractRoot: BasePath): String = sbb.core.pb.describe(contractRoot)
