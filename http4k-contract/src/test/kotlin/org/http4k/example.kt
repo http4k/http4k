@@ -17,11 +17,11 @@ fun main(args: Array<String>) {
 
     val app = routes(
         "/contract" by cont(NoRenderer)(
-            GET to "/" bindTo { request: Request -> Response(OK) } describedBy Desc(),
             GET to "value" / Path.int().of("world") bindTo ::bob describedBy Desc(),
-            GET to "value2" / Path.int().of("world") bindTo ::bob
+            GET to "value2" / Path.int().of("world") bindTo ::bob,
+            GET to "/" bindTo { _: Request -> Response(OK) } describedBy Desc()
         )
     )
 
-    app(Request(GET, "/contract/value2/bob/bob2"))
+    println(app(Request(GET, "/contract/value2/bob2")))
 }

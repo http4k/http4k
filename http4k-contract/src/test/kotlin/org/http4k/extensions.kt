@@ -47,18 +47,15 @@ fun cont(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", 
     }
 
 class ServerRoute2 internal constructor(private val sbb: SBB, private val toHandler: (ExtractedParts) -> HttpHandler) {
+    internal val nonBodyParams = sbb.desc.core.requestParams.plus(sbb.pb.pathLenses).flatMap { it }
 
-    internal val core = sbb.desc.core
-    internal val method = sbb.core.method
-    internal val nonBodyParams = core.requestParams.plus(sbb.core.pb.pathLenses).flatMap { it }
+    internal val jsonRequest: Request? = sbb.desc.core.request?.let { if (Header.Common.CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) it else null }
 
-    internal val jsonRequest: Request? = core.request?.let { if (Header.Common.CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) it else null }
-
-    internal val tags = core.tags.toSet().sortedBy { it.name }
+    internal val tags = sbb.desc.core.tags.toSet().sortedBy { it.name }
 
     internal fun router(contractRoot: BasePath): Router = sbb.toRouter(contractRoot, toHandler)
 
-    internal fun describeFor(contractRoot: BasePath): String = sbb.core.pb.describe(contractRoot)
+    internal fun describeFor(contractRoot: BasePath): String = sbb.pb.describe(contractRoot)
 }
 
 abstract class PB internal constructor(val pathFn: (BasePath) -> BasePath, vararg val pathLenses: PathLens<*>) {
@@ -84,48 +81,44 @@ class PB1<out A> internal constructor(pathFn: (BasePath) -> BasePath, val a: Pat
 
 operator fun <A> String.div(next: PathLens<A>): PB1<A> = PB0 { it } / next
 
-abstract class SBB(val core: Core, val desc: Desc) {
+abstract class SBB(val method: Method, val pb: PB, val desc: Desc) {
     abstract infix fun describedBy(new: Desc): SBB
     abstract fun toServerRoute(): ServerRoute2
 
     internal fun toRouter(contractRoot: BasePath, toHandler: (ExtractedParts) -> HttpHandler): Router = object : Router {
-        override fun match(request: Request): HttpHandler? = core.matches(contractRoot, request, desc.core.validationFilter, core.pb.pathLenses.toList(), toHandler)
+        override fun match(request: Request): HttpHandler? = matches(contractRoot, request, desc.core.validationFilter, pb.pathLenses.toList(), toHandler)
     }
 
-    companion object {
-        data class Core(val method: Method, val pb: PB) {
-            internal fun matches(contractRoot: BasePath, request: Request,
-                                 validationFilter: Filter,
-                                 lenses: List<PathLens<*>>,
-                                 toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
-                if (request.method == method && request.basePath().startsWith(pb.pathFn(contractRoot))) {
-                    try {
-                        request.without(pb.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
-                    } catch (e: LensFailure) {
-                        null
-                    }
-                } else null
-        }
-    }
+    internal fun matches(contractRoot: BasePath, request: Request,
+                         validationFilter: Filter,
+                         lenses: List<PathLens<*>>,
+                         toHandler: (ExtractedParts) -> HttpHandler): HttpHandler? =
+        if (request.method == method && request.basePath().startsWith(pb.pathFn(contractRoot))) {
+            try {
+                request.without(pb.pathFn(contractRoot)).extract(lenses)?.let { validationFilter.then(toHandler(it)) }
+            } catch (e: LensFailure) {
+                null
+            }
+        } else null
 }
 
-class SBB0(core: Core, desc: Desc, private val fn: HttpHandler) : SBB(core, desc) {
-    override infix fun describedBy(new: Desc): SBB = SBB0(core, desc, fn)
-    override fun toServerRoute(): ServerRoute2 = TODO()
+class SBB0(method: Method, pb: PB, desc: Desc, private val fn: HttpHandler) : SBB(method, pb, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB0(method, pb, desc, fn)
+    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { fn })
 }
 
-class SBB1<A>(core: Core, desc: Desc, private val fn: (A) -> HttpHandler) : SBB(core, desc) {
-    override infix fun describedBy(new: Desc): SBB = SBB1(core, desc, fn)
-    override fun toServerRoute(): ServerRoute2 = TODO()
+class SBB1<A>(method: Method, pb: PB, desc: Desc, private val fn: (A) -> HttpHandler, private val psA: PathLens<A>) : SBB(method, pb, desc) {
+    override infix fun describedBy(new: Desc): SBB = SBB1(method, pb, desc, fn, psA)
+    override fun toServerRoute(): ServerRoute2 = ServerRoute2(this, { parts -> fn(parts[psA]) })
 }
 
-infix fun Pair<Method, String>.bindTo(fn: HttpHandler): SBB = SBB0(SBB.Companion.Core(first, PB0 { it / second }), Desc(), fn)
+infix fun Pair<Method, String>.bindTo(fn: HttpHandler): SBB = SBB0(first, PB0 { it / second }, Desc(), fn)
 
 @JvmName("bind0")
-infix fun Pair<Method, PB0>.bindTo(fn: HttpHandler): SBB = SBB0(SBB.Companion.Core(first, second), Desc(), fn)
+infix fun Pair<Method, PB0>.bindTo(fn: HttpHandler): SBB = SBB0(first, second, Desc(), fn)
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, PB1<A>>.bindTo(fn: (A) -> HttpHandler): SBB = SBB1(SBB.Companion.Core(first, second), Desc(), fn)
+infix fun <A> Pair<Method, PB1<A>>.bindTo(fn: (A) -> HttpHandler): SBB = SBB1(first, second, Desc(), fn, second.a)
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     @Suppress("UNCHECKED_CAST")
