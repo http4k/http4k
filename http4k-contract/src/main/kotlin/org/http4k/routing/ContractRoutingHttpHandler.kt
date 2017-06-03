@@ -15,13 +15,13 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
 
-class Contract internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
+class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     override fun invoke(request: Request): Response = httpHandler(request)
 
-    override fun withBasePath(new: String): Contract = Contract(httpHandler.withBasePath(new))
-    override fun withFilter(new: Filter): RoutingHttpHandler = Contract(httpHandler.withFilter(new))
+    override fun withBasePath(new: String): ContractRoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withBasePath(new))
+    override fun withFilter(new: Filter): RoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withFilter(new))
 
     companion object {
         internal data class Handler(private val renderer: ContractRenderer,
