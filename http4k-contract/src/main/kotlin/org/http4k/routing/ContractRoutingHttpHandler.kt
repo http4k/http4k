@@ -9,10 +9,10 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Header
 
 class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
@@ -29,20 +29,20 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
                                     private val descriptionPath: String,
                                     private val rootAsString: String = "",
                                     private val routes: List<ServerRoute> = emptyList(),
-                                    private val filter: Filter = ServerFilters.CatchLensFailure
+                                    private val filter: Filter = Filter { next -> { next(it) } }
         ) : RoutingHttpHandler {
             private val contractRoot = BasePath(rootAsString)
             override fun withFilter(new: Filter) = copy(filter = filter.then(new))
             override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(Status.NOT_FOUND.description("Route not found")) }
+            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
             override fun invoke(request: Request): Response = handler(request)
 
             private val descriptionRoute = GET to PathDef0 { BasePath("$it$descriptionPath") } bind { renderer.description(contractRoot, security, routes) }
 
             private val routers = routes
-                .map { it.toRouter(contractRoot) to security.filter.then(identify(it)).then(filter) }
+                .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
                 .plus(descriptionRoute.toRouter(contractRoot) to identify(descriptionRoute).then(filter))
 
             private val noMatch: HttpHandler? = null
