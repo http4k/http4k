@@ -6,9 +6,10 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.routing.RoutingHttpHandler
 
@@ -17,22 +18,27 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: ContractR
 
     override fun invoke(request: Request): Response = httpHandler(request)
 
-    override fun withBasePath(basePath: String): ContractRoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.copy(rootAsString = basePath + httpHandler.rootAsString))
-    override fun withFilter(filter: Filter): RoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+    override fun withBasePath(new: String): ContractRoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withBasePath(new))
+    override fun withFilter(new: Filter): RoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withFilter(new))
     fun withRoute(new: ServerRoute) = withRoutes(new)
     fun withRoutes(vararg new: ServerRoute) = withRoutes(new.toList())
-    fun withRoutes(new: Iterable<ServerRoute>) = ContractRoutingHttpHandler(httpHandler.copy(routes = httpHandler.routes + new))
+    fun withRoutes(new: Iterable<ServerRoute>) = ContractRoutingHttpHandler(httpHandler.withRoutes(new))
 
     companion object {
-        internal data class Handler(internal val rootAsString: String,
-                                    private val renderer: ContractRenderer,
-                                    internal val filter: Filter,
-                                    private val security: Security = NoSecurity,
-                                    private val descriptionPath: String = "",
-                                    internal val routes: List<ServerRoute>) : HttpHandler {
+        internal data class Handler(private val renderer: ContractRenderer,
+                                    private val security: Security,
+                                    private val descriptionPath: String,
+                                    private val rootAsString: String = "",
+                                    private val routes: List<ServerRoute> = emptyList(),
+                                    private val filter: Filter = ServerFilters.CatchLensFailure
+                                    ) : HttpHandler {
             private val contractRoot = BasePath(rootAsString)
 
-            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(Status.NOT_FOUND.description("Route not found")) }
+            internal fun withRoutes(new: Iterable<ServerRoute>) = copy(routes = routes + new)
+            internal fun withFilter(new: Filter) = copy(filter = filter.then(new))
+            internal fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
+
+            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
             override fun invoke(request: Request): Response = handler(request)
 

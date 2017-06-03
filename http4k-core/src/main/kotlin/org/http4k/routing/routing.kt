@@ -19,8 +19,8 @@ interface Router {
 }
 
 interface RoutingHttpHandler : Router, HttpHandler {
-    fun withFilter(filter: Filter): RoutingHttpHandler
-    fun withBasePath(basePath: String): RoutingHttpHandler
+    fun withFilter(new: Filter): RoutingHttpHandler
+    fun withBasePath(new: String): RoutingHttpHandler
 }
 
 fun routes(vararg routes: Route): RoutingHttpHandler = GroupRoutingHttpHandler(Handler(null, routes.asList()))

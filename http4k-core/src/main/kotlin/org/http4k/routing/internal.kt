@@ -17,9 +17,9 @@ import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
 class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
-    override fun withFilter(filter: Filter): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+    override fun withFilter(new: Filter): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(new)))
 
-    override fun withBasePath(basePath: String): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(basePath = basePath + httpHandler.basePath))
+    override fun withBasePath(new: String): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(basePath = new + httpHandler.basePath))
 
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
@@ -67,11 +67,11 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
 }
 
 internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
-    override fun withFilter(filter: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(filter)))
+    override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(new)))
 
-    override fun withBasePath(basePath: String): RoutingHttpHandler = GroupRoutingHttpHandler(
-        httpHandler.copy(basePath = UriTemplate.from(basePath + httpHandler.basePath?.toString().orEmpty()),
-            routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$basePath/${it.template}")) }
+    override fun withBasePath(new: String): RoutingHttpHandler = GroupRoutingHttpHandler(
+        httpHandler.copy(basePath = UriTemplate.from(new + httpHandler.basePath?.toString().orEmpty()),
+            routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$new/${it.template}")) }
         )
     )
 
