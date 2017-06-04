@@ -13,34 +13,38 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 
 class ServerRoute internal constructor(val method: Method,
-                                       val pathDef: PathDef,
+                                       val routeSpec: RouteSpec,
                                        private val toHandler: (ExtractedParts) -> HttpHandler,
                                        val meta: RouteMeta = RouteMeta()) {
 
-    infix fun with(new: RouteMeta) = ServerRoute(method, pathDef, toHandler, new)
+    infix fun with(new: RouteMeta) = ServerRoute(method, routeSpec, toHandler, new)
 
-    internal val nonBodyParams = pathDef.requestParams.plus(pathDef.pathLenses).flatMap { it }
+    internal val nonBodyParams = routeSpec.requestParams.plus(routeSpec.pathLenses).flatMap { it }
 
     internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
     internal val tags = meta.tags.toSet().sortedBy { it.name }
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
-        override fun match(request: Request): HttpHandler? =
-            if (request.method == method && request.basePath().startsWith(pathDef.pathFn(contractRoot))) {
+        override fun match(request: Request): HttpHandler? {
+            val startsWith = request.basePath().startsWith(routeSpec.pathFn(contractRoot))
+//            println(request.basePath())
+//            println(" @ " + routeSpec.pathFn(contractRoot))
+            return if (request.method == method && startsWith) {
                 try {
-                    request.without(pathDef.pathFn(contractRoot))
-                        .extract(pathDef.pathLenses.toList())
+                    request.without(routeSpec.pathFn(contractRoot))
+                        .extract(routeSpec.pathLenses.toList())
                         ?.let {
-                            pathDef.then(toHandler(it))
+                            routeSpec.then(toHandler(it))
                         }
                 } catch (e: LensFailure) {
                     null
                 }
             } else null
+        }
     }
 
-    internal fun describeFor(contractRoot: BasePath): String = pathDef.describe(contractRoot)
+    internal fun describeFor(contractRoot: BasePath): String = routeSpec.describe(contractRoot)
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {

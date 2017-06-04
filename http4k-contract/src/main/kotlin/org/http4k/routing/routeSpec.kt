@@ -1,41 +1,89 @@
 package org.http4k.routing
 
-import org.http4k.core.ContentType
-import org.http4k.core.Method.GET
+import org.http4k.contract.BasePath
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.with
-import org.http4k.lens.BiDiBodyLens
-import org.http4k.lens.Header
+import org.http4k.lens.BodyLens
+import org.http4k.lens.Failure
+import org.http4k.lens.Lens
+import org.http4k.lens.LensFailure
+import org.http4k.lens.Path
+import org.http4k.lens.PathLens
 
-data class Tag(val name: String, val description: String? = null)
+abstract class RouteSpec internal constructor(val pathFn: (BasePath) -> BasePath,
+                                              val requestParams: List<Lens<Request, *>>,
+                                              val body: BodyLens<*>?,
+                                              vararg val pathLenses: PathLens<*>) : Filter {
 
-data class RouteMeta private constructor(val summary: String,
-                                         val description: String?,
-                                         val request: Request? = null,
-                                         val tags: Set<Tag> = emptySet(),
-                                         val produces: Set<ContentType> = emptySet(),
-                                         val consumes: Set<ContentType> = emptySet(),
-                                         val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
+    abstract infix operator fun plus(new: Lens<Request, *>): RouteSpec
+    abstract infix operator fun plus(new: BodyLens<*>): RouteSpec
 
-    constructor(name: String = "<unknown>", description: String? = null) : this(name, description, null)
+    abstract infix operator fun <T> div(next: PathLens<T>): RouteSpec
 
-    fun taggedWith(tag: String) = taggedWith(Tag(tag))
-    fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
+    open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) =
-        copy(
-            produces = produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
-            responses = responses.plus(new.second.status to new))
+    override fun invoke(nextHandler: HttpHandler): HttpHandler =
+        { req ->
+            val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+            val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
+                try {
+                    next(req)
+                    memo
+                } catch (e: LensFailure) {
+                    memo.plus(e.failures)
+                }
+            }
+            if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
+        }
 
-    @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
-
-    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
-
-    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
-    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
-
+    internal fun describe(contractRoot: BasePath): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 }
+
+class RouteSpec0 internal constructor(pathFn: (BasePath) -> BasePath, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?) : RouteSpec(pathFn, requestParams, body) {
+    override infix fun plus(new: Lens<Request, *>) = RouteSpec0(pathFn, requestParams.plus(listOf(new)), body)
+    override infix fun plus(new: BodyLens<*>) = RouteSpec0(pathFn, requestParams, new)
+
+    override infix operator fun div(next: String) = RouteSpec0({ it / next }, emptyList(), body)
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = RouteSpec1(pathFn, requestParams, body, next)
+}
+
+class RouteSpec1<out A> internal constructor(pathFn: (BasePath) -> BasePath, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, val a: PathLens<A>) : RouteSpec(pathFn, requestParams, body, a) {
+    override infix fun plus(new: Lens<Request, *>) = RouteSpec1(pathFn, requestParams.plus(listOf(new)), body, a)
+    override infix fun plus(new: BodyLens<*>) = RouteSpec1(pathFn, requestParams, new, a)
+
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = RouteSpec2(pathFn, requestParams, body, a, next)
+}
+
+class RouteSpec2<out A, out B> internal constructor(pathFn: (BasePath) -> BasePath, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, val a: PathLens<A>, val b: PathLens<B>) : RouteSpec(pathFn, requestParams, body, a, b) {
+    override infix fun plus(new: Lens<Request, *>) = RouteSpec2(pathFn, requestParams.plus(listOf(new)), body, a, b)
+    override infix fun plus(new: BodyLens<*>) = RouteSpec2(pathFn, requestParams, new, a, b)
+
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = RouteSpec3(pathFn, requestParams, body, a, b, next)
+}
+
+class RouteSpec3<out A, out B, out C> internal constructor(pathFn: (BasePath) -> BasePath, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?,
+                                                           val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : RouteSpec(pathFn, requestParams, body, a, b, c) {
+    override infix fun plus(new: Lens<Request, *>) = RouteSpec3(pathFn, requestParams.plus(listOf(new)), body, a, b, c)
+    override infix fun plus(new: BodyLens<*>) = RouteSpec3(pathFn, requestParams, new, a, b, c)
+
+    override infix operator fun div(next: String) = div(Path.fixed(next))
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = RouteSpec4(pathFn, requestParams, body, a, b, c, next)
+}
+
+class RouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (BasePath) -> BasePath, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?,
+                                                                  val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>) : RouteSpec(pathFn, requestParams, body, a, b, c, d) {
+    override infix fun plus(new: Lens<Request, *>) = RouteSpec4(pathFn, requestParams.plus(listOf(new)), body, a, b, c, d)
+    override infix fun plus(new: BodyLens<*>) = RouteSpec4(pathFn, requestParams, new, a, b, c, d)
+
+    override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
+
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")
+}
+

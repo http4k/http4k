@@ -64,12 +64,12 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.pathDef.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.routeSpec.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
-        val consumes = route.meta.consumes.plus(route.pathDef.body?.let { listOf(it.contentType) } ?: emptyList())
+        val consumes = route.meta.consumes.plus(route.routeSpec.body?.let { listOf(it.contentType) } ?: emptyList())
 
         val pathJson = json.obj(
             "tags" to json.array(routeTags),
