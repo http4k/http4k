@@ -15,7 +15,7 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
     override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
 
     private fun render(basePath: BasePath, route: ServerRoute) =
-        route.method.toString() + ":" + route.describeFor(basePath) to json.string(route.desc.summary)
+        route.method.toString() + ":" + route.describeFor(basePath) to json.string(route.routeSpec.summary)
 
     override fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>): Response {
         return Response(OK)

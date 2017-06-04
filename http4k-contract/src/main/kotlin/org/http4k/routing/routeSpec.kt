@@ -19,22 +19,22 @@ import org.http4k.lens.QueryLens
 
 data class Tag(val name: String, val description: String? = null)
 
-data class Desc private constructor(val summary: String,
-                                    val description: String?,
-                                    val body: BodyLens<*>?,
-                                    val request: Request? = null,
-                                    val tags: Set<Tag> = emptySet(),
-                                    val produces: Set<ContentType> = emptySet(),
-                                    val consumes: Set<ContentType> = emptySet(),
-                                    val requestParams: List<Lens<Request, *>> = emptyList(),
-                                    val responses: Map<Status, Pair<String, Response>> = emptyMap()) : Filter {
+data class RouteSpec private constructor(val summary: String,
+                                         val description: String?,
+                                         val body: BodyLens<*>?,
+                                         val request: Request? = null,
+                                         val tags: Set<Tag> = emptySet(),
+                                         val produces: Set<ContentType> = emptySet(),
+                                         val consumes: Set<ContentType> = emptySet(),
+                                         val requestParams: List<Lens<Request, *>> = emptyList(),
+                                         val responses: Map<Status, Pair<String, Response>> = emptyMap()) : Filter {
 
     constructor(name: String = "<unknown>", description: String? = null) : this(name, description, null)
 
     fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(listOf(new)))
     fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(listOf(new)))
     fun body(new: BodyLens<*>) = copy(body = new, consumes = consumes.plus(new.contentType))
-    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): Desc = copy(request = Request(GET, "").with(new.first of new.second)).body(new.first)
+    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): RouteSpec = copy(request = Request(GET, "").with(new.first of new.second)).body(new.first)
 
     fun taggedWith(tag: String) = taggedWith(Tag(tag))
     fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))

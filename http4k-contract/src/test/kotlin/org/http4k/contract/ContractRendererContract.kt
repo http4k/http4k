@@ -30,7 +30,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
-import org.http4k.routing.Desc
+import org.http4k.routing.RouteSpec
 import org.http4k.routing.Tag
 import org.http4k.routing.bind
 import org.http4k.routing.by
@@ -62,8 +62,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
         val customBody = Body.json("the body of the message").toLens()
 
         val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }))(
-            GET to "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } } describedBy
-                Desc("summary of this route", "some rambling description of what this thing actually does")
+            GET to "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } } with
+                RouteSpec("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
                     .header(Header.optional("header", "description of the header"))
                     .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
@@ -72,8 +72,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .taggedWith("tag3")
                     .taggedWith("tag1"),
 
-            POST to "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } } describedBy
-                Desc("a post endpoint")
+            POST to "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } } with
+                RouteSpec("a post endpoint")
                     .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
                     .producing(APPLICATION_JSON)
                     .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
@@ -82,12 +82,12 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .query(Query.int().required("query"))
                     .body(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
 
-            GET to "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } } describedBy
-                Desc("a friendly endpoint")
+            GET to "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } } with
+                RouteSpec("a friendly endpoint")
                     .query(Query.boolean().required("query", "description of the query"))
                     .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()),
 
-            GET to "simples" bind { Response(OK) } describedBy Desc("a simple endpoint")
+            GET to "simples" bind { Response(OK) } with RouteSpec("a simple endpoint")
         )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())

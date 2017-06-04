@@ -29,7 +29,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
+        val route = GET to "/" bind { _: Request -> Response(OK) } with RouteSpec("").header(header).query(query).body(body)
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
@@ -39,7 +39,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
+        val route = GET to "/" bind { _: Request -> Response(OK) } with RouteSpec("").header(header).query(query).body(body)
 
         val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
         assertThat(route.toRouter(Root).match(invalidRequest), present())
