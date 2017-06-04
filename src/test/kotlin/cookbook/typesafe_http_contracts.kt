@@ -5,6 +5,7 @@ import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.Swagger
 import org.http4k.core.Body
+import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -68,18 +69,18 @@ fun main(args: Array<String>) {
         it == 42
     })
 
+    val body = Body.string(APPLICATION_XML).toLens()
     val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)(
         GET to "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add
             with RouteSpec("add", "Adds 2 numbers together").returning("The result" to OK),
-        GET to "echo" / Path.of("name") bind ::echo
-            with RouteSpec("echo").query(ageQuery)
+        GET to "echo" / Path.of("name") + ageQuery + body bind ::echo with RouteSpec("echo").query(ageQuery)
     )
 
     val handler = routes(
         "/context" by filter.then(contract),
         "/static" by NoCache().then(static(Classpath("cookbook"))),
         "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
-            GET to "echo" / Path.of("name") bind ::echo with RouteSpec("echo").query(ageQuery)
+            GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteSpec("echo").query(ageQuery)
         )
     )
 

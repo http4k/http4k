@@ -24,20 +24,20 @@ fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = 
         ))
     }
 
-operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0 { it / this } / next
+operator fun <A> String.div(next: PathLens<A>): PathDef1<A> = PathDef0({ it / this }, emptyList(), null) / next
 
-operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef1({ it }, this) / next
+operator fun <A, B> PathLens<A>.div(next: PathLens<B>): PathDef2<A, B> = PathDef1({ it }, emptyList(), null, this) / next
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
 infix fun Pair<Method, String>.bind(handler: HttpHandler) =
-    ServerRoute(first, PathDef0 { if(BasePath(second) == Root) it else it /second  }, { handler })
+    ServerRoute(first, PathDef0({ if(BasePath(second) == Root) it else it /second  }, emptyList(), null), { handler })
 
 @JvmName("bindPathDef0")
 infix fun Pair<Method, PathDef0>.bind(handler: HttpHandler) = ServerRoute(first, second, { handler })
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to PathDef1({ it }, second) bind fn
+infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to PathDef1({ it }, emptyList(), null, second) bind fn
 
 @JvmName("bind1Def")
 infix fun <A> Pair<Method, PathDef1<A>>.bind(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
