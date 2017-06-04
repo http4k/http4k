@@ -15,15 +15,15 @@ import org.http4k.lens.PathLens
 class ServerRoute internal constructor(val method: Method,
                                        val pathDef: PathDef,
                                        private val toHandler: (ExtractedParts) -> HttpHandler,
-                                       val routeSpec: RouteSpec = RouteSpec()) {
+                                       val meta: RouteMeta = RouteMeta()) {
 
-    infix fun with(new: RouteSpec) = ServerRoute(method, pathDef, toHandler, new)
+    infix fun with(new: RouteMeta) = ServerRoute(method, pathDef, toHandler, new)
 
     internal val nonBodyParams = pathDef.requestParams.plus(pathDef.pathLenses).flatMap { it }
 
-    internal val jsonRequest: Request? = routeSpec.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
+    internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
-    internal val tags = routeSpec.tags.toSet().sortedBy { it.name }
+    internal val tags = meta.tags.toSet().sortedBy { it.name }
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
         override fun match(request: Request): HttpHandler? =

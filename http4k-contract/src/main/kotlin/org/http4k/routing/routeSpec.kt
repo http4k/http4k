@@ -11,7 +11,7 @@ import org.http4k.lens.Header
 
 data class Tag(val name: String, val description: String? = null)
 
-data class RouteSpec private constructor(val summary: String,
+data class RouteMeta private constructor(val summary: String,
                                          val description: String?,
                                          val request: Request? = null,
                                          val tags: Set<Tag> = emptySet(),
@@ -20,8 +20,6 @@ data class RouteSpec private constructor(val summary: String,
                                          val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
 
     constructor(name: String = "<unknown>", description: String? = null) : this(name, description, null)
-
-    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): RouteSpec = copy(request = Request(GET, "").with(new.first of new.second))
 
     fun taggedWith(tag: String) = taggedWith(Tag(tag))
     fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
@@ -34,6 +32,8 @@ data class RouteSpec private constructor(val summary: String,
 
     @JvmName("returningStatus")
     fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
+
+    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
 
     fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
     fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))

@@ -25,7 +25,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.http4k.routing.RouteSpec
+import org.http4k.routing.RouteMeta
 import org.http4k.routing.bind
 import org.http4k.routing.by
 import org.http4k.routing.contract
@@ -70,15 +70,15 @@ fun main(args: Array<String>) {
 
     val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)(
         GET to "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add
-            with RouteSpec("add", "Adds 2 numbers together").returning("The result" to OK),
-        GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteSpec("echo")
+            with RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
+        GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteMeta("echo")
     )
 
     val handler = routes(
         "/context" by filter.then(contract),
         "/static" by NoCache().then(static(Classpath("cookbook"))),
         "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
-            GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteSpec("echo")
+            GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteMeta("echo")
         )
     )
 
