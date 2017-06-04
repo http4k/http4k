@@ -42,8 +42,9 @@ class ServerRouteTest {
         val route = GET to "/" + header + query + body bind { _: Request -> Response(OK) } with RouteMeta("")
 
         val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
-        assertThat(route.toRouter(Root).match(invalidRequest), present())
-        assertThat({ route.toRouter(Root).match(invalidRequest)?.invoke(invalidRequest) },
+        val actual = route.toRouter(Root).match(invalidRequest)
+        assertThat(actual, present())
+        assertThat({ actual?.invoke(invalidRequest) },
             throws(lensFailureWith(query.meta.missing())))
     }
 
