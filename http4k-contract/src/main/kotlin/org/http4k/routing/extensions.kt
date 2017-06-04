@@ -10,7 +10,9 @@ import org.http4k.contract.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
-import org.http4k.lens.Path
+import org.http4k.core.Request
+import org.http4k.lens.BodyLens
+import org.http4k.lens.Lens
 import org.http4k.lens.PathLens
 import org.http4k.routing.ContractRoutingHttpHandler.Companion.Handler
 
@@ -25,7 +27,9 @@ fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = 
         ))
     }
 
-fun Path.root(value: String) = RouteSpec0({ if (BasePath(value) == Root) it else it / value }, emptyList(), null)
+operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, listOf(new), null)
+
+operator infix fun String.rem(new: BodyLens<*>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, emptyList(), new)
 
 operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0({ it / this }, emptyList(), null) / next
 
