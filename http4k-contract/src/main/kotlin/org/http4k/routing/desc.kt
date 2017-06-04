@@ -19,52 +19,49 @@ import org.http4k.lens.QueryLens
 
 data class Tag(val name: String, val description: String? = null)
 
-class Desc private constructor(internal val core: Core) {
-    constructor(name: String = "<unknown>", description: String? = null) : this(Core(name, description, null))
+data class Desc private constructor(val summary: String,
+                                    val description: String?,
+                                    val body: BodyLens<*>?,
+                                    val request: Request? = null,
+                                    val tags: Set<Tag> = emptySet(),
+                                    val produces: Set<ContentType> = emptySet(),
+                                    val consumes: Set<ContentType> = emptySet(),
+                                    val requestParams: List<Lens<Request, *>> = emptyList(),
+                                    val responses: Map<Status, Pair<String, Response>> = emptyMap()) : Filter {
 
-    fun header(new: HeaderLens<*>) = Desc(core.copy(requestParams = core.requestParams.plus(listOf(new))))
-    fun query(new: QueryLens<*>) = Desc(core.copy(requestParams = core.requestParams.plus(listOf(new))))
-    fun body(new: BodyLens<*>) = Desc(core.copy(body = new, consumes = core.consumes.plus(new.contentType)))
-    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): Desc = Desc(core.copy(request = Request(GET, "").with(new.first of new.second))).body(new.first)
+    constructor(name: String = "<unknown>", description: String? = null) : this(name, description, null)
+
+    fun header(new: HeaderLens<*>) = copy(requestParams = requestParams.plus(listOf(new)))
+    fun query(new: QueryLens<*>) = copy(requestParams = requestParams.plus(listOf(new)))
+    fun body(new: BodyLens<*>) = copy(body = new, consumes = consumes.plus(new.contentType))
+    fun <T> body(new: Pair<BiDiBodyLens<T>, T>): Desc = copy(request = Request(GET, "").with(new.first of new.second)).body(new.first)
 
     fun taggedWith(tag: String) = taggedWith(Tag(tag))
-    fun taggedWith(vararg tags: Tag) = Desc(core.copy(tags = core.tags.plus(tags)))
+    fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) =
-        Desc(core.copy(
-            produces = core.produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
-            responses = core.responses.plus(new.second.status to new)))
+        copy(
+            produces = produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
+            responses = responses.plus(new.second.status to new))
 
     @JvmName("returningStatus")
     fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
 
-    fun producing(vararg new: ContentType) = Desc(core.copy(produces = core.produces.plus(new)))
-    fun consuming(vararg new: ContentType) = Desc(core.copy(consumes = core.consumes.plus(new)))
+    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
+    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
 
-    companion object {
-        internal data class Core(val summary: String,
-                                 val description: String?,
-                                 val body: BodyLens<*>?,
-                                 val request: Request? = null,
-                                 val tags: Set<Tag> = emptySet(),
-                                 val produces: Set<ContentType> = emptySet(),
-                                 val consumes: Set<ContentType> = emptySet(),
-                                 val requestParams: List<Lens<Request, *>> = emptyList(),
-                                 val responses: Map<Status, Pair<String, Response>> = emptyMap()) : Filter {
-            override fun invoke(nextHandler: HttpHandler): HttpHandler =
-                { req ->
-                    val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
-                    val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
-                        try {
-                            next(req)
-                            memo
-                        } catch (e: LensFailure) {
-                            memo.plus(e.failures)
-                        }
-                    }
-                    if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
+    override fun invoke(nextHandler: HttpHandler): HttpHandler =
+        { req ->
+            val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+            val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
+                try {
+                    next(req)
+                    memo
+                } catch (e: LensFailure) {
+                    memo.plus(e.failures)
                 }
+            }
+            if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
         }
-    }
 }

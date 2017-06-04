@@ -60,31 +60,31 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun renderTags(routes: List<ServerRoute>) = routes.flatMap(ServerRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
-        val (responses, responseDefinitions) = render(route.desc.core.responses.values.toList())
+        val (responses, responseDefinitions) = render(route.desc.responses.values.toList())
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.desc.core.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.desc.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
         val pathJson = json.obj(
             "tags" to json.array(routeTags),
-            "summary" to json.string(route.desc.core.summary),
-            "description" to (route.desc.core.description?.let(json::string) ?: json.nullNode()),
-            "produces" to json.array(route.desc.core.produces.map { json.string(it.value) }),
-            "consumes" to json.array(route.desc.core.consumes.map { json.string(it.value) }),
+            "summary" to json.string(route.desc.summary),
+            "description" to (route.desc.description?.let(json::string) ?: json.nullNode()),
+            "produces" to json.array(route.desc.produces.map { json.string(it.value) }),
+            "consumes" to json.array(route.desc.consumes.map { json.string(it.value) }),
             "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes)),
             "responses" to json.obj(responses),
-            "supportedContentTypes" to json.array(route.desc.core.produces.map { json.string(it.value) }),
+            "supportedContentTypes" to json.array(route.desc.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {
                 is ApiKey<*> -> listOf(json.obj("api_key" to json.array(emptyList())))
                 else -> emptyList<NODE>()
             })
         )
 
-        val definitions = route.desc.core.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
+        val definitions = route.desc.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
 
         return FieldAndDefinitions(route.method.toString().toLowerCase() to pathJson, definitions)
     }

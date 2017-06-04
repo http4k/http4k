@@ -19,11 +19,11 @@ class ServerRoute internal constructor(val method: Method,
 
     infix fun describedBy(new: Desc) = ServerRoute(method, pathDef, toHandler, new)
 
-    internal val nonBodyParams = desc.core.requestParams.plus(pathDef.pathLenses).flatMap { it }
+    internal val nonBodyParams = desc.requestParams.plus(pathDef.pathLenses).flatMap { it }
 
-    internal val jsonRequest: Request? = desc.core.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
+    internal val jsonRequest: Request? = desc.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
-    internal val tags = desc.core.tags.toSet().sortedBy { it.name }
+    internal val tags = desc.tags.toSet().sortedBy { it.name }
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
         override fun match(request: Request): HttpHandler? =
@@ -32,7 +32,7 @@ class ServerRoute internal constructor(val method: Method,
                     request.without(pathDef.pathFn(contractRoot))
                         .extract(pathDef.pathLenses.toList())
                         ?.let {
-                            desc.core.then(toHandler(it))
+                            desc.then(toHandler(it))
                         }
                 } catch (e: LensFailure) {
                     null
