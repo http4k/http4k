@@ -10,6 +10,7 @@ import org.http4k.contract.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 import org.http4k.routing.ContractRoutingHttpHandler.Companion.Handler
 
@@ -24,6 +25,8 @@ fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = 
         ))
     }
 
+fun Path.root(value: String) = RouteSpec0({ if (BasePath(value) == Root) it else it / value }, emptyList(), null)
+
 operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0({ it / this }, emptyList(), null) / next
 
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = RouteSpec1({ it }, emptyList(), null, this) / next
@@ -31,7 +34,7 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = Route
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
 infix fun Pair<Method, String>.bind(handler: HttpHandler) =
-    ServerRoute(first, RouteSpec0({ if(BasePath(second) == Root) it else it /second  }, emptyList(), null), { handler })
+    ServerRoute(first, RouteSpec0({ if (BasePath(second) == Root) it else it / second }, emptyList(), null), { handler })
 
 @JvmName("bindPathDef0")
 infix fun Pair<Method, RouteSpec0>.bind(handler: HttpHandler) = ServerRoute(first, second, { handler })
