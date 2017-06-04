@@ -23,9 +23,9 @@ import java.nio.ByteBuffer
 
 class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient) : HttpHandler {
 
-    override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toUtterlyIdleResponse()
+    override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toHttp4kResponse()
 
-    private fun CloseableHttpResponse.toUtterlyIdleResponse(): Response =
+    private fun CloseableHttpResponse.toHttp4kResponse(): Response =
         allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity?.toTarget() ?: Body.EMPTY)) {
             memo, (first, second) ->
             memo.header(first, second)
