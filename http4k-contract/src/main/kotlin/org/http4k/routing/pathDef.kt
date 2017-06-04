@@ -1,16 +1,20 @@
 package org.http4k.routing
 
 import org.http4k.contract.BasePath
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.lens.BodyLens
+import org.http4k.lens.Failure
 import org.http4k.lens.Lens
+import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 
 abstract class PathDef internal constructor(val pathFn: (BasePath) -> BasePath,
                                             val requestParams: List<Lens<Request, *>>,
                                             val body: BodyLens<*>?,
-                                            vararg val pathLenses: PathLens<*>) {
+                                            vararg val pathLenses: PathLens<*>) : Filter {
 
     abstract infix operator fun plus(new: Lens<Request, *>): PathDef
     abstract infix operator fun plus(new: BodyLens<*>): PathDef
@@ -18,6 +22,20 @@ abstract class PathDef internal constructor(val pathFn: (BasePath) -> BasePath,
     abstract infix operator fun <T> div(next: PathLens<T>): PathDef
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
+
+    override fun invoke(nextHandler: HttpHandler): HttpHandler =
+        { req ->
+            val body = body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+            val errors = body.plus(requestParams).fold(emptyList<Failure>()) { memo, next ->
+                try {
+                    next(req)
+                    memo
+                } catch (e: LensFailure) {
+                    memo.plus(e.failures)
+                }
+            }
+            if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
+        }
 
     internal fun describe(contractRoot: BasePath): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 }
