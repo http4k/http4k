@@ -35,7 +35,7 @@ of services without HTTP container being required.
         * Core abstraction APIs implemented by the other modules 
    * [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) HTTP client adapters for Apache and OkHttp
    * [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules) Single LOC Server spinup for Jetty, Netty and Undertow
-   * [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) Typesafe, auto-validating, self-documenting (via Swagger) HTTP services
+   * **BETA!** [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) Typesafe, auto-validating, self-documenting (via Swagger) HTTP services
    * [Templating:](https://github.com/http4k/http4k/wiki/Templating-Modules) Caching and Hot-Reload engine support for Handlebars
    * [Message formats:](https://github.com/http4k/http4k/wiki/Message-Format-Modules) HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
 
