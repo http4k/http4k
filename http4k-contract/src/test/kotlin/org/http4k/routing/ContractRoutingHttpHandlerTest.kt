@@ -15,6 +15,8 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.lens.Header
+import org.http4k.lens.Header.X_URI_TEMPLATE
+import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.junit.Test
 
@@ -47,21 +49,17 @@ class ContractRoutingHttpHandlerTest {
         assertThat(header(response), equalTo("true"))
     }
 
-//    @Test
-//    fun `identifies called route using identity header on request`() {
-//
-//        val root = ("/root" by contract(SimpleJson(Argo))(
-//            GET to Path.fixed("hello") / Path.of("world") bind {
-//                _, _ ->
-//                {
-//                    Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it))
-//                }
-//                ))
-//                root(Request(GET, "/root/hello/planet"))
-//
-//                assertThat(response.status, equalTo(OK))
-//                assertThat(X_URI_TEMPLATE(response), equalTo("/root/hello/{world}"))
-//            }
+    @Test
+    fun `identifies called route using identity header on request`() {
+        val root = routes(
+            "/root" by contract()(
+                GET to Path.fixed("hello") / Path.of("world") bind { _, _ -> { Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it)) } })
+        )
+        val response = root(Request(GET, "/root/hello/planet"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(X_URI_TEMPLATE(response), equalTo("/root/hello/{world}"))
+    }
 
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
