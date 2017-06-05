@@ -55,14 +55,14 @@ class EndpointUnitTest {
 
 fun MyMathsApp(recorderHttp: HttpHandler) =
     ServerFilters.CatchAll().then(routes(
-        GET to "/add" by myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
+        "/add" to GET by myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
     ))
 
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()
 
     private val app = routes(
-        POST to "/{answer}" by { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
+        "/{answer}" to POST by { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
     )
 
     override fun invoke(request: Request): Response = app(request)

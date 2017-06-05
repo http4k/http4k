@@ -23,36 +23,40 @@ fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverR
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ServerRoute) =
     ContractRoutingHttpHandler(Handler(renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }))
 
-operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, listOf(new), null)
+operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0(toBaseFn(this), listOf(new), null)
 
-operator infix fun String.rem(new: BodyLens<*>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, emptyList(), new)
+operator infix fun String.rem(new: BodyLens<*>) = RouteSpec0(toBaseFn(this), emptyList(), new)
 
-operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0({ it / this }, emptyList(), null) / next
+operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0(toBaseFn(this), emptyList(), null) / next
 
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = RouteSpec1({ it }, emptyList(), null, this) / next
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
-fun Pair<Method, RouteSpec>.newRequest(baseUri: Uri) = Request(first, "").uri(baseUri.path(second.describe(Root)))
+fun Pair<RouteSpec, Method>.newRequest(baseUri: Uri) = Request(second, "").uri(baseUri.path(first.describe(Root)))
 
 @JvmName("bind0String")
-infix fun Pair<Method, String>.bind(handler: HttpHandler) =
-    ServerRoute(first, RouteSpec0({ if (BasePath(second) == Root) it else it / second }, emptyList(), null), { handler })
+infix fun Pair<String, Method>.bind(handler: HttpHandler) = ServerRoute(second, RouteSpec0(toBaseFn(first), emptyList(), null), { handler })
 
 @JvmName("bind1Path")
-infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to RouteSpec1({ it }, emptyList(), null, second) bind fn
+infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = RouteSpec1({ it }, emptyList(), null, first) to second bind fn
 
 @JvmName("bind0")
-infix fun Pair<Method, RouteSpec0>.bind(handler: HttpHandler) = ServerRoute(first, second, { handler })
+infix fun Pair<RouteSpec0, Method>.bind(handler: HttpHandler) = ServerRoute(second, first, { handler })
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, RouteSpec1<A>>.bind(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
+infix fun <A> Pair<RouteSpec1<A>, Method>.bind(fn: (A) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a]) })
 
 @JvmName("bind2")
-infix fun <A, B> Pair<Method, RouteSpec2<A, B>>.bind(fn: (A, B) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b]) })
+infix fun <A, B> Pair<RouteSpec2<A, B>, Method>.bind(fn: (A, B) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b]) })
 
 @JvmName("bind3")
-infix fun <A, B, C> Pair<Method, RouteSpec3<A, B, C>>.bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c]) })
+infix fun <A, B, C> Pair<RouteSpec3<A, B, C>, Method>.bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c]) })
 
 @JvmName("bind4")
-infix fun <A, B, C, D> Pair<Method, RouteSpec4<A, B, C, D>>.bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a], it[second.b], it[second.c], it[second.d]) })
+infix fun <A, B, C, D> Pair<RouteSpec4<A, B, C, D>, Method>.bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
+
+private fun toBaseFn(path: String): (BasePath) -> BasePath = when (BasePath(path)) {
+    is Root -> { basePath: BasePath -> basePath }
+    else -> { basePath: BasePath -> basePath / path.trimStart('/') }
+}

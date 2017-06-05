@@ -30,11 +30,8 @@ class ServerRoute internal constructor(val method: Method,
     fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(routeSpec.describe(Root)))
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
-        override fun match(request: Request): HttpHandler? {
-            val startsWith = request.basePath().startsWith(routeSpec.pathFn(contractRoot))
-//            println(request.basePath())
-//            println(" @ " + routeSpec.pathFn(contractRoot))
-            return if (request.method == method && startsWith) {
+        override fun match(request: Request): HttpHandler? =
+            if (request.method == method && request.basePath().startsWith(routeSpec.pathFn(contractRoot))) {
                 try {
                     request.without(routeSpec.pathFn(contractRoot))
                         .extract(routeSpec.pathLenses.toList())
@@ -45,7 +42,6 @@ class ServerRoute internal constructor(val method: Method,
                     null
                 }
             } else null
-        }
     }
 
     internal fun describeFor(contractRoot: BasePath): String = routeSpec.describe(contractRoot)

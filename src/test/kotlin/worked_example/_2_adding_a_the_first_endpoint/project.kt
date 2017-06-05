@@ -19,8 +19,8 @@ fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
-        GET to "/ping" by { _: Request -> Response(OK) },
-        GET to "/add" by { request: Request ->
+        "/ping" to GET by { _: Request -> Response(OK) },
+        "/add" to GET by { request: Request ->
             val valuesToAdd = Query.int().multi.defaulted("value", listOf()).extract(request)
             Response(OK).body(valuesToAdd.sum().toString())
         }
