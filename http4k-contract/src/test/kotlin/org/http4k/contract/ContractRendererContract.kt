@@ -63,7 +63,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }))(
             GET to "echo" / Path.of("message")
-                + Header.optional("header", "description of the header")
+                % Header.optional("header", "description of the header")
                 bind { msg -> { Response(OK).body(msg) } } with
                 RouteMeta("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
@@ -74,7 +74,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .taggedWith("tag1"),
 
             POST to "echo" / Path.of("message")
-                + Query.int().required("query") + customBody
+                % Query.int().required("query") % customBody
                 bind { msg -> { Response(OK).body(msg) } } with
                 RouteMeta("a post endpoint")
                     .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
@@ -85,8 +85,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
 
             GET to "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
-                + Query.boolean().required("query", "description of the query")
-                + Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
+                % Query.boolean().required("query", "description of the query")
+                % Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
                 bind { a, _, _ -> { Response(OK).body(a) } } with
                 RouteMeta("a friendly endpoint"),
 

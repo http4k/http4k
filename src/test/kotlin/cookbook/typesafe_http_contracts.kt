@@ -78,7 +78,7 @@ fun main(args: Array<String>) {
         "/context" by filter.then(contract),
         "/static" by NoCache().then(static(Classpath("cookbook"))),
         "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
-            GET to "echo" / Path.of("name") + ageQuery bind ::echo with RouteMeta("echo")
+            GET to "echo" / Path.of("name") % ageQuery bind ::echo with RouteMeta("echo")
         )
     )
 

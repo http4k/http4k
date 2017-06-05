@@ -29,8 +29,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" % header.and(query).and(body) bind { _: Request -> Response(OK) } with RouteMeta("")
-        val route2 = GET to Path.of("hello") % header.and(body).and(query) bind { _ -> { _: Request -> Response(OK) }} with RouteMeta("")
+        val route = GET to "/" % header % query % body bind { _: Request -> Response(OK) } with RouteMeta("")
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
@@ -40,7 +39,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to header.and(body).and(query) bind { _: Request -> Response(OK) } with RouteMeta("")
+        val route = GET to "/" % header % query % body bind { _: Request -> Response(OK) } with RouteMeta("")
 
         val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
         val actual = route.toRouter(Root).match(invalidRequest)
@@ -116,6 +115,3 @@ class ServerRouteTest {
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid"))?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 }
-
-
-
