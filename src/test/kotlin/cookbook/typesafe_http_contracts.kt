@@ -1,19 +1,20 @@
 package cookbook
 
+import org.http4k.client.OkHttp
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
-import org.http4k.contract.Route
 import org.http4k.contract.Swagger
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.CachingFilters
+import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ReportRouteLatency
 import org.http4k.filter.ResponseFilters
@@ -23,9 +24,12 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
-import org.http4k.routing.ResourceLoader
+import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.RouteMeta
+import org.http4k.routing.bind
 import org.http4k.routing.by
 import org.http4k.routing.contract
+import org.http4k.routing.div
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.server.Jetty
@@ -59,20 +63,28 @@ fun main(args: Array<String>) {
         println(name + " took " + latency)
     })
 
-    val security = ApiKey(Query.int().required("apiKey"), { it == 42 })
+    val security = ApiKey(Query.int().required("apiKey"), {
+        println("foo" + (it == 42))
+        it == 42
+    })
 
-    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)
-        .withRoute(Route("add", "Adds 2 numbers together").returning("The result" to OK).at(GET) / "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add)
-        .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
+    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)(
+        GET to "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add
+            with RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
+        GET to "echo" / Path.of("name") % ageQuery bind ::echo with RouteMeta("echo")
+    )
 
     val handler = routes(
         "/context" by filter.then(contract),
-        "/static" by CachingFilters.Response.NoCache().then(static(ResourceLoader.Classpath("cookbook"))),
-        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))
-            .withRoute(Route("echo").query(ageQuery).at(GET) / "echo" / Path.of("name") bind ::echo)
+        "/static" by NoCache().then(static(Classpath("cookbook"))),
+        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
+            GET to "echo" / Path.of("name") % ageQuery bind ::echo with RouteMeta("echo")
+        )
     )
 
-    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000))
+    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000), false)
+
+    println(OkHttp()(Request(GET, "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42")))
 }
 
 // Adding 2 numbers:        curl -v "http://localhost:8000/context/add/123/564?apiKey=42"

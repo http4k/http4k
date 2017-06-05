@@ -29,11 +29,12 @@ data class ApiKey<T>(val param: Lens<Request, T>, val validateKey: (T) -> Boolea
     override val filter = Filter {
         next ->
         {
-            try {
-                if (validateKey(param(it))) next(it) else Response(UNAUTHORIZED)
+            val keyValid = try {
+                validateKey(param(it))
             } catch (e: LensFailure) {
-                Response(UNAUTHORIZED)
+                false
             }
+            if (keyValid) next(it) else Response(UNAUTHORIZED)
         }
     }
 }

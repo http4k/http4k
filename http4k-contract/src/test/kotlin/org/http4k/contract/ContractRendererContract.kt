@@ -30,8 +30,12 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
+import org.http4k.routing.RouteMeta
+import org.http4k.routing.Tag
+import org.http4k.routing.bind
 import org.http4k.routing.by
 import org.http4k.routing.contract
+import org.http4k.routing.div
 import org.junit.Test
 
 abstract class ContractRendererContract(private val renderer: ContractRenderer) {
@@ -57,38 +61,41 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }))
-            .withRoute(
-                Route("summary of this route", "some rambling description of what this thing actually does")
+        val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }))(
+            GET to "echo" / Path.of("message")
+                % Header.optional("header", "description of the header")
+                bind { msg -> { Response(OK).body(msg) } } with
+                RouteMeta("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
-                    .header(Header.optional("header", "description of the header"))
                     .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
                     .returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
                     .returning("no way jose" to FORBIDDEN)
                     .taggedWith("tag3")
-                    .taggedWith("tag1")
-                    .at(GET) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
-            .withRoute(
-                Route("a post endpoint")
+                    .taggedWith("tag1"),
+
+            POST to "echo" / Path.of("message")
+                % Query.int().required("query") % customBody
+                bind { msg -> { Response(OK).body(msg) } } with
+                RouteMeta("a post endpoint")
                     .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
                     .producing(APPLICATION_JSON)
                     .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
                     .taggedWith("tag1")
                     .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
-                    .query(Query.int().required("query"))
-                    .body(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
-                    .at(POST) / "echo" / Path.of("message") bind { msg -> { Response(OK).body(msg) } })
-            .withRoute(
-                Route("a friendly endpoint")
-                    .query(Query.boolean().required("query", "description of the query"))
-                    .body(Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens())
-                    .at(GET) / "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") bind { a, _, _ -> { Response(OK).body(a) } })
-            .withRoute(
-                Route("a simple endpoint")
-                    .at(GET) / "simples" bind { Response(OK) })
+                    .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
+
+            GET to "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
+                % Query.boolean().required("query", "description of the query")
+                % Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
+                bind { a, _, _ -> { Response(OK).body(a) } } with
+                RouteMeta("a friendly endpoint"),
+
+            GET to "simples" bind { Response(OK) } with RouteMeta("a simple endpoint")
+        )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
+//        println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }
