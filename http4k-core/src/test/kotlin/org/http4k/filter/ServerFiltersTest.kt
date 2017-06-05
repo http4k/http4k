@@ -91,7 +91,6 @@ class ServerFiltersTest {
         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR)}
         val response = handler(Request(OPTIONS, "/"))
         assertThat(response.status, equalTo(OK))
-        println(response)
         assertThat(response.header("access-control-allow-origin"), equalTo("foo, bar"))
         assertThat(response.header("access-control-allow-headers"), equalTo("rita, sue, bob"))
         assertThat(response.header("access-control-allow-methods"), equalTo("DELETE, POST"))
