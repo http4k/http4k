@@ -32,12 +32,13 @@ import org.http4k.lens.int
 import org.http4k.lens.webForm
 import org.http4k.routing.RouteMeta
 import org.http4k.routing.Tag
-import org.http4k.routing.bind
 import org.http4k.routing.body
 import org.http4k.routing.by
 import org.http4k.routing.contract
 import org.http4k.routing.div
+import org.http4k.routing.handler
 import org.http4k.routing.header
+import org.http4k.routing.meta
 import org.http4k.routing.query
 import org.junit.Test
 
@@ -67,34 +68,37 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
         val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }),
             "/echo" / Path.of("message")
                 header Header.optional("header", "description of the header")
-                to GET bind { msg -> { Response(OK).body(msg) } } with
-                RouteMeta("summary of this route", "some rambling description of what this thing actually does")
-                    .producing(APPLICATION_JSON)
-                    .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                    .returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                    .returning("no way jose" to FORBIDDEN)
-                    .taggedWith("tag3")
-                    .taggedWith("tag1"),
+                to GET
+                handler { msg -> { Response(OK).body(msg) } }
+                meta RouteMeta("summary of this route", "some rambling description of what this thing actually does")
+                .producing(APPLICATION_JSON)
+                .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                .returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                .returning("no way jose" to FORBIDDEN)
+                .taggedWith("tag3")
+                .taggedWith("tag1"),
 
             "/echo" / Path.of("message")
                 query Query.int().required("query")
                 body customBody
-                to POST bind { msg -> { Response(OK).body(msg) } } with
-                RouteMeta("a post endpoint")
-                    .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
-                    .producing(APPLICATION_JSON)
-                    .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
-                    .taggedWith("tag1")
-                    .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
-                    .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
+                to POST
+                handler { msg -> { Response(OK).body(msg) } }
+                meta RouteMeta("a post endpoint")
+                .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
+                .producing(APPLICATION_JSON)
+                .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
+                .taggedWith("tag1")
+                .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
+                .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
 
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
                 query Query.boolean().required("query", "description of the query")
                 body Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
-                to GET bind { a, _, _ -> { Response(OK).body(a) } } with
-                RouteMeta("a friendly endpoint"),
+                to GET
+                handler { a, _, _ -> { Response(OK).body(a) } }
+                meta RouteMeta("a friendly endpoint"),
 
-            "/simples" to GET bind { Response(OK) } with RouteMeta("a simple endpoint")
+            "/simples" to GET handler { Response(OK) } meta RouteMeta("a simple endpoint")
         )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())

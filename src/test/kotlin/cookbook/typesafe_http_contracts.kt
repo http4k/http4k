@@ -26,10 +26,11 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.RouteMeta
-import org.http4k.routing.bind
 import org.http4k.routing.by
 import org.http4k.routing.contract
 import org.http4k.routing.div
+import org.http4k.routing.handler
+import org.http4k.routing.meta
 import org.http4k.routing.query
 import org.http4k.routing.routes
 import org.http4k.routing.static
@@ -70,16 +71,26 @@ fun main(args: Array<String>) {
     })
 
     val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
-        "/add" / Path.int().of("value1") / Path.int().of("value2") to GET bind ::add
-            with RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
-        "/echo" / Path.of("name") query ageQuery to GET bind ::echo with RouteMeta("echo")
+        "/add" / Path.int().of("value1") / Path.int().of("value2")
+            to GET
+            handler ::add
+            meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
+        "/echo" / Path.of("name")
+            query ageQuery
+            to GET
+            handler ::echo
+            meta RouteMeta("echo")
     )
 
     val handler = routes(
         "/context" by filter.then(contract),
         "/static" by NoCache().then(static(Classpath("cookbook"))),
         "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
-            "/echo" / Path.of("name") query ageQuery to GET bind ::echo with RouteMeta("echo")
+            "/echo" / Path.of("name")
+                query ageQuery
+                to GET
+                handler ::echo
+                meta RouteMeta("echo")
         )
     )
 

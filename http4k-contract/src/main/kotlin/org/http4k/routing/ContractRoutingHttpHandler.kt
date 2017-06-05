@@ -39,7 +39,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
 
             override fun invoke(request: Request): Response = handler(request)
 
-            private val descriptionRoute = RouteSpec0({ BasePath("$it$descriptionPath") }, emptyList(), null) to GET bind { renderer.description(contractRoot, security, routes) }
+            private val descriptionRoute = RouteSpec0({ BasePath("$it$descriptionPath") }, emptyList(), null) to GET handler { renderer.description(contractRoot, security, routes) }
 
             private val routers = routes
                 .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
