@@ -1,6 +1,5 @@
 package cookbook
 
-import org.http4k.client.OkHttp
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.Swagger
@@ -9,7 +8,6 @@ import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -95,8 +93,6 @@ fun main(args: Array<String>) {
     )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000), false)
-
-    println(OkHttp()(Request(GET, "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42")))
 }
 
 // Adding 2 numbers:        curl -v "http://localhost:8000/context/add/123/564?apiKey=42"

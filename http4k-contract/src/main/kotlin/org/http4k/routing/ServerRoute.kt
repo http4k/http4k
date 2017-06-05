@@ -46,6 +46,8 @@ class ServerRoute internal constructor(internal val method: Method,
     }
 
     internal fun describeFor(contractRoot: BasePath): String = routeSpec.describe(contractRoot)
+
+    override fun toString(): String = "${method.name}: ${routeSpec.describe(Root)}"
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {

@@ -47,6 +47,10 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
 
             private val noMatch: HttpHandler? = null
 
+            override fun toString(): String {
+                return contractRoot.toString() + "\n" + routes.map { it.toString() }.joinToString("\n")
+            }
+
             override fun match(request: Request): HttpHandler? =
                 if (request.isIn(contractRoot)) {
                     routers.fold(noMatch, { memo, (router, routeFilter) ->
