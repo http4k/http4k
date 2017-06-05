@@ -23,8 +23,16 @@ The principles of the toolkit are:
 * **Immutablility:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
-* **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
-* **Modularity:** Common behaviours are abstracted into the [`http4k-core`](https://github.com/http4k/http4k/wiki/Core-Module) module. Current add-ons cover:
+* **Dependency-lite:** The [`http4k-core`](https://github.com/http4k/http4k/wiki/Core-Module) module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
+* **Modularity:**  
+   * [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
+        * Base HTTP handler and immutable HTTP message objects, cookie handling
+        * Commonly used route Filters (caching, debugging, request tracing)
+        * Path-based routing, including nestable contexts
+        * Typesafe HTTP message construction/desconstruction using Lenses
+        * Static file-serving capability with Caching, Hot-Reload
+        * Servlet implementation to allow zero-dependency plugin to any Servlet container
+        * Core abstraction APIs implemented by the other modules 
    * [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) HTTP client adapters for Apache and OkHttp
    * [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules) Single LOC Server spinup for Jetty, Netty and Undertow
    * [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) Typesafe, auto-validating, self-documenting (via Swagger) HTTP services
