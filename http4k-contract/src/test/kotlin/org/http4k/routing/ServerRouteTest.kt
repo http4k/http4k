@@ -55,8 +55,19 @@ class ServerRouteTest {
     fun `can build a request from a route`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val route = GET to path1 / path2 bind { _, _ -> { _: Request -> Response(OK) } } with RouteMeta("")
+        val pair = GET to path1 / path2 % Query.required("")
+        pair.newRequest(Uri.of("http://rita.com"))
+        val route = pair bind { _, _ -> { _: Request -> Response(OK) } } with RouteMeta("")
         val request = route.newRequest(Uri.of("http://rita.com"))
+
+        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
+    }
+
+    @Test
+    fun `can build a request from a routespec`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val request = (GET to path1 / path2 % Query.required("")).newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
     }
@@ -115,4 +126,3 @@ class ServerRouteTest {
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid"))?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 }
-

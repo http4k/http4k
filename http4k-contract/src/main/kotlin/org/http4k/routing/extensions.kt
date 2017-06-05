@@ -11,6 +11,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Lens
 import org.http4k.lens.PathLens
@@ -36,6 +37,8 @@ operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0({ it 
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = RouteSpec1({ it }, emptyList(), null, this) / next
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
+
+fun Pair<Method, RouteSpec>.newRequest(baseUri: Uri) = Request(first, "").uri(baseUri.path(second.describe(Root)))
 
 @JvmName("bind0String")
 infix fun Pair<Method, String>.bind(handler: HttpHandler) =
