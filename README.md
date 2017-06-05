@@ -24,7 +24,7 @@ The principles of the toolkit are:
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
 * **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
-* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
+* **Modularity:** Common behaviours are abstracted into the [`http4k-core`](https://github.com/http4k/http4k/wiki/Core-Module) module. Current add-ons cover:
    * [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) HTTP client adapters for Apache and OkHttp
    * [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules) Single LOC Server spinup for Jetty, Netty and Undertow
    * [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) Typesafe, auto-validating, self-documenting (via Swagger) HTTP services
