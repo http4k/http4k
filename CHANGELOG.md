@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v1.33.0
+- Reimplementation of `http4k-contract` API to match main routing API. Contracts are now nestable.
+
 ### v1.32.2
 - Fix Filters being applied twice in `ContractRoutingHttpHandler`
 
