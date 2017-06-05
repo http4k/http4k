@@ -62,8 +62,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
         val customBody = Body.json("the body of the message").toLens()
 
         val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }),
-            GET to "echo" / Path.of("message")
-                % Header.optional("header", "description of the header")
+            "echo" / Path.of("message")
+                % Header.optional("header", "description of the header") to GET
                 bind { msg -> { Response(OK).body(msg) } } with
                 RouteMeta("summary of this route", "some rambling description of what this thing actually does")
                     .producing(APPLICATION_JSON)
@@ -73,8 +73,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .taggedWith("tag3")
                     .taggedWith("tag1"),
 
-            POST to "echo" / Path.of("message")
-                % Query.int().required("query") % customBody
+            "echo" / Path.of("message")
+                % Query.int().required("query") % customBody to POST
                 bind { msg -> { Response(OK).body(msg) } } with
                 RouteMeta("a post endpoint")
                     .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
@@ -84,13 +84,13 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
                     .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
 
-            GET to "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
+            "welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
                 % Query.boolean().required("query", "description of the query")
                 % Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
-                bind { a, _, _ -> { Response(OK).body(a) } } with
+                to GET bind { a, _, _ -> { Response(OK).body(a) } } with
                 RouteMeta("a friendly endpoint"),
 
-            GET to "simples" bind { Response(OK) } with RouteMeta("a simple endpoint")
+            "simples" to GET bind { Response(OK) } with RouteMeta("a simple endpoint")
         )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())

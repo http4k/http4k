@@ -32,7 +32,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" % header % query % body bind { _: Request -> Response(OK) } with RouteMeta("")
+        val route = "/" % header % query % body to GET bind { _: Request -> Response(OK) } with RouteMeta("")
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(header of "value", query of "value", body of "hello")), present())
     }
@@ -42,7 +42,7 @@ class ServerRouteTest {
         val header = Header.required("header")
         val query = Query.required("query")
         val body = Body.string(TEXT_PLAIN).toLens()
-        val route = GET to "/" % header % query % body bind { _: Request -> Response(OK) } with RouteMeta("")
+        val route = "/" % header % query % body to GET bind { _: Request -> Response(OK) } with RouteMeta("")
 
         val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
         val actual = route.toRouter(Root).match(invalidRequest)
@@ -55,7 +55,7 @@ class ServerRouteTest {
     fun `can build a request from a route`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val pair = GET to path1 / path2 % Query.required("")
+        val pair = path1 / path2 % Query.required("") to GET
         pair.newRequest(Uri.of("http://rita.com"))
         val route = pair bind { _, _ -> { _: Request -> Response(OK) } } with RouteMeta("")
         val request = route.newRequest(Uri.of("http://rita.com"))
@@ -67,14 +67,14 @@ class ServerRouteTest {
     fun `can build a request from a routespec`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val request = (GET to path1 / path2 % Query.required("")).newRequest(Uri.of("http://rita.com"))
+        val request = (path1 / path2 % Query.required("") to GET).newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
     }
 
     @Test
     fun `0 parts - matches route`() {
-        val route = GET to "/" bind { Response(OK) }
+        val route = "/" to GET bind { Response(OK) }
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
@@ -85,28 +85,28 @@ class ServerRouteTest {
     fun `1 part - matches route`() {
         fun matched(value: String) = { _: Request -> Response(OK).body(value) }
 
-        checkMatching(GET to Path.of("value") bind ::matched, "/value", "value")
+        checkMatching(Path.of("value") to GET bind ::matched, "/value", "value")
     }
 
     @Test
     fun `2 parts - matches route`() {
         fun matched(value1: String, value2: String) = { _: Request -> Response(OK).body(value1 + value2) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") bind ::matched, "/value1/value2", "value1value2")
+        checkMatching(Path.of("value") / Path.of("value2") to GET bind ::matched, "/value1/value2", "value1value2")
     }
 
     @Test
     fun `3 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String) = { _: Request -> Response(OK).body(value1 + value2 + value3) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") bind ::matched, "/value1/value2/value3", "value1value2value3")
+        checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") to GET bind ::matched, "/value1/value2/value3", "value1value2value3")
     }
 
     @Test
     fun `4 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String) = { _: Request -> Response(OK).body(value1 + value2 + value3 + value4) }
 
-        checkMatching(GET to Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bind ::matched, "/value1/value2/value3/value4", "value1value2value3value4")
+        checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") to GET bind ::matched, "/value1/value2/value3/value4", "value1value2value3value4")
     }
 
     @Test(expected = UnsupportedOperationException::class)
