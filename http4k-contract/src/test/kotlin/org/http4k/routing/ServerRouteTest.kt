@@ -56,11 +56,20 @@ class ServerRouteTest {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
         val pair = path1 / path2 query Query.required("") to GET
-        pair.newRequest(Uri.of("http://rita.com"))
         val route = pair handler { _, _ -> { _: Request -> Response(OK) } } meta RouteMeta("")
         val request = route.newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
+    }
+
+    @Test
+    fun `can build a request from a string`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val pair = "/bob" to GET
+        val request = pair.newRequest(Uri.of("http://rita.com"))
+
+        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/bob"))
     }
 
     @Test

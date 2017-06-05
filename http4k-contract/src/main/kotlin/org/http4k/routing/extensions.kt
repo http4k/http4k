@@ -30,7 +30,11 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = Route
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
-fun Pair<RouteSpec, Method>.newRequest(baseUri: Uri) = Request(second, "").uri(baseUri.path(first.describe(Root)))
+@JvmName("newRequestString")
+fun Pair<String, Method>.newRequest(baseUri: Uri = Uri.of("")) = Request(second, "").uri(baseUri.path(first))
+
+@JvmName("newRequestRouteSpec")
+fun Pair<RouteSpec, Method>.newRequest(baseUri: Uri = Uri.of("")) = Request(second, "").uri(baseUri.path(first.describe(Root)))
 
 @JvmName("handler0String")
 infix fun Pair<String, Method>.handler(handler: HttpHandler) = ServerRoute(second, RouteSpec0(toBaseFn(first), emptyList(), null), { handler })
