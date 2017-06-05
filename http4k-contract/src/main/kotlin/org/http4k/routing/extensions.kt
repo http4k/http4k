@@ -37,16 +37,17 @@ operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = Route
 
 infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
+@JvmName("bind0String")
 infix fun Pair<Method, String>.bind(handler: HttpHandler) =
     ServerRoute(first, RouteSpec0({ if (BasePath(second) == Root) it else it / second }, emptyList(), null), { handler })
 
-@JvmName("bindPathDef0")
+@JvmName("bind1Path")
+infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to RouteSpec1({ it }, emptyList(), null, second) bind fn
+
+@JvmName("bind0")
 infix fun Pair<Method, RouteSpec0>.bind(handler: HttpHandler) = ServerRoute(first, second, { handler })
 
 @JvmName("bind1")
-infix fun <A> Pair<Method, PathLens<A>>.bind(fn: (A) -> HttpHandler) = first to RouteSpec1({ it }, emptyList(), null, second) bind fn
-
-@JvmName("bind1Def")
 infix fun <A> Pair<Method, RouteSpec1<A>>.bind(fn: (A) -> HttpHandler) = ServerRoute(first, second, { fn(it[second.a]) })
 
 @JvmName("bind2")

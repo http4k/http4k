@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.contract.Root
 import org.http4k.core.Body
@@ -13,10 +14,12 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.lens.int
 import org.http4k.lens.lensFailureWith
 import org.http4k.lens.missing
 import org.http4k.lens.string
@@ -48,18 +51,15 @@ class ServerRouteTest {
             throws(lensFailureWith(query.meta.missing())))
     }
 
-//    @Test
-//    fun `can build a request from a route`() {
-//        val path1 = Path.int().of("sue")
-//        val path2 = Path.string().of("bob")
-//
-//        val route = GET to  path1 / path2 bind { _: Request -> Response(OK) } describedBy Desc("").header(header).query(query).body(body)
-//        val request = route.newRequest(Uri.of("http://rita.com"))
-//
-//        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(
-//            Request(GET, "http://rita.com/123/hello+world")
-//        )
-//    }
+    @Test
+    fun `can build a request from a route`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val route = GET to path1 / path2 bind { _, _ -> { _: Request -> Response(OK) } } with RouteMeta("")
+        val request = route.newRequest(Uri.of("http://rita.com"))
+
+        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
+    }
 
     @Test
     fun `0 parts - matches route`() {
@@ -115,3 +115,4 @@ class ServerRouteTest {
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid"))?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
     }
 }
+

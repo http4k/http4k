@@ -1,12 +1,14 @@
 package org.http4k.routing
 
 import org.http4k.contract.BasePath
+import org.http4k.contract.Root
 import org.http4k.contract.basePath
 import org.http4k.contract.without
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
@@ -24,6 +26,8 @@ class ServerRoute internal constructor(val method: Method,
     internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
     internal val tags = meta.tags.toSet().sortedBy { it.name }
+
+    fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(routeSpec.describe(Root)))
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
         override fun match(request: Request): HttpHandler? {
