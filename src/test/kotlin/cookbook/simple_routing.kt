@@ -15,9 +15,9 @@ import org.http4k.routing.routes
 fun main(args: Array<String>) {
 
     val app = routes(
-        GET to "bob" by { Response(OK).body("you GET bob") },
-        POST to "rita" by { Response(OK).body("you POST rita") },
-        DELETE to "sue" by { Response(OK).body("you DELETE sue") }
+        "bob" to GET by { Response(OK).body("you GET bob") },
+        "rita" to POST by { Response(OK).body("you POST rita") },
+        "sue" to DELETE by { Response(OK).body("you DELETE sue") }
     )
 
     println(app(Request(GET, "/bob")))

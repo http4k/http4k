@@ -27,15 +27,15 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Before
     fun before() {
         server = routes(
-            GET to "/" by { _: Request ->
+            "/" to GET by { _: Request ->
                 Response(ACCEPTED)
                     .header("content-type", "text/plain")
                     .body("Hello World")
             },
-            POST to "/echo" by { req: Request -> Response(OK).body(req.bodyString()) },
-            GET to "/request-headers" by { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-            GET to "/uri" by { req: Request -> Response(OK).body(req.uri.toString()) },
-            GET to "/boom" by { _: Request -> throw IllegalArgumentException("BOOM!") }
+            "/echo" to POST by { req: Request -> Response(OK).body(req.bodyString()) },
+            "/request-headers" to GET by { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+            "/uri" to GET by { req: Request -> Response(OK).body(req.uri.toString()) },
+            "/boom" to GET by { _: Request -> throw IllegalArgumentException("BOOM!") }
         ).startServer(serverConfig(port), false)
     }
 
