@@ -28,6 +28,9 @@ class ServerRoute internal constructor(internal val method: Method,
     fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(routeSpec.describe(Root)))
 
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
+
+        override fun toString(): String = "${method.name}: ${routeSpec.describe(contractRoot)}"
+
         override fun match(request: Request): HttpHandler? =
             if (request.method == method && request.basePath().startsWith(routeSpec.pathFn(contractRoot))) {
                 try {
