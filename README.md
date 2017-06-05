@@ -39,7 +39,7 @@ of services without HTTP container being required.
    * [Templating:](https://github.com/http4k/http4k/wiki/Templating-Modules) Caching and Hot-Reload engine support for Handlebars
    * [Message formats:](https://github.com/http4k/http4k/wiki/Message-Format-Modules) HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
 
-# Getting started
+## Getting started
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
@@ -78,7 +78,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-# See it in action:
+## See it in action:
 * [Cookbook example code](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook)
 * [Todo backend (simple version)](https://github.com/http4k/http4k-todo-backend)
 * [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
