@@ -14,12 +14,10 @@ import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 
-class ServerRoute internal constructor(val method: Method,
-                                       val routeSpec: RouteSpec,
-                                       private val toHandler: (ExtractedParts) -> HttpHandler,
-                                       val meta: RouteMeta = RouteMeta()) {
-
-    infix fun with(new: RouteMeta) = ServerRoute(method, routeSpec, toHandler, new)
+class ServerRoute internal constructor(internal val method: Method,
+                                       internal val routeSpec: RouteSpec,
+                                       internal val toHandler: (ExtractedParts) -> HttpHandler,
+                                       internal val meta: RouteMeta = RouteMeta()) {
 
     internal val nonBodyParams = routeSpec.requestParams.plus(routeSpec.pathLenses).flatMap { it }
 

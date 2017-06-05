@@ -32,26 +32,26 @@ infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHand
 
 fun Pair<RouteSpec, Method>.newRequest(baseUri: Uri) = Request(second, "").uri(baseUri.path(first.describe(Root)))
 
-@JvmName("bind0String")
-infix fun Pair<String, Method>.bind(handler: HttpHandler) = ServerRoute(second, RouteSpec0(toBaseFn(first), emptyList(), null), { handler })
+@JvmName("handler0String")
+infix fun Pair<String, Method>.handler(handler: HttpHandler) = ServerRoute(second, RouteSpec0(toBaseFn(first), emptyList(), null), { handler })
 
-@JvmName("bind1Path")
-infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = RouteSpec1({ it }, emptyList(), null, first) to second bind fn
+@JvmName("handler1Path")
+infix fun <A> Pair<PathLens<A>, Method>.handler(fn: (A) -> HttpHandler) = RouteSpec1({ it }, emptyList(), null, first) to second handler fn
 
-@JvmName("bind0")
-infix fun Pair<RouteSpec0, Method>.bind(handler: HttpHandler) = ServerRoute(second, first, { handler })
+@JvmName("handler0")
+infix fun Pair<RouteSpec0, Method>.handler(handler: HttpHandler) = ServerRoute(second, first, { handler })
 
-@JvmName("bind1")
-infix fun <A> Pair<RouteSpec1<A>, Method>.bind(fn: (A) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a]) })
+@JvmName("handler1")
+infix fun <A> Pair<RouteSpec1<A>, Method>.handler(fn: (A) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a]) })
 
-@JvmName("bind2")
-infix fun <A, B> Pair<RouteSpec2<A, B>, Method>.bind(fn: (A, B) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b]) })
+@JvmName("handler2")
+infix fun <A, B> Pair<RouteSpec2<A, B>, Method>.handler(fn: (A, B) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b]) })
 
-@JvmName("bind3")
-infix fun <A, B, C> Pair<RouteSpec3<A, B, C>, Method>.bind(fn: (A, B, C) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c]) })
+@JvmName("handler3")
+infix fun <A, B, C> Pair<RouteSpec3<A, B, C>, Method>.handler(fn: (A, B, C) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c]) })
 
-@JvmName("bind4")
-infix fun <A, B, C, D> Pair<RouteSpec4<A, B, C, D>, Method>.bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
+@JvmName("handler4")
+infix fun <A, B, C, D> Pair<RouteSpec4<A, B, C, D>, Method>.handler(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
 
 infix fun String.query(new: QueryLens<*>) = RouteSpec0(toBaseFn(this), listOf(new), null)
 infix fun String.header(new: HeaderLens<*>) = RouteSpec0(toBaseFn(this), listOf(new), null)
@@ -76,6 +76,8 @@ infix fun <A, B, C> RouteSpec3<A, B, C>.body(new: BodyLens<*>) = RouteSpec3(path
 infix fun <A, B, C, D> RouteSpec4<A, B, C, D>.query(new: QueryLens<*>) = RouteSpec4(pathFn, requestParams.plus(listOf(new)), body, a, b, c, d)
 infix fun <A, B, C, D> RouteSpec4<A, B, C, D>.header(new: HeaderLens<*>) = RouteSpec4(pathFn, requestParams.plus(listOf(new)), body, a, b, c, d)
 infix fun <A, B, C, D> RouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = RouteSpec4(pathFn, requestParams, new, a, b, c, d)
+
+infix fun ServerRoute.meta(new: RouteMeta) = ServerRoute(method, routeSpec, toHandler, new)
 
 private fun toBaseFn(path: String): (BasePath) -> BasePath = when (BasePath(path)) {
     is Root -> { basePath: BasePath -> basePath }
