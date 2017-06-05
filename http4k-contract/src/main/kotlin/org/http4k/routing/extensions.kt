@@ -23,11 +23,11 @@ fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverR
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ServerRoute) =
     ContractRoutingHttpHandler(Handler(renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }))
 
-operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, listOf(new), null)
+operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0(toBaseFn(this), listOf(new), null)
 
-operator infix fun String.rem(new: BodyLens<*>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, emptyList(), new)
+operator infix fun String.rem(new: BodyLens<*>) = RouteSpec0(toBaseFn(this), emptyList(), new)
 
-operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0({ it / this }, emptyList(), null) / next
+operator fun <A> String.div(next: PathLens<A>): RouteSpec1<A> = RouteSpec0(toBaseFn(this), emptyList(), null) / next
 
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): RouteSpec2<A, B> = RouteSpec1({ it }, emptyList(), null, this) / next
 
@@ -36,8 +36,7 @@ infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHand
 fun Pair<RouteSpec, Method>.newRequest(baseUri: Uri) = Request(second, "").uri(baseUri.path(first.describe(Root)))
 
 @JvmName("bind0String")
-infix fun Pair<String, Method>.bind(handler: HttpHandler) =
-    ServerRoute(second, RouteSpec0({ if (BasePath(first) == Root) it else it / first }, emptyList(), null), { handler })
+infix fun Pair<String, Method>.bind(handler: HttpHandler) = ServerRoute(second, RouteSpec0(toBaseFn(first), emptyList(), null), { handler })
 
 @JvmName("bind1Path")
 infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = RouteSpec1({ it }, emptyList(), null, first) to second bind fn
@@ -56,3 +55,8 @@ infix fun <A, B, C> Pair<RouteSpec3<A, B, C>, Method>.bind(fn: (A, B, C) -> Http
 
 @JvmName("bind4")
 infix fun <A, B, C, D> Pair<RouteSpec4<A, B, C, D>, Method>.bind(fn: (A, B, C, D) -> HttpHandler) = ServerRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
+
+private fun toBaseFn(path: String): (BasePath) -> BasePath = when (BasePath(path)) {
+    is Root -> { basePath: BasePath -> basePath }
+    else -> { basePath: BasePath -> basePath / path.trimStart('/') }
+}

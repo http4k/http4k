@@ -32,8 +32,9 @@ class ServerRoute internal constructor(val method: Method,
     internal fun toRouter(contractRoot: BasePath): Router = object : Router {
         override fun match(request: Request): HttpHandler? {
             val startsWith = request.basePath().startsWith(routeSpec.pathFn(contractRoot))
-//            println(request.basePath())
-//            println(" @ " + routeSpec.pathFn(contractRoot))
+            println(request.basePath())
+            println(contractRoot)
+            println(" @ " + routeSpec.pathFn(contractRoot))
             return if (request.method == method && startsWith) {
                 try {
                     request.without(routeSpec.pathFn(contractRoot))
