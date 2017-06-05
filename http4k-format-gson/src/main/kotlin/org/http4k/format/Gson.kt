@@ -13,16 +13,21 @@ import java.math.BigInteger
 open class ConfigurableGson(builder: GsonBuilder) : Json<JsonElement, JsonElement> {
 
     override fun typeOf(value: JsonElement): JsonType =
-        if (value.isJsonArray) JsonType.Array
-        else if (value.isJsonNull) JsonType.Null
-        else if (value.isJsonObject) JsonType.Object
-        else if (value.isJsonPrimitive) {
-            val prim = value.asJsonPrimitive
-            if (prim.isBoolean) JsonType.Boolean
-            else if (prim.isNumber) JsonType.Number
-            else if (prim.isString) JsonType.String
-            else throw IllegalArgumentException("Don't know now to translate $value")
-        } else throw IllegalArgumentException("Don't know now to translate $value")
+        when {
+            value.isJsonArray -> JsonType.Array
+            value.isJsonNull -> JsonType.Null
+            value.isJsonObject -> JsonType.Object
+            value.isJsonPrimitive -> {
+                val prim = value.asJsonPrimitive
+                when {
+                    prim.isBoolean -> JsonType.Boolean
+                    prim.isNumber -> JsonType.Number
+                    prim.isString -> JsonType.String
+                    else -> throw IllegalArgumentException("Don't know now to translate $value")
+                }
+            }
+            else -> throw IllegalArgumentException("Don't know now to translate $value")
+        }
 
     private val compact = builder.create()
     private val pretty = builder.setPrettyPrinting().create()

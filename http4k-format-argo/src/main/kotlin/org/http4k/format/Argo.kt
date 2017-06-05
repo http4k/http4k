@@ -14,15 +14,16 @@ import java.math.BigInteger
 object Argo : Json<JsonRootNode, JsonNode> {
 
     override fun typeOf(value: JsonNode): JsonType =
-        if (value.type == JsonNodeType.STRING) JsonType.String
-        else if (value.type == JsonNodeType.TRUE) JsonType.Boolean
-        else if (value.type == JsonNodeType.FALSE) JsonType.Boolean
-        else if (value.type == JsonNodeType.NUMBER) JsonType.Number
-        else if (value.type == JsonNodeType.ARRAY) JsonType.Array
-        else if (value.type == JsonNodeType.OBJECT) JsonType.Object
-        else if (value.type == JsonNodeType.NULL) JsonType.Null
-        else throw IllegalArgumentException("Don't know now to translate $value")
-
+        when (value.type) {
+            JsonNodeType.STRING -> JsonType.String
+            JsonNodeType.TRUE -> JsonType.Boolean
+            JsonNodeType.FALSE -> JsonType.Boolean
+            JsonNodeType.NUMBER -> JsonType.Number
+            JsonNodeType.ARRAY -> JsonType.Array
+            JsonNodeType.OBJECT -> JsonType.Object
+            JsonNodeType.NULL -> JsonType.Null
+            else -> throw IllegalArgumentException("Don't know now to translate $value")
+        }
 
     private val pretty = PrettyJsonFormatter()
     private val compact = CompactJsonFormatter()
