@@ -29,33 +29,33 @@ class ServerRouteTest {
 
     @Test
     fun `validates contract - success`() {
-        val header = Header.required("header")
-        val query = Query.required("query")
-        val body = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" % header % query % body to GET bind { _: Request -> Response(OK) } with RouteMeta("")
+        val headerLens = Header.required("header")
+        val queryLens = Query.required("query")
+        val bodyLens = Body.string(TEXT_PLAIN).toLens()
+        val route = "/" header headerLens query queryLens body bodyLens to GET bind { _: Request -> Response(OK) } with RouteMeta("")
 
-        assertThat(route.toRouter(Root).match(Request(GET, "").with(header of "value", query of "value", body of "hello")), present())
+        assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
     }
 
     @Test
     fun `validates contract - failure`() {
-        val header = Header.required("header")
-        val query = Query.required("query")
-        val body = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" % header % query % body to GET bind { _: Request -> Response(OK) } with RouteMeta("")
+        val headerLens = Header.required("header")
+        val queryLens = Query.required("query")
+        val bodyLens = Body.string(TEXT_PLAIN).toLens()
+        val route = "/" header headerLens query queryLens body bodyLens to GET bind { _: Request -> Response(OK) } with RouteMeta("")
 
-        val invalidRequest = Request(GET, "").with(header of "value", body of "hello")
+        val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
         val actual = route.toRouter(Root).match(invalidRequest)
         assertThat(actual, present())
         assertThat({ actual?.invoke(invalidRequest) },
-            throws(lensFailureWith(query.meta.missing())))
+            throws(lensFailureWith(queryLens.meta.missing())))
     }
 
     @Test
     fun `can build a request from a route`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val pair = path1 / path2 % Query.required("") to GET
+        val pair = path1 / path2 query Query.required("") to GET
         pair.newRequest(Uri.of("http://rita.com"))
         val route = pair bind { _, _ -> { _: Request -> Response(OK) } } with RouteMeta("")
         val request = route.newRequest(Uri.of("http://rita.com"))
@@ -67,7 +67,7 @@ class ServerRouteTest {
     fun `can build a request from a routespec`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val request = (path1 / path2 % Query.required("") to GET).newRequest(Uri.of("http://rita.com"))
+        val request = (path1 / path2 query Query.required("") to GET).newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
     }
