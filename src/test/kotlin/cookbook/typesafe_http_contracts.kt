@@ -68,7 +68,7 @@ fun main(args: Array<String>) {
         it == 42
     })
 
-    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security)(
+    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
         GET to "add" / Path.int().of("value1") / Path.int().of("value2") bind ::add
             with RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
         GET to "echo" / Path.of("name") % ageQuery bind ::echo with RouteMeta("echo")
@@ -77,7 +77,7 @@ fun main(args: Array<String>) {
     val handler = routes(
         "/context" by filter.then(contract),
         "/static" by NoCache().then(static(Classpath("cookbook"))),
-        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo))(
+        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
             GET to "echo" / Path.of("name") % ageQuery bind ::echo with RouteMeta("echo")
         )
     )

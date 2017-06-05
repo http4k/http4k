@@ -17,16 +17,11 @@ import org.http4k.lens.Lens
 import org.http4k.lens.PathLens
 import org.http4k.routing.ContractRoutingHttpHandler.Companion.Handler
 
-interface ContractBuilder {
-    operator fun invoke(vararg serverRoutes: ServerRoute): ContractRoutingHttpHandler
-}
-
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity) =
-    object : ContractBuilder {
-        override fun invoke(vararg serverRoutes: ServerRoute): ContractRoutingHttpHandler = ContractRoutingHttpHandler(Handler(
-            renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }
-        ))
-    }
+fun contract(vararg serverRoutes: ServerRoute) = contract(NoRenderer, "", NoSecurity, *serverRoutes)
+fun contract(renderer: ContractRenderer, vararg serverRoutes: ServerRoute) = contract(renderer, "", NoSecurity, *serverRoutes)
+fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ServerRoute) = contract(renderer, descriptionPath, NoSecurity, *serverRoutes)
+fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ServerRoute) =
+    ContractRoutingHttpHandler(Handler(renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } }))
 
 operator infix fun String.rem(new: Lens<Request, *>) = RouteSpec0({ if (BasePath(this) == Root) it else it / this }, listOf(new), null)
 
