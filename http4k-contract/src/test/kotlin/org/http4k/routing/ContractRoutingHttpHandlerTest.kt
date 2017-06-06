@@ -18,6 +18,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.junit.Ignore
 import org.junit.Test
 
 class ContractRoutingHttpHandlerTest {
@@ -47,6 +48,19 @@ class ContractRoutingHttpHandlerTest {
 
         assertThat(response.status, equalTo(OK))
         assertThat(header(response), equalTo("true"))
+    }
+
+    @Test
+    @Ignore
+    fun `traffic goes to the path specified`() {
+        val root = routes(
+            "/root/bar" by contract(
+                "/foo/bar" / Path.of("world") to GET handler { _ -> { Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it)) } })
+        )
+        val response = root(Request(GET, "/root/bar/foo/bar/hello"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(X_URI_TEMPLATE(response), equalTo("/root/bar/foo/bar/{world}"))
     }
 
     @Test
@@ -83,8 +97,8 @@ class ContractRoutingHttpHandlerTest {
 
     @Test
     fun `can change path to description route`() {
-        val response = ("/root" by contract(SimpleJson(Argo), "/docs/swagger.json"))
-            .invoke(Request(GET, "/root/docs/swagger.json"))
+        val response = ("/root/foo" by contract(SimpleJson(Argo), "/docs/swagger.json"))
+            .invoke(Request(GET, "/root/foo/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
     }
 

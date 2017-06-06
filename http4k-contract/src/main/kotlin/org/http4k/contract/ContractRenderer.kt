@@ -9,6 +9,6 @@ interface ContractRenderer {
 
     fun badRequest(failures: List<Failure>): Response
 
-    fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>): Response
+    fun description(contractRoot: PathSegments, security: Security, routes: List<ServerRoute>): Response
 }
 

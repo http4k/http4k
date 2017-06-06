@@ -8,7 +8,7 @@ import org.http4k.lens.Failure
 import org.http4k.routing.ServerRoute
 
 object NoRenderer : ContractRenderer {
-    override fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>) = Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ServerRoute>) = Response(OK)
 
     override fun badRequest(failures: List<Failure>): Response = Response(BAD_REQUEST)
 

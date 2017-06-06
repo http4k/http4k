@@ -1,10 +1,10 @@
 package org.http4k.routing
 
 
-import org.http4k.contract.BasePath
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.NoRenderer
 import org.http4k.contract.NoSecurity
+import org.http4k.contract.PathSegments
 import org.http4k.contract.Root
 import org.http4k.contract.Security
 import org.http4k.core.Filter
@@ -83,7 +83,7 @@ infix fun <A, B, C, D> RouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = RouteSpec
 
 infix fun ServerRoute.meta(new: RouteMeta) = ServerRoute(method, routeSpec, toHandler, new)
 
-private fun toBaseFn(path: String): (BasePath) -> BasePath = when (BasePath(path)) {
-    is Root -> { basePath: BasePath -> basePath }
-    else -> { basePath: BasePath -> basePath / path.trimStart('/') }
+private fun toBaseFn(path: String): (PathSegments) -> PathSegments = when (PathSegments(path)) {
+    is Root -> { pathSegments: PathSegments -> pathSegments }
+    else -> { pathSegments: PathSegments -> pathSegments / path.trimStart('/') }
 }

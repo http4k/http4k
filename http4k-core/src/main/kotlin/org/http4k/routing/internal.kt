@@ -19,14 +19,14 @@ import javax.activation.MimetypesFileTypeMap
 class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
     override fun withFilter(new: Filter): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(new)))
 
-    override fun withBasePath(new: String): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(basePath = new + httpHandler.basePath))
+    override fun withBasePath(new: String): RoutingHttpHandler = StaticRoutingHttpHandler(httpHandler.copy(pathSegments = new + httpHandler.pathSegments))
 
     override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
 
     override fun invoke(req: Request): Response = httpHandler(req)
 
     companion object {
-        data class Handler(val basePath: String,
+        data class Handler(val pathSegments: String,
                            val resourceLoader: ResourceLoader,
                            val extraPairs: Map<String, ContentType>,
                            val filter: Filter = Filter { next -> { next(it) } }
@@ -57,7 +57,7 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
             override fun invoke(req: Request): Response = handler(req)
 
             private fun convertPath(path: String): String {
-                val newPath = if (basePath == "/" || basePath == "") path else path.replace(basePath, "")
+                val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")
                 val resolved = if (newPath.isBlank()) "/index.html" else newPath
                 return resolved.replaceFirst("/", "")
             }
@@ -70,7 +70,7 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
     override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(new)))
 
     override fun withBasePath(new: String): RoutingHttpHandler = GroupRoutingHttpHandler(
-        httpHandler.copy(basePath = UriTemplate.from(new + httpHandler.basePath?.toString().orEmpty()),
+        httpHandler.copy(pathSegments = UriTemplate.from(new + httpHandler.pathSegments?.toString().orEmpty()),
             routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$new/${it.template}")) }
         )
     )
@@ -80,13 +80,13 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     companion object {
-        internal data class Handler(internal val basePath: UriTemplate? = null, internal val routes: List<Route>, val filter: Filter = Filter { next -> { next(it) } }) : HttpHandler {
+        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val routes: List<Route>, val filter: Filter = Filter { next -> { next(it) } }) : HttpHandler {
             private val routers = routes.map(Route::asRouter)
             private val noMatch: HttpHandler? = null
             private val handler: HttpHandler = filter.then { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
             fun match(request: Request): HttpHandler? =
-                if (basePath?.matches(request.uri.path) ?: true)
+                if (pathSegments?.matches(request.uri.path) ?: true)
                     routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
                 else null
 

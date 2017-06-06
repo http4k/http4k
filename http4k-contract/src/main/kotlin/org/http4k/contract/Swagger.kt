@@ -25,7 +25,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     override fun notFound() = errors.notFound()
 
-    override fun description(contractRoot: BasePath, security: Security, routes: List<ServerRoute>) =
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ServerRoute>) =
         Response(OK).body(json.pretty(json.obj(
             "swagger" to json.string("2.0"),
             "info" to apiInfo.asJson(),
@@ -36,7 +36,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
         )))
 
-    private fun renderPaths(routes: List<ServerRoute>, contractRoot: BasePath, security: Security): FieldsAndDefinitions<NODE> {
+    private fun renderPaths(routes: List<ServerRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
         return routes
             .groupBy { it.describeFor(contractRoot) }.entries
             .fold(FieldsAndDefinitions<NODE>(), {
@@ -59,7 +59,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     private fun renderTags(routes: List<ServerRoute>) = routes.flatMap(ServerRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
-    private fun render(basePath: BasePath, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
+    private fun render(pathSegments: PathSegments, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses.values.toList())
 
         val schema = route.jsonRequest?.asSchema()
@@ -68,7 +68,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
-        val routeTags = if (route.tags.isEmpty()) listOf(json.string(basePath.toString())) else route.tagsAsJson()
+        val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
         val consumes = route.meta.consumes.plus(route.routeSpec.body?.let { listOf(it.contentType) } ?: emptyList())
 
         val pathJson = json.obj(

@@ -1,8 +1,8 @@
 package org.http4k.routing
 
-import org.http4k.contract.BasePath
+import org.http4k.contract.PathSegments
 import org.http4k.contract.Root
-import org.http4k.contract.basePath
+import org.http4k.contract.pathSegments
 import org.http4k.contract.without
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
@@ -27,12 +27,12 @@ class ServerRoute internal constructor(internal val method: Method,
 
     fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(routeSpec.describe(Root)))
 
-    internal fun toRouter(contractRoot: BasePath): Router = object : Router {
+    internal fun toRouter(contractRoot: PathSegments): Router = object : Router {
 
         override fun toString(): String = "${method.name}: ${routeSpec.describe(contractRoot)}"
 
         override fun match(request: Request): HttpHandler? =
-            if (request.method == method && request.basePath().startsWith(routeSpec.pathFn(contractRoot))) {
+            if (request.method == method && request.pathSegments().startsWith(routeSpec.pathFn(contractRoot))) {
                 try {
                     request.without(routeSpec.pathFn(contractRoot))
                         .extract(routeSpec.pathLenses.toList())
@@ -45,7 +45,7 @@ class ServerRoute internal constructor(internal val method: Method,
             } else null
     }
 
-    internal fun describeFor(contractRoot: BasePath): String = routeSpec.describe(contractRoot)
+    internal fun describeFor(contractRoot: PathSegments): String = routeSpec.describe(contractRoot)
 
     override fun toString(): String = "${method.name}: ${routeSpec.describe(Root)}"
 }
@@ -55,8 +55,8 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
     operator fun <T> get(lens: PathLens<T>): T = mapping[lens] as T
 }
 
-private operator fun <T> BasePath.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
+private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
-private fun BasePath.extract(lenses: List<PathLens<*>>): ExtractedParts? =
+private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
     if (this.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens::invoke) }.toMap()) else null
 
