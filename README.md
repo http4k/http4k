@@ -24,7 +24,7 @@ The principles of the toolkit are:
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
 * **Dependency-lite:** The [`http4k-core`](https://github.com/http4k/http4k/wiki/Core-Module) module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
-* Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
+* **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
     * full suites of microservices
