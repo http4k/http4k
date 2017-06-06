@@ -18,7 +18,6 @@ import org.http4k.lens.Header
 import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.junit.Ignore
 import org.junit.Test
 
 class ContractRoutingHttpHandlerTest {
@@ -51,7 +50,6 @@ class ContractRoutingHttpHandlerTest {
     }
 
     @Test
-    @Ignore
     fun `traffic goes to the path specified`() {
         val root = routes(
             "/root/bar" by contract(

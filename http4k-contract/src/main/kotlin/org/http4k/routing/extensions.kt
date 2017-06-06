@@ -83,7 +83,4 @@ infix fun <A, B, C, D> RouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = RouteSpec
 
 infix fun ServerRoute.meta(new: RouteMeta) = ServerRoute(method, routeSpec, toHandler, new)
 
-private fun toBaseFn(path: String): (PathSegments) -> PathSegments = when (PathSegments(path)) {
-    is Root -> { pathSegments: PathSegments -> pathSegments }
-    else -> { pathSegments: PathSegments -> pathSegments / path.trimStart('/') }
-}
+private fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }

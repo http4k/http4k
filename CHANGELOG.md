@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.0.5
+- Fix #23. Contract now supports multi-part URL params (for hardcoded parts)
+
 ### v2.0.4
 - Fix #22. Uri template does not parse out correct path params when URL starts with a path part.
 

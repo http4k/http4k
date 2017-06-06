@@ -8,6 +8,11 @@ sealed class PathSegments {
 
     abstract fun startsWith(other: PathSegments): Boolean
     operator fun div(child: String): PathSegments = Slash(this, child)
+    operator fun div(child: PathSegments): PathSegments {
+        return child.toList().fold(this) {
+            memo, next -> memo / next
+        }
+    }
 
     companion object {
         operator fun invoke(str: String): PathSegments =
