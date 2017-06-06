@@ -67,6 +67,25 @@ class UriTemplateTest {
     }
 
     @Test
+    fun canExtractFromUri_withLeadingSlash() {
+        val template = from("/{id:.+}/{id2:.+}")
+        val extracted = template.extract("/foo/bar")
+        assertThat(extracted.getValue("id"), equalTo("foo"))
+        assertThat(extracted.getValue("id2"), equalTo("bar"))
+    }
+
+    @Test
+    fun canExtractFromUri_withTrailingSlash() {
+        val template = from("/{id:.+}/{id2:.+}/")
+        val extracted = template.extract("/foo/bar/")
+        assertThat(extracted.getValue("id"), equalTo("foo"))
+        assertThat(extracted.getValue("id2"), equalTo("bar"))
+        val extractedNoTrailing = template.extract("/foo/bar/")
+        assertThat(extractedNoTrailing.getValue("id"), equalTo("foo"))
+        assertThat(extractedNoTrailing.getValue("id2"), equalTo("bar"))
+    }
+
+    @Test
     fun canExtractFromUriWithEncodedSpace() {
         val template = from("path/{id1}")
         assertThat(template.extract("path/foo+bar").getValue("id1"), equalTo("foo bar"))

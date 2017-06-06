@@ -27,7 +27,7 @@ class UriTemplate private constructor(private val template: String) {
 
     fun matches(uri: String): Boolean = templateRegex.matches(uri.trimSlashes())
 
-    fun extract(uri: String): Map<String, String> = parameterNames.zip(templateRegex.findParameterValues(uri)).toMap()
+    fun extract(uri: String): Map<String, String> = parameterNames.zip(templateRegex.findParameterValues(uri.trimSlashes())).toMap()
 
     fun generate(parameters: Map<String, String>): String =
         templateWithSuffix.replace(URI_TEMPLATE_FORMAT, { matchResult ->
