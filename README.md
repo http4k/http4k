@@ -68,7 +68,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-## Module feature overview
+## Module feature overview
 * [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
