@@ -24,39 +24,6 @@ The principles of the toolkit are:
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as plugging together 
 of services without HTTP container being required.
 * **Dependency-lite:** The [`http4k-core`](https://github.com/http4k/http4k/wiki/Core-Module) module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
-* **Module feature overview:**
-   * [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
-        * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
-        * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
-        * **Path-based routing**, including nestable contexts
-        * **Typesafe HTTP message construction/desconstruction** using Lenses
-        * **Static file-serving** capability with **Caching and Hot-Reload** 
-        * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
-        * Core abstraction APIs implemented by the other modules 
-   * [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) 
-        * **Single LOC** HTTP client adapters 
-            * **Apache**
-            * **OkHttp**
-   * [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules)
-        * **Single LOC** server backend spinup for:
-            * **Jetty**
-            * **Netty**
-            * **Undertow**
-        * API design allows for plugging into configurable instances of each
-   * **BETA!** [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) 
-       * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
-       * **Typesafe** path matching
-       * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-       * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
-   * [Templating:](https://github.com/http4k/http4k/wiki/Templating-Modules) 
-        * **Pluggable** templating system support for:
-            * Handlebars 
-        * Caching and **Hot-Reload** template support
-   * [Message formats:](https://github.com/http4k/http4k/wiki/Message-Format-Modules) 
-        * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
-            * **Jackson** -includes support for **fully automatic marshalling of Data classes**)
-            * **Gson**
-            * **Argo**
 * Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
@@ -100,6 +67,40 @@ fun main(args: Array<String>) {
     jettyServer.stop()
 }
 ```
+
+## Module feature overview
+* [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
+    * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
+    * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
+    * **Path-based routing**, including nestable contexts
+    * **Typesafe HTTP message construction/desconstruction** using Lenses
+    * **Static file-serving** capability with **Caching and Hot-Reload** 
+    * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
+    * Core abstraction APIs implemented by the other modules 
+* [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) 
+    * **Single LOC** HTTP client adapters 
+        * **Apache**
+        * **OkHttp**
+* [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules)
+    * **Single LOC** server backend spinup for:
+        * **Jetty**
+        * **Netty**
+        * **Undertow**
+    * API design allows for plugging into configurable instances of each
+* **BETA!** [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) 
+   * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
+   * **Typesafe** path matching
+   * **Auto-validation** of incoming requests == **zero boilerplate validation code**
+   * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
+* [Templating:](https://github.com/http4k/http4k/wiki/Templating-Modules) 
+    * **Pluggable** templating system support for:
+        * Handlebars 
+    * Caching and **Hot-Reload** template support
+* [Message formats:](https://github.com/http4k/http4k/wiki/Message-Format-Modules) 
+    * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
+        * **Jackson** -includes support for **fully automatic marshalling of Data classes**)
+        * **Gson**
+        * **Argo**
 
 ## See it in action:
 * [Cookbook example code](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook)
