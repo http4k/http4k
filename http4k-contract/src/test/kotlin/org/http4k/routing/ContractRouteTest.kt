@@ -25,7 +25,7 @@ import org.http4k.lens.missing
 import org.http4k.lens.string
 import org.junit.Test
 
-class ServerRouteTest {
+class ContractRouteTest {
 
     @Test
     fun `validates contract - success`() {
@@ -123,7 +123,7 @@ class ServerRouteTest {
         Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5")
     }
 
-    private fun checkMatching(route: ServerRoute, valid: String, expected: String) {
+    private fun checkMatching(route: ContractRoute, valid: String, expected: String) {
         val routerOnNoPrefix = route.toRouter(Root)
         assertThat(routerOnNoPrefix.match(Request(GET, "")), absent())
         assertThat(routerOnNoPrefix.match(Request(POST, valid)), absent())

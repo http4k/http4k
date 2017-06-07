@@ -14,30 +14,30 @@ import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 
-class ServerRoute internal constructor(internal val method: Method,
-                                       internal val routeSpec: RouteSpec,
-                                       internal val toHandler: (ExtractedParts) -> HttpHandler,
-                                       internal val meta: RouteMeta = RouteMeta()) {
+class ContractRoute internal constructor(internal val method: Method,
+                                         internal val spec: ContractRouteSpec,
+                                         internal val toHandler: (ExtractedParts) -> HttpHandler,
+                                         internal val meta: RouteMeta = RouteMeta()) {
 
-    internal val nonBodyParams = routeSpec.requestParams.plus(routeSpec.pathLenses).flatMap { it }
+    internal val nonBodyParams = spec.requestParams.plus(spec.pathLenses).flatMap { it }
 
     internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
     internal val tags = meta.tags.toSet().sortedBy { it.name }
 
-    fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(routeSpec.describe(Root)))
+    fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
     internal fun toRouter(contractRoot: PathSegments): Router = object : Router {
 
-        override fun toString(): String = "${method.name}: ${routeSpec.describe(contractRoot)}"
+        override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
         override fun match(request: Request): HttpHandler? =
-            if (request.method == method && request.pathSegments().startsWith(routeSpec.pathFn(contractRoot))) {
+            if (request.method == method && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
                 try {
-                    request.without(routeSpec.pathFn(contractRoot))
-                        .extract(routeSpec.pathLenses.toList())
+                    request.without(spec.pathFn(contractRoot))
+                        .extract(spec.pathLenses.toList())
                         ?.let {
-                            routeSpec.then(toHandler(it))
+                            spec.then(toHandler(it))
                         }
                 } catch (e: LensFailure) {
                     null
@@ -45,9 +45,9 @@ class ServerRoute internal constructor(internal val method: Method,
             } else null
     }
 
-    internal fun describeFor(contractRoot: PathSegments): String = routeSpec.describe(contractRoot)
+    internal fun describeFor(contractRoot: PathSegments): String = spec.describe(contractRoot)
 
-    override fun toString(): String = "${method.name}: ${routeSpec.describe(Root)}"
+    override fun toString(): String = "${method.name}: ${spec.describe(Root)}"
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {

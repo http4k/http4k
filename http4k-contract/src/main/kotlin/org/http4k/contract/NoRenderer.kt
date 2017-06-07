@@ -5,10 +5,10 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Failure
-import org.http4k.routing.ServerRoute
+import org.http4k.routing.ContractRoute
 
 object NoRenderer : ContractRenderer {
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ServerRoute>) = Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) = Response(OK)
 
     override fun badRequest(failures: List<Failure>): Response = Response(BAD_REQUEST)
 

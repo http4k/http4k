@@ -7,7 +7,7 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Meta
-import org.http4k.routing.ServerRoute
+import org.http4k.routing.ContractRoute
 import org.http4k.routing.Tag
 import util.JsonSchema
 import util.JsonToJsonSchema
@@ -25,7 +25,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     override fun notFound() = errors.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ServerRoute>) =
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         Response(OK).body(json.pretty(json.obj(
             "swagger" to json.string("2.0"),
             "info" to apiInfo.asJson(),
@@ -36,7 +36,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
         )))
 
-    private fun renderPaths(routes: List<ServerRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
+    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
         return routes
             .groupBy { it.describeFor(contractRoot) }.entries
             .fold(FieldsAndDefinitions<NODE>(), {
@@ -57,19 +57,19 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         schema?.let { "schema" to it.node } ?: "type" to json.string(it.paramMeta.value)
     )
 
-    private fun renderTags(routes: List<ServerRoute>) = routes.flatMap(ServerRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
+    private fun renderTags(routes: List<ContractRoute>) = routes.flatMap(ContractRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
-    private fun render(pathSegments: PathSegments, security: Security, route: ServerRoute): FieldAndDefinitions<NODE> {
+    private fun render(pathSegments: PathSegments, security: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses.values.toList())
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.routeSpec.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.spec.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
-        val consumes = route.meta.consumes.plus(route.routeSpec.body?.let { listOf(it.contentType) } ?: emptyList())
+        val consumes = route.meta.consumes.plus(route.spec.body?.let { listOf(it.contentType) } ?: emptyList())
 
         val pathJson = json.obj(
             "tags" to json.array(routeTags),
@@ -118,7 +118,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         JsonSchema(json.nullNode(), emptyList())
     }
 
-    private fun ServerRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
+    private fun ContractRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
 
     private fun ApiInfo.asJson() = json.obj("title" to json.string(title), "version" to json.string(version), "description" to json.string(description ?: ""))
 

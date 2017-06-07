@@ -28,7 +28,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
                                     private val security: Security,
                                     private val descriptionPath: String,
                                     private val rootAsString: String = "",
-                                    private val routes: List<ServerRoute> = emptyList(),
+                                    private val routes: List<ContractRoute> = emptyList(),
                                     private val filter: Filter = Filter { next -> { next(it) } }
         ) : RoutingHttpHandler {
             private val contractRoot = PathSegments(rootAsString)
@@ -39,7 +39,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
 
             override fun invoke(request: Request): Response = handler(request)
 
-            private val descriptionRoute = RouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET handler { renderer.description(contractRoot, security, routes) }
+            private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET handler { renderer.description(contractRoot, security, routes) }
 
             private val routers = routes
                 .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
@@ -58,7 +58,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
                     })
                 } else null
 
-            private fun identify(route: ServerRoute): Filter =
+            private fun identify(route: ContractRoute): Filter =
                 route.describeFor(contractRoot).let { routeIdentity ->
                     Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
                 }
