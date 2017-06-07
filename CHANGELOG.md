@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v2.1.0
-- Added GSON functions to convert arbitary objects to/from JSON
+- Added GSON full-auto functions to convert arbitary objects to/from JSON.
 
 ### v2.0.5
 - Fix #23. Contract now supports multi-part URL params (for hardcoded parts)

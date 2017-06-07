@@ -69,15 +69,13 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : AutoMarshalli
     override fun text(value: JsonNode): String = value.asText()
 
     override fun asJsonObject(a: Any): JsonNode = mapper.convertValue(a, JsonNode::class.java)
-
     override fun <T : Any> asA(s: String, c: KClass<T>): T = mapper.convertValue(s.asJsonObject(), c.java)
-
     override fun <T : Any> asA(j: JsonNode, c: KClass<T>): T = mapper.convertValue(j, c.java)
 
     inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 object Jackson : ConfigurableJackson(ObjectMapper()

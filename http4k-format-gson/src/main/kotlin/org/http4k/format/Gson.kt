@@ -7,11 +7,13 @@ import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
+import org.http4k.core.Body
+import org.http4k.lens.BiDiBodyLensSpec
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.reflect.KClass
 
-open class ConfigurableGson(builder: GsonBuilder) : Json<JsonElement, JsonElement> {
-
+open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElement>() {
     override fun typeOf(value: JsonElement): JsonType =
         when {
             value.isJsonArray -> JsonType.Array
@@ -61,6 +63,14 @@ open class ConfigurableGson(builder: GsonBuilder) : Json<JsonElement, JsonElemen
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
 
+    override fun asJsonObject(a: Any): JsonElement = compact.toJsonTree(a)
+    override fun <T : Any> asA(s: String, c: KClass<T>): T = compact.fromJson(s, c.java)
+    override fun <T : Any> asA(j: JsonElement, c: KClass<T>): T = compact.fromJson(j, c.java)
+
+    inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
+    inline fun <reified T : Any> JsonElement.asA(): T = asA(this, T::class)
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 object Gson : ConfigurableGson(GsonBuilder().serializeNulls())
