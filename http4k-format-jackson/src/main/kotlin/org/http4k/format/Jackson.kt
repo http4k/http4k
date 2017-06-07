@@ -23,7 +23,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode, JsonNode> {
+open class ConfigurableJackson(private val mapper: ObjectMapper) : AutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
@@ -68,20 +68,11 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
 
-    @JvmName("anyAsJsonObject")
-    fun asJsonObject(a: Any): JsonNode = mapper.convertValue(a, JsonNode::class.java)
+    override fun asJsonObject(a: Any): JsonNode = mapper.convertValue(a, JsonNode::class.java)
 
-    @JvmName("stringAsA")
-    fun <T : Any> asA(s: String, c: KClass<T>): T = mapper.convertValue(s.asJsonObject(), c.java)
+    override fun <T : Any> asA(s: String, c: KClass<T>): T = mapper.convertValue(s.asJsonObject(), c.java)
 
-    @JvmName("nodeAsA")
-    fun <T : Any> asA(j: JsonNode, c: KClass<T>): T = mapper.convertValue(j, c.java)
-
-    fun Any.asJsonObject(): JsonNode = asJsonObject(this)
-
-    fun <T : Any> String.asA(c: KClass<T>): T = asA(this, c)
-
-    fun <T : Any> JsonNode.asA(c: KClass<T>): T = asA(this, c)
+    override fun <T : Any> asA(j: JsonNode, c: KClass<T>): T = mapper.convertValue(j, c.java)
 
     inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
