@@ -68,16 +68,25 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : Json<JsonNode
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
 
-    fun Any.asJsonNode(): JsonNode = mapper.convertValue(this, JsonNode::class.java)
-    fun <T : Any> String.asA(c: KClass<T>): T = mapper.convertValue(this.asJsonObject(), c.java)
-    fun <T : Any> JsonNode.asA(c: KClass<T>): T = mapper.convertValue(this, c.java)
+    @JvmName("anyAsJsonObject")
+    fun asJsonObject(a: Any): JsonNode = mapper.convertValue(a, JsonNode::class.java)
 
-    inline fun <reified T : Any> String.asA(): T = asA(T::class)
-    inline fun <reified T : Any> JsonNode.asA(): T = asA(T::class)
+    @JvmName("stringAsA")
+    fun <T : Any> asA(s: String, c: KClass<T>): T = mapper.convertValue(s.asJsonObject(), c.java)
 
-    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonNode() })
+    @JvmName("nodeAsA")
+    fun <T : Any> asA(j: JsonNode, c: KClass<T>): T = mapper.convertValue(j, c.java)
 
-    fun Any.asJsonString(): String = asJsonNode().asCompactJsonString()
+    fun Any.asJsonObject(): JsonNode = asJsonObject(this)
+
+    fun <T : Any> String.asA(c: KClass<T>): T = asA(this, c)
+
+    fun <T : Any> JsonNode.asA(c: KClass<T>): T = asA(this, c)
+
+    inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
+    inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
+
+    inline fun <reified T : Any> Body.Companion.auto(description : String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 object Jackson : ConfigurableJackson(ObjectMapper()
