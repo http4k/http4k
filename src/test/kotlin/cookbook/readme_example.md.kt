@@ -66,7 +66,7 @@ fun main(args: Array<String>) {
     val compositeFilter = CachingFilters.Response.NoCache().then(timingFilter)
     val app: HttpHandler = compositeFilter.then(allRoutes)
 
-    // 1 LOC to mount an app and start it in a container
+    // only 1 LOC to mount an app and start it in a container
     app.asServer(Jetty(9000)).start()
 
     // HTTP clients are also HttpHandlers!

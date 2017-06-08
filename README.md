@@ -30,7 +30,7 @@ of services without HTTP container being required.
     * full suites of microservices
 
 ## Example
-This quick example is designed to convey the features of **http4k**. There is also a [quickstart](https://github.com/http4k/http4k/wiki/Quickstart) on the wiki for the simplest possible starting point.
+This quick example is designed to convey the simplicity & features of **http4k**. There is also a [quickstart](https://github.com/http4k/http4k/wiki/Quickstart) on the wiki for the simplest possible starting point.
 
 This "hello world" style example demonstrates how to serve and consume HTTP services using **http4k**. 
 
@@ -111,7 +111,7 @@ fun main(args: Array<String>) {
     val compositeFilter = CachingFilters.Response.NoCache().then(timingFilter)
     val app: HttpHandler = compositeFilter.then(allRoutes)
 
-    // 1 LOC to mount an app and start it in a container
+    // only 1 LOC to mount an app and start it in a container
     app.asServer(Jetty(9000)).start()
 
     // HTTP clients are also HttpHandlers!
