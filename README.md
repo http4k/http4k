@@ -52,8 +52,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CachingFilters
-import org.http4k.routing.Route
-import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.by
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -61,29 +59,18 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
-    // create an HttpHandler - which is just a function from  Request -> Response
-    val friendlyHttpHandler: HttpHandler = { req: Request ->
-        val path: String? = req.path("name")
-        Response(OK).body("hello ${path ?: "anon!"}")
-    }
-
-    // we can bind HttpHandlers to paths/methods to create a Route
-    val route: Route = "/greet/{name}" to GET by friendlyHttpHandler
-
-    // combine many Routes together to make a RoutingHttpHandler (which is both a Router and an HttpHandler)
-    val router: RoutingHttpHandler = routes(
-        "/ping" to GET by { Response(OK).body("pong!") },
-        route
+    // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
+    // then combine many Routes together to make another HttpHandler
+    val app: HttpHandler = routes(
+        "/ping" to GET by { _: Request -> Response(OK).body("pong!") },
+        "/greet/{name}" to GET by { req: Request ->
+            val path: String? = req.path("name")
+            Response(OK).body("hello ${path ?: "anon!"}")
+        }
     )
 
-    // mount the Routers at separate contexts - to create another HttpHandler!
-    val allRoutes: HttpHandler = routes(
-        "/internal" by router,
-        "/api" by router
-    )
-
-    // call the router in-memory without spinning up a server
-    val inMemoryResponse: Response = allRoutes(Request(GET, "/api/greet/Bob"))
+    // call the handler in-memory without spinning up a server
+    val inMemoryResponse: Response = app(Request(GET, "/greet/Bob"))
     println(inMemoryResponse)
 
 // Produces:
@@ -107,15 +94,15 @@ fun main(args: Array<String>) {
 
     // we can "stack" filters to create reusable units, and then apply them to an HttpHandler
     val compositeFilter = CachingFilters.Response.NoCache().then(timingFilter)
-    val app: HttpHandler = compositeFilter.then(allRoutes)
+    val filteredApp: HttpHandler = compositeFilter.then(app)
 
     // only 1 LOC to mount an app and start it in a container
-    app.asServer(Jetty(9000)).start()
+    filteredApp.asServer(Jetty(9000)).start()
 
     // HTTP clients are also HttpHandlers!
     val client: HttpHandler = OkHttp()
 
-    val networkResponse: Response = client(Request(GET, "http://localhost:9000/api/greet/Bob"))
+    val networkResponse: Response = client(Request(GET, "http://localhost:9000/greet/Bob"))
     println(networkResponse)
 
 // Produces:
