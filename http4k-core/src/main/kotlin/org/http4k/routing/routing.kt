@@ -32,7 +32,7 @@ fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) {
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
     StaticRoutingHttpHandler(StaticHandler("", resourceLoader, extraPairs.asList().toMap()))
 
-fun Request.path(name: String): String? = uriTemplate().extract(uri.toString())[name]
+fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
 infix fun Pair<String, Method>.by(action: HttpHandler): Route = Route(second, from(first), action)
 

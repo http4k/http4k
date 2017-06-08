@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.1.1
+- Fix for #24 - UriTemplate captures query parameters when the trailing path parameter is a regex.
+
 ### v2.1.0
 - Added GSON full-auto functions to convert arbitary objects to/from JSON.
 

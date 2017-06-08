@@ -84,6 +84,12 @@ class RoutingTest {
     }
 
     @Test
+    fun `matches regex uri with query`() {
+        val handler = routes("/a/{b:.+}" to GET by { Response(OK).body(it.path("b")!!) })
+        assertThat(handler(Request(GET, "/a/foo?bob=rita")).bodyString(), equalTo("foo"))
+    }
+
+    @Test
     fun `matches request with extra path parts`() {
         val routes = routes("/a" to GET by { Response(OK) })
 
