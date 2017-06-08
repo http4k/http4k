@@ -18,7 +18,7 @@ import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.int
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
@@ -58,7 +58,7 @@ class FakeRecorderHttp : HttpHandler {
 
     private val app = CatchLensFailure.then(
         routes(
-            "/{answer}" to POST by { request -> calls.add(answer.extract(request)); Response(ACCEPTED) }
+            "/{answer}" to POST bind { request -> calls.add(answer.extract(request)); Response(ACCEPTED) }
         )
     )
 

@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CachingFilters
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
@@ -19,8 +19,8 @@ fun main(args: Array<String>) {
     // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
     // then combine many Routes together to make another HttpHandler
     val app: HttpHandler = routes(
-        "/ping" to GET by { _: Request -> Response(OK).body("pong!") },
-        "/greet/{name}" to GET by { req: Request ->
+        "/ping" to GET bind { _: Request -> Response(OK).body("pong!") },
+        "/greet/{name}" to GET bind { req: Request ->
             val path: String? = req.path("name")
             Response(OK).body("hello ${path ?: "anon!"}")
         }

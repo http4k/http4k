@@ -30,16 +30,6 @@ import org.http4k.lens.Query
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
-import org.http4k.routing.RouteMeta
-import org.http4k.routing.Tag
-import org.http4k.routing.body
-import org.http4k.routing.by
-import org.http4k.routing.contract
-import org.http4k.routing.div
-import org.http4k.routing.handler
-import org.http4k.routing.header
-import org.http4k.routing.meta
-import org.http4k.routing.query
 import org.junit.Test
 
 abstract class ContractRendererContract(private val renderer: ContractRenderer) {
@@ -65,11 +55,11 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val router = "/basepath" by contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }),
+        val router = "/basepath" bind contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }),
             "/echo" / Path.of("message")
                 header Header.optional("header", "description of the header")
                 to GET
-                handler { msg -> { Response(OK).body(msg) } }
+                bind { msg -> { Response(OK).body(msg) } }
                 meta RouteMeta("summary of this route", "some rambling description of what this thing actually does")
                 .producing(APPLICATION_JSON)
                 .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
@@ -82,7 +72,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 query Query.int().required("query")
                 body customBody
                 to POST
-                handler { msg -> { Response(OK).body(msg) } }
+                bind { msg -> { Response(OK).body(msg) } }
                 meta RouteMeta("a post endpoint")
                 .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
                 .producing(APPLICATION_JSON)
@@ -95,10 +85,10 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 query Query.boolean().required("query", "description of the query")
                 body Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
                 to GET
-                handler { a, _, _ -> { Response(OK).body(a) } }
+                bind { a, _, _ -> { Response(OK).body(a) } }
                 meta RouteMeta("a friendly endpoint"),
 
-            "/simples" to GET handler { Response(OK) } meta RouteMeta("a simple endpoint")
+            "/simples" to GET bind { Response(OK) } meta RouteMeta("a simple endpoint")
         )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())

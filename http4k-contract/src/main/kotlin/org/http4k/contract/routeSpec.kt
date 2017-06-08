@@ -1,6 +1,5 @@
-package org.http4k.routing
+package org.http4k.contract
 
-import org.http4k.contract.PathSegments
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request

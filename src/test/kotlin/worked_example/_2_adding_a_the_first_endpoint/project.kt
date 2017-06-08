@@ -9,7 +9,7 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
@@ -19,8 +19,8 @@ fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
-        "/ping" to GET by { _: Request -> Response(OK) },
-        "/add" to GET by { request: Request ->
+        "/ping" to GET bind { _: Request -> Response(OK) },
+        "/add" to GET bind { request: Request ->
             val valuesToAdd = Query.int().multi.defaulted("value", listOf()).extract(request)
             Response(OK).body(valuesToAdd.sum().toString())
         }

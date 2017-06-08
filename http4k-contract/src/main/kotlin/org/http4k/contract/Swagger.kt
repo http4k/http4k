@@ -7,8 +7,6 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Meta
-import org.http4k.routing.ContractRoute
-import org.http4k.routing.Tag
 import util.JsonSchema
 import util.JsonToJsonSchema
 

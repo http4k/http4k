@@ -21,7 +21,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up contents of existing root file`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/mybob.xml")))
         assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
         assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
@@ -29,7 +29,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can register custom mime types`() {
-        val handler = "/svc" by static(Classpath(), "myxml" to APPLICATION_XML)
+        val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
         val result = handler(Request(GET, of("/svc/mybob.myxml")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("<myxml>content</myxml>"))
@@ -38,7 +38,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `defaults to index html if is no route`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("hello from the root index.html"))
@@ -47,7 +47,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `defaults to index html if is no route - non-root-context`() {
-        val handler = "/svc" by static(Classpath("org"))
+        val handler = "/svc" bind static(Classpath("org"))
         val result = handler(Request(GET, of("/svc")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("hello from the io index.html"))
@@ -56,14 +56,14 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `non existing index html if is no route`() {
-        val handler = "/svc" by static(Classpath("org/http4k"))
+        val handler = "/svc" bind static(Classpath("org/http4k"))
         val result = handler(Request(GET, of("/svc")))
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `looks up contents of existing subdir file - non-root context`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/$pkg/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
@@ -72,7 +72,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up contents of existing subdir file`() {
-        val handler = "/" by static()
+        val handler = "/" bind static()
         val result = handler(Request(GET, of("/$pkg/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
@@ -81,7 +81,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can alter the root path`() {
-        val handler = "/svc" by static(Classpath(pkg))
+        val handler = "/svc" bind static(Classpath(pkg))
         val result = handler(Request(GET, of("/svc/StaticRouter.js")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
@@ -90,42 +90,42 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `looks up non existent-file`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/NotHere.xml")))
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `cannot serve a directory`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/org")))
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `looks up non existent path`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/bob/StaticRouter.js")))
         assertThat(result.status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `can't subvert the path`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         assertThat(handler(Request(GET, of("/svc/../svc/Bob.xml"))).status, equalTo(NOT_FOUND))
         assertThat(handler(Request(GET, of("/svc/~/.bashrc"))).status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `as a router when does not fine file`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
 
         assertThat(handler.match(Request(GET, of("/svc/../svc/Bob.xml"))), absent())
     }
 
     @Test
     fun `as a router finds file`() {
-        val handler = "/svc" by static()
+        val handler = "/svc" bind static()
         val req = Request(GET, of("/svc/mybob.xml"))
         assertThat(handler.match(req)?.invoke(req)?.status, equalTo(OK))
     }
@@ -136,7 +136,7 @@ class StaticRoutingHttpHandlerTest {
             next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
-        val handler = "/svc" by changePathFilter.then(static())
+        val handler = "/svc" bind changePathFilter.then(static())
         val req = Request(GET, of("/svc/notmybob.xml"))
         assertThat(handler(req).status, equalTo(OK))
     }
@@ -147,7 +147,7 @@ class StaticRoutingHttpHandlerTest {
             next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
-        val handler = changePathFilter.then("/svc" by static())
+        val handler = changePathFilter.then("/svc" bind static())
         val req = Request(GET, of("/svc/notmybob.xml"))
         assertThat(handler(req).status, equalTo(OK))
     }

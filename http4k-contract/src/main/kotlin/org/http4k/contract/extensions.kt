@@ -1,12 +1,7 @@
-package org.http4k.routing
+package org.http4k.contract
 
 
-import org.http4k.contract.ContractRenderer
-import org.http4k.contract.NoRenderer
-import org.http4k.contract.NoSecurity
-import org.http4k.contract.PathSegments
-import org.http4k.contract.Root
-import org.http4k.contract.Security
+import org.http4k.contract.ContractRoutingHttpHandler.Companion.Handler
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -16,7 +11,6 @@ import org.http4k.lens.BodyLens
 import org.http4k.lens.HeaderLens
 import org.http4k.lens.PathLens
 import org.http4k.lens.QueryLens
-import org.http4k.routing.ContractRoutingHttpHandler.Companion.Handler
 
 fun contract(vararg serverRoutes: ContractRoute) = contract(NoRenderer, "", NoSecurity, *serverRoutes)
 fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract(renderer, "", NoSecurity, *serverRoutes)
@@ -28,7 +22,7 @@ operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = Contract
 
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): ContractRouteSpec2<A, B> = ContractRouteSpec1({ it }, emptyList(), null, this) / next
 
-infix fun String.by(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
+infix fun String.bind(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
 @JvmName("newRequestString")
 fun Pair<String, Method>.newRequest(baseUri: Uri = Uri.of("")) = Request(second, "").uri(baseUri.path(first))
@@ -37,25 +31,25 @@ fun Pair<String, Method>.newRequest(baseUri: Uri = Uri.of("")) = Request(second,
 fun Pair<ContractRouteSpec, Method>.newRequest(baseUri: Uri = Uri.of("")) = Request(second, "").uri(baseUri.path(first.describe(Root)))
 
 @JvmName("handler0String")
-infix fun Pair<String, Method>.handler(handler: HttpHandler) = ContractRoute(second, ContractRouteSpec0(toBaseFn(first), emptyList(), null), { handler })
+infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRoute(second, ContractRouteSpec0(toBaseFn(first), emptyList(), null), { handler })
 
 @JvmName("handler1Path")
-infix fun <A> Pair<PathLens<A>, Method>.handler(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, emptyList(), null, first) to second handler fn
+infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, emptyList(), null, first) to second bind fn
 
 @JvmName("handler0")
-infix fun Pair<ContractRouteSpec0, Method>.handler(handler: HttpHandler) = ContractRoute(second, first, { handler })
+infix fun Pair<ContractRouteSpec0, Method>.bind(handler: HttpHandler) = ContractRoute(second, first, { handler })
 
 @JvmName("handler1")
-infix fun <A> Pair<ContractRouteSpec1<A>, Method>.handler(fn: (A) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a]) })
+infix fun <A> Pair<ContractRouteSpec1<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a]) })
 
 @JvmName("handler2")
-infix fun <A, B> Pair<ContractRouteSpec2<A, B>, Method>.handler(fn: (A, B) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b]) })
+infix fun <A, B> Pair<ContractRouteSpec2<A, B>, Method>.bind(fn: (A, B) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b]) })
 
 @JvmName("handler3")
-infix fun <A, B, C> Pair<ContractRouteSpec3<A, B, C>, Method>.handler(fn: (A, B, C) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b], it[first.c]) })
+infix fun <A, B, C> Pair<ContractRouteSpec3<A, B, C>, Method>.bind(fn: (A, B, C) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b], it[first.c]) })
 
 @JvmName("handler4")
-infix fun <A, B, C, D> Pair<ContractRouteSpec4<A, B, C, D>, Method>.handler(fn: (A, B, C, D) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
+infix fun <A, B, C, D> Pair<ContractRouteSpec4<A, B, C, D>, Method>.bind(fn: (A, B, C, D) -> HttpHandler) = ContractRoute(second, first, { fn(it[first.a], it[first.b], it[first.c], it[first.d]) })
 
 infix fun String.query(new: QueryLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null)
 infix fun String.header(new: HeaderLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null)

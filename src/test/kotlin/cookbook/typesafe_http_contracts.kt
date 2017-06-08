@@ -2,7 +2,13 @@ package cookbook
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
+import org.http4k.contract.RouteMeta
 import org.http4k.contract.Swagger
+import org.http4k.contract.bind
+import org.http4k.contract.contract
+import org.http4k.contract.div
+import org.http4k.contract.meta
+import org.http4k.contract.query
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
@@ -23,13 +29,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.http4k.routing.RouteMeta
-import org.http4k.routing.by
-import org.http4k.routing.contract
-import org.http4k.routing.div
-import org.http4k.routing.handler
-import org.http4k.routing.meta
-import org.http4k.routing.query
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.server.Jetty
@@ -71,23 +71,23 @@ fun main(args: Array<String>) {
     val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
         "/add" / Path.int().of("value1") / Path.int().of("value2")
             to GET
-            handler ::add
+            bind ::add
             meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
         "/echo" / Path.of("name")
             query ageQuery
             to GET
-            handler ::echo
+            bind ::echo
             meta RouteMeta("echo")
     )
 
     val handler = routes(
-        "/context" by filter.then(contract),
-        "/static" by NoCache().then(static(Classpath("cookbook"))),
-        "/" by contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
+        "/context" bind filter.then(contract),
+        "/static" bind NoCache().then(static(Classpath("cookbook"))),
+        "/" bind contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
             "/echo" / Path.of("name")
                 query ageQuery
                 to GET
-                handler ::echo
+                bind ::echo
                 meta RouteMeta("echo")
         )
     )

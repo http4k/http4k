@@ -1,9 +1,5 @@
-package org.http4k.routing
+package org.http4k.contract
 
-import org.http4k.contract.ContractRenderer
-import org.http4k.contract.PathSegments
-import org.http4k.contract.Security
-import org.http4k.contract.isIn
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -14,6 +10,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Header
+import org.http4k.routing.RoutingHttpHandler
 
 class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
@@ -39,7 +36,7 @@ class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) 
 
             override fun invoke(request: Request): Response = handler(request)
 
-            private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET handler { renderer.description(contractRoot, security, routes) }
+            private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET bind { renderer.description(contractRoot, security, routes) }
 
             private val routers = routes
                 .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }

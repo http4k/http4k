@@ -34,7 +34,7 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
-infix fun Pair<String, Method>.by(action: HttpHandler): Route = Route(second, from(first), action)
+infix fun Pair<String, Method>.bind(action: HttpHandler): Route = Route(second, from(first), action)
 
-infix fun String.by(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
+infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
 

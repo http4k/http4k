@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.static
@@ -18,19 +18,19 @@ fun main(args: Array<String>) {
     val routesWithFilter =
         PrintRequestAndResponse().then(
             routes(
-                "/get/{name}" to GET by { req: Request -> Response(OK).body(req.path("name")!!) },
-                "/post/{name}" to POST by { _: Request -> Response(OK) }
+                "/get/{name}" to GET bind { req: Request -> Response(OK).body(req.path("name")!!) },
+                "/post/{name}" to POST bind { _: Request -> Response(OK) }
             )
         )
     println(routesWithFilter(Request(GET, "/get/value")))
 
     val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("cookbook")))
     val app = routes(
-        "/bob" by routesWithFilter,
-        "/static" by staticWithFilter,
-        "/rita" by routes(
-            "/delete/{name}" to DELETE by { _: Request -> Response(OK) },
-            "/post/{name}" to POST by { _: Request -> Response(OK) }
+        "/bob" bind routesWithFilter,
+        "/static" bind staticWithFilter,
+        "/rita" bind routes(
+            "/delete/{name}" to DELETE bind { _: Request -> Response(OK) },
+            "/post/{name}" to POST bind { _: Request -> Response(OK) }
         )
     )
 

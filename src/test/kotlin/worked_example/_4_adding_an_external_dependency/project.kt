@@ -14,7 +14,7 @@ import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
@@ -31,9 +31,9 @@ fun MyMathsApp(recorderHttp: HttpHandler): HttpHandler {
     val recorder = Recorder(recorderHttp)
     return CatchLensFailure.then(
         routes(
-            "/ping" to GET by { _: Request -> Response(OK) },
-            "/add" to GET by calculate(recorder) { it.sum() },
-            "/multiply" to GET by calculate(recorder) { it.fold(1) { memo, next -> memo * next } }
+            "/ping" to GET bind { _: Request -> Response(OK) },
+            "/add" to GET bind calculate(recorder) { it.sum() },
+            "/multiply" to GET bind calculate(recorder) { it.fold(1) { memo, next -> memo * next } }
         )
     )
 }

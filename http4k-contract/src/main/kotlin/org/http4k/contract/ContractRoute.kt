@@ -1,9 +1,5 @@
-package org.http4k.routing
+package org.http4k.contract
 
-import org.http4k.contract.PathSegments
-import org.http4k.contract.Root
-import org.http4k.contract.pathSegments
-import org.http4k.contract.without
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -13,6 +9,7 @@ import org.http4k.core.then
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
+import org.http4k.routing.Router
 
 class ContractRoute internal constructor(internal val method: Method,
                                          internal val spec: ContractRouteSpec,

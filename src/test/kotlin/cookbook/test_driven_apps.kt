@@ -14,7 +14,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.ServerFilters
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
@@ -55,14 +55,14 @@ class EndpointUnitTest {
 
 fun MyMathsApp(recorderHttp: HttpHandler) =
     ServerFilters.CatchAll().then(routes(
-        "/add" to GET by myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
+        "/add" to GET bind myMathsEndpoint({ first, second -> first + second }, AnswerRecorder(recorderHttp))
     ))
 
 class FakeRecorderHttp : HttpHandler {
     val calls = mutableListOf<Int>()
 
     private val app = routes(
-        "/{answer}" to POST by { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
+        "/{answer}" to POST bind { request -> calls.add(request.path("answer")!!.toInt()); Response(OK) }
     )
 
     override fun invoke(request: Request): Response = app(request)

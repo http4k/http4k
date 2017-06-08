@@ -6,7 +6,6 @@ import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
-import org.http4k.routing.ContractRoute
 
 class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>) : ContractRenderer {
 

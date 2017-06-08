@@ -1,4 +1,4 @@
-package org.http4k.routing
+package org.http4k.contract
 
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET

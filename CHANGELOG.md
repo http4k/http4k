@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.2.0
+- Rename  `by()` to `bind()` in routing for clarity. 
+
 ### v2.1.2
 - Fix for #24 - UriTemplate captures query parameters when the trailing path parameter is a regex.
 

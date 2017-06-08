@@ -6,7 +6,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 /**
@@ -15,9 +15,9 @@ import org.http4k.routing.routes
 fun main(args: Array<String>) {
 
     val app = routes(
-        "bob" to GET by { Response(OK).body("you GET bob") },
-        "rita" to POST by { Response(OK).body("you POST rita") },
-        "sue" to DELETE by { Response(OK).body("you DELETE sue") }
+        "bob" to GET bind { Response(OK).body("you GET bob") },
+        "rita" to POST bind { Response(OK).body("you POST rita") },
+        "sue" to DELETE bind { Response(OK).body("you DELETE sue") }
     )
 
     println(app(Request(GET, "/bob")))

@@ -12,7 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.After
 import org.junit.Before
@@ -27,15 +27,15 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Before
     fun before() {
         server = routes(
-            "/" to GET by { _: Request ->
+            "/" to GET bind { _: Request ->
                 Response(ACCEPTED)
                     .header("content-type", "text/plain")
                     .body("Hello World")
             },
-            "/echo" to POST by { req: Request -> Response(OK).body(req.bodyString()) },
-            "/request-headers" to GET by { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-            "/uri" to GET by { req: Request -> Response(OK).body(req.uri.toString()) },
-            "/boom" to GET by { _: Request -> throw IllegalArgumentException("BOOM!") }
+            "/echo" to POST bind { req: Request -> Response(OK).body(req.bodyString()) },
+            "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+            "/uri" to GET bind { req: Request -> Response(OK).body(req.uri.toString()) },
+            "/boom" to GET bind { _: Request -> throw IllegalArgumentException("BOOM!") }
         ).startServer(serverConfig(port), false)
     }
 
