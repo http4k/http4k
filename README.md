@@ -32,7 +32,7 @@ of services without HTTP container being required.
 ## Example
 This quick example is designed to convey the features of **http4k**. There is also a [quickstart](https://github.com/http4k/http4k/wiki/Quickstart) on the wiki for the simplest possible starting point.
 
-This "hello world" example demonstrates how to serve and consume HTTP services using **http4k**. 
+This "hello world" style example demonstrates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
@@ -43,8 +43,7 @@ dependencies {
 }
 ```
 
-The following creates a simplest possible endpoint function (with no path), binds it to a Jetty server then starts, queries, and stops it.
-
+Full code below:
 ```kotlin
 import org.http4k.client.OkHttp
 import org.http4k.core.Filter
