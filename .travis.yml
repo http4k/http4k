@@ -5,7 +5,7 @@ script:
 - "./gradlew check"
 after_success:
 - "./gradlew jacocoRootReport coveralls"
-- "travis_wait 45 ./release-ci.sh"
+- "travis_wait 60 ./release-ci.sh"
 cache:
   directories:
   - "$HOME/.m2"
