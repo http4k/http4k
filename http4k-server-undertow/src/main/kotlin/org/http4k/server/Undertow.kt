@@ -24,7 +24,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
     private fun Response.into(exchange: HttpServerExchange) {
         exchange.statusCode = status.code
         headers.forEach {
-            exchange.responseHeaders.put(HttpString(it.first), it.second + "; charset=utf-8")
+            exchange.responseHeaders.put(HttpString(it.first), it.second)
         }
         exchange.responseSender.send(body.payload)
     }
