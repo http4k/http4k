@@ -2,8 +2,8 @@ The creators of **http4k** takes testing very seriously - so seriously that ther
 The API has been designed to make it as simple as possible to test both individual endpoints and entire applications in a consistent fashion, which is aided by remembering that:
 
 1. The input and output `Request/Response` objects are immutable.
-2. `HttpHandler` endpoints are just functions.
-3. An entire **http4k** application is *just* an `HttpHandler`.
+1. `HttpHandler` endpoints are just functions.
+1. An entire **http4k** application is *just* an `HttpHandler`.
 
 Because of the above, there really isn't much required in the way of "testing infrastructure" - no magic containers or test fixtures that you might find in other frameworks. 
 Testing is just matter of calling the correct function! Additionally, because the server and client HttpHandler interfaces are symmetrical - moving between in and out of container contexts 

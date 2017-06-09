@@ -3,11 +3,12 @@
 
 ### About
 The core module has ZERO dependencies and provides the following:
-* Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
-* HTTP handler and filter abstractions which models services as simple, composable functions.
-* Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
-* [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
-* Abstractions for Servers, Clients, messasge formats, Templating etc.
+
+- Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
+- HTTP handler and filter abstractions which models services as simple, composable functions.
+- Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
+- [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
+- Abstractions for Servers, Clients, messasge formats, Templating etc.
 
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:
@@ -55,12 +56,13 @@ val app: HttpHandler = latencyAndBasicAuth.then(handler)
 ```
 
 The `http4k-core` module comes with a set of handy Filters for application to both Server and Client `HttpHandlers`, covering common things like:
-* Request tracing headers (x-b3-traceid etc)
-* Basic Auth
-* Cache Control
-* CORS
-* Cookie handling
-* Debugging request and responses
+
+- Request tracing headers (x-b3-traceid etc)
+- Basic Auth
+- Cache Control
+- CORS
+- Cookie handling
+- Debugging request and responses
 
 Check out the `org.http4k.filter` package for the exact list.
 
