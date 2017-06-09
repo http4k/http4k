@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.2.1
+- Remove excess "charset" from headers in Undertow
+
 ### v2.2.0
 - Rename  `by()` to `bind()` in routing for clarity. 
 
