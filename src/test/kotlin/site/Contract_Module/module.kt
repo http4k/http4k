@@ -23,6 +23,8 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.routing.routes
 
+//1. **Define a route**
+//Firstly, create a route with the desired contract of path, headers, queries and body parameters.
 val ageQuery = Query.int().required("age")
 val stringBody = Body.string(TEXT_PLAIN).toLens()
 
@@ -31,6 +33,8 @@ val route = ("/echo" / Path.of("name")
     body stringBody
     to Method.GET)
 
+//2. **Dynamic binding of calls to an HttpHandler**
+//Next, bind this route to a function which creates an `HttpHandler` for each invocation, which receives the dynamic path elements from the path:
 fun echo(nameFromPath: String): HttpHandler = { request: Request ->
     val age = ageQuery(request)
     val sentMessage = stringBody(request)
@@ -40,6 +44,8 @@ fun echo(nameFromPath: String): HttpHandler = { request: Request ->
     )
 }
 
+//3. **Combining Routes into a contract and bind to a context**
+//Finally, the `ContractRoutes` are added into a reusable `Contract` in the standard way, defining a renderer (in this example Swagger) and a security model (in this case an API-Key):
 val routeWithBindings = route bind ::echo meta RouteMeta("echo")
 
 val security = ApiKey(Query.int().required("api"), { it == 42 })

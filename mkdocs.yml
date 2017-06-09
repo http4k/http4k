@@ -5,5 +5,5 @@ site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
 remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme: 'material'
-extra_javascript:
-  - code.js
+extra_css:
+  - ./css/site.css
