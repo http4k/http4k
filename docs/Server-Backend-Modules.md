@@ -1,0 +1,14 @@
+### Installation (Gradle)
+**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "X.X.X"```
+
+**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "X.X.X"```
+
+**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "X.X.X"```
+
+### About
+Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
+
+```kotlin
+{ _: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
+```
+Alteratively, all server-backend modules allow for plugging **http4k** handlers into the relevant server API, which allows for custom Server configuration.

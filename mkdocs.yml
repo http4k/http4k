@@ -1,3 +1,9 @@
 site_name: http4k
-
+site_url: http://www.http4k.org
+site_description: Http4k documentation
+site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
+remote_branch: master
+repo_url: https://github.com/http4k/http4k/
 theme: 'material'
+extra_javascript:
+  - code.js

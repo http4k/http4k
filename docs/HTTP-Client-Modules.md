@@ -1,0 +1,17 @@
+### Installation (Gradle)
+**Apache:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "X.X.X"```
+
+**OkHttp:** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "X.X.X"```
+
+### About
+Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC:
+
+```kotlin
+val client = ApacheClient()
+val request = Request(Method.GET, "http://httpbin.org/get").query("location", "John Doe")
+val response = client(request)
+println(response.status)
+println(response.bodyString())
+```
+
+Alteratively, all client adapter modules allow for custom configuration of the relevant Client configuration.
