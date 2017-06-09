@@ -12,10 +12,13 @@ import org.http4k.core.UriTemplate.Companion.from
 import org.http4k.routing.GroupRoutingHttpHandler.Companion.Handler
 import org.http4k.routing.StaticRoutingHttpHandler.Companion.Handler as StaticHandler
 
-data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler)
-
 interface Router {
     fun match(request: Request): HttpHandler?
+}
+
+data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler) : Router {
+    private val router = GroupRoutingHttpHandler.Companion.Handler(template, listOf(this))
+    override fun match(request: Request) = router.match(request)
 }
 
 interface RoutingHttpHandler : Router, HttpHandler {
@@ -37,4 +40,3 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 infix fun Pair<String, Method>.bind(action: HttpHandler): Route = Route(second, from(first), action)
 
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
-

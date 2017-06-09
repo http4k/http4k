@@ -51,6 +51,22 @@ class RoutingTest {
         assertThat(response.bodyString(), equalTo("matched"))
     }
 
+
+    @Test
+    fun `can mix and match Routers and Routes`() {
+        val routes = routes(
+            "/a" to GET bind { Response(OK).body("matched a") },
+            "/b/c" bind routes(
+                "/d" to GET bind { Response(OK).body("matched b/c/d") },
+                "/" to GET bind { Response(OK).body("matched b/c") }
+            )
+        )
+
+        assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
+        assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
+        assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
+    }
+
     @Test
     fun `matches uses first match`() {
         val routes = routes(
