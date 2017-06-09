@@ -20,5 +20,6 @@ combined into `RouteModules`, which have the following features:
 When launched, Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
 For a more extended example, see the following example apps: 
-* [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
-* [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
+
+- [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
+- [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
