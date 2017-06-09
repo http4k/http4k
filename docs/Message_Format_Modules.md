@@ -10,4 +10,4 @@ These modules add the ability to use JSON as a first-class citizen when reading 
 standard methods and extension methods for converting common types into native JSON objects, including custom Lens methods for each library so that 
 JSON node objects can be written and read directly from HTTP messages:
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/Message_Format_Modules/module.kt"></script>
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/message_format_module_0.kt"></script>

@@ -90,17 +90,12 @@ val requiredQuery = Query.required("myQueryName")
 val nonEmptyQuery = Query.nonEmptyString().required("myNonEmptyQuery")
 val optionalHeader = Header.int().optional("Content-Length")
 val responseBody = Body.string(PLAIN_TEXT).toLens()
-```
 
-Most of the useful common JDK types are covered. However, if we want to use our own types, we can just use `map()`
-```kotlin
+// Most of the useful common JDK types are covered. However, if we want to use our own types, we can just use `map()`
 data class CustomType(val value: String)
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
-```
 
-To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
-
-```kotlin
+//To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
 val handler = routes(
     "/hello/{date:*}" to GET bind { request: Request -> 
          val pathDate: LocalDate = pathLocalDate(request) 
@@ -119,12 +114,12 @@ val handler = routes(
       }
 )
 
-ServerFilters.CatchLensFailure.then(handler(Request(Method.GET, "/hello/2000-01-01?myCustomType=someValue")))
-```
-With the addition of the `CatchLensFailure` filter, no other validation is required when using Lenses, as **http4k** will handle invalid requests by returning a BAD_REQUEST (400) response.
+val app = ServerFilters.CatchLensFailure.then(handler(Request(Method.GET, "/hello/2000-01-01?myCustomType=someValue")))
+//With the addition of the `CatchLensFailure` filter, no other validation is required when using Lenses, as **http4k** will handle invalid requests by returning a BAD_REQUEST (400) response.
 
-More convieniently for construction of HTTP messages, multiple lenses can be used at once to modify a message, which is useful for properly building both requests and responses in a typesafe way without resorting to string values (especially in URLs which should never be constructed using String concatenation):
-```kotlin
+//More convieniently for construction of HTTP messages, multiple lenses can be used at once to modify a message, which is useful for properly building both requests and responses in a typesafe way without resorting to string values (especially in 
+URLs which should never be constructed using String concatenation):
+
 val modifiedRequest: Request = Request(Method.GET, "http://google.com/{pathLocalDate}").with(
     pathLocalDate of LocalDate.now(),
     requiredQuery of "myAmazingString",

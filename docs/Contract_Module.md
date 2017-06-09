@@ -15,7 +15,7 @@ combined into `RouteModules`, which have the following features:
 (http://json-schema.org/) models for messages.
 - **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/Contract_Module/module.kt"></script>
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/contract_module0.kt"></script>
 
 When launched, Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
