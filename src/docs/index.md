@@ -1,6 +1,17 @@
-<img src="/img/logo_1100x200_blue_on_white.png"/>
+<img src="http://http4k.org/img/logo_1100x200_blue_on_white.png"/>
 
 **http4k** is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
+
+<span class="github">
+[![coverage](https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master)](https://coveralls.io/github/http4k/http4k?branch=master)
+[![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
+[![Download](https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg)](https://bintray.com/http4k/maven/http4k-core/_latestVersion)
+[![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+[![kotlin](https://img.shields.io/badge/kotlin-1.1.2-blue.svg)](http://kotlinlang.org)
+[![codebeat badge](https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e)](https://codebeat.co/projects/github-com-http4k-http4k-master)
+[![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg)](https://gitter.im/http4k/http4k)
+[![Awesome Kotlin Badge](https://kotlin.link/awesome-kotlin.svg)](https://kotlin.link)
+</span>
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
 servers, clients, templating etc) that are provided as optional add-on libraries.
@@ -28,7 +39,7 @@ plugging together of services without HTTP container being required.
    * Templating support: Caching and Hot-Reload engine support for Handlebars
 
 ## Module feature overview
-* [Core:](/guide/modules/core) 
+* [Core:](http://http4k.org/guide/modules/core) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
@@ -36,29 +47,29 @@ plugging together of services without HTTP container being required.
     * **Static file-serving** capability with **Caching and Hot-Reload** 
     * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
     * Core abstraction APIs implemented by the other modules 
-* [Client:](/guide/modules/clients) 
+* [Client:](http://http4k.org/guide/modules/clients) 
     * **Single LOC** HTTP client adapters 
         * **Apache**
         * **OkHttp**
-* [Server:](/guide/modules/servers)
+* [Server:](http://http4k.org/guide/modules/servers)
     * **Single LOC** server backend spinup for:
         * **Jetty**
         * **Netty**
         * **Undertow**
     * API design allows for plugging into configurable instances of each
-* **BETA!** [Contracts:](/guide/modules/contracts) 
+* **BETA!** [Contracts:](http://http4k.org/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
    * **Typesafe** path matching
    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
-* [Templating:](/guide/modules/templating) 
+* [Templating:](http://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * Handlebars 
     * Caching and **Hot-Reload** template support
-* [Message formats:](/guide/modules/message_formats) 
+* [Message formats:](http://http4k.org/guide/modules/message_formats) 
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
         * **Jackson** -includes support for **fully automatic marshalling of Data classes**)
-        * **Gson**
+        * **Gson** -includes support for **fully automatic marshalling of Data classes**)
         * **Argo**
 
 ## Acknowledgments
