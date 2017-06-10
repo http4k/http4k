@@ -8,6 +8,8 @@ documentation, and checking in a high-level way that the business endpoints are 
 ## Requirements:
 - The service can be pinged over HTTP to prove that is still alive.
 
-
+## Production:
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_1_building_the_walking_skeleton/project.kt"></script>
+
+## Tests:
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_1_building_the_walking_skeleton/tests.kt"></script>

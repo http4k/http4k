@@ -4,3 +4,9 @@ also been converted to reusable extension methods on Response.
 
 ## Requirements:
 - Implement an "add" service, which will sum a number of integer values.
+
+## Production:
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_2_adding_a_the_first_endpoint/project.kt"></script>
+
+## Tests:
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_2_adding_a_the_first_endpoint/tests.kt"></script>

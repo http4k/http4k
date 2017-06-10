@@ -22,3 +22,10 @@ The following process is followed to us to the final state, whilst always allowi
 1. Introduce the recorder HttpHandler to MyMathApp, creating a FakeRecorderHttp in the AppEnvironment
 1. Alter the AddFunctionalTest and MultiplyFunctionalTest to set the expectations on the interactions recorder in FakeRecorderHttp
 1. In MyMathApp, create the Recorder business implementation (Recorder) and pass it to calculate(), then implement the call to record()
+
+
+## Production:
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_4_adding_an_external_dependency/project.kt"></script>
+
+## Tests:
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/guide/worked_example/_4_adding_an_external_dependency/tests.kt"></script>
