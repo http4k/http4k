@@ -6,6 +6,9 @@ remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme: 'material'
 theme_dir: ./docs/theme
+markdown_extensions:
+  - meta
+  - codehilite
 extra_css:
   - ./css/site.css
 extra:
@@ -13,3 +16,21 @@ extra:
     primary: 'indigo'
     accent: 'blue'
   logo: img/logo_1100x200_white_on_blue.png
+
+pages:
+  - Introduction: index.md
+  - Rationale & Concepts: rationale.md
+  - Get it: installation.md
+  - Getting started: quickstart.md
+  - User Guide:
+    - Modules:
+      - Core: modules/core.md
+      - Server Backend: modules/servers.md
+      - HTTP Client: modules/clients.md
+      - Message Formats: modules/message_formats.md
+      - Templating: modules/templating.md
+      - Typesafe Contracts: modules/contracts.md
+    - Application Testing: testing.md
+  - Performance: performance.md
+  - HTTP4K in action: http4k-in-action.md
+

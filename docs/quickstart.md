@@ -1,3 +1,5 @@
+# Quickstart
+
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 
 
 To install, add these dependencies to your **Gradle** file:
