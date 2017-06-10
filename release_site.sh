@@ -10,6 +10,7 @@ cp -R src/docs ${TMP}/
 echo `pwd`
 cp CONTRIBUTING.md ${TMP}docs/contributing/index.md
 cp CHANGELOG.md ${TMP}docs/changelog/index.md
+cp README.md ${TMP}docs/index.md
 cp -R src/mkdocs.yml ${TMP}
 
 cd ${TMP}
