@@ -1,9 +1,9 @@
 ### Installation (Gradle)
-**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "X.X.X"```
+**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "2.3.0"```
 
-**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "X.X.X"```
+**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "2.3.0"```
 
-**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "X.X.X"```
+**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "2.3.0"```
 
 ### About
 Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
