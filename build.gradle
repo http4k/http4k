@@ -194,5 +194,8 @@ sourceSets {
             srcDirs 'src/test/kotlin'
             srcDirs 'src/docs'
         }
+        resources {
+            srcDir 'src/docs'
+        }
     }
 }

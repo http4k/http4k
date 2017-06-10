@@ -22,7 +22,7 @@ data class Person(val name: String, val age: Int) : ViewModel
  */
 fun main(args: Array<String>) {
 
-    val renderer = HandlebarsTemplates().HotReload("src/test/resources")
+    val renderer = HandlebarsTemplates().HotReload("src/docs")
 
     val view = Body.view(renderer, TEXT_HTML)
 
