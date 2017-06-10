@@ -59,13 +59,6 @@ plugging together of services without HTTP container being required.
         * **Gson**
         * **Argo**
 
-
-## Installation
-All **http4k** libraries are available on Maven Central and JCenter. Add the following to your Gradle file, substituting in the latest version displayed in the sidebar:
-```
-compile group: "org.http4k", name: "http4k-core", version: "X.X.X"
-```
-
 ## Acknowledgments
 
 * [Dan Bodart](https://twitter.com/DanielBodart)'s [utterlyidle](https://github.com/bodar/utterlyidle)
