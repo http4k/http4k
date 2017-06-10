@@ -13,4 +13,4 @@ dependencies {
 
 The following creates a simple endpoint, binds it to a Jetty server then starts, queries, and stops it.
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/test/kotlin/site/quickstart0.kt"></script>
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart0.kt"></script>

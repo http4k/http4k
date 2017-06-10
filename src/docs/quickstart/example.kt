@@ -1,3 +1,5 @@
+package quickstart
+
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 import org.http4k.core.Request

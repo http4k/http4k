@@ -19,9 +19,9 @@ extra:
 
 pages:
   - Introduction: index.md
-  - Rationale & Concepts: rationale.md
-  - Installation:  installation.md
-  - Getting started: quickstart.md
+  - Rationale & Concepts: rationale/index.md
+  - Installation:  installation/index.md
+  - Getting started: quickstart/index.md
   - Developer Guide:
     - Modules:
       - Core: guide/modules/core.md
@@ -38,6 +38,6 @@ pages:
       - 3. Adding another endpoint: guide/example/_3_adding_the_second_endpoint/index.md
       - 4. An external dependency: guide/example/_4_adding_an_external_dependency/index.md
   - Cookbook:
-    - Server as a function: cookbook/server_as_a_function.md
-  - Performance: performance.md
-  - HTTP4K in action: http4k-in-action.md
+    - Server as a function: cookbook/server_as_a_function/index.md
+  - Performance: performance/index.md
+  - HTTP4K in action: in_action/index.md
