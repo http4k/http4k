@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.client_as_a_function
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler

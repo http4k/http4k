@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.test_driven_apps
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch

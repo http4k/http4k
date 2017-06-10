@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.server_as_a_function
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method

@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.simple_routing
 
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET

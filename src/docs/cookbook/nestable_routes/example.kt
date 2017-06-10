@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.nestable_routes
 
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
         )
     println(routesWithFilter(Request(GET, "/get/value")))
 
-    val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("cookbook")))
+    val staticWithFilter = PrintRequestAndResponse().then(static(Classpath("cookbook/nestable_routes")))
     val app = routes(
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,

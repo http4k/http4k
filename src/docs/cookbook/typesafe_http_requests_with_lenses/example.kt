@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.typesafe_http_requests_with_lenses
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN

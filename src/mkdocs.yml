@@ -33,11 +33,11 @@ pages:
     - Application Testing: guide/testing.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md
-      - 1. Building a walking skeleton: guide/example/1-building-a-walking-skeleton.md
-      - 2. Adding an endpoint: guide/example/2-adding-the-first-endpoint.md
-      - 3. Adding another endpoint: guide/example/3-adding-the-second-endpoint.md
-      - 4. An external dependency: guide/example/4-adding-an-external-dependency.md
+      - 1. Building a walking skeleton: guide/example/_1_building_a_walking_skeleton/index.md
+      - 2. Adding an endpoint: guide/example/_2_adding_the_first_endpoint/index.md
+      - 3. Adding another endpoint: guide/example/_3_adding_the_second_endpoint/index.md
+      - 4. An external dependency: guide/example/_4_adding_an_external_dependency/index.md
   - Cookbook:
-    - Recipe1: cookbook/recipe1.md
+    - Server as a function: cookbook/server_as_a_function.md
   - Performance: performance.md
   - HTTP4K in action: http4k-in-action.md

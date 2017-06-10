@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.container_integration
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method

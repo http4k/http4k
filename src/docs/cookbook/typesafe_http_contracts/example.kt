@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.typesafe_http_contracts
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey

@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.readme
 
 import org.http4k.client.OkHttp
 import org.http4k.core.Filter

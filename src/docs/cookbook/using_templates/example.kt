@@ -1,4 +1,4 @@
-package cookbook
+package cookbook.using_templates
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
