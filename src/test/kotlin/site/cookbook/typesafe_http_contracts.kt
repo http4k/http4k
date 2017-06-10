@@ -1,4 +1,4 @@
-package cookbook
+package site.cookbook
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey

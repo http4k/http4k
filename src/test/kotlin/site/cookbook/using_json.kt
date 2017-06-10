@@ -1,4 +1,4 @@
-package cookbook
+package site.cookbook
 
 import org.http4k.core.Body
 import org.http4k.core.Response
