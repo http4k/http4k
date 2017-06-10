@@ -3,6 +3,12 @@
 }
 
 ul.statusLink {
+    float: right;
+    padding-right: 2rem;
+}
+ul.statusLink li {
+    padding: 0.5rem;
+    display: inline;
     list-style: none;
 }
 

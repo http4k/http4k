@@ -25,7 +25,6 @@ plugging together of services without HTTP container being required.
    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
    * Templating support: Caching and Hot-Reload engine support for Handlebars
 
-
 ## Module feature overview
 * [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
