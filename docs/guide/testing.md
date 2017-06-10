@@ -10,4 +10,4 @@ Testing is just matter of calling the correct function! Additionally, because th
 (or indeed even to another HTTP framework entirely) is just a matter of switching out the HttpHandler implementation from the constructed app (out of container) to an HTTP client (in-container).
 
 That said, possibly the most useful thing is to demonstrate the process that we have developed to test micro-services. A simple example of the development process can be found 
-[here](https://github.com/http4k/http4k/tree/master/src/test/kotlin/worked_example).
+[here](/guide/example).
