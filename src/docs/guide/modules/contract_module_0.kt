@@ -1,3 +1,5 @@
+package guide.modules
+
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.RouteMeta

@@ -1,4 +1,4 @@
-package site.cookbook
+package cookbook
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler

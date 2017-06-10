@@ -1,3 +1,5 @@
+package guide.modules
+
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body
 import org.http4k.core.Response

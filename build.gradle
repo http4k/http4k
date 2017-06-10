@@ -188,3 +188,11 @@ dependencies {
     testCompile testing
 }
 
+sourceSets {
+    test {
+        kotlin {
+            srcDirs 'src/test/kotlin'
+            srcDirs 'src/docs'
+        }
+    }
+}
