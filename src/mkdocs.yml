@@ -40,4 +40,4 @@ pages:
   - Cookbook:
     - Server as a function: cookbook/server_as_a_function/index.md
   - Performance: performance/index.md
-  - HTTP4K in action: in_action/index.md
+  - In action: in_action/index.md
