@@ -1,4 +1,4 @@
-package guide.modules
+package guide.modules.message_formats
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body

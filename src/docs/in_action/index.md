@@ -1,5 +1,4 @@
-# See http4k in action:
-* [Cookbook example code](https://github.com/http4k/http4k/tree/master/src/test/kotlin/cookbook)
+# See http4k in action in these external projects:
 * [Todo backend (simple version)](https://github.com/http4k/http4k-todo-backend)
 * [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
 * [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)

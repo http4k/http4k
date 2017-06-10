@@ -24,13 +24,13 @@ pages:
   - Getting started: quickstart/index.md
   - Developer Guide:
     - Modules:
-      - Core: guide/modules/core.md
-      - Server Backend: guide/modules/servers.md
-      - HTTP Client: guide/modules/clients.md
-      - Message Formats: guide/modules/message_formats.md
-      - Templating: guide/modules/templating.md
-      - Typesafe Contracts: guide/modules/contracts.md
-    - Application Testing: guide/testing.md
+      - Core: guide/modules/core/index.md
+      - Server Backend: guide/modules/servers/index.md
+      - HTTP Client: guide/modules/clients/index.md
+      - Message Formats: guide/modules/message_formats/index.md
+      - Templating: guide/modules/templating/index.md
+      - Typesafe Contracts: guide/modules/contracts/index.md
+    - Application Testing: guide/testing/index.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md
       - 1. Building a walking skeleton: guide/example/_1_building_a_walking_skeleton/index.md

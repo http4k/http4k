@@ -28,7 +28,7 @@ plugging together of services without HTTP container being required.
    * Templating support: Caching and Hot-Reload engine support for Handlebars
 
 ## Module feature overview
-* [Core:](https://github.com/http4k/http4k/wiki/Core-Module) 
+* [Core:](/guide/modules/core) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
@@ -36,26 +36,26 @@ plugging together of services without HTTP container being required.
     * **Static file-serving** capability with **Caching and Hot-Reload** 
     * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
     * Core abstraction APIs implemented by the other modules 
-* [Client:](https://github.com/http4k/http4k/wiki/HTTP-Client-Modules) 
+* [Client:](/guide/modules/clients) 
     * **Single LOC** HTTP client adapters 
         * **Apache**
         * **OkHttp**
-* [Server:](https://github.com/http4k/http4k/wiki/Server-Backend-Modules)
+* [Server:](/guide/modules/servers)
     * **Single LOC** server backend spinup for:
         * **Jetty**
         * **Netty**
         * **Undertow**
     * API design allows for plugging into configurable instances of each
-* **BETA!** [Contracts:](https://github.com/http4k/http4k/wiki/Contract-Module) 
+* **BETA!** [Contracts:](/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
    * **Typesafe** path matching
    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
-* [Templating:](https://github.com/http4k/http4k/wiki/Templating-Modules) 
+* [Templating:](/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * Handlebars 
     * Caching and **Hot-Reload** template support
-* [Message formats:](https://github.com/http4k/http4k/wiki/Message-Format-Modules) 
+* [Message formats:](/guide/modules/message_formats) 
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
         * **Jackson** -includes support for **fully automatic marshalling of Data classes**)
         * **Gson**

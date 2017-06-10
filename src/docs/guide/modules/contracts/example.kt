@@ -1,4 +1,4 @@
-package guide.modules
+package guide.modules.contracts
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
