@@ -1,3 +1,11 @@
 .gist-meta {
     display: none;
 }
+
+ul.statusLink {
+    list-style: none;
+}
+
+.md-content {
+    margin-right: 0;
+}
