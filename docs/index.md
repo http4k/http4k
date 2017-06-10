@@ -1,3 +1,5 @@
+<img src="/img/logo_1100x200_blue_on_white.png"/>
+
 **http4k** is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 

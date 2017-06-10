@@ -24,13 +24,13 @@ pages:
   - Getting started: quickstart.md
   - User Guide:
     - Modules:
-      - Core: modules/core.md
-      - Server Backend: modules/servers.md
-      - HTTP Client: modules/clients.md
-      - Message Formats: modules/message_formats.md
-      - Templating: modules/templating.md
-      - Typesafe Contracts: modules/contracts.md
-    - Application Testing: testing.md
+      - Core: guide/modules/core.md
+      - Server Backend: guide/modules/servers.md
+      - HTTP Client: guide/modules/clients.md
+      - Message Formats: guide/modules/message_formats.md
+      - Templating: guide/modules/templating.md
+      - Typesafe Contracts: guide/modules/contracts.md
+    - Application Testing: guide/testing.md
   - Performance: performance.md
   - HTTP4K in action: http4k-in-action.md
 
