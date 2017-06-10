@@ -1,4 +1,4 @@
-# http4k
+<img src="https://github.com/http4k/http4k/raw/master/docs/img/logo_1100x200_blue_on_white.png"/>
 
 [![coverage](https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master)](https://coveralls.io/github/http4k/http4k?branch=master)
 [![build status](https://travis-ci.org/http4k/http4k.svg?branch=master)](https://travis-ci.org/http4k/http4k)
