@@ -41,3 +41,6 @@ pages:
     - Server as a function: cookbook/server_as_a_function/index.md
   - Performance: performance/index.md
   - In action: in_action/index.md
+  - Changelog: changelog/index.md
+  - Contributers' Guide: contributing/index.md
+  - Help & Support: support/index.md

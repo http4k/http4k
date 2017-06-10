@@ -24,3 +24,7 @@ ul.statusLink li {
 [data-md-color-primary=indigo] .md-header {
     background-color: #2e7bf4;
 }
+
+.github {
+    display: none;
+}
