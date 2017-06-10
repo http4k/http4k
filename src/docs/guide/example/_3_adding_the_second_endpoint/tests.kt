@@ -1,7 +1,9 @@
-package site.guide.worked_example._3_adding_another_endpoint
+package guide.example._3_adding_the_second_endpoint
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import guide.example._3_adding_the_second_endpoint.Matchers.answerShouldBe
+import guide.example._3_adding_the_second_endpoint.Matchers.statusShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -12,8 +14,6 @@ import org.http4k.core.Status.Companion.OK
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import site.guide.worked_example._3_adding_another_endpoint.Matchers.answerShouldBe
-import site.guide.worked_example._3_adding_another_endpoint.Matchers.statusShouldBe
 
 object Matchers {
     fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)

@@ -1,4 +1,4 @@
-package site.guide.worked_example._2_adding_a_the_first_endpoint
+package guide.example._2_adding_the_first_endpoint
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

@@ -1,7 +1,9 @@
-package site.guide.worked_example._4_adding_an_external_dependency
+package guide.example._4_adding_an_external_dependency
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import guide.example._4_adding_an_external_dependency.Matchers.answerShouldBe
+import guide.example._4_adding_an_external_dependency.Matchers.statusShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -26,8 +28,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import site.guide.worked_example._4_adding_an_external_dependency.Matchers.answerShouldBe
-import site.guide.worked_example._4_adding_an_external_dependency.Matchers.statusShouldBe
 
 
 object Matchers {

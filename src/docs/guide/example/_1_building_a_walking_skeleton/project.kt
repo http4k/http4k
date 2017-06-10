@@ -1,4 +1,4 @@
-package site.guide.worked_example._1_building_the_walking_skeleton
+package guide.example._1_building_a_walking_skeleton
 
 import org.http4k.core.Request
 import org.http4k.core.Response
