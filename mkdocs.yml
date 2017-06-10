@@ -22,7 +22,7 @@ pages:
   - Rationale & Concepts: rationale.md
   - Installation:  installation.md
   - Getting started: quickstart.md
-  - User Guide:
+  - Developer Guide:
     - Modules:
       - Core: guide/modules/core.md
       - Server Backend: guide/modules/servers.md
@@ -31,6 +31,13 @@ pages:
       - Templating: guide/modules/templating.md
       - Typesafe Contracts: guide/modules/contracts.md
     - Application Testing: guide/testing.md
+    - Worked TDD Example:
+      - Introduction: guide/example/index.md
+      - Building a walking skeleton: guide/example/building-a-walking-skeleton.md
+      - Adding an endpoint: guide/example/adding-the-first-endpoint.md
+      - Adding another endpoint: guide/example/adding-the-second-endpoint.md
+      - An external dependency: guide/example/adding-an-external-dependency.md
+  - Cookbook:
+    - Recipe1: cookbook/recipe1.md
   - Performance: performance.md
   - HTTP4K in action: http4k-in-action.md
-
