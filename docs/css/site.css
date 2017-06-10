@@ -15,3 +15,12 @@ ul.statusLink li {
 .md-content {
     margin-right: 0;
 }
+
+.md-header-nav__source {
+    width: 15rem;
+    margin-left: 1rem;
+}
+
+[data-md-color-primary=indigo] .md-header {
+    background-color: #2e7bf4;
+}

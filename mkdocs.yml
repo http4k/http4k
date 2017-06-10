@@ -8,3 +8,8 @@ theme: 'material'
 theme_dir: ./docs/theme
 extra_css:
   - ./css/site.css
+extra:
+  palette:
+    primary: 'indigo'
+    accent: 'blue'
+  logo: img/logo_1100x200_white_on_blue.png

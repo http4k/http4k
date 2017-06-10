@@ -11,10 +11,6 @@ cp -R mkdocs.yml ${TMP}
 
 cd ${TMP}
 mkdocs gh-deploy
-echo "www.http4k.org" > CNAME
-git add CNAME
-git commit -am"Adding CNAME"
-git push
 cd -
 
 
