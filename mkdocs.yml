@@ -20,7 +20,7 @@ extra:
 pages:
   - Introduction: index.md
   - Rationale & Concepts: rationale.md
-  - Get it: installation.md
+  - Installation:  installation.md
   - Getting started: quickstart.md
   - User Guide:
     - Modules:
