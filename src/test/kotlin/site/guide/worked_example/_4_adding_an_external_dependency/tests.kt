@@ -1,4 +1,4 @@
-package worked_example._4_adding_an_external_dependency
+package site.guide.worked_example._4_adding_an_external_dependency
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
@@ -26,8 +26,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import worked_example._4_adding_an_external_dependency.Matchers.answerShouldBe
-import worked_example._4_adding_an_external_dependency.Matchers.statusShouldBe
+import site.guide.worked_example._4_adding_an_external_dependency.Matchers.answerShouldBe
+import site.guide.worked_example._4_adding_an_external_dependency.Matchers.statusShouldBe
 
 
 object Matchers {

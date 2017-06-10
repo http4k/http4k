@@ -33,10 +33,10 @@ pages:
     - Application Testing: guide/testing.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md
-      - 1. Building a walking skeleton: guide/example/building-a-walking-skeleton.md
-      - 2. Adding an endpoint: guide/example/adding-the-first-endpoint.md
-      - 3. Adding another endpoint: guide/example/adding-the-second-endpoint.md
-      - 4. An external dependency: guide/example/adding-an-external-dependency.md
+      - 1. Building a walking skeleton: guide/example/1-building-a-walking-skeleton.md
+      - 2. Adding an endpoint: guide/example/2-adding-the-first-endpoint.md
+      - 3. Adding another endpoint: guide/example/3-adding-the-second-endpoint.md
+      - 4. An external dependency: guide/example/4-adding-an-external-dependency.md
   - Cookbook:
     - Recipe1: cookbook/recipe1.md
   - Performance: performance.md

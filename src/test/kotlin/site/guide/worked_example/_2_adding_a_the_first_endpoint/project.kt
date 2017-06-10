@@ -1,4 +1,4 @@
-package worked_example._3_adding_another_endpoint
+package site.guide.worked_example._2_adding_a_the_first_endpoint
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -20,18 +20,10 @@ fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
         "/ping" to GET bind { _: Request -> Response(OK) },
-        "/add" to GET bind calculate { it.sum() },
-        "/multiply" to GET bind calculate { it.fold(1) { memo, next -> memo * next } }
+        "/add" to GET bind { request: Request ->
+            val valuesToAdd = Query.int().multi.defaulted("value", listOf()).extract(request)
+            Response(OK).body(valuesToAdd.sum().toString())
+        }
     )
 )
 
-private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
-    val values = Query.int().multi.defaulted("value", listOf())
-
-    return {
-        request: Request ->
-        val valuesToCalc = values.extract(request)
-        val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
-        Response(OK).body(answer.toString())
-    }
-}
