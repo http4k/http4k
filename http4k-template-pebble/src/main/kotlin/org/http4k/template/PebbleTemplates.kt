@@ -12,7 +12,7 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
     private class PebbleTemplateRenderer(private val engine: PebbleEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
             val writer = StringWriter()
-            engine.getTemplate(viewModel.template().trimStart('/') + ".peb").evaluate(writer, mapOf("context" to viewModel))
+            engine.getTemplate(viewModel.template().trimStart('/') + ".peb").evaluate(writer, mapOf("model" to viewModel))
             writer.toString()
         } catch (e: LoaderException) {
             throw ViewNotFound(viewModel)
