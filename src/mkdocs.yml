@@ -15,7 +15,7 @@ extra:
   palette:
     primary: 'indigo'
     accent: 'blue'
-  logo: img/logo_1100x200_white_on_blue.png
+  logo: img/logo_1100x200_white_on_blue_trans.png
 edit_uri: edit/master/src/docs/
 
 pages:
