@@ -16,6 +16,7 @@ extra:
     primary: 'indigo'
     accent: 'blue'
   logo: img/logo_1100x200_white_on_blue.png
+edit_uri: edit/master/src/docs/
 
 pages:
   - Introduction: index.md
