@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-pip install mkdocs
-pip install mkdocs-material
+pip install -r requirements.txt
 
 TMP=/tmp/http4k.github.io/
 rm -rf ${TMP}
