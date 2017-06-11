@@ -22,10 +22,6 @@ ul.statusLink li {
     margin-left: 1rem;
 }
 
-html [data-md-color-primary=indigo] .md-nav--primary .md-nav__title--site   {
-    background-color: #2e7bf4;
-}
-
 [data-md-color-primary=indigo] .md-header {
     background-color: #2e7bf4;
 }
