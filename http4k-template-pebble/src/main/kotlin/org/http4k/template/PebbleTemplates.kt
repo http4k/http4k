@@ -12,7 +12,7 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
     private class PebbleTemplateRenderer(private val engine: PebbleEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
             val writer = StringWriter()
-            engine.getTemplate(viewModel.template().trimStart('/') + ".peb").evaluate(writer, mapOf("model" to viewModel))
+            engine.getTemplate(viewModel.template() + ".peb").evaluate(writer, mapOf("model" to viewModel))
             writer.toString()
         } catch (e: LoaderException) {
             throw ViewNotFound(viewModel)
@@ -27,13 +27,13 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
 
     override fun Caching(baseTemplateDir: String): TemplateRenderer {
         val loader = FileLoader()
-        loader.prefix = baseTemplateDir.trimStart('/')
+        loader.prefix = baseTemplateDir
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(true).loader(loader)).build())
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer {
         val loader = FileLoader()
-        loader.prefix = baseTemplateDir.trimStart('/')
+        loader.prefix = baseTemplateDir
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().cacheActive(false).loader(loader)).build())
     }
 }
