@@ -36,13 +36,6 @@ import org.http4k.server.Jetty
 import org.http4k.server.startServer
 import java.time.Clock
 
-/**
- * This contract example shows:
- * - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)
- * - Custom filters (latency)
- * - API key security via a typesafe Query parameter (this can be a header or a body parameter as well)
- * - Swagger API documentation - Run this example and point a browser at http://petstore.swagger.io/?url=http://localhost:8000/context/swagger.json
- */
 fun main(args: Array<String>) {
 
     fun add(value1: Int, value2: Int): HttpHandler = {

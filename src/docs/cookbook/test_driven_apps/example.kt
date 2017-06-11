@@ -24,10 +24,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-/**
- * This example shows the various styles of testing endpoints
- */
-
 class AnswerRecorder(private val httpClient: HttpHandler) : (Int) -> Unit {
     override fun invoke(answer: Int): Unit {
         httpClient(Request(POST, "/" + answer.toString()))

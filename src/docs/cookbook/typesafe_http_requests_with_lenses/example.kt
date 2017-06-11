@@ -14,9 +14,6 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 
-/**
- * Example showing how to create and apply lenses to requests and responses.
- */
 fun main(args: Array<String>) {
 
     data class Child(val name: String)

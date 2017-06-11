@@ -9,9 +9,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-/**
- * This example shows how to use the simple routing functionality to bind several routes
- */
 fun main(args: Array<String>) {
 
     val app = routes(

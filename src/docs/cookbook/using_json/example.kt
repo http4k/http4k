@@ -11,9 +11,6 @@ import org.http4k.format.Jackson.asJsonValue
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.json
 
-/**
- * Example of how to use the JSON library API wrappers, in this case the module used is Jackson
- */
 fun main(args: Array<String>) {
 
     val json = Jackson

@@ -8,9 +8,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.server.Jetty
 import org.http4k.server.startServer
 
-/**
- * This example shows how to convert an HttpHandler to a server
- */
 fun main(args: Array<String>) {
 
     val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
