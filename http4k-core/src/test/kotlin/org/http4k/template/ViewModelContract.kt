@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
 
-class ViewModelTest {
+abstract class ViewModelContract(private val templates: Templates) {
 
     private val items = listOf(
         Item("item1", "£1", listOf(Feature("pretty"))),
@@ -17,7 +17,7 @@ class ViewModelTest {
 
     @Test
     fun `renders from Body`() {
-        val renderer = HandlebarsTemplates().CachingClasspath()
+        val renderer = templates.CachingClasspath()
 
         val view = Body.view(renderer, TEXT_HTML)
 
@@ -27,5 +27,4 @@ class ViewModelTest {
         assertThat(response.status, equalTo(OK))
         assertThat(CONTENT_TYPE(response), equalTo(TEXT_HTML))
     }
-
 }
