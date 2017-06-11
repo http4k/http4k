@@ -7,6 +7,7 @@ remote_branch: master
 repo_url: https://github.com/http4k/http4k/
 theme: 'material'
 theme_dir: ./docs/theme
+google_analytics: ['UA-69281315-11', 'http4k.org']
 markdown_extensions:
   - meta
   - codehilite
