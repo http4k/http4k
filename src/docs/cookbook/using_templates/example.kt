@@ -16,10 +16,6 @@ import org.http4k.template.view
 // setting the template property from ViewModel
 data class Person(val name: String, val age: Int) : ViewModel
 
-/**
- * Example showing how to use the Templating modules - in this case Handlebars, both by standard
- * response manipulation and via a typesafe view lens
- */
 fun main(args: Array<String>) {
 
     val renderer = HandlebarsTemplates().HotReload("src/docs")

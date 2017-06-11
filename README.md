@@ -64,12 +64,13 @@ plugging together of services without HTTP container being required.
    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
 * [Templating:](http://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
-        * Handlebars 
+        * **Handlebars** 
+        * **Pebble**
     * Caching and **Hot-Reload** template support
 * [Message formats:](http://http4k.org/guide/modules/message_formats) 
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
-        * **Jackson** -includes support for **fully automatic marshalling of Data classes**)
-        * **Gson** -includes support for **fully automatic marshalling of Data classes**)
+        * **Jackson** - includes support for **fully automatic marshalling of Data classes**)
+        * **Gson** - includes support for **fully automatic marshalling of Data classes**)
         * **Argo**
 
 ## Acknowledgments
