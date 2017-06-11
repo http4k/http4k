@@ -19,7 +19,7 @@ extra:
     accent: 'blue'
   logo: img/logo_1100x200_white_on_blue_trans.png
 edit_uri: edit/master/src/docs/
-
+strict: true
 pages:
   - Introduction: index.md
   - Rationale & Concepts: rationale/index.md
