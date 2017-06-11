@@ -46,9 +46,9 @@ pages:
     - Nestable routes: cookbook/nestable_routes/index.md
     - Using JSON: cookbook/using_json/index.md
     - Using templates: cookbook/using_templates/index.md
-    - Generating data classes from json: cookbook/generating_data_classes_from_json/index.md
-    - Typesafe http contracts: cookbook/typesafe_http_contracts/index.md
-    - Typesafe http requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
+    - Generating data classes from JSON: cookbook/generating_data_classes_from_json/index.md
+    - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
+    - Typesafe HTTP requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
   - Performance: performance/index.md
   - In action: in_action/index.md
