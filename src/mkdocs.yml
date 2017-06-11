@@ -40,6 +40,16 @@ pages:
       - 4. An external dependency: guide/example/_4_adding_an_external_dependency/index.md
   - Cookbook:
     - Server as a function: cookbook/server_as_a_function/index.md
+    - Client as a function: cookbook/client_as_a_function/index.md
+    - Container integration: cookbook/container_integration/index.md
+    - Simple routing: cookbook/simple_routing/index.md
+    - Nestable routes: cookbook/nestable_routes/index.md
+    - Using JSON: cookbook/using_json/index.md
+    - Using templates: cookbook/using_templates/index.md
+    - Generating data classes from json: cookbook/generating_data_classes_from_json/index.md
+    - Typesafe http contracts: cookbook/typesafe_http_contracts/index.md
+    - Typesafe http requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
+    - Test driven apps: cookbook/test_driven_apps/index.md
   - Performance: performance/index.md
   - In action: in_action/index.md
   - Changelog: changelog/index.md
