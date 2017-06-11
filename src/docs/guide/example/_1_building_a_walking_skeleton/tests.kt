@@ -9,9 +9,10 @@ import org.http4k.core.Status.Companion.OK
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.*
 
 class EndToEndTest {
-    private val port = 8000
+    private val port = Random().nextInt(1000) + 8000
     private val client = OkHttp()
     private val server = MyMathServer(port)
 

@@ -28,6 +28,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import java.util.*
 
 
 object Matchers {
@@ -79,8 +80,8 @@ class RealRecorderTest : RecorderCdc() {
 }
 
 class EndToEndTest {
-    private val port = 8000
-    private val recorderPort = 10000
+    private val port = Random().nextInt(1000) + 8000
+    private val recorderPort = port+1
     private val client = OkHttp()
     private val recorder = FakeRecorderHttp()
     private val server = MyMathServer(port, Uri.of("http://localhost:$recorderPort"))
