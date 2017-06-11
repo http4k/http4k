@@ -6,6 +6,7 @@ ul.statusLink {
     float: right;
     padding-right: 2rem;
 }
+
 ul.statusLink li {
     padding: 0.5rem;
     display: inline;
@@ -21,8 +22,16 @@ ul.statusLink li {
     margin-left: 1rem;
 }
 
+html [data-md-color-primary=indigo] .md-nav--primary .md-nav__title--site   {
+    background-color: #2e7bf4;
+}
+
 [data-md-color-primary=indigo] .md-header {
     background-color: #2e7bf4;
+}
+
+[data-md-color-primary=indigo] .md-nav__source {
+    background-color: rgba(46, 123, 244, 0.96);
 }
 
 .github {
