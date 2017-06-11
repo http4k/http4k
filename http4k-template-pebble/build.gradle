@@ -1,0 +1,13 @@
+description = 'Http4k Pebble templating support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+
+    compile 'com.mitchellbosecke:pebble:2.4.0'
+
+    testCompile project(path: ":http4k-core", configuration: "testArtifacts")
+
+    testCompile testing
+}

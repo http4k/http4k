@@ -21,7 +21,7 @@ abstract class TemplatesContract(private val templates: Templates) {
 
     @Test
     fun `caching file-based`() {
-        val renderer = templates.Caching("../http4k-core/src/test/resources")
+        val renderer = templates.Caching("src/test/resources")
         checkOnClasspath(renderer)
         checkAtRoot(renderer)
         checkNonExistent(renderer)
@@ -29,7 +29,7 @@ abstract class TemplatesContract(private val templates: Templates) {
 
     @Test
     fun `hot reload`() {
-        val renderer = templates.HotReload("../http4k-core/src/test/resources")
+        val renderer = templates.HotReload("src/test/resources")
         checkOnClasspath(renderer)
         checkAtRoot(renderer)
         checkNonExistent(renderer)
