@@ -26,7 +26,6 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
         return ThymeleafTemplateRenderer(configure(templateEngine))
     }
 
-
     override fun HotReload(baseTemplateDir: String): TemplateRenderer {
         val templateEngine = TemplateEngine()
         val loader = FileTemplateResolver()
