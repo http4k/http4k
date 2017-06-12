@@ -1,0 +1,4 @@
+src/docs/*
+tools/
+.idea/
+gradle/
