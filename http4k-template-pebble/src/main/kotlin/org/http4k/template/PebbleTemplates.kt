@@ -15,6 +15,7 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
             engine.getTemplate(viewModel.template() + ".peb").evaluate(writer, mapOf("model" to viewModel))
             writer.toString()
         } catch (e: LoaderException) {
+            e.printStackTrace()
             throw ViewNotFound(viewModel)
         }
     }

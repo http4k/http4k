@@ -1,1 +1,1 @@
-{{#each items}}Name:{{name}}Price:{{price}}{{#each features}}Feature:{{description}}{{/each}}{{/each}}
+<ul>{{#each items}}<li>Name:<span>{{name}}</span>Price:<span>{{price}}</span><ul>{{#each features}}<li>Feature:<span>{{description}}</span></li>{{/each}}</ul></li>{{/each}}</ul>

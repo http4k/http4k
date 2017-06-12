@@ -1,1 +1,2 @@
-{% for item in model.items %}AtRootName:{{item.name}}Price:{{item.price}}{% for feature in item.features %}Feature:{{feature.description}}{% endfor %}{% endfor %}
+<ul><li th:each="item: ${model.items}">AtRootName:<span th:text="${item.name}">test</span>Price:<span th:text="${item.price}">1234</span><ul><li th:each="feature: ${item.features}">Feature:<span th:text="${feature
+.description}">test</span></li></ul></li></ul>

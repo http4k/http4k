@@ -23,7 +23,7 @@ abstract class ViewModelContract(private val templates: Templates) {
 
         val response = view(OnClasspath(items), Response(OK))
 
-        assertThat(response.bodyString(), equalTo("Name:item1Price:£1Feature:prettyName:item2Price:£3Feature:nasty"))
+        assertThat(response.bodyString(), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
         assertThat(response.status, equalTo(OK))
         assertThat(CONTENT_TYPE(response), equalTo(TEXT_HTML))
     }
