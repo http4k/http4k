@@ -66,6 +66,7 @@ plugging together of services without HTTP container being required.
     * **Pluggable** templating system support for:
         * **Handlebars** 
         * **Pebble**
+        * **Thymeleaf**
     * Caching and **Hot-Reload** template support
 * [Message formats:](http://http4k.org/guide/modules/message_formats) 
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
