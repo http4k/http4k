@@ -5,7 +5,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v2.5.0
 - Add `Thymeleaf` templating support
 
-### v2.4.0
+### v2.5.0
 - Add `Pebble` templating support
 
 ### v2.3.0
