@@ -87,7 +87,7 @@ allprojects {
                     pom.withXml {
                         asNode().appendNode('name', archivesBaseName)
                         asNode().appendNode('description', description)
-                        asNode().appendNode('url', 'http://' + archivesBaseName + '.github.io')
+                        asNode().appendNode('url', 'https://http4k.org')
                         asNode().appendNode('developers')
                                 .appendNode('developer').appendNode('name', 'Ivan Sanchez').parent().appendNode('email', 'mail@s4nchez.github.io')
                                 .parent().parent()
