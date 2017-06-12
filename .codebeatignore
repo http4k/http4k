@@ -1,4 +1,4 @@
-src/docs/*
-tools/
-.idea/
-gradle/
+src/docs/**
+tools/**
+.idea/**
+gradle/**
