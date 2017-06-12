@@ -185,6 +185,7 @@ dependencies {
     provided project(":http4k-server-undertow")
     provided project(":http4k-template-handlebars")
     provided project(":http4k-template-pebble")
+    provided project(":http4k-template-thymeleaf")
 
     testCompile testing
 }

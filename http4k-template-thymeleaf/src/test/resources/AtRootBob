@@ -1,0 +1,1 @@
+{% for item in model.items %}AtRootName:{{item.name}}Price:{{item.price}}{% for feature in item.features %}Feature:{{feature.description}}{% endfor %}{% endfor %}
