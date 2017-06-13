@@ -38,6 +38,8 @@ plugging together of services without HTTP container being required.
    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
    * Templating support: Caching and Hot-Reload engine support for Handlebars
 
+<span class="github">
+
 ## Example
 This quick example is designed to convey the simplicity & features of **http4k**. There is also a [quickstart](https://github.com/http4k/http4k/wiki/Quickstart) on the wiki for the simplest possible starting point.
 
@@ -129,6 +131,8 @@ fun main(args: Array<String>) {
 }
 ```
 
+</span>
+
 ## Module feature overview
 * [Core:](http://http4k.org/guide/modules/core) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
@@ -165,9 +169,6 @@ fun main(args: Array<String>) {
         * **Gson** - includes support for **fully automatic marshalling of Data classes**)
         * **Argo**
 
-<span class="github">
-
-</span>
 
 ## Acknowledgments
 
