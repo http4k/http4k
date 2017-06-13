@@ -36,7 +36,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
             "/uri" to GET bind { req: Request -> Response(OK).body(req.uri.toString()) },
             "/boom" to GET bind { _: Request -> throw IllegalArgumentException("BOOM!") }
-        ).startServer(serverConfig(port), false)
+        ).asServer(serverConfig(port)).start()
     }
 
     @Test

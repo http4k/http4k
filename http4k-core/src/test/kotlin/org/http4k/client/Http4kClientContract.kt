@@ -15,7 +15,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
-import org.http4k.server.startServer
+import org.http4k.server.asServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +34,7 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
                 .header("header", request.header("header"))
                 .header("query", request.query("query"))
                 .body(request.body)
-        }.startServer(serverConfig(port), false)
+        }.asServer(serverConfig(port)).start()
     }
 
     @After

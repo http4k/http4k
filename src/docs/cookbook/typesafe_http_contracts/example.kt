@@ -33,7 +33,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.server.Jetty
-import org.http4k.server.startServer
+import org.http4k.server.asServer
 import java.time.Clock
 
 fun main(args: Array<String>) {
@@ -85,7 +85,7 @@ fun main(args: Array<String>) {
         )
     )
 
-    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).startServer(Jetty(8000), false)
+    ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000)).start()
 }
 
 // Adding 2 numbers:        curl -v "http://localhost:8000/context/add/123/564?apiKey=42"
