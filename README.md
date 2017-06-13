@@ -38,17 +38,51 @@ plugging together of services without HTTP container being required.
    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
    * Templating support: Caching and Hot-Reload engine support for Handlebars
 
-<span class="github">
+## Module feature overview
+* [Core:](http://http4k.org/guide/modules/core) 
+    * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
+    * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
+    * **Path-based routing**, including nestable contexts
+    * **Typesafe HTTP message construction/desconstruction** using Lenses
+    * **Static file-serving** capability with **Caching and Hot-Reload** 
+    * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
+    * Core abstraction APIs implemented by the other modules 
+* [Client:](http://http4k.org/guide/modules/clients) 
+    * **Single LOC** HTTP client adapters 
+        * **Apache**
+        * **OkHttp**
+* [Server:](http://http4k.org/guide/modules/servers)
+    * **Single LOC** server backend spinup for:
+        * **Jetty**
+        * **Netty**
+        * **Undertow**
+    * API design allows for plugging into configurable instances of each
+* **BETA!** [Contracts:](http://http4k.org/guide/modules/contracts) 
+   * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
+   * **Typesafe** path matching
+   * **Auto-validation** of incoming requests == **zero boilerplate validation code**
+   * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
+* [Templating:](http://http4k.org/guide/modules/templating) 
+    * **Pluggable** templating system support for:
+        * **Handlebars** 
+        * **Pebble**
+        * **Thymeleaf**
+    * Caching and **Hot-Reload** template support
+* [Message formats:](http://http4k.org/guide/modules/message_formats) 
+    * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
+        * **Jackson** - includes support for **fully automatic marshalling of Data classes**)
+        * **Gson** - includes support for **fully automatic marshalling of Data classes**)
+        * **Argo**
 
 ## Example
-This quick example is designed to convey the simplicity & features of **http4k**. There is also a [quickstart](https://github.com/http4k/http4k/wiki/Quickstart) on the wiki for the simplest possible starting point.
+This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](http://www.http4k.org/quickstart/) for the simplest possible starting point.
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "2.3.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.3.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "2.3.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.5.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.5.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "2.5.0"
 }
 ```
 
@@ -130,45 +164,6 @@ fun main(args: Array<String>) {
 //    hello Bob
 }
 ```
-
-</span>
-
-## Module feature overview
-* [Core:](http://http4k.org/guide/modules/core) 
-    * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
-    * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
-    * **Path-based routing**, including nestable contexts
-    * **Typesafe HTTP message construction/desconstruction** using Lenses
-    * **Static file-serving** capability with **Caching and Hot-Reload** 
-    * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
-    * Core abstraction APIs implemented by the other modules 
-* [Client:](http://http4k.org/guide/modules/clients) 
-    * **Single LOC** HTTP client adapters 
-        * **Apache**
-        * **OkHttp**
-* [Server:](http://http4k.org/guide/modules/servers)
-    * **Single LOC** server backend spinup for:
-        * **Jetty**
-        * **Netty**
-        * **Undertow**
-    * API design allows for plugging into configurable instances of each
-* **BETA!** [Contracts:](http://http4k.org/guide/modules/contracts) 
-   * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
-   * **Typesafe** path matching
-   * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-   * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
-* [Templating:](http://http4k.org/guide/modules/templating) 
-    * **Pluggable** templating system support for:
-        * **Handlebars** 
-        * **Pebble**
-        * **Thymeleaf**
-    * Caching and **Hot-Reload** template support
-* [Message formats:](http://http4k.org/guide/modules/message_formats) 
-    * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
-        * **Jackson** - includes support for **fully automatic marshalling of Data classes**)
-        * **Gson** - includes support for **fully automatic marshalling of Data classes**)
-        * **Argo**
-
 
 ## Acknowledgments
 
