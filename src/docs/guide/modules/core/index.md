@@ -90,12 +90,11 @@ There is one "location" type for each part of the message, each with config/mapp
 
 | Location  | Starting type | Applicable to           | Multiplicity         | Requirement terminator | Examples  |
 ------------|---------------|-------------------------|----------------------|------------------------|------------
-| Query     | `String`      | `Request`               | Singular or multiple | Optional or Required   | `Query.optional("name")`<br/>`Query.required("name")`<br/>`Query.int().required("name")`<br/>`Query.localDate().multi.required("name")
-`<br/>`Query.map(::CustomType, { it.value }).required("name")` |
-| Header    | `String`      | `Request` or `Response` | Singular or multiple | Optional or Required   | `Header.optional("name")`<br/>`Header.required("name")`<br/>`Header.int().required("name")`<br/>`Header.localDate().multi.required("name")
-`<br/>`Header.map(::CustomType, { it.value }).required("name")`|
-| Path      | `String`      | `Request`                 | Singular | Required   |  `Path.of("name")`<br/>`Path.int().of("name")`<br/>`Path.map(::CustomType, { it.value }).of("name")`|
-| FormField | `String`      | `WebForm` | Singular or multiple | Optional or Required   | `FormField.optional("name")`<br/>`FormField.required("name")`<br/>`FormField.int().required("name")`<br/>`FormField.localDate().multi.required("name")`<br/>`FormField.map(::CustomType, { it.value }).required("name")`|
+| Query     | `String`      | `Request`               | Singular or multiple | Optional or Required   | `Query.optional("name")`<br/>`Query.required("name")`<br/>`Query.int().required("name")`<br/>`Query.localDate().multi.required("name")`<br/>`Query.map(::CustomType, { it.value }).required("name")` |
+| Header    | `String`      | `Request` or `Response` | Singular or multiple | Optional or Required   | `Header.optional("name")`<br/>`Header.required("name")`<br/>`Header.int().required("name")`<br/>`Header.localDate().multi.required("name")`<br/>`Header.map(::CustomType, { it.value }).required("name")`|
+| Path      | `String`      | `Request`               | Singular | Required   |  `Path.of("name")`<br/>`Path.int().of("name")`<br/>`Path.map(::CustomType, { it.value }).of("name")`|
+| FormField | `String`      | `WebForm`               | Singular or multiple | Optional or Required   | `FormField.optional("name")`<br/>`FormField.required("name")`<br/>`FormField.int().required("name")`<br/>`FormField.localDate().multi.required
+("name")`<br/>`FormField.map(::CustomType, { it.value }).required("name")`|
 | Body      | `ByteBuffer`  | `Request` or `Response` | Singular | Required   |  `Body.string(ContentType.TEXT_PLAIN).toLens()`<br/>`Body.json().toLens()`<br/>`Body.webForm(FormValidator.Strict, FormField.required("name")).toLens()` |
 
 Once the lens is declared, you can use it on a target object to either get or set the value:
