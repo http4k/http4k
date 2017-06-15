@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.6.0
+- Newly created Zipkin traces are now populated onto incoming request in ServerFilters.
+
 ### v2.5.1
 - Slight tweak to GSON auto-marshalling to allow for use of raw Arrays with auto-marshalling
 

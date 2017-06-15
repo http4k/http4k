@@ -29,12 +29,14 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `initialises request tracing and sets on outgoing response when not present`() {
+    fun `initialises request tracing on request and sets on outgoing response when not present`() {
         var newThreadLocal: ZipkinTraces? = null
         val svc = ServerFilters.RequestTracing().then {
-            newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()
+            newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()!!
             newThreadLocal!!.spanId shouldMatch present()
-
+            val setOnRequest = ZipkinTraces(it)
+            setOnRequest.traceId shouldMatch equalTo(newThreadLocal!!.traceId)
+            setOnRequest.spanId shouldMatch equalTo(newThreadLocal!!.parentSpanId)
             Response(OK)
         }
 
@@ -58,6 +60,10 @@ class ServerFiltersTest {
             { req, resp, trace -> end = Triple(req, resp, trace) }
         ).then {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
+            val setOnRequest = ZipkinTraces(it)
+            setOnRequest.traceId shouldMatch equalTo(actual.traceId)
+            setOnRequest.spanId shouldMatch equalTo(actual.parentSpanId)
+
             actual.traceId shouldMatch equalTo(originalTraceId)
             actual.spanId shouldMatch present()
             actual.parentSpanId shouldMatch equalTo(originalSpanId)
