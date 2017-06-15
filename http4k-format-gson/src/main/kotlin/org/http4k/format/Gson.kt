@@ -34,7 +34,7 @@ open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElem
     private val compact = builder.create()
     private val pretty = builder.setPrettyPrinting().create()
 
-    override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).asJsonObject
+    override fun String.asJsonObject(): JsonElement = JsonParser().parse(this)
     override fun String?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Int?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Double?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(BigDecimal(this)) } ?: JsonNull.INSTANCE
