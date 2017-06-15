@@ -85,25 +85,23 @@ A Lens is a bi-directional entity which can be used to either **get** or **set**
 to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). 
 
 To utilise a lens, first you have to declare it with the form `<Location>.<configuration and mapping operations>.<terminator>`.
-Some examples of declarations are:
-
-```kotlin
-val pathLocalDate = Path.localDate().of("date")
-val requiredQuery = Query.required("myQueryName")
-val nonEmptyQuery = Query.nonEmptyString().required("myNonEmptyQuery")
-val optionalHeader = Header.int().optional("Content-Length")
-val responseBody = Body.string(PLAIN_TEXT).toLens()
-```
 
 There is one "location" type for each part of the message, each with config/mapping operations which are specific to that location:
 
-| Location | Starting type | Applicable to           | Multiplicity         | Requirement terminator | Examples  |
------------|---------------|-------------------------|----------------------|------------------------|------------
-| Query    | `String`      | `Request`               | Singular or multiple | Optional or Required   | `Query.optional("name")`<br/>`Query.required("name")`<br/>`Query.int().required("name")`<br/>`Query.localDate().multi.required("name")`<br/>`Query.map(::CustomType, { it.value }).required("name")` |
-| Header   | `String`      | `Request` or `Response` | Singular or multiple | Optional or Required   | `Header.optional("name")`<br/>`Header.required("name")`<br/>`Header.int().required("name")`<br/>`Header.localDate().multi.required("name")`<br/>`Header.map(::CustomType, { it.value }).required("name")`|
-| Path   | `String`       | `Request`                 | Singular | Required   |  `Path.of("name")`<br/>`Path.int().of("name")`<br/>`Path.map(::CustomType, { it.value }).of("name")`|
-| FormField   | `String`      | `WebForm` | Singular or multiple | Optional or Required   | `FormField.optional("name")`<br/>`FormField.required("name")`<br/>`FormField.int().required("name")`<br/>`FormField.localDate().multi.required("name")`<br/>`FormField.map(::CustomType, { it.value }).required("name")`|
-| Body   | `ByteBuffer`       | `Request` or `Response` | Singular | Required   |  `Body.string(ContentType.TEXT_PLAIN).toLens()`<br/>`Body.json().toLens()`<br/>`Body.webForm(FormValidator.Strict, FormField.required("name")).toLens()` |
+| Location  | Starting type | Applicable to           | Multiplicity         | Requirement terminator | Examples  |
+------------|---------------|-------------------------|----------------------|------------------------|------------
+| Query     | `String`      | `Request`               | Singular or multiple | Optional or Required   | `Query.optional("name")`<br/>`Query.required("name")`<br/>`Query.int().required("name")`<br/>`Query.localDate().multi.required("name")
+`<br/>`Query.map(::CustomType, { it.value }).required("name")` |
+| Header    | `String`      | `Request` or `Response` | Singular or multiple | Optional or Required   | `Header.optional("name")`<br/>`Header.required("name")`<br/>`Header.int().required("name")`<br/>`Header.localDate().multi.required("name")
+`<br/>`Header.map(::CustomType, { it.value }).required("name")`|
+| Path      | `String`      | `Request`                 | Singular | Required   |  `Path.of("name")`<br/>`Path.int().of("name")`<br/>`Path.map(::CustomType, { it.value }).of("name")`|
+| FormField | `String`      | `WebForm` | Singular or multiple | Optional or Required   | `FormField.optional("name")`<br/>`FormField.required("name")`<br/>`FormField.int().required("name")`<br/>`FormField.localDate().multi.required("name")`<br/>`FormField.map(::CustomType, { it.value }).required("name")`|
+| Body      | `ByteBuffer`  | `Request` or `Response` | Singular | Required   |  `Body.string(ContentType.TEXT_PLAIN).toLens()`<br/>`Body.json().toLens()`<br/>`Body.webForm(FormValidator.Strict, FormField.required("name")).toLens()` |
+
+Once the lens is declared, you can use it on a target object to either get or set the value:
+
+- Retrieving a value: use `<lens>.extract(<target>)`, or the more concise invoke form: `<lens>(<target>)`
+- Setting a value: use `<lens>.inject(<target>)`, or the more concise invoke form: `<lens>(<value>, <target>)`
 
 ```kotlin
 val pathLocalDate = Path.localDate().of("date")
