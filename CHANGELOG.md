@@ -5,7 +5,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v2.5.1
 - Small tweak to GSON object handling
 
-### v2.5.0
+### v2.5.1
 - Add `Thymeleaf` templating support
 
 ### v2.4.0
