@@ -2,10 +2,13 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.5.1
+- Small tweak to GSON object handling
+
 ### v2.5.0
 - Add `Thymeleaf` templating support
 
-### v2.5.0
+### v2.4.0
 - Add `Pebble` templating support
 
 ### v2.3.0
