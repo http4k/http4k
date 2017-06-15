@@ -13,6 +13,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
+class InvalidJsonException : Exception("Could not convert to a JSON Object or Array")
+
 open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElement>() {
     override fun typeOf(value: JsonElement): JsonType =
         when {
@@ -34,7 +36,7 @@ open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElem
     private val compact = builder.create()
     private val pretty = builder.setPrettyPrinting().create()
 
-    override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).asJsonObject
+    override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).let { if(it.isJsonArray || it.isJsonObject) it else throw InvalidJsonException() }
     override fun String?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Int?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Double?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(BigDecimal(this)) } ?: JsonNull.INSTANCE

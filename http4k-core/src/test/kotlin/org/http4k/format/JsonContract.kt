@@ -89,5 +89,6 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE
     @Test
     fun `invalid json blows up parse`() {
         assertThat({ j.parse("") }, throws(anything))
+        assertThat({ j.parse("somevalue") }, throws(anything))
     }
 }

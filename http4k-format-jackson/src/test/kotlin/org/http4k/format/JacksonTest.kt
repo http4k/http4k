@@ -23,6 +23,15 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
         assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
     }
 
+    @Test
+    fun `roundtrip list of arbitary objects to and from object`() {
+        val body = Body.auto<Array<ArbObject>>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(arrayOf(obj).toList()))
+    }
+
 }
 
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
