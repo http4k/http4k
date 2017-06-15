@@ -79,10 +79,40 @@ Note that the `http4k-contract` module contains a more typesafe implementation o
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
-For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). A Lens is a bi-directional 
-entity which can be used to either get or set a particular value from/onto an HTTP message. **http4k** provides a DSL 
-to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement 
-for those parts (i.e. mandatory or optional). Some examples of declarations are:
+For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). 
+
+A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. **http4k** provides a DSL 
+to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). 
+
+To utilise a lens, first you have to declare it with the form `<Location>.<configuration and mapping operations>.<terminator>`.
+Some examples of declarations are:
+
+```kotlin
+val pathLocalDate = Path.localDate().of("date")
+val requiredQuery = Query.required("myQueryName")
+val nonEmptyQuery = Query.nonEmptyString().required("myNonEmptyQuery")
+val optionalHeader = Header.int().optional("Content-Length")
+val responseBody = Body.string(PLAIN_TEXT).toLens()
+```
+
+There is one "location" type for each part of the message, each with config/mapping operations which are specific to that location:
+
+| Location | Starting type | Applicable to           | Multiplicity         | Requirement terminator | Examples  |
+-----------|---------------|-------------------------|----------------------|------------------------|------------
+| Query    | `String`      | `Request`               | Singular or multiple | Optional or Required   | `Query.optional("name")`
+`Query.required("name")`
+`Query.int().required("name")`
+`Query.localDate().multi.required("name")`
+`Query.map(::CustomType, { it.value }).required("name")`
+| Header   | `String`      | `Request` or `Response` | Singular or multiple | Optional or Required   | `Header.optional("name")`
+`Header.required("name")`
+`Header.int().required("name")`
+`Header.localDate().multi.required("name")`
+`Header.map(::CustomType, { it.value }).required("name")`
+| Path   | `String`       | `Request`                 | Singular | Required   |  `Path.of("name")`
+`Path.int().of("name")`
+`Path.map(::CustomType, { it.value }).of("name")`
+
 
 ```kotlin
 val pathLocalDate = Path.localDate().of("date")
