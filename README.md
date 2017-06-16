@@ -86,7 +86,7 @@ dependencies {
 }
 ```
 
-This "hello world" style example demonstrates how to serve and consume HTTP services with dynamic routing:
+This "Hello World" style example demonstrates how to serve and consume HTTP services with dynamic routing:
 ```kotlin
 package cookbook
 
