@@ -23,7 +23,7 @@ function maven_publish {
 
 echo "Making $LOCAL_VERSION available in Maven central..."
 
-#maven_publish "http4k-aws"
+maven_publish "http4k-aws"
 maven_publish "http4k-core"
 maven_publish "http4k-contract"
 maven_publish "http4k-template-handlebars"
