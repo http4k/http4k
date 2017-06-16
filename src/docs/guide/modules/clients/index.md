@@ -14,4 +14,4 @@ println(response.status)
 println(response.bodyString())
 ```
 
-Alteratively, all client adapter modules allow for custom configuration of the relevant Client configuration.
+Alternatively, all client adapter modules allow for custom configuration of the relevant Client configuration.
