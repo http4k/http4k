@@ -2,6 +2,7 @@ language: java
 jdk: oraclejdk8
 install: "pip install -r requirements.txt"
 script: "./gradlew check"
+sudo: true
 after_success:
 - "./gradlew jacocoRootReport coveralls"
 - "./release-site.sh"
