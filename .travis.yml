@@ -1,11 +1,18 @@
-language: python
-jdk: oraclejdk8
-script: "./gradlew check"
-after_success:
-- "./gradlew jacocoRootReport coveralls"
-- "./release-site.sh"
-- "travis_wait 120 ./release-ci.sh"
-cache:
-  directories:
-  - "$HOME/.m2"
-  - "$HOME/.gradle"
+matrix:
+  include:
+    - language: java
+      jdk:
+      - oraclejdk8
+      script:
+      - "./gradlew check"
+      after_success:
+      - "./gradlew jacocoRootReport coveralls"
+      - "./release-site.sh"
+      - "travis_wait 60 ./release-ci.sh"
+      cache:
+        directories:
+        - "$HOME/.m2"
+        - "$HOME/.gradle"
+    - language: python
+      script:
+        - "./release-site.sh"
