@@ -1,6 +1,8 @@
 language: java
 jdk: oraclejdk8
-install: "pip install -r requirements.txt"
+install:
+- "virtualenv ./virtualenv"
+- "source ./virtualenv/bin/activate"
 script: "./gradlew check"
 sudo: true
 after_success:
