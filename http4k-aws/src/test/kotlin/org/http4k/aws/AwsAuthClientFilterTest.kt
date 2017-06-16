@@ -8,13 +8,14 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.junit.Test
 import java.time.Clock.fixed
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class AwsClientTest {
+class AwsClientFilterTest {
 
     private val scope = AwsCredentialScope("us-east", "s3")
     private val credentials = AwsCredentials("access", "secret")
@@ -23,7 +24,7 @@ class AwsClientTest {
 
     val audit = AuditHandler()
 
-    private val client = AwsHttpClient(scope, credentials, clock).then(audit)
+    private val client = ClientFilters.AwsAuth(scope, credentials, clock).then(audit)
 
     @Test
     fun `adds authorization header`() {

@@ -1,9 +1,9 @@
 package org.http4k.aws
 
 import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.toParameters
+import org.http4k.filter.ClientFilters
 import org.http4k.urlEncoded
 import java.io.UnsupportedEncodingException
 import java.time.Clock
@@ -15,37 +15,38 @@ data class AwsCredentials(val accessKey: String, val secretKey: String)
 
 data class AwsCredentialScope(val region: String, val service: String)
 
-class AwsHttpClient(private val scope: AwsCredentialScope,
-                    private val credentials: AwsCredentials,
-                    private val clock: Clock = Clock.systemDefaultZone()) : Filter {
-    companion object {
-        val ALGORITHM = "AWS4-HMAC-SHA256"
+private val ALGORITHM = "AWS4-HMAC-SHA256"
+
+fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
+                          credentials: AwsCredentials,
+                          clock: Clock = Clock.systemDefaultZone()) =
+    Filter {
+        next ->
+        {
+            val date = AwsRequestDate.of(clock.instant())
+
+            val fullRequest = it
+                .header("host", it.uri.host)
+                .header("x-amz-date", date.full)
+
+            val canonicalRequest = AwsCanonicalRequest.of(fullRequest)
+
+            val signedRequest = fullRequest
+                .header("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
+                .header("x-amz-content-sha256", canonicalRequest.payloadHash)
+
+            next(signedRequest)
+        }
     }
 
-    override fun invoke(next: HttpHandler): HttpHandler = {
-        request ->
-        val date = AwsRequestDate.of(clock.instant())
-
-        val fullRequest = request
-            .header("host", request.uri.host)
-            .header("x-amz-date", date.full)
-
-        val canonicalRequest = AwsCanonicalRequest.of(fullRequest)
-
-        val signedRequest = fullRequest
-            .header("Authorization", buildAuthHeader(canonicalRequest, date))
-            .header("x-amz-content-sha256", canonicalRequest.payloadHash)
-
-        next(signedRequest)
-    }
-
-    private fun buildAuthHeader(canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
-        String.format("%s Credential=%s/%s, SignedHeaders=%s, Signature=%s",
-            ALGORITHM,
-            credentials.accessKey, scope.datedScope(date),
-            canonicalRequest.signedHeaders,
-            AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date))
-}
+private fun buildAuthHeader(scope: AwsCredentialScope,
+                            credentials: AwsCredentials,
+                            canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
+    String.format("%s Credential=%s/%s, SignedHeaders=%s, Signature=%s",
+        ALGORITHM,
+        credentials.accessKey, scope.datedScope(date),
+        canonicalRequest.signedHeaders,
+        AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date))
 
 internal data class AwsCanonicalRequest(val value: String, val signedHeaders: String, val payloadHash: String) {
     companion object {
@@ -116,7 +117,7 @@ internal object AwsSignatureV4Signer {
     }
 
     private fun AwsCanonicalRequest.stringToSign(requestScope: AwsCredentialScope, date: AwsRequestDate) =
-        AwsHttpClient.ALGORITHM +
+        ALGORITHM +
             "\n" +
             date.full +
             "\n" +

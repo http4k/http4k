@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.junit.After
 import org.junit.Assume.assumeTrue
@@ -43,7 +44,7 @@ class AwsRealTest {
             equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
 
         client = DebuggingFilters.PrintRequestAndResponse()
-            .then(AwsHttpClient(AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service")),
+            .then(ClientFilters.AwsAuth(AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service")),
                 AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey")))
                 .then(ApacheClient()))
 
