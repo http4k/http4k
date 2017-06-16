@@ -8,7 +8,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v2.7.0
 - Add AWS module
 
-### v2.6.0
+### v2.7.1
 - Newly created Zipkin traces are now populated onto incoming request in ServerFilters.
 
 ### v2.5.1
