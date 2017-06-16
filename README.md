@@ -37,6 +37,7 @@ plugging together of services without HTTP container being required.
    * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
    * Templating support: Caching and Hot-Reload engine support for Handlebars
+   * AWS request signing: super-simple interactions with AWS services.
 
 ## Module feature overview
 * [Core:](http://http4k.org/guide/modules/core) 
