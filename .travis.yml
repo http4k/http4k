@@ -1,6 +1,7 @@
 language: java
 jdk: oraclejdk8
 install:
+- "pip install virtualenv"
 - "virtualenv ./virtualenv"
 - "source ./virtualenv/bin/activate"
 script: "./gradlew check"
