@@ -73,6 +73,8 @@ plugging together of services without HTTP container being required.
         * **Jackson** - includes support for **fully [automatic marshalling](http://www.http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Gson** - includes support for **fully [automatic marshalling](http://www.http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo**
+* [AWS:](http://http4k.org/guide/modules/aws) 
+    * Client filter to allow super-simple interaction with AWS services (via request signing)
 
 ## Example
 This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](http://www.http4k.org/quickstart/) for the simplest possible starting point.
