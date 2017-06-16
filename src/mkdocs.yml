@@ -33,6 +33,7 @@ pages:
       - Message Formats: guide/modules/message_formats/index.md
       - Templating: guide/modules/templating/index.md
       - Typesafe Contracts: guide/modules/contracts/index.md
+      - AWS: guide/modules/aws/index.md
     - Application Testing: guide/testing/index.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md
