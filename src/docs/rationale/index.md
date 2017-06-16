@@ -28,7 +28,9 @@ Scenarios such as "what happens if this HTTP dependency continually takes > 5 se
 ## Concepts
 
 * All incoming and outgoing HTTP services are modelled as `HttpHandler`, which is modelled as `(Request) -> Response`:
-    `val handler: HttpHandler = { request: Request -> Response(OK) }`
+```kotlin
+val handler: HttpHandler = { request: Request -> Response(OK) }
+```
 * Pre/post processing is done using a `Filter`, which is modelled as `(HttpHandler) -> HttpHandler`. Filters can therefore be composed together to make reusable "stacks" of behaviour which can be applied to a terminating `HttpHandler` - to yield 
 a decorated `HttpHander`:
 ```kotlin
@@ -36,8 +38,9 @@ a decorated `HttpHander`:
     val decorated: HttpHandler = filter.then(handler)
 ```
 * Binding an HttpHandler to a path and HTTP verb yields a `Route`:
-    `val route: Route = "/path" to GET bind { Response(OK).body("you GET bob") }
-`
+```kotlin
+val route: Route = "/path" to GET bind { Response(OK).body("you GET bob") }
+```
 * Routes can be combined together into a `RoutingHttpHandler`, which is an `HttpHandler` which also a `Router`:
 ```kotlin
 val app: RoutingHttpHandler = routes(
@@ -54,9 +57,13 @@ val bigApp: HttpHandler = routes(
 )
 ```
 * HttpHandlers can be bound to a container (to create an `Http4kServer`) with 1 LOC. The decouples the server implementation from the business logic:
-    `val jettyServer = app.asServer(Jetty(9000)).start()`
+```kotlin
+val jettyServer = app.asServer(Jetty(9000)).start()
+```
 * Http clients are also HttpHandlers:
-    ` val client: ApacheClient = ApacheClient()`
+```kotlin
+val client: ApacheClient = ApacheClient()
+```
 * Because the client and server interfaces are the same, apps can simply be plugged together out-of-container by just injecting one into the other:
 ```kotlin
     val app1: HttpHandler = MyApp1()
