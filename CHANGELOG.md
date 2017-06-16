@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.7.1
+- Alter AWS Auth filter creation. Now use `ClientFilters.AwsAuth`
+
 ### v2.7.0
 - Add AWS module
 
