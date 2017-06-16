@@ -41,7 +41,7 @@ a decorated `HttpHander`:
 ```kotlin
 val route: Route = "/path" to GET bind { Response(OK).body("you GET bob") }
 ```
-* `Routes` can be combined together into a `RoutingHttpHandler`, which is an `HttpHandler` which also a `Router`:
+* `Routes` can be combined together into a `RoutingHttpHandler`, which is both an `HttpHandler` and a`Router``:
 ```kotlin
 val app: RoutingHttpHandler = routes(
     "bob" to GET bind { Response(OK).body("you GET bob") },
@@ -60,7 +60,7 @@ val bigApp: HttpHandler = routes(
 ```kotlin
 val jettyServer = app.asServer(Jetty(9000)).start()
 ```
-* Http clients are also HttpHandlers:
+* An Http client is also a `HttpHandler`:
 ```kotlin
 val client: HttpHandler = ApacheClient()
 ```
