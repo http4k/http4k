@@ -1,8 +1,7 @@
 matrix:
   include:
     - language: java
-      jdk:
-      - oraclejdk8
+      jdk: oraclejdk8
       script:
       - "./gradlew check"
       after_success:
