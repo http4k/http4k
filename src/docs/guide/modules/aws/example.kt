@@ -7,8 +7,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import java.util.*
 
