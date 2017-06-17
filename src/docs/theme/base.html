@@ -1,6 +1,6 @@
 {% import "partials/language.html" as lang %}
 <!DOCTYPE html>
-<html lang="{{ lang.t('language') }}" class="no-js">
+<html lang="{{ lang.t('language') }}" class="no-js" itemscope itemtype="http://schema.org/Product">
 <head>
     {% block site_meta %}
     <meta charset="utf-8">
@@ -47,6 +47,15 @@
     <meta name="twitter:title" content="http4k web framework">
     <meta name="twitter:description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.">
     <meta name="twitter:image" content="http://www.http4k.org/img/logo_card_blue_on_white.png">
+    <meta property="og:title" content="http4k web framework" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="http://www.http4k.org/" />
+    <meta property="og:image" content="http://www.http4k.org/img/logo_card_blue_on_white.png" />
+    <meta property="og:description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way." />
+    <meta itemprop="name" content="http4k">
+    <meta itemprop="description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.">
+    <meta itemprop="image" content="http://www.http4k.org/img/logo_card_blue_on_white.png">
+
     <meta name="generator" content="mkdocs-{{ mkdocs_version }}, mkdocs-material-1.7.3">
     {% endblock %}
     {% block htmltitle %}
