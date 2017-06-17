@@ -6,7 +6,6 @@ matrix:
       - "./gradlew check"
       after_success:
       - "./gradlew jacocoRootReport coveralls"
-      - "./release-site.sh"
       - "travis_wait 60 ./release-ci.sh"
       cache:
         directories:
