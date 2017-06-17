@@ -1,11 +1,15 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.aws.AuditHandler
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.then
 import org.junit.Test
+import java.time.Clock.fixed
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
