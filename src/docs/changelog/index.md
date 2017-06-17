@@ -2,10 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.8.0
+### v2.8.1
 - Add `Pebble` templating support
 
-### v2.8.0
+### v2.8.1
 - Make Route a Router so we can nest them together.
 
 ### v2.2.1

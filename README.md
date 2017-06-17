@@ -83,9 +83,9 @@ This quick example is designed to convey the simplicity & features of **http4k**
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "2.8.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.8.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "2.8.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.8.1"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.8.1"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "2.8.1"
 }
 ```
 
