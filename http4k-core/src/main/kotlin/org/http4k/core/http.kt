@@ -45,7 +45,7 @@ interface HttpMessage {
     }
 }
 
-enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH }
+enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE }
 
 interface Request : HttpMessage {
     val method: Method

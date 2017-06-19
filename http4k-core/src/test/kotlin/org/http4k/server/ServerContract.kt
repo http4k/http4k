@@ -2,9 +2,8 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.startsWith
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -26,26 +25,36 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Before
     fun before() {
-        server = routes(
-            "/" to GET bind { _: Request ->
-                Response(ACCEPTED)
-                    .header("content-type", "text/plain")
-                    .body("Hello World")
-            },
-            "/echo" to POST bind { req: Request -> Response(OK).body(req.bodyString()) },
-            "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-            "/uri" to GET bind { req: Request -> Response(OK).body(req.uri.toString()) },
-            "/boom" to GET bind { _: Request -> throw IllegalArgumentException("BOOM!") }
-        ).asServer(serverConfig(port)).start()
+
+        val routes =
+            Method.values().map {
+                "/" + it.name to it bind { _: Request ->
+                    Response(OK).body(it.name)
+                }
+            }.plus(listOf(
+                "/" to GET bind { _: Request ->
+                    Response(ACCEPTED)
+                        .header("content-type", "text/plain")
+                        .body("Hello World")
+                },
+                "/echo" to POST bind { req: Request -> Response(OK).body(req.bodyString()) },
+                "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+                "/uri" to GET bind { req: Request -> Response(OK).body(req.uri.toString()) },
+                "/boom" to GET bind { _: Request -> throw IllegalArgumentException("BOOM!") }
+            ))
+
+        server = routes(*routes.toTypedArray()).asServer(serverConfig(port)).start()
     }
 
     @Test
-    fun `can call an endpoint`() {
-        val response = client(Request(GET, "http://localhost:$port/"))
+    fun `can call an endpoint with all supported Methods`() {
+        for (method in Method.values()) {
 
-        assertThat(response.status, equalTo(ACCEPTED))
-        assertThat(response.header("content-type"), present(startsWith("text/plain")))
-        assertThat(response.bodyString(), equalTo("Hello World"))
+            val response = client(Request(method, "http://localhost:$port/" + method.name))
+
+            assertThat(response.status, equalTo(OK))
+            assertThat(response.bodyString(), equalTo(method.name))
+        }
     }
 
     @Test

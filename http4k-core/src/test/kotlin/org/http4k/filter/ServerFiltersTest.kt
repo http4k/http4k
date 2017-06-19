@@ -89,7 +89,7 @@ class ServerFiltersTest {
         assertThat(response.status, equalTo(I_M_A_TEAPOT))
         assertThat(response.header("access-control-allow-origin"), equalTo("*"))
         assertThat(response.header("access-control-allow-headers"), equalTo("content-type"))
-        assertThat(response.header("access-control-allow-methods"), equalTo("GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH"))
+        assertThat(response.header("access-control-allow-methods"), equalTo("GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE"))
     }
 
     @Test

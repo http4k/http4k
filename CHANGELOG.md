@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.9.0
+- Added PURGE HTTP method as it's used commonly by various caches.
+
 ### v2.8.1
 - Repackage AWS classes for consistency with rest of project
 
