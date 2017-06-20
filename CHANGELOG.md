@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.10
+### v2.10.0
 - Add method to set form values in the request
 
 ### v2.9.0
