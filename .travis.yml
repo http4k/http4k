@@ -14,3 +14,4 @@ matrix:
     - language: python
       script:
         - "./release-site.sh"
+      group: deprecated-2017Q2
