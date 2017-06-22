@@ -2,11 +2,7 @@ package org.http4k.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
-import org.http4k.core.Parameters
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.*
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -61,6 +57,13 @@ class CookieTest {
     fun `cookie values are quoted`() {
         assertThat(Cookie("my-cookie", "my \"quoted\" value").toString(),
             equalTo("""my-cookie="my \"quoted\" value"; """))
+    }
+
+    @Test
+    fun `cookies with equals signs inside quotes can be extracted from request`(){
+        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
+        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
+        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
     }
 
     @Test
