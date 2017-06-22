@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.10.1
+- Fix cookie parsing when value contains '='
+
 ### v2.10.0
 - Add method to set form values in the request
 
