@@ -36,7 +36,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Make Route a Router so we can nest them together.
 
 ### v2.2.1
-- Remove excess "charset" from headers in Undertow
+- Remove excess "charset" from headers in Undertow.
 
 ### v2.2.0
 - Rename  `by()` to `bind()` in routing for clarity. 
