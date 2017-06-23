@@ -47,6 +47,7 @@ plugging together of services without HTTP container being required.
     * **Typesafe HTTP message construction/desconstruction** using Lenses
     * **Static file-serving** capability with **Caching and Hot-Reload** 
     * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
+    * **SunHttp** server backend spinup (development use only)
     * Core abstraction APIs implemented by the other modules 
 * [Client:](http://http4k.org/guide/modules/clients) 
     * **Single LOC** HTTP client adapters 

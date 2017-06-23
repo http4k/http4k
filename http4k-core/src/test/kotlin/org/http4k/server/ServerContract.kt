@@ -32,10 +32,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     Response(OK).body(it.name)
                 }
             }.plus(listOf(
-                "/" to GET bind { _: Request ->
+                "/headers" to GET bind { _: Request ->
                     Response(ACCEPTED)
                         .header("content-type", "text/plain")
-                        .body("Hello World")
                 },
                 "/echo" to POST bind { req: Request -> Response(OK).body(req.bodyString()) },
                 "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
@@ -63,6 +62,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello mum"))
+    }
+
+    @Test
+    fun `returns headers`() {
+        val response = client(Request(GET, "http://localhost:$port/headers"))
+
+        assertThat(response.status, equalTo(ACCEPTED))
+        assertThat(response.header("content-type"), equalTo("text/plain"))
     }
 
     @Test

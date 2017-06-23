@@ -12,7 +12,6 @@ dependencies {
     provided project(":http4k-core")
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile project(":http4k-server-jetty")
 
     testCompile testing
 }
