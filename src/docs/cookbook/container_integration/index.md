@@ -2,9 +2,9 @@ This example shows how to convert an HttpHandler to a server
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.10.1"
-    compile group: "org.http4k", name: "http4k-apache", version: "2.10.1"
-    compile group: "org.http4k", name: "http4k-jetty", version: "2.10.1"
+    compile group: "org.http4k", name: "http4k-core", version: "2.11.0"
+    compile group: "org.http4k", name: "http4k-apache", version: "2.11.0"
+    compile group: "org.http4k", name: "http4k-jetty", version: "2.11.0"
 ```
 
 ### Code
