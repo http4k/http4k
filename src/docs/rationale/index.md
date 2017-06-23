@@ -15,7 +15,7 @@ For our purposes, we needed something that:
 1. Has a symmetric server/client API (`HttpHandler` should just be `Request -> Response`).
 1. Has immutable Request/Response objects.
 
-**http4k** ticks all of these boxes.
+**http4k** ticks all of these boxes. 
 
 It allow us to construct entire suites of services which can be tested either wired together without HTTP, or spun up in containers 
 in 1 LOC. The symmetric HTTP API also allows filter chains (often called interceptors in other frameworks) to be constructed into reusable units/stacks for both 
