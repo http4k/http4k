@@ -32,12 +32,12 @@ plugging together of services without HTTP container being required.
     * applications
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
-   * Pluggable HTTP client adapters for Apache and OkHttp
-   * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty and Undertow
-   * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
-   * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
-   * Templating support: Caching and Hot-Reload engine support for Handlebars
-   * AWS request signing: super-simple interactions with AWS services.
+    * Pluggable HTTP client adapters for Apache and OkHttp
+    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty and Undertow
+    * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
+    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
+    * Templating support: Caching and Hot-Reload engine support for Handlebars
+    * AWS request signing: super-simple interactions with AWS services.
 
 ## Module feature overview
 * [Core:](http://http4k.org/guide/modules/core) 
