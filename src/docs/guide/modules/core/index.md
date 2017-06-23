@@ -8,7 +8,7 @@ The core module has ZERO dependencies and provides the following:
 - HTTP handler and filter abstractions which models services as simple, composable functions.
 - Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
 - [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
-- Abstractions for Servers, Clients, messasge formats, Templating etc.
+- Abstractions for Servers, Clients, JSON Message formats, Templating etc.
 
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:
