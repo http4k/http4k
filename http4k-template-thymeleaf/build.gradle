@@ -4,11 +4,9 @@ dependencies {
     provided kotlin_lib
 
     provided project(":http4k-core")
-
     compile 'org.thymeleaf:thymeleaf:3.0.6.RELEASE'
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-
     testCompile testing
 }
 

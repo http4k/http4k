@@ -15,6 +15,7 @@ dependencies {
     provided project(":http4k-core")
     compile undertow
     compile "commons-io:commons-io:2.5"
+
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(":http4k-client-apache")
     testCompile testing
