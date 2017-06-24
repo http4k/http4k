@@ -44,6 +44,14 @@ class StaticRoutingHttpHandlerTest {
         assertThat(result.bodyString(), equalTo("hello from the root index.html"))
         assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
     }
+    @Test
+    fun `defaults to index html if is no route - root-context`() {
+        val handler = "/" bind static()
+        val result = handler(Request(GET, of("/")))
+        assertThat(result.status, equalTo(OK))
+        assertThat(result.bodyString(), equalTo("hello from the root index.html"))
+        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+    }
 
     @Test
     fun `defaults to index html if is no route - non-root-context`() {

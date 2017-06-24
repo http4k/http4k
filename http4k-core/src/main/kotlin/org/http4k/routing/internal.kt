@@ -58,7 +58,7 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
 
             private fun convertPath(path: String): String {
                 val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")
-                val resolved = if (newPath.isBlank()) "/index.html" else newPath
+                val resolved = if (newPath == "/" || newPath.isBlank()) "/index.html" else newPath
                 return resolved.replaceFirst("/", "")
             }
         }

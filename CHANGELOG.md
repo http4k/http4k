@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.11.1
+- Fix static routes not defaulting to index.html when in root context
+
 ### v2.11.0
 - Added `SunHttp` server implementation (for development use only)
 
