@@ -670,6 +670,7 @@ text/calendar					ics ifb
 text/css					css
 text/csv					csv
 text/html					html htm
+text/babel					jsx
 text/n3						n3
 text/plain					txt text conf def list log in
 text/prs.lines.tag				dsc
