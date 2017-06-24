@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-aws", version: "2.11.0"```
+```compile group: "org.http4k", name: "http4k-aws", version: "2.11.1"```
 
 ### About
 
