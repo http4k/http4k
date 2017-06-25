@@ -136,14 +136,23 @@ class RoutingTest {
     @Test
     fun `can put routes inside of routes`() {
         val subRoutes = routes(
-            "/a/{route}" to GET bind { Response(OK).body("matched") }
+            "/a/{route}" to GET bind { Response(OK).header("header", it.header("header")).body("matched") }
         )
 
-        val app = routes("/prefix" bind subRoutes)
+        var count = 0
+        val filter = Filter {
+            next ->
+            {
+                next(it.replaceHeader("header", "value" + count++))
+            }
+        }
+
+        val app = routes("/prefix" bind filter.then(subRoutes))
 
         val response = app(Request(GET, "/prefix/a/something"))
 
         assertThat(response.status, equalTo(OK))
+        assertThat(response.header("header"), equalTo("value0"))
         assertThat(response.bodyString(), equalTo("matched"))
     }
 

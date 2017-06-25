@@ -67,7 +67,8 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
 }
 
 internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
-    override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(httpHandler.copy(filter = httpHandler.filter.then(new)))
+    override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(
+        httpHandler.copy(routes = httpHandler.routes.map { it.copy(handler = new.then(it.handler)) }))
 
     override fun withBasePath(new: String): RoutingHttpHandler = GroupRoutingHttpHandler(
         httpHandler.copy(pathSegments = UriTemplate.from(new + httpHandler.pathSegments?.toString().orEmpty()),
@@ -80,15 +81,14 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     companion object {
-        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val routes: List<Route>, val filter: Filter = Filter { next -> { next(it) } }) : HttpHandler {
+        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val routes: List<Route>) : HttpHandler {
             private val routers = routes.map(Route::asRouter)
             private val noMatch: HttpHandler? = null
-            private val handler: HttpHandler = filter.then { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
+            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
-            fun match(request: Request): HttpHandler? =
-                if (pathSegments?.matches(request.uri.path) ?: true)
-                    routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
-                else null
+            fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) ?: true)
+                routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+            else null
 
             override fun invoke(request: Request): Response = handler(request)
         }
