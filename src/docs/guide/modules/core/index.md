@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-core", version: "2.11.1"```
+```compile group: "org.http4k", name: "http4k-core", version: "2.11.2"```
 
 ### About
 The core module has ZERO dependencies and provides the following:

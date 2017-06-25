@@ -2,7 +2,7 @@
 **Although the functionality is sound, the Contract API is still in Beta in undergoing changes as it is finalised.**
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-contract", version: "2.11.1"```
+```compile group: "org.http4k", name: "http4k-contract", version: "2.11.2"```
 
 ### About
 The `http4k-contract` module adds a much more sophisticated routing mechanism to that available in `http4k-core`. It adds the facility 
