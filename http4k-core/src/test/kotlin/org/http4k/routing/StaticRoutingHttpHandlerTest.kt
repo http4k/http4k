@@ -44,6 +44,7 @@ class StaticRoutingHttpHandlerTest {
         assertThat(result.bodyString(), equalTo("hello from the root index.html"))
         assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
     }
+
     @Test
     fun `defaults to index html if is no route - root-context`() {
         val handler = "/" bind static()
@@ -59,6 +60,21 @@ class StaticRoutingHttpHandlerTest {
         val result = handler(Request(GET, of("/svc")))
         assertThat(result.status, equalTo(OK))
         assertThat(result.bodyString(), equalTo("hello from the io index.html"))
+        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+    }
+
+    @Test
+    fun `can apply filters`() {
+        val rewritePathToRootIndex = Filter {
+            next ->
+            {
+                next(it.uri(it.uri.path("/index.html")))
+            }
+        }
+        val handler = rewritePathToRootIndex.then("/" bind static(Classpath("")))
+        val result = handler(Request(GET, of("/asdas")))
+        assertThat(result.status, equalTo(OK))
+        assertThat(result.bodyString(), equalTo("hello from the root index.html"))
         assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
     }
 
