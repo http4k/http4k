@@ -49,6 +49,7 @@ val app: RoutingHttpHandler = routes(
     "sue" to DELETE bind { Response(OK).body("you DELETE sue") }
 )
 ```
+* A `Router` is a selective request handler, which attempts to match a request. If it cannot, processing falls through to the next `Router` in the list.
 * `Routers` can be combined together to form another `HttpHandler`:
 ```kotlin
 val bigApp: HttpHandler = routes(
