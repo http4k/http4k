@@ -41,7 +41,7 @@ a decorated `HttpHander`:
 ```kotlin
 val route: Route = "/path" to GET bind { Response(OK).body("you GET bob") }
 ```
-* `Routes` can be combined together into a `RoutingHttpHandler`, which is both an `HttpHandler` and a`Router``:
+* `Routes` can be combined together into a `RoutingHttpHandler`, which is both an `HttpHandler` and a`Router`:
 ```kotlin
 val app: RoutingHttpHandler = routes(
     "bob" to GET bind { Response(OK).body("you GET bob") },
