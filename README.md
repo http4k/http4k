@@ -50,7 +50,7 @@ plugging together of services without HTTP container being required.
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
     * Core abstraction APIs implemented by the other modules 
 * [Client:](http://http4k.org/guide/modules/clients) 
-    * **Single LOC** HTTP client adapters 
+    * **1LOC** HTTP client adapters 
         * **Apache**
         * **OkHttp**
 * [Server:](http://http4k.org/guide/modules/servers)
