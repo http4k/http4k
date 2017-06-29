@@ -59,7 +59,7 @@ plugging together of services without HTTP container being required.
         * **Netty**
         * **Undertow**
     * API design allows for plugging into configurable instances of each
-* **BETA!** [Contracts:](http://http4k.org/guide/modules/contracts) 
+* [Contracts:](http://http4k.org/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
    * **Typesafe** path matching
    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
