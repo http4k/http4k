@@ -1,4 +1,4 @@
-This example shows how to convert an HttpHandler to a server
+This example shows how to serve an application HttpHandler using an embedded an HTTP server. All server-backend implementations are launched in an identical manner (in 1LOC). Additionally, server instances can be customised using classes available in the implementation JARs - in the case of Jetty, the application is mounted using the `asServlet()` extension method into the Jetty container.
 
 ### Gradle setup
 ```
