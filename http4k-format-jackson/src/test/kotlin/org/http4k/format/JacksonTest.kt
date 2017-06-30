@@ -10,19 +10,7 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.junit.Test
 
-class JacksonAutoTest : AutoMarshallingContract<JsonNode>(Jackson)
-
-class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
-
-    @Test
-    fun `roundtrip arbitary object to and from object`() {
-        val body = Body.auto<ArbObject>().toLens()
-
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
-
-        assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
-    }
-
+class JacksonAutoTest : AutoMarshallingContract<JsonNode>(Jackson) {
     @Test
     fun `roundtrip list of arbitary objects to and from object`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
@@ -31,9 +19,8 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(arrayOf(obj).toList()))
     }
-
 }
 
+class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson)
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
-
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Jackson)
