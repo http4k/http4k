@@ -1,6 +1,3 @@
-## NOTE
-**Although the functionality is sound, the Contract API is still in Beta in undergoing changes as it is finalised.**
-
 ### Installation (Gradle)
 ```compile group: "org.http4k", name: "http4k-contract", version: "2.11.2"```
 

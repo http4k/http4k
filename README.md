@@ -47,19 +47,19 @@ plugging together of services without HTTP container being required.
     * **Typesafe HTTP message construction/desconstruction** using Lenses
     * **Static file-serving** capability with **Caching and Hot-Reload** 
     * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
-    * **SunHttp** server backend spinup (development use only)
+    * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
     * Core abstraction APIs implemented by the other modules 
 * [Client:](http://http4k.org/guide/modules/clients) 
-    * **Single LOC** HTTP client adapters 
+    * **1LOC** HTTP client adapters 
         * **Apache**
         * **OkHttp**
 * [Server:](http://http4k.org/guide/modules/servers)
-    * **Single LOC** server backend spinup for:
+    * **1LOC** server backend spinup for:
         * **Jetty**
         * **Netty**
         * **Undertow**
     * API design allows for plugging into configurable instances of each
-* **BETA!** [Contracts:](http://http4k.org/guide/modules/contracts) 
+* [Contracts:](http://http4k.org/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
    * **Typesafe** path matching
    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
