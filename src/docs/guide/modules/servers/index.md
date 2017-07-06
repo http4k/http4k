@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-server-core", version: "2.11.2"```
+**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "2.11.2"```
 
 **Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "2.11.2"```
 
