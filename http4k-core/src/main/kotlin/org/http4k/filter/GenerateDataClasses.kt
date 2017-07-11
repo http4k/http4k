@@ -13,18 +13,18 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
                                                        private val out: PrintStream = System.out,
                                                        private val idGenerator: () -> Int = { Random().nextInt() }) : Filter {
 
+    private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
+
     override fun invoke(next: HttpHandler): HttpHandler =
         { req ->
             val response = next(req)
             out.println("// result generated from ${req.uri}\n")
-            process("Base", json.body().toLens()(response))
-                .flatMap { it }
+            out.println(flatten(setOf(process("Base", json.body().toLens()(response))))
                 .toSet()
                 .groupBy { it.asClassName() }
                 .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
                 .sorted()
-                .map { it + "\n" }
-                .map(out::println)
+                .joinToString("\n\n"))
             response
         }
 
@@ -42,8 +42,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
 
     data class ArrayGen(val elements: Set<Gen>) : Gen {
         override fun asClassName(): String {
-            val arrayType = if (elements.size == 1) elements.first()
-            else Primitives.Null
+            val arrayType = if (elements.size == 1) elements.first() else Primitives.Null
             return "List<${arrayType.asClassName()}>"
         }
 

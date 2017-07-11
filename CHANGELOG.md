@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.11.3
+- Fix #26 - GenerateDataClasses does not recurse into nested object trees
+
 ### v2.11.2
 - Fix filter application on GroupRoutingHttpHandler to apply the filter when it is applied with `then(RoutingHttpHandler()`
 

@@ -61,10 +61,11 @@ data class Base(val string: String?, val double: Number?, val long: Number?, val
 
 data class Empty()
 
+data class List1(val id: String?)
+
 data class NonEmpty(val double: Number?, val long: Number?)
 
 data class SingleTypeArray1(val string: String?, val list: List<List1>?)
-
 """))
     }
 }
