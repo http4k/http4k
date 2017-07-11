@@ -20,9 +20,10 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
             process("Base", json.body().toLens()(response))
                 .flatMap { it }
                 .toSet()
-                .mapNotNull(Gen::asDefinitionString)
-                .map { it + "\n" }
+                .groupBy { it.asClassName() }
+                .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
                 .sorted()
+                .map { it + "\n" }
                 .map(out::println)
             response
         }
@@ -45,6 +46,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
             else Primitives.Null
             return "List<${arrayType.asClassName()}>"
         }
+
         override fun iterator(): Iterator<Gen> = elements.iterator()
     }
 
