@@ -1,5 +1,5 @@
 site_name: http4k
-site_url: http://www.http4k.org
+site_url: https://http4k.org
 site_description: Documentation site for the http4k web framework written in Kotlin
 site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
 copyright: 'Copyright &copy; 2017 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'

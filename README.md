@@ -1,4 +1,4 @@
-<a href="http://http4k.org"><img src="http://http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
+<a href="https://http4k.org"><img src="https://http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
 
 <span class="github">
 <a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"></a>
@@ -40,7 +40,7 @@ plugging together of services without HTTP container being required.
     * AWS request signing: super-simple interactions with AWS services.
 
 ## Module feature overview
-* [Core:](http://http4k.org/guide/modules/core) 
+* [Core:](https://http4k.org/guide/modules/core) 
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
@@ -49,37 +49,37 @@ plugging together of services without HTTP container being required.
     * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
     * Core abstraction APIs implemented by the other modules 
-* [Client:](http://http4k.org/guide/modules/clients) 
+* [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** HTTP client adapters 
         * **Apache**
         * **OkHttp**
-* [Server:](http://http4k.org/guide/modules/servers)
+* [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:
         * **Jetty**
         * **Netty**
         * **Undertow**
     * API design allows for plugging into configurable instances of each
-* [Contracts:](http://http4k.org/guide/modules/contracts) 
+* [Contracts:](https://http4k.org/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
    * **Typesafe** path matching
    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
-* [Templating:](http://http4k.org/guide/modules/templating) 
+* [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * **Handlebars** 
         * **Pebble**
         * **Thymeleaf**
     * Caching and **Hot-Reload** template support
-* [Message formats:](http://http4k.org/guide/modules/message_formats) 
+* [Message formats:](https://http4k.org/guide/modules/message_formats) 
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
-        * **Jackson** - includes support for **fully [automatic marshalling](http://www.http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-        * **Gson** - includes support for **fully [automatic marshalling](http://www.http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
+        * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
+        * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo**
-* [AWS:](http://http4k.org/guide/modules/aws) 
+* [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 
 ## Example
-This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](http://www.http4k.org/quickstart/) for the simplest possible starting point.
+This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
