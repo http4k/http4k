@@ -1,4 +1,4 @@
-<a href="https://http4k.org"><img src="https://http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
+<a href="https://http4k.org"><img src="https://www.http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
 
 <span class="github">
 <a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"></a>
