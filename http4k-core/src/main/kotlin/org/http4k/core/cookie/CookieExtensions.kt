@@ -30,4 +30,4 @@ fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull(
 
 fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))
 
-fun Response.invalidateCookie(name: String): Response = replaceCookie(Cookie(name, "").invalidate())
+fun Response.invalidateCookie(name: String, domain: String? = null): Response = replaceCookie(Cookie(name, "", domain = domain).invalidate())
