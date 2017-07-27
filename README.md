@@ -77,7 +77,9 @@ plugging together of services without HTTP container being required.
         * **Argo**
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
-
+* [WebDriver:](https://http4k.org/guide/modules/webdriver) 
+    * Ultra-lightweight Selenium WebDriver implementation for **http4k** application.
+    
 ## Example
 This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
 

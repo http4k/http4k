@@ -34,6 +34,7 @@ pages:
       - Templating: guide/modules/templating/index.md
       - Typesafe Contracts: guide/modules/contracts/index.md
       - AWS: guide/modules/aws/index.md
+      - WebDriver: guide/modules/webdriver/index.md
     - Application Testing: guide/testing/index.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md
