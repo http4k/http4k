@@ -141,9 +141,15 @@ class CookieTest {
     }
 
     @Test
-    fun `cookie can be invalidate at response level`() {
+    fun `cookie can be invalidated at response level`() {
         assertThat(Response(Status.OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
             equalTo(Cookie("foo", "").invalidate()))
+    }
+
+    @Test
+    fun `cookie with domain can be invalidated at response level`() {
+        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar", domain="foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
+            equalTo(Cookie("foo", "", domain="foo.com").invalidate()))
     }
 
     @Test
