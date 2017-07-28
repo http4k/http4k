@@ -74,7 +74,7 @@ plugging together of services without HTTP container being required.
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
         * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
-        * **Argo**
+        * **Argo** - lightweight Java JSON API with zero dependencies.
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
