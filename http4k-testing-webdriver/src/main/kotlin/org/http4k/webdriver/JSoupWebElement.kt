@@ -19,7 +19,13 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet
 
-    override fun clear() = throw FeatureNotImplementedYet
+    override fun clear() {
+        if (isA("option")) {
+            element.removeAttr("selected")
+        } else if (isCheckable()) {
+            element.removeAttr("checked")
+        }
+    }
 
     override fun submit() {
         current("form")?.let {
@@ -40,11 +46,13 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
         } else if (isA("option")) {
             val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") ?: false
 
-            if (isSelected && !currentSelectIsMultiple) {
-                element.removeAttr("selected")
-            } else {
-                element.attr("selected", "selected")
-            }
+            val oldValue = isSelected
+
+            if (currentSelectIsMultiple) element.attr("selected", "selected")
+            else current("select")?.findElements(By.tagName("option"))?.forEach { it.clear() }
+
+            if (oldValue && !currentSelectIsMultiple) clear()
+            else element.attr("selected", "selected")
         }
     }
 

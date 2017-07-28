@@ -8,7 +8,6 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.jsoup.Jsoup
-import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType
@@ -119,7 +118,6 @@ class JSoupWebElementTest {
     }
 
     @Test
-    @Ignore
     fun `send keys to an single select`() {
         val select = select(false)
         select.findElements(By.tagName("option")).first().click()
@@ -147,7 +145,6 @@ class JSoupWebElementTest {
     @Test
     fun `unsupported features`() {
         isNotImplemented { element().isDisplayed }
-        isNotImplemented { element().clear() }
         isNotImplemented { element().location }
         isNotImplemented { element().rect }
         isNotImplemented { element().size }
