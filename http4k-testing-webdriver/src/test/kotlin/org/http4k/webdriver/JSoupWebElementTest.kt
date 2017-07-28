@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.jsoup.Jsoup
@@ -19,8 +20,8 @@ class JSoupWebElementTest {
         |<disabled disabled>disabled</disabled>
         |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
-    private fun form() = JSoupWebElement({ method, url -> newLocation = method to url }, Jsoup.parse("""
-        <form method="POST" action="/posted">
+    private fun form(method: Method = POST) = JSoupWebElement({ actual, url -> newLocation = actual to url }, Jsoup.parse("""
+        <form method="${method.name}" action="/posted">
             <p>inner</p>
         </form>
         """)).findElement(By.tagName("form"))!!
@@ -57,8 +58,8 @@ class JSoupWebElementTest {
 
     @Test
     fun `submit an element inside the form`() {
-        form().findElement(By.tagName("p"))!!.submit()
-        assertThat(newLocation, equalTo(POST to "/posted"))
+        form(DELETE).findElement(By.tagName("p"))!!.submit()
+        assertThat(newLocation, equalTo(DELETE to "/posted"))
     }
 
     @Test
