@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import org.http4k.core.Method
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -23,7 +24,16 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun clear() = throw FeatureNotImplementedYet()
 
-    override fun submit() = throw FeatureNotImplementedYet()
+    override fun submit() {
+        if (isA("form")) {
+            val method = getAttribute("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
+            navigate(method, getAttribute("action") ?: "<unknown>")
+        } else {
+            element.parent()?.let { JSoupWebElement(navigate, it).submit() }
+        }
+    }
+
+    private fun isA(s: String) = tagName.toLowerCase() == s
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet()
 
@@ -31,7 +41,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun click() {
         getAttribute("href")?.let {
-            if (tagName.toLowerCase() == "a") navigate(it)
+            if (isA("a")) navigate(Method.GET, it)
         }
     }
 

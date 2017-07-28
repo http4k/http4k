@@ -11,10 +11,13 @@ import org.openqa.selenium.OutputType
 class JSoupWebElementTest {
 
     private var newLocation: String? = null
-    private fun element(tag: String = "a") = JSoupWebElement({ newLocation = it }, Jsoup.parse("""<$tag id="bob" href="/link"><span>hello</span></$tag>""")).findElement(By.tagName(tag))!!
+    private fun element(tag: String = "a") = JSoupWebElement({ _, url -> newLocation = url }, Jsoup.parse("""<$tag id="bob" href="/link"><span>hello</span></$tag>""")).findElement(By.tagName(tag))!!
 
-    @Test
-    fun `find sub element`() = assertThat(element().findElement(By.tagName("span"))!!.text, equalTo("hello"))
+    private fun form() = JSoupWebElement({ _, url -> newLocation = url }, Jsoup.parse("""
+        <form method="POST" action="/posted">
+            <p>inner</p>
+        </form>
+        """)).findElement(By.tagName("form"))!!
 
     @Test
     fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))
@@ -41,12 +44,29 @@ class JSoupWebElementTest {
     }
 
     @Test
+    fun `submit a form`() {
+        form().submit()
+        assertThat(newLocation, equalTo("/posted"))
+    }
+
+    @Test
+    fun `submit an element inside the form`() {
+        form().findElement(By.tagName("p"))!!.submit()
+        assertThat(newLocation, equalTo("/posted"))
+    }
+
+    @Test
+    fun `submit a non-form`() {
+        element().submit()
+        assertThat(newLocation, absent())
+    }
+
+    @Test
     fun `unsupported features`() {
         isNotImplemented { element().isDisplayed }
         isNotImplemented { element().isEnabled }
         isNotImplemented { element().isSelected }
         isNotImplemented { element().clear() }
-        isNotImplemented { element().submit() }
         isNotImplemented { element().sendKeys("") }
         isNotImplemented { element().location }
         isNotImplemented { element().rect }
