@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.13.0 (uncut)
+- More features for `http4k-testing-webdriver`.
+
 ### v2.12.0
 - Added `http4k-testing-webdriver` module, an ultralight Selenium WebDriver for **http4k** apps
 
