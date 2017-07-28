@@ -5,6 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.cookie.cookie
+import org.http4k.core.cookie.cookies
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -12,6 +13,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriver.Navigation
 import org.openqa.selenium.WebElement
 import java.net.URL
+import java.time.ZoneId
 import java.util.*
 import kotlin.NoSuchElementException
 import org.http4k.core.cookie.Cookie as HCookie
@@ -23,12 +25,19 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
-    private val siteCookies = mutableSetOf<Cookie>()
+    private val siteCookies = mutableMapOf<String, Cookie>()
 
     private fun navigateTo(request: Request) {
-        val requestWithCookies = siteCookies.fold(request) { memo, next -> memo.cookie(HCookie(next.name, next.value)) }
-        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), handler(requestWithCookies).bodyString(), current)
+        val requestWithCookies = siteCookies.entries.fold(request) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
+        val response = handler(requestWithCookies)
+        response.cookies().forEach {
+            siteCookies.put(it.name, it.toWebDriver())
+        }
+        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), response.bodyString(), current)
     }
+
+    private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
+        expires?.let {  Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
 
     override fun get(url: String) {
         navigateTo(Request(GET, url).body(""))
@@ -99,25 +108,23 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     override fun manage() = object : WebDriver.Options {
         override fun addCookie(cookie: Cookie) {
-            siteCookies.add(cookie)
+            siteCookies.put(cookie.name, cookie)
         }
 
-        override fun getCookies() = siteCookies.toSet()
+        override fun getCookies() = siteCookies.values.toSet()
 
         override fun deleteCookieNamed(name: String?) {
-            siteCookies.removeIf {
-                it.name == name
-            }
+            siteCookies.remove(name)
         }
 
-        override fun getCookieNamed(name: String) = siteCookies.find { it.name == name }
+        override fun getCookieNamed(name: String) = siteCookies[name]
 
         override fun deleteAllCookies() {
             siteCookies.clear()
         }
 
         override fun deleteCookie(cookie: Cookie) {
-            siteCookies.remove(cookie)
+            siteCookies.remove(cookie.name)
         }
 
         override fun ime() = throw FeatureNotImplementedYet

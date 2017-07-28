@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.junit.Test
 import org.openqa.selenium.By
@@ -13,7 +14,10 @@ import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
+import org.http4k.core.cookie.Cookie as HCookie
 
 class Http4kWebDriverTest {
     private val driver = Http4kWebDriver { req ->
@@ -134,13 +138,25 @@ class Http4kWebDriverTest {
     @Test
     fun `cookies are added to request`() {
         val driver = Http4kWebDriver { req ->
-            Response(OK).body(req.cookies().joinToString("\n") { it.toString() }) }
+            Response(OK).body(req.cookies().joinToString("\n") { it.toString() })
+        }
         driver.manage().addCookie(Cookie("foo1", "bar1", "domain", "/", Date(0), true, true))
         driver.manage().addCookie(Cookie("foo2", "bar2"))
 
         driver.get("/")
 
         assertThat(driver.pageSource, equalTo("foo1=\"bar1\"; \nfoo2=\"bar2\"; "))
+    }
+
+    @Test
+    fun `service set cookies are stored in the driver`() {
+        val driver = Http4kWebDriver {
+            Response(OK).cookie(HCookie("name", "value", 100, LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC), "domain", "path", true, true))
+        }
+
+        driver.get("/")
+
+        assertThat(driver.manage().cookies, equalTo(setOf(Cookie("name", "value", "domain", "path", Date(0), true, true))))
     }
 
     @Test
