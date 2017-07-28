@@ -8,13 +8,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.Test
 import org.openqa.selenium.By
+import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
 
 class Http4kWebDriverTest {
-    private val driver = Http4kWebDriver {
-        req ->
+    private val driver = Http4kWebDriver { req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
             .replace("FORMMETHOD", Method.POST.name)
@@ -44,8 +44,7 @@ class Http4kWebDriverTest {
 
     @Test
     fun `GET form`() {
-        val driver = Http4kWebDriver {
-            req ->
+        val driver = Http4kWebDriver { req ->
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
                 .replace("FORMMETHOD", Method.GET.name)
@@ -116,12 +115,22 @@ class Http4kWebDriverTest {
 
         val windowHandle = driver.windowHandle
 
-        isNotImplemented {driver.manage()}
-        isNotImplemented {driver.switchTo().alert()}
-        isNotImplemented {driver.switchTo().frame(0)}
-        isNotImplemented {driver.switchTo().frame("bob")}
-        isNotImplemented {driver.switchTo().frame(windowHandle)}
-        isNotImplemented {driver.switchTo().parentFrame()}
+        val cookie = Cookie("name", "value")
+        isNotImplemented { driver.manage().addCookie(cookie) }
+        isNotImplemented { driver.manage().deleteAllCookies() }
+        isNotImplemented { driver.manage().deleteCookie(cookie) }
+        isNotImplemented { driver.manage().deleteCookieNamed("name") }
+        isNotImplemented { driver.manage().getCookieNamed("name") }
+        isNotImplemented { driver.manage().cookies }
+        isNotImplemented { driver.manage().ime() }
+        isNotImplemented { driver.manage().logs() }
+        isNotImplemented { driver.manage().timeouts() }
+        isNotImplemented { driver.manage().window() }
+        isNotImplemented { driver.switchTo().alert() }
+        isNotImplemented { driver.switchTo().frame(0) }
+        isNotImplemented { driver.switchTo().frame("bob") }
+        isNotImplemented { driver.switchTo().frame(windowHandle) }
+        isNotImplemented { driver.switchTo().parentFrame() }
     }
 
     private fun WebDriver.assertOnPage(expected: String) {

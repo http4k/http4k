@@ -6,6 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
+import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriver.Navigation
 import org.openqa.selenium.WebElement
@@ -91,5 +92,25 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
         }
     }
 
-    override fun manage(): WebDriver.Options? = throw FeatureNotImplementedYet
+    override fun manage() = object : WebDriver.Options {
+        override fun addCookie(cookie: Cookie)  = throw FeatureNotImplementedYet
+
+        override fun getCookies() = throw FeatureNotImplementedYet
+
+        override fun deleteCookieNamed(name: String?) = throw FeatureNotImplementedYet
+
+        override fun ime() = throw FeatureNotImplementedYet
+
+        override fun logs() = throw FeatureNotImplementedYet
+
+        override fun getCookieNamed(name: String) = throw FeatureNotImplementedYet
+
+        override fun deleteAllCookies() = throw FeatureNotImplementedYet
+
+        override fun deleteCookie(cookie: Cookie) = throw FeatureNotImplementedYet
+
+        override fun timeouts() = throw FeatureNotImplementedYet
+
+        override fun window() = throw FeatureNotImplementedYet
+    }
 }

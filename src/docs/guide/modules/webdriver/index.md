@@ -12,6 +12,7 @@ A basic Selenium WebDriver API implementation for **http4k** HttpHandlers, which
 | Link clicking|yes|yes|
 | Form detection and submission|yes|
 | Form field entry|yes|
+| Cookies|not yet :)|
 | JavaScript|no|
 | Alerts|no|
 | Screenshots|no|
