@@ -8,6 +8,7 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.jsoup.Jsoup
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType
@@ -20,12 +21,18 @@ class JSoupWebElementTest {
 
     private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
-    private fun element(tag: String = "a"): WebElement {
-        return JSoupWebElement(navigate, Jsoup.parse("""<$tag id="bob" href="/link">
-            |<span>hello</span>
-            |<disabled disabled>disabled</disabled>
-            |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
-    }
+    private fun select(multiple: Boolean): WebElement =
+        JSoupWebElement(navigate, Jsoup.parse("""<select name="bob" ${if(multiple) "multiple" else ""}>
+            <option>foo1</option>
+            <option>foo2</option>
+            </select>"""
+        )).findElement(By.tagName("select"))!!
+
+    private fun element(tag: String = "a"): WebElement =
+        JSoupWebElement(navigate, Jsoup.parse("""<$tag id="bob" href="/link">
+        |<span>hello</span>
+        |<disabled disabled>disabled</disabled>
+        |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
     private fun form(method: Method = POST) = JSoupWebElement({ actual, url -> newLocation = actual to url }, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
@@ -55,7 +62,7 @@ class JSoupWebElementTest {
         fun assertCheckableSetsValue(type: String) {
             val input = input(type)
             input.click()
-            assertThat(input.getAttribute("checked"), equalTo("checked"))
+            assertThat(input.isSelected, equalTo(true))
         }
 
         assertCheckableSetsValue("checkbox")
@@ -101,9 +108,9 @@ class JSoupWebElementTest {
     @Test
     fun `send keys to an input`() {
         fun assertKeysSetValue(type: String) {
-            val textInput = input(type)
-            textInput.sendKeys("hello")
-            assertThat(textInput.getAttribute("value"), equalTo("hello"))
+            val input = input(type)
+            input.sendKeys("hello")
+            assertThat(input.getAttribute("value"), equalTo("hello"))
         }
 
         assertKeysSetValue("text")
@@ -112,16 +119,34 @@ class JSoupWebElementTest {
     }
 
     @Test
+    @Ignore
+    fun `send keys to an single select`() {
+        val select = select(false)
+        select.findElements(By.tagName("option")).first().click()
+        select.findElements(By.tagName("option")).last().click()
+        assertThat(select.findElements(By.tagName("option")).first().isSelected, equalTo(false))
+        assertThat(select.findElements(By.tagName("option")).last().isSelected, equalTo(true))
+    }
+
+    @Test
+    fun `send keys to a multi select`() {
+        val select = select(true)
+        select.findElements(By.tagName("option")).first().click()
+        select.findElements(By.tagName("option")).last().click()
+        assertThat(select.findElements(By.tagName("option")).first().isSelected, equalTo(true))
+        assertThat(select.findElements(By.tagName("option")).last().isSelected, equalTo(true))
+    }
+
+    @Test
     fun `send keys to an textArea`() {
-        val textInput = form().findElement(By.id("textarea"))
-        textInput.sendKeys("hello")
-        assertThat(textInput.text, equalTo("hello"))
+        val input = form().findElement(By.id("textarea"))
+        input.sendKeys("hello")
+        assertThat(input.text, equalTo("hello"))
     }
 
     @Test
     fun `unsupported features`() {
         isNotImplemented { element().isDisplayed }
-        isNotImplemented { element().isSelected }
         isNotImplemented { element().clear() }
         isNotImplemented { element().location }
         isNotImplemented { element().rect }

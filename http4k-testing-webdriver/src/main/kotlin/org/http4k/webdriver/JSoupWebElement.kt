@@ -22,7 +22,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun clear() = throw FeatureNotImplementedYet
 
     override fun submit() {
-        currentForm()?.let {
+        current("form")?.let {
             val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
             navigate(method, it.element.attr("action") ?: "<unknown>")
         }
@@ -33,24 +33,39 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = throw FeatureNotImplementedYet
 
     override fun click() {
-        if(isA("a")) {
+        if (isA("a")) {
             element.attr("href")?.let { navigate(Method.GET, it) }
-        } else if(isA("input") && setOf("checkbox", "radio").contains(element.attr("type"))) {
+        } else if (isCheckable()) {
             element.attr("checked", "checked")
+        } else if (isA("option")) {
+            val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") ?: false
+
+            if (isSelected && !currentSelectIsMultiple) {
+                element.removeAttr("selected")
+            } else {
+                element.attr("selected", "selected")
+            }
         }
     }
 
+    private fun isCheckable() = isA("input") && setOf("checkbox", "radio").contains(element.attr("type"))
+
     override fun getSize(): Dimension = throw FeatureNotImplementedYet
 
-    override fun isSelected(): Boolean = throw FeatureNotImplementedYet
+    override fun isSelected(): Boolean = when {
+        isA("option") -> element.hasAttr("selected")
+        isCheckable() -> element.hasAttr("checked")
+        else -> false
+    }
 
     override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
     override fun sendKeys(vararg keysToSend: CharSequence) {
+        val valueToSet = keysToSend.joinToString("")
         if (isA("textarea")) {
-            element.text(keysToSend.joinToString(""))
+            element.text(valueToSet)
         } else if (isA("input")) {
-            element.attr("value", keysToSend.joinToString(""))
+            element.attr("value", valueToSet)
         }
     }
 
@@ -66,7 +81,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun findElements(by: By) = JSoupElementFinder(navigate, element).findElements(by)
 
-    private fun currentForm(): JSoupWebElement? = if (isA("form")) this else this.parent()?.currentForm()
+    private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else this.parent()?.current(tag)
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, it) }
 
