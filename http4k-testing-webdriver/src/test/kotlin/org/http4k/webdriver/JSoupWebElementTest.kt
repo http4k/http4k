@@ -51,10 +51,15 @@ class JSoupWebElementTest {
     fun `text`() = assertThat(element().text, equalTo("hello disabled"))
 
     @Test
-    fun `click checkbox`() {
-        val input = input("checkbox")
-        input.click()
-        assertThat(input.getAttribute("checked"), equalTo("checked"))
+    fun `click checkbox or radio`() {
+        fun assertCheckableSetsValue(type: String) {
+            val input = input(type)
+            input.click()
+            assertThat(input.getAttribute("checked"), equalTo("checked"))
+        }
+
+        assertCheckableSetsValue("checkbox")
+        assertCheckableSetsValue("radio")
     }
 
     @Test
@@ -95,9 +100,15 @@ class JSoupWebElementTest {
 
     @Test
     fun `send keys to an input`() {
-        val textInput = form().findElement(By.id("text"))
-        textInput.sendKeys("hello")
-        assertThat(textInput.getAttribute("value"), equalTo("hello"))
+        fun assertKeysSetValue(type: String) {
+            val textInput = input(type)
+            textInput.sendKeys("hello")
+            assertThat(textInput.getAttribute("value"), equalTo("hello"))
+        }
+
+        assertKeysSetValue("text")
+        assertKeysSetValue("date")
+        assertKeysSetValue("password")
     }
 
     @Test

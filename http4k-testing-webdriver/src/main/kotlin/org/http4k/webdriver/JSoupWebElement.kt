@@ -35,7 +35,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun click() {
         if(isA("a")) {
             element.attr("href")?.let { navigate(Method.GET, it) }
-        } else if(isA("input") && element.attr("type") == "checkbox") {
+        } else if(isA("input") && setOf("checkbox", "radio").contains(element.attr("type"))) {
             element.attr("checked", "checked")
         }
     }
