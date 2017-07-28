@@ -1,8 +1,14 @@
 package org.http4k.webdriver
 
+import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.with
+import org.http4k.lens.FormField
+import org.http4k.lens.FormValidator
 import org.http4k.lens.WebForm
+import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -47,15 +53,20 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
                         .map { it.getAttribute("value") }
                 }
 
-            val a = inputs.plus(textareas).plus(selects)
+            val form = WebForm(inputs.plus(textareas).plus(selects)
                 .groupBy { it.first }
-                .mapValues { it.value.map { it.second }.flatMap { it } }
-            WebForm(a)
+                .mapValues { it.value.map { it.second }.flatMap { it } })
 
-            navigate(Request(method, it.element.attr("action") ?: "<unknown>"))
+            val body = Body.webForm(FormValidator.Strict,
+                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
+
+            val uri = it.element.attr("action") ?: "<unknown>"
+            val postRequest = Request(method, uri).with(body of form)
+
+            if (method == Method.POST) navigate(postRequest)
+            else navigate(Request(method, Uri.of(uri).query(postRequest.bodyString())).body(""))
         }
     }
-
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 

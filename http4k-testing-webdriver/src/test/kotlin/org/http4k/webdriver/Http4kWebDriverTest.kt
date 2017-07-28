@@ -3,10 +3,12 @@ package org.http4k.webdriver
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.Test
 import org.openqa.selenium.By
+import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
 
@@ -15,9 +17,10 @@ class Http4kWebDriverTest {
         req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
+            .replace("FORMMETHOD", Method.POST.name)
             .replace("THEMETHOD", req.method.name)
             .replace("THEBODY", req.bodyString())
-            .replace("THEURL", req.uri.path)
+            .replace("THEURL", req.uri.toString())
             .replace("THETIME", System.currentTimeMillis().toString())
         )
     }
@@ -34,27 +37,48 @@ class Http4kWebDriverTest {
     fun `POST form`() {
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
-        assertOnPage("/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
+        driver.assertOnPage("/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&text1=&checkbox1=checkbox&checkbox1=&select1=option1&select1=option2"))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
     @Test
+    fun `GET form`() {
+        val driver = Http4kWebDriver {
+            req ->
+            val body = File("src/test/resources/test.html").readText()
+            Response(OK).body(body
+                .replace("FORMMETHOD", Method.GET.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+            )
+        }
+
+        driver.get("/bob")
+        driver.findElement(By.id("button"))!!.submit()
+        driver.assertOnPage("/form?text1=textValue&text1=&checkbox1=checkbox&checkbox1=&select1=option1&select1=option2")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("GET"))
+    }
+
+    @Test
     fun `navigation`() {
-        driver.navigate().to("/rita")
-        assertOnPage("/rita")
+        driver.navigate().to("http://localhost/rita")
+        driver.assertOnPage("http://localhost/rita")
 
         driver.navigate().to(URL("http://localhost/bob"))
-        assertOnPage("/bob")
+        driver.assertOnPage("http://localhost/bob")
         driver.get("/bill")
-        assertOnPage("/bill")
+        driver.assertOnPage("/bill")
         driver.navigate().back()
-        assertOnPage("/bob")
+        driver.assertOnPage("http://localhost/bob")
         driver.navigate().forward()
-        assertOnPage("/bill")
+        driver.assertOnPage("/bill")
         val preRefreshTime = driver.findElement(By.tagName("h2"))!!.text
         driver.navigate().refresh()
-        assertOnPage("/bill")
+        driver.assertOnPage("/bill")
         assertThat(driver.findElement(By.tagName("h2"))!!.text, !equalTo(preRefreshTime))
     }
 
@@ -83,7 +107,7 @@ class Http4kWebDriverTest {
     fun `click`() {
         driver.get("/bill")
         driver.findElement(By.tagName("a"))!!.click()
-        assertOnPage("/link")
+        driver.assertOnPage("/link")
     }
 
     @Test
@@ -100,8 +124,8 @@ class Http4kWebDriverTest {
         isNotImplemented {driver.switchTo().parentFrame()}
     }
 
-    private fun assertOnPage(expected: String) {
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo(expected))
+    private fun WebDriver.assertOnPage(expected: String) {
+        assertThat(this.findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
 
 }

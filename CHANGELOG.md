@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.14.0
+- More features for `http4k-testing-webdriver`. We now support Form entry and submission.
+
 ### v2.13.0
 - More features for `http4k-testing-webdriver`.
 
