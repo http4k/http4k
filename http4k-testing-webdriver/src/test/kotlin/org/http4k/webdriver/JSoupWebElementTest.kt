@@ -30,6 +30,9 @@ class JSoupWebElementTest {
     fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))
 
     @Test
+    fun `equality is based on jsoup element`() = assertThat(element(), equalTo(element()))
+
+    @Test
     fun `tag name`() = assertThat(element().tagName, equalTo("a"))
 
     @Test

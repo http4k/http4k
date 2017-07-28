@@ -9,7 +9,8 @@ import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
+class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
+
     override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, element).findElement(by)
 
     override fun getTagName(): String = element.tagName()
@@ -56,4 +57,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet()
 
     override fun getCssValue(propertyName: String?): String = throw FeatureNotImplementedYet()
+
+    override fun equals(other: Any?): Boolean = element == element
+
+    override fun hashCode(): Int = element.hashCode()
+
 }
