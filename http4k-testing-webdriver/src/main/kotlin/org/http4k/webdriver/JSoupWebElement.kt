@@ -42,7 +42,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
         if (isA("a")) {
             element.attr("href")?.let { navigate(Method.GET, it) }
         } else if (isCheckable()) {
-            element.attr("checked", "checked")
+            if (isSelected) clear()
+            else element.attr("checked", "checked")
+
         } else if (isA("option")) {
             val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") ?: false
 

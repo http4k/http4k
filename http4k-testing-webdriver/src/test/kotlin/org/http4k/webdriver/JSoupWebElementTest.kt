@@ -21,7 +21,7 @@ class JSoupWebElementTest {
     private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
     private fun select(multiple: Boolean): WebElement =
-        JSoupWebElement(navigate, Jsoup.parse("""<select name="bob" ${if(multiple) "multiple" else ""}>
+        JSoupWebElement(navigate, Jsoup.parse("""<select name="bob" ${if (multiple) "multiple" else ""}>
             <option>foo1</option>
             <option>foo2</option>
             </select>"""
@@ -57,12 +57,17 @@ class JSoupWebElementTest {
     fun `text`() = assertThat(element().text, equalTo("hello disabled"))
 
     @Test
-    fun `clear checkbox`() {
-        val input = input("checkbox")
-        input.click()
-        assertThat(input.isSelected, equalTo(true))
-        input.clear()
-        assertThat(input.isSelected, equalTo(false))
+    fun `clear`() {
+        fun assertClearable(type: String) {
+            val input = input(type)
+            input.click()
+            assertThat(input.isSelected, equalTo(true))
+            input.clear()
+            assertThat(input.isSelected, equalTo(false))
+        }
+
+        assertClearable("checkbox")
+        assertClearable("radio")
     }
 
     @Test
@@ -75,6 +80,15 @@ class JSoupWebElementTest {
 
         assertCheckableSetsValue("checkbox")
         assertCheckableSetsValue("radio")
+    }
+
+    @Test
+    fun `click checkbox to clear`() {
+        val input = input("checkbox")
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+        input.click()
+        assertThat(input.isSelected, equalTo(false))
     }
 
     @Test
