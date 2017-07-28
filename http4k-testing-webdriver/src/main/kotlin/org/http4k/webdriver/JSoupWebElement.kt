@@ -30,7 +30,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun submit() {
         current("form")?.let {
             val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
-            navigate(method, it.element.attr("action") ?: "<unknown>")
+            navigate(method, it.element.attr("action") ?: "<unknown>", "")
         }
     }
 
@@ -40,7 +40,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun click() {
         if (isA("a")) {
-            element.attr("href")?.let { navigate(Method.GET, it) }
+            element.attr("href")?.let { navigate(Method.GET, it, "") }
         } else if (isCheckable()) {
             if (isSelected) clear()
             else element.attr("checked", "checked")

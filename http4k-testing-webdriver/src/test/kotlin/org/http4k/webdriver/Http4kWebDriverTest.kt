@@ -15,6 +15,8 @@ class Http4kWebDriverTest {
         req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
+            .replace("THEMETHOD", req.method.name)
+            .replace("THEBODY", req.bodyString())
             .replace("THEURL", req.uri.path)
             .replace("THETIME", System.currentTimeMillis().toString())
         )
@@ -26,6 +28,15 @@ class Http4kWebDriverTest {
         assertThat(driver.currentUrl, equalTo("/bob"))
         assertThat(driver.title, equalTo("Page title"))
         assertThat(driver.findElement(By.id("firstId"))!!.text, equalTo("the first text"))
+    }
+
+    @Test
+    fun `POST form`() {
+        driver.get("/bob")
+        driver.findElement(By.id("button"))!!.submit()
+        assertOnPage("/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
     @Test

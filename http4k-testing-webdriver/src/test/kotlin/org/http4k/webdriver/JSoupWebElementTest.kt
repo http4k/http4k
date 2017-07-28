@@ -16,7 +16,7 @@ import org.openqa.selenium.WebElement
 class JSoupWebElementTest {
 
     private var newLocation: Pair<Method, String>? = null
-    private val navigate: (Method, String) -> Unit = { method, url -> newLocation = method to url }
+    private val navigate: (Method, String, String) -> Unit = { method, url, _ -> newLocation = method to url }
 
     private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
@@ -33,7 +33,7 @@ class JSoupWebElementTest {
         |<disabled disabled>disabled</disabled>
         |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
-    private fun form(method: Method = POST) = JSoupWebElement({ actual, url -> newLocation = actual to url }, Jsoup.parse("""
+    private fun form(method: Method = POST) = JSoupWebElement({ actual, url, body -> newLocation = actual to url }, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
             <input id="text" type="text"/>
             <textarea id="textarea"/>

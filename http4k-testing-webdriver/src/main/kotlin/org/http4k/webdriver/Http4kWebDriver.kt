@@ -13,19 +13,19 @@ import java.net.URL
 import java.util.*
 import kotlin.NoSuchElementException
 
-typealias Navigate = (Method, String) -> Unit
+typealias Navigate = (Method, String, String) -> Unit
 
 class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
 
-    private fun navigateTo(method: Method, url: String) {
-        current = Page(this::navigateTo, UUID.randomUUID(), url, handler(Request(method, url)).bodyString(), current)
+    private fun navigateTo(method: Method, url: String, body: String) {
+        current = Page(this::navigateTo, UUID.randomUUID(), url, handler(Request(method, url).body(body)).bodyString(), current)
     }
 
     override fun get(url: String) {
-        navigateTo(Method.GET, url)
+        navigateTo(Method.GET, url, "")
     }
 
     override fun getCurrentUrl(): String? = current?.url
