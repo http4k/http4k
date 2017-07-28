@@ -26,4 +26,7 @@ class JSoupElementFinderTest {
 
     @Test
     fun `find by css`() = assertThat(state.findElementByCssSelector(".aClass")!!.text, equalTo("the first text"))
+
+    @Test
+    fun `find by disabled css`() = assertThat(state.findElementByCssSelector("disabled[disabled]")!!.text, equalTo("this is a disabled item"))
 }

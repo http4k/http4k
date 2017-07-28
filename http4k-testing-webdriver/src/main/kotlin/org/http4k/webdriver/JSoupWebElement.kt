@@ -49,7 +49,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun isSelected(): Boolean = throw FeatureNotImplementedYet()
 
-    override fun isEnabled(): Boolean = throw FeatureNotImplementedYet()
+    override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
     override fun sendKeys(vararg keysToSend: CharSequence?) = throw FeatureNotImplementedYet()
 

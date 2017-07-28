@@ -11,7 +11,10 @@ import org.openqa.selenium.OutputType
 class JSoupWebElementTest {
 
     private var newLocation: String? = null
-    private fun element(tag: String = "a") = JSoupWebElement({ _, url -> newLocation = url }, Jsoup.parse("""<$tag id="bob" href="/link"><span>hello</span></$tag>""")).findElement(By.tagName(tag))!!
+    private fun element(tag: String = "a") = JSoupWebElement({ _, url -> newLocation = url }, Jsoup.parse("""<$tag id="bob" href="/link">
+        |<span>hello</span>
+        |<disabled disabled>disabled</disabled>
+        |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
     private fun form() = JSoupWebElement({ _, url -> newLocation = url }, Jsoup.parse("""
         <form method="POST" action="/posted">
@@ -29,7 +32,7 @@ class JSoupWebElementTest {
     fun `attribute`() = assertThat(element().getAttribute("id"), equalTo("bob"))
 
     @Test
-    fun `text`() = assertThat(element().text, equalTo("hello"))
+    fun `text`() = assertThat(element().text, equalTo("hello disabled"))
 
     @Test
     fun `click link`() {
@@ -62,9 +65,14 @@ class JSoupWebElementTest {
     }
 
     @Test
+    fun `disabled`() {
+        assertThat(element().isEnabled, equalTo(true))
+        assertThat(element().findElement(By.tagName("disabled")).isEnabled, equalTo(false))
+    }
+
+    @Test
     fun `unsupported features`() {
         isNotImplemented { element().isDisplayed }
-        isNotImplemented { element().isEnabled }
         isNotImplemented { element().isSelected }
         isNotImplemented { element().clear() }
         isNotImplemented { element().sendKeys("") }
