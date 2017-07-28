@@ -1,5 +1,6 @@
 package org.http4k.webdriver
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.jsoup.Jsoup
@@ -9,36 +10,48 @@ import org.openqa.selenium.OutputType
 
 class JSoupWebElementTest {
 
-    val element = JSoupWebElement(Jsoup.parse("""<a id="bob"><span>hello</span></a>""")).findElement(By.tagName("a"))!!
+    private var newLocation: String? = null
+    private fun element(tag: String = "a") = JSoupWebElement({ newLocation = it }, Jsoup.parse("""<$tag id="bob" href="/link"><span>hello</span></$tag>""")).findElement(By.tagName(tag))!!
 
     @Test
-    fun `find sub element`() = assertThat(element.findElement(By.tagName("span"))!!.text, equalTo("hello"))
+    fun `find sub element`() = assertThat(element().findElement(By.tagName("span"))!!.text, equalTo("hello"))
 
     @Test
-    fun `find sub elements`() = assertThat(element.findElements(By.tagName("span"))[0].text, equalTo("hello"))
+    fun `find sub elements`() = assertThat(element().findElements(By.tagName("span"))[0].text, equalTo("hello"))
 
     @Test
-    fun `tag name`() = assertThat(element.tagName, equalTo("a"))
+    fun `tag name`() = assertThat(element().tagName, equalTo("a"))
 
     @Test
-    fun `attribute`() = assertThat(element.getAttribute("id"), equalTo("bob"))
+    fun `attribute`() = assertThat(element().getAttribute("id"), equalTo("bob"))
 
     @Test
-    fun `text`() = assertThat(element.text, equalTo("hello"))
+    fun `text`() = assertThat(element().text, equalTo("hello"))
+
+    @Test
+    fun `click link`() {
+        element("a").click()
+        assertThat(newLocation, equalTo("/link"))
+    }
+
+    @Test
+    fun `click non-link`() {
+        element("foo").click()
+        assertThat(newLocation, absent())
+    }
 
     @Test
     fun `unsupported features`() {
-        isNotImplemented {element.isDisplayed}
-        isNotImplemented {element.isEnabled}
-        isNotImplemented {element.isSelected}
-        isNotImplemented {element.clear()}
-        isNotImplemented {element.click()}
-        isNotImplemented {element.submit()}
-        isNotImplemented {element.sendKeys("")}
-        isNotImplemented {element.location}
-        isNotImplemented {element.rect}
-        isNotImplemented {element.size}
-        isNotImplemented {element.getScreenshotAs(OutputType.FILE)}
-        isNotImplemented {element.getCssValue("some value")}
+        isNotImplemented { element().isDisplayed }
+        isNotImplemented { element().isEnabled }
+        isNotImplemented { element().isSelected }
+        isNotImplemented { element().clear() }
+        isNotImplemented { element().submit() }
+        isNotImplemented { element().sendKeys("") }
+        isNotImplemented { element().location }
+        isNotImplemented { element().rect }
+        isNotImplemented { element().size }
+        isNotImplemented { element().getScreenshotAs(OutputType.FILE) }
+        isNotImplemented { element().getCssValue("some value") }
     }
 }

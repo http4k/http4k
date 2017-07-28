@@ -8,8 +8,8 @@ import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class JSoupWebElement(private val element: Element) : WebElement {
-    override fun findElement(by: By): WebElement? = JSoupElementFinder(element).findElement(by)
+data class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
+    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, element).findElement(by)
 
     override fun getTagName(): String = element.tagName()
 
@@ -17,19 +17,23 @@ data class JSoupWebElement(private val element: Element) : WebElement {
 
     override fun getAttribute(name: String): String? = element.attr(name)
 
-    override fun findElements(by: By) = JSoupElementFinder(element).findElements(by)
+    override fun findElements(by: By) = JSoupElementFinder(navigate, element).findElements(by)
 
     override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet()
 
-    override fun clear(): Unit = throw FeatureNotImplementedYet()
+    override fun clear() = throw FeatureNotImplementedYet()
 
-    override fun submit(): Unit = throw FeatureNotImplementedYet()
+    override fun submit() = throw FeatureNotImplementedYet()
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet()
 
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = throw FeatureNotImplementedYet()
 
-    override fun click(): Unit = throw FeatureNotImplementedYet()
+    override fun click() {
+        getAttribute("href")?.let {
+            if (tagName.toLowerCase() == "a") navigate(it)
+        }
+    }
 
     override fun getSize(): Dimension = throw FeatureNotImplementedYet()
 
@@ -37,7 +41,7 @@ data class JSoupWebElement(private val element: Element) : WebElement {
 
     override fun isEnabled(): Boolean = throw FeatureNotImplementedYet()
 
-    override fun sendKeys(vararg keysToSend: CharSequence?): Unit = throw FeatureNotImplementedYet()
+    override fun sendKeys(vararg keysToSend: CharSequence?) = throw FeatureNotImplementedYet()
 
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet()
 

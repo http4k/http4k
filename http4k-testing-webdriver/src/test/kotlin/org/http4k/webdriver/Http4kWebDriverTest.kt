@@ -31,19 +31,19 @@ class Http4kWebDriverTest {
     @Test
     fun `navigation`() {
         driver.navigate().to("/rita")
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/rita"))
+        assertOnPage("/rita")
 
         driver.navigate().to(URL("http://localhost/bob"))
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/bob"))
+        assertOnPage("/bob")
         driver.get("/bill")
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/bill"))
+        assertOnPage("/bill")
         driver.navigate().back()
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/bob"))
+        assertOnPage("/bob")
         driver.navigate().forward()
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/bill"))
+        assertOnPage("/bill")
         val preRefreshTime = driver.findElement(By.tagName("h2"))!!.text
         driver.navigate().refresh()
-        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo("/bill"))
+        assertOnPage("/bill")
         assertThat(driver.findElement(By.tagName("h2"))!!.text, !equalTo(preRefreshTime))
     }
 
@@ -69,6 +69,13 @@ class Http4kWebDriverTest {
     }
 
     @Test
+    fun `click`() {
+        driver.get("/bill")
+        driver.findElement(By.tagName("a"))!!.click()
+        assertOnPage("/link")
+    }
+
+    @Test
     fun `unsupported features`() {
         driver.get("/bill")
 
@@ -81,4 +88,9 @@ class Http4kWebDriverTest {
         isNotImplemented {driver.switchTo().frame(windowHandle)}
         isNotImplemented {driver.switchTo().parentFrame()}
     }
+
+    private fun assertOnPage(expected: String) {
+        assertThat(driver.findElement(By.tagName("h1"))!!.text, equalTo(expected))
+    }
+
 }

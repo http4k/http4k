@@ -13,13 +13,15 @@ import java.net.URL
 import java.util.*
 import kotlin.NoSuchElementException
 
+typealias Navigate = (String) -> Unit
+
 class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
 
     override fun get(url: String) {
-        current = Page(UUID.randomUUID(), url, handler(Request(Method.GET, url)).bodyString(), current)
+        current = Page(navigate()::to, UUID.randomUUID(), url, handler(Request(Method.GET, url)).bodyString(), current)
     }
 
     override fun getCurrentUrl(): String? = current?.url

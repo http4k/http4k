@@ -9,7 +9,7 @@ import org.openqa.selenium.internal.FindsByCssSelector
 import org.openqa.selenium.internal.FindsById
 import org.openqa.selenium.internal.FindsByTagName
 
-internal class JSoupElementFinder(private val element: Element) :
+internal class JSoupElementFinder(private val navigate: Navigate, private val element: Element) :
     FindsByCssSelector, FindsByTagName, FindsById, FindsByClassName, SearchContext {
     override fun findElementByClassName(className: String) = findElementsByClassName(className).firstOrNull()
 
@@ -25,7 +25,7 @@ internal class JSoupElementFinder(private val element: Element) :
 
     override fun findElementByCssSelector(selector: String) = findElementsByCssSelector(selector).firstOrNull()
 
-    override fun findElementsByCssSelector(selector: String): List<WebElement> = element.select(selector).map { JSoupWebElement(it) }
+    override fun findElementsByCssSelector(selector: String): List<WebElement> = element.select(selector).map { JSoupWebElement(navigate, it) }
 
     override fun findElement(by: By): WebElement? = by.findElement(this)
 
