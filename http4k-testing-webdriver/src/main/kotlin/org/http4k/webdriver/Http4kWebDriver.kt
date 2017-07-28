@@ -53,15 +53,15 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     override fun switchTo(): WebDriver.TargetLocator {
         val driver = this
         return object : WebDriver.TargetLocator {
-            override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet()
+            override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet
 
-            override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet()
+            override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet
 
-            override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet()
+            override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet
 
-            override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet()
+            override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet
 
-            override fun alert(): Alert = throw FeatureNotImplementedYet()
+            override fun alert(): Alert = throw FeatureNotImplementedYet
 
             override fun activeElement(): WebElement = activeElement ?: current?.firstElement() ?: throw NoSuchElementException("no page loaded!")
 
@@ -91,5 +91,5 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
         }
     }
 
-    override fun manage(): WebDriver.Options? = throw FeatureNotImplementedYet()
+    override fun manage(): WebDriver.Options? = throw FeatureNotImplementedYet
 }
