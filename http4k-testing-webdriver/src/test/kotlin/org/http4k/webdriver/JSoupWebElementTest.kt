@@ -11,17 +11,26 @@ import org.jsoup.Jsoup
 import org.junit.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType
+import org.openqa.selenium.WebElement
 
 class JSoupWebElementTest {
 
     private var newLocation: Pair<Method, String>? = null
-    private fun element(tag: String = "a") = JSoupWebElement({ method, url -> newLocation = method to url }, Jsoup.parse("""<$tag id="bob" href="/link">
-        |<span>hello</span>
-        |<disabled disabled>disabled</disabled>
-        |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
+    private val navigate: (Method, String) -> Unit = { method, url -> newLocation = method to url }
+
+    private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
+
+    private fun element(tag: String = "a"): WebElement {
+        return JSoupWebElement(navigate, Jsoup.parse("""<$tag id="bob" href="/link">
+            |<span>hello</span>
+            |<disabled disabled>disabled</disabled>
+            |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
+    }
 
     private fun form(method: Method = POST) = JSoupWebElement({ actual, url -> newLocation = actual to url }, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
+            <input id="text" type="text"/>
+            <textarea id="textarea"/>
             <p>inner</p>
         </form>
         """)).findElement(By.tagName("form"))!!
@@ -40,6 +49,13 @@ class JSoupWebElementTest {
 
     @Test
     fun `text`() = assertThat(element().text, equalTo("hello disabled"))
+
+    @Test
+    fun `click checkbox`() {
+        val input = input("checkbox")
+        input.click()
+        assertThat(input.getAttribute("checked"), equalTo("checked"))
+    }
 
     @Test
     fun `click link`() {
@@ -78,11 +94,24 @@ class JSoupWebElementTest {
     }
 
     @Test
+    fun `send keys to an input`() {
+        val textInput = form().findElement(By.id("text"))
+        textInput.sendKeys("hello")
+        assertThat(textInput.getAttribute("value"), equalTo("hello"))
+    }
+
+    @Test
+    fun `send keys to an textArea`() {
+        val textInput = form().findElement(By.id("textarea"))
+        textInput.sendKeys("hello")
+        assertThat(textInput.text, equalTo("hello"))
+    }
+
+    @Test
     fun `unsupported features`() {
         isNotImplemented { element().isDisplayed }
         isNotImplemented { element().isSelected }
         isNotImplemented { element().clear() }
-        isNotImplemented { element().sendKeys("") }
         isNotImplemented { element().location }
         isNotImplemented { element().rect }
         isNotImplemented { element().size }

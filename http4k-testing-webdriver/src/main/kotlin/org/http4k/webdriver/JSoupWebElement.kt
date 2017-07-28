@@ -9,7 +9,7 @@ import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-class JSoupWebElement(private val navigate: Navigate, protected val element: Element) : WebElement {
+data class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
 
     override fun getTagName(): String = element.tagName()
 
@@ -23,8 +23,8 @@ class JSoupWebElement(private val navigate: Navigate, protected val element: Ele
 
     override fun submit() {
         currentForm()?.let {
-            val method = it.getAttribute("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
-            navigate(method, it.getAttribute("action") ?: "<unknown>")
+            val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
+            navigate(method, it.element.attr("action") ?: "<unknown>")
         }
     }
 
@@ -33,7 +33,11 @@ class JSoupWebElement(private val navigate: Navigate, protected val element: Ele
     override fun <X : Any?> getScreenshotAs(target: OutputType<X>?): X = throw FeatureNotImplementedYet
 
     override fun click() {
-        getAttribute("href")?.let { if (isA("a")) navigate(Method.GET, it) }
+        if(isA("a")) {
+            element.attr("href")?.let { navigate(Method.GET, it) }
+        } else if(isA("input") && element.attr("type") == "checkbox") {
+            element.attr("checked", "checked")
+        }
     }
 
     override fun getSize(): Dimension = throw FeatureNotImplementedYet
@@ -42,7 +46,13 @@ class JSoupWebElement(private val navigate: Navigate, protected val element: Ele
 
     override fun isEnabled(): Boolean = !element.hasAttr("disabled")
 
-    override fun sendKeys(vararg keysToSend: CharSequence?) = throw FeatureNotImplementedYet
+    override fun sendKeys(vararg keysToSend: CharSequence) {
+        if (isA("textarea")) {
+            element.text(keysToSend.joinToString(""))
+        } else if (isA("input")) {
+            element.attr("value", keysToSend.joinToString(""))
+        }
+    }
 
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet
 
@@ -60,5 +70,5 @@ class JSoupWebElement(private val navigate: Navigate, protected val element: Ele
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, it) }
 
-    private fun isA(tag: String) = tagName.toLowerCase() == tag
+    private fun isA(tag: String) = tagName.toLowerCase() == tag.toLowerCase()
 }
