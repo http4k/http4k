@@ -20,12 +20,12 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private var current: Page? = null
     private var activeElement: WebElement? = null
 
-    private fun doIt(method: Method, url: String): Unit {
-        current = Page(this::doIt, UUID.randomUUID(), url, handler(Request(method, url)).bodyString(), current)
+    private fun navigateTo(method: Method, url: String) {
+        current = Page(this::navigateTo, UUID.randomUUID(), url, handler(Request(method, url)).bodyString(), current)
     }
 
     override fun get(url: String) {
-        doIt(Method.GET, url)
+        navigateTo(Method.GET, url)
     }
 
     override fun getCurrentUrl(): String? = current?.url
