@@ -2,8 +2,8 @@ Example showing how to use the Templating modules - in this case Handlebars, bot
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.13.0"
-    compile group: "org.http4k", name: "http4k-template-handlebars", version: "2.13.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.14.0"
+    compile group: "org.http4k", name: "http4k-template-handlebars", version: "2.14.0"
 ```
 
 ### Code
