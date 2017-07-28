@@ -9,7 +9,7 @@ A basic Selenium WebDriver API implementation for **http4k** HttpHandlers, which
 |---------|-----------|
 | Basic navigation|yes|
 | CSS selector functionality|yes|
-| Link clicking|yes|yes|
+| Link clicking|yes|
 | Form detection and submission|yes|
 | Form field entry|yes|
 | Cookies|not yet :)|
