@@ -110,18 +110,31 @@ class Http4kWebDriverTest {
     }
 
     @Test
+    fun `cookie adding and deleting`() {
+        val cookie1 = Cookie("foo1", "bar")
+        val cookie2 = Cookie("foo2", "bar")
+        val cookie3 = Cookie("foo3", "bar")
+
+        assertThat(driver.manage().cookies, equalTo(emptySet()))
+        driver.manage().addCookie(cookie1)
+        driver.manage().addCookie(cookie2)
+        driver.manage().addCookie(cookie3)
+        assertThat(driver.manage().cookies, equalTo(setOf(cookie1, cookie2, cookie3)))
+        assertThat(driver.manage().getCookieNamed("foo1"), equalTo(cookie1))
+        driver.manage().deleteCookieNamed("foo1")
+        assertThat(driver.manage().cookies, equalTo(setOf(cookie2, cookie3)))
+        driver.manage().deleteCookie(cookie2)
+        assertThat(driver.manage().cookies, equalTo(setOf(cookie3)))
+        driver.manage().deleteAllCookies()
+        assertThat(driver.manage().cookies, equalTo(emptySet()))
+    }
+
+    @Test
     fun `unsupported features`() {
         driver.get("/bill")
 
         val windowHandle = driver.windowHandle
 
-        val cookie = Cookie("name", "value")
-        isNotImplemented { driver.manage().addCookie(cookie) }
-        isNotImplemented { driver.manage().deleteAllCookies() }
-        isNotImplemented { driver.manage().deleteCookie(cookie) }
-        isNotImplemented { driver.manage().deleteCookieNamed("name") }
-        isNotImplemented { driver.manage().getCookieNamed("name") }
-        isNotImplemented { driver.manage().cookies }
         isNotImplemented { driver.manage().ime() }
         isNotImplemented { driver.manage().logs() }
         isNotImplemented { driver.manage().timeouts() }

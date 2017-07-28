@@ -20,9 +20,14 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
+    private val siteCookies = mutableSetOf<Cookie>()
 
     private fun navigateTo(request: Request) {
-        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), handler(request).bodyString(), current)
+        val requestWithCookies = siteCookies.fold(request) { memo, next ->
+            memo
+        }
+
+        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), handler(requestWithCookies).bodyString(), current)
     }
 
     override fun get(url: String) {
@@ -93,21 +98,31 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     }
 
     override fun manage() = object : WebDriver.Options {
-        override fun addCookie(cookie: Cookie)  = throw FeatureNotImplementedYet
+        override fun addCookie(cookie: Cookie) {
+            siteCookies.add(cookie)
+        }
 
-        override fun getCookies() = throw FeatureNotImplementedYet
+        override fun getCookies() = siteCookies.toSet()
 
-        override fun deleteCookieNamed(name: String?) = throw FeatureNotImplementedYet
+        override fun deleteCookieNamed(name: String?) {
+            siteCookies.removeIf {
+                it.name == name
+            }
+        }
+
+        override fun getCookieNamed(name: String) = siteCookies.find { it.name == name }
+
+        override fun deleteAllCookies() {
+            siteCookies.clear()
+        }
+
+        override fun deleteCookie(cookie: Cookie) {
+            siteCookies.remove(cookie)
+        }
 
         override fun ime() = throw FeatureNotImplementedYet
 
         override fun logs() = throw FeatureNotImplementedYet
-
-        override fun getCookieNamed(name: String) = throw FeatureNotImplementedYet
-
-        override fun deleteAllCookies() = throw FeatureNotImplementedYet
-
-        override fun deleteCookie(cookie: Cookie) = throw FeatureNotImplementedYet
 
         override fun timeouts() = throw FeatureNotImplementedYet
 
