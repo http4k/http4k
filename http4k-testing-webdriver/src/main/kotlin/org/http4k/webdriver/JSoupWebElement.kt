@@ -1,6 +1,8 @@
 package org.http4k.webdriver
 
 import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.lens.WebForm
 import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
@@ -30,9 +32,30 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
     override fun submit() {
         current("form")?.let {
             val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
-            navigate(method, it.element.attr("action") ?: "<unknown>", "")
+            val inputs = it
+                .findElements(By.tagName("input"))
+                .filter { it.getAttribute("name") != "" }
+                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+            val textareas = it.findElements(By.tagName("input"))
+                .filter { it.getAttribute("name") != "" }
+                .map { it.getAttribute("name") to listOf(it.text) }
+            val selects = it.findElements(By.tagName("select"))
+                .filter { it.getAttribute("name") != "" }
+                .map {
+                    it.getAttribute("name") to it.findElements(By.tagName("option"))
+                        .filter { it.isSelected }
+                        .map { it.getAttribute("value") }
+                }
+
+            val a = inputs.plus(textareas).plus(selects)
+                .groupBy { it.first }
+                .mapValues { it.value.map { it.second }.flatMap { it } }
+            WebForm(a)
+
+            navigate(Request(method, it.element.attr("action") ?: "<unknown>"))
         }
     }
+
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
@@ -40,11 +63,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun click() {
         if (isA("a")) {
-            element.attr("href")?.let { navigate(Method.GET, it, "") }
+            element.attr("href")?.let { navigate(Request(Method.GET, it)) }
         } else if (isCheckable()) {
             if (isSelected) clear()
             else element.attr("checked", "checked")
-
         } else if (isA("option")) {
             val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") ?: false
 

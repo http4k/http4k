@@ -2,7 +2,7 @@ package org.http4k.webdriver
 
 
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
@@ -13,19 +13,19 @@ import java.net.URL
 import java.util.*
 import kotlin.NoSuchElementException
 
-typealias Navigate = (Method, String, String) -> Unit
+typealias Navigate = (Request) -> Unit
 
 class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
 
-    private fun navigateTo(method: Method, url: String, body: String) {
-        current = Page(this::navigateTo, UUID.randomUUID(), url, handler(Request(method, url).body(body)).bodyString(), current)
+    private fun navigateTo(request: Request) {
+        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), handler(request).bodyString(), current)
     }
 
     override fun get(url: String) {
-        navigateTo(Method.GET, url, "")
+        navigateTo(Request(GET, url).body(""))
     }
 
     override fun getCurrentUrl(): String? = current?.url
@@ -82,7 +82,7 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
         override fun refresh() {
             current?.let {
-                current = it.copy(contents = handler(Request(Method.GET, it.url)).bodyString())
+                current = it.copy(contents = handler(Request(GET, it.url)).bodyString())
             }
         }
 

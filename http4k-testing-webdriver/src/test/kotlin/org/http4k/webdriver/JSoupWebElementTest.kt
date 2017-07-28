@@ -7,6 +7,7 @@ import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
 import org.jsoup.Jsoup
 import org.junit.Test
 import org.openqa.selenium.By
@@ -16,7 +17,7 @@ import org.openqa.selenium.WebElement
 class JSoupWebElementTest {
 
     private var newLocation: Pair<Method, String>? = null
-    private val navigate: (Method, String, String) -> Unit = { method, url, _ -> newLocation = method to url }
+    private val navigate: (Request) -> Unit = { it -> newLocation = it.method to it.uri.toString() }
 
     private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
@@ -33,7 +34,7 @@ class JSoupWebElementTest {
         |<disabled disabled>disabled</disabled>
         |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
-    private fun form(method: Method = POST) = JSoupWebElement({ actual, url, body -> newLocation = actual to url }, Jsoup.parse("""
+    private fun form(method: Method = POST) = JSoupWebElement(navigate, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
             <input id="text" type="text"/>
             <textarea id="textarea"/>
