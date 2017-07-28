@@ -5,7 +5,19 @@
 
 A basic Selenium WebDriver API implementation for **http4k** HttpHandlers, which runs completely out of container (no network) for ultra fast tests.
 
-Note that since this is NOT a browser, we don't support any complicated features like JavaScript. Basic navigation and CSS selector functionality are supported.
+| Feature | Supported | Planned |
+|---------|-----------|----------|
+| Basic navigation|yes|yes|
+| CSS selector functionality|yes|yes|
+| Link clicking|yes|yes|
+| Form detection and submission|yes|yes|
+| Form field entry|no|yes|
+| JavaScript|no|no|
+| Alerts|no|no|
+| Screenshots|no|no|
+| Frames|no|no|
+| Multiple windows|no|no|
+
 
 Use the API like any other WebDriver implementation, by simply passing your app HttpHandler to construct it:
 
