@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.13.0 (uncut)
+### v2.13.0
 - More features for `http4k-testing-webdriver`.
 
 ### v2.12.0
