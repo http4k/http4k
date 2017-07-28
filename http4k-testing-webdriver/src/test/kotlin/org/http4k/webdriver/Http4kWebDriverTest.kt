@@ -6,12 +6,14 @@ import com.natpryce.hamkrest.present
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.cookie.cookies
 import org.junit.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
+import java.util.*
 
 class Http4kWebDriverTest {
     private val driver = Http4kWebDriver { req ->
@@ -127,6 +129,18 @@ class Http4kWebDriverTest {
         assertThat(driver.manage().cookies, equalTo(setOf(cookie3)))
         driver.manage().deleteAllCookies()
         assertThat(driver.manage().cookies, equalTo(emptySet()))
+    }
+
+    @Test
+    fun `cookies are added to request`() {
+        val driver = Http4kWebDriver { req ->
+            Response(OK).body(req.cookies().joinToString("\n") { it.toString() }) }
+        driver.manage().addCookie(Cookie("foo1", "bar1", "domain", "/", Date(0), true, true))
+        driver.manage().addCookie(Cookie("foo2", "bar2"))
+
+        driver.get("/")
+
+        assertThat(driver.pageSource, equalTo("foo1=\"bar1\"; \nfoo2=\"bar2\"; "))
     }
 
     @Test

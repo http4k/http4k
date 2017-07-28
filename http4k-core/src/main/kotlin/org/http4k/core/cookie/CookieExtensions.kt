@@ -18,6 +18,8 @@ fun Response.replaceCookie(cookie: Cookie): Response = removeCookie(cookie.name)
 
 fun Request.cookie(name: String, value: String): Request = replaceHeader("Cookie", cookies().plus(Cookie(name, value)).toCookieString())
 
+fun Request.cookie(new: Cookie): Request = replaceHeader("Cookie", cookies().plus(new).toCookieString())
+
 internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.filter { it.isNotBlank() }.map { it.split("=", limit = 2).let { Cookie(it.elementAt(0), it.elementAtOrElse(1, { "\"\"" }).unquoted()) } }
 
 fun Request.cookies(): List<Cookie> = header("Cookie")?.toCookieList() ?: listOf()

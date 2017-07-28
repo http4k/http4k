@@ -4,6 +4,7 @@ package org.http4k.webdriver
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.cookie.cookie
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -13,6 +14,8 @@ import org.openqa.selenium.WebElement
 import java.net.URL
 import java.util.*
 import kotlin.NoSuchElementException
+import org.http4k.core.cookie.Cookie as HCookie
+
 
 typealias Navigate = (Request) -> Unit
 
@@ -23,10 +26,7 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private val siteCookies = mutableSetOf<Cookie>()
 
     private fun navigateTo(request: Request) {
-        val requestWithCookies = siteCookies.fold(request) { memo, next ->
-            memo
-        }
-
+        val requestWithCookies = siteCookies.fold(request) { memo, next -> memo.cookie(HCookie(next.name, next.value)) }
         current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), handler(requestWithCookies).bodyString(), current)
     }
 
