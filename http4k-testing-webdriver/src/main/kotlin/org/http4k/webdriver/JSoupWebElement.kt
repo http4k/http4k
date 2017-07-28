@@ -11,15 +11,11 @@ import org.openqa.selenium.WebElement
 
 class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
 
-    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, element).findElement(by)
-
     override fun getTagName(): String = element.tagName()
 
     override fun getText(): String = element.text()
 
     override fun getAttribute(name: String): String? = element.attr(name)
-
-    override fun findElements(by: By) = JSoupElementFinder(navigate, element).findElements(by)
 
     override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet()
 
@@ -62,4 +58,7 @@ class JSoupWebElement(private val navigate: Navigate, private val element: Eleme
 
     override fun hashCode(): Int = element.hashCode()
 
+    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, element).findElement(by)
+
+    override fun findElements(by: By) = JSoupElementFinder(navigate, element).findElements(by)
 }
