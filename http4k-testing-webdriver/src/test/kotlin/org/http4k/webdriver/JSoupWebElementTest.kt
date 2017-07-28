@@ -57,6 +57,15 @@ class JSoupWebElementTest {
     fun `text`() = assertThat(element().text, equalTo("hello disabled"))
 
     @Test
+    fun `clear checkbox`() {
+        val input = input("checkbox")
+        input.click()
+        assertThat(input.isSelected, equalTo(true))
+        input.clear()
+        assertThat(input.isSelected, equalTo(false))
+    }
+
+    @Test
     fun `click checkbox or radio`() {
         fun assertCheckableSetsValue(type: String) {
             val input = input(type)
