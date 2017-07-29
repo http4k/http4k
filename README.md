@@ -79,6 +79,8 @@ plugging together of services without HTTP container being required.
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
     * Ultra-lightweight Selenium WebDriver implementation for **http4k** application.
+* [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
+    * A set of Hamkrest matchers for testing **http4k** Request and Response messages.
     
 ## Example
 This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
