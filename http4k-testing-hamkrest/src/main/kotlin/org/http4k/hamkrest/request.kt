@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.has
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.body.form
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.lens.QueryLens
@@ -15,6 +16,8 @@ fun <T> hasQuery(lens: QueryLens<T>, matcher: Matcher<T>): Matcher<Request> = Le
 fun hasQuery(name: String, expected: String?): Matcher<Request> = has("Query", { req: Request -> req.query(name) }, equalTo(expected))
 
 fun hasQuery(name: String, expected: List<String?>): Matcher<Request> = has("Queries", { req: Request -> req.queries(name) }, equalTo(expected))
+
+fun hasForm(name: String, expected: String?): Matcher<Request> = has("Form", { req: Request -> req.form(name) }, equalTo(expected))
 
 fun hasMethod(expected: Method): Matcher<Request> = has("Method", { req: Request -> req.method }, equalTo(expected))
 

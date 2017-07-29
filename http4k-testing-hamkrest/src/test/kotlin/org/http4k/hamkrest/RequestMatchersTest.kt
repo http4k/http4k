@@ -5,6 +5,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.body.form
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.with
@@ -23,7 +24,10 @@ class RequestMatchersTest {
     fun `uri as uri`() = assertMatchAndNonMatch(Request(GET, "/bob"), hasUri(Uri.of("/bob")), hasUri(Uri.of("/bill")))
 
     @Test
-    fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob"), hasQuery("query", "bob"), hasQuery("query", "bill"))
+    fun `form`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", "bob"), hasForm("form", "bill"))
+
+    @Test
+    fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", "bob"), hasQuery("form", "bill"))
 
     @Test
     fun `queries`() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), hasQuery("query", listOf("bob", "bob2")), hasQuery("query", listOf("bill")))
