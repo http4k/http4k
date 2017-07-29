@@ -1,30 +1,15 @@
 package org.http4k.hamkrest
 
-import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import org.http4k.core.Uri
 
-fun hasUriPath(expected: String) = object : Matcher<Uri> {
-    override val description = "Uri with Path $expected"
-    override fun invoke(actual: Uri) = equalTo(expected)(actual.path)
-}
+fun hasUriPath(expected: String) = has("Path", { u: Uri -> u.path }, equalTo(expected))
 
-fun hasUriQuery(expected: String) = object : Matcher<Uri> {
-    override val description = "Uri with Query $expected"
-    override fun invoke(actual: Uri) = equalTo(expected)(actual.query)
-}
+fun hasUriQuery(expected: String) = has("Query", { u: Uri -> u.query }, equalTo(expected))
 
-fun hasAuthority(expected: String) = object : Matcher<Uri> {
-    override val description = "Uri with Authority $expected"
-    override fun invoke(actual: Uri) = equalTo(expected)(actual.authority)
-}
+fun hasAuthority(expected: String) = has("Authority", { u: Uri -> u.authority }, equalTo(expected))
 
-fun hasHost(expected: String) = object : Matcher<Uri> {
-    override val description = "Uri with Host $expected"
-    override fun invoke(actual: Uri) = equalTo(expected)(actual.host)
-}
+fun hasHost(expected: String) = has("Host", { u: Uri -> u.host }, equalTo(expected))
 
-fun hasPort(expected: Int?) = object : Matcher<Uri> {
-    override val description = "Uri with Port $expected"
-    override fun invoke(actual: Uri) = equalTo(expected)(actual.port)
-}
+fun hasPort(expected: Int) = has("Port", { u: Uri -> u.port }, equalTo(expected))
