@@ -27,12 +27,6 @@ class HttpMessageMatchersTest {
         }
 
     @Test
-    fun `header lens2`() =
-        Header.required("bob").let {
-            assertMatchAndNonMatch(Request(GET, "/"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
-        }
-
-    @Test
     fun `content type`() = assertMatchAndNonMatch(Request(GET, "/").header("Content-Type", "application/json"), hasContentType(APPLICATION_JSON), hasContentType(APPLICATION_FORM_URLENCODED))
 
     @Test

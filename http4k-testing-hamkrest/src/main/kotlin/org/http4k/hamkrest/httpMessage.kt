@@ -10,7 +10,7 @@ import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
 import org.http4k.lens.HeaderLens
 
-fun <T> hasHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<Request> = has("Header", { req: Request -> lens(req) }, matcher)
+fun <T> hasHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Header", { req: Request -> lens(req) }, matcher))
 
 fun hasHeader(name: String, expected: String?) = has("Header", { m: HttpMessage -> m.header(name) }, equalTo(expected))
 
@@ -20,4 +20,4 @@ fun hasContentType(expected: ContentType) = has("Content-Type", { m: HttpMessage
 
 fun hasBody(expected: String) = has("Body", { m: HttpMessage -> m.bodyString() }, equalTo(expected))
 
-fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>) = has("Body", { m: HttpMessage -> lens(m) }, matcher)
+fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))

@@ -10,7 +10,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.lens.QueryLens
 
-fun <T> hasQuery(lens: QueryLens<T>, matcher: Matcher<T>): Matcher<Request> = has("Query", { req: Request -> lens(req) }, matcher)
+fun <T> hasQuery(lens: QueryLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Query", { req: Request -> lens(req) }, matcher))
 
 fun hasQuery(name: String, expected: String?): Matcher<Request> = has("Query", { req: Request -> req.query(name) }, equalTo(expected))
 
