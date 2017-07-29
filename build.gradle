@@ -186,6 +186,7 @@ dependencies {
     provided project(":http4k-template-handlebars")
     provided project(":http4k-template-pebble")
     provided project(":http4k-template-thymeleaf")
+    provided project(":http4k-testing-hamkrest")
     provided project(":http4k-testing-webdriver")
 
     testCompile testing

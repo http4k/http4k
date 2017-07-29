@@ -1,0 +1,10 @@
+description = 'Ultra-lightweight Selenium WebDriver implementation for http4k apps'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+
+    provided hamkrest
+}
+
