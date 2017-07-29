@@ -7,6 +7,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.toBody
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.string
@@ -30,7 +31,10 @@ class HttpMessageMatchersTest {
     fun `content type`() = assertMatchAndNonMatch(Request(GET, "/").header("Content-Type", "application/json"), hasContentType(APPLICATION_JSON), hasContentType(APPLICATION_FORM_URLENCODED))
 
     @Test
-    fun `body`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))
+    fun `body string`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))
+
+    @Test
+    fun `body`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
 
     @Test
     fun `body lens`() =
