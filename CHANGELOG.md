@@ -2,8 +2,11 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.16.0 (uncut)
+- Added `http4k-testing-hamkrest` which contains a set of Hamkrest matchers for Http4k objects.
+
 ### v2.15.0
-- More features for `http4k-testing-webdriver`. Cookie support added
+- More features for `http4k-testing-webdriver`. Cookie support added.
 
 ### v2.14.0
 - More features for `http4k-testing-webdriver`. We now support Form entry and submission.
