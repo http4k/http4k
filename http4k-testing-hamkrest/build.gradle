@@ -6,5 +6,8 @@ dependencies {
     provided project(":http4k-core")
 
     provided hamkrest
+
+    testCompile testing
+
 }
 

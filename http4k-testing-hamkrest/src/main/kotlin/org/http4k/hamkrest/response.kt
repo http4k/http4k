@@ -2,29 +2,14 @@ package org.http4k.hamkrest
 
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 
-fun status(expected: Status) = object : Matcher<Response> {
-    override val description = "Response with Status of $expected"
-    override fun invoke(actual: Response) = equalTo(expected)(actual.status)
-}
+fun hasStatus(expected: Status) = has(Response::status, equalTo(expected))
 
-fun setCookie(expected: Cookie) = object : Matcher<Response> {
-    override val description = "Response with Cookie $expected"
-    override fun invoke(actual: Response) = equalTo(expected)(actual.cookieWith(expected.name))
-}
+fun hasSetCookie(expected: Cookie): Matcher<Response> = hasSetCookie(expected.name, equalTo(expected))
 
-fun setCookie(name: String, expected: String) = object : Matcher<Response> {
-    override val description = "Response with Cookie $name=$expected"
-    override fun invoke(actual: Response) = equalTo(expected)(actual.cookieWith(name)?.value)
-}
-
-fun setCookie(name: String, expected: Matcher<Cookie?>) = object : Matcher<Response> {
-    override val description = "Response with Cookie $name"
-    override fun invoke(actual: Response) = expected(actual.cookieWith(name))
-}
-
-private fun Response.cookieWith(name: String) = cookies().find { name == it.name }
+fun hasSetCookie(name: String, expected: Matcher<Cookie>): Matcher<Response> = has("cookie", { r: Response -> r.cookies().find { name == it.name }!! }, expected)

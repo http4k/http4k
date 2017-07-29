@@ -2,53 +2,27 @@ package org.http4k.hamkrest
 
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 
-fun query(name: String, expected: String?) = object : Matcher<Request> {
-    override val description = "Request with Query $name=$expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.query(name))
-}
+fun hasQuery(name: String, expected: String?): Matcher<Request> = has("Query", { req: Request -> req.query(name) }, equalTo(expected))
 
-fun query(name: String, expected: List<String?>) = object : Matcher<Request> {
-    override val description = "Request with Query $name=$expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.queries(name))
-}
+fun hasQuery(name: String, expected: List<String?>): Matcher<Request> = has("Queries", { req: Request -> req.queries(name) }, equalTo(expected))
 
-fun method(expected: Method) = object : Matcher<Request> {
-    override val description = "Request with Method $expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.method)
-}
+fun hasMethod(expected: Method): Matcher<Request> = has("Method", { req: Request -> req.method }, equalTo(expected))
 
-fun uri(expected: Uri) = object : Matcher<Request> {
-    override val description = "Request with Uri $expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.uri)
-}
+fun hasUri(expected: Uri): Matcher<Request> = hasUri(equalTo(expected))
 
-fun uri(expected: String) = object : Matcher<Request> {
-    override val description = "Request with Uri $expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.uri.toString())
-}
+fun hasUri(expected: String): Matcher<Request> = hasUri(has(Uri::toString, equalTo(expected)))
 
-fun uri(expected: Matcher<Uri>) = object : Matcher<Request> {
-    override val description = "Request with Uri $expected"
-    override fun invoke(actual: Request) = expected(actual.uri)
-}
+fun hasUri(expected: Matcher<Uri>): Matcher<Request> = has("uri", { req: Request -> req.uri }, expected)
 
-fun cookie(expected: Cookie) = object : Matcher<Request> {
-    override val description = "Request with Cookie $expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.cookie(expected.name))
-}
+fun hasCookie(expected: Cookie): Matcher<Request> = hasCookie(expected.name, equalTo(expected))
 
-fun cookie(name: String, expected: String) = object : Matcher<Request> {
-    override val description = "Request with Cookie $name=$expected"
-    override fun invoke(actual: Request) = equalTo(expected)(actual.cookie(name)?.value)
-}
+fun hasCookie(name: String, expected: String): Matcher<Request> = hasCookie(name, hasCookieValue(expected))
 
-fun cookie(name: String, expected: Matcher<Cookie?>) = object : Matcher<Request> {
-    override val description = "Request with Cookie $name"
-    override fun invoke(actual: Request) = expected(actual.cookie(name))
-}
+fun hasCookie(name: String, expected: Matcher<Cookie>): Matcher<Request> = has("cookie", { r: Request -> r.cookie(name)!! }, expected)
