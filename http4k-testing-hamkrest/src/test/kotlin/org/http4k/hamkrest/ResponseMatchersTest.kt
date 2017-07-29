@@ -8,7 +8,6 @@ import org.http4k.core.cookie.cookie
 import org.junit.Test
 
 class ResponseMatchersTest {
-
     @Test
     fun `status`() = assertMatchAndNonMatch(Response(OK), hasStatus(OK), hasStatus(BAD_GATEWAY))
 
