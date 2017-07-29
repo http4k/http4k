@@ -7,6 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
+import org.http4k.core.with
+import org.http4k.lens.Query
 import org.junit.Test
 
 class RequestMatchersTest {
@@ -25,6 +27,12 @@ class RequestMatchersTest {
 
     @Test
     fun `queries`() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), hasQuery("query", listOf("bob", "bob2")), hasQuery("query", listOf("bill")))
+
+    @Test
+    fun `query lens`() =
+        Query.required("").let {
+            assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasQuery(it, equalTo("bob")), hasQuery(it, equalTo("bill")))
+        }
 
     @Test
     fun `cookie`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bob")), hasCookie(Cookie("name", "bill")))
