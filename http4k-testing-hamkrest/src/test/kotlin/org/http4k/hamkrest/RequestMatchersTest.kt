@@ -30,7 +30,7 @@ class RequestMatchersTest {
 
     @Test
     fun `query lens`() =
-        Query.required("").let {
+        Query.required("bob").let {
             assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasQuery(it, equalTo("bob")), hasQuery(it, equalTo("bill")))
         }
 

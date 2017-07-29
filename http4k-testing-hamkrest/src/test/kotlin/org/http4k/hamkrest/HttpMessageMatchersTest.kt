@@ -22,8 +22,14 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `header lens`() =
-        Header.required("").let {
+        Header.required("bob").let {
             assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
+        }
+
+    @Test
+    fun `header lens2`() =
+        Header.required("bob").let {
+            assertMatchAndNonMatch(Request(GET, "/"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
         }
 
     @Test
