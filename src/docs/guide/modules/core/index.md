@@ -2,14 +2,14 @@
 ```compile group: "org.http4k", name: "http4k-core", version: "2.16.1"```
 
 ### About
-The core module has ZERO dependencies and provides the following:
+Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the following:
 
 - Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 - HTTP handler and filter abstractions which models services as simple, composable functions.
 - Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
 - [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
 - Abstractions for Servers, Clients, JSON Message formats, Templating etc.
-- `SunHttp` Single-LOC development Server-backend 
+- `SunHttp` Single-LOC development Server-backend
 
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:
