@@ -17,17 +17,13 @@ We have developed the following modules to help with testing:
 - [http4k-testing-hamkrest](/guide/modules/hamkrest): a set of composable Hamkrest matchers for matching **http4k** message objects against.
 - [http4k-testing-webdriver](/guide/modules/webdriver): an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive **http4k** apps (ie. a HttpHandlers).
 
-### Testing HttpHandlers with static paths
+## Example code for testing
+
+#### Testing HttpHandlers with static paths
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/DynamicPathTest.kt"></script>
 
-### Testing HttpHandlers with dynamic paths
+#### Testing HttpHandlers with dynamic paths
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/StaticPathTest.kt"></script>
 
-### Testing Filters
+#### Testing Filters
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/FilterTest.kt"></script>
-
-### Interaction testing with Selenium WebDriver
-The `http4k-testing-webdriver` module is an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive **http4k** apps (ie. a HttpHandlers). See [here](/guide/modules/webdriver) for details.
-
-### Interaction testing with Selenium WebDriver
-The `http4k-testing-webdriver` module is an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive **http4k** apps (ie. a HttpHandlers). See [here](/guide/modules/webdriver) for details.
