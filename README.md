@@ -37,7 +37,9 @@ plugging together of services without HTTP container being required.
     * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
     * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
     * Templating support: Caching and Hot-Reload engine support for Handlebars
-    * AWS request signing: super-simple interactions with AWS services.
+    * AWS request signing: super-simple interactions with AWS services
+    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
+    * Testing: Hamkrest Matchers for **http4k** objects
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
