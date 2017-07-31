@@ -21,6 +21,9 @@ fun hasContentType(expected: ContentType) = has("Content-Type", { m: HttpMessage
 
 fun hasBody(expected: Matcher<Body>) = has("Body", { m: HttpMessage -> m.body }, expected)
 
+@JvmName("hasBodyString")
+fun hasBody(expected: Matcher<String>) = has("Body", { m: HttpMessage -> m.bodyString() }, expected)
+
 fun hasBody(expected: String) = has("Body", { m: HttpMessage -> m.bodyString() }, equalTo(expected))
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))

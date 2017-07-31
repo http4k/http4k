@@ -34,7 +34,10 @@ class HttpMessageMatchersTest {
     fun `body string`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))
 
     @Test
-    fun `body`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
+    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
+
+    @Test
+    fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob")), hasBody(equalTo("bill")))
 
     @Test
     fun `body lens`() =
