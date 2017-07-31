@@ -1,16 +1,15 @@
 package guide.example._4_adding_an_external_dependency
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import guide.example._4_adding_an_external_dependency.Matchers.answerShouldBe
-import guide.example._4_adding_an_external_dependency.Matchers.statusShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
@@ -18,6 +17,8 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Path
 import org.http4k.lens.int
 import org.http4k.routing.bind
@@ -32,11 +33,9 @@ import java.util.*
 
 
 object Matchers {
-    fun Response.statusShouldBe(expected: Status) = status shouldMatch equalTo(expected)
 
     fun Response.answerShouldBe(expected: Int) {
-        statusShouldBe(OK)
-        bodyString().toInt() shouldMatch equalTo(expected)
+        this shouldMatch hasStatus(OK).and(hasBody(expected.toString()))
     }
 }
 
@@ -101,7 +100,7 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(GET, "http://localhost:$port/ping")).statusShouldBe(OK)
+        client(Request(GET, "http://localhost:$port/ping")) shouldMatch hasStatus(OK)
         client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
         client(Request(GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
     }
@@ -129,7 +128,7 @@ class AddFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        env.client(Request(GET, "/add?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
+        env.client(Request(GET, "/add?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
         env.recorder.calls.isEmpty() shouldMatch equalTo(true)
     }
 }
@@ -151,7 +150,7 @@ class MultiplyFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        env.client(Request(GET, "/multiply?value=1&value=notANumber")).statusShouldBe(BAD_REQUEST)
+        env.client(Request(GET, "/multiply?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
         env.recorder.calls.isEmpty() shouldMatch equalTo(true)
     }
 }
