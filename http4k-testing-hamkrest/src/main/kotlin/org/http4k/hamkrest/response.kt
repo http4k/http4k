@@ -12,4 +12,4 @@ fun hasStatus(expected: Status) = has(Response::status, equalTo(expected))
 
 fun hasSetCookie(expected: Cookie): Matcher<Response> = hasSetCookie(expected.name, equalTo(expected))
 
-fun hasSetCookie(name: String, expected: Matcher<Cookie>): Matcher<Response> = has("cookie", { r: Response -> r.cookies().find { name == it.name }!! }, expected)
+fun hasSetCookie(name: String, expected: Matcher<Cookie>): Matcher<Response> = has("Cookie '$name'", { r: Response -> r.cookies().find { name == it.name }!! }, expected)
