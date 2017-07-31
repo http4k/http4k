@@ -1,5 +1,6 @@
 package cookbook.test_driven_apps
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.client.OkHttp
@@ -14,6 +15,8 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetHostFrom
 import org.http4k.filter.ServerFilters
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -44,8 +47,7 @@ class EndpointUnitTest {
         val unit = myMathsEndpoint({ first, second -> first + second }, { answer = it })
         val response = unit(Request(GET, "/").query("first", "123").query("second", "456"))
         answer shouldMatch equalTo(579)
-        response.status shouldMatch equalTo(OK)
-        response.bodyString() shouldMatch equalTo("the answer is 579")
+        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
     }
 }
 
@@ -72,15 +74,14 @@ class FunctionalTest {
     @Test
     fun `adds numbers`() {
         val response = app(Request(GET, "/add").query("first", "123").query("second", "456"))
-        response.status shouldMatch equalTo(OK)
-        response.bodyString() shouldMatch equalTo("the answer is 579")
+        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
         recorderHttp.calls shouldMatch equalTo(listOf(579))
     }
 
     @Test
     fun `not found`() {
         val response = app(Request(GET, "/nothing").query("first", "123").query("second", "456"))
-        response.status shouldMatch equalTo(NOT_FOUND)
+        response shouldMatch hasStatus(NOT_FOUND)
     }
 }
 
@@ -110,8 +111,7 @@ class EndToEndTest {
     @Test
     fun `adds numbers`() {
         val response = client(Request(GET, "http://localhost:8000/add").query("first", "123").query("second", "456"))
-        response.bodyString() shouldMatch equalTo("the answer is 579")
-        response.status shouldMatch equalTo(OK)
+        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
         recorderHttp.calls shouldMatch equalTo(listOf(579))
     }
 
