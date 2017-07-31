@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.16.1 (uncut)
+### v2.16.1
 - Improved messages for `http4k-testing-hamkrest` matchers.
 
 ### v2.16.0
