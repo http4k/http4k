@@ -5,5 +5,6 @@ dependencies {
     provided "javax.servlet:javax.servlet-api:3.1.0"
     testCompile testing
     testCompile project(":http4k-client-apache")
+    testCompile project(":http4k-testing-hamkrest")
 }
 

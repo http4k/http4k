@@ -12,8 +12,7 @@ object ResponseFilters {
     /**
      * Intercept the response after it is sent to the next service.
      */
-    fun Tap(fn: (Response) -> Unit) = Filter {
-        next ->
+    fun Tap(fn: (Response) -> Unit) = Filter { next ->
         {
             next(it).let {
                 fn(it)
@@ -22,8 +21,7 @@ object ResponseFilters {
         }
     }
 
-    fun ReportLatency(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter = Filter {
-        next ->
+    fun ReportLatency(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter = Filter { next ->
         {
             val start = clock.instant()
             val response = next(it)
@@ -32,5 +30,18 @@ object ResponseFilters {
             response
         }
     }
-}
 
+    /**
+     * Basic UnGZipping of Response. Does not currently support GZipping streams
+     */
+    fun GZip(): Filter = Filter { next ->
+        { next(it).let { it.body(it.body.gzipped()) } }
+    }
+
+    /**
+     * Basic UnGZipping of Response. Does not currently support GZipping streams
+     */
+    fun GunZip(): Filter = Filter { next ->
+        { next(it).let { it.body(it.body.gunzipped()) } }
+    }
+}
