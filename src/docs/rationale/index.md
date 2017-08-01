@@ -10,7 +10,7 @@ For our purposes, we needed something that:
 1. Provides typesafe HTTP message deconstruction/construction (in this case via Lenses).
 1. Automatically deals with contract breaches (missing/invalid params etc) to remove boilerplate.
 1. Absolutely no magic involved: No reflection. No annotations.
-1. Minimal dependencies (`http4k-core` has zero).
+1. Minimal dependencies (apart from the Kotlin StdLib, `http4k-core` has zero).
 1. Automatic generation of Swagger documentation (including JSON Schema models).
 1. Has a symmetric server/client API (`HttpHandler` should just be `Request -> Response`).
 1. Has immutable Request/Response objects.

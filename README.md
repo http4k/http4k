@@ -26,18 +26,20 @@ of 2 types of simple function:
 * **Immutablility:** All entities in the library are immutable unless their function explicitly disallows this.
 * **Symmetric:** The `HttpHandler` interface is identical for both HTTP services and clients. This allows for simple offline testability of applications, as well as 
 plugging together of services without HTTP container being required.
-* **Dependency-lite:** The `http4k-core` module has ZERO dependencies. Add-on modules only have dependencies required for specific implementation.
+* **Dependency-lite:** Apart the from Kotlin StdLib, `http4k-core` module has ZERO dependencies and weighs in at ~500kb. Add-on modules only have dependencies required for specific implementation.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
     * Pluggable HTTP client adapters for Apache and OkHttp
-    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty and Undertow
+    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp
     * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
     * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
     * Templating support: Caching and Hot-Reload engine support for Handlebars
-    * AWS request signing: super-simple interactions with AWS services.
+    * AWS request signing: super-simple interactions with AWS services
+    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
+    * Testing: Hamkrest Matchers for **http4k** objects
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
@@ -46,7 +48,8 @@ plugging together of services without HTTP container being required.
     * **Path-based routing**, including nestable contexts
     * **Typesafe HTTP message construction/desconstruction** using Lenses
     * **Static file-serving** capability with **Caching and Hot-Reload** 
-    * Servlet implementation to allow **zero-dependency plugin to any Servlet container**
+    * Servlet implementation to allow **
+    -dependency plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
     * Core abstraction APIs implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
@@ -58,6 +61,7 @@ plugging together of services without HTTP container being required.
         * **Jetty**
         * **Netty**
         * **Undertow**
+        * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
