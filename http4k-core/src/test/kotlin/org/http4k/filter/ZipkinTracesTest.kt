@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.junit.Test
@@ -16,8 +17,8 @@ class TraceIdTest {
     fun `creates a new random`() {
         val r = Random()
         r.setSeed(1)
-        assertThat(TraceId.new(r), equalTo(TraceId("73d51abbd89cb819")))
-        assertThat(TraceId.new(r), equalTo(TraceId("6f0efb6892f94d68")))
+        TraceId.new(r) shouldMatch equalTo(TraceId("73d51abbd89cb819"))
+        TraceId.new(r) shouldMatch equalTo(TraceId("6f0efb6892f94d68"))
     }
 
 }
@@ -40,13 +41,12 @@ class ZipkinTracesTest {
 
     @Test
     fun `gets a set of traces from a request`() {
-        assertThat(ZipkinTraces(requestWithTraces),
-            equalTo(expected))
+        ZipkinTraces(requestWithTraces) shouldMatch equalTo(expected)
     }
 
     @Test
     fun `puts expected things onto a request`() {
-        assertThat(ZipkinTraces(expected, Request(Method.GET, "")), equalTo(requestWithTraces))
+        ZipkinTraces(expected, Request(Method.GET, "")) shouldMatch equalTo(requestWithTraces)
     }
 
 }

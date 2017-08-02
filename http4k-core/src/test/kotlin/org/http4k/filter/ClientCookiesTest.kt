@@ -1,7 +1,7 @@
 package org.http4k.filter
 
-import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,6 +10,8 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.filter.cookie.BasicCookieStorage
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
@@ -25,7 +27,7 @@ class ClientCookiesTest {
 
         (0..3).forEach {
             val response = client(Request(Method.GET, "/"))
-            assertThat(response.header("Set-Cookie"), equalTo("""counter="${it + 1}"; """))
+            response shouldMatch hasHeader("Set-Cookie", """counter="${it + 1}"; """)
         }
     }
 
@@ -54,12 +56,13 @@ class ClientCookiesTest {
 
         client(Request(Method.GET, "/set"))
 
-        assertThat(cookieStorage.retrieve().size, equalTo(1))
-        assertThat(client(Request(Method.GET, "/get")).bodyString(), equalTo("bar"))
+        cookieStorage.retrieve().size shouldMatch equalTo(1)
+
+        client(Request(Method.GET, "/get")) shouldMatch hasBody("bar")
 
         clock.add(10)
 
-        assertThat(client(Request(Method.GET, "/get")).bodyString(), equalTo("gone"))
+        client(Request(Method.GET, "/get")) shouldMatch hasBody("gone")
     }
 
     fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0

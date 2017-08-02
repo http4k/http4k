@@ -102,7 +102,8 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
             Response(OK)
         }
-        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
+
+        svc(Request(GET, "")) shouldMatch equalTo(Response(OK))
         assertThat(start, equalTo(Request(GET, "") to zipkinTraces))
         assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), zipkinTraces)))
     }
@@ -113,13 +114,14 @@ class ClientFiltersTest {
             assertThat(ZipkinTraces(it), present())
             Response(OK)
         }
-        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
+
+        svc(Request(GET, "")) shouldMatch equalTo(Response(OK))
     }
 
     @Test
     fun `set host on client`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:8080")).then { Response(OK).body(it.uri.toString()) }
-        assertThat(handler(Request(GET, "/loop")).bodyString(), equalTo("http://localhost:8080/loop"))
+        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost:8080/loop")
     }
 
     @Test
