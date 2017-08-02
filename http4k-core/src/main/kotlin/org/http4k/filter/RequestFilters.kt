@@ -19,14 +19,22 @@ object RequestFilters {
      * Basic GZipping of Request. Does not currently support GZipping streams
      */
     fun GZip(): Filter = Filter { next ->
-        { next(it.body(it.body.gzipped())) }
+        { request ->
+            val existingTransferEncodingHeader = request.header("transfer-encoding")?.let { ", " } ?: ""
+            next(request.body(request.body.gzipped()).replaceHeader("transfer-encoding", existingTransferEncodingHeader + "gzip"))
+        }
     }
 
     /**
      * Basic UnGZipping of Request. Does not currently support GZipping streams
      */
-    fun GunZip(): Filter = Filter { next ->
-        { next(it.body(it.body.gunzipped())) }
+    fun GunZip() = Filter { next ->
+        { request ->
+            request.header("transfer-encoding")
+                ?.let { if (it.contains("gzip")) it else null }
+                ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
+        }
     }
+
 }
 

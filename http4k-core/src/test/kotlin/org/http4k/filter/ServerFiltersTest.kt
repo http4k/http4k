@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -15,8 +16,10 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.core.toBody
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.junit.Before
 import org.junit.Test
 import java.io.PrintWriter
@@ -137,9 +140,23 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `gzip`() {
-        val handler = ClientFilters.GZip().then(ServerFilters.GZip()).then { Response(OK).body(it.body) }
+    fun `gunzip request and gzip response`() {
+        val handler = ServerFilters.GZip().then {
+            it shouldMatch hasBody(equalTo("hello"))
+            Response(OK).body(it.body)
+        }
 
-        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
+        handler(Request(GET, "/").header("transfer-encoding", "gzip").body("hello".toBody().gzipped())) shouldMatch
+            hasHeader("transfer-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
+    }
+
+    @Test
+    fun `passes through non-gzipped request`() {
+        val handler = ServerFilters.GZip().then {
+            it shouldMatch hasBody("hello")
+            Response(OK).body("hello")
+        }
+
+        handler(Request(GET, "/").body("hello"))
     }
 }

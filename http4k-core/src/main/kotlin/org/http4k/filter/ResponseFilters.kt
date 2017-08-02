@@ -34,14 +34,25 @@ object ResponseFilters {
     /**
      * Basic UnGZipping of Response. Does not currently support GZipping streams
      */
-    fun GZip(): Filter = Filter { next ->
-        { next(it).let { it.body(it.body.gzipped()) } }
+    fun GZip() = Filter { next ->
+        {
+            next(it).let {
+                val existingTransferEncodingHeader = it.header("transfer-encoding")?.let { ", " } ?: ""
+                it.body(it.body.gzipped()).replaceHeader("transfer-encoding", existingTransferEncodingHeader + "gzip")
+            }
+        }
     }
 
     /**
      * Basic UnGZipping of Response. Does not currently support GZipping streams
      */
-    fun GunZip(): Filter = Filter { next ->
-        { next(it).let { it.body(it.body.gunzipped()) } }
+    fun GunZip() = Filter { next ->
+        {
+            next(it).let { response ->
+                response.header("transfer-encoding")
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { response.body(response.body.gunzipped()) } ?: response
+            }
+        }
     }
 }

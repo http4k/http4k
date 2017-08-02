@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -13,7 +14,9 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -65,7 +68,7 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `discards charset from location header`(){
+    fun `discards charset from location header`() {
         assertThat(followRedirects(Request(GET, "/redirect-with-charset")), equalTo(Response(Status.OK).body("destination")))
     }
 
@@ -120,8 +123,20 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `gzip`() {
-        val handler = ClientFilters.GZip().then(ServerFilters.GZip()).then { Response(OK).body(it.body) }
+    fun `gzip request and gunzip response`() {
+        val handler = ClientFilters.GZip().then {
+            it shouldMatch hasHeader("transfer-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
+            Response(OK).header("transfer-encoding", "gzip").body(it.body)
+        }
+
+        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
+    }
+
+    @Test
+    fun `passes through non-gzipped response`() {
+        val handler = ClientFilters.GZip().then {
+            Response(OK).body("hello")
+        }
 
         handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
     }

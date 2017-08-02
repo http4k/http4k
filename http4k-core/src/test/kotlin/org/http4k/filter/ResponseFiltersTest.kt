@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
@@ -9,8 +10,10 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.core.toBody
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.http4k.toHttpHandler
 import org.http4k.util.TickingClock
 import org.junit.Test
@@ -43,13 +46,30 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `gzip and unzip response`() {
+    fun `gzip response and adds gzip transfer encoding`() {
         fun assertSupportsZipping(body: String) {
-            val roundTrip = ResponseFilters.GunZip().then(ResponseFilters.GZip()).then { Response(OK).body(body) }
-            roundTrip(Request(Method.GET, "")) shouldMatch hasBody(body)
+            val zipped = ResponseFilters.GZip().then { Response(OK).body(body) }
+            zipped(Request(Method.GET, "")) shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("transfer-encoding", "gzip"))
         }
         assertSupportsZipping("foobar")
         assertSupportsZipping("")
+    }
+
+    @Test
+    fun `gunzip response which has gzip transfer encoding`() {
+        fun assertSupportsUnzipping(body: String) {
+            val handler = ResponseFilters.GunZip().then { Response(OK).header("transfer-encoding", "gzip").body(body.toBody().gzipped()) }
+            handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(hasHeader("transfer-encoding", "gzip"))
+        }
+        assertSupportsUnzipping("foobar")
+        assertSupportsUnzipping("")
+    }
+
+    @Test
+    fun `passthrough gunzip response with no transfer encoding`() {
+        val body = "foobar"
+        val handler = ResponseFilters.GunZip().then { Response(OK).header("transfer-encoding", "zip").body(body) }
+        handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(!hasHeader("transfer-encoding", "gzip"))
     }
 
 }
