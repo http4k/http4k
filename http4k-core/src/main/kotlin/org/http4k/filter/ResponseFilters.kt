@@ -36,10 +36,13 @@ object ResponseFilters {
      */
     fun GZip() = Filter { next ->
         {
-            next(it).let {
-                val existingTransferEncodingHeader = it.header("transfer-encoding")?.let { ", " } ?: ""
-                it.body(it.body.gzipped()).replaceHeader("transfer-encoding", existingTransferEncodingHeader + "gzip")
-            }
+            val originalResponse = next(it)
+            if( (it.header("accept-encoding") ?: "").contains("gzip", true)) {
+                originalResponse.let {
+                    val existingTransferEncodingHeader = it.header("transfer-encoding")?.let { ", " } ?: ""
+                    it.body(it.body.gzipped()).replaceHeader("transfer-encoding", existingTransferEncodingHeader + "gzip")
+                }
+            } else originalResponse
         }
     }
 

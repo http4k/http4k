@@ -46,10 +46,10 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `gzip response and adds gzip transfer encoding`() {
+    fun `gzip response and adds gzip transfer encoding if the request has accept-encoding of gzip`() {
         fun assertSupportsZipping(body: String) {
             val zipped = ResponseFilters.GZip().then { Response(OK).body(body) }
-            zipped(Request(Method.GET, "")) shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("transfer-encoding", "gzip"))
+            zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("transfer-encoding", "gzip"))
         }
         assertSupportsZipping("foobar")
         assertSupportsZipping("")
@@ -66,7 +66,7 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `passthrough gunzip response with no transfer encoding`() {
+    fun `passthrough gunzip response with no transfer encoding when request has no accept-encoding of gzip`() {
         val body = "foobar"
         val handler = ResponseFilters.GunZip().then { Response(OK).header("transfer-encoding", "zip").body(body) }
         handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(!hasHeader("transfer-encoding", "gzip"))

@@ -146,7 +146,7 @@ class ServerFiltersTest {
             Response(OK).body(it.body)
         }
 
-        handler(Request(GET, "/").header("transfer-encoding", "gzip").body("hello".toBody().gzipped())) shouldMatch
+        handler(Request(GET, "/").header("accept-encoding", "gzip").header("transfer-encoding", "gzip").body("hello".toBody().gzipped())) shouldMatch
             hasHeader("transfer-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
     }
 
