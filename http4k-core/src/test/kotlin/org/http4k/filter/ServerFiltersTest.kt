@@ -138,8 +138,8 @@ class ServerFiltersTest {
 
     @Test
     fun `gzip`() {
-        val handler = ServerFilters.GZip().then { Response(OK).body(it.body) }
+        val handler = ClientFilters.GZip().then(ServerFilters.GZip()).then { Response(OK).body(it.body) }
 
-        ClientFilters.GZip().then(handler)(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
+        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
     }
 }
