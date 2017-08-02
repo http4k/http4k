@@ -21,6 +21,9 @@ object ResponseFilters {
         }
     }
 
+    /**
+     * Measure and report the latency of a request to the passed function.
+     */
     fun ReportLatency(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter = Filter { next ->
         {
             val start = clock.instant()

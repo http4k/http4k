@@ -9,9 +9,14 @@ import org.http4k.format.JsonType.Object
 import java.io.PrintStream
 import java.util.*
 
+/**
+ * This Filter is used to generate Data class definitions from a Response containing JSON. The Filter will try and reduce
+ * the number of class definitions by selecting the definition with the most fields (for cases where lists of items
+ * have different fields).
+ */
 class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>,
                                                        private val out: PrintStream = System.out,
-                                                       private val idGenerator: () -> Int = { Random().nextInt() }) : Filter {
+                                                       private val idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
 
     private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
 

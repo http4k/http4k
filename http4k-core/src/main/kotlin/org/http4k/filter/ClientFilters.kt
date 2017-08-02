@@ -20,6 +20,9 @@ import java.time.LocalDateTime
 
 object ClientFilters {
 
+    /**
+     * Adds Zipkin request tracing headers to the outbound request. (traceid, spanid, parentspanid)
+     */
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
@@ -34,6 +37,10 @@ object ClientFilters {
         }
     }
 
+    /**
+     * Sets the host on an outbound request. This is useful to separate configuration of remote endpoints
+     * from the logic required to construct the rest of the request.
+     */
     object SetHostFrom {
         operator fun invoke(uri: Uri): Filter = Filter { next ->
             { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))) }
@@ -103,6 +110,10 @@ object ClientFilters {
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
     }
 
+    /**
+     * Basic GZip and Gunzip support of Request/Response. Does not currently support GZipping streams.
+     * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
+     */
     object GZip {
         operator fun invoke(): Filter = RequestFilters.GZip().then(ResponseFilters.GunZip())
     }
