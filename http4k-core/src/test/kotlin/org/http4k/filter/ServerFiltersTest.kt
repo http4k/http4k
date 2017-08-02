@@ -16,6 +16,7 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.hamkrest.hasBody
 import org.junit.Before
 import org.junit.Test
 import java.io.PrintWriter
@@ -133,5 +134,12 @@ class ServerFiltersTest {
         val response = handler(Request(GET, "/").header("b", "2").header("c", "3"))
 
         assertThat(response.headers, equalTo(listOf("b" to "2") as Headers))
+    }
+
+    @Test
+    fun `gzip`() {
+        val handler = ServerFilters.GZip().then { Response(OK).body(it.body) }
+
+        ClientFilters.GZip().then(handler)(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
     }
 }

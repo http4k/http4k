@@ -10,6 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.core.then
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
@@ -22,8 +23,7 @@ object ClientFilters {
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter {
-            next ->
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
                 val traces = THREAD_LOCAL.get()
                 startReportFn(it, traces)
@@ -35,15 +35,13 @@ object ClientFilters {
     }
 
     object SetHostFrom {
-        operator fun invoke(uri: Uri): Filter = Filter {
-            next ->
+        operator fun invoke(uri: Uri): Filter = Filter { next ->
             { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))) }
         }
     }
 
     object BasicAuth {
-        operator fun invoke(provider: () -> Credentials): Filter = Filter {
-            next ->
+        operator fun invoke(provider: () -> Credentials): Filter = Filter { next ->
             { next(it.header("Authorization", "Basic ${provider().base64Encoded()}")) }
         }
 
@@ -85,8 +83,7 @@ object ClientFilters {
 
     object Cookies {
         operator fun invoke(clock: Clock = Clock.systemDefaultZone(),
-                            storage: CookieStorage = BasicCookieStorage()): Filter = Filter {
-            next ->
+                            storage: CookieStorage = BasicCookieStorage()): Filter = Filter { next ->
             { request ->
                 val now = clock.now()
                 removeExpired(now, storage)
@@ -105,4 +102,9 @@ object ClientFilters {
 
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
     }
+
+    object GZip {
+        operator fun invoke(): Filter = RequestFilters.GZip().then(ResponseFilters.GunZip())
+    }
+
 }

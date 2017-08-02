@@ -8,7 +8,8 @@ import java.util.concurrent.ConcurrentHashMap
 data class LocalCookie(val cookie: Cookie, val created: LocalDateTime) {
     fun isExpired(now: LocalDateTime) =
         cookie.maxAge?.let { maxAge ->
-            Duration.between(created, now).seconds >= maxAge }
+            Duration.between(created, now).seconds >= maxAge
+        }
             ?: cookie.expires?.let { expires -> Duration.between(created, now).seconds > Duration.between(created, expires).seconds }
             ?: false
 }

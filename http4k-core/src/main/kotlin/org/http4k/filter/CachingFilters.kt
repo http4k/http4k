@@ -35,8 +35,7 @@ object CachingFilters {
      * These filters operate on Requests (pre-flight)
      */
     object Request {
-        fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter {
-            next ->
+        fun AddIfModifiedSince(clock: Clock, maxAge: Duration) = Filter { next ->
             {
                 next(it.header("If-Modified-Since", RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).minus(maxAge))))
             }
@@ -80,7 +79,7 @@ object CachingFilters {
             private fun now(response: org.http4k.core.Response) =
                 try {
                     response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from) ?: ZonedDateTime.now(clock)
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     ZonedDateTime.now(clock)
                 }
         }
@@ -89,8 +88,7 @@ object CachingFilters {
          * Hash algo stolen from http://stackoverflow.com/questions/26423662/scalatra-response-hmac-calulation
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
-        fun AddETag(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter {
-            next ->
+        fun AddETag(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
             {
                 val response = next(it)
                 if (predicate(response)) {

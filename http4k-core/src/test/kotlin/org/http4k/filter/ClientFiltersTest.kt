@@ -3,6 +3,7 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -12,6 +13,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -115,6 +117,13 @@ class ClientFiltersTest {
     fun `set host on client`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:8080")).then { Response(OK).body(it.uri.toString()) }
         assertThat(handler(Request(GET, "/loop")).bodyString(), equalTo("http://localhost:8080/loop"))
+    }
+
+    @Test
+    fun `gzip`() {
+        val handler = ClientFilters.GZip().then(ServerFilters.GZip()).then { Response(OK).body(it.body) }
+
+        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
     }
 
 }

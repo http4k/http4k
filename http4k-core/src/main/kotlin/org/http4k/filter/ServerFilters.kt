@@ -12,6 +12,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
@@ -32,8 +33,7 @@ object ServerFilters {
     object Cors {
         private fun List<String>.joined() = this.joinToString(", ")
 
-        operator fun invoke(policy: CorsPolicy) = Filter {
-            next ->
+        operator fun invoke(policy: CorsPolicy) = Filter { next ->
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
                 response.with(
@@ -48,8 +48,7 @@ object ServerFilters {
     object RequestTracing {
         operator fun invoke(
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter {
-            next ->
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
@@ -68,8 +67,7 @@ object ServerFilters {
     }
 
     object BasicAuth {
-        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter {
-            next ->
+        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter { next ->
             {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
@@ -98,8 +96,7 @@ object ServerFilters {
     }
 
     object CatchAll {
-        operator fun invoke(errorStatus: Status = INTERNAL_SERVER_ERROR): Filter = Filter {
-            next ->
+        operator fun invoke(errorStatus: Status = INTERNAL_SERVER_ERROR): Filter = Filter { next ->
             {
                 try {
                     next(it)
@@ -114,14 +111,16 @@ object ServerFilters {
     }
 
     object CopyHeaders {
-        operator fun invoke(vararg headers: String): Filter = Filter {
-            next ->
-            {
-                request ->
+        operator fun invoke(vararg headers: String): Filter = Filter { next ->
+            { request ->
                 val response = next(request)
                 headers.fold(response,
                     { memo, name -> request.header(name)?.let { memo.header(name, it) } ?: memo })
             }
         }
+    }
+
+    object GZip {
+        operator fun invoke(): Filter = RequestFilters.GunZip().then(ResponseFilters.GZip())
     }
 }
