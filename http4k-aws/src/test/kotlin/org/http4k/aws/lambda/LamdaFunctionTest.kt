@@ -9,7 +9,7 @@ import org.junit.Test
 class LamdaFunctionTest {
 
     @Test
-    fun `loads from the environment and calls through`() {
+    fun `loads app from the environment and adapts API Gateway request and response`() {
         val request = ApiGatewayProxyRequest()
         request.httpMethod = "GET"
         request.body = "input body"
