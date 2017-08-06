@@ -6,7 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.junit.Test
 
-class LamdaFunctionTest {
+class LambdaFunctionTest {
 
     @Test
     fun `loads app from the environment and adapts API Gateway request and response`() {
@@ -20,7 +20,7 @@ class LamdaFunctionTest {
         val env = mapOf(
             BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name,
             "a" to "b")
-        val response = LamdaFunction(env).handle(request)
+        val response = LambdaFunction(env).handle(request)
 
         response.statusCode shouldMatch equalTo(201)
         response.headers shouldMatch equalTo(env)

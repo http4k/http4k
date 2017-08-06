@@ -11,7 +11,7 @@ import org.http4k.core.toUrlEncoded
  * This is the main entry point for the lambda. It uses the local environment
  * to instantiate the Http4k handler which can be used for further invocations.
  */
-class LamdaFunction(private val env: Map<String, String> = System.getenv()) {
+class LambdaFunction(private val env: Map<String, String> = System.getenv()) {
     private val app = BootstrapAppLoader(env)
 
     fun handle(request: ApiGatewayProxyRequest) = app(request.asHttp4k()).asApiGateway()
