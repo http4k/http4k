@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "2.17.0"```
+```compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "2.17.1"```
 
 ### About
 
