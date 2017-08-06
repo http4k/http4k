@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.17.0
+### v2.17.1
 - Added GZip filters to `http4k-core` to zip request and response bodies.
 
 ### v2.16.1
