@@ -96,7 +96,7 @@ class ServerFiltersTest {
         response shouldMatch hasStatus(I_M_A_TEAPOT)
             .and(hasHeader("access-control-allow-origin", "*"))
             .and(hasHeader("access-control-allow-headers", "content-type"))
-            .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD, CONNECT"))
+            .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD"))
     }
 
     @Test
