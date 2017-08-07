@@ -6,10 +6,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status
 import org.http4k.core.UriTemplate
-import org.http4k.core.UriTemplate.Companion.from
-import org.http4k.routing.GroupRoutingHttpHandler.Companion.Handler
 import org.http4k.routing.StaticRoutingHttpHandler.Companion.Handler as StaticHandler
 
 interface Router {
@@ -30,10 +28,14 @@ interface RoutingHttpHandler : Router, HttpHandler {
     fun withBasePath(new: String): RoutingHttpHandler
 }
 
-fun routes(vararg routes: Route): RoutingHttpHandler = GroupRoutingHttpHandler(Handler(null, routes.asList()))
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
+    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(Status.NOT_FOUND)
 
-fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.let { fold ->
-    { request: Request -> fold.match(request)?.invoke(request) ?: Response(NOT_FOUND) }
+    override fun match(request: Request): HttpHandler? = list.find { it.match(request) != null }
+
+    override fun withFilter(new: Filter): RoutingHttpHandler = routes(*list.map { it.withFilter(new) }.toTypedArray())
+
+    override fun withBasePath(new: String): RoutingHttpHandler = routes(*list.map { it.withBasePath(new) }.toTypedArray())
 }
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
@@ -41,6 +43,7 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
-infix fun Pair<String, Method>.bind(action: HttpHandler): Route = Route(second, from(first), action)
+infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = GroupRoutingHttpHandler(
+    GroupRoutingHttpHandler.Companion.Handler(null, Route(second, UriTemplate.from(first), action)))
 
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)

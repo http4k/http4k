@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -13,12 +14,34 @@ import org.junit.Test
 
 class RouterTest {
 
-    private val notFoundRouter = object : Router {
+    private val notFoundRouter = object : RoutingHttpHandler {
+        override fun invoke(p1: Request): Response {
+            TODO("not implemented")
+        }
+
+        override fun withFilter(new: Filter): RoutingHttpHandler {
+            TODO("not implemented")
+        }
+
+        override fun withBasePath(new: String): RoutingHttpHandler {
+            TODO("not implemented")
+        }
+
         override fun match(request: Request): HttpHandler? = null
     }
 
-    private val okRouter = object : Router {
-        override fun match(request: Request): HttpHandler? = { Response(OK) }
+    private val okRouter = object : RoutingHttpHandler {
+        override fun invoke(p1: Request): Response = Response(OK)
+
+        override fun withFilter(new: Filter): RoutingHttpHandler {
+            TODO("not implemented")
+        }
+
+        override fun withBasePath(new: String): RoutingHttpHandler {
+            TODO("not implemented")
+        }
+
+        override fun match(request: Request): HttpHandler? = this
     }
 
     @Test
@@ -30,10 +53,4 @@ class RouterTest {
     fun `falls back to 404 response`() {
         assertThat(routes(notFoundRouter)(Request(GET, of("/boo"))), equalTo(Response(NOT_FOUND)))
     }
-
-    @Test
-    fun `can combine routers and call them as a handler`() {
-        assertThat(routes(notFoundRouter.then(okRouter))(Request(GET, of("/boo"))), equalTo(Response(OK)))
-    }
-
 }

@@ -25,7 +25,6 @@ class RoutingTest {
         val response = routes(Request(GET, "/a/something"))
 
         assertThat(response.status, equalTo(NOT_FOUND))
-        assertThat(response.status.description, equalTo("Route not found"))
     }
 
     @Test

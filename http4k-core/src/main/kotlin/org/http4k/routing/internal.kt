@@ -66,11 +66,11 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
 
 internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
     override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(
-        httpHandler.copy(routes = httpHandler.routes.map { it.copy(handler = new.then(it.handler)) }))
+        httpHandler.copy(route = httpHandler.route.copy(handler = new.then(httpHandler.route.handler))))
 
     override fun withBasePath(new: String): RoutingHttpHandler = GroupRoutingHttpHandler(
         httpHandler.copy(pathSegments = UriTemplate.from(new + httpHandler.pathSegments?.toString().orEmpty()),
-            routes = httpHandler.routes.map { it.copy(template = UriTemplate.from("$new/${it.template}")) }
+            route = httpHandler.route.copy(template = UriTemplate.from("$new/${httpHandler.route.template}"))
         )
     )
 
@@ -79,25 +79,15 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
     override fun match(request: Request): HttpHandler? = httpHandler.match(request)
 
     companion object {
-        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val routes: List<Route>) : HttpHandler {
-            private val noMatch: HttpHandler? = null
+        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val route: Route) : HttpHandler {
             private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
             fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) != false)
-                routes.fold(noMatch, { memo, route ->
-                    memo ?: route.match(request)
-                })
+                route.match(request)
             else null
 
             override fun invoke(request: Request): Response = handler(request)
         }
-    }
-}
-
-internal fun Router.then(that: Router): Router {
-    val originalMatch = this::match
-    return object : Router {
-        override fun match(request: Request): HttpHandler? = originalMatch(request) ?: that.match(request)
     }
 }
 
