@@ -8,7 +8,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.UriTemplate
-import org.http4k.routing.StaticRoutingHttpHandler.Companion.Handler as StaticHandler
 
 interface Router {
     fun match(request: Request): HttpHandler?
@@ -30,7 +29,7 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : Routi
 }
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
-    StaticRoutingHttpHandler(StaticHandler("", resourceLoader, extraPairs.asList().toMap()))
+    StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
