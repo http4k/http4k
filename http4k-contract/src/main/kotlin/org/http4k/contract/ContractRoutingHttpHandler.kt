@@ -12,52 +12,40 @@ import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Header
 import org.http4k.routing.RoutingHttpHandler
 
-class ContractRoutingHttpHandler internal constructor(val httpHandler: Handler) : RoutingHttpHandler {
-    override fun match(request: Request): HttpHandler? = httpHandler.match(request)
+data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
+                                      private val security: Security,
+                                      private val descriptionPath: String,
+                                      private val rootAsString: String = "",
+                                      private val routes: List<ContractRoute> = emptyList(),
+                                      private val filter: Filter = Filter { next -> { next(it) } }
+) : RoutingHttpHandler {
+    private val contractRoot = PathSegments(rootAsString)
+    override fun withFilter(new: Filter) = copy(filter = filter.then(new))
+    override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    override fun invoke(request: Request): Response = httpHandler(request)
+    private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
-    override fun withBasePath(new: String): ContractRoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withBasePath(new))
-    override fun withFilter(new: Filter): RoutingHttpHandler = ContractRoutingHttpHandler(httpHandler.withFilter(new))
+    override fun invoke(request: Request): Response = handler(request)
 
-    companion object {
-        internal data class Handler(private val renderer: ContractRenderer,
-                                    private val security: Security,
-                                    private val descriptionPath: String,
-                                    private val rootAsString: String = "",
-                                    private val routes: List<ContractRoute> = emptyList(),
-                                    private val filter: Filter = Filter { next -> { next(it) } }
-        ) : RoutingHttpHandler {
-            private val contractRoot = PathSegments(rootAsString)
-            override fun withFilter(new: Filter) = copy(filter = filter.then(new))
-            override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
+    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET bind { renderer.description(contractRoot, security, routes) }
 
-            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
+    private val routers = routes
+        .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
+        .plus(descriptionRoute.toRouter(contractRoot) to identify(descriptionRoute).then(filter))
 
-            override fun invoke(request: Request): Response = handler(request)
+    private val noMatch: HttpHandler? = null
 
-            private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, emptyList(), null) to GET bind { renderer.description(contractRoot, security, routes) }
+    override fun toString(): String = contractRoot.toString() + "\n" + routes.map { it.toString() }.joinToString("\n")
 
-            private val routers = routes
-                .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
-                .plus(descriptionRoute.toRouter(contractRoot) to identify(descriptionRoute).then(filter))
+    override fun match(request: Request): HttpHandler? =
+        if (request.isIn(contractRoot)) {
+            routers.fold(noMatch, { memo, (router, routeFilter) ->
+                memo ?: router.match(request)?.let { routeFilter.then(it) }
+            })
+        } else null
 
-            private val noMatch: HttpHandler? = null
-
-            override fun toString(): String = contractRoot.toString() + "\n" + routes.map { it.toString() }.joinToString("\n")
-
-            override fun match(request: Request): HttpHandler? =
-                if (request.isIn(contractRoot)) {
-                    routers.fold(noMatch, { memo, (router, routeFilter) ->
-                        memo ?: router.match(request)?.let { routeFilter.then(it) }
-                    })
-                } else null
-
-            private fun identify(route: ContractRoute): Filter =
-                route.describeFor(contractRoot).let { routeIdentity ->
-                    Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
-                }
+    private fun identify(route: ContractRoute): Filter =
+        route.describeFor(contractRoot).let { routeIdentity ->
+            Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
         }
-    }
-
 }
