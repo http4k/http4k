@@ -67,6 +67,12 @@ class UriTemplateTest {
     }
 
     @Test
+    fun fallbackDoesNotWork() {
+        val template = from("/b/c")
+        assertThat(template.matches("/b/c/e/f"), equalTo(false))
+    }
+
+    @Test
     fun canExtractFromUri_withLeadingSlash() {
         val template = from("/{id:.+}/{id2:.+}")
         val extracted = template.extract("/foo/bar")

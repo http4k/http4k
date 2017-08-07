@@ -50,13 +50,15 @@ class RoutingTest {
         assertThat(response.bodyString(), equalTo("matched"))
     }
 
-
     @Test
-    fun `can mix and match Routers and Routes`() {
+    fun `can mix and match Route styles`() {
         val routes = routes(
             "/a" to GET bind { Response(OK).body("matched a") },
             "/b/c" bind routes(
                 "/d" to GET bind { Response(OK).body("matched b/c/d") },
+                "/e" bind routes(
+                    "/f" to GET bind { Response(OK).body("matched b/c/e/f") }
+                ),
                 "/" to GET bind { Response(OK).body("matched b/c") }
             )
         )
@@ -64,6 +66,10 @@ class RoutingTest {
         assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
         assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
         assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
+        assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
+        assertThat(routes(Request(GET, "/b/c/e/g")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
     }
 
     @Test
@@ -139,8 +145,7 @@ class RoutingTest {
         )
 
         var count = 0
-        val filter = Filter {
-            next ->
+        val filter = Filter { next ->
             {
                 next(it.replaceHeader("header", "value" + count++))
             }
@@ -180,8 +185,7 @@ class RoutingTest {
 
     @Test
     fun `can add filter to router`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
@@ -191,8 +195,7 @@ class RoutingTest {
 
     @Test
     fun `can add filter to a RoutingHttpHandler`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = changePathFilter.then("/svc" bind static())
