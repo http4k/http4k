@@ -86,7 +86,7 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
             private val noMatch: HttpHandler? = null
             private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
-            fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) ?: true)
+            fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) != false)
                 routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
             else null
 
