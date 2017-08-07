@@ -2,6 +2,7 @@ package org.http4k.server
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -28,9 +29,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         val routes =
             Method.values().map {
-                "/" + it.name to it bind { _: Request ->
-                    Response(OK).body(it.name)
-                }
+                "/" + it.name to it bind { _: Request -> Response(OK).body(it.name) }
             }.plus(listOf(
                 "/headers" to GET bind { _: Request ->
                     Response(ACCEPTED)
@@ -52,7 +51,8 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             val response = client(Request(method, "http://localhost:$port/" + method.name))
 
             assertThat(response.status, equalTo(OK))
-            assertThat(response.bodyString(), equalTo(method.name))
+            if (method == Method.HEAD) assertThat(response.body, equalTo(Body.EMPTY))
+            else assertThat(response.bodyString(), equalTo(method.name))
         }
     }
 
