@@ -45,7 +45,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
     }
 }
 
-data class StaticRoutingHttpHandler(private val pathSegments: String,
+internal data class StaticRoutingHttpHandler(private val pathSegments: String,
                                     private val resourceLoader: ResourceLoader,
                                     private val extraPairs: Map<String, ContentType>,
                                     private val filter: Filter = Filter { next -> { next(it) } }
@@ -64,7 +64,7 @@ data class StaticRoutingHttpHandler(private val pathSegments: String,
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
-data class TemplateRoutingHttpHandler(val method: Method,
+internal data class TemplateRoutingHttpHandler(val method: Method,
                                       val template: UriTemplate,
                                       val handler: HttpHandler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? =
