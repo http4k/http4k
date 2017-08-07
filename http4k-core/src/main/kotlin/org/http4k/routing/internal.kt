@@ -5,6 +5,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -64,31 +65,23 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
     }
 }
 
-internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttpHandler.Companion.Handler) : RoutingHttpHandler {
-    override fun withFilter(new: Filter): RoutingHttpHandler = GroupRoutingHttpHandler(
-        httpHandler.copy(route = httpHandler.route.copy(handler = new.then(httpHandler.route.handler))))
+private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
-    override fun withBasePath(new: String): RoutingHttpHandler = GroupRoutingHttpHandler(
-        httpHandler.copy(pathSegments = UriTemplate.from(new + httpHandler.pathSegments?.toString().orEmpty()),
-            route = httpHandler.route.copy(template = UriTemplate.from("$new/${httpHandler.route.template}"))
-        )
-    )
+data class TemplateRoutingHttpHandler(val method: Method,
+                                      val template: UriTemplate,
+                                      val handler: HttpHandler) : RoutingHttpHandler {
+    override fun match(request: Request): HttpHandler? =
+        if (template.matches(request.uri.path) && method == request.method)
+            { r: Request -> handler(r.withUriTemplate(template)) }
+        else null
 
-    override fun invoke(request: Request): Response = httpHandler(request)
+    override fun invoke(request: Request): Response =
+        match(request)?.invoke(request) ?: Response(NOT_FOUND.description("Route not found"))
 
-    override fun match(request: Request): HttpHandler? = httpHandler.match(request)
+    override fun withFilter(new: Filter): RoutingHttpHandler = copy(handler = new.then(handler))
 
-    companion object {
-        internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val route: Route) : HttpHandler {
-            private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
-
-            fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) != false)
-                route.match(request)
-            else null
-
-            override fun invoke(request: Request): Response = handler(request)
-        }
-    }
+    override fun withBasePath(new: String): RoutingHttpHandler = copy(template = UriTemplate.from("$new/$template"))
 }
+
 
 internal fun Request.uriTemplate(): UriTemplate = headers.findSingle("x-uri-template")?.let { UriTemplate.from(it) } ?: throw IllegalStateException("x-uri-template header not present in the request")

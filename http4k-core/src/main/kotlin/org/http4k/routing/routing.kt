@@ -14,15 +14,6 @@ interface Router {
     fun match(request: Request): HttpHandler?
 }
 
-data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler) : Router {
-    override fun match(request: Request): HttpHandler? =
-        if (template.matches(request.uri.path) && method == request.method) {
-            { handler(it.withUriTemplate(template)) }
-        } else null
-}
-
-private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
-
 interface RoutingHttpHandler : Router, HttpHandler {
     fun withFilter(new: Filter): RoutingHttpHandler
     fun withBasePath(new: String): RoutingHttpHandler
@@ -43,7 +34,6 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
-infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = GroupRoutingHttpHandler(
-    GroupRoutingHttpHandler.Companion.Handler(null, Route(second, UriTemplate.from(first), action)))
+infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(second, UriTemplate.from(first), action)
 
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
