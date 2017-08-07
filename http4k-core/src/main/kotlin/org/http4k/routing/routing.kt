@@ -17,9 +17,13 @@ interface Router {
 }
 
 data class Route(val method: Method, val template: UriTemplate, val handler: HttpHandler) : Router {
-    private val router = GroupRoutingHttpHandler.Companion.Handler(template, listOf(this))
-    override fun match(request: Request) = router.match(request)
+    override fun match(request: Request): HttpHandler? =
+        if (template.matches(request.uri.path) && method == request.method) {
+            { handler(it.withUriTemplate(template)) }
+        } else null
 }
+
+private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
 interface RoutingHttpHandler : Router, HttpHandler {
     fun withFilter(new: Filter): RoutingHttpHandler
@@ -28,8 +32,8 @@ interface RoutingHttpHandler : Router, HttpHandler {
 
 fun routes(vararg routes: Route): RoutingHttpHandler = GroupRoutingHttpHandler(Handler(null, routes.asList()))
 
-fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.let {
-    fold -> { request: Request -> fold.match(request)?.invoke(request) ?: Response(NOT_FOUND) }
+fun routes(first: Router, vararg then: Router): HttpHandler = then.fold(first) { memo, next -> memo.then(next) }.let { fold ->
+    { request: Request -> fold.match(request)?.invoke(request) ?: Response(NOT_FOUND) }
 }
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =

@@ -27,8 +27,8 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
 
     companion object {
         data class Handler(val pathSegments: String,
-                           val resourceLoader: ResourceLoader,
-                           val extraPairs: Map<String, ContentType>,
+                           private val resourceLoader: ResourceLoader,
+                           private val extraPairs: Map<String, ContentType>,
                            val filter: Filter = Filter { next -> { next(it) } }
         ) : HttpHandler {
             private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
@@ -39,11 +39,9 @@ class StaticRoutingHttpHandler constructor(private val httpHandler: StaticRoutin
                 )
             }
 
-            private val handler = filter.then {
-                req ->
+            private val handler = filter.then { req ->
                 val path = convertPath(req.uri.path)
-                resourceLoader.load(path)?.let {
-                    url ->
+                resourceLoader.load(path)?.let { url ->
                     val lookupType = ContentType(extMap.getContentType(path))
                     if (req.method == GET && lookupType != OCTET_STREAM) {
                         Response(OK)
@@ -82,12 +80,13 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
 
     companion object {
         internal data class Handler(internal val pathSegments: UriTemplate? = null, internal val routes: List<Route>) : HttpHandler {
-            private val routers = routes.map(Route::asRouter)
             private val noMatch: HttpHandler? = null
             private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
 
             fun match(request: Request): HttpHandler? = if (pathSegments?.matches(request.uri.path) != false)
-                routers.fold(noMatch, { memo, router -> memo ?: router.match(request) })
+                routes.fold(noMatch, { memo, route ->
+                    memo ?: route.match(request)
+                })
             else null
 
             override fun invoke(request: Request): Response = handler(request)
@@ -95,21 +94,11 @@ internal class GroupRoutingHttpHandler(private val httpHandler: GroupRoutingHttp
     }
 }
 
-private fun Route.asRouter(): Router = object : Router {
-    override fun match(request: Request): HttpHandler? =
-        if (template.matches(request.uri.path) && method == request.method) {
-            { req: Request -> handler(req.withUriTemplate(template)) }
-        } else null
-}
-
-
 internal fun Router.then(that: Router): Router {
     val originalMatch = this::match
     return object : Router {
         override fun match(request: Request): HttpHandler? = originalMatch(request) ?: that.match(request)
     }
 }
-
-private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
 internal fun Request.uriTemplate(): UriTemplate = headers.findSingle("x-uri-template")?.let { UriTemplate.from(it) } ?: throw IllegalStateException("x-uri-template header not present in the request")
