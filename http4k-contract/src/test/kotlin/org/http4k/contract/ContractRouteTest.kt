@@ -65,7 +65,7 @@ class ContractRouteTest {
     fun `can build a request from a string`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val pair = "/bob" to GET
+        val pair = "/bob" bindContract GET
         val request = pair.newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/bob"))
@@ -75,7 +75,7 @@ class ContractRouteTest {
     fun `can build a request from a routespec`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val request = (path1 / path2 query Query.required("") to GET).newRequest(Uri.of("http://rita.com"))
+        val request = (path1 / path2 query Query.required("") bindContract GET).newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
     }
