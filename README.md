@@ -64,10 +64,10 @@ plugging together of services without HTTP container being required.
         * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
-   * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
-   * **Typesafe** path matching
-   * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-   * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
+    * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
+    * **Typesafe** path matching
+    * **Auto-validation** of incoming requests == **zero boilerplate validation code**
+    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
 * [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * **Handlebars** 
