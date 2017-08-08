@@ -64,7 +64,7 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
-internal data class TemplateRoutingHttpHandler(val method: Method,
+data class TemplateRoutingHttpHandler(val method: Method,
                                       val template: UriTemplate,
                                       val handler: HttpHandler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? =

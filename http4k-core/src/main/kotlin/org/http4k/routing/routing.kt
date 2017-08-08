@@ -33,6 +33,13 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
+class PathMethod(val path: String, val method: Method) {
+    infix fun to(action: HttpHandler) = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
+}
+
+infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
+
+@Deprecated("For consistency with routing API", ReplaceWith("this.first bind this.second to action"))
 infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(second, UriTemplate.from(first), action)
 
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
