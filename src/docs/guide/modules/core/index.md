@@ -71,8 +71,8 @@ Check out the `org.http4k.filter` package for the exact list.
 Basic routing for mapping a URL pattern to an `HttpHandler`:
 ```kotlin
 routes(
-    "/hello/{name:*}" to GET bind { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
-    "/fail" to POST bind { request: Request -> Response(INTERNAL_SERVER_ERROR) }
+    "/hello/{name:*}" bind GET to { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
+    "/fail" bind POST to { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).asServer(Jetty(8000)).start()
 ```
 
@@ -115,7 +115,7 @@ val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCust
 
 //To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
 val handler = routes(
-    "/hello/{date:*}" to GET bind { request: Request -> 
+    "/hello/{date:*}" bind GET to { request: Request -> 
          val pathDate: LocalDate = pathLocalDate(request) 
          // SAME AS: 
          // val pathDate: LocalDate = pathLocalDate.extract(request)
