@@ -2,8 +2,8 @@ This example demonstrates a client module (in this case the Apache Client). A cl
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.18.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "2.18.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.18.1"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "2.18.1"
 ```
 
 ### Code

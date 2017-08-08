@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-core", version: "2.18.0"```
+```compile group: "org.http4k", name: "http4k-core", version: "2.18.1"```
 
 ### About
 Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the following:
