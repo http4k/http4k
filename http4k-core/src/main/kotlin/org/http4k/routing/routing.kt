@@ -1,6 +1,13 @@
 package org.http4k.routing
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.UriTemplate
 
 interface Router {
     fun match(request: Request): HttpHandler?
@@ -27,7 +34,7 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
 class PathMethod(val path: String, val method: Method) {
-    infix fun to(action: HttpHandler) = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
+    infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
 }
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
