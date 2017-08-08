@@ -4,6 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v2.18.0
 - Add support for unlimited nesting for `routes()` blocks. Removed the raw `Route` object, which can be replaced with `Router` or `RoutingHttpHandler` where appropriate.
+- Deprecated old routing structure, so now  `"/path" to GET bind` is `"/path" bind GET to`. To fix deprecation, simply switch the calls to "to" and "bind" in routing setup. 
+- Rename of `bind()` in `http4k-contract` to be `bindContract()`
 
 ### v2.17.2
 - Added missing eclectic HTTP method. :)
