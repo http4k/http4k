@@ -2,16 +2,12 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Filter
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
 import org.junit.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
@@ -111,12 +107,12 @@ class RoutingTest {
     }
 
     @Test
-    fun `matches request with extra path parts`() {
+    fun `does not matche request with extra path parts`() {
         val routes = routes("/a" to GET bind { Response(OK) })
 
         val response = routes(Request(GET, "/a/b"))
 
-        assertThat(response, equalTo(Response(OK)))
+        assertThat(response, equalTo(Response(NOT_FOUND)))
     }
 
     @Test
@@ -166,7 +162,8 @@ class RoutingTest {
             "/{.*}" to GET bind { Response(OK).body("matched") }
         ))
 
-        assertThat(app(Request(GET, "/prefix/a/something")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/prefix/foo")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/prefix/foo/something")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/notprefix/a/something")).status, equalTo(NOT_FOUND))
     }
 

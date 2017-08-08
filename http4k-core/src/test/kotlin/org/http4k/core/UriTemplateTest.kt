@@ -32,15 +32,13 @@ class UriTemplateTest {
     }
 
     @Test
-    fun canCaptureEnd() {
+    fun doesNotCaptureEnd() {
         val template1 = from("path")
-        assertThat(template1.matches("path/123"), equalTo(true))
-        assertThat(template1.extract("path/123").getValue("$"), equalTo("/123"))
+        assertThat(template1.matches("path/123"), equalTo(false))
         val template = from("path/{id}")
-        assertThat(template.matches("path/123/someotherpath"), equalTo(true))
-        assertThat(template.extract("path/123/someotherpath").getValue("$"), equalTo("/someotherpath"))
+        assertThat(template.matches("path/123/someotherpath"), equalTo(false))
         assertThat(template.matches("path/123"), equalTo(true))
-        assertThat(template.generate(pathParameters(pair("id", "123"), pair("$", "/someotherpath"))), equalTo("path/123/someotherpath"))
+        assertThat(template.generate(pathParameters(pair("id", "123"))), equalTo("path/123"))
     }
 
     @Test
