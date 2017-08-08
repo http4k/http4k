@@ -5,15 +5,14 @@ import java.net.URLEncoder
 import java.util.regex.Pattern
 
 class UriTemplate private constructor(private val template: String) {
-    private val templateWithSuffix = "$template{$:(/.*)?}"
     private val templateRegex: Regex
     private val matches: Sequence<MatchResult>
     private val parameterNames: List<String>
 
     init {
-        matches = URI_TEMPLATE_FORMAT.findAll(templateWithSuffix)
+        matches = URI_TEMPLATE_FORMAT.findAll(template)
         parameterNames = matches.map { it.groupValues[1] }.toList()
-        templateRegex = templateWithSuffix.replace(URI_TEMPLATE_FORMAT,
+        templateRegex = template.replace(URI_TEMPLATE_FORMAT,
             { notMatched -> Pattern.quote(notMatched) },
             { matched -> if (matched.groupValues[2].isBlank()) "([^/]+)" else "(${matched.groupValues[2]})" }).toRegex()
     }
@@ -30,7 +29,7 @@ class UriTemplate private constructor(private val template: String) {
     fun extract(uri: String): Map<String, String> = parameterNames.zip(templateRegex.findParameterValues(uri.trimSlashes())).toMap()
 
     fun generate(parameters: Map<String, String>): String =
-        templateWithSuffix.replace(URI_TEMPLATE_FORMAT, { matchResult ->
+        template.replace(URI_TEMPLATE_FORMAT, { matchResult ->
             val paramValue = parameters[matchResult.groupValues[1]] ?: ""
             if (paramValue.contains("/")) paramValue else URLEncoder.encode(paramValue, "UTF-8")
         })

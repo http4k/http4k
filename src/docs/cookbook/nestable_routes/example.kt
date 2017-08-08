@@ -18,8 +18,8 @@ fun main(args: Array<String>) {
     val routesWithFilter =
         PrintRequestAndResponse().then(
             routes(
-                "/get/{name}" to GET bind { req: Request -> Response(OK).body(req.path("name")!!) },
-                "/post/{name}" to POST bind { _: Request -> Response(OK) }
+                "/get/{name}" bind GET to { req: Request -> Response(OK).body(req.path("name")!!) },
+                "/post/{name}" bind POST to { _: Request -> Response(OK) }
             )
         )
     println(routesWithFilter(Request(GET, "/get/value")))
@@ -29,8 +29,8 @@ fun main(args: Array<String>) {
         "/bob" bind routesWithFilter,
         "/static" bind staticWithFilter,
         "/rita" bind routes(
-            "/delete/{name}" to DELETE bind { _: Request -> Response(OK) },
-            "/post/{name}" to POST bind { _: Request -> Response(OK) }
+            "/delete/{name}" bind DELETE to { _: Request -> Response(OK) },
+            "/post/{name}" bind POST to { _: Request -> Response(OK) }
         )
     )
 

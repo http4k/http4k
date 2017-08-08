@@ -25,14 +25,13 @@ class RoutingTest {
         val response = routes(Request(GET, "/a/something"))
 
         assertThat(response.status, equalTo(NOT_FOUND))
-        assertThat(response.status.description, equalTo("Route not found"))
     }
 
     @Test
     @Ignore
     fun `method not allowed`() {
         val routes = routes(
-            "/a/{route}" to GET bind { Response(OK).body("matched") }
+            "/a/{route}" bind GET to { Response(OK).body("matched") }
         )
 
         val response = routes(Request(POST, "/a/something"))
@@ -43,7 +42,7 @@ class RoutingTest {
     @Test
     fun `matches uri template and method`() {
         val routes = routes(
-            "/a/{route}" to GET bind { Response(OK).body("matched") }
+            "/a/{route}" bind GET to { Response(OK).body("matched") }
         )
 
         val response = routes(Request(GET, "/a/something"))
@@ -51,27 +50,33 @@ class RoutingTest {
         assertThat(response.bodyString(), equalTo("matched"))
     }
 
-
     @Test
-    fun `can mix and match Routers and Routes`() {
+    fun `can mix and match Route styles`() {
         val routes = routes(
-            "/a" to GET bind { Response(OK).body("matched a") },
+            "/a" bind GET to { Response(OK).body("matched a") },
             "/b/c" bind routes(
-                "/d" to GET bind { Response(OK).body("matched b/c/d") },
-                "/" to GET bind { Response(OK).body("matched b/c") }
+                "/d" bind GET to { Response(OK).body("matched b/c/d") },
+                "/e" bind routes(
+                    "/f" bind GET to { Response(OK).body("matched b/c/e/f") }
+                ),
+                "/" bind GET to { Response(OK).body("matched b/c") }
             )
         )
 
         assertThat(routes(Request(GET, "/a")).bodyString(), equalTo("matched a"))
         assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
         assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
+        assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
+        assertThat(routes(Request(GET, "/b/c/e/g")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `matches uses first match`() {
         val routes = routes(
-            "/a/{route}" to GET bind { Response(OK).body("matched a") },
-            "/a/{route}" to GET bind { Response(OK).body("matched b") }
+            "/a/{route}" bind GET to { Response(OK).body("matched a") },
+            "/a/{route}" bind GET to { Response(OK).body("matched b") }
         )
 
         val response = routes(Request(GET, "/a/something"))
@@ -82,7 +87,7 @@ class RoutingTest {
     @Test
     fun `path parameters are available in request`() {
         val routes = routes(
-            "/{a}/{b}/{c}" to GET bind { req: Request -> Response(OK).body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
+            "/{a}/{b}/{c}" bind GET to { req: Request -> Response(OK).body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
         )
 
         val response = routes(Request(GET, "/x/y/z"))
@@ -92,7 +97,7 @@ class RoutingTest {
 
     @Test
     fun `matches uri with query`() {
-        val routes = routes("/a/b" to GET bind { Response(OK) })
+        val routes = routes("/a/b" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b?foo=bar"))
 
@@ -101,22 +106,22 @@ class RoutingTest {
 
     @Test
     fun `matches regex uri with query`() {
-        val handler = routes("/a/{b:.+}" to GET bind { Response(OK).body(it.path("b")!!) })
+        val handler = routes("/a/{b:.+}" bind GET to { Response(OK).body(it.path("b")!!) })
         assertThat(handler(Request(GET, "/a/foo?bob=rita")).bodyString(), equalTo("foo"))
     }
 
     @Test
-    fun `matches request with extra path parts`() {
-        val routes = routes("/a" to GET bind { Response(OK) })
+    fun `does not matche request with extra path parts`() {
+        val routes = routes("/a" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b"))
 
-        assertThat(response, equalTo(Response(OK)))
+        assertThat(response, equalTo(Response(NOT_FOUND)))
     }
 
     @Test
     fun `can stop matching extra parts`() {
-        val routes = routes("/a{$}" to GET bind { Response(OK) })
+        val routes = routes("/a{$}" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/b"))
 
@@ -136,12 +141,11 @@ class RoutingTest {
     @Test
     fun `can put routes inside of routes`() {
         val subRoutes = routes(
-            "/a/{route}" to GET bind { Response(OK).header("header", it.header("header")).body("matched") }
+            "/a/{route}" bind GET to { Response(OK).header("header", it.header("header")).body("matched") }
         )
 
         var count = 0
-        val filter = Filter {
-            next ->
+        val filter = Filter { next ->
             {
                 next(it.replaceHeader("header", "value" + count++))
             }
@@ -159,17 +163,18 @@ class RoutingTest {
     @Test
     fun `group router shortcuts if parent prefix does not match`() {
         val app = routes("/prefix" bind routes(
-            "/{.*}" to GET bind { Response(OK).body("matched") }
+            "/{.*}" bind GET to { Response(OK).body("matched") }
         ))
 
-        assertThat(app(Request(GET, "/prefix/a/something")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/prefix/foo")).status, equalTo(OK))
+        assertThat(app(Request(GET, "/prefix/foo/something")).status, equalTo(NOT_FOUND))
         assertThat(app(Request(GET, "/notprefix/a/something")).status, equalTo(NOT_FOUND))
     }
 
     @Test
     fun `route grouping prefix can contain a dynamic segment`() {
         val subRoutes = routes(
-            "/a/{route}" to GET bind { Response(OK).body(it.path("name") + it.path("route")) }
+            "/a/{route}" bind GET to { Response(OK).body(it.path("name") + it.path("route")) }
         )
 
         val app = routes("/{name:\\d+}" bind subRoutes)
@@ -181,8 +186,7 @@ class RoutingTest {
 
     @Test
     fun `can add filter to router`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
@@ -192,8 +196,7 @@ class RoutingTest {
 
     @Test
     fun `can add filter to a RoutingHttpHandler`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = changePathFilter.then("/svc" bind static())
@@ -207,7 +210,7 @@ class RoutingTest {
             .then({ Response(OK).body(it.header("name")!!) })
 
         val routingHttpHandler = routes(
-            "/a/thing" to GET bind routes
+            "/a/thing" bind GET to routes
         )
         assertThat(routingHttpHandler(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
     }
@@ -216,7 +219,7 @@ class RoutingTest {
     fun `can apply a filter to a Router`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
             .then(routes(
-                "/a/thing" to GET bind { Response(OK).body(it.header("name")!!) }
+                "/a/thing" bind GET to { Response(OK).body(it.header("name")!!) }
             ))
 
         assertThat(routes(Request(GET, "/a/thing")).bodyString(), equalTo("value"))

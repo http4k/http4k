@@ -8,14 +8,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.http4k.routing.Route
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.junit.Test
 
-val EchoPath: Route = "/echo/{message}" to GET bind { r -> Response(OK).body(r.path("message") ?: "nothing!") }
+val EchoPath = "/echo/{message}" bind GET to { r -> Response(OK).body(r.path("message") ?: "nothing!") }
 
 class DynamicPathTest {
 

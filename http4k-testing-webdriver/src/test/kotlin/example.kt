@@ -1,4 +1,5 @@
-import org.http4k.core.Method
+
+import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.routing.bind
@@ -12,7 +13,7 @@ import org.openqa.selenium.By
 fun main(args: Array<String>) {
 
     val app = routes(
-        "/hello" to Method.GET bind {
+        "/hello" bind GET to {
             Response(Status.OK).body("<html><title>hello</title></html>")
         }
     )

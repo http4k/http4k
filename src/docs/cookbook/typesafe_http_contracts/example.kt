@@ -5,6 +5,7 @@ import org.http4k.contract.ApiKey
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.Swagger
 import org.http4k.contract.bind
+import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
@@ -51,8 +52,7 @@ fun main(args: Array<String>) {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), {
-        name, latency ->
+    val filter: Filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), { name, latency ->
         println(name + " took " + latency)
     })
 
@@ -63,13 +63,12 @@ fun main(args: Array<String>) {
 
     val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
         "/add" / Path.int().of("value1") / Path.int().of("value2")
-            to GET
-            bind ::add
+            bindContract GET
+            to ::add
             meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
         "/echo" / Path.of("name")
             query ageQuery
-            to GET
-            bind ::echo
+            bindContract GET to ::echo
             meta RouteMeta("echo")
     )
 
@@ -79,8 +78,7 @@ fun main(args: Array<String>) {
         "/" bind contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
             "/echo" / Path.of("name")
                 query ageQuery
-                to GET
-                bind ::echo
+                bindContract GET to ::echo
                 meta RouteMeta("echo")
         )
     )

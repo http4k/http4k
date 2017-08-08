@@ -19,9 +19,9 @@ fun MyMathServer(port: Int): Http4kServer = MyMathsApp().asServer(Jetty(port))
 
 fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
     routes(
-        "/ping" to GET bind { _: Request -> Response(OK) },
-        "/add" to GET bind calculate { it.sum() },
-        "/multiply" to GET bind calculate { it.fold(1) { memo, next -> memo * next } }
+        "/ping" bind GET to { _: Request -> Response(OK) },
+        "/add" bind GET to calculate { it.sum() },
+        "/multiply" bind GET to calculate { it.fold(1) { memo, next -> memo * next } }
     )
 )
 

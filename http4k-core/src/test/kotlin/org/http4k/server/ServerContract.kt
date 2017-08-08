@@ -29,16 +29,16 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         val routes =
             Method.values().map {
-                "/" + it.name to it bind { _: Request -> Response(OK).body(it.name) }
+                "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
             }.plus(listOf(
-                "/headers" to GET bind { _: Request ->
+                "/headers" bind GET to { _: Request ->
                     Response(ACCEPTED)
                         .header("content-type", "text/plain")
                 },
-                "/echo" to POST bind { req: Request -> Response(OK).body(req.bodyString()) },
-                "/request-headers" to GET bind { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-                "/uri" to GET bind { req: Request -> Response(OK).body(req.uri.toString()) },
-                "/boom" to GET bind { _: Request -> throw IllegalArgumentException("BOOM!") }
+                "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
+                "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+                "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
+                "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
             ))
 
         server = routes(*routes.toTypedArray()).asServer(serverConfig(port)).start()

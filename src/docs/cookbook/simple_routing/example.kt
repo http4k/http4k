@@ -12,9 +12,9 @@ import org.http4k.routing.routes
 fun main(args: Array<String>) {
 
     val app = routes(
-        "bob" to GET bind { Response(OK).body("you GET bob") },
-        "rita" to POST bind { Response(OK).body("you POST rita") },
-        "sue" to DELETE bind { Response(OK).body("you DELETE sue") }
+        "bob" bind GET to { Response(OK).body("you GET bob") },
+        "rita" bind POST to { Response(OK).body("you POST rita") },
+        "sue" bind DELETE to { Response(OK).body("you DELETE sue") }
     )
 
     println(app(Request(GET, "/bob")))
