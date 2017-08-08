@@ -1,13 +1,6 @@
 package org.http4k.routing
 
-import org.http4k.core.ContentType
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.UriTemplate
+import org.http4k.core.*
 
 interface Router {
     fun match(request: Request): HttpHandler?
@@ -19,7 +12,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
 }
 
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
-    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(Status.NOT_FOUND)
+    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(Status.NOT_FOUND.description("Route not found"))
 
     override fun match(request: Request): HttpHandler? = list.find { it.match(request) != null }
 
