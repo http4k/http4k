@@ -70,9 +70,11 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.bindContract(method: Metho
     }
 }
 
+// TODO deprecate or remove??
 @JvmName("handler0String")
 infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(toBaseFn(first), emptyList(), null).bindContract(second) to handler
 
+// TODO deprecate or remove??
 @JvmName("handler1Path")
 infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, emptyList(), null, first).bindContract(second) to fn
 
