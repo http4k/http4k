@@ -109,6 +109,9 @@ enum class ContentNegotiation {
         override fun invoke(expected: ContentType, actual: ContentType?) {
             if (actual != null && actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
         }
+    },
+    None {
+        override fun invoke(expected: ContentType, actual: ContentType?) {}
     };
 
     @Throws(LensFailure::class)
@@ -123,3 +126,10 @@ fun Body.Companion.nonEmptyString(contentType: ContentType, description: String?
 
 fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
     = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+
+fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BodyLensSpec<String> =
+    pattern.toRegex().let { regex ->
+        return string(contentType, description, contentNegotiation).map {
+            regex.matchEntire(it)?.groupValues?.get(group)!!
+        }
+    }

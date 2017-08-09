@@ -24,6 +24,13 @@ class BodyTest {
     }
 
     @Test
+    fun `can get regex body`() {
+        val regexBody = Body.regex("bob(.+)alice", contentNegotiation = ContentNegotiation.None).toLens()
+        assertThat(regexBody(emptyRequest.body("bobritaalice")), equalTo("rita"))
+        assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith(Meta(true, "body", ParamMeta.StringParam, "body").invalid())))
+    }
+
+    @Test
     fun `non empty string`() {
         val nonEmpty = Body.nonEmptyString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
@@ -39,6 +46,13 @@ class BodyTest {
                 .header("content-type", "text/bob")
                 .body("some value"))
         }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
+    }
+
+    @Test
+    fun `accept any content type when none`() {
+        val noneBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.None).toLens()
+        noneBody(emptyRequest.body("some value"))
+        noneBody(emptyRequest.body("some value").header("content-type", "text/bob"))
     }
 
     @Test
