@@ -1,6 +1,7 @@
 package org.http4k.aws
 
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.toParameters
 import org.http4k.urlEncoded
 
@@ -11,7 +12,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
             val payloadHash = request.payloadHash()
             val canonical = request.method.name +
                 "\n" +
-                request.uri.path +
+                request.uri.normalisedPath() +
                 "\n" +
                 request.canonicalQueryString() +
                 "\n" +
@@ -39,5 +40,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .joinToString("&")
 
         private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.payload.array())
+
+        private fun Uri.normalisedPath() = path.split("/").map { it.urlEncoded() }.joinToString("/")
     }
 }
