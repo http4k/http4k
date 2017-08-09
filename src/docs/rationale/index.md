@@ -34,7 +34,9 @@ val handler: HttpHandler = { request: Request -> Response(OK) }
 * Pre/post processing is done using a `Filter`, which is modelled as `(HttpHandler) -> HttpHandler`. Filters can therefore be composed together to make reusable "stacks" of behaviour which can be applied to a terminating `HttpHandler` - to yield 
 a decorated `HttpHander`:
 ```kotlin
-    val filter: Filter = Filter { next: HttpHandler -> request: Request -> next(request).header("my response header", "value")} }
+    val filter: Filter = Filter { next: HttpHandler ->
+        { request: Request -> next(request).header("my response header", "value") }
+    }
     val decorated: HttpHandler = filter.then(handler)
 ```
 * Binding an `HttpHandler` to a path and HTTP verb yields a `Route`:
