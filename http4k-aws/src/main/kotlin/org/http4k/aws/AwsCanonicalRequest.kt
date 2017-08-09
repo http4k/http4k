@@ -41,6 +41,6 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
 
         private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.payload.array())
 
-        private fun Uri.normalisedPath() = path.split("/").map { it.urlEncoded() }.joinToString("/")
+        private fun Uri.normalisedPath() = if(path.isBlank()) "/" else path.split("/").map { it.urlEncoded() }.joinToString("/")
     }
 }

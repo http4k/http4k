@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.18.3
+- Fix AWS request signing for requests containing empty path 
+
 ### v2.18.2
 - Fix AWS request signing for requests containing path with special characters 
 

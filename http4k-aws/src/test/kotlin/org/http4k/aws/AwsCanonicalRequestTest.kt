@@ -31,4 +31,16 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
 
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     }
+
+    @Test
+    fun `normalises empty path`() {
+        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com"))
+        canonical.value.shouldMatch(equalTo("""GET
+/
+
+
+
+
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
+    }
 }
