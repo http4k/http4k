@@ -127,7 +127,7 @@ fun Body.Companion.nonEmptyString(contentType: ContentType, description: String?
 fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
     = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
 
-fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BodyLensSpec<String> =
+fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict) =
     pattern.toRegex().let { regex ->
-        string(contentType, description, contentNegotiation).map { regex.matchEntire(it)?.groupValues?.get(group)!! }
+        string(contentType, description, contentNegotiation).map({ regex.matchEntire(it)?.groupValues?.get(group)!! }, { it })
     }
