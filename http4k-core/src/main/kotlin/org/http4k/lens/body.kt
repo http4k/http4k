@@ -129,7 +129,5 @@ fun Body.Companion.binary(contentType: ContentType, description: String? = null,
 
 fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BodyLensSpec<String> =
     pattern.toRegex().let { regex ->
-        return string(contentType, description, contentNegotiation).map {
-            regex.matchEntire(it)?.groupValues?.get(group)!!
-        }
+        string(contentType, description, contentNegotiation).map { regex.matchEntire(it)?.groupValues?.get(group)!! }
     }
