@@ -43,7 +43,7 @@ object ClientFilters {
      */
     object SetHostFrom {
         operator fun invoke(uri: Uri): Filter = Filter { next ->
-            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))) }
+            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port)).replaceHeader("Host", uri.host)) }
         }
     }
 
