@@ -80,7 +80,7 @@ Note that the `http4k-contract` module contains a more typesafe implementation o
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
-For this purpose, we can use a [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf). 
+For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing). 
 
 A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. **http4k** provides a DSL 
 to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). 
