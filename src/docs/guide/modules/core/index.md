@@ -100,7 +100,7 @@ There is one "location" type for each part of the message, each with config/mapp
 Once the lens is declared, you can use it on a target object to either get or set the value:
 
 - Retrieving a value: use `<lens>.extract(<target>)`, or the more concise invoke form: `<lens>(<target>)`
-- Setting a value: use `<lens>.inject(<target>)`, or the more concise invoke form: `<lens>(<value>, <target>)`
+- Setting a value: use `<lens>.inject(<value>, <target>)`, or the more concise invoke form: `<lens>(<value>, <target>)`
 
 ```kotlin
 val pathLocalDate = Path.localDate().of("date")
