@@ -48,8 +48,6 @@ function notify_gitter {
     curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $GITTER_BEARER_TOKEN" "$GITTER_WEBHOOK"  -d "{'text':'$MESSAGE'}"
 }
 
-./release-maven-central.sh
-
 if [ $? -ne 0 ]; then
     notify_slack "Release has failed. Check <https://travis-ci.org/http4k/http4k-core/builds/$TRAVIS_BUILD_ID|Build #$TRAVIS_BUILD_NUMBER> for details."
 else

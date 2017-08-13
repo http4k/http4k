@@ -7,11 +7,29 @@ matrix:
       - "./gradlew check"
       after_success:
       - "./gradlew jacocoRootReport coveralls"
-      - "travis_wait 60 ./release-ci.sh"
       cache:
         directories:
         - "$HOME/.m2"
         - "$HOME/.gradle"
+    - stage: bintray
+      script: "./release-ci.sh"
+    - stage: maven central
+      script: "release-maven-central-single http4k-aws"
+      script: "release-maven-central-single http4k-core"
+      script: "release-maven-central-single http4k-contract"
+      script: "release-maven-central-single http4k-template-handlebars"
+      script: "release-maven-central-single http4k-template-pebble"
+      script: "release-maven-central-single http4k-template-thymeleaf"
+      script: "release-maven-central-single http4k-client-apache"
+      script: "release-maven-central-single http4k-client-okhttp"
+      script: "release-maven-central-single http4k-format-argo"
+      script: "release-maven-central-single http4k-format-gson"
+      script: "release-maven-central-single http4k-format-jackson"
+      script: "release-maven-central-single http4k-server-jetty"
+      script: "release-maven-central-single http4k-server-netty"
+      script: "release-maven-central-single http4k-server-undertow"
+      script: "release-maven-central-single http4k-testing-hamkrest"
+      script: "release-maven-central-single http4k-testing-webdriver"
     - stage: docs
       language: python
       script:
