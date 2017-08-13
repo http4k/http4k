@@ -12,8 +12,10 @@ matrix:
         - "$HOME/.m2"
         - "$HOME/.gradle"
     - stage: bintray
+      language: generic
       script: "./release-ci.sh"
     - stage: maven central
+      language: generic
       script: "./release-maven-central-single.sh http4k-aws"
       script: "./release-maven-central-single.sh http4k-core"
       script: "./release-maven-central-single.sh http4k-contract"
