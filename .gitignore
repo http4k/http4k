@@ -6,5 +6,5 @@ gradle.properties
 .DS_Store
 classes/
 /site/
-
+out/
 src/docs/index.md
