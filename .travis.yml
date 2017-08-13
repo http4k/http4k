@@ -1,37 +1,41 @@
-matrix:
+env:
+ - PACKAGE_NAME=http4k-aws
+ - PACKAGE_NAME=http4k-core
+ - PACKAGE_NAME=http4k-contract
+ - PACKAGE_NAME=http4k-template-handlebars
+ - PACKAGE_NAME=http4k-template-pebble
+ - PACKAGE_NAME=http4k-template-thymeleaf
+ - PACKAGE_NAME=http4k-client-apache
+ - PACKAGE_NAME=http4k-client-okhttp
+ - PACKAGE_NAME=http4k-format-argo
+ - PACKAGE_NAME=http4k-format-gson
+ - PACKAGE_NAME=http4k-format-jackson
+ - PACKAGE_NAME=http4k-server-jetty
+ - PACKAGE_NAME=http4k-server-netty
+ - PACKAGE_NAME=http4k-server-undertow
+ - PACKAGE_NAME=http4k-testing-hamkrest
+ - PACKAGE_NAME=http4k-testing-webdriver
+
+jobs:
   include:
     - stage: build
       language: java
       jdk: oraclejdk8
       script:
-      - "./gradlew check"
+      - "./gradlew clean"
       after_success:
-      - "./gradlew jacocoRootReport coveralls"
+      - "./gradlew clean"
       cache:
         directories:
         - "$HOME/.m2"
         - "$HOME/.gradle"
     - stage: bintray
-      language: generic
+      language: bash
       script: "./release-ci.sh"
     - stage: maven central
-      language: generic
-      script: "./release-maven-central-single.sh http4k-aws"
-      script: "./release-maven-central-single.sh http4k-core"
-      script: "./release-maven-central-single.sh http4k-contract"
-      script: "./release-maven-central-single.sh http4k-template-handlebars"
-      script: "./release-maven-central-single.sh http4k-template-pebble"
-      script: "./release-maven-central-single.sh http4k-template-thymeleaf"
-      script: "./release-maven-central-single.sh http4k-client-apache"
-      script: "./release-maven-central-single.sh http4k-client-okhttp"
-      script: "./release-maven-central-single.sh http4k-format-argo"
-      script: "./release-maven-central-single.sh http4k-format-gson"
-      script: "./release-maven-central-single.sh http4k-format-jackson"
-      script: "./release-maven-central-single.sh http4k-server-jetty"
-      script: "./release-maven-central-single.sh http4k-server-netty"
-      script: "./release-maven-central-single.sh http4k-server-undertow"
-      script: "./release-maven-central-single.sh http4k-testing-hamkrest"
-      script: "./release-maven-central-single.sh http4k-testing-webdriver"
+      language: bash
+      script: "./release-maven-central-single.sh"
+      env: PACKAGE_NAME=http4k-aws
     - stage: docs
       language: python
       script:
