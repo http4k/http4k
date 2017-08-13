@@ -4,9 +4,9 @@ matrix:
       language: java
       jdk: oraclejdk8
       script:
-      - "./gradlew clean"
+      - "./gradlew check"
       after_success:
-      - "./gradlew clean"
+      - "./gradlew jacocoRootReport coveralls"
       cache:
         directories:
         - "$HOME/.m2"
