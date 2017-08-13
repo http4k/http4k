@@ -15,23 +15,54 @@ matrix:
       language: bash
       script: "./release-ci.sh"
     - stage: maven central
+      script: "./release-maven-central-single.sh"
       language: bash
-      script: "./release-maven-central-single.sh http4k-aws"
-    - script: "./release-maven-central-single.sh http4k-core"
-    - script: "./release-maven-central-single.sh http4k-contract"
-    - script: "./release-maven-central-single.sh http4k-template-handlebars"
-    - script: "./release-maven-central-single.sh http4k-template-pebble"
-    - script: "./release-maven-central-single.sh http4k-template-thymeleaf"
-    - script: "./release-maven-central-single.sh http4k-client-apache"
-    - script: "./release-maven-central-single.sh http4k-client-okhttp"
-    - script: "./release-maven-central-single.sh http4k-format-argo"
-    - script: "./release-maven-central-single.sh http4k-format-gson"
-    - script: "./release-maven-central-single.sh http4k-format-jackson"
-    - script: "./release-maven-central-single.sh http4k-server-jetty"
-    - script: "./release-maven-central-single.sh http4k-server-netty"
-    - script: "./release-maven-central-single.sh http4k-server-undertow"
-    - script: "./release-maven-central-single.sh http4k-testing-hamkrest"
-    - script: "./release-maven-central-single.sh http4k-testing-webdriver"
+      env: PACKAGE_NAME=http4k-aws
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-core
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-contract
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-template-handlebars
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-template-pebble
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-template-thymeleaf
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-client-apache
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-client-okhttp
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-format-argo
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-format-gson
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-format-jackson
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-server-jetty
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-server-netty
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-server-undertow
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-testing-hamkrest
+    - script: "./release-maven-central-single.sh"
+      language: bash
+      env: PACKAGE_NAME=http4k-testing-webdriver
     - stage: docs
       language: python
       script:
