@@ -1,22 +1,4 @@
-env:
- - PACKAGE_NAME=http4k-aws
- - PACKAGE_NAME=http4k-core
- - PACKAGE_NAME=http4k-contract
- - PACKAGE_NAME=http4k-template-handlebars
- - PACKAGE_NAME=http4k-template-pebble
- - PACKAGE_NAME=http4k-template-thymeleaf
- - PACKAGE_NAME=http4k-client-apache
- - PACKAGE_NAME=http4k-client-okhttp
- - PACKAGE_NAME=http4k-format-argo
- - PACKAGE_NAME=http4k-format-gson
- - PACKAGE_NAME=http4k-format-jackson
- - PACKAGE_NAME=http4k-server-jetty
- - PACKAGE_NAME=http4k-server-netty
- - PACKAGE_NAME=http4k-server-undertow
- - PACKAGE_NAME=http4k-testing-hamkrest
- - PACKAGE_NAME=http4k-testing-webdriver
-
-jobs:
+matrix:
   include:
     - stage: build
       language: java
@@ -34,8 +16,22 @@ jobs:
       script: "./release-ci.sh"
     - stage: maven central
       language: bash
-      script: "./release-maven-central-single.sh"
-      env: PACKAGE_NAME=http4k-aws
+      script: "./release-maven-central-single.sh http4k-aws"
+    - script: "./release-maven-central-single.sh http4k-core"
+    - script: "./release-maven-central-single.sh http4k-contract"
+    - script: "./release-maven-central-single.sh http4k-template-handlebars"
+    - script: "./release-maven-central-single.sh http4k-template-pebble"
+    - script: "./release-maven-central-single.sh http4k-template-thymeleaf"
+    - script: "./release-maven-central-single.sh http4k-client-apache"
+    - script: "./release-maven-central-single.sh http4k-client-okhttp"
+    - script: "./release-maven-central-single.sh http4k-format-argo"
+    - script: "./release-maven-central-single.sh http4k-format-gson"
+    - script: "./release-maven-central-single.sh http4k-format-jackson"
+    - script: "./release-maven-central-single.sh http4k-server-jetty"
+    - script: "./release-maven-central-single.sh http4k-server-netty"
+    - script: "./release-maven-central-single.sh http4k-server-undertow"
+    - script: "./release-maven-central-single.sh http4k-testing-hamkrest"
+    - script: "./release-maven-central-single.sh http4k-testing-webdriver"
     - stage: docs
       language: python
       script:

@@ -28,10 +28,10 @@ function maven_publish {
     fi
 }
 
-PACKAGE_NAME=${PACKAGE_NAME:-}
+PACKAGE_NAME=${1:-}
 
 if [[ -z "$PACKAGE_NAME"  ]]; then
-    echo "PACKAGE_NAME is missing."
+    echo "Usage: $0 [package-name]"
     exit 1
 fi
 
