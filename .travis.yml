@@ -1,6 +1,7 @@
 matrix:
   include:
-    - language: java
+    - stage: build
+      language: java
       jdk: oraclejdk8
       script:
       - "./gradlew check"
@@ -11,6 +12,7 @@ matrix:
         directories:
         - "$HOME/.m2"
         - "$HOME/.gradle"
-    - language: python
+    - stage: docs
+      language: python
       script:
         - "./release-site.sh"
