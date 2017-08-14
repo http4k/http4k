@@ -14,6 +14,10 @@ matrix:
     - stage: bintray
       language: bash
       script: "./release-ci.sh"
+    - stage: docs
+      language: python
+      script:
+      - "./release-site.sh"
     - stage: maven central
       script: "./release-maven-central-single.sh"
       language: bash
@@ -63,7 +67,3 @@ matrix:
     - script: "./release-maven-central-single.sh"
       language: bash
       env: PACKAGE_NAME=http4k-testing-webdriver
-    - stage: docs
-      language: python
-      script:
-        - "./release-site.sh"
