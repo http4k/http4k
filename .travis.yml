@@ -27,5 +27,5 @@ matrix:
       script:
       - "./release-site.sh"
     - stage: maven central
-      script: "travis_wait 60 ./release-maven-central.sh"
+      script: "travis_wait 90 ./release-maven-central.sh"
       language: bash
