@@ -67,16 +67,18 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 
 Check out the `org.http4k.filter` package for the exact list.
 
-### Simple Routing
-Basic routing for mapping a URL pattern to an `HttpHandler`:
+### Nestable, path-based Routing
+Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and **http4k** will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
 ```kotlin
 routes(
-    "/hello/{name:*}" bind GET to { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") },
+    "/hello" bind routes(
+        "/{name:*}" bind GET to { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") }
+    ),
     "/fail" bind POST to { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).asServer(Jetty(8000)).start()
 ```
 
-Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality.
+Note that the `http4k-contract` module contains a more typesafe implementation of routing functionality, with runtime-generated live documentation in Swagger format.
 
 ### Typesafe parameter destructuring/construction of HTTP messages with Lenses
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
