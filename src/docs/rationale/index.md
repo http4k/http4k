@@ -39,11 +39,11 @@ a decorated `HttpHander`:
     }
     val decorated: HttpHandler = filter.then(handler)
 ```
-* Binding an `HttpHandler` to a path and HTTP verb yields a `Route`:
+* Binding an `HttpHandler` to a path and HTTP verb yields a `RoutingHttpHandler`, which is both an `HttpHandler` and a`Router`:
 ```kotlin
-val route: Route = "/path" bind GET to { Response(OK).body("you GET bob") }
+val route: RoutingHttpHandler = "/path" bind GET to { Response(OK).body("you GET bob") }
 ```
-* `Routes` can be combined together into a `RoutingHttpHandler`, which is both an `HttpHandler` and a`Router`:
+* `RoutingHttpHandler`s can be grouped together:
 ```kotlin
 val app: RoutingHttpHandler = routes(
     "bob" bind GET to { Response(OK).body("you GET bob") },
@@ -52,7 +52,7 @@ val app: RoutingHttpHandler = routes(
 )
 ```
 * A `Router` is a selective request handler, which attempts to match a request. If it cannot, processing falls through to the next `Router` in the list.
-* `Routers` can be combined together to form another `HttpHandler`:
+* `Routers` can be combined together (under particular context roots) to form another `RoutingHttpHandler`:
 ```kotlin
 val bigApp: HttpHandler = routes(
     "/this" bind app, 
