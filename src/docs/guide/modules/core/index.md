@@ -10,6 +10,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
 - Abstractions for Servers, Clients, JSON Message formats, Templating etc.
 - `SunHttp` Single-LOC development Server-backend
+- Static file-serving capability with **Caching** and **Hot-Reload**
 
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:
@@ -67,7 +68,7 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 
 Check out the `org.http4k.filter` package for the exact list.
 
-### Nestable, path-based Routing
+### Routers - Nestable, path-based Routing
 Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and **http4k** will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
 ```kotlin
 routes(
@@ -146,9 +147,20 @@ val modifiedRequest: Request = Request(Method.GET, "http://google.com/{pathLocal
     optionalHeader of 123
 )
 ```
+### Serving static assets
+For serving static assets, just bind a path to a Static block as below, using either a Classpath or HotReload based ResourceLoader instance. Typically, HotReload is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
+```kotlin
+routes(
+    "/static" bind static(Classpath("org.http4k.some.package.name"))
+    "/hotreload" bind static(HotReload("path/to/static/dir/goes/here"))
+)
+```
 
-### Other features
-Creates `curl` command for a given request:
+### Request and Response toString()
+The HttpMessages used by **http4k** toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
+
+### CURL format
+Creates `curl` command for a given request - this is useful to include in audit logs so exact requests can be replayed if required:
 
 ```kotlin
 val curl = Request(POST, "http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
