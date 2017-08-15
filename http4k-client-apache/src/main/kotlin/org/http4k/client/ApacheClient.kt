@@ -21,7 +21,7 @@ import org.http4k.core.Status
 import java.net.URI
 import java.nio.ByteBuffer
 
-class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient) : HttpHandler {
+class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient()) : HttpHandler {
 
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toHttp4kResponse()
 
@@ -51,7 +51,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 
     companion object {
-        private val defaultApacheHttpClient = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
+        private fun defaultApacheHttpClient() = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
             .setRedirectsEnabled(false)
             .setCookieSpec(IGNORE_COOKIES)
             .build()).build()
