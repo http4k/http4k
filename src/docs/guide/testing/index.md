@@ -16,7 +16,7 @@ That said, possibly the most useful thing is to demonstrate the process that we 
 We have developed the following modules to help with testing:
 
 - [http4k-testing-hamkrest](/guide/modules/hamkrest): a set of composable Hamkrest matchers for matching **http4k** message objects against.
-- [http4k-testing-webdriver](/guide/modules/webdriver): an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive **http4k** apps (ie. a HttpHandlers).
+- [http4k-testing-webdriver](/guide/modules/webdriver): an ultra-lightweight Selenium WebDriver implementation which can be used to test-drive **http4k** apps (ie. HttpHandlers).
 
 ## Example code for testing
 
