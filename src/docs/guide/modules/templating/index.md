@@ -7,6 +7,7 @@
 
 ### About
 The pluggable **http4k** templating API adds `ViewModel` rendering for common templating libraries. The implementations provide the a number of renderers for views:
+
 * Cached on the classpath
 * Cached from the filesystem
 * Hot-Reloading from the filesystem
