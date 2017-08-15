@@ -21,10 +21,10 @@ We have developed the following modules to help with testing:
 ## Example code for testing
 
 #### Testing HttpHandlers with static paths
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/DynamicPathTest.kt"></script>
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/StaticPathTest.kt"></script>
 
 #### Testing HttpHandlers with dynamic paths
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/StaticPathTest.kt"></script>
+<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/DynamicPathTest.kt"></script>
 
 #### Testing Filters
 <script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/FilterTest.kt"></script>
