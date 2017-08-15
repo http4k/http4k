@@ -42,7 +42,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
-            val textareas = it.findElements(By.tagName("input"))
+            val textareas = it.findElements(By.tagName("textarea"))
                 .filter { it.getAttribute("name") != "" }
                 .map { it.getAttribute("name") to listOf(it.text) }
             val selects = it.findElements(By.tagName("select"))

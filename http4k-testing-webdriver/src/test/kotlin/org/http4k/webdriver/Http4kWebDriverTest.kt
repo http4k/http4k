@@ -44,7 +44,7 @@ class Http4kWebDriverTest {
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&text1=&checkbox1=checkbox&checkbox1=&select1=option1&select1=option2"))
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
 
@@ -63,7 +63,7 @@ class Http4kWebDriverTest {
 
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
-        driver.assertOnPage("/form?text1=textValue&text1=&checkbox1=checkbox&checkbox1=&select1=option1&select1=option2")
+        driver.assertOnPage("/form?text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2")
         assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("GET"))
     }
