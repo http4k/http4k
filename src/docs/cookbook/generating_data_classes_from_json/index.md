@@ -2,7 +2,7 @@ This example show the usage of the `GenerateDataClasses` to generate Kotlin data
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.18.5"
+    compile group: "org.http4k", name: "http4k-core", version: "2.19.0"
 ```
 
 ### Code
