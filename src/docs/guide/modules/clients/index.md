@@ -1,7 +1,7 @@
 ### Installation (Gradle)
-**Apache:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "2.19.0"```
+**Apache:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "2.20.0"```
 
-**OkHttp:** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "2.19.0"```
+**OkHttp:** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "2.20.0"```
 
 ### About
 Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC:

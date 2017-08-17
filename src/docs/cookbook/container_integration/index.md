@@ -2,9 +2,9 @@ This example shows how to both how to serve an application HttpHandler using an 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.19.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "2.19.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.19.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.20.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "2.20.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "2.20.0"
 ```
 
 ### Code
