@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
 
+
 abstract class TemplatesContract(private val templates: Templates) {
 
     private val items = listOf(
@@ -18,6 +19,12 @@ abstract class TemplatesContract(private val templates: Templates) {
         checkAtRoot(renderer)
         checkNonExistent(renderer)
     }
+
+//    @Test
+//    fun `caching classpath not at root`() {
+//        val renderer = templates.CachingClasspath("org.http4k.template")
+//        assertThat(renderer(OnClasspathNotAtRoot(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+//    }
 
     @Test
     fun `caching file-based`() {

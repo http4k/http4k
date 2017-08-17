@@ -1,0 +1,1 @@
+<ul><li th:each="item: ${model.items}">Name:<span th:text="${item.name}">test</span>Price:<span th:text="${item.price}">1234</span><ul><li th:each="feature: ${item.features}">Feature:<span th:text="${feature.description}">test</span></li></ul></li></ul>

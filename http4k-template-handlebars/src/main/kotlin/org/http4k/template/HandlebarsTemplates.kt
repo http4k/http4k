@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { it }) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String) = object : TemplateRenderer {
         private val classToTemplate = ConcurrentHashMap<Class<*>, Template>()
-        private val handlebars = configure(Handlebars(ClassPathTemplateLoader(baseClasspathPackage)))
+        private val handlebars = configure(Handlebars(ClassPathTemplateLoader("/" + baseClasspathPackage.replace('.', '/'))))
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
