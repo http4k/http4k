@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.20.0
+- Fixed #30 - CachingClasspath template ResourceLoader not working with non-root packages.
+
 ### v2.19.0
 - Fixed #29 - webdriver submission of text area.
 - Http clients now use a new instance of the default for each instantiation. Previously there was a shared instance.
