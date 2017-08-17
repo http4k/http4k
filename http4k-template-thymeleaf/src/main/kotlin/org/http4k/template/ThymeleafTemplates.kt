@@ -13,7 +13,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         val templateEngine = TemplateEngine()
         val loader = ClassLoaderTemplateResolver()
-        loader.prefix = baseClasspathPackage
+        loader.prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
         templateEngine.setTemplateResolver(loader)
         return ThymeleafTemplateRenderer(configure(templateEngine))
     }
