@@ -20,11 +20,11 @@ abstract class TemplatesContract(private val templates: Templates) {
         checkNonExistent(renderer)
     }
 
-//    @Test
-//    fun `caching classpath not at root`() {
-//        val renderer = templates.CachingClasspath("org.http4k.template")
-//        assertThat(renderer(OnClasspathNotAtRoot(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
-//    }
+    @Test
+    fun `caching classpath not at root`() {
+        val renderer = templates.CachingClasspath("org.http4k.template")
+        assertThat(renderer(OnClasspathNotAtRoot(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+    }
 
     @Test
     fun `caching file-based`() {

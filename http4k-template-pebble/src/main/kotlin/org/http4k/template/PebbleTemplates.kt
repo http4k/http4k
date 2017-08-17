@@ -22,7 +22,7 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
 
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         val loader = ClasspathLoader()
-        loader.prefix = if (baseClasspathPackage.isEmpty()) "." else baseClasspathPackage
+        loader.prefix = if (baseClasspathPackage.isEmpty()) "." else "./" + baseClasspathPackage.replace('.', '/')
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().loader(loader)).build())
     }
 
