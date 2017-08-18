@@ -18,6 +18,8 @@ interface RoutingHttpHandler : Router, HttpHandler {
     fun withBasePath(new: String): RoutingHttpHandler
 }
 
+fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
+
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
     override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(Status.NOT_FOUND.description("Route not found"))
 

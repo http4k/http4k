@@ -20,7 +20,7 @@ class RoutingTest {
 
     @Test
     fun `not found`() {
-        val routes = routes()
+        val routes = routes("/a/b" bind GET to { Response(OK) })
 
         val response = routes(Request(GET, "/a/something"))
 
@@ -57,7 +57,11 @@ class RoutingTest {
             "/b/c" bind routes(
                 "/d" bind GET to { Response(OK).body("matched b/c/d") },
                 "/e" bind routes(
-                    "/f" bind GET to { Response(OK).body("matched b/c/e/f") }
+                    "/f" bind GET to { Response(OK).body("matched b/c/e/f") },
+                    "/g" bind routes(
+                        GET to { _: Request -> Response(OK).body("matched b/c/e/g/GET") },
+                        POST to { _: Request -> Response(OK).body("matched b/c/e/g/POST") }
+                    )
                 ),
                 "/" bind GET to { Response(OK).body("matched b/c") }
             )
@@ -67,7 +71,9 @@ class RoutingTest {
         assertThat(routes(Request(GET, "/b/c/d")).bodyString(), equalTo("matched b/c/d"))
         assertThat(routes(Request(GET, "/b/c")).bodyString(), equalTo("matched b/c"))
         assertThat(routes(Request(GET, "/b/c/e/f")).bodyString(), equalTo("matched b/c/e/f"))
-        assertThat(routes(Request(GET, "/b/c/e/g")).status, equalTo(NOT_FOUND))
+        assertThat(routes(Request(GET, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/GET"))
+        assertThat(routes(Request(POST, "/b/c/e/g")).bodyString(), equalTo("matched b/c/e/g/POST"))
+        assertThat(routes(Request(GET, "/b/c/e/h")).status, equalTo(NOT_FOUND))
         assertThat(routes(Request(GET, "/b")).status, equalTo(NOT_FOUND))
         assertThat(routes(Request(GET, "/b/e")).status, equalTo(NOT_FOUND))
     }
