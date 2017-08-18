@@ -2,20 +2,34 @@
 
 package org.http4k.core
 
+import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.version
+import java.io.InputStream
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
 
-data class Body(val payload: ByteBuffer) {
-    constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
-
-    override fun toString(): String = String(payload.array())
+interface Body {
+    val stream: InputStream;
+    val payload: ByteBuffer;
 
     companion object {
-        val EMPTY = Body("")
+        operator fun invoke(value: String):Body = MemoryBody(value)
+        operator fun invoke(payload: ByteBuffer):Body = MemoryBody(payload)
+        val EMPTY:Body = MemoryBody("")
     }
+}
+
+data class MemoryBody(override val payload: ByteBuffer) : Body {
+    constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+    override val stream: InputStream get() = payload.array().inputStream()
+    override fun toString(): String = payload.asString()
+}
+
+class StreamBody(override val stream: InputStream) : Body {
+    override val payload: ByteBuffer by lazy { ByteBuffer.wrap(stream.readBytes()) }
+    override fun toString(): String = String(payload.array())
 }
 
 interface HttpMessage {

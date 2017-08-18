@@ -50,7 +50,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-        val responseBody = wrappedBuffer(body.payload)
+        val responseBody = wrappedBuffer(ByteBuffer.wrap(body.stream.readBytes()))
         val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), responseBody)
         headers.forEach { (key, value) -> res.headers().set(key, value) }
         return res

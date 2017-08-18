@@ -9,7 +9,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import java.nio.ByteBuffer
-import java.nio.channels.Channels
 import java.util.*
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -25,7 +24,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        source.body.let { Channels.newChannel(destination.outputStream).write(it.payload) }
+        source.body.stream.copyTo(destination.outputStream)
     }
 
     private fun HttpServletRequest.asServletRequest(): Request =

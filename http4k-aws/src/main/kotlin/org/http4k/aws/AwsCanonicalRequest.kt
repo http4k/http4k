@@ -39,7 +39,7 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .sorted()
                 .joinToString("&")
 
-        private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.payload.array())
+        private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.toString().toByteArray())
 
         private fun Uri.normalisedPath() = if(path.isBlank()) "/" else path.split("/").map { it.urlEncoded() }.joinToString("/")
     }

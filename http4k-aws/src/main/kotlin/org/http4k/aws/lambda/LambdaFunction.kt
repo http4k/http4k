@@ -1,11 +1,6 @@
 package org.http4k.aws.lambda
 
-import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Uri
-import org.http4k.core.toUrlEncoded
+import org.http4k.core.*
 
 /**
  * This is the main entry point for the lambda. It uses the local environment
@@ -21,7 +16,7 @@ internal fun Response.asApiGateway() = ApiGatewayProxyResponse(status.code, head
 
 internal fun ApiGatewayProxyRequest.asHttp4k() = (headers ?: emptyMap()).toList().fold(
     Request(Method.valueOf(httpMethod), uri())
-        .body(body?.let(::Body) ?: Body.EMPTY)) { memo, (first, second) ->
+        .body(body?.let(::MemoryBody) ?: Body.EMPTY)) { memo, (first, second) ->
     memo.header(first, second)
 }
 

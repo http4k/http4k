@@ -12,12 +12,7 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils.toByteArray
-import org.http4k.core.Body
-import org.http4k.core.Headers
-import org.http4k.core.HttpHandler
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.*
 import java.net.URI
 import java.nio.ByteBuffer
 
@@ -46,7 +41,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun HttpEntity.toTarget(): Body = Body(ByteBuffer.wrap(toByteArray(this)))
+    private fun HttpEntity.toTarget(): Body = StreamBody(content)
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 

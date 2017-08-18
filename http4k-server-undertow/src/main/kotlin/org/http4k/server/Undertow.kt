@@ -12,6 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 
@@ -26,7 +27,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         headers.forEach {
             exchange.responseHeaders.put(HttpString(it.first), it.second)
         }
-        exchange.responseSender.send(body.payload)
+        exchange.responseSender.send(ByteBuffer.wrap(body.stream.readBytes()))
     }
 
     private fun HttpServerExchange.asRequest(): Request {

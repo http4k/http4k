@@ -37,7 +37,7 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
 private fun HttpExchange.populate(httpResponse: Response) {
     httpResponse.headers.forEach { (key, value) -> responseHeaders.add(key, value) }
     sendResponseHeaders(httpResponse.status.code, 0)
-    Channels.newChannel(responseBody).write(httpResponse.body.payload)
+    Channels.newChannel(responseBody).write(ByteBuffer.wrap(httpResponse.body.stream.readBytes()))
 }
 
 private fun HttpExchange.toRequest(): Request {
