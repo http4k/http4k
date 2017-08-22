@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 
 set -e
 set -o errexit
@@ -18,7 +18,7 @@ fi
 
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew -PreleaseVersion=$LOCAL_VERSION clean build \
+./gradlew -PreleaseVersion=$LOCAL_VERSION clean assemble \
     :http4k-aws:bintrayUpload \
     :http4k-core:bintrayUpload \
     :http4k-contract:bintrayUpload \
