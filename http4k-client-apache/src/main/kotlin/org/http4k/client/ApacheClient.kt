@@ -8,13 +8,11 @@ import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpRequestBase
-import org.apache.http.entity.ByteArrayEntity
+import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.apache.http.util.EntityUtils.toByteArray
 import org.http4k.core.*
 import java.net.URI
-import java.nio.ByteBuffer
 
 class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient()) : HttpHandler {
 
@@ -31,7 +29,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
             init {
                 val request = this@toApacheRequest
                 uri = URI(request.uri.toString())
-                entity = ByteArrayEntity(request.bodyString().toByteArray())
+                entity = InputStreamEntity(request.body.stream)
                 request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
             }
 
