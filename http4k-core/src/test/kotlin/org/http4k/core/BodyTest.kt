@@ -28,4 +28,14 @@ class BodyTest {
         String(Body("abc").stream.readBytes()).shouldMatch(equalTo("abc"))
     }
 
+    @Test
+    fun `stream body allow for equality by consuming its stream`(){
+        Body("abc".byteInputStream()).shouldMatch(equalTo(Body("abc".byteInputStream())))
+    }
+
+    @Test
+    fun `stream body generates consistent hashing by consuming its stream`(){
+        Body("abc".byteInputStream()).hashCode().shouldMatch(equalTo(Body("abc".byteInputStream()).hashCode()))
+    }
+
 }

@@ -15,23 +15,33 @@ interface Body {
     val payload: ByteBuffer;
 
     companion object {
-        operator fun invoke(value: String):Body = MemoryBody(value)
-        operator fun invoke(payload: ByteBuffer):Body = MemoryBody(payload)
-        operator fun invoke(stream: InputStream):Body = StreamBody(stream)
+        operator fun invoke(body: String): Body = MemoryBody(body)
+        operator fun invoke(body: ByteBuffer): Body = MemoryBody(body)
+        operator fun invoke(body: InputStream): Body = StreamBody(body)
 
-        val EMPTY:Body = MemoryBody("")
+        val EMPTY: Body = MemoryBody("")
     }
 }
 
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+
     override val stream: InputStream get() = payload.array().inputStream()
     override fun toString(): String = payload.asString()
 }
 
 class StreamBody(override val stream: InputStream) : Body {
     override val payload: ByteBuffer by lazy { ByteBuffer.wrap(stream.readBytes()) }
+
     override fun toString(): String = String(payload.array())
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Body?) return false
+        return payload == other?.payload
+    }
+
+    override fun hashCode(): Int = payload.hashCode()
 }
 
 interface HttpMessage {
