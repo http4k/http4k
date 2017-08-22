@@ -1,14 +1,6 @@
 package org.http4k.servlet
 
-import org.http4k.core.Body
-import org.http4k.core.Headers
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Parameters
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Uri
-import java.nio.ByteBuffer
+import org.http4k.core.*
 import java.util.*
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -30,7 +22,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     private fun HttpServletRequest.asServletRequest(): Request =
         headerParameters().fold(
             Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-                .body(Body(ByteBuffer.wrap(inputStream.readBytes())))) {
+                .body(inputStream)) {
             memo, (first, second) ->
             memo.header(first, second)
         }

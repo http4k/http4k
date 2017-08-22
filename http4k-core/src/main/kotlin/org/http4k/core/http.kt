@@ -52,6 +52,8 @@ interface HttpMessage {
 
     fun body(body: String): HttpMessage
 
+    fun body(body: InputStream): HttpMessage
+
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
     fun bodyString(): String = body.toString()
@@ -85,6 +87,8 @@ interface Request : HttpMessage {
 
     override fun body(body: String): Request
 
+    override fun body(body: InputStream): Request
+
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
@@ -112,6 +116,8 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun body(body: String) = copy(body = Body(body))
 
+    override fun body(body: InputStream) = copy(body = Body(body))
+
     override fun toString(): String = toMessage()
 
 }
@@ -128,6 +134,8 @@ interface Response : HttpMessage {
     override fun body(body: Body): Response
 
     override fun body(body: String): Response
+
+    override fun body(body: InputStream): Response
 
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
@@ -146,6 +154,8 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun body(body: Body) = copy(body = body)
 
     override fun body(body: String) = copy(body = Body(body))
+
+    override fun body(body: InputStream) = copy(body = Body(body))
 
     override fun toString(): String = toMessage()
 }
