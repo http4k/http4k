@@ -17,6 +17,8 @@ interface Body {
     companion object {
         operator fun invoke(value: String):Body = MemoryBody(value)
         operator fun invoke(payload: ByteBuffer):Body = MemoryBody(payload)
+        operator fun invoke(stream: InputStream):Body = StreamBody(stream)
+
         val EMPTY:Body = MemoryBody("")
     }
 }
