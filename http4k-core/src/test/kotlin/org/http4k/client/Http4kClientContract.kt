@@ -16,12 +16,17 @@ import org.http4k.filter.ClientFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
+import org.http4k.util.RetryRule
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
 abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler) {
+    @Rule
+    @JvmField var retryRule = RetryRule(5)
+
     private var server: Http4kServer? = null
 
     private val port = Random().nextInt(1000) + 8000

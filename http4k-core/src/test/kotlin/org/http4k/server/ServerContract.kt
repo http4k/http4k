@@ -14,13 +14,18 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.util.RetryRule
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler) {
     private var server: Http4kServer? = null
+
+    @Rule
+    @JvmField var retryRule = RetryRule(5)
 
     private val port = Random().nextInt(1000) + 8000
 
