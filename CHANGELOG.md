@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.20.1
+- Fixed #31 - Matching of segments in URIs is done after URLs are decoded, which results in not capturing encoded slashes in the path segments.
+
 ### v2.20.0
 - Fixed #30 - CachingClasspath template ResourceLoader not working with non-root packages.
 

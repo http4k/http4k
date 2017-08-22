@@ -101,8 +101,15 @@ class UriTemplateTest {
         assertThat(template.generate(pathParameters(pair("id", "foo"))), equalTo("path/foo"))
     }
 
-    fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
+    @Test
+    fun doesNotDecodeSlashesWhenCapturing() {
+        val extracted = from("path/{first}/{second}").extract("path/1%2F2/3")
+        assertThat(extracted.getValue("first"), equalTo("1/2"))
+        assertThat(extracted.getValue("second"), equalTo("3"))
+    }
 
-    fun pair(v1: String, v2: String) = v1 to v2
+    private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
+
+    private fun pair(v1: String, v2: String) = v1 to v2
 }
 
