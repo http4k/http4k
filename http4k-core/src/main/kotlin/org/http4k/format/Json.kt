@@ -7,7 +7,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.ContentNegotiation.Companion.NonStrict
+import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.root
@@ -61,12 +61,12 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun compact(node: ROOT): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
-    fun body(description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ROOT> =
+    fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> =
         root(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
             .map(ByteBuffer::asString, String::asByteBuffer)
             .map({ parse(it) }, { compact(it) })
 
-    fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = NonStrict): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
+    fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
 }
 
 enum class JsonType {

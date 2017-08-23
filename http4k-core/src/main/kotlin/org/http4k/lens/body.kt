@@ -7,7 +7,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.with
-import org.http4k.lens.ContentNegotiation.Companion.NonStrict
+import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -140,16 +140,16 @@ interface ContentNegotiation {
     }
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
     = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
 
-fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
+fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
     = string(contentType, description, contentNegotiation).map(::nonEmpty, { it })
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
     = root(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
 
-fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict) =
+fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
     pattern.toRegex().let { regex ->
         string(contentType, description, contentNegotiation).map({ regex.matchEntire(it)?.groupValues?.get(group)!! }, { it })
     }

@@ -26,7 +26,7 @@ class BodyTest {
 
     @Test
     fun `can get regex body`() {
-        val regexBody = Body.regex("bob(.+)alice", contentNegotiation = ContentNegotiation.None).toLens()
+        val regexBody = Body.regex("bob(.+)alice").toLens()
         assertThat(regexBody(emptyRequest.body("bobritaalice")), equalTo("rita"))
         assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith(Meta(true, "body", ParamMeta.StringParam, "body").invalid())))
     }
