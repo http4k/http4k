@@ -7,8 +7,8 @@ This contract example shows:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.21.1"
-    compile group: "org.http4k", name: "http4k-contract", version: "2.21.1"
+    compile group: "org.http4k", name: "http4k-core", version: "2.21.2"
+    compile group: "org.http4k", name: "http4k-contract", version: "2.21.2"
 ```
 
 ### Code
