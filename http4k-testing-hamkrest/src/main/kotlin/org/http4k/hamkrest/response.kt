@@ -8,7 +8,7 @@ import org.http4k.core.Status
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookies
 
-fun hasStatus(expected: Status) = has(Response::status, equalTo(expected))
+fun hasStatus(expected: Status): Matcher<Response> = has(Response::status, equalTo(expected))
 
 fun hasSetCookie(expected: Cookie): Matcher<Response> = hasSetCookie(expected.name, equalTo(expected))
 

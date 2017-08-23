@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.21.2
+- Fixed Hamkrest matchers to be on HttpMessage and not Http Request.
+
 ### v2.21.1
 - Default body Content Negotiation strategy changed to None
 
