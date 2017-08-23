@@ -7,7 +7,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.with
-import org.http4k.lens.ContentNegotiation.NonStrict
+import org.http4k.lens.ContentNegotiation.Companion.NonStrict
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
@@ -99,23 +99,45 @@ internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNe
 /**
  * Modes for determining if a passed content type is acceptable.
  */
-enum class ContentNegotiation {
-    Strict {
-        override fun invoke(expected: ContentType, actual: ContentType?) {
-            if (actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
-        }
-    },
-    NonStrict {
-        override fun invoke(expected: ContentType, actual: ContentType?) {
-            if (actual != null && actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
-        }
-    },
-    None {
-        override fun invoke(expected: ContentType, actual: ContentType?) {}
-    };
+interface ContentNegotiation {
 
     @Throws(LensFailure::class)
-    abstract operator fun invoke(expected: ContentType, actual: ContentType?)
+    operator fun invoke(expected: ContentType, actual: ContentType?)
+
+    companion object {
+        /**
+         * The received Content-type header passed back MUST equal the expected Content-type, including directive
+         */
+        val Strict = object : ContentNegotiation {
+            override fun invoke(expected: ContentType, actual: ContentType?) {
+                if (actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+            }
+        }
+        /**
+         * The received Content-type header passed back MUST equal the expected Content-type, not including the directive
+         */
+        val StrictNoDirective = object : ContentNegotiation {
+            override fun invoke(expected: ContentType, actual: ContentType?) {
+                if (expected.value != actual?.value) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+            }
+        }
+
+        /**
+         * If present, the received Content-type header passed back MUST equal the expected Content-type, including directive
+         */
+        val NonStrict = object : ContentNegotiation {
+            override fun invoke(expected: ContentType, actual: ContentType?) {
+                if (actual != null && actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+            }
+        }
+
+        /**
+         * No validation is done on the received content type at all
+         */
+        val None = object : ContentNegotiation {
+            override fun invoke(expected: ContentType, actual: ContentType?) {}
+        }
+    }
 }
 
 fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = NonStrict)

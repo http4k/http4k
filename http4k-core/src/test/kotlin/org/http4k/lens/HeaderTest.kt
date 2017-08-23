@@ -3,7 +3,9 @@ package org.http4k.lens
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
+import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -85,4 +87,28 @@ class HeaderTest {
         assertThat(Header.multi.required("hello").toString(), equalTo("Required header 'hello'"))
         assertThat(Header.multi.optional("hello").toString(), equalTo("Optional header 'hello'"))
     }
+
+    @Test
+    fun `content type serialises and deserialises correctly to message - with directive`() {
+        val lens = Header.Common.CONTENT_TYPE
+        val reqWithHeader = Request(GET, "").with(lens of ContentType.TEXT_HTML)
+        reqWithHeader.header("Content-Type") shouldMatch equalTo("text/html; charset=utf-8")
+        lens(reqWithHeader) shouldMatch equalTo(ContentType.TEXT_HTML)
+    }
+
+    @Test
+    fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
+        val lens = Header.Common.CONTENT_TYPE
+        val reqWithHeader = Request(GET, "").header("Content-Type", "bob ; foomanchu")
+        lens(reqWithHeader) shouldMatch equalTo(ContentType("bob"))
+    }
+
+    @Test
+    fun `content type serialises and deserialises correctly to message - no directive`() {
+        val lens = Header.Common.CONTENT_TYPE
+        val reqWithHeader = Request(GET, "").with(lens of ContentType("value"))
+        reqWithHeader.header("Content-Type") shouldMatch equalTo("value")
+        lens(reqWithHeader) shouldMatch equalTo(ContentType("value"))
+    }
+
 }

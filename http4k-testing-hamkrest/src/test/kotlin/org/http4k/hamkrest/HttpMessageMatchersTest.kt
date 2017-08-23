@@ -28,7 +28,7 @@ class HttpMessageMatchersTest {
         }
 
     @Test
-    fun `content type`() = assertMatchAndNonMatch(Request(GET, "/").header("Content-Type", "application/json"), hasContentType(APPLICATION_JSON), hasContentType(APPLICATION_FORM_URLENCODED))
+    fun `content type`() = assertMatchAndNonMatch(Request(GET, "/").header("Content-Type", "application/json; charset=utf-8"), hasContentType(APPLICATION_JSON), hasContentType(APPLICATION_FORM_URLENCODED))
 
     @Test
     fun `body string`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))

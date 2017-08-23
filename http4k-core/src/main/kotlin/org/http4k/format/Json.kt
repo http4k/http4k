@@ -7,7 +7,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.ContentNegotiation.NonStrict
+import org.http4k.lens.ContentNegotiation.Companion.NonStrict
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.root
