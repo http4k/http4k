@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v2.21.0 (uncut)
-- Converted Content-Negotiation strategy from an Enum to an interface, so that users can define their own strategies. We also now check encoding.
+- Converted Content-Negotiation strategy from an Enum to an interface, so that users can define their own strategies. We also now check encoding so there are 4-built in strategies to choose from: Strict, StrictNoDirective, NonStrict and None.
 
 ### v2.20.1
 - Fixed #31 - Matching of segments in URIs is done after URLs are decoded, which results in not capturing encoded slashes in the path segments.

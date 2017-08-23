@@ -4,9 +4,11 @@ import java.nio.charset.Charset
 
 data class ContentType(val value: String, val directive: Pair<String, String>? = null) {
 
+    fun toHeaderValue() = value + (directive?.let { "; ${it.first}=${it.second}" } ?: "")
+
     companion object {
 
-        fun Text(value: String, charset: Charset? = Charsets.UTF_8) = ContentType(value, charset?.let { "charset" to charset.name() })
+        fun Text(value: String, charset: Charset? = Charsets.UTF_8) = ContentType(value, charset?.let { "charset" to charset.name().toLowerCase() })
         fun MultipartForm(boundary: String): ContentType = ContentType("multipart/form-data", "boundary" to boundary)
 
         val APPLICATION_JSON = Text("application/json")

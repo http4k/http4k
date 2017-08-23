@@ -21,7 +21,7 @@ class BodyTest {
     fun `can get string body when lax`() {
         val laxContentType = Body.string(TEXT_PLAIN).toLens()
         assertThat(laxContentType(emptyRequest.body("some value")), equalTo("some value"))
-        assertThat(laxContentType(emptyRequest.header("Content-type", TEXT_PLAIN.value).body("some value")), equalTo("some value"))
+        assertThat(laxContentType(emptyRequest.header("Content-type", TEXT_PLAIN.toHeaderValue()).body("some value")), equalTo("some value"))
     }
 
     @Test
@@ -43,19 +43,19 @@ class BodyTest {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
-        strictBody(emptyRequest.header("content-type", "text/bob;  charset  = utf-8  ").body("some value")) shouldMatch equalTo("some value")
+        strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")) shouldMatch equalTo("some value")
     }
 
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() {
         val strictNoDirectiveBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.StrictNoDirective).toLens()
         assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
-        strictNoDirectiveBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) shouldMatch equalTo("some value")
+        strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")) shouldMatch equalTo("some value")
     }
 
     @Test
     fun `rejects invalid content type when ContentNegotiation NonStrict`() {
-        val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
+        val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.NonStrict).toLens()
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
         strictBody(emptyRequest.body("some value")) shouldMatch equalTo("some value")
     }
@@ -99,7 +99,7 @@ class BodyTest {
     fun `can create a one way custom Body type`() {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType).toLens()
         assertThat(customBody(emptyRequest
-            .header("Content-type", TEXT_PLAIN.value)
+            .header("Content-type", TEXT_PLAIN.toHeaderValue())
             .body("hello world!")), equalTo(MyCustomBodyType("hello world!")))
     }
 }
