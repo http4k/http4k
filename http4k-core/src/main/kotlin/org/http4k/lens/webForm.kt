@@ -6,7 +6,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toUrlEncoded
-import org.http4k.lens.ContentNegotiation.Strict
+import org.http4k.lens.ContentNegotiation.Companion.Strict
 import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer

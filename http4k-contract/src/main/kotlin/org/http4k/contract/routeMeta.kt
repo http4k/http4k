@@ -11,13 +11,13 @@ import org.http4k.lens.Header
 
 data class Tag(val name: String, val description: String? = null)
 
-data class RouteMeta private constructor(val summary: String,
-                                         val description: String?,
-                                         val request: Request? = null,
-                                         val tags: Set<Tag> = emptySet(),
-                                         val produces: Set<ContentType> = emptySet(),
-                                         val consumes: Set<ContentType> = emptySet(),
-                                         val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
+data class RouteMeta(val summary: String,
+                     val description: String?,
+                     val request: Request? = null,
+                     val tags: Set<Tag> = emptySet(),
+                     val produces: Set<ContentType> = emptySet(),
+                     val consumes: Set<ContentType> = emptySet(),
+                     val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
 
     constructor(name: String = "<unknown>", description: String? = null) : this(name, description, null)
 
