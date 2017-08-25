@@ -38,7 +38,7 @@ class JacksonXmlTest {
     }
 
     @Test
-    fun `roundtrip simple bean as Xml`() {
+    fun `convert XML to simple bean`() {
         val body = Body.auto<SimpleBean>().toLens()
         assertThat(body(Response(Status.OK).body(beforeXml)), equalTo(SimpleBean(1, true)))
     }
