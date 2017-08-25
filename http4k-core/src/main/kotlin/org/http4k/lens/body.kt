@@ -87,7 +87,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
     }
 }
 
-internal fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) =
+fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) =
     BiDiBodyLensSpec(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
