@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.22.0
+- Added `http4k-format-jackson-xml` module, with auto data class marshalling.
+
 ### v2.21.2
 - Fixed Hamkrest matchers to be on HttpMessage and not Http Request.
 
