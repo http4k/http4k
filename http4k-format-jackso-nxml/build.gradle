@@ -1,0 +1,12 @@
+description = 'Http4k Jackson XML support'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0'
+
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile testing
+}

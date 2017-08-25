@@ -9,6 +9,7 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.ContentNegotiation
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
@@ -72,7 +73,7 @@ open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElem
     inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
     inline fun <reified T : Any> JsonElement.asA(): T = asA(this, T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null): BiDiBodyLensSpec<T> = Body.json(description).map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 object Gson : ConfigurableGson(GsonBuilder().serializeNulls())
