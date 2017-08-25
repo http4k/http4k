@@ -1,4 +1,4 @@
-description = 'Http4k Argo JSON support'
+description = 'Http4k Jackson JSON support'
 
 dependencies {
     provided kotlin_lib
