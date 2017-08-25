@@ -8,6 +8,7 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.BodyLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -34,6 +35,8 @@ open class ConfigurableJacksonXml(val mapper: XmlMapper) {
         return writer.toString()
     }
 
+    fun <IN> BiDiLensSpec<IN, String, String>.xml() = this.map({ it.asXmlNode() }, { it.asXmlString() })
+
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Node> =
         baseBody(description, contentNegotiation).map({ it.asXmlNode() }, { it.asXmlString() })
@@ -44,7 +47,7 @@ open class ConfigurableJacksonXml(val mapper: XmlMapper) {
 
 }
 
-fun baseBody(description: String?, contentNegotiation: ContentNegotiation) = root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+fun baseBody(description: String?, contentNegotiation: ContentNegotiation): BiDiBodyLensSpec<String> = root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
     .map(ByteBuffer::asString, String::asByteBuffer)
 
 object JacksonXml : ConfigurableJacksonXml(XmlMapper().let {

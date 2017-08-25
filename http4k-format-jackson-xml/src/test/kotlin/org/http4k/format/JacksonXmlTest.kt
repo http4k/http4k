@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -11,6 +12,7 @@ import org.http4k.format.JacksonXml.asXmlNode
 import org.http4k.format.JacksonXml.asXmlString
 import org.http4k.format.JacksonXml.auto
 import org.http4k.format.JacksonXml.xml
+import org.http4k.lens.Query
 import org.junit.Test
 
 data class SimpleBean(val x: Int?, val y: Boolean?)
@@ -40,4 +42,15 @@ class JacksonXmlTest {
         val body = Body.auto<SimpleBean>().toLens()
         assertThat(body(Response(Status.OK).body(beforeXml)), equalTo(SimpleBean(1, true)))
     }
+
+    @Test
+    fun `random lens supports XML marshalling`() {
+        val xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><SomeXml/>"
+        val original = Request(GET, "/").query("foo", xmlString)
+        val lens = Query.xml().required("foo")
+        val out = lens(original)
+        out.asXmlString() shouldMatch equalTo(xmlString)
+        lens(out, Request(GET, "/")) shouldMatch equalTo(original)
+    }
+
 }
