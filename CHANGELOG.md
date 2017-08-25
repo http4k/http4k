@@ -6,7 +6,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Fixed 36: Form entry is too strict with content encoding
 
 ### v2.22.0
-- Added `http4k-format-jackson-xml` module, with auto data class marshalling.
+- Added `http4k-format-jackson-xml` module, with auto data class marshalling (outbound only).
 - Upgrade several dependencies
 
 ### v2.21.2
