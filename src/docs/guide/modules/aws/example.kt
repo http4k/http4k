@@ -14,7 +14,7 @@ import java.util.*
 
 fun main(args: Array<String>) {
 
-    val region = "US-East1"
+    val region = "us-east-1"
     val service = "S3"
     val accessKey = "myGreatAwsAccessKey"
     val secretKey = "myGreatAwsSecretKey"
@@ -36,17 +36,17 @@ fun main(args: Array<String>) {
     val key = UUID.randomUUID().toString()
 
     val keyUri = Uri.of("https://$bucketName.s3.amazonaws.com/$key")
-    println(Request(PUT, keyUri).body("some amazing content that I want stored on S3"))
+    println(client(Request(PUT, keyUri).body("some amazing content that I want stored on S3")))
 
     // get the keys in the bucket
-    println(Request(GET, bucketUri))
+    println(client(Request(GET, bucketUri)))
 
     // get the contents of the key in the bucket
-    println(Request(GET, keyUri))
+    println(client(Request(GET, keyUri)))
 
     // delete the key in the bucket
-    println(Request(GET, keyUri))
+    println(client(Request(GET, keyUri)))
 
     // delete the bucket
-    println(Request(GET, bucketUri))
+    println(client(Request(GET, bucketUri)))
 }
