@@ -8,4 +8,4 @@ This example shows how to both how to serve an application HttpHandler using an 
 ```
 
 ### Code
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration/example.kt"></script>

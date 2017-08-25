@@ -25,7 +25,7 @@ The following process is followed to us to the final state, whilst always allowi
 
 
 ## Production:
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/project.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/project.kt"></script>
 
 ## Tests:
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/tests.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/tests.kt"></script>

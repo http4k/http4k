@@ -20,4 +20,4 @@ A basic Selenium WebDriver API implementation for **http4k** HttpHandlers, which
 
 Use the API like any other WebDriver implementation, by simply passing your app HttpHandler to construct it:
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/webdriver/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/webdriver/example.kt"></script>

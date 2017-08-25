@@ -10,7 +10,7 @@ These modules add the ability to use JSON as a first-class citizen when reading 
 standard methods and extension methods for converting common types into native JSON objects, including custom Lens methods for each library so that 
 JSON node objects can be written and read directly from HTTP messages:
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/example.kt"></script>
 
 ### Auto-marshalling capabilities
 
@@ -18,7 +18,7 @@ Some of the JSON message libraries (eg. GSON and Jackson) provide the mechanism 
 
 We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses*:
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/auto.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/auto.kt"></script>
 
 #### Important note regarding JSON arrays
 When handling raw JSON array messages, such as: `[123, 456, 567]`, there is a slight gotcha when auto-marshalling messages from JSON.
@@ -27,5 +27,5 @@ This is demonstrated by the following, where you can see that the output of the 
 
 As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLens()` instead, and then compare using `Arrays.equal()`
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/list_gotcha.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/list_gotcha.kt"></script>
 

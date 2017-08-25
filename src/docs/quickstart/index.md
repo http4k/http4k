@@ -13,7 +13,7 @@ dependencies {
 
 The following creates a simple endpoint, binds it to a Jetty server then starts, queries, and stops it.
 
-<script src="http://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/quickstart/example.kt"></script>
 
 
 ## Single-line CD Bootstrap
