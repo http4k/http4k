@@ -9,6 +9,7 @@ import org.http4k.format.Xml.asCleanedJsonNode
 import java.io.PrintStream
 import java.util.*
 
+@Deprecated("Due to limitations with the underlying conversion mechanism which means it doesn't support list types. Alternative approach needed to provide full support for data class conversion.")
 class GenerateXmlDataClasses(out: PrintStream = System.out,
                              idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
 

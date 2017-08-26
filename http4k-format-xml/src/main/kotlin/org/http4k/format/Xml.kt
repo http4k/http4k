@@ -43,14 +43,14 @@ open class ConfigurableJacksonXml(val mapper: XmlMapper) {
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Node> =
-        baseBody(description, contentNegotiation).map({ it.asXmlNode() }, { it.asXmlString() })
+        root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+            .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlNode() }, { it.asXmlString() })
 
+    @Deprecated("Due to limitations with the underlying conversion mechanism which means it doesn't support list types. Alternative approach needed to provide full support for data class conversion.")
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BodyLensSpec<T> =
-        baseBody(description, contentNegotiation).map({ it.asA<T>() })
+        root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+            .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asA<T>() })
 }
-
-fun baseBody(description: String?, contentNegotiation: ContentNegotiation): BiDiBodyLensSpec<String> = root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
-    .map(ByteBuffer::asString, String::asByteBuffer)
 
 fun JsonNode.clean(): JsonNode {
     if(this.isObject) {

@@ -2,18 +2,21 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.23.2
+- Deprecated methods in XML support due to limitation with underlying Jackson implementation.
+
 ### v2.23.1
-- Fixed bug with GenerateXmlDataClasses filter.
+- Fixed bug with GenerateXmlDataClasses filter
 
 ### v2.23.0
 - Renamed `http4k-format-jackson-xml` module to `http4k-format-xml`.
 - Improved XML unmarshalling support.
 
 ### v2.22.1
-- Fixed 36: Form entry is too strict with content encoding
+- Fixed 36: Form entry is too strict with content encoding.
 
 ### v2.22.0
-- Added `http4k-format-jackson-xml` module, with auto data class marshalling (outbound only).
+- Added `http4k-format-jackson-xml` module, with XML parsing support.
 - Upgrade several dependencies
 
 ### v2.21.2
