@@ -26,7 +26,9 @@ import javax.xml.transform.stream.StreamResult
 
 open class ConfigurableJacksonXml(val mapper: XmlMapper) {
 
-    inline fun <reified T : Any> String.asA(): T = mapper.convertValue(mapper.readTree(this).clean(), T::class.java)
+    inline fun <reified T : Any> String.asA(): T = mapper.convertValue(asCleanedJsonNode(), T::class.java)
+
+    fun String.asCleanedJsonNode() = mapper.readTree(this).clean()
 
     fun String.asXmlNode(): Node = mapper.convertValue(this, Node::class.java)
 

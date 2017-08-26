@@ -5,7 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Jackson
-import org.http4k.format.Xml
+import org.http4k.format.Xml.asCleanedJsonNode
 import java.io.PrintStream
 import java.util.*
 
@@ -15,7 +15,7 @@ class GenerateXmlDataClasses(out: PrintStream = System.out,
     private val chains = GenerateDataClasses(Jackson, out, idGenerator).then(Filter { next ->
         {
             val originalResponse = next(it)
-            originalResponse.with(Jackson.body().toLens() of (Xml.mapper.readTree(originalResponse.bodyString())))
+            originalResponse.with(Jackson.body().toLens() of (originalResponse.bodyString().asCleanedJsonNode()))
         }
     })
 
