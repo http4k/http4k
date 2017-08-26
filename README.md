@@ -35,7 +35,7 @@ plugging together of services without HTTP container being required.
     * Pluggable HTTP client adapters for Apache and OkHttp
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp
     * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
-    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling)
+    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling) and XML (includes auto-marshalling)
     * Templating support: Caching and Hot-Reload engine support for Handlebars
     * AWS request signing: super-simple interactions with AWS services
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
@@ -79,6 +79,7 @@ plugging together of services without HTTP container being required.
         * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo** - lightweight Java JSON API with zero dependencies.
+        * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 

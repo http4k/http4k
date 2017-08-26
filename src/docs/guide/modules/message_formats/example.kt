@@ -2,6 +2,8 @@ package guide.modules.message_formats
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.Body
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
@@ -11,6 +13,8 @@ import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.asJsonValue
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.json
+import org.http4k.format.Xml.xml
+import org.w3c.dom.Node
 
 // Extension method API:
 val json = Jackson
@@ -22,7 +26,7 @@ val objectUsingExtensionFunctions: JsonNode =
         "thisIsAList" to listOf(true.asJsonValue()).asJsonArray()
     ).asJsonObject()
 
-val s = objectUsingExtensionFunctions.asPrettyJsonString()
+val jsonString: String = objectUsingExtensionFunctions.asPrettyJsonString()
 
 // Direct JSON library API:
 val objectUsingDirectApi: JsonNode = json.obj(
@@ -34,3 +38,7 @@ val objectUsingDirectApi: JsonNode = json.obj(
 val response = Response(Status.OK).with(
     Body.json().toLens() of json.array(listOf(objectUsingDirectApi, objectUsingExtensionFunctions))
 )
+
+val xmlLens = Body.xml().toLens()
+
+val xmlNode: Node = xmlLens.extract(Request(GET, "").body("<xml/>"))
