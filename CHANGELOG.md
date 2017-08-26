@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.23.3
+- New algorithm for XML data class deserialisation, so un-deprecated XML methods.
+
 ### v2.23.2
 - Deprecated methods in XML support due to limitation with underlying Jackson implementation.
 

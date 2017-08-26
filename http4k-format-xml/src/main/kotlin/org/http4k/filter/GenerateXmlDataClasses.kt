@@ -5,18 +5,17 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Jackson
-import org.http4k.format.Xml.asCleanedJsonNode
+import org.http4k.format.Xml.asXmlToJsonNode
 import java.io.PrintStream
 import java.util.*
 
-@Deprecated("Due to limitations with the underlying conversion mechanism which means it doesn't support list types. Alternative approach needed to provide full support for data class conversion.")
 class GenerateXmlDataClasses(out: PrintStream = System.out,
                              idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
 
     private val chains = GenerateDataClasses(Jackson, out, idGenerator).then(Filter { next ->
         {
             val originalResponse = next(it)
-            originalResponse.with(Jackson.body().toLens() of (originalResponse.bodyString().asCleanedJsonNode()))
+            originalResponse.with(Jackson.body().toLens() of (originalResponse.bodyString().asXmlToJsonNode()))
         }
     })
 

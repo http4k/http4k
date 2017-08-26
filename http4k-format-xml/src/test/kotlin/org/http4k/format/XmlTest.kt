@@ -15,14 +15,16 @@ import org.http4k.format.Xml.xml
 import org.http4k.lens.Query
 import org.junit.Test
 
-data class SubWithText(val attr: String?, val _textValue: String?)
+data class Base(val xml: XmlB?)
 
-data class SubWithAttr(val attr: String?)
+data class SubWithAttr(val attr: Int?)
 
-data class XmlBody(val subWithText: SubWithText?, val subWithAttr: SubWithAttr?)
+data class SubWithText(val attr: String?, val content: String?)
+
+data class XmlB(val subWithText: List<SubWithText>?, val subWithAttr: SubWithAttr?, val content: Boolean?)
 
 class XmlTest {
-    private val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><xml><subWithText attr="attrValue">subText</subWithText><subWithAttr attr="attr2"/></xml>"""
+    private val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><xml>true<subWithText attr="attrValue">subText</subWithText><subWithText attr="attrValue3">subText4</subWithText><subWithAttr attr="3"/></xml>"""
 
     @Test
     fun `roundtrip xml to and from body ext method`() {
@@ -39,8 +41,9 @@ class XmlTest {
 
     @Test
     fun `convert XML to simple bean`() {
-        val body = Body.auto<XmlBody>().toLens()
-        assertThat(body(Response(Status.OK).body(xml)), equalTo(XmlBody(SubWithText("attrValue", "subText"), SubWithAttr("attr2"))))
+        val body = Body.auto<Base>().toLens()
+        val expected = Base(XmlB(listOf(SubWithText("attrValue", "subText"), SubWithText("attrValue3", "subText4")), SubWithAttr(3), true))
+        assertThat(body(Response(Status.OK).body(xml)), equalTo(expected))
     }
 
     @Test

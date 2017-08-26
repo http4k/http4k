@@ -2,7 +2,6 @@ package org.http4k.format
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.asByteBuffer
@@ -17,6 +16,7 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.root
+import org.json.XML
 import org.w3c.dom.Node
 import java.io.StringWriter
 import java.nio.ByteBuffer
@@ -26,9 +26,9 @@ import javax.xml.transform.stream.StreamResult
 
 open class ConfigurableJacksonXml(val mapper: XmlMapper) {
 
-    inline fun <reified T : Any> String.asA(): T = mapper.convertValue(asCleanedJsonNode(), T::class.java)
+    inline fun <reified T : Any> String.asA(): T = mapper.convertValue(asXmlToJsonNode(), T::class.java)
 
-    fun String.asCleanedJsonNode() = mapper.readTree(this).clean()
+    fun String.asXmlToJsonNode(): JsonNode = Jackson.parse(XML.toJSONObject(this).toString())
 
     fun String.asXmlNode(): Node = mapper.convertValue(this, Node::class.java)
 
@@ -46,21 +46,9 @@ open class ConfigurableJacksonXml(val mapper: XmlMapper) {
         root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlNode() }, { it.asXmlString() })
 
-    @Deprecated("Due to limitations with the underlying conversion mechanism which means it doesn't support list types. Alternative approach needed to provide full support for data class conversion.")
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BodyLensSpec<T> =
         root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asA<T>() })
-}
-
-fun JsonNode.clean(): JsonNode {
-    if(this.isObject) {
-        val objectNode = this as ObjectNode
-        objectNode.remove("")?.let {
-            objectNode.set("_textValue", it)
-        }
-    }
-    this.elements().forEach { it.clean() }
-    return this
 }
 
 object Xml : ConfigurableJacksonXml(XmlMapper().let {
@@ -71,3 +59,4 @@ object Xml : ConfigurableJacksonXml(XmlMapper().let {
         .configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
     it
 })
+
