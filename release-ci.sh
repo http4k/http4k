@@ -30,7 +30,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-format-argo:bintrayUpload \
     :http4k-format-gson:bintrayUpload \
     :http4k-format-jackson:bintrayUpload \
-    :http4k-format-jackson-xml:bintrayUpload \
+    :http4k-format-xml:bintrayUpload \
     :http4k-server-jetty:bintrayUpload \
     :http4k-server-netty:bintrayUpload \
     :http4k-server-undertow:bintrayUpload \

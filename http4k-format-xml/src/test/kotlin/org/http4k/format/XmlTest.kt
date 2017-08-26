@@ -8,39 +8,39 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.format.JacksonXml.asXmlNode
-import org.http4k.format.JacksonXml.asXmlString
-import org.http4k.format.JacksonXml.auto
-import org.http4k.format.JacksonXml.xml
+import org.http4k.format.Xml.asXmlNode
+import org.http4k.format.Xml.asXmlString
+import org.http4k.format.Xml.auto
+import org.http4k.format.Xml.xml
 import org.http4k.lens.Query
 import org.junit.Test
 
-data class SimpleBean(val x: Int?, val y: Boolean?)
+data class SubWithText(val attr: String?, val _textValue: String?)
 
-class JacksonXmlTest {
-    private val beforeXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-        "<SimpleBean>\n" +
-        "    <x>1</x>\n" +
-        "    <y>true</y>\n" +
-        "</SimpleBean>"
+data class SubWithAttr(val attr: String?)
+
+data class XmlBody(val subWithText: SubWithText?, val subWithAttr: SubWithAttr?)
+
+class XmlTest {
+    val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><xml><subWithText attr="attrValue">subText</subWithText><subWithAttr attr="attr2"/></xml>"""
 
     @Test
     fun `roundtrip xml to and from body ext method`() {
         val lens = Body.xml().toLens()
-        val out = lens.extract(Request(GET, "").body(beforeXml))
+        val out = lens.extract(Request(GET, "").body(xml))
         val after = lens.inject(out, Request(GET, ""))
-        assertThat(after.bodyString(), equalTo(beforeXml))
+        assertThat(after.bodyString(), equalTo(xml))
     }
 
     @Test
     fun `roundtrip Xml node to and from String`() {
-        assertThat(beforeXml.asXmlNode().asXmlString(), equalTo(beforeXml))
+        assertThat(xml.asXmlNode().asXmlString(), equalTo(xml))
     }
 
     @Test
     fun `convert XML to simple bean`() {
-        val body = Body.auto<SimpleBean>().toLens()
-        assertThat(body(Response(Status.OK).body(beforeXml)), equalTo(SimpleBean(1, true)))
+        val body = Body.auto<XmlBody>().toLens()
+        assertThat(body(Response(Status.OK).body(xml)), equalTo(XmlBody(SubWithText("attrValue", "subText"), SubWithAttr("attr2"))))
     }
 
     @Test
