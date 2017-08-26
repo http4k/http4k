@@ -22,7 +22,7 @@ data class SubWithAttr(val attr: String?)
 data class XmlBody(val subWithText: SubWithText?, val subWithAttr: SubWithAttr?)
 
 class XmlTest {
-    val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><xml><subWithText attr="attrValue">subText</subWithText><subWithAttr attr="attr2"/></xml>"""
+    private val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><xml><subWithText attr="attrValue">subText</subWithText><subWithAttr attr="attr2"/></xml>"""
 
     @Test
     fun `roundtrip xml to and from body ext method`() {

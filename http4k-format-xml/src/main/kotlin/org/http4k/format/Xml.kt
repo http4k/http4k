@@ -45,9 +45,10 @@ open class ConfigurableJacksonXml(val mapper: XmlMapper) {
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BodyLensSpec<T> =
         baseBody(description, contentNegotiation).map({ it.asA<T>() })
-
-
 }
+
+fun baseBody(description: String?, contentNegotiation: ContentNegotiation): BiDiBodyLensSpec<String> = root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+    .map(ByteBuffer::asString, String::asByteBuffer)
 
 fun JsonNode.clean(): JsonNode {
     if(this.isObject) {
@@ -59,9 +60,6 @@ fun JsonNode.clean(): JsonNode {
     this.elements().forEach { it.clean() }
     return this
 }
-
-fun baseBody(description: String?, contentNegotiation: ContentNegotiation): BiDiBodyLensSpec<String> = root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
-    .map(ByteBuffer::asString, String::asByteBuffer)
 
 object Xml : ConfigurableJacksonXml(XmlMapper().let {
     it.registerModule(KotlinModule())
