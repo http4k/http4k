@@ -22,7 +22,7 @@ We can use this facility in **http4k** to automatically marshall objects to/from
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/auto.kt"></script>
 
-There is a utility to generate Kotlin code for JSON and XML data class code [here](http://http4k-data-class-gen.herokuapp.com/xml) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
+There is a utility to generate Kotlin code for JSON and XML data class code [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
 #### Important note regarding JSON arrays
 When handling raw JSON array messages, such as: `[123, 456, 567]`, there is a slight gotcha when auto-marshalling messages from JSON.

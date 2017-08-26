@@ -35,7 +35,7 @@ plugging together of services without HTTP container being required.
     * Pluggable HTTP client adapters for Apache and OkHttp
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp
     * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
-    * HTTP message adapters for Argo JSON, Gson JSON and Jackson JSON (includes auto-marshalling) and XML (includes auto-marshalling)
+    * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Templating support: Caching and Hot-Reload engine support for Handlebars
     * AWS request signing: super-simple interactions with AWS services
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
