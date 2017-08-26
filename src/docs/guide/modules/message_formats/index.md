@@ -20,7 +20,11 @@ Some of the message libraries (eg. GSON, Jackson, XML) provide the mechanism to 
 
 We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
+#### JSON
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoJson.kt"></script>
+
+#### XML
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt"></script>
 
