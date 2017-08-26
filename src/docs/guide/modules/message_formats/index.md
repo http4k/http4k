@@ -18,9 +18,11 @@ JSON/XML node objects can be written and read directly from HTTP messages:
 
 Some of the message libraries (eg. GSON, Jackson, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection.
 
-We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses*:
+We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/auto.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoJson.kt"></script>
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt"></script>
 
 There is a utility to generate Kotlin code for JSON and XML data class code [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
