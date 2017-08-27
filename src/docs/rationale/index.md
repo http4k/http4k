@@ -32,7 +32,8 @@ Scenarios such as "what happens if this HTTP dependency continually takes > 5 se
 val handler: HttpHandler = { request: Request -> Response(OK) }
 ```
 * Pre/post processing is done using a `Filter`, which is modelled as `(HttpHandler) -> HttpHandler`. Filters can therefore be composed together to make reusable "stacks" of behaviour which can be applied to a terminating `HttpHandler` - to yield 
-a decorated `HttpHander`:
+a decorated `HttpHandl
+er`:
 ```kotlin
     val filter: Filter = Filter { next: HttpHandler ->
         { request: Request -> next(request).header("my response header", "value") }
