@@ -8,7 +8,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.format.Xml.asXmlNode
+import org.http4k.format.Xml.asXmlDocument
 import org.http4k.format.Xml.asXmlString
 import org.http4k.format.Xml.auto
 import org.http4k.format.Xml.xml
@@ -37,7 +37,7 @@ class XmlTest {
 
     @Test
     fun `roundtrip Xml node to and from String`() {
-        assertThat(xml.asXmlNode().asXmlString(), equalTo(xml))
+        assertThat(xml.asXmlDocument().asXmlString(), equalTo(xml))
     }
 
     @Test
