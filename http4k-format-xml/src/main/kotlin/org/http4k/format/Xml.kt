@@ -1,9 +1,9 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.google.gson.JsonElement
 import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
@@ -24,11 +24,11 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-open class ConfigurableJacksonXml(val mapper: XmlMapper) {
+open class ConfigurableJacksonXml(private val mapper: XmlMapper) {
 
-    inline fun <reified T : Any> String.asA(): T = mapper.convertValue(asXmlToJsonNode(), T::class.java)
+    inline fun <reified T : Any> String.asA(): T = Gson.asA(asXmlToJsonElement(), T::class)
 
-    fun String.asXmlToJsonNode(): JsonNode = Jackson.parse(XML.toJSONObject(this).toString())
+    fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this).toString())
 
     fun String.asXmlNode(): Node = mapper.convertValue(this, Node::class.java)
 
