@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.23.4
+- Switch XML generation to Gson over Jackson because Jackson doesn't handle uppercase field names well.
+
 ### v2.23.3
 - New algorithm for XML data class deserialisation, so un-deprecated XML methods.
 
