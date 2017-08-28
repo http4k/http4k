@@ -95,7 +95,6 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             }
 
             override fun stop() {
-                // FIXME is this correct??!
                 closeFuture?.cancel(false)
                 workerGroup.shutdownGracefully()
                 masterGroup.shutdownGracefully()
