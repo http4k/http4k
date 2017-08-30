@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.24.0
+- Added CatchLensFailure for ClientFilters - which catches un-deserializable invalid responses from clients and generates a BAD_GATEWAY error.
+
 ### v2.23.4
 - Switch XML generation to Gson over Jackson because Jackson doesn't handle uppercase field names well.
 - Switch native XML parsed type to Document over Node.
