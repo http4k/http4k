@@ -17,6 +17,10 @@ import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header
+import org.http4k.lens.Invalid
+import org.http4k.lens.LensFailure
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +38,7 @@ class ClientFiltersTest {
         }
     }
 
-    val followRedirects = ClientFilters.FollowRedirects().then(server)
+    private val followRedirects = ClientFilters.FollowRedirects().then(server)
 
     @Test
     fun `does not follow redirect by default`() {
@@ -142,5 +146,16 @@ class ClientFiltersTest {
 
         handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
     }
+
+    @Test
+    fun `catch lens failure`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta))
+        val handler = ClientFilters.CatchLensFailure.then { throw e }
+
+        val response = handler(Request(GET, "/"))
+
+        response shouldMatch hasStatus(Status.BAD_GATEWAY)
+    }
+
 
 }

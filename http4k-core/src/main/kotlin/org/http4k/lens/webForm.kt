@@ -4,7 +4,6 @@ import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toUrlEncoded
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
@@ -28,7 +27,7 @@ data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(
 
 enum class FormValidator : (WebForm) -> WebForm {
     Strict {
-        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw LensFailure(form.errors, NOT_ACCEPTABLE)
+        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw LensFailure(form.errors)
     },
     Feedback {
         override fun invoke(form: WebForm): WebForm = form

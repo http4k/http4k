@@ -1,27 +1,31 @@
 package org.http4k.lens
 
-import org.http4k.core.Status
-import org.http4k.core.Status.Companion.BAD_REQUEST
+data class LensFailure(val failures: List<Failure>, override val cause: Exception? = null) : Exception(failures.map { it.toString() }.joinToString(), cause) {
 
-data class LensFailure(val failures: List<Failure>, val status: Status = BAD_REQUEST, override val cause: Exception? = null) : Exception(failures.map { it.toString() }.joinToString(), cause) {
+    constructor(vararg failures: Failure, cause: Exception? = null) : this(failures.asList(), cause)
 
-    constructor(vararg failures: Failure, status: Status = BAD_REQUEST, cause: Exception? = null) : this(failures.asList(), status, cause)
+    fun overall(): Failure.Type {
+        val all = failures.map { it.type }
+        return if (all.contains(Failure.Type.Unsupported)) Failure.Type.Unsupported
+        else if (all.isEmpty() || all.contains(Failure.Type.Invalid)) Failure.Type.Invalid
+        else Failure.Type.Missing
+    }
 
     companion object {
-        operator fun invoke(vararg failures: Failure, status: Status = BAD_REQUEST, cause: Exception? = null) = LensFailure(failures.toList(), status, cause)
+        operator fun invoke(vararg failures: Failure, cause: Exception? = null) = LensFailure(failures.toList(), cause)
     }
 }
 
-sealed class Failure {
+sealed class Failure(val type: Type) {
+    enum class Type {
+        Invalid, Missing, Unsupported
+    }
+
     abstract val meta: Meta
 }
 
-data class Missing(override val meta: Meta) : Failure()
+data class Missing(override val meta: Meta) : Failure(Type.Missing)
 
-data class Invalid(override val meta: Meta) : Failure()
+data class Invalid(override val meta: Meta) : Failure(Type.Invalid)
 
-
-fun Lens<*, *>.invalid() = Invalid(this.meta)
-fun Lens<*, *>.missing() = Missing(this.meta)
-fun Meta.missing() = Missing(this)
-fun Meta.invalid() = Invalid(this)
+data class Unsupported(override val meta: Meta) : Failure(Type.Unsupported)

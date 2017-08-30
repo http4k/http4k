@@ -31,26 +31,26 @@ class QueryTest {
         assertThat(Query.optional("world")(request), absent())
 
         val requiredQuery = Query.required("world")
-        assertThat({ requiredQuery(request) }, throws(lensFailureWith(requiredQuery.missing())))
+        assertThat({ requiredQuery(request) }, throws(lensFailureWith(Missing(requiredQuery.meta), overallType = Failure.Type.Missing)))
 
         assertThat(Query.multi.optional("world")(request), absent())
         val requiredMultiQuery = Query.multi.required("world")
-        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(requiredMultiQuery.missing())))
+        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(Missing(requiredMultiQuery.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
-        assertThat({ requiredQuery(request) }, throws(lensFailureWith(requiredQuery.invalid())))
+        assertThat({ requiredQuery(request) }, throws(lensFailureWith(Invalid(requiredQuery.meta), overallType = Failure.Type.Invalid)))
 
         val optionalQuery = Query.map(String::toInt).optional("hello")
-        assertThat({ optionalQuery(request) }, throws(lensFailureWith(optionalQuery.invalid())))
+        assertThat({ optionalQuery(request) }, throws(lensFailureWith(Invalid(optionalQuery.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiQuery = Query.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(requiredMultiQuery.invalid())))
+        assertThat({ requiredMultiQuery(request) }, throws(lensFailureWith(Invalid(requiredMultiQuery.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiQuery = Query.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiQuery(request) }, throws(lensFailureWith(optionalMultiQuery.invalid())))
+        assertThat({ optionalMultiQuery(request) }, throws(lensFailureWith(Invalid(optionalMultiQuery.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

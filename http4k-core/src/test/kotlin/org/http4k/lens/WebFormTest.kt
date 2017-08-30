@@ -7,7 +7,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.toBody
 import org.http4k.core.with
 import org.http4k.lens.FormValidator.Feedback
@@ -43,7 +42,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             ).toLens()(request)
-        }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
+        }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
@@ -77,7 +76,7 @@ class WebFormTest {
         val intRequiredField = FormField.int().required("another")
         assertThat(
             { Body.webForm(Strict, stringRequiredField, intRequiredField).toLens()(request) },
-            throws(lensFailureWith(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), status = NOT_ACCEPTABLE))
+            throws(lensFailureWith(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 

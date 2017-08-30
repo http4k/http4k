@@ -25,26 +25,26 @@ class FormFieldTest {
     fun `value missing`() {
         assertThat(FormField.optional("world")(form), absent())
         val requiredFormField = FormField.required("world")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(requiredFormField.missing())))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
 
         assertThat(FormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = FormField.multi.required("world")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(optionalMultiFormField.missing())))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Missing(optionalMultiFormField.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormField = FormField.map(String::toInt).required("hello")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(requiredFormField.invalid())))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalFormField = FormField.map(String::toInt).optional("hello")
-        assertThat({ optionalFormField(form) }, throws(lensFailureWith(optionalFormField.invalid())))
+        assertThat({ optionalFormField(form) }, throws(lensFailureWith(Invalid(optionalFormField.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiFormField = FormField.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith(requiredMultiFormField.invalid())))
+        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith(Invalid(requiredMultiFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiFormField = FormField.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(optionalMultiFormField.invalid())))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Invalid(optionalMultiFormField.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

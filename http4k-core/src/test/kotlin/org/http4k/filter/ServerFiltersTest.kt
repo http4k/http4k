@@ -12,15 +12,21 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header
+import org.http4k.lens.Invalid
+import org.http4k.lens.LensFailure
+import org.http4k.lens.Unsupported
 import org.junit.Before
 import org.junit.Test
 import java.io.PrintWriter
@@ -162,4 +168,25 @@ class ServerFiltersTest {
 
         handler(Request(GET, "/").body("hello"))
     }
+
+    @Test
+    fun `catch lens failure - invalid`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta))
+        val handler = ServerFilters.CatchLensFailure.then { throw e }
+
+        val response = handler(Request(GET, "/"))
+
+        response shouldMatch hasStatus(BAD_REQUEST)
+    }
+
+    @Test
+    fun `catch lens failure - unsupported`() {
+        val e = LensFailure(Unsupported(Header.required("bob").meta))
+        val handler = ServerFilters.CatchLensFailure.then { throw e }
+
+        val response = handler(Request(GET, "/"))
+
+        response shouldMatch hasStatus(UNSUPPORTED_MEDIA_TYPE)
+    }
+
 }

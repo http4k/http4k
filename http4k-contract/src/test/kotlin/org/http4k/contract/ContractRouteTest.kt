@@ -15,12 +15,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.Missing
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.lensFailureWith
-import org.http4k.lens.missing
 import org.http4k.lens.string
 import org.junit.Test
 
@@ -47,7 +48,7 @@ class ContractRouteTest {
         val actual = route.toRouter(Root).match(invalidRequest)
         assertThat(actual, present())
         assertThat({ actual?.invoke(invalidRequest) },
-            throws(lensFailureWith(queryLens.meta.missing())))
+            throws(lensFailureWith(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test

@@ -14,13 +14,13 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
-    it.path(meta.name)?.let(get) ?: throw LensFailure(meta.missing())
+    it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta))
 }) {
 
     operator fun invoke(target: String) = try {
         get(target)
     } catch (e: Exception) {
-        throw LensFailure(map { it.invalid() }, cause = e)
+        throw LensFailure(map { Invalid(it) }, cause = e)
     }
 
     override fun toString(): String = "{${meta.name}}"

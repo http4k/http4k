@@ -9,11 +9,14 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import java.io.PrintWriter
@@ -92,15 +95,16 @@ object ServerFilters {
     }
 
     /**
-     * Converts Lens extraction failures into Http 400 (Bad Requests). This is required when using lenses to
-     * automatically respond to bad requests.
+     * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
+     * This is required when using lenses to automatically unmarshall inbound requests.
      */
     object CatchLensFailure : Filter {
         override fun invoke(next: HttpHandler): HttpHandler = {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
-                Response(lensFailure.status)
+                if (lensFailure.overall() == Failure.Type.Unsupported) Response(UNSUPPORTED_MEDIA_TYPE)
+                else Response(BAD_REQUEST)
             }
         }
     }

@@ -5,7 +5,6 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
-import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Header.Common.CONTENT_TYPE
@@ -110,7 +109,7 @@ interface ContentNegotiation {
          */
         val Strict = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+                if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
             }
         }
         /**
@@ -118,7 +117,7 @@ interface ContentNegotiation {
          */
         val StrictNoDirective = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (expected.value != actual?.value) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+                if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
             }
         }
 
@@ -127,7 +126,7 @@ interface ContentNegotiation {
          */
         val NonStrict = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != null && actual != expected) throw LensFailure(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)
+                if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
             }
         }
 

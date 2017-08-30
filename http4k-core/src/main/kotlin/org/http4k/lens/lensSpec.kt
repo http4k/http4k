@@ -74,7 +74,7 @@ open class LensSpec<IN, MID, OUT>(protected val location: String,
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
         val meta = Meta(true, location, paramMeta, name, description)
         val getLens = get(name)
-        return Lens(meta, { getLens(it).firstOrNull() ?: throw LensFailure(meta.missing()) })
+        return Lens(meta, { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
     }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
@@ -102,7 +102,7 @@ open class LensSpec<IN, MID, OUT>(protected val location: String,
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
             val meta = Meta(true, location, paramMeta, name, description)
             val getLens = get(name)
-            return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw LensFailure(meta.missing()) else it } })
+            return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta)) else it } })
         }
     }
 }
@@ -157,7 +157,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String,
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(meta,
-            { getLens(it).firstOrNull() ?: throw LensFailure(meta.missing()) },
+            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) },
             { out: OUT, target: IN -> setLens(listOf(out), target) })
     }
 
@@ -187,7 +187,7 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(meta,
-                { getLens(it).let { if (it.isEmpty()) throw LensFailure(meta.missing()) else it } },
+                { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta)) else it } },
                 { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }

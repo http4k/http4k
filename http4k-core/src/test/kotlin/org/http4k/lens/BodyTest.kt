@@ -8,7 +8,6 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status.Companion.NOT_ACCEPTABLE
 import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.junit.Test
@@ -28,35 +27,35 @@ class BodyTest {
     fun `can get regex body`() {
         val regexBody = Body.regex("bob(.+)alice").toLens()
         assertThat(regexBody(emptyRequest.body("bobritaalice")), equalTo("rita"))
-        assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith(Meta(true, "body", ParamMeta.StringParam, "body").invalid())))
+        assertThat({ regexBody(emptyRequest.body("foobaralice")) }, throws(lensFailureWith(Invalid(Meta(true, "body", ParamMeta.StringParam, "body")), overallType = Failure.Type.Invalid)))
     }
 
     @Test
     fun `non empty string`() {
         val nonEmpty = Body.nonEmptyString(TEXT_PLAIN).toLens()
         assertThat(nonEmpty(emptyRequest.body("123")), equalTo("123"))
-        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(lensFailureWith(Meta(true, "body", ParamMeta.StringParam, "body").invalid())))
+        assertThat({ nonEmpty(emptyRequest.body("")) }, throws(lensFailureWith(Invalid(Meta(true, "body", ParamMeta.StringParam, "body")), overallType = Failure.Type.Invalid)))
     }
 
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation Strict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
-        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
-        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
+        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")) shouldMatch equalTo("some value")
     }
 
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() {
         val strictNoDirectiveBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.StrictNoDirective).toLens()
-        assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
+        assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")) shouldMatch equalTo("some value")
     }
 
     @Test
     fun `rejects invalid content type when ContentNegotiation NonStrict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.NonStrict).toLens()
-        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith(CONTENT_TYPE.invalid(), status = NOT_ACCEPTABLE)))
+        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         strictBody(emptyRequest.body("some value")) shouldMatch equalTo("some value")
     }
 

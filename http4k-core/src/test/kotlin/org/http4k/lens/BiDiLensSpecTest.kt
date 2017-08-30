@@ -52,7 +52,7 @@ class BiDiLensSpecTest {
         val requiredLens = spec.regex("v(\\d+)", 1).required("hello")
         assertThat(requiredLens("v123"), equalTo("123"))
         assertThat((spec.regex("v(\\d+)", 1).map(String::toInt).required("hello"))("v123"), equalTo(123))
-        assertThat({ requiredLens("hello") }, throws(lensFailureWith(requiredLens.invalid())))
+        assertThat({ requiredLens("hello") }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

@@ -14,7 +14,7 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
     } catch (e: LensFailure) {
         throw e
     } catch (e: Exception) {
-        throw LensFailure(invalid(), cause = e)
+        throw LensFailure(Invalid(meta), cause = e)
     }
 }
 
