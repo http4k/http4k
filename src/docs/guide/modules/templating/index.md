@@ -12,16 +12,5 @@ The **http4k** templating API provides a standard mechanism for rendering using 
 * Cached from the filesystem
 * Hot-Reloading from the filesystem
 
-```kotlin
-data class Person(val name: String, val age: Int) : ViewModel
-
-val renderer = HandlebarsTemplates().HotReload("src/test/resources")
-
-val app: HttpHandler = {
-    val viewModel = Person("Bob", 45)
-    val renderedView = renderer(viewModel)
-    Response(OK).body(renderedView)
-}
-
-println(app(Request(Method.GET, "/someUrl")))
-```
+The examples below are for Handlebars, but the others have the same APIs:
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt"></script>
