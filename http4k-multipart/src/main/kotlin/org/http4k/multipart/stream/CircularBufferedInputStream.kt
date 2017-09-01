@@ -20,14 +20,15 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
     override fun read(): Int {
         dumpState(">>> READ")
 
-        if (EOS) {
-            return -1
+        return if (EOS) {
+            -1
+        } else {
+            val result = read1()
+
+            dumpState("<<< READ")
+
+            result
         }
-        val result = read1()
-
-        dumpState("<<< READ")
-
-        return result
     }
 
     private fun read1(): Int {
