@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v2.25.0
-- Add streaming support to HTTP Server backend and HTTP Client module.
+- Add streaming support to HTTP Client module.
 - Remove CatchLensFailure ClientFilter as it will never be used.
 
 ### v2.24.0
