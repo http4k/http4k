@@ -79,7 +79,7 @@ public class MultipartFormMapTest {
         String boundary = "-----1234";
         InputStream multipartFormContentsStream = new ByteArrayInputStream(new ValidMultipartFormBuilder(boundary)
                 .file("file", "foo.tab", "text/whatever", "This is the content of the file\n")
-                .field("field", "fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf")
+                .field("field", "fieldValue" + StreamingMultipartFormHappyTests.Companion.getCR_LF() + "with cr lf")
                 .field("multi", "value1")
                 .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
                 .field("multi", "value2")
@@ -91,9 +91,9 @@ public class MultipartFormMapTest {
 
         assertThat(partMap.get("file").get(0).getFileName(), equalTo("foo.tab"));
         assertThat(partMap.get("anotherFile").get(0).getFileName(), equalTo("BAR.tab"));
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("field").get(0).getNewInputStream(), new ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf").getBytes()));
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(0).getNewInputStream(), new ByteArrayInputStream("value1".getBytes()));
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(1).getNewInputStream(), new ByteArrayInputStream("value2".getBytes()));
+        StreamingMultipartFormHappyTests.Companion.compareOneStreamToAnother(partMap.get("field").get(0).getNewInputStream(), new ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.Companion.getCR_LF() + "with cr lf").getBytes()));
+        StreamingMultipartFormHappyTests.Companion.compareOneStreamToAnother(partMap.get("multi").get(0).getNewInputStream(), new ByteArrayInputStream("value1".getBytes()));
+        StreamingMultipartFormHappyTests.Companion.compareOneStreamToAnother(partMap.get("multi").get(1).getNewInputStream(), new ByteArrayInputStream("value2".getBytes()));
         parts.close();
     }
 
@@ -161,11 +161,11 @@ public class MultipartFormMapTest {
     public void throwsExceptionIfMultipartMalformed() throws Exception {
         Iterable<StreamingPart> form = StreamingMultipartFormParts.Companion.parse(
                 "---2345".getBytes(UTF_8),
-                new ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.CR_LF +
-                        "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.CR_LF +
-                        "" + StreamingMultipartFormHappyTests.CR_LF +
+                new ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.Companion.getCR_LF() +
+                        "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.Companion.getCR_LF() +
+                        "" + StreamingMultipartFormHappyTests.Companion.getCR_LF() +
                         "value" + // no CR_LF
-                        "-----2345--" + StreamingMultipartFormHappyTests.CR_LF).getBytes()),
+                        "-----2345--" + StreamingMultipartFormHappyTests.Companion.getCR_LF()).getBytes()),
                 UTF_8);
 
         try {
@@ -211,7 +211,7 @@ public class MultipartFormMapTest {
     private void assertFileIsCorrect(Part filePart, String expectedFilename, InputStream inputStream, boolean inMemory) throws IOException {
         assertThat(expectedFilename + " in memory?", filePart.isInMemory(), equalTo(inMemory));
         assertThat(filePart.getFileName(), equalTo(expectedFilename));
-        StreamingMultipartFormHappyTests.compareStreamToFile(inputStream, filePart.getFileName());
+        StreamingMultipartFormHappyTests.Companion.compareStreamToFile(inputStream, filePart.getFileName());
     }
 
     private String[] temporaryFileList() {
