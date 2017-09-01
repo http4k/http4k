@@ -1,5 +1,6 @@
 package org.http4k.multipart;
 
+import kotlin.Pair;
 import org.http4k.multipart.exceptions.ParseError;
 import org.http4k.multipart.exceptions.TokenNotFoundException;
 import org.http4k.multipart.part.StreamingPart;
@@ -95,8 +96,8 @@ public class StreamingMultipartFormSadTests {
         String boundary = "-----2345";
         Iterator<StreamingPart> form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, new ValidMultipartFormBuilder(boundary)
             .part("contents of StreamingPart",
-                ValidMultipartFormBuilder.pair("Content-Disposition", asList(ValidMultipartFormBuilder.pair("form-data", null), ValidMultipartFormBuilder.pair("bit", "first"), ValidMultipartFormBuilder.pair("name", "first-name"))),
-                ValidMultipartFormBuilder.pair("Content-Disposition", asList(ValidMultipartFormBuilder.pair("form-data", null), ValidMultipartFormBuilder.pair("bot", "second"), ValidMultipartFormBuilder.pair("name", "second-name"))))
+                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("bit", "first"), new Pair("name", "first-name"))),
+                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("bot", "second"), new Pair("name", "second-name"))))
             .build());
 
         StreamingPart StreamingPart = form.next();
@@ -214,18 +215,18 @@ public class StreamingMultipartFormSadTests {
         Arrays.fill(chars, 'x');
         Iterator<StreamingPart> form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, new ValidMultipartFormBuilder(boundary)
             .part("some contents",
-                ValidMultipartFormBuilder.pair("Content-Disposition", asList(ValidMultipartFormBuilder.pair("form-data", null), ValidMultipartFormBuilder.pair("name", "fieldName"), ValidMultipartFormBuilder.pair("filename", "filename"))),
-                ValidMultipartFormBuilder.pair("Content-Type", Arrays.asList(ValidMultipartFormBuilder.pair("text/plain", null))),
-                ValidMultipartFormBuilder.pair("extra-1", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-2", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-3", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-4", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-5", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-6", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-7", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-8", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-9", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars), null))),
-                ValidMultipartFormBuilder.pair("extra-10", Arrays.asList(ValidMultipartFormBuilder.pair(new String(chars, 0, 816), null))) // header section exactly 10240 bytes big!
+                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", "fieldName"), new Pair("filename", "filename"))),
+                new Pair("Content-Type", Arrays.asList(new Pair("text/plain", null))),
+                new Pair("extra-1", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-2", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-3", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-4", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-5", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-6", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-7", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-8", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-9", Arrays.asList(new Pair(new String(chars), null))),
+                new Pair("extra-10", Arrays.asList(new Pair(new String(chars, 0, 816), null))) // header section exactly 10240 bytes big!
             ).build());
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes");
