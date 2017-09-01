@@ -27,11 +27,23 @@ class DebuggingFiltersTest {
     }
 
     @Test
-    fun `can suppress body`(){
+    fun `prints stream body by default`(){
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
         PrintRequestAndResponse(PrintStream(os))
+            .then(resp.toHttpHandler())(req)
+        val actual = String(os.toByteArray())
+        assertThat(actual, containsSubstring(req.toString()))
+        assertThat(actual, containsSubstring(resp.toString()))
+    }
+
+    @Test
+    fun `can suppress body`(){
+        val os = ByteArrayOutputStream()
+        val req = Request(Method.GET, "").body("anything".byteInputStream())
+        val resp = Response(OK).body("anything".byteInputStream())
+        PrintRequestAndResponse(PrintStream(os), false)
             .then(resp.toHttpHandler())(req)
         val actual = String(os.toByteArray())
         assertThat(actual, containsSubstring(req.body("<<stream>>").toString()))
