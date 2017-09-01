@@ -8,7 +8,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import java.nio.ByteBuffer.wrap
 
 class OkHttp(private val client: OkHttpClient = defaultOkHttpClient()) : HttpHandler {
 
@@ -26,7 +25,7 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient()) : HttpHan
     private fun okhttp3.Response.asHttp4k(): Response {
         val initial = body()?.let {
             Response(Status(code(), ""))
-                .body(Body(wrap(it.bytes())))
+                .body(Body(it.byteStream()))
         } ?: Response(Status(code(), ""))
         return headers().toMultimap().asSequence().fold(
             initial) { memo, headerValues ->
