@@ -1,6 +1,5 @@
 package org.http4k.multipart.stream
 
-import java.io.IOException
 import java.io.InputStream
 import java.nio.InvalidMarkException
 
@@ -16,7 +15,7 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
     private var markInvalid: Boolean = false
     private var EOS: Boolean = false
 
-    @Throws(IOException::class)
+
     override fun read(): Int {
         dumpState(">>> READ")
 
@@ -61,7 +60,7 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
         return len
     }
 
-    @Throws(IOException::class)
+
     private fun readMore(): Boolean {
         val rightIndex = rightBounds and bufferIndexMask
         val leftIndex = leftBounds and bufferIndexMask
@@ -90,7 +89,7 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
         return true
     }
 
-    @Throws(IOException::class)
+
     override fun available(): Int {
         return (rightBounds - cursor).toInt()
     }
@@ -100,7 +99,7 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
     }
 
     @Synchronized
-    @Throws(IOException::class)
+
     override fun reset() {
         dumpState(">>> RESET")
 

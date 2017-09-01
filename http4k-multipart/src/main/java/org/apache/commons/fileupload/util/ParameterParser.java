@@ -104,9 +104,9 @@ public class ParameterParser {
         }
         // Strip away quotation marks if necessary
         if (quoted
-            && ((i2 - i1) >= 2)
-            && (chars[i1] == '"')
-            && (chars[i2 - 1] == '"')) {
+                && ((i2 - i1) >= 2)
+                && (chars[i1] == '"')
+                && (chars[i2 - 1] == '"')) {
             i1++;
             i2--;
         }
@@ -284,10 +284,10 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     public Map<String, String> parse(
-        final char[] charArray,
-        int offset,
-        int length,
-        char separator) {
+            final char[] charArray,
+            int offset,
+            int length,
+            char separator) {
 
         if (charArray == null) {
             return new HashMap<>();
@@ -301,12 +301,12 @@ public class ParameterParser {
         String paramValue;
         while (hasChar()) {
             paramName = parseToken(new char[]{
-                '=', separator});
+                    '=', separator});
             paramValue = null;
             if (hasChar() && (charArray[pos] == '=')) {
                 pos++; // skip '='
                 paramValue = parseQuotedToken(new char[]{
-                    separator});
+                        separator});
 
                 if (paramValue != null) {
                     try {

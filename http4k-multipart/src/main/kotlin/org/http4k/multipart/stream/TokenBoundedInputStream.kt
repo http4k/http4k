@@ -20,7 +20,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
      * @return number of bytes inserted into buffer
      * @throws IOException
      */
-    @Throws(IOException::class)
+
     fun getBytesUntil(endOfToken: ByteArray, buffer: ByteArray, encoding: Charset): Int {
         var bufferIndex = 0
         val bufferLength = buffer.size
@@ -63,7 +63,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
         return String(buffer, index, length, encoding)
     }
 
-    @Throws(IOException::class)
+
     private fun matchToken(token: ByteArray, initialCharacter: Int): Boolean {
         var initialChar = initialCharacter
         var eotIndex = 0
@@ -81,7 +81,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
      * @return true if the token is found (and the bytes have been consumed),
      * false if it isn't found (and the stream is unchanged)
      */
-    @Throws(IOException::class)
+
     fun matchInStream(token: ByteArray): Boolean {
         mark(token.size)
 
@@ -101,7 +101,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
      * @return the next byte in the stream, -1 if the underlying stream has finished,
      * or -2 if the token is found. The token is consumed when it is matched.
      */
-    @Throws(IOException::class)
+
     fun readByteFromStreamUnlessTokenMatched(token: ByteArray): Int {
         val b = readFromStream()
         if (b.toByte() == token[0]) {
@@ -117,7 +117,6 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
     }
 
 
-    @Throws(IOException::class)
     private fun readFromStream(): Int {
         if (maxStreamLength > -1 && cursor >= maxStreamLength) {
             throw StreamTooLongException("Form contents was longer than $maxStreamLength bytes")

@@ -7,9 +7,8 @@ import org.junit.Test
 
 class UriTemplateTest {
 
-    @Test
-    @Throws(Exception::class)
-    fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
+     @Test
+fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
         val template = from("properties/{name}")
 
         assertThat(

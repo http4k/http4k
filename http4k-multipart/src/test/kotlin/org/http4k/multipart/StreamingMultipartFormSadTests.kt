@@ -14,7 +14,6 @@ import java.util.*
 class StreamingMultipartFormSadTests {
 
     @Test
-    @Throws(Exception::class)
     fun failsWhenNoBoundaryInStream() {
         val boundary = "---1234"
         var form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, "No boundary anywhere".toByteArray())
@@ -33,7 +32,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsWhenGettingNextPastEndOfParts() {
         val boundary = "-----1234"
         val form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
@@ -52,7 +50,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsWhenGettingNextPastEndOfPartsAfterHasNext() {
         val boundary = "-----1234"
         val form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
@@ -72,7 +69,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun partHasNoHeaders() {
         val boundary = "-----2345"
         val form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
@@ -92,7 +88,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun overwritesPartHeaderIfHeaderIsRepeated() {
         val boundary = "-----2345"
         val form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
@@ -108,7 +103,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfFoundBoundaryButNoFieldSeparator() {
         val boundary = "---2345"
 
@@ -123,7 +117,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfHeaderMissingFieldSeparator() {
         val boundary = "---2345"
 
@@ -143,7 +136,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfContentsMissingFieldSeparator() {
         val boundary = "---2345"
 
@@ -160,7 +152,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfContentsMissingFieldSeparatorAndHasReadToEndOfContent() {
         val boundary = "---2345"
 
@@ -177,7 +168,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfClosingBoundaryIsMissingFieldSeparator() {
         val boundary = "---2345"
 
@@ -192,7 +182,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfClosingBoundaryIsMissing() {
         val boundary = "---2345"
 
@@ -207,7 +196,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfHeadingTooLong() {
         val boundary = "---2345"
 
@@ -220,7 +208,6 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Throws(Exception::class)
     fun failsIfTooManyHeadings() {
         val boundary = "---2345"
 

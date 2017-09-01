@@ -12,7 +12,6 @@ import java.nio.InvalidMarkException
 class CircularBufferedInputStreamTest {
 
     @Test
-    @Throws(Exception::class)
     fun returns_a_byte_at_a_time() {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
@@ -25,7 +24,6 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun returns_bytes() {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
@@ -58,7 +56,6 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun cannot_mark_further_then_buffer_size() {
         val bytes = "hello my name is Tiest".toByteArray()
         val inputStream = createInputStream(bytes, 3)
@@ -73,7 +70,6 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun marks_and_resets() {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
@@ -121,7 +117,6 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun resetting_after_reading_past_readlimit_fails() {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
@@ -149,7 +144,6 @@ class CircularBufferedInputStreamTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun resetting_after_reading_past_readlimit_fails_2() {
         val bytes = "My name is Tiest don't you know".toByteArray()
         val inputStream = createInputStream(bytes, 7)
