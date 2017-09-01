@@ -19,12 +19,6 @@ fun main(args: Array<String>) {
     // first, create a Renderer - this can be a Caching instance or a HotReload for development
     val renderer = HandlebarsTemplates().HotReload("src/test/resources")
 
-    // OR we can customise the Handlebars instance here...
-    val rendererWithConfig = HandlebarsTemplates { handlebars: Handlebars ->
-        // configure handlebars here...
-        handlebars
-    }.CachingClasspath("src/test/resources")
-
     // first example uses a renderer to create a string
     val app: HttpHandler = {
         val viewModel = Person("Bob", 45)
