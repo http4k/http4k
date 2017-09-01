@@ -45,7 +45,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         return b
     }
 
-    @Throws(IOException::class)
+
     private fun findBoundary() {
         if (state == MultipartFormStreamState.findPrefix) {
             if (!inputStream.matchInStream(FIELD_SEPARATOR)) {
@@ -85,7 +85,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         }
     }
 
-    @Throws(IOException::class)
+
     private fun parseNextPart(): StreamingPart? {
         findBoundary()
         return if (state == MultipartFormStreamState.header) {
@@ -95,7 +95,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         }
     }
 
-    @Throws(IOException::class)
+
     private fun parsePart(): StreamingPart? {
         val headers = parseHeaderLines()
 
@@ -142,7 +142,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         return string?.trim { it <= ' ' }
     }
 
-    @Throws(IOException::class)
+
     private fun parseHeaderLines(): Map<String, String> {
         assertStateIs(MultipartFormStreamState.header)
 
@@ -246,7 +246,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         internal var endOfStream = false
         internal var closed = false
 
-        @Throws(IOException::class)
+
         override fun read(): Int {
             if (closed) {
                 throw AlreadyClosedException()
@@ -258,7 +258,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
 
         }
 
-        @Throws(IOException::class)
+
         private fun readNextByte(): Int {
             val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix!!)
             if (result == -1) {
@@ -369,7 +369,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             return actualBoundary
         }
 
-        @Throws(IOException::class)
+
         fun readStringFromStreamUntilMatched(tokenBoundedInputStream: TokenBoundedInputStream, endOfToken: ByteArray, maxStringSizeInBytes: Int, encoding: Charset): String {
             // very inefficient search!
             val buffer = ByteArray(maxStringSizeInBytes)

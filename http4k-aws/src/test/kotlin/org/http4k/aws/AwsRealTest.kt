@@ -21,7 +21,6 @@ import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import java.io.IOException
 import java.io.InputStream
 import java.util.*
 
@@ -34,7 +33,6 @@ class AwsRealTest {
     private var s3Root: Uri? = null
 
     @Before
-    @Throws(IOException::class)
     fun createClient() {
         val properties = Properties()
         properties.load(properties())
@@ -56,9 +54,8 @@ class AwsRealTest {
         s3Root = Uri.of("https://s3.amazonaws.com/")
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun putThenGetThenDelete() {
+     @Test
+fun putThenGetThenDelete() {
         val contents = UUID.randomUUID().toString()
 
         assertThat(
@@ -108,7 +105,7 @@ class AwsRealTest {
     }
 
     @After
-    @Throws(Exception::class)
+
     fun removeBucket() {
         client!!(Request(DELETE, bucketUrl!!))
     }

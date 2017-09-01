@@ -31,7 +31,7 @@ public class ParameterParserTest {
     @Test
     public void testParsing() {
         String s =
-            "test; test1 =  stuff   ; test2 =  \"stuff; stuff\"; test3=\"stuff";
+                "test; test1 =  stuff   ; test2 =  \"stuff; stuff\"; test3=\"stuff";
         ParameterParser parser = new ParameterParser();
         Map<String, String> params = parser.parse(s, ';');
         assertEquals(null, params.get("test"));

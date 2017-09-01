@@ -37,7 +37,7 @@ object MultipartFormMap {
      * be closed so that it is cleaned up after.
      * @throws IOException
      */
-    @Throws(IOException::class)
+
     fun formMap(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): Parts {
         try {
             val partMap = HashMap<String, List<Part>>()
@@ -47,7 +47,7 @@ object MultipartFormMap {
                 val keyParts = (partMap[part.fieldName] ?: listOf()).let {
                     it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
                 }
-                if(part.fieldName == null) {
+                if (part.fieldName == null) {
                     throw ParseError("no name for part")
                 }
                 partMap.put(part.fieldName, keyParts)
@@ -62,7 +62,7 @@ object MultipartFormMap {
         }
     }
 
-    @Throws(IOException::class)
+
     private fun serialisePart(encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File, part: StreamingPart, partInputStream: InputStream, bytes: ByteArray): Part {
         var length = 0
 
@@ -82,7 +82,7 @@ object MultipartFormMap {
         }
     }
 
-    @Throws(IOException::class)
+
     private fun storeInMemory(bytes: ByteArray, length: Int, partInputStream: InputStream): ByteArray {
         partInputStream.close()
 
@@ -91,7 +91,7 @@ object MultipartFormMap {
         return result
     }
 
-    @Throws(IOException::class)
+
     private fun writeToDisk(fileName: String?, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int, partInputStream: InputStream): File {
         val tempFile = File.createTempFile(fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
         tempFile.deleteOnExit()
