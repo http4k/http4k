@@ -44,10 +44,13 @@ object MultipartFormMap {
             val bytes = ByteArray(writeToDiskThreshold)
 
             for (part in parts) {
-                val keyParts = (partMap[part.getFieldName()] ?: listOf()).let {
+                val keyParts = (partMap[part.fieldName] ?: listOf()).let {
                     it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
                 }
-                partMap.put(part.getFieldName(), keyParts)
+                if(part.fieldName == null) {
+                    throw ParseError("no name for part")
+                }
+                partMap.put(part.fieldName, keyParts)
             }
             return Parts(partMap)
         } catch (e: ParseError) {
@@ -89,8 +92,8 @@ object MultipartFormMap {
     }
 
     @Throws(IOException::class)
-    private fun writeToDisk(fileName: String, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int, partInputStream: InputStream): File {
-        val tempFile = File.createTempFile(fileName + "-", ".tmp", temporaryFileDirectory)
+    private fun writeToDisk(fileName: String?, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int, partInputStream: InputStream): File {
+        val tempFile = File.createTempFile(fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
         tempFile.deleteOnExit()
         val outputStream = FileOutputStream(tempFile)
         outputStream.write(bytes, 0, length)

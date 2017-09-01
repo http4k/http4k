@@ -49,21 +49,21 @@ public class MultipartFormMapTest {
                     boundary, body, ISO_8859_1, maxStreamLength);
 
             try (Parts parts = MultipartFormMap.INSTANCE.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory)) {
-                Map<String, List<Part>> partMap = parts.partMap;
+                Map<String, List<Part>> partMap = parts.getPartMap();
 
                 Part articleType = partMap.get("articleType").get(0);
-                System.out.println(articleType.fieldName); // "articleType"
-                System.out.println(articleType.headers); // {Content-Disposition=form-data; name="articleType"}
-                System.out.println(articleType.length); // 8 bytes
+                System.out.println(articleType.getFieldName()); // "articleType"
+                System.out.println(articleType.getHeaders()); // {Content-Disposition=form-data; name="articleType"}
+                System.out.println(articleType.getLength()); // 8 bytes
                 System.out.println(articleType.isInMemory()); // true
                 System.out.println(articleType.getString()); // "obituary"
 
                 Part simple7bit = partMap.get("uploadManuscript").get(0);
-                System.out.println(simple7bit.fieldName); // "uploadManuscript"
-                System.out.println(simple7bit.fileName); // "simple7bit.txt"
-                System.out.println(simple7bit.headers); // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
+                System.out.println(simple7bit.getFieldName()); // "uploadManuscript"
+                System.out.println(simple7bit.getFileName()); // "simple7bit.txt"
+                System.out.println(simple7bit.getHeaders()); // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
                 // Content-Type => text/plain}
-                System.out.println(simple7bit.length); // 8221 bytes
+                System.out.println(simple7bit.getLength()); // 8221 bytes
                 System.out.println(simple7bit.isInMemory()); // false
                 simple7bit.getNewInputStream(); // stream of the contents of the file
             } catch (IOException e) {
@@ -87,10 +87,10 @@ public class MultipartFormMapTest {
         Iterable<StreamingPart> form = StreamingMultipartFormParts.Companion.parse(boundary.getBytes(UTF_8), multipartFormContentsStream, UTF_8);
 
         Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY);
-        Map<String, List<Part>> partMap = parts.partMap;
+        Map<String, List<Part>> partMap = parts.getPartMap();
 
-        assertThat(partMap.get("file").get(0).fileName, equalTo("foo.tab"));
-        assertThat(partMap.get("anotherFile").get(0).fileName, equalTo("BAR.tab"));
+        assertThat(partMap.get("file").get(0).getFileName(), equalTo("foo.tab"));
+        assertThat(partMap.get("anotherFile").get(0).getFileName(), equalTo("BAR.tab"));
         StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("field").get(0).getNewInputStream(), new ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf").getBytes()));
         StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(0).getNewInputStream(), new ByteArrayInputStream("value1".getBytes()));
         StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(1).getNewInputStream(), new ByteArrayInputStream("value2".getBytes()));
@@ -102,7 +102,7 @@ public class MultipartFormMapTest {
         Iterable<StreamingPart> form = safariExample();
 
         Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY);
-        Map<String, List<Part>> partMap = parts.partMap;
+        Map<String, List<Part>> partMap = parts.getPartMap();
         allFieldsAreLoadedCorrectly(partMap, true, true, true, true);
         parts.close();
 
@@ -130,7 +130,7 @@ public class MultipartFormMapTest {
         Iterable<StreamingPart> form = safariExample();
 
         Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 100, TEMPORARY_FILE_DIRECTORY);
-        Map<String, List<Part>> partMap = parts.partMap;
+        Map<String, List<Part>> partMap = parts.getPartMap();
 
         allFieldsAreLoadedCorrectly(partMap, false, false, false, false);
 
@@ -144,7 +144,7 @@ public class MultipartFormMapTest {
         Iterable<StreamingPart> form = safariExample();
 
         Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY);
-        Map<String, List<Part>> partMap = parts.partMap;
+        Map<String, List<Part>> partMap = parts.getPartMap();
 
         allFieldsAreLoadedCorrectly(partMap, false, true, true, false);
 
@@ -210,7 +210,7 @@ public class MultipartFormMapTest {
 
     private void assertFileIsCorrect(Part filePart, String expectedFilename, InputStream inputStream, boolean inMemory) throws IOException {
         assertThat(expectedFilename + " in memory?", filePart.isInMemory(), equalTo(inMemory));
-        assertThat(filePart.fileName, equalTo(expectedFilename));
+        assertThat(filePart.getFileName(), equalTo(expectedFilename));
         StreamingMultipartFormHappyTests.compareStreamToFile(inputStream, filePart.getFileName());
     }
 

@@ -116,7 +116,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             return parseNextPart()
         } else {
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
-            val fieldName = if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"])
+            val fieldName = (if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"]))
             val filename = filenameFromMap(contentDisposition)
 
             return StreamingPart(
