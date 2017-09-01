@@ -1,0 +1,13 @@
+description = 'http4k multipart form support'
+
+ext {
+}
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+
+    testCompile testing
+}
+
