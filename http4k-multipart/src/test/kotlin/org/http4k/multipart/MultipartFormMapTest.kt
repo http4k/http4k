@@ -39,17 +39,14 @@ class MultipartFormMapTest {
 
                 val parts = MultipartFormMap.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory!!)
                 try {
-
-                    val partMap = parts.partMap
-
-                    val articleType = partMap["articleType"]!![0]
+                    val articleType = parts.partMap["articleType"]!![0]
                     println(articleType.fieldName) // "articleType"
                     println(articleType.headers) // {Content-Disposition=form-data; name="articleType"}
                     println(articleType.length) // 8 bytes
                     println(articleType.isInMemory) // true
                     println(articleType.string) // "obituary"
 
-                    val simple7bit = partMap["uploadManuscript"]!![0]
+                    val simple7bit = parts.partMap["uploadManuscript"]!![0]
                     println(simple7bit.fieldName) // "uploadManuscript"
                     println(simple7bit.fileName) // "simple7bit.txt"
                     println(simple7bit.headers) // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
