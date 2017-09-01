@@ -1,18 +1,20 @@
 package org.http4k.client
 
+import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.HttpHandler
+import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.*
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
@@ -23,23 +25,28 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
-abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler) {
-    @Rule
-    @JvmField var retryRule = RetryRule(5)
+abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, val client: HttpHandler) {
+//    @Rule
+//    @JvmField
+//    var retryRule = RetryRule(5)
 
     private var server: Http4kServer? = null
 
-    private val port = Random().nextInt(1000) + 8000
+    val port = Random().nextInt(1000) + 8000
 
     @Before
     fun before() {
-        server = { request: Request ->
+        val defaultHandler = { request: Request ->
             Response(OK)
-                .header("uri", request.uri.toString())
-                .header("header", request.header("header"))
-                .header("query", request.query("query"))
-                .body(request.body)
-        }.asServer(serverConfig(port)).start()
+                    .header("uri", request.uri.toString())
+                    .header("header", request.header("header"))
+                    .header("query", request.query("query"))
+                    .body(request.body)
+        }
+        server = routes("/someUri" bind POST to defaultHandler,
+                "/empty" bind GET to { _: Request -> Response(OK).body("") },
+                "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") })
+                .asServer(serverConfig(port)).start()
     }
 
     @After
@@ -50,8 +57,8 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     @Test
     fun `can make call`() {
         val response = client(Request(POST, "http://localhost:$port/someUri")
-            .query("query", "123")
-            .header("header", "value").body("body"))
+                .query("query", "123")
+                .header("header", "value").body("body"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("uri"), equalTo("/someUri?query=123"))
@@ -110,5 +117,20 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), containsSubstring("foo"))
+    }
+
+    @Test
+    fun `empty body`() {
+        val response = client(Request(Method.GET, "http://localhost:$port/empty"))
+        response.status.successful.shouldMatch(equalTo(true))
+        response.bodyString().shouldMatch(equalTo(""))
+    }
+
+    @Test
+    fun `redirection response`() {
+        val response = ClientFilters.FollowRedirects()
+            .then(client)(Request(Method.GET, "http://httpbin.org/relative-redirect/5"))
+        response.status.shouldMatch(equalTo(OK))
+        response.bodyString().shouldMatch(anything)
     }
 }
