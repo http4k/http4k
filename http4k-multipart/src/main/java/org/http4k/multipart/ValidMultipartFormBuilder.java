@@ -39,9 +39,7 @@ public class ValidMultipartFormBuilder {
     }
 
     public ValidMultipartFormBuilder field(String name, String value) {
-        part(value,
-                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", name)))
-        );
+        part(value, new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", name))));
         return this;
     }
 
@@ -50,8 +48,9 @@ public class ValidMultipartFormBuilder {
             String headers = headerName + ": " + pairs.stream().map((pair) -> {
                 if (pair.getSecond() != null) {
                     return pair.getFirst() + "=\"" + pair.getSecond() + "\"";
+                } else {
+                    return pair.getFirst();
                 }
-                return pair.getFirst();
             }).collect(Collectors.joining("; "));
 
             builder.write(headers.getBytes(encoding));
