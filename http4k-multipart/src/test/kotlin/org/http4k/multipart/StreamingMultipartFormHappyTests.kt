@@ -163,29 +163,28 @@ class StreamingMultipartFormHappyTests {
         val form = getMultipartFormParts(boundary,
             ValidMultipartFormBuilder(boundary)
                 .part("This is the content of the file\n",
-                    Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("name", "fileFieldName"), Pair("filename", "filename.txt"))),
-                    Pair("Content-Type", listOf(Pair("plain/text", null))),
-                    Pair("Some-header", listOf(Pair("some value", null))))
+                    "Content-Disposition" to listOf("form-data" to null, "name" to "fileFieldName", "filename" to "filename.txt"),
+                    "Content-Type" to listOf("plain/text" to null),
+                    "Some-header" to listOf("some value" to null))
                 .part("This is the content of the field\n",
-                    Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("name", "fieldFieldName"))),
-                    Pair("Another-header", listOf(Pair("some-key", "some-value")))
-                )
+                    "Content-Disposition" to listOf("form-data" to null, "name" to "fieldFieldName"),
+                    "Another-header" to listOf("some-key" to "some-value"))
                 .build())
 
         val file = assertFilePart(form, "fileFieldName", "filename.txt", "plain/text", "This is the content of the file\n")
 
         val fileHeaders = file.headers
         assertThat(fileHeaders.size, equalTo(3))
-        assertThat<String>(fileHeaders["Content-Disposition"], equalTo("form-data; name=\"fileFieldName\"; filename=\"filename.txt\""))
-        assertThat<String>(fileHeaders["Content-Type"], equalTo("plain/text"))
-        assertThat<String>(fileHeaders["Some-header"], equalTo("some value"))
+        assertThat(fileHeaders["Content-Disposition"], equalTo("form-data; name=\"fileFieldName\"; filename=\"filename.txt\""))
+        assertThat(fileHeaders["Content-Type"], equalTo("plain/text"))
+        assertThat(fileHeaders["Some-header"], equalTo("some value"))
 
         val field = assertFieldPart(form, "fieldFieldName", "This is the content of the field\n")
 
         val fieldHeaders = field.headers
         assertThat(fieldHeaders.size, equalTo(2))
-        assertThat<String>(fieldHeaders["Content-Disposition"], equalTo("form-data; name=\"fieldFieldName\""))
-        assertThat<String>(fieldHeaders["Another-header"], equalTo("some-key=\"some-value\""))
+        assertThat(fieldHeaders["Content-Disposition"], equalTo("form-data; name=\"fieldFieldName\""))
+        assertThat(fieldHeaders["Another-header"], equalTo("some-key=\"some-value\""))
 
         assertThereAreNoMoreParts(form)
     }
@@ -301,9 +300,9 @@ val CR_LF = "\r\n"
 
 fun assertRealLifeFile(parts: Iterator<StreamingPart>, fileName: String, contentType: String) {
     val file = parts.next()
-    assertThat<String>("field name", file.fieldName, equalTo("uploadManuscript"))
-    assertThat<String>("file name", file.fileName, equalTo(fileName))
-    assertThat<String>("content type", file.contentType, equalTo(contentType))
+    assertThat("field name", file.fieldName, equalTo("uploadManuscript"))
+    assertThat("file name", file.fileName, equalTo(fileName))
+    assertThat("content type", file.contentType, equalTo(contentType))
     assertPartIsNotField(file)
     compareStreamToFile(file)
 }
@@ -345,8 +344,8 @@ fun getMultipartFormParts(boundary: ByteArray, multipartFormContents: ByteArray,
 fun assertFilePart(form: Iterator<StreamingPart>, fieldName: String, fileName: String, contentType: String, contents: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
     assertThereAreMoreParts(form)
     val file = form.next()
-    assertThat<String>("file name", file.fileName, equalTo(fileName))
-    assertThat<String>("content type", file.contentType, equalTo(contentType))
+    assertThat("file name", file.fileName, equalTo(fileName))
+    assertThat("content type", file.contentType, equalTo(contentType))
     assertPartIsNotField(file)
     assertPart(fieldName, contents, file, encoding)
     return file
@@ -362,7 +361,7 @@ fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, fieldValue
 
 
 fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
-    assertThat<String>("field name", StreamingPart.fieldName, equalTo(fieldName))
+    assertThat("field name", StreamingPart.fieldName, equalTo(fieldName))
     assertThat("contents", StreamingPart.getContentsAsString(encoding, 4096), equalTo(fieldValue))
 }
 
