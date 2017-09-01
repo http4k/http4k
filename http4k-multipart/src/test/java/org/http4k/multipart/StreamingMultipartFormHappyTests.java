@@ -269,7 +269,7 @@ public class StreamingMultipartFormHappyTests {
 
     @Test
     public void canLoadComplexRealLifeSafariExample() throws Exception {
-        Iterator<StreamingPart> parts = StreamingMultipartFormParts.parse(
+        Iterator<StreamingPart> parts = StreamingMultipartFormParts.Companion.parse(
                 "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(StandardCharsets.UTF_8),
                 new FileInputStream("examples/safari-example.multipart"),
                 StandardCharsets.UTF_8
@@ -286,7 +286,7 @@ public class StreamingMultipartFormHappyTests {
 
     @Test
     public void canLoadComplexRealLifeChromeExample() throws Exception {
-        Iterator<StreamingPart> parts = StreamingMultipartFormParts.parse(
+        Iterator<StreamingPart> parts = StreamingMultipartFormParts.Companion.parse(
                 "----WebKitFormBoundaryft3FGhOMTYoOkCCc".getBytes(StandardCharsets.UTF_8),
                 new FileInputStream("examples/chrome-example.multipart"),
                 StandardCharsets.UTF_8
@@ -339,7 +339,7 @@ public class StreamingMultipartFormHappyTests {
 
     static Iterator<StreamingPart> getMultipartFormParts(byte[] boundary, byte[] multipartFormContents, Charset encoding) throws IOException {
         InputStream multipartFormContentsStream = new ByteArrayInputStream(multipartFormContents);
-        return StreamingMultipartFormParts.parse(boundary, multipartFormContentsStream, encoding).iterator();
+        return StreamingMultipartFormParts.Companion.parse(boundary, multipartFormContentsStream, encoding).iterator();
     }
 
     static StreamingPart assertFilePart(Iterator<StreamingPart> form, String fieldName, String fileName, String contentType, String contents) throws IOException {

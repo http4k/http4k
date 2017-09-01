@@ -24,14 +24,14 @@ public class ValidMultipartFormBuilder {
 
     public ValidMultipartFormBuilder(byte[] boundary, Charset encoding) {
         this.encoding = encoding;
-        this.boundary.push(StreamingMultipartFormParts.prependBoundaryWithStreamTerminator(boundary));
+        this.boundary.push(StreamingMultipartFormParts.Companion.prependBoundaryWithStreamTerminator(boundary));
     }
 
     public byte[] build() {
         try {
             builder.write(boundary.peek());
-            builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR);
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getSTREAM_TERMINATOR());
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             return builder.toByteArray();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,7 +54,7 @@ public class ValidMultipartFormBuilder {
             }).collect(Collectors.joining("; "));
 
             builder.write(headers.getBytes(encoding));
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,13 +63,13 @@ public class ValidMultipartFormBuilder {
     public ValidMultipartFormBuilder part(String contents, Pair<String, List<Pair<String, String>>>... headers) {
         try {
             builder.write(boundary.peek());
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             asList(headers).forEach(header -> {
                 appendHeader(header.getFirst(), header.getSecond());
             });
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             builder.write(contents.getBytes(encoding));
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -87,9 +87,9 @@ public class ValidMultipartFormBuilder {
     public ValidMultipartFormBuilder rawPart(String raw) {
         try {
             builder.write(boundary.peek());
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             builder.write(raw.getBytes(encoding));
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -99,11 +99,11 @@ public class ValidMultipartFormBuilder {
     public ValidMultipartFormBuilder startMultipart(String multipartFieldName, String subpartBoundary) {
         try {
             builder.write(boundary.peek());
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             appendHeader("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", multipartFieldName)));
             appendHeader("Content-Type", asList(new Pair("multipart/mixed", null), new Pair("boundary", subpartBoundary)));
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
-            boundary.push((new String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).getBytes(encoding));
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
+            boundary.push((new String(StreamingMultipartFormParts.Companion.getSTREAM_TERMINATOR(), encoding) + subpartBoundary).getBytes(encoding));
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,8 +121,8 @@ public class ValidMultipartFormBuilder {
     public ValidMultipartFormBuilder endMultipart() {
         try {
             builder.write(boundary.pop());
-            builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR);
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
+            builder.write(StreamingMultipartFormParts.Companion.getSTREAM_TERMINATOR());
+            builder.write(StreamingMultipartFormParts.Companion.getFIELD_SEPARATOR());
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);

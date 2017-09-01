@@ -199,7 +199,7 @@ public class StreamingMultipartFormSadTests {
     public void failsIfHeadingTooLong() throws Exception {
         String boundary = "---2345";
 
-        char[] chars = new char[StreamingMultipartFormParts.HEADER_SIZE_MAX];
+        char[] chars = new char[StreamingMultipartFormParts.Companion.getHEADER_SIZE_MAX()];
         Arrays.fill(chars, 'x');
         Iterator<StreamingPart> form = StreamingMultipartFormHappyTests.getMultipartFormParts(boundary, new ValidMultipartFormBuilder(boundary)
             .file("aFile", new String(chars), "application/octet-stream", "File contents here").build());
