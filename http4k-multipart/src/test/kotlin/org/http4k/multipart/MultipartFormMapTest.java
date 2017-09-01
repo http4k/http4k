@@ -46,7 +46,7 @@ public class MultipartFormMapTest {
 
             byte[] boundary = contentType.substring(contentType.indexOf("boundary=") + "boundary=".length()).getBytes(ISO_8859_1);
             Iterable<StreamingPart> streamingParts = StreamingMultipartFormParts.parse(
-                boundary, body, ISO_8859_1, maxStreamLength);
+                    boundary, body, ISO_8859_1, maxStreamLength);
 
             try (Parts parts = MultipartFormMap.INSTANCE.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory)) {
                 Map<String, List<Part>> partMap = parts.partMap;
@@ -78,45 +78,43 @@ public class MultipartFormMapTest {
     public void uploadMultipleFilesAndFields() throws Exception {
         String boundary = "-----1234";
         InputStream multipartFormContentsStream = new ByteArrayInputStream(new ValidMultipartFormBuilder(boundary)
-            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n")
-            .field("field", "fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf")
-            .field("multi", "value1")
-            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
-            .field("multi", "value2")
-            .build());
+                .file("file", "foo.tab", "text/whatever", "This is the content of the file\n")
+                .field("field", "fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf")
+                .field("multi", "value1")
+                .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
+                .field("multi", "value2")
+                .build());
         Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(boundary.getBytes(UTF_8), multipartFormContentsStream, UTF_8);
 
-        try (Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)) {
-            Map<String, List<Part>> partMap = parts.partMap;
+        Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY);
+        Map<String, List<Part>> partMap = parts.partMap;
 
-            assertThat(partMap.get("file").get(0).fileName, equalTo("foo.tab"));
-            assertThat(partMap.get("anotherFile").get(0).fileName, equalTo("BAR.tab"));
-            StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("field").get(0).getNewInputStream(), new ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf").getBytes()));
-            StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(0).getNewInputStream(), new ByteArrayInputStream("value1".getBytes()));
-            StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(1).getNewInputStream(), new ByteArrayInputStream("value2".getBytes()));
-        }
+        assertThat(partMap.get("file").get(0).fileName, equalTo("foo.tab"));
+        assertThat(partMap.get("anotherFile").get(0).fileName, equalTo("BAR.tab"));
+        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("field").get(0).getNewInputStream(), new ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf").getBytes()));
+        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(0).getNewInputStream(), new ByteArrayInputStream("value1".getBytes()));
+        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap.get("multi").get(1).getNewInputStream(), new ByteArrayInputStream("value2".getBytes()));
+        parts.close();
     }
 
     @Test
     public void canLoadComplexRealLifeSafariExample() throws Exception {
         Iterable<StreamingPart> form = safariExample();
 
-        try (Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY)) {
-            Map<String, List<Part>> partMap = parts.partMap;
-
-            allFieldsAreLoadedCorrectly(partMap, true, true, true, true);
-
-        }
+        Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY);
+        Map<String, List<Part>> partMap = parts.partMap;
+        allFieldsAreLoadedCorrectly(partMap, true, true, true, true);
+        parts.close();
 
     }
 
     @Test
     public void throwsExceptionIfFormIsTooBig() throws Exception {
         Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(
-            "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
-            new FileInputStream("examples/safari-example.multipart"),
-            UTF_8,
-            1024
+                "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
+                new FileInputStream("examples/safari-example.multipart"),
+                UTF_8,
+                1024
         );
 
         try {
@@ -131,13 +129,13 @@ public class MultipartFormMapTest {
     public void savesAllPartsToDisk() throws Exception {
         Iterable<StreamingPart> form = safariExample();
 
-        try (Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 100, TEMPORARY_FILE_DIRECTORY)) {
-            Map<String, List<Part>> partMap = parts.partMap;
+        Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 100, TEMPORARY_FILE_DIRECTORY);
+        Map<String, List<Part>> partMap = parts.partMap;
 
-            allFieldsAreLoadedCorrectly(partMap, false, false, false, false);
+        allFieldsAreLoadedCorrectly(partMap, false, false, false, false);
 
-            assertThat(temporaryFileList().length, equalTo(4));
-        }
+        assertThat(temporaryFileList().length, equalTo(4));
+        parts.close();
         assertThat(temporaryFileList().length, equalTo(0));
     }
 
@@ -145,31 +143,33 @@ public class MultipartFormMapTest {
     public void savesSomePartsToDisk() throws Exception {
         Iterable<StreamingPart> form = safariExample();
 
-        try (Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)) {
-            Map<String, List<Part>> partMap = parts.partMap;
+        Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY);
+        Map<String, List<Part>> partMap = parts.partMap;
 
-            allFieldsAreLoadedCorrectly(partMap, false, true, true, false);
+        allFieldsAreLoadedCorrectly(partMap, false, true, true, false);
 
-            String[] files = temporaryFileList();
-            assertPartSaved("simple7bit.txt", files);
-            assertPartSaved("starbucks.jpeg", files);
-            assertThat(files.length, equalTo(2));
-        }
+        String[] files = temporaryFileList();
+        assertPartSaved("simple7bit.txt", files);
+        assertPartSaved("starbucks.jpeg", files);
+        assertThat(files.length, equalTo(2));
+
+        parts.close();
         assertThat(temporaryFileList().length, equalTo(0));
     }
 
     @Test
     public void throwsExceptionIfMultipartMalformed() throws Exception {
         Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(
-            "---2345".getBytes(UTF_8),
-            new ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.CR_LF +
-                "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.CR_LF +
-                "" + StreamingMultipartFormHappyTests.CR_LF +
-                "value" + // no CR_LF
-                "-----2345--" + StreamingMultipartFormHappyTests.CR_LF).getBytes()),
-            UTF_8);
+                "---2345".getBytes(UTF_8),
+                new ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.CR_LF +
+                        "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.CR_LF +
+                        "" + StreamingMultipartFormHappyTests.CR_LF +
+                        "value" + // no CR_LF
+                        "-----2345--" + StreamingMultipartFormHappyTests.CR_LF).getBytes()),
+                UTF_8);
 
-        try (Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)) {
+        try {
+            MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY);
             fail("Should have thrown an Exception");
         } catch (TokenNotFoundException e) {
             assertThat(e.getMessage(), equalTo("Boundary must be proceeded by field separator, but didn't find it"));
@@ -178,9 +178,9 @@ public class MultipartFormMapTest {
 
     private Iterable<StreamingPart> safariExample() throws IOException {
         return StreamingMultipartFormParts.parse(
-            "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
-            new FileInputStream("examples/safari-example.multipart"),
-            UTF_8
+                "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
+                new FileInputStream("examples/safari-example.multipart"),
+                UTF_8
         );
     }
 
@@ -200,8 +200,8 @@ public class MultipartFormMapTest {
 
     private void assertPartSaved(final String fileName, String[] files) {
         assertTrue(
-            "couldn't find " + fileName + " in " + Arrays.toString(files),
-            files[0].contains(fileName) || files[1].contains(fileName));
+                "couldn't find " + fileName + " in " + Arrays.toString(files),
+                files[0].contains(fileName) || files[1].contains(fileName));
     }
 
     private void assertFileIsCorrect(Part filePart, String expectedFilename, boolean inMemory) throws IOException {
