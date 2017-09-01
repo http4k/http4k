@@ -1,25 +1,17 @@
 package org.http4k.multipart.part
 
-import java.io.ByteArrayInputStream
 import java.io.Closeable
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.FileSystemException
 
 sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, fileName: String?, headers: Map<String, String>, val length: Int) : PartMetaData(fieldName, formField, contentType, fileName, headers), Closeable {
 
-    abstract val newInputStream: InputStream
-
     abstract val bytes: ByteArray
 
     abstract val string: String
 
-    class DiskBacked(part: PartMetaData, private val theFile: File) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
-
-        override val newInputStream: InputStream
-            get() = FileInputStream(theFile)
+    class DiskBacked(part: PartMetaData, internal val theFile: File) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
 
         override val bytes
             get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
@@ -50,9 +42,6 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
                 }
                 return content!!
             }
-
-        override val newInputStream: InputStream
-            get() = ByteArrayInputStream(bytes)
 
         override fun close() {
             // do nothing

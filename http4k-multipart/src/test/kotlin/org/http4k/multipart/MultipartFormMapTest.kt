@@ -53,7 +53,7 @@ class MultipartFormMapTest {
                     // Content-Type => text/plain}
                     println(simple7bit.length) // 8221 bytes
                     println(simple7bit.isInMemory()) // false
-                    simple7bit.newInputStream // stream of the contents of the file
+                    simple7bit.newInputStream() // stream of the contents of the file
                 } finally {
                     parts.close()
                 }
@@ -81,9 +81,9 @@ class MultipartFormMapTest {
 
         assertThat<String>(partMap["file"]!![0].fileName, equalTo("foo.tab"))
         assertThat<String>(partMap["anotherFile"]!![0].fileName, equalTo("BAR.tab"))
-        compareOneStreamToAnother(partMap["field"]!![0].newInputStream, ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
-        compareOneStreamToAnother(partMap["multi"]!![0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
-        compareOneStreamToAnother(partMap["multi"]!![1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
+        compareOneStreamToAnother(partMap["field"]!![0].newInputStream(), ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
+        compareOneStreamToAnother(partMap["multi"]!![0].newInputStream(), ByteArrayInputStream("value1".toByteArray()))
+        compareOneStreamToAnother(partMap["multi"]!![1].newInputStream(), ByteArrayInputStream("value2".toByteArray()))
         parts.close()
     }
 
@@ -197,7 +197,7 @@ class MultipartFormMapTest {
 
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
-        assertFileIsCorrect(filePart, expectedFilename, filePart.newInputStream, inMemory)
+        assertFileIsCorrect(filePart, expectedFilename, filePart.newInputStream(), inMemory)
     }
 
 
@@ -221,3 +221,8 @@ class MultipartFormMapTest {
 }
 
 fun Part.isInMemory(): Boolean = this is Part.InMemory
+
+fun Part.newInputStream(): InputStream = when(this) {
+    is Part.DiskBacked -> FileInputStream(theFile)
+    is Part.InMemory -> ByteArrayInputStream(bytes)
+}
