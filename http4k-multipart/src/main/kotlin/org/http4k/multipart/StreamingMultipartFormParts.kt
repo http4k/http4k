@@ -169,12 +169,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             nextIsKnown = true
 
             if (state == MultipartFormStreamState.contents) {
-                try {
-                    currentPart!!.inputStream.close()
-                } catch (e: Exception) {
-                    /* ???? */
-                }
-
+                currentPart!!.inputStream.close()
             }
 
             currentPart = safelyParseNextPart()
@@ -198,11 +193,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             } else {
 
                 if (state == MultipartFormStreamState.contents) {
-                    try {
-                        currentPart!!.inputStream.close()
-                    } catch (e: Exception) {
-                        throw RuntimeException("Closing a part inputstream: ", e)
-                    }
+                    currentPart!!.inputStream.close()
                 }
 
                 currentPart = safelyParseNextPart()
@@ -234,18 +225,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         internal var endOfStream = false
         internal var closed = false
 
-
-        override fun read(): Int {
-            if (closed) {
-                throw AlreadyClosedException()
-            }
-
-            return if (endOfStream) {
-                -1
-            } else readNextByte()
-
-        }
-
+        override fun read(): Int = if (closed) throw AlreadyClosedException() else if (endOfStream) -1 else readNextByte()
 
         private fun readNextByte(): Int {
             val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix!!)
