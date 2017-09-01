@@ -70,7 +70,7 @@ class MultipartFormMapTest {
         val boundary = "-----1234"
         val multipartFormContentsStream = ByteArrayInputStream(ValidMultipartFormBuilder(boundary)
             .file("file", "foo.tab", "text/whatever", "This is the content of the file\n")
-            .field("field", "fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf")
+            .field("field", "fieldValue" + CR_LF + "with cr lf")
             .field("multi", "value1")
             .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
             .field("multi", "value2")
@@ -82,9 +82,9 @@ class MultipartFormMapTest {
 
         assertThat<String>(partMap["file"]!![0].fileName, equalTo("foo.tab"))
         assertThat<String>(partMap["anotherFile"]!![0].fileName, equalTo("BAR.tab"))
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap["field"]!![0].newInputStream, ByteArrayInputStream(("fieldValue" + StreamingMultipartFormHappyTests.CR_LF + "with cr lf").toByteArray()))
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap["multi"]!![0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
-        StreamingMultipartFormHappyTests.compareOneStreamToAnother(partMap["multi"]!![1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
+        compareOneStreamToAnother(partMap["field"]!![0].newInputStream, ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
+        compareOneStreamToAnother(partMap["multi"]!![0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
+        compareOneStreamToAnother(partMap["multi"]!![1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
         parts.close()
     }
 
@@ -158,12 +158,12 @@ class MultipartFormMapTest {
     fun throwsExceptionIfMultipartMalformed() {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
-            ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.CR_LF +
-                "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.CR_LF +
-                "" + StreamingMultipartFormHappyTests.CR_LF +
+            ByteArrayInputStream(("-----2345" + CR_LF +
+                "Content-Disposition: form-data; name=\"name\"" + CR_LF +
+                "" + CR_LF +
                 "value" + // no CR_LF
 
-                "-----2345--" + StreamingMultipartFormHappyTests.CR_LF).toByteArray()),
+                "-----2345--" + CR_LF).toByteArray()),
             UTF_8)
 
         try {
@@ -214,7 +214,7 @@ class MultipartFormMapTest {
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inputStream: InputStream, inMemory: Boolean) {
         assertThat(expectedFilename + " in memory?", filePart.isInMemory, equalTo(inMemory))
         assertThat<String>(filePart.fileName, equalTo(expectedFilename))
-        StreamingMultipartFormHappyTests.compareStreamToFile(inputStream, filePart.fileName)
+        compareStreamToFile(inputStream, filePart.fileName)
     }
 
     private fun temporaryFileList(): Array<String>? {

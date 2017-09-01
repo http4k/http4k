@@ -34,20 +34,20 @@ class StreamingMultipartFormEncodingTests {
 
 
     private fun testForm(form: Iterator<StreamingPart>, simpleChar: String, complexChar: String, encoding: Charset) {
-        StreamingMultipartFormHappyTests.assertFilePart(form, "file", "foo.tab" + complexChar, "text/whatever" + simpleChar + complexChar, "This is the content of the file" + simpleChar + complexChar, encoding)
-        StreamingMultipartFormHappyTests.assertFieldPart(form, "field" + complexChar, "fieldValue" + simpleChar + complexChar, encoding)
-        StreamingMultipartFormHappyTests.assertFieldPart(form, "multi", "value1" + simpleChar, encoding)
-        StreamingMultipartFormHappyTests.assertFilePart(form, "anotherFile", "BAR.tab", "text/something" + simpleChar, "This is another file" + simpleChar, encoding)
-        StreamingMultipartFormHappyTests.assertFieldPart(form, "multi", "value2" + simpleChar, encoding)
+        assertFilePart(form, "file", "foo.tab" + complexChar, "text/whatever" + simpleChar + complexChar, "This is the content of the file" + simpleChar + complexChar, encoding)
+        assertFieldPart(form, "field" + complexChar, "fieldValue" + simpleChar + complexChar, encoding)
+        assertFieldPart(form, "multi", "value1" + simpleChar, encoding)
+        assertFilePart(form, "anotherFile", "BAR.tab", "text/something" + simpleChar, "This is another file" + simpleChar, encoding)
+        assertFieldPart(form, "multi", "value2" + simpleChar, encoding)
 
-        StreamingMultipartFormHappyTests.assertThereAreNoMoreParts(form)
+        assertThereAreNoMoreParts(form)
     }
 
 
     private fun constructForm(encoding: Charset): Iterator<StreamingPart> {
         val boundary = "-----\u00E91234\uD83D\uDCA9"
         val boundaryBytes = boundary.toByteArray(encoding)
-        return StreamingMultipartFormHappyTests.getMultipartFormParts(boundaryBytes,
+        return getMultipartFormParts(boundaryBytes,
             ValidMultipartFormBuilder(boundaryBytes, encoding)
                 .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9")
                 .field("field\uD83D\uDCA9", "fieldValue\u00E9\uD83D\uDCA9")
