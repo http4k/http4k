@@ -1,5 +1,6 @@
 package org.http4k.multipart;
 
+import kotlin.Pair;
 import org.http4k.multipart.exceptions.AlreadyClosedException;
 import org.http4k.multipart.part.StreamingPart;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.http4k.multipart.ValidMultipartFormBuilder.pair;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -172,12 +172,12 @@ public class StreamingMultipartFormHappyTests {
         Iterator<StreamingPart> form = getMultipartFormParts(boundary,
                 new ValidMultipartFormBuilder(boundary)
                         .part("This is the content of the file\n",
-                                pair("Content-Disposition", asList(pair("form-data", null), pair("name", "fileFieldName"), pair("filename", "filename.txt"))),
-                                pair("Content-Type", asList(pair("plain/text", null))),
-                                pair("Some-header", asList(pair("some value", null))))
+                                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", "fileFieldName"), new Pair("filename", "filename.txt"))),
+                                new Pair("Content-Type", asList(new Pair("plain/text", null))),
+                                new Pair("Some-header", asList(new Pair("some value", null))))
                         .part("This is the content of the field\n",
-                                pair("Content-Disposition", asList(pair("form-data", null), pair("name", "fieldFieldName"))),
-                                pair("Another-header", asList(pair("some-key", "some-value")))
+                                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", "fieldFieldName"))),
+                                new Pair("Another-header", asList(new Pair("some-key", "some-value")))
                         )
                         .build());
 

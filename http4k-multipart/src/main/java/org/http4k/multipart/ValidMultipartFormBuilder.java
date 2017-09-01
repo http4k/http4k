@@ -1,5 +1,7 @@
 package org.http4k.multipart;
 
+import kotlin.Pair;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,7 +40,7 @@ public class ValidMultipartFormBuilder {
 
     public ValidMultipartFormBuilder field(String name, String value) {
         part(value,
-            pair("Content-Disposition", asList(pair("form-data", null), pair("name", name)))
+                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", name)))
         );
         return this;
     }
@@ -46,10 +48,10 @@ public class ValidMultipartFormBuilder {
     private void appendHeader(final String headerName, List<Pair<String, String>> pairs) {
         try {
             String headers = headerName + ": " + pairs.stream().map((pair) -> {
-                if (pair.getValue() != null) {
-                    return pair.getKey() + "=\"" + pair.getValue() + "\"";
+                if (pair.getSecond() != null) {
+                    return pair.getFirst() + "=\"" + pair.getSecond() + "\"";
                 }
-                return pair.getKey();
+                return pair.getFirst();
             }).collect(Collectors.joining("; "));
 
             builder.write(headers.getBytes(encoding));
@@ -64,7 +66,7 @@ public class ValidMultipartFormBuilder {
             builder.write(boundary.peek());
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
             asList(headers).forEach(header -> {
-                appendHeader(header.getKey(), header.getValue());
+                appendHeader(header.getFirst(), header.getSecond());
             });
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
             builder.write(contents.getBytes(encoding));
@@ -77,8 +79,8 @@ public class ValidMultipartFormBuilder {
 
     public ValidMultipartFormBuilder file(String fieldName, String filename, String contentType, String contents) {
         part(contents,
-            pair("Content-Disposition", asList(pair("form-data", null), pair("name", fieldName), pair("filename", filename))),
-            pair("Content-Type", asList(pair(contentType, null)))
+                new Pair("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", fieldName), new Pair("filename", filename))),
+                new Pair("Content-Type", asList(new Pair(contentType, null)))
         );
         return this;
     }
@@ -99,8 +101,8 @@ public class ValidMultipartFormBuilder {
         try {
             builder.write(boundary.peek());
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
-            appendHeader("Content-Disposition", asList(pair("form-data", null), pair("name", multipartFieldName)));
-            appendHeader("Content-Type", asList(pair("multipart/mixed", null), pair("boundary", subpartBoundary)));
+            appendHeader("Content-Disposition", asList(new Pair("form-data", null), new Pair("name", multipartFieldName)));
+            appendHeader("Content-Type", asList(new Pair("multipart/mixed", null), new Pair("boundary", subpartBoundary)));
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR);
             boundary.push((new String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).getBytes(encoding));
             return this;
@@ -111,8 +113,8 @@ public class ValidMultipartFormBuilder {
 
     public ValidMultipartFormBuilder attachment(String fileName, String contentType, String contents) {
         part(contents,
-            pair("Content-Disposition", asList(pair("attachment", null), pair("filename", fileName))),
-            pair("Content-Type", asList(pair(contentType, null)))
+                new Pair("Content-Disposition", asList(new Pair("attachment", null), new Pair("filename", fileName))),
+                new Pair("Content-Type", asList(new Pair(contentType, null)))
         );
         return this;
     }
@@ -125,29 +127,6 @@ public class ValidMultipartFormBuilder {
             return this;
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public static <K, V> Pair<K, V> pair(K key, V value) {
-        return new Pair<>(key, value);
-    }
-
-    public static class Pair<K, V> {
-
-        public final K key;
-        public final V value;
-
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
         }
     }
 }
