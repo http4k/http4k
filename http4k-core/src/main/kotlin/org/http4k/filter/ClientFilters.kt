@@ -68,6 +68,7 @@ object ClientFilters {
             return if (response.isRedirection() && request.allowsRedirection()) {
                 if (attempt == 10) throw IllegalStateException("Too many redirection")
                 val location = response.header("location")?.removeCharset().orEmpty()
+                response.assureBodyIsConsumed()
                 makeRequest(next, request.uri(request.newLocation(location)), attempt + 1)
             } else {
                 response
@@ -80,6 +81,8 @@ object ClientFilters {
                 locationUri.authority(uri.authority).scheme(uri.scheme)
             } else locationUri
         }
+
+        private fun Response.assureBodyIsConsumed() = body.stream.close()
 
         private fun Response.isRedirection(): Boolean {
             return status.redirection && header("location")?.let(String::isNotBlank) ?: false
