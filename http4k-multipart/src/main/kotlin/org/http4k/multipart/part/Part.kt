@@ -12,8 +12,6 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
 
     abstract val newInputStream: InputStream
 
-    abstract val isInMemory: Boolean
-
     abstract val bytes: ByteArray
 
     abstract val string: String
@@ -22,8 +20,6 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
 
         override val newInputStream: InputStream
             get() = FileInputStream(theFile)
-
-        override val isInMemory = false
 
         override val bytes
             get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
@@ -57,8 +53,6 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
 
         override val newInputStream: InputStream
             get() = ByteArrayInputStream(bytes)
-
-        override val isInMemory = true
 
         override fun close() {
             // do nothing
