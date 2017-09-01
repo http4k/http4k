@@ -25,7 +25,8 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     private var server: Http4kServer? = null
 
     @Rule
-    @JvmField var retryRule = RetryRule(5)
+    @JvmField
+    var retryRule = RetryRule(5)
 
     private val port = Random().nextInt(1000) + 8000
 
@@ -40,6 +41,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     Response(ACCEPTED)
                         .header("content-type", "text/plain")
                 },
+                "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
                 "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
                 "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
                 "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
@@ -98,6 +100,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("one, two, three"))
+    }
+
+    @Test
+    fun `deals with streaming response`() {
+        val response = client(Request(GET, "http://localhost:$port/stream"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("hello"))
     }
 
     @After

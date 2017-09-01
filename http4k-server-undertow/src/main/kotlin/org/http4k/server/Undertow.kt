@@ -11,8 +11,6 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import java.nio.ByteBuffer
-
 
 /**
  * Exposed to allow for insertion into a customised Undertow server instance
@@ -25,7 +23,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         headers.forEach {
             exchange.responseHeaders.put(HttpString(it.first), it.second)
         }
-        exchange.responseSender.send(ByteBuffer.wrap(body.stream.readBytes()))
+        body.stream.copyTo(exchange.outputStream)
     }
 
     private fun HttpServerExchange.asRequest(): Request {
