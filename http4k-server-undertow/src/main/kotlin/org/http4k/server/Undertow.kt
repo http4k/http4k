@@ -4,7 +4,6 @@ import io.undertow.Undertow
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.util.HttpString
-import org.apache.commons.io.IOUtils
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -13,7 +12,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 
 /**
@@ -37,10 +35,12 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
             .fold(Request(Method.valueOf(requestMethod.toString()), uri)) {
                 memo, (first, second) ->
                 memo.header(first.toString(), second)
-            }.body(IOUtils.toString(inputStream, Charset.defaultCharset()))
+            }.body(inputStream)
     }
 
-    override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
+    override fun handleRequest(exchange: HttpServerExchange) {
+        if (exchange.isInIoThread) exchange.dispatch(this) else safeHandler(exchange.asRequest()).into(exchange)
+    }
 }
 
 data class Undertow(val port: Int = 8000) : ServerConfig {
