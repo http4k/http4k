@@ -3,7 +3,8 @@ package org.http4k.server
 
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
-import io.netty.buffer.Unpooled.wrappedBuffer
+import io.netty.buffer.ByteBufOutputStream
+import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
@@ -27,9 +28,6 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.nio.ByteBuffer
 
 
 /**
@@ -50,23 +48,19 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-        val responseBody = wrappedBuffer(ByteBuffer.wrap(body.stream.readBytes()))
-        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), responseBody)
+        val nettyBody = Unpooled.buffer()
+        val out = ByteBufOutputStream(nettyBody)
+        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), nettyBody)
         headers.forEach { (key, value) -> res.headers().set(key, value) }
+        body.stream.copyTo(out)
         return res
-    }
-
-    private fun InputStream.readAll(estimatedSize: Int = DEFAULT_BUFFER_SIZE): ByteArray {
-        val buffer = ByteArrayOutputStream(Math.max(estimatedSize, this.available()))
-        copyTo(buffer)
-        return buffer.toByteArray()
     }
 
     private fun FullHttpRequest.asRequest(): Request =
         headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) {
             memo, next ->
             memo.header(next.key, next.value)
-        }.body(Body(ByteBuffer.wrap(ByteBufInputStream(content()).readAll())))
+        }.body(Body(ByteBufInputStream(content())))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
