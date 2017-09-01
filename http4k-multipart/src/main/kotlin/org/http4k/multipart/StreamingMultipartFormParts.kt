@@ -132,7 +132,9 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
 
 
     private fun parseHeaderLines(): Map<String, String> {
-        assertStateIs(MultipartFormStreamState.header)
+        if (MultipartFormStreamState.header != state) {
+            throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got ${state}")
+        }
 
         val result = HashMap<String, String>()
         var previousHeaderName: String? = null
@@ -246,7 +248,6 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             closed = true
             if (!endOfStream) {
                 try {
-
                     while (readNextByte() >= 0) {
                         // drop unwanted bytes :(
                     }
@@ -259,12 +260,6 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         }
     }
 
-    private fun assertStateIs(expectedState: MultipartFormStreamState) {
-        if (expectedState != state) {
-            throw IllegalStateException("Expected state $expectedState but got $state")
-        }
-    }
-
     private enum class MultipartFormStreamState {
         findPrefix, findBoundary, boundaryFound, eos, header, contents, error
     }
@@ -272,21 +267,20 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
     companion object {
         private val DEFAULT_BUFSIZE = 4096
 
-
         /**
          * The Carriage Return ASCII character value.
          */
-        val CR: Byte = 0x0D
+        private val CR: Byte = 0x0D
 
         /**
          * The Line Feed ASCII character value.
          */
-        val LF: Byte = 0x0A
+        private val LF: Byte = 0x0A
 
         /**
          * The dash (-) ASCII character value.
          */
-        val DASH: Byte = 0x2D
+        private val DASH: Byte = 0x2D
 
         /**
          * The maximum length of all headers
