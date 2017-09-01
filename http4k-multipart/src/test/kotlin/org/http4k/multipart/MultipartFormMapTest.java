@@ -1,7 +1,5 @@
 package org.http4k.multipart;
 
-import org.http4k.multipart.exceptions.StreamTooLongException;
-import org.http4k.multipart.exceptions.TokenNotFoundException;
 import org.http4k.multipart.part.Part;
 import org.http4k.multipart.part.Parts;
 import org.http4k.multipart.part.StreamingPart;
@@ -66,8 +64,6 @@ public class MultipartFormMapTest {
                 System.out.println(simple7bit.getLength()); // 8221 bytes
                 System.out.println(simple7bit.isInMemory()); // false
                 simple7bit.getNewInputStream(); // stream of the contents of the file
-            } catch (IOException e) {
-                // parsing can go wrong... handle it here
             }
         } catch (IOException e) {
             // general stream exceptions
@@ -120,7 +116,7 @@ public class MultipartFormMapTest {
         try {
             MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY);
             fail("should have failed because the form is too big");
-        } catch (StreamTooLongException e) {
+        } catch (Throwable e) {
             assertThat(e.getMessage(), containsString("Form contents was longer than 1024 bytes"));
         }
     }
@@ -171,7 +167,7 @@ public class MultipartFormMapTest {
         try {
             MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY);
             fail("Should have thrown an Exception");
-        } catch (TokenNotFoundException e) {
+        } catch (Throwable e) {
             assertThat(e.getMessage(), equalTo("Boundary must be proceeded by field separator, but didn't find it"));
         }
     }
