@@ -43,7 +43,7 @@ class MultipartFormMapTest {
                     println(articleType.fieldName) // "articleType"
                     println(articleType.headers) // {Content-Disposition=form-data; name="articleType"}
                     println(articleType.length) // 8 bytes
-                    println(articleType.isInMemory) // true
+                    println(articleType.isInMemory()) // true
                     println(articleType.string) // "obituary"
 
                     val simple7bit = parts.partMap["uploadManuscript"]!![0]
@@ -52,7 +52,7 @@ class MultipartFormMapTest {
                     println(simple7bit.headers) // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
                     // Content-Type => text/plain}
                     println(simple7bit.length) // 8221 bytes
-                    println(simple7bit.isInMemory) // false
+                    println(simple7bit.isInMemory()) // false
                     simple7bit.newInputStream // stream of the contents of the file
                 } finally {
                     parts.close()
@@ -169,23 +169,19 @@ class MultipartFormMapTest {
 
     }
 
-    @Throws(IOException::class)
-    private fun safariExample(): Iterable<StreamingPart> {
-        return StreamingMultipartFormParts.parse(
-            "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
-            FileInputStream("examples/safari-example.multipart"),
-            UTF_8
-        )
-    }
+    private fun safariExample(): Iterable<StreamingPart> = StreamingMultipartFormParts.parse(
+        "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
+        FileInputStream("examples/safari-example.multipart"),
+        UTF_8
+    )
 
-    @Throws(IOException::class)
     private fun allFieldsAreLoadedCorrectly(partMap: Map<String, List<Part>>, simple7bit: Boolean, file: Boolean, txt: Boolean, jpeg: Boolean) {
 
         assertFileIsCorrect(partMap["uploadManuscript"]!![0], "simple7bit.txt", simple7bit)
         assertFileIsCorrect(partMap["uploadManuscript"]!![2], "utf8\uD83D\uDCA9.file", file)
 
         val articleType = partMap["articleType"]!![0]
-        assertTrue("articleType", articleType.isInMemory)
+        assertTrue("articleType", articleType.isInMemory())
         assertThat(articleType.string, equalTo("obituary"))
 
         assertFileIsCorrect(partMap["uploadManuscript"]!![3], "utf8\uD83D\uDCA9.txt", txt)
@@ -199,14 +195,14 @@ class MultipartFormMapTest {
             files!![0].contains(fileName) || files[1].contains(fileName))
     }
 
-    @Throws(IOException::class)
+
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
         assertFileIsCorrect(filePart, expectedFilename, filePart.newInputStream, inMemory)
     }
 
-    @Throws(IOException::class)
+
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inputStream: InputStream, inMemory: Boolean) {
-        assertThat(expectedFilename + " in memory?", filePart.isInMemory, equalTo(inMemory))
+        assertThat(expectedFilename + " in memory?", filePart.isInMemory(), equalTo(inMemory))
         assertThat<String>(filePart.fileName, equalTo(expectedFilename))
         compareStreamToFile(inputStream, filePart.fileName)
     }
@@ -223,3 +219,5 @@ class MultipartFormMapTest {
         }
     }
 }
+
+fun Part.isInMemory(): Boolean = this is Part.InMemory
