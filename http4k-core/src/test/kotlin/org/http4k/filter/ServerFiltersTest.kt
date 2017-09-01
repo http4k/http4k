@@ -26,6 +26,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
 import org.http4k.lens.LensFailure
+import org.http4k.lens.Missing
 import org.http4k.lens.Unsupported
 import org.junit.Before
 import org.junit.Test
@@ -171,12 +172,13 @@ class ServerFiltersTest {
 
     @Test
     fun `catch lens failure - invalid`() {
-        val e = LensFailure(Invalid(Header.required("bob").meta))
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta))
         val handler = ServerFilters.CatchLensFailure.then { throw e }
 
         val response = handler(Request(GET, "/"))
 
         response shouldMatch hasStatus(BAD_REQUEST)
+        response.status.description shouldMatch equalTo("header 'bob' must be string; header 'bill' is required")
     }
 
     @Test

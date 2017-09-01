@@ -5,9 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 
 class LensFailureTest {
-    private val unsupported = Unsupported(Meta(true, "", ParamMeta.BooleanParam, "name"))
-    private val invalid = Invalid(Meta(true, "", ParamMeta.BooleanParam, "name"))
-    private val missing = Missing(Meta(true, "", ParamMeta.BooleanParam, "name"))
+    private val unsupported = Unsupported(Header.Common.CONTENT_TYPE.meta)
+    private val invalid = Invalid(Meta(true, "query", ParamMeta.BooleanParam, "name"))
+    private val missing = Missing(Meta(true, "header", ParamMeta.BooleanParam, "name"))
 
     @Test
     fun `overall returns invalid if there are no failures`() {
@@ -28,4 +28,12 @@ class LensFailureTest {
     fun `overall returns missing if there no invalid for unsupported ailures`() {
         assertThat(LensFailure(missing, missing).overall(), equalTo(Failure.Type.Missing))
     }
+
+    @Test
+    fun `failures have descriptive toString`() {
+        assertThat(missing.toString(), equalTo("header 'name' is required"))
+        assertThat(invalid.toString(), equalTo("query 'name' must be boolean"))
+        assertThat(unsupported.toString(), equalTo("header 'content-type' is not acceptable"))
+    }
+
 }

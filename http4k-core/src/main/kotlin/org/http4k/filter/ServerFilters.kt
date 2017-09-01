@@ -104,7 +104,7 @@ object ServerFilters {
                 next(it)
             } catch (lensFailure: LensFailure) {
                 if (lensFailure.overall() == Failure.Type.Unsupported) Response(UNSUPPORTED_MEDIA_TYPE)
-                else Response(BAD_REQUEST)
+                else Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
             }
         }
     }

@@ -24,8 +24,14 @@ sealed class Failure(val type: Type) {
     abstract val meta: Meta
 }
 
-data class Missing(override val meta: Meta) : Failure(Type.Missing)
+data class Missing(override val meta: Meta) : Failure(Type.Missing) {
+    override fun toString(): String = "${meta.location} '${meta.name}' is required"
+}
 
-data class Invalid(override val meta: Meta) : Failure(Type.Invalid)
+data class Invalid(override val meta: Meta) : Failure(Type.Invalid) {
+    override fun toString(): String = "${meta.location} '${meta.name}' must be ${meta.paramMeta.value}"
+}
 
-data class Unsupported(override val meta: Meta) : Failure(Type.Unsupported)
+data class Unsupported(override val meta: Meta) : Failure(Type.Unsupported) {
+    override fun toString(): String = "${meta.location} '${meta.name}' is not acceptable"
+}
