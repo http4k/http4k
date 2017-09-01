@@ -124,18 +124,11 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         }
     }
 
-    private fun filenameFromMap(contentDisposition: Map<String, String>): String? {
-        return if (contentDisposition.containsKey("filename")) {
-            trim(contentDisposition["filename"] ?: "")
-        } else {
-            null
-        }
-    }
+    private fun filenameFromMap(contentDisposition: Map<String, String>): String? =
+        if (contentDisposition.containsKey("filename")) trim(contentDisposition["filename"] ?: "") else null
 
 
-    private fun trim(string: String?): String? {
-        return string?.trim { it <= ' ' }
-    }
+    private fun trim(string: String?): String? = string?.trim { it <= ' ' }
 
 
     private fun parseHeaderLines(): Map<String, String> {
