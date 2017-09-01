@@ -11,10 +11,15 @@ import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import java.net.URI
 
-class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient()) : HttpHandler {
+class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient(), private val bodyMode: ResponseBodyMode = ResponseBodyMode.Memory) : HttpHandler {
 
     override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toHttp4kResponse()
 
@@ -39,7 +44,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun HttpEntity.toTarget(): Body = StreamBody(content)
+    private fun HttpEntity.toTarget(): Body = bodyMode(content)
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 

@@ -3,13 +3,12 @@ package org.http4k.client
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.create
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 
-class OkHttp(private val client: OkHttpClient = defaultOkHttpClient()) : HttpHandler {
+class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: ResponseBodyMode = ResponseBodyMode.Memory) : HttpHandler {
 
     private fun Request.asOkHttp(): okhttp3.Request =
         headers.fold(okhttp3.Request.Builder()
@@ -25,7 +24,7 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient()) : HttpHan
     private fun okhttp3.Response.asHttp4k(): Response {
         val initial = body()?.let {
             Response(Status(code(), ""))
-                .body(Body(it.byteStream()))
+                .body(bodyMode(it.byteStream()))
         } ?: Response(Status(code(), ""))
         return headers().toMultimap().asSequence().fold(
             initial) { memo, headerValues ->
