@@ -44,7 +44,7 @@ class MultipartFormMapTest {
                     println(articleType.headers) // {Content-Disposition=form-data; name="articleType"}
                     println(articleType.length) // 8 bytes
                     println(articleType.isInMemory()) // true
-                    println(articleType.string) // "obituary"
+                    println(articleType.string()) // "obituary"
 
                     val simple7bit = parts.partMap["uploadManuscript"]!![0]
                     println(simple7bit.fieldName) // "uploadManuscript"
@@ -182,7 +182,7 @@ class MultipartFormMapTest {
 
         val articleType = partMap["articleType"]!![0]
         assertTrue("articleType", articleType.isInMemory())
-        assertThat(articleType.string, equalTo("obituary"))
+        assertThat(articleType.string(), equalTo("obituary"))
 
         assertFileIsCorrect(partMap["uploadManuscript"]!![3], "utf8\uD83D\uDCA9.txt", txt)
         assertFileIsCorrect(partMap["uploadManuscript"]!![1], "starbucks.jpeg", jpeg)
@@ -222,7 +222,12 @@ class MultipartFormMapTest {
 
 fun Part.isInMemory(): Boolean = this is Part.InMemory
 
-fun Part.newInputStream(): InputStream = when(this) {
+fun Part.newInputStream(): InputStream = when (this) {
     is Part.DiskBacked -> FileInputStream(theFile)
     is Part.InMemory -> ByteArrayInputStream(bytes)
+}
+
+fun Part.string(): String = when (this) {
+    is Part.DiskBacked -> throw RuntimeException("wat?")
+    is Part.InMemory -> String(bytes, encoding)
 }
