@@ -7,7 +7,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -16,7 +15,6 @@ import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
-import org.http4k.lens.LensFailure
 import java.time.Clock
 import java.time.LocalDateTime
 
@@ -113,19 +111,6 @@ object ClientFilters {
             = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
-    }
-
-    /**
-     * Converts Lens extraction failures into Http 502 (Bad Gateway).
-     */
-    object CatchLensFailure : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
-            try {
-                next(it)
-            } catch (lensFailure: LensFailure) {
-                Response(BAD_GATEWAY)
-            }
-        }
     }
 
     /**
