@@ -65,10 +65,10 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
 
     @Throws(IOException::class)
     private fun matchToken(token: ByteArray, initialCharacter: Int): Boolean {
-        var initialCharacter = initialCharacter
+        var initialChar = initialCharacter
         var eotIndex = 0
-        while (initialCharacter > -1 && initialCharacter.toByte() == token[eotIndex] && ++eotIndex < token.size) {
-            initialCharacter = readFromStream()
+        while (initialChar > -1 && initialChar.toByte() == token[eotIndex] && ++eotIndex < token.size) {
+            initialChar = readFromStream()
         }
         return eotIndex == token.size
     }
