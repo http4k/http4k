@@ -33,6 +33,7 @@ allprojects {
     apply plugin: 'cobertura'
     apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'provided-base'
 
