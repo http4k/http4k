@@ -1,9 +1,9 @@
 package org.http4k.multipart
 
 import org.http4k.multipart.exceptions.ParseError
-import org.http4k.multipart.part.DiskBackedPart
-import org.http4k.multipart.part.InMemoryPart
 import org.http4k.multipart.part.Part
+import org.http4k.multipart.part.Part.DiskBacked
+import org.http4k.multipart.part.Part.InMemory
 import org.http4k.multipart.part.Parts
 import org.http4k.multipart.part.StreamingPart
 import java.io.File
@@ -69,19 +69,18 @@ object MultipartFormMap {
         while (true) {
             val count = partInputStream.read(bytes, length, writeToDiskThreshold - length)
             if (count < 0) {
-                return InMemoryPart(
+                return InMemory(
                     part,
                     storeInMemory(bytes, length, partInputStream), encoding)
             }
             length += count
             if (length >= writeToDiskThreshold) {
-                return DiskBackedPart(
+                return DiskBacked(
                     part,
                     writeToDisk(part.fileName, writeToDiskThreshold, temporaryFileDirectory, bytes, length, partInputStream))
             }
         }
     }
-
 
     private fun storeInMemory(bytes: ByteArray, length: Int, partInputStream: InputStream): ByteArray {
         partInputStream.close()
