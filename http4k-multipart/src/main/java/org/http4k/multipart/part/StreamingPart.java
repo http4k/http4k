@@ -21,7 +21,7 @@ public class StreamingPart extends PartMetaData {
     }
 
     public String getContentsAsString(Charset encoding, int maxPartContentSize) throws IOException {
-        return StreamUtil.readStringFromInputStream(inputStream, encoding, maxPartContentSize);
+        return StreamUtil.INSTANCE.readStringFromInputStream(inputStream, encoding, maxPartContentSize);
     }
 
 }
