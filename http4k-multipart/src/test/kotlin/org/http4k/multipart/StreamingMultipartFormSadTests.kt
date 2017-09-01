@@ -92,8 +92,8 @@ class StreamingMultipartFormSadTests {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
             .part("contents of StreamingPart",
-                Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("bit", "first"), Pair("name", "first-name"))),
-                Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("bot", "second"), Pair("name", "second-name"))))
+                "Content-Disposition" to listOf("form-data" to null, "bit" to "first", "name" to "first-name"),
+                "Content-Disposition" to listOf("form-data" to null, "bot" to "second", "name" to "second-name"))
             .build())
 
         val StreamingPart = form.next()
@@ -247,8 +247,5 @@ class StreamingMultipartFormSadTests {
         } catch (e: ParseError) {
             assertThat(e.message, equalTo(errorMessage))
         }
-
     }
-
-
 }
