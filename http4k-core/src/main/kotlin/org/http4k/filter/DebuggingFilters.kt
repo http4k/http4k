@@ -1,6 +1,8 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpMessage
+import org.http4k.core.StreamBody
 import org.http4k.core.then
 import java.io.PrintStream
 
@@ -10,7 +12,7 @@ object DebuggingFilters {
      * Print details of the request before it is sent to the next service.
      */
     fun PrintRequest(out: PrintStream = System.out): Filter = RequestFilters.Tap { req ->
-        out.println(listOf("***** REQUEST: ${req.method}: ${req.uri} *****", req).joinToString("\n"))
+        out.println(listOf("***** REQUEST: ${req.method}: ${req.uri} *****", req.printable()).joinToString("\n"))
     }
 
     /**
@@ -20,7 +22,7 @@ object DebuggingFilters {
         {
             try {
                 next(it).let { response ->
-                    out.println(listOf("***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****", response).joinToString("\n"))
+                    out.println(listOf("***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****", response.printable()).joinToString("\n"))
                     response
                 }
             } catch (e: Exception) {
@@ -30,6 +32,8 @@ object DebuggingFilters {
             }
         }
     }
+
+    private fun HttpMessage.printable(): HttpMessage = if (body is StreamBody) body("<<stream>>") else this
 
     /**
      * Print details of a request and it's response.
