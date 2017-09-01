@@ -5,14 +5,18 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.*
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
@@ -26,9 +30,9 @@ import org.junit.Test
 import java.util.*
 
 abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, val client: HttpHandler) {
-//    @Rule
-//    @JvmField
-//    var retryRule = RetryRule(5)
+    @Rule
+    @JvmField
+    var retryRule = RetryRule(5)
 
     private var server: Http4kServer? = null
 

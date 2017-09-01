@@ -90,7 +90,7 @@ fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation
     BiDiBodyLensSpec(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
-            target.body.let { listOf(ByteBuffer.wrap(it.stream.readBytes())) }
+            target.body.let { listOf(it.payload) }
         },
         LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE of acceptedContentType) }
     )

@@ -11,8 +11,8 @@ import java.nio.ByteBuffer
 typealias Headers = Parameters
 
 interface Body {
-    val stream: InputStream;
-    val payload: ByteBuffer;
+    val stream: InputStream
+    val payload: ByteBuffer
 
     companion object {
         operator fun invoke(body: String): Body = MemoryBody(body)
