@@ -294,96 +294,90 @@ class StreamingMultipartFormHappyTests {
     }
 
 
-    private fun assertRealLifeFile(parts: Iterator<StreamingPart>, fileName: String, contentType: String) {
-        val file = parts.next()
-        assertThat<String>("field name", file.fieldName, equalTo("uploadManuscript"))
-        assertThat<String>("file name", file.fileName, equalTo(fileName))
-        assertThat<String>("content type", file.contentType, equalTo(contentType))
-        assertPartIsNotField(file)
-        compareStreamToFile(file)
-    }
+}
 
-    companion object {
-
-        val CR_LF = "\r\n"
+val CR_LF = "\r\n"
 
 
-        fun compareStreamToFile(file: StreamingPart) {
-            val formFile = file.inputStream
-            compareStreamToFile(formFile, file.fileName)
-        }
+fun assertRealLifeFile(parts: Iterator<StreamingPart>, fileName: String, contentType: String) {
+    val file = parts.next()
+    assertThat<String>("field name", file.fieldName, equalTo("uploadManuscript"))
+    assertThat<String>("file name", file.fileName, equalTo(fileName))
+    assertThat<String>("content type", file.contentType, equalTo(contentType))
+    assertPartIsNotField(file)
+    compareStreamToFile(file)
+}
+
+fun compareStreamToFile(file: StreamingPart) {
+    val formFile = file.inputStream
+    compareStreamToFile(formFile, file.fileName)
+}
 
 
-        fun compareStreamToFile(actualSream: InputStream, fileName: String?) {
-            val original = FileInputStream("examples/" + fileName!!)
-            compareOneStreamToAnother(actualSream, original)
-        }
+fun compareStreamToFile(actualSream: InputStream, fileName: String?) {
+    val original = FileInputStream("examples/" + fileName!!)
+    compareOneStreamToAnother(actualSream, original)
+}
 
 
-        fun compareOneStreamToAnother(actualStream: InputStream, expectedStream: InputStream) {
-            var index = 0
-            while (true) {
-                val actual = actualStream.read()
-                val expected = expectedStream.read()
-                assertThat("index " + index, actual, equalTo(expected))
-                index++
-                if (actual < 0) {
-                    break
-                }
-            }
-        }
-
-
-        internal fun getMultipartFormParts(boundary: String, multipartFormContents: ByteArray): Iterator<StreamingPart> {
-            return getMultipartFormParts(boundary.toByteArray(StandardCharsets.UTF_8), multipartFormContents, StandardCharsets.UTF_8)
-        }
-
-
-        internal fun getMultipartFormParts(boundary: ByteArray, multipartFormContents: ByteArray, encoding: Charset): Iterator<StreamingPart> {
-            val multipartFormContentsStream = ByteArrayInputStream(multipartFormContents)
-            return StreamingMultipartFormParts.parse(boundary, multipartFormContentsStream, encoding).iterator()
-        }
-
-
-        @JvmOverloads internal fun assertFilePart(form: Iterator<StreamingPart>, fieldName: String, fileName: String, contentType: String, contents: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
-            assertThereAreMoreParts(form)
-            val file = form.next()
-            assertThat<String>("file name", file.fileName, equalTo(fileName))
-            assertThat<String>("content type", file.contentType, equalTo(contentType))
-            assertPartIsNotField(file)
-            assertPart(fieldName, contents, file, encoding)
-            return file
-        }
-
-
-        @JvmOverloads internal fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, fieldValue: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
-            assertThereAreMoreParts(form)
-            val field = form.next()
-            assertPartIsFormField(field)
-            assertPart(fieldName, fieldValue, field, encoding)
-            return field
-        }
-
-
-        private fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
-            assertThat<String>("field name", StreamingPart.fieldName, equalTo(fieldName))
-            assertThat("contents", StreamingPart.getContentsAsString(encoding, 4096), equalTo(fieldValue))
-        }
-
-        internal fun assertThereAreNoMoreParts(form: Iterator<StreamingPart>) {
-            assertFalse("Too many parts", form.hasNext())
-        }
-
-        internal fun assertThereAreMoreParts(form: Iterator<StreamingPart>) {
-            assertTrue("Not enough parts", form.hasNext())
-        }
-
-        private fun assertPartIsFormField(field: StreamingPart) {
-            assertTrue("the StreamingPart is a form field", field.isFormField)
-        }
-
-        internal fun assertPartIsNotField(file: StreamingPart) {
-            assertFalse("the StreamingPart is not a form field", file.isFormField)
+fun compareOneStreamToAnother(actualStream: InputStream, expectedStream: InputStream) {
+    var index = 0
+    while (true) {
+        val actual = actualStream.read()
+        val expected = expectedStream.read()
+        assertThat("index " + index, actual, equalTo(expected))
+        index++
+        if (actual < 0) {
+            break
         }
     }
+}
+
+fun getMultipartFormParts(boundary: String, multipartFormContents: ByteArray): Iterator<StreamingPart> {
+    return getMultipartFormParts(boundary.toByteArray(StandardCharsets.UTF_8), multipartFormContents, StandardCharsets.UTF_8)
+}
+
+fun getMultipartFormParts(boundary: ByteArray, multipartFormContents: ByteArray, encoding: Charset): Iterator<StreamingPart> {
+    val multipartFormContentsStream = ByteArrayInputStream(multipartFormContents)
+    return StreamingMultipartFormParts.parse(boundary, multipartFormContentsStream, encoding).iterator()
+}
+
+fun assertFilePart(form: Iterator<StreamingPart>, fieldName: String, fileName: String, contentType: String, contents: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
+    assertThereAreMoreParts(form)
+    val file = form.next()
+    assertThat<String>("file name", file.fileName, equalTo(fileName))
+    assertThat<String>("content type", file.contentType, equalTo(contentType))
+    assertPartIsNotField(file)
+    assertPart(fieldName, contents, file, encoding)
+    return file
+}
+
+fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, fieldValue: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
+    assertThereAreMoreParts(form)
+    val field = form.next()
+    assertPartIsFormField(field)
+    assertPart(fieldName, fieldValue, field, encoding)
+    return field
+}
+
+
+fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
+    assertThat<String>("field name", StreamingPart.fieldName, equalTo(fieldName))
+    assertThat("contents", StreamingPart.getContentsAsString(encoding, 4096), equalTo(fieldValue))
+}
+
+fun assertThereAreNoMoreParts(form: Iterator<StreamingPart>) {
+    assertFalse("Too many parts", form.hasNext())
+}
+
+fun assertThereAreMoreParts(form: Iterator<StreamingPart>) {
+    assertTrue("Not enough parts", form.hasNext())
+}
+
+fun assertPartIsFormField(field: StreamingPart) {
+    assertTrue("the StreamingPart is a form field", field.isFormField)
+}
+
+fun assertPartIsNotField(file: StreamingPart) {
+    assertFalse("the StreamingPart is not a form field", file.isFormField)
 }
