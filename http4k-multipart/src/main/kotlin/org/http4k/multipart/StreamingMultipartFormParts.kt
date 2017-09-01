@@ -88,11 +88,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
 
     private fun parseNextPart(): StreamingPart? {
         findBoundary()
-        return if (state == MultipartFormStreamState.header) {
-            parsePart()
-        } else {
-            null
-        }
+        return if (state == MultipartFormStreamState.header) parsePart() else null
     }
 
 
@@ -129,11 +125,10 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
     }
 
     private fun filenameFromMap(contentDisposition: Map<String, String>): String? {
-        if (contentDisposition.containsKey("filename")) {
-            val filename = contentDisposition["filename"]
-            return trim(filename ?: "")
+        return if (contentDisposition.containsKey("filename")) {
+            trim(contentDisposition["filename"] ?: "")
         } else {
-            return null
+            null
         }
     }
 
