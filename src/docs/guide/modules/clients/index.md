@@ -4,14 +4,12 @@
 **OkHttp:** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "2.25.0"```
 
 ### About
-Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC:
+Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC.
 
-```kotlin
-val client = ApacheClient()
-val request = Request(Method.GET, "http://httpbin.org/get").query("location", "John Doe")
-val response = client(request)
-println(response.status)
-println(response.bodyString())
-```
+Activate streaming mode by passing a `ResponseBodyMode` (default is non-streaming).
 
-Alternatively, all client adapter modules allow for custom configuration of the relevant Client configuration.
+These examples are for the Apache HTTP client, but the API is similar for the others:
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example.kt"></script>
+
+Alternatively, all client adapter modules allow for custom configuration of the relevant Client configuration by
