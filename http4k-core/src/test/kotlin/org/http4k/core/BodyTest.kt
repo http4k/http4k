@@ -41,6 +41,13 @@ class BodyTest {
     }
 
     @Test
+    fun `can not consume stream body as stream more than once`(){
+        val body = Body("abc".byteInputStream())
+        String(body.stream.readBytes()) shouldMatch equalTo("abc")
+        String(body.stream.readBytes()) shouldMatch equalTo("")
+    }
+
+    @Test
     fun `stream body generates consistent hashing by consuming its stream`(){
         Body("abc".byteInputStream()).hashCode().shouldMatch(equalTo(Body("abc".byteInputStream()).hashCode()))
     }
