@@ -215,18 +215,18 @@ class StreamingMultipartFormSadTests {
         chars.fill('x')
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
             .part("some contents",
-                Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("name", "fieldName"), Pair("filename", "filename"))),
-                Pair("Content-Type", listOf(Pair("text/plain", null))),
-                Pair("extra-1", listOf(Pair(String(chars), null))),
-                Pair("extra-2", listOf(Pair(String(chars), null))),
-                Pair("extra-3", listOf(Pair(String(chars), null))),
-                Pair("extra-4", listOf(Pair(String(chars), null))),
-                Pair("extra-5", listOf(Pair(String(chars), null))),
-                Pair("extra-6", listOf(Pair(String(chars), null))),
-                Pair("extra-7", listOf(Pair(String(chars), null))),
-                Pair("extra-8", listOf(Pair(String(chars), null))),
-                Pair("extra-9", listOf(Pair(String(chars), null))),
-                Pair("extra-10", listOf(Pair(String(chars, 0, 816), null))) // header section exactly 10240 bytes big!
+                "Content-Disposition" to listOf(Pair("form-data", null), Pair("name", "fieldName"), Pair("filename", "filename")),
+                "Content-Type" to listOf(Pair("text/plain", null)),
+                "extra-1" to listOf(String(chars) to null),
+                "extra-2" to listOf(String(chars) to null),
+                "extra-3" to listOf(String(chars) to null),
+                "extra-4" to listOf(String(chars) to null),
+                "extra-5" to listOf(String(chars) to null),
+                "extra-6" to listOf(String(chars) to null),
+                "extra-7" to listOf(String(chars) to null),
+                "extra-8" to listOf(String(chars) to null),
+                "extra-9" to listOf(String(chars) to null),
+                "extra-10" to listOf(Pair(String(chars, 0, 816), null)) // header section exactly 10240 bytes big!
             ).build())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")
