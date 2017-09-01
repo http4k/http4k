@@ -215,7 +215,7 @@ class StreamingMultipartFormSadTests {
         chars.fill('x')
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
             .part("some contents",
-                "Content-Disposition" to listOf(Pair("form-data", null), Pair("name", "fieldName"), Pair("filename", "filename")),
+                "Content-Disposition" to listOf("form-data" to null, "name" to "fieldName", "filename" to "filename"),
                 "Content-Type" to listOf(Pair("text/plain", null)),
                 "extra-1" to listOf(String(chars) to null),
                 "extra-2" to listOf(String(chars) to null),
