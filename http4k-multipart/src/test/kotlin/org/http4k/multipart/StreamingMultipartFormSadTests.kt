@@ -216,7 +216,7 @@ class StreamingMultipartFormSadTests {
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
             .part("some contents",
                 "Content-Disposition" to listOf("form-data" to null, "name" to "fieldName", "filename" to "filename"),
-                "Content-Type" to listOf(Pair("text/plain", null)),
+                "Content-Type" to listOf("text/plain" to null),
                 "extra-1" to listOf(String(chars) to null),
                 "extra-2" to listOf(String(chars) to null),
                 "extra-3" to listOf(String(chars) to null),
@@ -226,7 +226,7 @@ class StreamingMultipartFormSadTests {
                 "extra-7" to listOf(String(chars) to null),
                 "extra-8" to listOf(String(chars) to null),
                 "extra-9" to listOf(String(chars) to null),
-                "extra-10" to listOf(Pair(String(chars, 0, 816), null)) // header section exactly 10240 bytes big!
+                "extra-10" to listOf(String(chars, 0, 816) to null) // header section exactly 10240 bytes big!
             ).build())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")
