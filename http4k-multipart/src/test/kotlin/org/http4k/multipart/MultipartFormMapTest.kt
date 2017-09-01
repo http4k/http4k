@@ -65,7 +65,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
         val multipartFormContentsStream = ByteArrayInputStream(ValidMultipartFormBuilder(boundary)
@@ -89,7 +88,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun canLoadComplexRealLifeSafariExample() {
         val form = safariExample()
 
@@ -101,7 +99,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun throwsExceptionIfFormIsTooBig() {
         val form = StreamingMultipartFormParts.parse(
             "----WebKitFormBoundary6LmirFeqsyCQRtbj".toByteArray(UTF_8),
@@ -120,7 +117,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun savesAllPartsToDisk() {
         val form = safariExample()
 
@@ -135,7 +131,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun savesSomePartsToDisk() {
         val form = safariExample()
 
@@ -154,7 +149,6 @@ class MultipartFormMapTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun throwsExceptionIfMultipartMalformed() {
         val form = StreamingMultipartFormParts.parse(
             "---2345".toByteArray(UTF_8),
