@@ -1,6 +1,12 @@
 package org.http4k.servlet
 
-import org.http4k.core.*
+import org.http4k.core.Headers
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Parameters
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Uri
 import java.util.*
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -10,7 +16,7 @@ fun HttpHandler.asServlet() = HttpHandlerServlet(this)
 
 class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
     override fun service(req: HttpServletRequest, resp: HttpServletResponse) =
-        transfer(handler(req.asServletRequest()), resp)
+        transfer(handler(req.asHttp4kRequest()), resp)
 
     @Suppress("DEPRECATION")
     private fun transfer(source: Response, destination: HttpServletResponse): Unit {
@@ -19,7 +25,7 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
         source.body.stream.copyTo(destination.outputStream)
     }
 
-    private fun HttpServletRequest.asServletRequest(): Request =
+    private fun HttpServletRequest.asHttp4kRequest(): Request =
         headerParameters().fold(
             Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
                 .body(inputStream)) {
