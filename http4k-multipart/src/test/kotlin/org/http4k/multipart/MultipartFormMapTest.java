@@ -45,7 +45,7 @@ public class MultipartFormMapTest {
         try (InputStream body = new FileInputStream("examples/safari-example.multipart")) {
 
             byte[] boundary = contentType.substring(contentType.indexOf("boundary=") + "boundary=".length()).getBytes(ISO_8859_1);
-            Iterable<StreamingPart> streamingParts = StreamingMultipartFormParts.parse(
+            Iterable<StreamingPart> streamingParts = StreamingMultipartFormParts.Companion.parse(
                     boundary, body, ISO_8859_1, maxStreamLength);
 
             try (Parts parts = MultipartFormMap.INSTANCE.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory)) {
@@ -84,7 +84,7 @@ public class MultipartFormMapTest {
                 .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
                 .field("multi", "value2")
                 .build());
-        Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(boundary.getBytes(UTF_8), multipartFormContentsStream, UTF_8);
+        Iterable<StreamingPart> form = StreamingMultipartFormParts.Companion.parse(boundary.getBytes(UTF_8), multipartFormContentsStream, UTF_8);
 
         Parts parts = MultipartFormMap.INSTANCE.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY);
         Map<String, List<Part>> partMap = parts.partMap;
@@ -110,7 +110,7 @@ public class MultipartFormMapTest {
 
     @Test
     public void throwsExceptionIfFormIsTooBig() throws Exception {
-        Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(
+        Iterable<StreamingPart> form = StreamingMultipartFormParts.Companion.parse(
                 "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
                 new FileInputStream("examples/safari-example.multipart"),
                 UTF_8,
@@ -159,7 +159,7 @@ public class MultipartFormMapTest {
 
     @Test
     public void throwsExceptionIfMultipartMalformed() throws Exception {
-        Iterable<StreamingPart> form = StreamingMultipartFormParts.parse(
+        Iterable<StreamingPart> form = StreamingMultipartFormParts.Companion.parse(
                 "---2345".getBytes(UTF_8),
                 new ByteArrayInputStream(("-----2345" + StreamingMultipartFormHappyTests.CR_LF +
                         "Content-Disposition: form-data; name=\"name\"" + StreamingMultipartFormHappyTests.CR_LF +
@@ -177,7 +177,7 @@ public class MultipartFormMapTest {
     }
 
     private Iterable<StreamingPart> safariExample() throws IOException {
-        return StreamingMultipartFormParts.parse(
+        return StreamingMultipartFormParts.Companion.parse(
                 "----WebKitFormBoundary6LmirFeqsyCQRtbj".getBytes(UTF_8),
                 new FileInputStream("examples/safari-example.multipart"),
                 UTF_8
