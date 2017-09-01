@@ -1,0 +1,21 @@
+This contains 💩.
+
+Encoded-Word[edit]
+Since RFC 2822, conforming message header names and values should be ASCII characters; values that contain non-ASCII data should use the MIME encoded-word syntax (RFC 2047) instead of a literal string. This syntax uses a string of ASCII characters indicating both the original character encoding (the "charset") and the content-transfer-encoding used to map the bytes of the charset into ASCII characters.
+
+The form is: "=?charset?encoding?encoded text?=".
+
+charset may be any character set registered with IANA. Typically it would be the same charset as the message body.
+encoding can be either "Q" denoting Q-encoding that is similar to the quoted-printable encoding, or "B" denoting base64 encoding.
+encoded text is the Q-encoded or base64-encoded text.
+An encoded-word may not be more than 75 characters long, including charset, encoding, encoded text, and delimiters. If it is desirable to encode more text than will fit in an encoded-word of 75 characters, multiple encoded-words (separated by CRLF SPACE) may be used.
+Difference between Q-encoding and quoted-printable[edit]
+The ASCII codes for the question mark ("?") and equals sign ("=") may not be represented directly as they are used to delimit the encoded-word. The ASCII code for space may not be represented directly because it could cause older parsers to split up the encoded word undesirably. To make the encoding smaller and easier to read the underscore is used to represent the ASCII code for space creating the side effect that underscore cannot be represented directly. Use of encoded words in certain parts of headers imposes further restrictions on which characters may be represented directly.
+
+For example,
+
+Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
+
+is interpreted as "Subject: ¡Hola, señor!".
+
+The encoded-word format is not used for the names of the headers (for example Subject). These header names are always in English in the raw message. When viewing a message with a non-English email client, the header names are usually translated by the client.

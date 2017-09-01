@@ -1,0 +1,178 @@
+------WebKitFormBoundaryft3FGhOMTYoOkCCc
+Content-Disposition: form-data; name="articleType"
+
+obituary
+------WebKitFormBoundaryft3FGhOMTYoOkCCc
+Content-Disposition: form-data; name="uploadManuscript"; filename="simple7bit.txt"
+Content-Type: text/plain
+
+Multipart messages[edit]
+The MIME multipart message contains a boundary in the "Content-Type: " header; this boundary, which must not occur in any of the parts, is placed between the parts, and at the beginning and end of the body of the message, as follows:
+
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=frontier
+
+This is a message with multiple parts in MIME format.
+--frontier
+Content-Type: text/plain
+
+This is the body of the message.
+--frontier
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+
+PGh0bWw+CiAgPGhlYWQ+CiAgPC9oZWFkPgogIDxib2R5PgogICAgPHA+VGhpcyBpcyB0aGUg
+Ym9keSBvZiB0aGUgbWVzc2FnZS48L3A+CiAgPC9ib2R5Pgo8L2h0bWw+Cg==
+--frontier--
+Each part consists of its own content header (zero or more Content- header fields) and a body. Multipart content can be nested. The content-transfer-encoding of a multipart type must always be "7bit", "8bit" or "binary" to avoid the complications that would be posed by multiple levels of decoding. The multipart block as a whole does not have a charset; non-ASCII characters in the part headers are handled by the Encoded-Word system, and the part bodies can have charsets specified if appropriate for their content-type.
+
+Notes:
+
+Before the first boundary is an area that is ignored by MIME-compliant clients. This area is generally used to put a message to users of old non-MIME clients.
+It is up to the sending mail client to choose a boundary string that doesn't clash with the body text. Typically this is done by inserting a long random string.
+The last boundary must have two hyphens at the end.
+Multipart subtypes[edit]
+The MIME standard defines various multipart-message subtypes, which specify the nature of the message parts and their relationship to one another. The subtype is specified in the "Content-Type" header of the overall message. For example, a multipart MIME message using the digest subtype would have its Content-Type set as "multipart/digest".
+
+The RFC initially defined 4 subtypes: mixed, digest, alternative and parallel. A minimally compliant application must support mixed and digest; other subtypes are optional. Applications must treat unrecognized subtypes as "multipart/mixed". Additional subtypes, such as signed and form-data, have since been separately defined in other RFCs.
+
+The following is a list of the most commonly used subtypes; it is not intended to be a comprehensive list.
+
+Mixed[edit]
+Multipart/mixed is used for sending files with different "Content-Type" headers inline (or as attachments). If sending pictures or other easily readable files, most mail clients will display them inline (unless otherwise specified with the "Content-disposition" header). Otherwise it will offer them as attachments. The default content-type for each part is "text/plain".
+
+Defined in RFC 2046, Section 5.1.3
+
+Digest[edit]
+Multipart/digest is a simple way to send multiple text messages. The default content-type for each part is "message/rfc822".
+
+Defined in RFC 2046, Section 5.1.5
+
+Message[edit]
+A message/rfc822 part contains an email message, including any headers. This is used for digests as well as for email forwarding.
+
+Defined in RFC 2046.
+
+Alternative[edit]
+The multipart/alternative subtype indicates that each part is an "alternative" version of the same (or similar) content, each in a different format denoted by its "Content-Type" header. The order of the parts is significant. RFC1341 states that: In general, user agents that compose multipart/alternative entities should place the body parts in increasing order of preference, that is, with the preferred format last.[4]
+
+Systems can then choose the "best" representation they are capable of processing; in general, this will be the last part that the system can understand, although other factors may affect this.
+
+Since a client is unlikely to want to send a version that is less faithful than the plain text version, this structure places the plain text version (if present) first. This makes life easier for users of clients that do not understand multipart messages.
+
+Most commonly, multipart/alternative is used for email with two parts, one plain text (text/plain) and one HTML (text/html). The plain text part provides backwards compatibility while the HTML part allows use of formatting and hyperlinks. Most email clients offer a user option to prefer plain text over HTML; this is an example of how local factors may affect how an application chooses which "best" part of the message to display.
+
+While it is intended that each part of the message represent the same content, the standard does not require this to be enforced in any way. At one time, anti-spam filters would only examine the text/plain part of a message,[citation needed] because it is easier to parse than the text/html part. But spammers eventually took advantage of this, creating messages with an innocuous-looking text/plain part and advertising in the text/html part. Anti-spam software eventually caught up on this trick, penalizing messages with very different text in a multipart/alternative message.[citation needed]
+
+Defined in RFC 2046, Section 5.1.4
+
+Related[edit]
+A multipart/related is used to indicate that each message part is a component of an aggregate whole. It is for compound objects consisting of several inter-related components - proper display cannot be achieved by individually displaying the constituent parts. The message consists of a root part (by default, the first) which reference other parts inline, which may in turn reference other parts. Message parts are commonly referenced by the "Content-ID" part header. The syntax of a reference is unspecified and is instead dictated by the encoding or protocol used in the part.
+
+One common usage of this subtype is to send a web page complete with images in a single message. The root part would contain the HTML document, and use image tags to reference images stored in the latter parts.
+
+Defined in RFC 2387
+
+Report[edit]
+Multipart/report is a message type that contains data formatted for a mail server to read. It is split between a text/plain (or some other content/type easily readable) and a message/delivery-status, which contains the data formatted for the mail server to read.
+
+Defined in RFC 6522
+
+Signed[edit]
+A multipart/signed message is used to attach a digital signature to a message. It has exactly two body parts, a body part and a signature part. The whole of the body part, including mime headers, is used to create the signature part. Many signature types are possible, like "application/pgp-signature" (RFC 3156) and "application/pkcs7-signature" (S/MIME).
+
+Defined in RFC 1847, Section 2.1
+
+Encrypted[edit]
+A multipart/encrypted message has two parts. The first part has control information that is needed to decrypt the application/octet-stream second part. Similar to signed messages, there are different implementations which are identified by their separate content types for the control part. The most common types are "application/pgp-encrypted" (RFC 3156) and "application/pkcs7-mime" (S/MIME).
+
+Defined in RFC 1847, Section 2.2
+
+Form-Data[edit]
+As its name implies, multipart/form-data is used to express values submitted through a form. Originally defined as part of HTML 4.0, it is most commonly used for submitting files via HTTP.
+
+Defined in RFC 7578 (previously RFC 2388)
+
+Mixed-Replace[edit]
+The content type multipart/x-mixed-replace was developed as part of a technology to emulate server push and streaming over HTTP.
+
+All parts of a mixed-replace message have the same semantic meaning. However, each part invalidates - "replaces" - the previous parts as soon as it is received completely. Clients should process the individual parts as soon as they arrive and should not wait for the whole message to finish.
+
+Originally developed by Netscape,[5] it is still supported by Mozilla, Firefox, Chrome,[6] Safari, and Opera, but traditionally ignored by Microsoft. It is commonly used in IP cameras as the MIME type for MJPEG streams.[7]
+
+Byteranges[edit]
+The multipart/byterange is used to represent noncontiguous byte ranges of a single message. It is used by HTTP when a server returns multiple byte ranges and is defined in RFC 2616.
+------WebKitFormBoundaryft3FGhOMTYoOkCCc
+Content-Disposition: form-data; name="uploadManuscript"; filename="starbucks.jpeg"
+Content-Type: image/jpeg
+
+ÿØÿà JFIF      ÿÛ C 	!"$"$ÿÛ CÿÂ  – –" ÿÄ              ÿÄ              ÿÚ    Ão|ïmXÔtxÚ"°s¦£f2U¦2¤n¨hÎÚ9â?Ecò~¦’@èÔÔ|öÂÜWÊo¦KÅV¯`‘¹²¼’{|v û|Ša½K«äú2j°ïÇ³!0öÁå «ÆÊ[3er÷‡tA™³Å™Di-˜‘ÓÅ½(Z*å£O¨Ë›Î³1øY@‡S(1ú0k•²Jö÷xÉn€[#Ğ{tít< x–¹$VH7¹=°|`¾‹V¡Äîó±ú.kÜ¶±Äˆ,šI¢wiöÍWK»}ŞW9Ù²¤š´‰åop(0¸ßPóıĞV±Q5Ê/]©°pL[gY’Ş5H¼4p™Œu^3"z×•ÕÑäT·^½õc³µ¦©úW™z“âíŒ0³Ú»IeUPè«Â«B„#¸-¦N½yaš•]Y4"j4ê[„§æş‘g<­l“fF:dVµšÌÀÄ¦<·=nÅòû<Šº¢iÅªrÖ4Næó°l¤v›fgœÈ:‚à,¤ê¤,ËÕJÇ*	6~€R[õı¤¬å©=$šD:JÿÄ )        ! "#12$AÿÚ  mR÷šM]Æ'B¥(NÛ™É§Q§UçUçZÉÕ²syçÓW^Z{şÜÈÕWM„ñ4ì›-Êk´Ì-şç-sŠN:k:Bt–t–t–tÒq®}¨ı5ms[úÎl¯J²¥uøTË¿ÕşmÀÃLšùO”ùO3‹N›Î6Ğ³»ÅäªÊ>Eµ\ëIÌ³~Û•–b£
+ñM^†W#:–	Üd	İåNï*w9«iœ›ĞJ	V»]B?”3.Ş¹)dm[IÕ1šw”4×Â5‡ğa÷"2,Lºª·¾ Îâ†œA3²‡
+ePÕ×oˆ}â,«
+ÜŠÛ’Z¸ğ¹eÆ¹Dé‰Áfne8ífCdæÖâ¨ü§ J¸fõ&°ÃÚ[E¢Í¡Ğq¦¯Õéâjª[2Æî×%•®Ke?uOÆ¡óõ¿Îb¼VeQv§‰TmbËÚ½òÅ¹ø*ó'Ôøúj_5
+¸^ÂÂMl"×Åëğş¢UùZ®@M+&ãF•‹\JÑ+½æN"‘•‡f3İk^£0…xïè&˜œòÂ6öÒÈõo5LuLv†n7HæWúˆ'ÓË¾o´Ã…f¯W<'ü˜ª7ä7só}¢Ï¦—×y¿´Ë8ğÉZÇiÈÂ¾À¹"íú|qÃ-9NS”åèL&ŒÓ58\cú?â'’"Ÿ–•ñÀŞo7›Íá1š„Âf®?Öâmà(éÿ );ûXÆ0™¼&k+÷*yüy¾F2ïo¹£Cèf ¡ª²¦şå|ğ¥y>æ>™~i±g¼ o üĞo4eû£Ô	´Úa„B%«º€zµã%’Ú«[íJ…O2ËÇM§§HX6›M§ÿÄ )          ! 1Q"#a02¡ğÿÚ ?×ö‰üXhY5Ô‡ÕÙË•»Êåò¹aò¹`ò±XqÛ*Tü (*ÈEŠÄ™Jô¡ßª|¦¯(ÉkL¶Ü¡‹  ~ÿ Š¹ì·dTÎÕ!)¯pì‰9Á– I^–&EG©¾Ğ,yÊWii=\:O”Îu´$¡‘éiM~†n±oøW>âº‰î1ÛŠ‚1V±2êmtÒÁš‘=Ía²Œ±²dšìŠnšoT;<!ìªAö}«w¿@Éª­»§0S“Z¦İÑÿÄ #            !1Q"a0ÿÚ ?_>2
+-§g’rNÍoÃ]z5—£]z5ÿ MÈE™#¸’Ûò™ŒØ>‡Í	$ŸÅRl“¦g“àtğH½EÈ•±«d;¼‚;$È­ÓèJÊeİ.„}Šç…õ‚ÙÿÄ 4 
+       !1 02AQaq‘"3b’4BCR#r‚¡ÿÚ  ?óXì™YÙI¿ô´-·Ú­¢±9«b*"h5ó2JaBô¢?’§á‹N¼‚µ\Ú}¨[Kim´Ğ[Am…¶Ø[ki_ziÈé²›†Ñâ¶š¬>¥|8&	h¹€¦8ªlo™³2ƒl_3Å]ZŸÙ\g£–XTì¿s²ıÎË
+½–ÍUƒ¾Êû?/^jÔû Ñ]„Ÿâ%5,v[PŸhÓñàÓ½b
+,jş  °, U[¸	‘t«ª;ºº½O²üŠ¿eù5~Ë×«ö^«şËh÷Î·Ş£Â'¡FÎOZşJ¥t¯D÷Xÿ Åùğ¿%ÓjSs]k
+o'j¼ö#Ü%Kß6ĞÁz§è½`®3¡ÊQÿ !ª·L4Ù85r7õeëÉQìwÛ]Õ·£5)Óë¿=§ğà‹e±àwe*(
+—9Í)µıB–‡3¡X»ºcèÒ¼<¨xnã¹Uµy¶Sl”SG4òí*w_©qz¶¶õ6LOU%ş%aò¿¸%¼BµN´òŞjµ¼+·â§²pÒŠTü6ôS”å­‹Gš†´Áx¹9?U~8g½H*÷¡M¼õVÃ`Ú¿;œTñP1:Àj¯Îz¨ÑªşQª6°‹Ó‡5zt‹Î9¹¯”çqv­Íç™È ›Á›åSç~­Êå!1¼«cùFkÔ§J³1¼õ‚x©Å¼QœÌc39a”]NTâ ç.å¬ §SŞÔMä`AA@‹à¯%©êÑhoKÑk ï8 wºı?ÿÄ &       !1AQaq ‘¡±ÁÑáğÿÚ  ?!¨,ºÃí„ =E0t RÃÇø•uŸ|sÈEe]áotNÌî^tç}İvğíêF©_Ã›´|K¬ÓXâ=tU4ƒ«L¦;ğ½Ü¯„i§QÓÄ&pxbGW‰¿@0qÉ¹æ¿Lµ±qÄl2Ëqı‰{Ö/îl‡ ÊáõÄ˜øF¦»›A'¿Ü	¸¦~ôL½P$<[rƒú…Ô.øêa—\¿D7-õ1”îÒz½átb¶›©½D,´½xˆ	6f¡²>œâ¼£ıñÿ »‹îßxï—íİı©¾ù‚bo…Ñfa¡‰Ø1Bn¨ZgÙÅÇHäˆ{¢g÷&Å5tYÿ 'ê0Aü’o3Šß‰m‘Õ)äETÈ&¼¨ÀvN|Q:ıK<‘àòhcMQÏìtÔÉ¾YŠ}Çp²±~ø±)U¶ı£\Ó¨ÏlÊXö%Gc¹ Oh£‹M¡"šø•yŸ˜Ú>ˆ×Ôù*¡.+İşKop¿3µßÑıÌûV…Ğ¨´;ÔĞ` "-ÙR/kRîÇT.›ï/âq€×ñÃÕË¹3G²Ş@³òK6¨Š~‰Œ CŠ¢ñí÷zšN3BSÙèşebùNå ,‚3,ÀVó5¸…ÁÏ^4³{M·'$5¨44ãì&æÀL%J‰¨ÓW—Í“vŠØÛ(¥]GkmÅ¦š¸v\ut,9ˆ2È4´êëïyˆ Ş¨˜€qíÁ6—¼ËĞ!‹¨±c¥Â.êx†S`éîµ7Xîí‰™–rB„ ¡s%¾ÑİSÒà:4€/Àn)ŸŒ/¨I¾îãğËºqÃ¶Š¾Æ
+½ÉŒ:‡äÉªÁ¸>â;©”:&ÂE˜…›&Z¯sà?Z.^ÁWJÔMì—Ä¦G>&J™º,ê<7"Ùƒ|’¸ä~eX¥AÇ”%%MS}JáZ¢;Ôäz†b¬¨•sğ	a{|*WÄ@‹%ºEd7¯òn›¶‰«¾¥3èß0óGÏ™uM–‚‰¯0j¶’¦Ä·g³úbaA·¬ö$aœÉh™D!¾J3²“ş ãQ·¯…$†RÿÚ      n4o6ˆÁ¯áôšSAı­×éjqş¨Ñ]Şã_7ì‰+ÃÏ=+Vv“1Ì‚(j,Ô?Å|èR¥d‹íYñö2?È=óÇŒ¼ÿÄ &         !1AQa¡q‘±ÁáğñÑÿÚ ?^ô#.¶t²Y,—)ÒŠ¦g‹æ]{[r_1=¿íşoøşa¹ãù•zÄñ ™ã†È×¾çÚŠ‰v7²\)e˜­›"©ˆtIst3İuóËl=Ìu›Ó·ÃÑâw	f¢¨¦Ø52­6Çí:JlU’Üİ}c=A€•Kyôó1„"Ü¹}.&gF “W_N7™¨ÛßxAm	_púõ©X‰)X(¦¸?0ó z[kƒÕrÕıg|YâT¨1«ï)ëö?°0œz¿h(Z~ö€KŒÊĞ O~FhèejşI…yWã:eís§ÆòÃkh‰(‰ĞL€'õˆŸá(%DEŒzÿÄ            !1AQa q¡ÿÚ ?HÒ±,À~søg6[¥¸¬“Ør°üA;%[û•:~^Gû†L-Â{È˜Š.ÀøIU??Û²H/g>$ÛsÙ_/bãõÆÉn÷Ù'ƒ]F
+Ï¢Zt£‡Ùm‡–cGr=X»ÆÏ³7hƒß¹ÇrŞùYe»(ûxœß›`™òùà¨õ{Zíâ8NïÿÄ &       !1AQaq‘¡±ÁÑğñáÿÚ  ?
+²lœ*2šmWq€æ/|2•s˜b\Cã£àÃè?0úa]±6ö'àCÎH©›}æ"šIÔÏêdø/¹Ò•«æ!;AŠšRUĞÅè©d´â4^n l¤²óqãå âöÊ€3²D‚ÿ ¤¡ûâÿ ´ä|Ó&~INåFüDæ|Rgâ
+ ¤”Êr/ƒwš•›S1åöŞ¦ç’=@2ˆa¢;–Á‡ÜıŒ¢Í:üG[¼{D"(weUÄKƒ°|Pm˜ÿ šâÆOƒÁ#D<¢œ/8iü$¿^J&º£q?¸Sˆë¿q1xâU£!RÆœpîÄ­±ºùÅÙOm%•X½¿„°³•D=s'“‚R×F(b‹pE7ù»„Y\vŸCo÷fş²–ıõˆ2Ÿï¬/ç?¼{ç¿¼Gæî]|ÌÅìEªUÍ W­W˜ƒ„»{3eu¸yÀ«>h€kĞ¬÷ıâ6—Œ±6Ûd^¸Ü7mÇè&Û^+üÀ7°Vİs„ ¸µù2\/¡`çPÌÚH_<¡û6Êã¢¦oÙ’œZÙx³÷µê„úˆ,?®‘²­ıKÚZùQúÂm6–$@Ê¥“ŠıÄZ3hz3	ë¿>ÃÇ™‡’W¼Q	AÅÆuÆår‘®°m[‹
+Õºö‰QQI–ìÃ‰S®—ùŒbïCÊÌ 5ÑfmÕµÇècú‚Ä:"^€=0NM=¢+AVçqêË>Jû¥1Ç½)Ã]tJ3(©Ißü ±¶Uâª'5†ÃKÏÕÄnU¥t£Kµà¸rĞSğÄ?óÕË“é^ƒ’X#–ß¡Bíëìcî<q«äÄ\í‚ÿ §õ·ğ[?2°ˆÿ ô;A-ú°©ïÃïäuG´ı˜ˆàZíÜN¾á*–UâÛŞ³w/ ?r˜2«¹*0fqKñ6(ÿ ŒÑÊÇó‡ÔÂ‘ÿ P`f€©tP‰Ê"õ††4ÇÄ®Zä|=NĞ¥…Eöqfjoé$j½XHœ/íqĞà‡NĞ›²C±—ñÃÑzèÛSÍGÇÑ¸¦“:)Eü„ÅzË.õgˆñ‚¤¡èrÆ:m—¥ú0·—Õ˜ôbQÜ£¤BkU8t\SæŸÌp%#HÌìy#RÊ­š*5Œx©ø[+Û+­
+‚—•£kù
+ëy€ßuQ”æ#¬¾–lP%L°!cLâò İ-¦ıªc€uŞdQ\b™eßUÄåDxÀ²º"7j;‚ñ¸tT¡àÊÌÛ•ó{—ë[ôŒ•ó¬S„¦d’½Úø¨ĞS÷«É}Înl× Fİòó;MW°ôUiB(¥*ù,îFÜÏtÁ¸'0s™}æ[y–eŸ‡q¿×‰š*+="M,˜³¹Ú·(uèÔ"
+˜ÆÇÉ¼C£~l[-/¼Qïq/q¯qºÅë€2u¦ÿ q!RĞL"Ô®î’éĞ{Ë¤§º8™±^¥+:’à¿k!åù—7Qî&fÏ^,DSÊc<Fı`º¯xÎCVx¥Èí 9‚:^°h¬rÆ(|Æ³Ä1â_JÌ1&ğîZ6Ì*:K–S•‹ÁÉÏwÍL´- Xa#`8}¢Qø²ú@rØĞf1KªçyhŠ]õ‰Òv¢«PçÒ9dŸG/1HN²PÅ‘3ß0òMj¨¡6nš²c‹O²zÊ2š)²×½ŠİB­heR./^2ÊCGY•…ÍC€˜ªÿÙ
+------WebKitFormBoundaryft3FGhOMTYoOkCCc
+Content-Disposition: form-data; name="uploadManuscript"; filename="utf8ğŸ’©.file"
+Content-Type: application/octet-stream
+
+This contains ğŸ’©.
+
+Encoded-Word[edit]
+Since RFC 2822, conforming message header names and values should be ASCII characters; values that contain non-ASCII data should use the MIME encoded-word syntax (RFC 2047) instead of a literal string. This syntax uses a string of ASCII characters indicating both the original character encoding (the "charset") and the content-transfer-encoding used to map the bytes of the charset into ASCII characters.
+
+The form is: "=?charset?encoding?encoded text?=".
+
+charset may be any character set registered with IANA. Typically it would be the same charset as the message body.
+encoding can be either "Q" denoting Q-encoding that is similar to the quoted-printable encoding, or "B" denoting base64 encoding.
+encoded text is the Q-encoded or base64-encoded text.
+An encoded-word may not be more than 75 characters long, including charset, encoding, encoded text, and delimiters. If it is desirable to encode more text than will fit in an encoded-word of 75 characters, multiple encoded-words (separated by CRLF SPACE) may be used.
+Difference between Q-encoding and quoted-printable[edit]
+The ASCII codes for the question mark ("?") and equals sign ("=") may not be represented directly as they are used to delimit the encoded-word. The ASCII code for space may not be represented directly because it could cause older parsers to split up the encoded word undesirably. To make the encoding smaller and easier to read the underscore is used to represent the ASCII code for space creating the side effect that underscore cannot be represented directly. Use of encoded words in certain parts of headers imposes further restrictions on which characters may be represented directly.
+
+For example,
+
+Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
+
+is interpreted as "Subject: Â¡Hola, seÃ±or!".
+
+The encoded-word format is not used for the names of the headers (for example Subject). These header names are always in English in the raw message. When viewing a message with a non-English email client, the header names are usually translated by the client.
+------WebKitFormBoundaryft3FGhOMTYoOkCCc
+Content-Disposition: form-data; name="uploadManuscript"; filename="utf8ğŸ’©.txt"
+Content-Type: text/plain
+
+This contains ğŸ’©.
+
+Encoded-Word[edit]
+Since RFC 2822, conforming message header names and values should be ASCII characters; values that contain non-ASCII data should use the MIME encoded-word syntax (RFC 2047) instead of a literal string. This syntax uses a string of ASCII characters indicating both the original character encoding (the "charset") and the content-transfer-encoding used to map the bytes of the charset into ASCII characters.
+
+The form is: "=?charset?encoding?encoded text?=".
+
+charset may be any character set registered with IANA. Typically it would be the same charset as the message body.
+encoding can be either "Q" denoting Q-encoding that is similar to the quoted-printable encoding, or "B" denoting base64 encoding.
+encoded text is the Q-encoded or base64-encoded text.
+An encoded-word may not be more than 75 characters long, including charset, encoding, encoded text, and delimiters. If it is desirable to encode more text than will fit in an encoded-word of 75 characters, multiple encoded-words (separated by CRLF SPACE) may be used.
+Difference between Q-encoding and quoted-printable[edit]
+The ASCII codes for the question mark ("?") and equals sign ("=") may not be represented directly as they are used to delimit the encoded-word. The ASCII code for space may not be represented directly because it could cause older parsers to split up the encoded word undesirably. To make the encoding smaller and easier to read the underscore is used to represent the ASCII code for space creating the side effect that underscore cannot be represented directly. Use of encoded words in certain parts of headers imposes further restrictions on which characters may be represented directly.
+
+For example,
+
+Subject: =?iso-8859-1?Q?=A1Hola,_se=F1or!?=
+
+is interpreted as "Subject: Â¡Hola, seÃ±or!".
+
+The encoded-word format is not used for the names of the headers (for example Subject). These header names are always in English in the raw message. When viewing a message with a non-English email client, the header names are usually translated by the client.
+------WebKitFormBoundaryft3FGhOMTYoOkCCc--

@@ -1,0 +1,96 @@
+Multipart messages[edit]
+The MIME multipart message contains a boundary in the "Content-Type: " header; this boundary, which must not occur in any of the parts, is placed between the parts, and at the beginning and end of the body of the message, as follows:
+
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=frontier
+
+This is a message with multiple parts in MIME format.
+--frontier
+Content-Type: text/plain
+
+This is the body of the message.
+--frontier
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+
+PGh0bWw+CiAgPGhlYWQ+CiAgPC9oZWFkPgogIDxib2R5PgogICAgPHA+VGhpcyBpcyB0aGUg
+Ym9keSBvZiB0aGUgbWVzc2FnZS48L3A+CiAgPC9ib2R5Pgo8L2h0bWw+Cg==
+--frontier--
+Each part consists of its own content header (zero or more Content- header fields) and a body. Multipart content can be nested. The content-transfer-encoding of a multipart type must always be "7bit", "8bit" or "binary" to avoid the complications that would be posed by multiple levels of decoding. The multipart block as a whole does not have a charset; non-ASCII characters in the part headers are handled by the Encoded-Word system, and the part bodies can have charsets specified if appropriate for their content-type.
+
+Notes:
+
+Before the first boundary is an area that is ignored by MIME-compliant clients. This area is generally used to put a message to users of old non-MIME clients.
+It is up to the sending mail client to choose a boundary string that doesn't clash with the body text. Typically this is done by inserting a long random string.
+The last boundary must have two hyphens at the end.
+Multipart subtypes[edit]
+The MIME standard defines various multipart-message subtypes, which specify the nature of the message parts and their relationship to one another. The subtype is specified in the "Content-Type" header of the overall message. For example, a multipart MIME message using the digest subtype would have its Content-Type set as "multipart/digest".
+
+The RFC initially defined 4 subtypes: mixed, digest, alternative and parallel. A minimally compliant application must support mixed and digest; other subtypes are optional. Applications must treat unrecognized subtypes as "multipart/mixed". Additional subtypes, such as signed and form-data, have since been separately defined in other RFCs.
+
+The following is a list of the most commonly used subtypes; it is not intended to be a comprehensive list.
+
+Mixed[edit]
+Multipart/mixed is used for sending files with different "Content-Type" headers inline (or as attachments). If sending pictures or other easily readable files, most mail clients will display them inline (unless otherwise specified with the "Content-disposition" header). Otherwise it will offer them as attachments. The default content-type for each part is "text/plain".
+
+Defined in RFC 2046, Section 5.1.3
+
+Digest[edit]
+Multipart/digest is a simple way to send multiple text messages. The default content-type for each part is "message/rfc822".
+
+Defined in RFC 2046, Section 5.1.5
+
+Message[edit]
+A message/rfc822 part contains an email message, including any headers. This is used for digests as well as for email forwarding.
+
+Defined in RFC 2046.
+
+Alternative[edit]
+The multipart/alternative subtype indicates that each part is an "alternative" version of the same (or similar) content, each in a different format denoted by its "Content-Type" header. The order of the parts is significant. RFC1341 states that: In general, user agents that compose multipart/alternative entities should place the body parts in increasing order of preference, that is, with the preferred format last.[4]
+
+Systems can then choose the "best" representation they are capable of processing; in general, this will be the last part that the system can understand, although other factors may affect this.
+
+Since a client is unlikely to want to send a version that is less faithful than the plain text version, this structure places the plain text version (if present) first. This makes life easier for users of clients that do not understand multipart messages.
+
+Most commonly, multipart/alternative is used for email with two parts, one plain text (text/plain) and one HTML (text/html). The plain text part provides backwards compatibility while the HTML part allows use of formatting and hyperlinks. Most email clients offer a user option to prefer plain text over HTML; this is an example of how local factors may affect how an application chooses which "best" part of the message to display.
+
+While it is intended that each part of the message represent the same content, the standard does not require this to be enforced in any way. At one time, anti-spam filters would only examine the text/plain part of a message,[citation needed] because it is easier to parse than the text/html part. But spammers eventually took advantage of this, creating messages with an innocuous-looking text/plain part and advertising in the text/html part. Anti-spam software eventually caught up on this trick, penalizing messages with very different text in a multipart/alternative message.[citation needed]
+
+Defined in RFC 2046, Section 5.1.4
+
+Related[edit]
+A multipart/related is used to indicate that each message part is a component of an aggregate whole. It is for compound objects consisting of several inter-related components - proper display cannot be achieved by individually displaying the constituent parts. The message consists of a root part (by default, the first) which reference other parts inline, which may in turn reference other parts. Message parts are commonly referenced by the "Content-ID" part header. The syntax of a reference is unspecified and is instead dictated by the encoding or protocol used in the part.
+
+One common usage of this subtype is to send a web page complete with images in a single message. The root part would contain the HTML document, and use image tags to reference images stored in the latter parts.
+
+Defined in RFC 2387
+
+Report[edit]
+Multipart/report is a message type that contains data formatted for a mail server to read. It is split between a text/plain (or some other content/type easily readable) and a message/delivery-status, which contains the data formatted for the mail server to read.
+
+Defined in RFC 6522
+
+Signed[edit]
+A multipart/signed message is used to attach a digital signature to a message. It has exactly two body parts, a body part and a signature part. The whole of the body part, including mime headers, is used to create the signature part. Many signature types are possible, like "application/pgp-signature" (RFC 3156) and "application/pkcs7-signature" (S/MIME).
+
+Defined in RFC 1847, Section 2.1
+
+Encrypted[edit]
+A multipart/encrypted message has two parts. The first part has control information that is needed to decrypt the application/octet-stream second part. Similar to signed messages, there are different implementations which are identified by their separate content types for the control part. The most common types are "application/pgp-encrypted" (RFC 3156) and "application/pkcs7-mime" (S/MIME).
+
+Defined in RFC 1847, Section 2.2
+
+Form-Data[edit]
+As its name implies, multipart/form-data is used to express values submitted through a form. Originally defined as part of HTML 4.0, it is most commonly used for submitting files via HTTP.
+
+Defined in RFC 7578 (previously RFC 2388)
+
+Mixed-Replace[edit]
+The content type multipart/x-mixed-replace was developed as part of a technology to emulate server push and streaming over HTTP.
+
+All parts of a mixed-replace message have the same semantic meaning. However, each part invalidates - "replaces" - the previous parts as soon as it is received completely. Clients should process the individual parts as soon as they arrive and should not wait for the whole message to finish.
+
+Originally developed by Netscape,[5] it is still supported by Mozilla, Firefox, Chrome,[6] Safari, and Opera, but traditionally ignored by Microsoft. It is commonly used in IP cameras as the MIME type for MJPEG streams.[7]
+
+Byteranges[edit]
+The multipart/byterange is used to represent noncontiguous byte ranges of a single message. It is used by HTTP when a server returns multiple byte ranges and is defined in RFC 2616.
