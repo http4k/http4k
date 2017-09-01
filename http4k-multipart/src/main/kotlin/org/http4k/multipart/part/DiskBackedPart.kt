@@ -12,9 +12,11 @@ class DiskBackedPart(part: PartMetaData, private val theFile: File) : Part(part.
 
     override val isInMemory = false
 
-    override val bytes = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
+    override val bytes
+        get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
 
-    override val string = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
+    override val string
+        get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
 
 
     override fun close() {
