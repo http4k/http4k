@@ -1,7 +1,6 @@
 package org.http4k.multipart
 
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -18,82 +17,60 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
     }
 
     fun build(): ByteArray {
-        try {
-            builder.write(boundary.peek())
-            builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            return builder.toByteArray()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-
+        builder.write(boundary.peek())
+        builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        return builder.toByteArray()
     }
 
     fun field(name: String, value: String): ValidMultipartFormBuilder {
-        part(value, Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("name", name))))
+        part(value, Pair("Content-Disposition", listOf("form-data" to null, "name" to name)))
         return this
     }
 
-    private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) = try {
+    private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) {
         val headers = headerName + ": " + pairs.joinToString("; ") { (first, second) ->
             if (second != null) """$first="$second"""" else first
         }
 
         builder.write(headers.toByteArray(encoding))
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-    } catch (e: IOException) {
-        throw RuntimeException(e)
     }
 
     fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): ValidMultipartFormBuilder {
-        try {
-            builder.write(boundary.peek())
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            asList(*headers).forEach { (first, second) -> appendHeader(first, second) }
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            builder.write(contents.toByteArray(encoding))
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            return this
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        builder.write(boundary.peek())
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        asList(*headers).forEach { (first, second) -> appendHeader(first, second) }
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        builder.write(contents.toByteArray(encoding))
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        return this
     }
 
     fun file(fieldName: String, filename: String, contentType: String, contents: String): ValidMultipartFormBuilder {
         part(contents,
-            Pair("Content-Disposition", listOf(Pair("form-data", null), Pair("name", fieldName), Pair("filename", filename))),
-            Pair("Content-Type", listOf(Pair(contentType, null)))
+            "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
+            "Content-Type" to listOf(contentType to null)
         )
         return this
     }
 
     fun rawPart(raw: String): ValidMultipartFormBuilder {
-        try {
-            builder.write(boundary.peek())
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            builder.write(raw.toByteArray(encoding))
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            return this
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        builder.write(boundary.peek())
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        builder.write(raw.toByteArray(encoding))
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        return this
     }
 
     fun startMultipart(multipartFieldName: String, subpartBoundary: String): ValidMultipartFormBuilder {
-        try {
-            builder.write(boundary.peek())
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            appendHeader("Content-Disposition", listOf(Pair("form-data", null), Pair("name", multipartFieldName)))
-            appendHeader("Content-Type", listOf(Pair("multipart/mixed", null), Pair("boundary", subpartBoundary)))
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
-            return this
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        builder.write(boundary.peek())
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        appendHeader("Content-Disposition", listOf(Pair("form-data", null), Pair("name", multipartFieldName)))
+        appendHeader("Content-Type", listOf(Pair("multipart/mixed", null), Pair("boundary", subpartBoundary)))
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
+        return this
     }
 
     fun attachment(fileName: String, contentType: String, contents: String): ValidMultipartFormBuilder {
@@ -105,14 +82,9 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
     }
 
     fun endMultipart(): ValidMultipartFormBuilder {
-        try {
-            builder.write(boundary.pop())
-            builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-            return this
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
+        builder.write(boundary.pop())
+        builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
+        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        return this
     }
 }
