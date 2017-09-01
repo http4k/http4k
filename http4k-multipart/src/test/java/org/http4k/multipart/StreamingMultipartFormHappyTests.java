@@ -208,15 +208,15 @@ public class StreamingMultipartFormHappyTests {
         StreamingPart file = form.next();
 
         //noinspection StatementWithEmptyBody
-        while (file.inputStream.read() > 0) {
+        while (file.getInputStream().read() > 0) {
             // keep reading.
         }
 
-        assertThat(file.inputStream.read(), equalTo(-1));
-        file.inputStream.close();
-        file.inputStream.close(); // can close multiple times
+        assertThat(file.getInputStream().read(), equalTo(-1));
+        file.getInputStream().close();
+        file.getInputStream().close(); // can close multiple times
         try {
-            int ignored = file.inputStream.read();
+            int ignored = file.getInputStream().read();
             fail("Should have complained that the StreamingPart has been closed " + ignored);
         } catch (AlreadyClosedException e) {
             // pass
@@ -233,13 +233,13 @@ public class StreamingMultipartFormHappyTests {
         file.getContentsAsString();
 
         try {
-            int ignored = file.inputStream.read();
+            int ignored = file.getInputStream().read();
             fail("Should have complained that the StreamingPart has been closed " + ignored);
         } catch (AlreadyClosedException e) {
             // pass
         }
 
-        file.inputStream.close(); // can close multiple times
+        file.getInputStream().close(); // can close multiple times
     }
 
     @Test
@@ -256,13 +256,13 @@ public class StreamingMultipartFormHappyTests {
         assertThat(file1, not(equalTo(file2)));
 
         try {
-            int ignored = file1.inputStream.read();
+            int ignored = file1.getInputStream().read();
             fail("Should have complained that the StreamingPart has been closed " + ignored);
         } catch (AlreadyClosedException e) {
             // pass
         }
 
-        file1.inputStream.close(); // can close multiple times
+        file1.getInputStream().close(); // can close multiple times
 
         assertThat(file2.getContentsAsString(), equalTo("Different file contents here"));
     }
@@ -311,7 +311,7 @@ public class StreamingMultipartFormHappyTests {
     }
 
     public static void compareStreamToFile(StreamingPart file) throws IOException {
-        InputStream formFile = file.inputStream;
+        InputStream formFile = file.getInputStream();
         compareStreamToFile(formFile, file.getFileName());
     }
 
