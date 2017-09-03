@@ -14,7 +14,7 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
 
     abstract val bytes: ByteArray
 
-    class DiskBacked(part: PartMetaData, internal val theFile: File) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
+    class DiskBacked(part: PartMetaData, private val theFile: File) : Part(part.fieldName, part.isFormField, part.contentType, part.fileName, part.headers, theFile.length().toInt()) {
         override val newInputStream: InputStream
             get() = FileInputStream(theFile)
 
@@ -30,7 +30,8 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
 
     class InMemory(original: PartMetaData,
                    override val bytes: ByteArray /* not immutable*/,
-                   internal val encoding: Charset) : Part(original.fieldName, original.isFormField, original.contentType, original.fileName, original.headers, bytes.size) {
+                   internal val encoding: Charset)
+        : Part(original.fieldName, original.isFormField, original.contentType, original.fileName, original.headers, bytes.size) {
 
         override val newInputStream: InputStream
             get() = ByteArrayInputStream(bytes)
