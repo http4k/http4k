@@ -114,7 +114,8 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
                 !contentDisposition.containsKey("filename"),
                 contentType,
                 filename,
-                BoundedInputStream(), headers)
+                BoundedInputStream(),
+                headers)
         }
     }
 
