@@ -44,11 +44,10 @@ object MultipartFormMap {
             val bytes = ByteArray(writeToDiskThreshold)
 
             for (part in parts) {
+                if (part.fieldName == null) throw ParseError("no name for part")
+
                 val keyParts = (partMap[part.fieldName] ?: listOf()).let {
                     it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
-                }
-                if (part.fieldName == null) {
-                    throw ParseError("no name for part")
                 }
                 partMap.put(part.fieldName, keyParts)
             }
