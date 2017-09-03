@@ -206,9 +206,7 @@ class MultipartFormMapTest {
         compareStreamToFile(inputStream, filePart.fileName)
     }
 
-    private fun temporaryFileList(): Array<String>? {
-        return TEMPORARY_FILE_DIRECTORY.list()
-    }
+    private fun temporaryFileList(): Array<String>? = TEMPORARY_FILE_DIRECTORY.list()
 
     companion object {
         val TEMPORARY_FILE_DIRECTORY = File("./out/tmp")
