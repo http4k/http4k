@@ -39,26 +39,18 @@ object MultipartFormMap {
      */
 
     fun formMap(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): Parts {
-        try {
-            val partMap = HashMap<String, List<Part>>()
-            val bytes = ByteArray(writeToDiskThreshold)
+        val partMap = HashMap<String, List<Part>>()
+        val bytes = ByteArray(writeToDiskThreshold)
 
-            for (part in parts) {
-                if (part.fieldName == null) throw ParseError("no name for part")
+        for (part in parts) {
+            if (part.fieldName == null) throw ParseError("no name for part")
 
-                val keyParts = (partMap[part.fieldName] ?: listOf()).let {
-                    it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
-                }
-                partMap.put(part.fieldName, keyParts)
+            val keyParts = (partMap[part.fieldName] ?: listOf()).let {
+                it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
             }
-            return Parts(partMap)
-        } catch (e: ParseError) {
-            // stupid... cos 'iterator' doesn't throw exceptions
-            if (e.cause is IOException) {
-                throw e.cause
-            }
-            throw e
+            partMap.put(part.fieldName, keyParts)
         }
+        return Parts(partMap)
     }
 
 

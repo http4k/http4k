@@ -164,7 +164,7 @@ class MultipartFormMapTest {
             MultipartFormMap.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)
             fail("Should have thrown an Exception")
         } catch (e: Throwable) {
-            assertThat<String>(e.message, equalTo("Boundary must be proceeded by field separator, but didn't find it"))
+            assertThat<String>(e.message, containsString("Boundary must be proceeded by field separator, but didn't find it"))
         }
 
     }
