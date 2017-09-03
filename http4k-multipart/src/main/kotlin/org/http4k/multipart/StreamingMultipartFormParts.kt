@@ -17,20 +17,15 @@ import java.util.*
 class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
     private val iterator: Iterator<StreamingPart>
 
-    private var boundary: ByteArray? = null
-    private var boundaryWithPrefix: ByteArray? = null
-    private var state: MultipartFormStreamState? = null
+    private var boundary = prependBoundaryWithStreamTerminator(boundary)
+    private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
+    private var state: MultipartFormStreamState = MultipartFormStreamState.findBoundary
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
-    private var oldBoundary: ByteArray? = null
-    private var oldBoundaryWithPrefix: ByteArray? = null
+    private var oldBoundary: ByteArray = boundary
+    private var oldBoundaryWithPrefix: ByteArray = boundaryWithPrefix
 
     init {
-        this.boundary = prependBoundaryWithStreamTerminator(boundary)
-
-        this.boundaryWithPrefix = addPrefixToBoundary(this.boundary)
-
-        state = MultipartFormStreamState.findBoundary
         iterator = StreamingMulipartFormPartIterator()
     }
 
@@ -55,8 +50,8 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         }
 
         if (state == MultipartFormStreamState.findBoundary) {
-            if (!inputStream.matchInStream(boundary!!)) {
-                throw TokenNotFoundException("Boundary not found <<" + String(boundary!!, encoding) + ">>")
+            if (!inputStream.matchInStream(boundary)) {
+                throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
             }
         }
 
@@ -227,7 +222,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         override fun read(): Int = if (closed) throw AlreadyClosedException() else if (endOfStream) -1 else readNextByte()
 
         private fun readNextByte(): Int {
-            val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix!!)
+            val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix)
             return when (result) {
                 -1 -> {
                     state = MultipartFormStreamState.findPrefix
