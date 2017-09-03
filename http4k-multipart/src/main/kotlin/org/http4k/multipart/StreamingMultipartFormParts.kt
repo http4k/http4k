@@ -91,7 +91,6 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
         return if (state == MultipartFormStreamState.header) parsePart() else null
     }
 
-
     private fun parsePart(): StreamingPart? {
         val headers = parseHeaderLines()
 
@@ -112,7 +111,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             return parseNextPart()
         } else {
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
-            val fieldName = (if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"]))
+            val fieldName = (if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"])) ?: throw ParseError("no name for part")
             val filename = filenameFromMap(contentDisposition)
 
             return StreamingPart(
@@ -133,7 +132,7 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
 
     private fun parseHeaderLines(): Map<String, String> {
         if (MultipartFormStreamState.header != state) {
-            throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got ${state}")
+            throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got $state")
         }
 
         val result = HashMap<String, String>()

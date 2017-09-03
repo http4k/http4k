@@ -1,14 +1,9 @@
 package org.http4k.multipart.part
 
-import java.util.*
-
-class Parts(partMap: Map<String, List<Part>>) : AutoCloseable {
-    internal val partMap: Map<String, List<Part>> = Collections.unmodifiableMap(partMap)
-
+class Parts(val partMap: Map<String, List<Part>>) : AutoCloseable {
     override fun close() {
         partMap.values
             .flatMap { it }
             .forEach { it.close() }
-
     }
 }
