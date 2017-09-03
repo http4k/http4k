@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.present
 import org.http4k.multipart.exceptions.ParseError
 import org.http4k.multipart.part.StreamingPart
 import org.junit.Assert.fail
+import org.junit.Ignore
 import org.junit.Test
 import java.util.*
 
@@ -69,6 +70,7 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
+    @Ignore("this is not a valid test case according to the RFC - we should blow up..")
     fun partHasNoHeaders() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
