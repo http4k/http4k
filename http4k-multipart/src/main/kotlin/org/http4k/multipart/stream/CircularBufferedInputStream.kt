@@ -90,16 +90,11 @@ open class CircularBufferedInputStream(private val inputStream: InputStream, max
     }
 
 
-    override fun available(): Int {
-        return (rightBounds - cursor).toInt()
-    }
+    override fun available(): Int = (rightBounds - cursor).toInt()
 
-    override fun markSupported(): Boolean {
-        return true
-    }
+    override fun markSupported(): Boolean = true
 
     @Synchronized
-
     override fun reset() {
         dumpState(">>> RESET")
 
