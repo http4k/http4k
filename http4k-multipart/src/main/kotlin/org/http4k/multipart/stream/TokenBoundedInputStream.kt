@@ -30,13 +30,10 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
             b = readFromStream()
             if (b < 0) {
                 throw TokenNotFoundException(
-                    "Reached end of stream before finding Token <<" + String(endOfToken, encoding) + ">>. " +
-                        "Last " + endOfToken.size + " bytes read were " +
-                        "<<" + getBytesRead(endOfToken, buffer, bufferIndex, encoding) + ">>")
+                    "Reached end of stream before finding Token <<${String(endOfToken, encoding)}>>. Last ${endOfToken.size} bytes read were <<${getBytesRead(endOfToken, buffer, bufferIndex, encoding)}>>")
             }
             if (bufferIndex >= bufferLength) {
-                throw TokenNotFoundException("Didn't find end of Token <<" + String(endOfToken, encoding) + ">> " +
-                    "within " + bufferLength + " bytes")
+                throw TokenNotFoundException("Didn't find end of Token <<${String(endOfToken, encoding)}>> within $bufferLength bytes")
             }
             val originalB = (b and 0x0FF).toByte()
             if (originalB == endOfToken[0]) {
@@ -85,9 +82,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
     fun matchInStream(token: ByteArray): Boolean {
         mark(token.size)
 
-        if (matchToken(token, readFromStream())) {
-            return true
-        }
+        if (matchToken(token, readFromStream())) return true
 
         reset()
         return false
@@ -107,9 +102,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
         if (b.toByte() == token[0]) {
             mark(token.size)
 
-            if (matchToken(token, b)) {
-                return -2
-            }
+            if (matchToken(token, b)) return -2
 
             reset()
         }
@@ -118,9 +111,7 @@ class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream
 
 
     private fun readFromStream(): Int {
-        if (maxStreamLength > -1 && cursor >= maxStreamLength) {
-            throw StreamTooLongException("Form contents was longer than $maxStreamLength bytes")
-        }
+        if (maxStreamLength > -1 && cursor >= maxStreamLength) throw StreamTooLongException("Form contents was longer than $maxStreamLength bytes")
         return read()
     }
 
