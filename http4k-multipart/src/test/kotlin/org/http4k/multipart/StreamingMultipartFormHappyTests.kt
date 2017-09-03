@@ -5,7 +5,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNot.not
 import org.http4k.multipart.exceptions.AlreadyClosedException
 import org.http4k.multipart.part.StreamingPart
-import org.http4k.multipart.stream.StreamUtil
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
@@ -363,7 +362,7 @@ fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, fieldValue
 
 fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
     assertThat("field name", StreamingPart.fieldName, equalTo(fieldName))
-    assertThat("contents", StreamUtil.readStringFromInputStream(StreamingPart.inputStream, encoding, 4096), equalTo(fieldValue))
+    assertThat("contents", StreamingPart.inputStream.reader(encoding).readText(), equalTo(fieldValue))
 }
 
 fun assertThereAreNoMoreParts(form: Iterator<StreamingPart>) {
