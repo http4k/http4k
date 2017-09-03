@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
-import org.http4k.multipart.exceptions.ParseError
 import org.http4k.multipart.part.StreamingPart
 import org.junit.Assert.fail
 import org.junit.Ignore

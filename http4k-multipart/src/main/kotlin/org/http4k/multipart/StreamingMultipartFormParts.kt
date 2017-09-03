@@ -1,9 +1,6 @@
 package org.http4k.multipart
 
 import org.apache.commons.fileupload.util.ParameterParser
-import org.http4k.multipart.exceptions.AlreadyClosedException
-import org.http4k.multipart.exceptions.ParseError
-import org.http4k.multipart.exceptions.TokenNotFoundException
 import org.http4k.multipart.part.StreamingPart
 import org.http4k.multipart.stream.TokenBoundedInputStream
 import java.io.IOException
