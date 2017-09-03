@@ -155,20 +155,19 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
     }
 
     inner class StreamingMulipartFormPartIterator : Iterator<StreamingPart> {
-        private var nextIsKnown: Boolean = false
+        private var nextIsKnown = false
         private var currentPart: StreamingPart? = null
 
         override fun hasNext(): Boolean {
-            if (nextIsKnown) {
-                return !isEndOfStream
-            }
-            nextIsKnown = true
+            if (!nextIsKnown) {
+                nextIsKnown = true
 
-            if (state == MultipartFormStreamState.contents) {
-                currentPart!!.inputStream.close()
-            }
+                if (state == MultipartFormStreamState.contents) {
+                    currentPart!!.inputStream.close()
+                }
 
-            currentPart = safelyParseNextPart()
+                currentPart = safelyParseNextPart()
+            }
 
             return !isEndOfStream
         }
