@@ -19,12 +19,10 @@ sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, 
             get() = FileInputStream(theFile)
 
         override val bytes
-            get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part. Check with isInMemory()")
+            get() = throw IllegalStateException("Cannot get bytes from a DiskBacked Part")
 
         override fun close() {
-            if (!theFile.delete()) {
-                throw FileSystemException("Failed to delete file")
-            }
+            if (!theFile.delete()) throw FileSystemException("Failed to delete file")
         }
     }
 
