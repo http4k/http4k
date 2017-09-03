@@ -215,8 +215,8 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
 
     private inner class BoundedInputStream : InputStream() {
 
-        internal var endOfStream = false
-        internal var closed = false
+        private var endOfStream = false
+        private var closed = false
 
         override fun read(): Int = if (closed) throw AlreadyClosedException() else if (endOfStream) -1 else readNextByte()
 
