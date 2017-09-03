@@ -3,7 +3,6 @@ package org.http4k.multipart
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNot.not
-import org.http4k.multipart.exceptions.AlreadyClosedException
 import org.http4k.multipart.part.StreamingPart
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

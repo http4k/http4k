@@ -1,6 +1,5 @@
 package org.http4k.multipart
 
-import org.http4k.multipart.exceptions.ParseError
 import org.http4k.multipart.part.Part
 import org.http4k.multipart.part.Part.DiskBacked
 import org.http4k.multipart.part.Part.InMemory
