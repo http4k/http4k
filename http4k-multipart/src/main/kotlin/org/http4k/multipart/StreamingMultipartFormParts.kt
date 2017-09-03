@@ -309,13 +309,11 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
          * @return an `Iterable<StreamingPart>` that you can for() through to get each part
          * @throws IOException
          */
-        fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset): Iterable<StreamingPart> {
-            return StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE))
-        }
+        fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset): Iterable<StreamingPart> =
+            StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE))
 
-        fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset, maxStreamLength: Int): Iterable<StreamingPart> {
-            return StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE, maxStreamLength))
-        }
+        fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset, maxStreamLength: Int): Iterable<StreamingPart> =
+            StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE, maxStreamLength))
 
         fun prependBoundaryWithStreamTerminator(boundary: ByteArray): ByteArray {
             val actualBoundary = ByteArray(boundary.size + 2)
@@ -323,7 +321,6 @@ class StreamingMultipartFormParts private constructor(boundary: ByteArray, priva
             System.arraycopy(boundary, 0, actualBoundary, 2, boundary.size)
             return actualBoundary
         }
-
 
         fun readStringFromStreamUntilMatched(tokenBoundedInputStream: TokenBoundedInputStream, endOfToken: ByteArray, maxStringSizeInBytes: Int, encoding: Charset): String {
             // very inefficient search!
