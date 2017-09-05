@@ -1,3 +1,7 @@
+## tldr;
+[Presentation](https://www.http4k.org/server_as_a_function_in_kotlin) about the development of http4k given at the Kotlin London meetup.
+
+## About
 **http4k** is the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - 
 the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the "Server as a function" and filter model is stolen from 
 [Finagle](https://twitter.github.io/finagle/), and the contract module/Swagger generator is ported from [Fintrospect](http://fintrospect.io). With the growing 
