@@ -18,7 +18,7 @@ import org.junit.Test
 class JettyStreamingTest {
     @Test
     fun `release streaming connections`() {
-        val threadPool = QueuedThreadPool(4)
+        val threadPool = QueuedThreadPool(10)
         val server = Server(threadPool)
         val connector = ServerConnector(server)
         server.addConnector(connector)
