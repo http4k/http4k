@@ -15,6 +15,7 @@ interface ServerConfig {
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 
+@Deprecated("For simplification of server creation", ReplaceWith("this.asServer(config).start()"))
 fun HttpHandler.startServer(config: ServerConfig, block: Boolean = true): Http4kServer =
     asServer(config).let {
         if (block) it.startAndBlock()
