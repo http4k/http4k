@@ -27,10 +27,10 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `gzip request and add transfer encoding`() {
+    fun `gzip request and add content encoding`() {
         fun assertSupportsZipping(body: String) {
             val handler = RequestFilters.GZip().then {
-                it shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("transfer-encoding", "gzip"))
+                it shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("content-encoding", "gzip"))
                 Response(OK)
             }
             handler(Request(Method.GET, "").body(body))
@@ -40,13 +40,13 @@ class RequestFiltersTest {
     }
 
     @Test
-    fun `gunzip request which has gzip transfer encoding`() {
+    fun `gunzip request which has gzip content encoding`() {
         fun assertSupportsUnzipping(body: String) {
             val handler = RequestFilters.GunZip().then {
                 it shouldMatch hasBody(body)
                 Response(OK)
             }
-            handler(Request(Method.GET, "").body(body.toBody().gzipped()).header("transfer-encoding", "gzip"))
+            handler(Request(Method.GET, "").body(body.toBody().gzipped()).header("content-encoding", "gzip"))
         }
         assertSupportsUnzipping("foobar")
         assertSupportsUnzipping("")

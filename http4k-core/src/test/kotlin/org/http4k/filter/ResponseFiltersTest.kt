@@ -46,30 +46,30 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `gzip response and adds gzip transfer encoding if the request has accept-encoding of gzip`() {
+    fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip`() {
         fun assertSupportsZipping(body: String) {
             val zipped = ResponseFilters.GZip().then { Response(OK).body(body) }
-            zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("transfer-encoding", "gzip"))
+            zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("content-encoding", "gzip"))
         }
         assertSupportsZipping("foobar")
         assertSupportsZipping("")
     }
 
     @Test
-    fun `gunzip response which has gzip transfer encoding`() {
+    fun `gunzip response which has gzip content encoding`() {
         fun assertSupportsUnzipping(body: String) {
-            val handler = ResponseFilters.GunZip().then { Response(OK).header("transfer-encoding", "gzip").body(body.toBody().gzipped()) }
-            handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(hasHeader("transfer-encoding", "gzip"))
+            val handler = ResponseFilters.GunZip().then { Response(OK).header("content-encoding", "gzip").body(body.toBody().gzipped()) }
+            handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(hasHeader("content-encoding", "gzip"))
         }
         assertSupportsUnzipping("foobar")
         assertSupportsUnzipping("")
     }
 
     @Test
-    fun `passthrough gunzip response with no transfer encoding when request has no accept-encoding of gzip`() {
+    fun `passthrough gunzip response with no content encoding when request has no accept-encoding of gzip`() {
         val body = "foobar"
-        val handler = ResponseFilters.GunZip().then { Response(OK).header("transfer-encoding", "zip").body(body) }
-        handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(!hasHeader("transfer-encoding", "gzip"))
+        val handler = ResponseFilters.GunZip().then { Response(OK).header("content-encoding", "zip").body(body) }
+        handler(Request(Method.GET, "")) shouldMatch hasBody(body).and(!hasHeader("content-encoding", "gzip"))
     }
 
 }

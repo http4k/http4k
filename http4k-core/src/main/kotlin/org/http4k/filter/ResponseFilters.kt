@@ -42,8 +42,7 @@ object ResponseFilters {
             val originalResponse = next(it)
             if( (it.header("accept-encoding") ?: "").contains("gzip", true)) {
                 originalResponse.let {
-                    val existingTransferEncodingHeader = it.header("transfer-encoding")?.let { ", " } ?: ""
-                    it.body(it.body.gzipped()).replaceHeader("transfer-encoding", existingTransferEncodingHeader + "gzip")
+                    it.body(it.body.gzipped()).replaceHeader("Content-Encoding", "gzip")
                 }
             } else originalResponse
         }
@@ -55,7 +54,7 @@ object ResponseFilters {
     fun GunZip() = Filter { next ->
         {
             next(it).let { response ->
-                response.header("transfer-encoding")
+                response.header("content-encoding")
                     ?.let { if (it.contains("gzip")) it else null }
                     ?.let { response.body(response.body.gunzipped()) } ?: response
             }

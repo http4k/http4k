@@ -17,10 +17,12 @@ import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
+import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.util.RetryRule
 import org.junit.After
@@ -37,6 +39,19 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     private var server: Http4kServer? = null
 
     val port = Random().nextInt(1000) + 8000
+
+    @Test
+    fun `supports gzipped content`() {
+        val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp())
+        asServer.start()
+        val client = ApacheClient()
+
+        val request = Request(Method.GET, "http://localhost:8000").header("accept-encoding", "gzip")
+        client(request)
+        client(request)
+        client(request)
+        asServer.stop()
+    }
 
     @Before
     fun before() {

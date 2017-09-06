@@ -127,8 +127,8 @@ class ClientFiltersTest {
     @Test
     fun `gzip request and gunzip response`() {
         val handler = ClientFilters.GZip().then {
-            it shouldMatch hasHeader("transfer-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
-            Response(OK).header("transfer-encoding", "gzip").body(it.body)
+            it shouldMatch hasHeader("content-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
+            Response(OK).header("content-encoding", "gzip").body(it.body)
         }
 
         handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
