@@ -13,4 +13,6 @@ compile group: "org.http4k", name: "http4k-core", version: "2.25.4"
     <li><a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"/></a></li>
     <li><a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"/></a></li>
     <li><a href="https://gitter.im/http4k/http4k"><img alt="Gitter" src="https://img.shields.io/badge/gitter-join%20chat-1dce73.svg"/></a></li>
+    <li><a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a></li>
+    <li><a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a></li>
 </ul>
