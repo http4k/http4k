@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 sealed class ResponseBodyMode : (InputStream) -> Body {
 
     object Memory : ResponseBodyMode() {
-        override fun invoke(stream: InputStream): Body = Body(ByteBuffer.wrap(stream.readBytes()))
+        override fun invoke(stream: InputStream): Body = stream.use { Body(ByteBuffer.wrap(it.readBytes())) }
     }
 
     object Stream : ResponseBodyMode() {

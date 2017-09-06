@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.25.3
+- Fix #39 - ResponseBodyMode.Memory properly closes streams (breaks jetty + gzip)
+
 ### v2.25.2
 - Ensure that streams are closed properly when consuming from an upstream client.
 
