@@ -1,8 +1,8 @@
 <a href="https://http4k.org"><img src="https://www.http4k.org/img/logo_1100x200_blue_on_white.png"/></a>
 
 <span class="github">
-[![Backers on Open Collective](https://opencollective.com/http4k/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/http4k/sponsors/badge.svg)](#sponsors)
-<a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"></a>
+<a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
+<a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 <a href="https://coveralls.io/github/http4k/http4k?branch=master"><img alt="coverage" src="https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master"></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
 <a href="https://bintray.com/http4k/maven/http4k-core/_latestVersion"><img alt="Download" src="https://api.bintray.com/packages/http4k/maven/http4k-core/images/download.svg"></a>
@@ -190,13 +190,13 @@ fun main(args: Array<String>) {
 This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
 <a href="graphs/contributors"><img src="https://opencollective.com/http4k/contributors.svg?width=890" /></a>
 
+<span class="github">
 
 ## Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/http4k#backer)]
 
 <a href="https://opencollective.com/http4k#backers" target="_blank"><img src="https://opencollective.com/http4k/backers.svg?width=890"></a>
-
 
 ## Sponsors
 
@@ -213,4 +213,4 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
 
-
+</span>
