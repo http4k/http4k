@@ -19,18 +19,20 @@ class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
         transfer(handler(req.asHttp4kRequest()), resp)
 
     @Suppress("DEPRECATION")
-    private fun transfer(source: Response, destination: HttpServletResponse): Unit {
+    private fun transfer(source: Response, destination: HttpServletResponse) {
         destination.setStatus(source.status.code, source.status.description)
         source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        source.body.stream.copyTo(destination.outputStream)
+        source.body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
     }
 
     private fun HttpServletRequest.asHttp4kRequest(): Request =
-        headerParameters().fold(
+        inputStream.use {
+            headerParameters().fold(
             Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-                .body(inputStream)) {
+                .body(it)) {
             memo, (first, second) ->
             memo.header(first, second)
+            }
         }
 
     private fun HttpServletRequest.headerParameters(): Headers =

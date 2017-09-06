@@ -52,7 +52,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         val out = ByteBufOutputStream(nettyBody)
         val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), nettyBody)
         headers.forEach { (key, value) -> res.headers().set(key, value) }
-        body.stream.copyTo(out)
+        body.stream.use{ input -> out.use { output -> input.copyTo(output) }}
         return res
     }
 

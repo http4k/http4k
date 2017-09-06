@@ -23,7 +23,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         headers.forEach {
             exchange.responseHeaders.put(HttpString(it.first), it.second)
         }
-        body.stream.copyTo(exchange.outputStream)
+        body.stream.use { input -> exchange.outputStream.use { output -> input.copyTo(output) } }
     }
 
     private fun HttpServerExchange.asRequest(): Request {

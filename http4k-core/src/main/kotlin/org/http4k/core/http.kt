@@ -31,7 +31,7 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
 }
 
 class StreamBody(override val stream: InputStream) : Body {
-    override val payload: ByteBuffer by lazy { ByteBuffer.wrap(stream.readBytes()) }
+    override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
 
     override fun toString(): String = String(payload.array())
 
