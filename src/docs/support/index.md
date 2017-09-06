@@ -13,7 +13,7 @@ This project exists thanks to all the people who [contribute](https://www.http4k
 
 If you use http4k in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
 
-<a href="https://opencollective.com/http4k#backers" target="_blank"><img src="https://opencollective.com/http4k/backers.svg?width=890"></a><a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/http4k#backers" target="_blank">
 <a href="https://opencollective.com/http4k/sponsor/1/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/1/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/2/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/2/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/3/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/3/avatar.svg"></a>
@@ -23,6 +23,7 @@ If you use http4k in your project or enterprise and would like to support ongoin
 <a href="https://opencollective.com/http4k/sponsor/7/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/8/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/9/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/9/avatar.svg"></a>
+<img src="https://opencollective.com/http4k/backers.svg?width=890"></a><a href="https://opencollective.com/http4k/sponsor/0/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/0/avatar.svg"></a>
 
 ## Logo usage
 The http4k logo design and branding are copyright 2017 to http4k.org. If you'd like to use the http4k logo in a presentation or for other purposes, it's probably fine, but please reach out to let know first on the channels above that you'd like to do so and we can provide the relevant high-quality asset files. Here are the relevant [branding guidelines](https://logojoy.com/b/http4k).
