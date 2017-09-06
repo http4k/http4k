@@ -2,8 +2,8 @@ Example of how to use the JSON library API wrappers, in this case the module use
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.25.3"
-    compile group: "org.http4k", name: "http4k-format-jackson", version: "2.25.3"
+    compile group: "org.http4k", name: "http4k-core", version: "2.25.4"
+    compile group: "org.http4k", name: "http4k-format-jackson", version: "2.25.4"
 ```
 
 ### Code
