@@ -45,3 +45,5 @@ infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(second, UriTemplate.from(first), action)
 
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
+
+infix fun String.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(null, UriTemplate.from(this), action)

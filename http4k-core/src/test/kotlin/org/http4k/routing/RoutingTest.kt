@@ -3,6 +3,7 @@ package org.http4k.routing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -48,6 +49,17 @@ class RoutingTest {
         val response = routes(Request(GET, "/a/something"))
 
         assertThat(response.bodyString(), equalTo("matched"))
+    }
+
+    @Test
+    fun `matches uri template only`() {
+        val routes = routes(
+            "/a/{route}" bind { Response(OK).body("matched") }
+        )
+
+        Method.values().forEach {
+            assertThat(routes(Request(it, "/a/something")).bodyString(), equalTo("matched"))
+        }
     }
 
     @Test

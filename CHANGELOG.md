@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.26.0
+- Added "catch all" routing option, which matches all methods to a handler
+
 ### v2.25.4
 - Fix #40 - GZip filters now use content-encoding headers instead of transfer-encoding
 

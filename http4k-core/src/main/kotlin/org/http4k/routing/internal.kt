@@ -18,8 +18,8 @@ import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
 internal class ResourceLoadingHandler(private val pathSegments: String,
-                               private val resourceLoader: ResourceLoader,
-                               extraPairs: Map<String, ContentType>) : HttpHandler {
+                                      private val resourceLoader: ResourceLoader,
+                                      extraPairs: Map<String, ContentType>) : HttpHandler {
     private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
 
     init {
@@ -64,11 +64,11 @@ data class StaticRoutingHttpHandler(private val pathSegments: String,
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
 
-data class TemplateRoutingHttpHandler(val method: Method,
+data class TemplateRoutingHttpHandler(val method: Method?,
                                       val template: UriTemplate,
                                       val handler: HttpHandler) : RoutingHttpHandler {
     override fun match(request: Request): HttpHandler? =
-        if (template.matches(request.uri.path) && method == request.method)
+        if (template.matches(request.uri.path) && (method == null || method == request.method))
             { r: Request -> handler(r.withUriTemplate(template)) }
         else null
 
