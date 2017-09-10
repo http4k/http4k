@@ -3,14 +3,14 @@
 There are many ways in which you can contribute to the development of the library:
 
 - Give us a Star on Github - you know you want to ;)
-- Questions can be directed towards the Gitter channel, or on Twitter <a href="https://twitter.com/http4k">@http4k</a>
-- For issues, please describe giving as much detail as you can - including version and steps to recreate
+- Bugs! We don't want them, but we surely want to know about them so we can mercilessly squash them.
+- Consider becoming a Supporter or a Backer through our OpenCollective (see below).
 
 ### pull requests
 If there are any message format library or templating engine bindings that you'd like to see supported, then please feel free to suggest them or provide a PR. 
 
 - JSON formats: create a new module with an implementation of `Json` by following the `Argo` example in the source.
-- Templating engines: create a new module with a `Templates`implementation by following the `HandlebarsTemplates` example in the source
+- Templating engines: create a new module with a `Templates` implementation by following the `HandlebarsTemplates` example in the source
 
 ### general guidelines
 - At the moment, PRs should be sent to the master branch - this might change in future so check back everytime!
