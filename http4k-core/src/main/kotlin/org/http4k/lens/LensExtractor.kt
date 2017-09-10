@@ -9,7 +9,7 @@ interface LensExtractor<in IN, out OUT>: (IN) -> OUT {
     override operator fun invoke(target: IN): OUT
 
     /**
-     * Lens operation to get the value from the target. Synonym for invoke(IN)
+     * Lens operation to get the value from the target. Synomym for invoke(IN)
      * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)
      */
     @Throws(LensFailure::class)

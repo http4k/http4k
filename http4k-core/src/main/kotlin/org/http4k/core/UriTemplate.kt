@@ -54,4 +54,6 @@ class UriTemplate private constructor(private val template: String) {
     }
 
     override fun toString(): String = template
+
+    fun prefixedWith(prefix: String): UriTemplate = UriTemplate.from("$prefix/$template")
 }
