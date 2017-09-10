@@ -1,6 +1,12 @@
 package org.http4k.aws.lambda
 
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.MemoryBody
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Uri
+import org.http4k.core.toUrlEncoded
 
 /**
  * This is the main entry point for the lambda. It uses the local environment

@@ -20,8 +20,7 @@ fun Response.Companion.parse(response: String): Response {
 
 private fun lines(request: String): List<String> {
     if (request.isBlank()) throw IllegalArgumentException("Empty message")
-    val lines = request.split("\r\n")
-    return lines
+    return request.split("\r\n")
 }
 
 private fun parseStatus(value: String): Status {
