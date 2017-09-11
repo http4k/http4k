@@ -1,5 +1,9 @@
 package org.http4k.template
 
+import com.github.jknack.handlebars.Handlebars
+import com.github.jknack.handlebars.Template
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader
+import com.github.jknack.handlebars.io.FileTemplateLoader
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap
