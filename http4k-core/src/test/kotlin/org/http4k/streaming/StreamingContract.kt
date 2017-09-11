@@ -20,7 +20,7 @@ import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-abstract class StreamingContract {
+abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
     private val runningInIdea = ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
     private val port = Random().nextInt(1000) + 8000
@@ -43,7 +43,7 @@ abstract class StreamingContract {
 
     @Test
     fun `can stream response`() {
-        val countdown = CountDownLatch(5)
+        val countdown = CountDownLatch(config.beeps)
 
         Thread {
             var lastReceived = System.currentTimeMillis()
@@ -54,24 +54,24 @@ abstract class StreamingContract {
                 if (runningInIdea) println("received")
 
                 currentReceived = System.currentTimeMillis()
-                if ((currentReceived - lastReceived) > 1500) {
-                    Assert.fail("Timed out waiting for server response")
+                if ((currentReceived - lastReceived) > config.maxWaitBetweenBeepsInMillis) {
+                    Assert.fail("Timed out waiting for next line")
                 }
                 lastReceived = currentReceived
                 countdown.countDown()
             }
         }.start()
 
-        val succeeded: Boolean = countdown.await(5, TimeUnit.SECONDS)
+        val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
         if (!succeeded)
-            Assert.fail("Timed out")
+            Assert.fail("Timed out waiting for server response")
     }
 
     private fun beeper(): InputStream {
         val input = PipedInputStream()
         val output = PipedOutputStream(input)
 
-        val line = "beep".repeat(5000) + "\n"
+        val line = "b".repeat(config.beepSize) + "\n"
 
         Thread {
             (1..5).forEach {
@@ -79,11 +79,18 @@ abstract class StreamingContract {
 
                 output.write(line.toByteArray())
                 output.flush()
-                Thread.sleep(500)
+                Thread.sleep(config.sleepTimeBetweenBeepsInMillis)
             }
             output.close()
         }.start()
 
         return input
     }
+}
+
+data class StreamingTestConfiguration(val beeps: Int = 5,
+                                      val beepSize: Int = 20000,
+                                      val sleepTimeBetweenBeepsInMillis: Long = 500) {
+    val maxWaitBetweenBeepsInMillis = sleepTimeBetweenBeepsInMillis * 3
+    val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * 2
 }
