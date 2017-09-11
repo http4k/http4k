@@ -10,8 +10,6 @@ import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
 import java.nio.ByteBuffer
 
-typealias FormFields = Map<String, List<String>>
-
 object FormField : BiDiLensSpec<WebForm, String, String>("form",
     StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
