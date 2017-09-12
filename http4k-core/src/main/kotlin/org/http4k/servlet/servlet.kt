@@ -15,30 +15,28 @@ import javax.servlet.http.HttpServletResponse
 fun HttpHandler.asServlet() = HttpHandlerServlet(this)
 
 class HttpHandlerServlet(private val handler: HttpHandler) : HttpServlet() {
-    override fun service(req: HttpServletRequest, resp: HttpServletResponse) =
-        transfer(handler(req.asHttp4kRequest()), resp)
+    override fun service(req: HttpServletRequest, resp: HttpServletResponse) = handler(req.asHttp4kRequest()).transferTo(resp)
+}
 
-    @Suppress("DEPRECATION")
-    private fun transfer(source: Response, destination: HttpServletResponse) {
-        destination.setStatus(source.status.code, source.status.description)
-        source.headers.forEach { (key, value) -> destination.addHeader(key, value) }
-        source.body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
+@Suppress("DEPRECATION")
+private fun Response.transferTo(destination: HttpServletResponse) {
+    destination.setStatus(status.code, status.description)
+    headers.forEach { (key, value) -> destination.addHeader(key, value) }
+    body.stream.use { input -> destination.outputStream.use { output -> input.copyTo(output) } }
+}
+
+private fun HttpServletRequest.asHttp4kRequest(): Request =
+    inputStream.use {
+        headerParameters().fold(
+            Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
+                .body(it)) { memo, (first, second) ->
+            memo.header(first, second)
+        }
     }
 
-    private fun HttpServletRequest.asHttp4kRequest(): Request =
-        inputStream.use {
-            headerParameters().fold(
-            Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-                .body(it)) {
-            memo, (first, second) ->
-            memo.header(first, second)
-            }
-        }
+private fun HttpServletRequest.headerParameters(): Headers =
+    headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })
 
-    private fun HttpServletRequest.headerParameters(): Headers =
-        headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })
+private fun Enumeration<String>.asPairs(key: String): Parameters = asSequence().map { key to it }.toList()
 
-    private fun Enumeration<String>.asPairs(key: String): Parameters = asSequence().map { key to it }.toList()
-
-    private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
-}
+private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
