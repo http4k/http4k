@@ -34,7 +34,7 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
             init {
                 val request = this@toApacheRequest
                 uri = URI(request.uri.toString())
-                entity = ByteArrayEntity(request.bodyString().toByteArray())
+                entity = ByteArrayEntity(request.body.payload.array())
                 request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
             }
 
