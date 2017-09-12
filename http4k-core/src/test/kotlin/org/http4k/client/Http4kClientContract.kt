@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -13,6 +14,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -29,6 +31,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.nio.ByteBuffer
 import java.util.*
 
 abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, val client: HttpHandler) {
@@ -64,7 +67,11 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
         }
         server = routes("/someUri" bind POST to defaultHandler,
                 "/empty" bind GET to { _: Request -> Response(OK).body("") },
-                "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") })
+            "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") },
+            "/check-image" bind POST to { request: Request ->
+                if (Arrays.equals(testImageBytes(), request.body.payload.array()))
+                    Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
+            })
                 .asServer(serverConfig(port)).start()
     }
 
@@ -152,4 +159,12 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
         response.status.shouldMatch(equalTo(OK))
         response.bodyString().shouldMatch(anything)
     }
+
+    @Test
+    fun `send binary data`() {
+        val response = client(Request(Method.POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
+        response.status.shouldMatch(equalTo(OK))
+    }
+
+    private fun testImageBytes() = this::class.java.getResourceAsStream("/test.png").readBytes()
 }

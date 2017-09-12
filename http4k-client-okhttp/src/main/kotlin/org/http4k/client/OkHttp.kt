@@ -18,7 +18,7 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         }.build()
 
     private fun Request.requestBody() =
-        if (permitsRequestBody(method.toString())) create(null, body.toString().toByteArray())
+        if (permitsRequestBody(method.toString())) create(null, body.payload.array())
         else null
 
     private fun okhttp3.Response.asHttp4k(): Response {
