@@ -1,16 +1,20 @@
 package org.http4k.streaming
 
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import java.io.InputStream
 import java.io.PipedInputStream
@@ -29,11 +33,19 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     abstract fun serverConfig(port: Int): ServerConfig
     abstract fun createClient(): HttpHandler
 
-    val server = { _: Request -> Response(Status.OK).body(beeper()) }
+    var countdown: CountDownLatch = CountDownLatch(config.beeps * 2)
+
+    val server = routes(
+        "/stream-response" bind GET to { _: Request -> Response(Status.OK).body(beeper()) },
+        "/stream-request" bind POST to { request: Request ->
+            testStreamConsumption { request.body.stream }; Response(Status.OK)
+        }
+    )
 
     @Before
     fun `set up`() {
         runningServer = server.asServer(serverConfig(port)).start()
+        countdown = CountDownLatch(config.beeps * 2)
     }
 
     @After
@@ -43,11 +55,29 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     fun `can stream response`() {
-        val countdown = CountDownLatch(config.beeps)
+        testStreamConsumption { createClient()(Request(GET, "http://localhost:$port/stream-response")).body.stream }
 
+        waitForCompletion()
+    }
+
+    @Test
+    @Ignore("not supported in jetty yet")
+    fun `can stream request`() {
+        createClient()(Request(POST, "http://localhost:$port/stream-request").body(beeper()))
+
+        waitForCompletion()
+    }
+
+    private fun waitForCompletion() {
+        val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
+        if (!succeeded)
+            Assert.fail("Timed out waiting for server response")
+    }
+
+    private fun testStreamConsumption(streamSource: () -> InputStream) {
         Thread {
             var lastReceived = System.currentTimeMillis()
-            val responseStream = createClient()(Request(Method.GET, "http://localhost:$port")).body.stream
+            val responseStream = streamSource()
             var currentReceived: Long
 
             responseStream.bufferedReader().forEachLine { line ->
@@ -61,10 +91,6 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
                 countdown.countDown()
             }
         }.start()
-
-        val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
-        if (!succeeded)
-            Assert.fail("Timed out waiting for server response")
     }
 
     private fun beeper(): InputStream {
@@ -79,6 +105,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
                 output.write(line.toByteArray())
                 output.flush()
+                countdown.countDown()
                 Thread.sleep(config.sleepTimeBetweenBeepsInMillis)
             }
             output.close()
