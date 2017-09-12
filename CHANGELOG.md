@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.26.1
+- Fix #41 - Sending binary body alters the size of the payload 
+
 ### v2.26.0
 - Added "catch all" routing option, which matches all methods to a handler
 
