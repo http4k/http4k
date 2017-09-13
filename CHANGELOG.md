@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.26.3
+- Fix #44 - Request cookies should not be wrapped in quotes 
+
 ### v2.26.2
 - Fix #43 - AWS does not sign binary requests correctly 
 
