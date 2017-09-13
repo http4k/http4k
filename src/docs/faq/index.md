@@ -11,7 +11,7 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 **Q. Does http4k support an Async model? I need webscale!**
 
-**A.** Not at the moment. Adding Async support is a decision that we are thinkning about carefully so that we don't end up complicating the API. When we do add it, it'll probably use co-routines and they're still marked as experimental which is another reason we are holding off. As for the scaling arguments, see the above answer relating to production usage.
+**A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll probably use co-routines and they're still marked as experimental which is another reason we are holding off. As for the scaling arguments, see the above answer relating to production usage.
 
 ### API
 **Q. Auto-marshalling: where is the `Body.auto` method defined?**
