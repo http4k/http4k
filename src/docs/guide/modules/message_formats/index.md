@@ -30,7 +30,12 @@ We can use this facility in **http4k** to automatically marshall objects to/from
 
 There is a utility to generate Kotlin code for JSON and XML data class code [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
-#### Important note regarding JSON arrays
+#### FAQ (aka gotchas) regarding Auto-marshalling capabilities
+
+##### Uppercase JSON key names
+The Jackson version of the automarshalling does NOT work for objects with uppercase key names - this is a known issue with the Jackson library and we are unable to fix it. Either use the GSON alternative, or annotate your Data class fields with `JsonAlias` annotations to work around this.
+
+##### JSON arrays
 When handling raw JSON array messages, such as: `[123, 456, 567]`, there is a slight gotcha when auto-marshalling messages from JSON.
 
 This is demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT the same as a native Kotlin list of objects. This can make tests break as the unmarshalled list is NOT equal to the native list.
