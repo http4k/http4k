@@ -24,7 +24,7 @@ data class Cookie(val name: String, val value: String,
 
     override fun toString(): String = "$name=${value.quoted()}; ${attributes()}"
 
-    private fun attributes(): String {
+    fun attributes(): String {
         val builder = mutableListOf<String>()
         builder.appendIfPresent(maxAge, "Max-Age=$maxAge")
         builder.appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")

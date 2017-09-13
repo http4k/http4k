@@ -2,11 +2,7 @@ package org.http4k.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
-import org.http4k.core.Parameters
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.*
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -107,12 +103,12 @@ class CookieTest {
     fun `cookes can be stored in request`() {
         val request = Request(Method.GET, "ignore").cookie("foo", "bar")
 
-        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"; ") as Parameters))
+        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=bar") as Parameters))
     }
 
     @Test
     fun `cookes can be retrieved from request`() {
-        val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"; ")
+        val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
     }
@@ -121,7 +117,7 @@ class CookieTest {
     fun `request stores multiple cookies in single header`() {
         val request = Request(Method.GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
-        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"one\"; bar=\"two\"; ") as Parameters))
+        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=one; bar=two") as Parameters))
     }
 
     @Test
