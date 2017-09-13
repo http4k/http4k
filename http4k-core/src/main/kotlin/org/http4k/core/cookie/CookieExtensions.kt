@@ -2,12 +2,11 @@ package org.http4k.core.cookie
 
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.quoted
 import org.http4k.unquoted
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", "${cookie.name}=${cookie.value.quoted()}; ${cookie.attributes()}")
+fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.fullCookieString())
 
 fun Response.removeCookie(name: String): Response {
     val oldCookies = headerValues("Set-Cookie")

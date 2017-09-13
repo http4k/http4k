@@ -22,9 +22,9 @@ data class Cookie(val name: String, val value: String,
     fun httpOnly() = copy(httpOnly = true)
     fun expires(date: LocalDateTime): Cookie = copy(expires = date)
 
-    override fun toString(): String = "$name=${value.quoted()}; ${attributes()}"
+    override fun toString(): String = fullCookieString()
 
-    fun attributes(): String {
+    private fun attributes(): String {
         val builder = mutableListOf<String>()
         builder.appendIfPresent(maxAge, "Max-Age=$maxAge")
         builder.appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")
@@ -73,6 +73,8 @@ data class Cookie(val name: String, val value: String,
     private fun MutableList<String>.appendIfTrue(toCheck: Boolean, toInclude: String) {
         if (toCheck) add(toInclude)
     }
+
+    fun fullCookieString(): String = "$name=${value.quoted()}; ${attributes()}"
 }
 
 private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
