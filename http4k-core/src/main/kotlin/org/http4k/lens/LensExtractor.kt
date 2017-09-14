@@ -14,4 +14,10 @@ interface LensExtractor<in IN, out OUT>: (IN) -> OUT {
      */
     @Throws(LensFailure::class)
     fun extract(target: IN): OUT = invoke(target)
+
+    /**
+     * Lens operation to get the value from the target. Synonym for invoke(IN)
+     */
+    operator fun <R : IN> get(target: R) = extract(target)
+
 }

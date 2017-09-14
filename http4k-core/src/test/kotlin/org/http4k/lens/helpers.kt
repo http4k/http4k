@@ -20,6 +20,8 @@ object BiDiLensContract {
         //synonym methods
         assertThat(spec.required("hello").extract(validValue), equalTo(tValue))
         assertThat(spec.required("hello").inject(tValue, s), equalTo(modifiedValue))
+        assertThat(spec.required("hello")[validValue], equalTo(tValue))
+        assertThat(spec.required("hello").set(s, tValue), equalTo(modifiedValue))
 
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(validValue), equalTo(tValue))

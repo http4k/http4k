@@ -15,10 +15,10 @@ import java.nio.ByteBuffer
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
  */
-open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val get: (HttpMessage) -> FINAL) : LensExtractor<HttpMessage, FINAL> {
+open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentType, private val getLens: (HttpMessage) -> FINAL) : LensExtractor<HttpMessage, FINAL> {
 
     override operator fun invoke(target: HttpMessage): FINAL = try {
-        get(target)
+        getLens(target)
     } catch (e: LensFailure) {
         throw e
     } catch (e: Exception) {
@@ -33,11 +33,11 @@ open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentTy
 class BiDiBodyLens<FINAL>(metas: List<Meta>,
                           contentType: ContentType,
                           get: (HttpMessage) -> FINAL,
-                          private val set: (FINAL, HttpMessage) -> HttpMessage)
+                          private val setLens: (FINAL, HttpMessage) -> HttpMessage)
     : LensInjector<HttpMessage, FINAL>, BodyLens<FINAL>(metas, contentType, get) {
 
     @Suppress("UNCHECKED_CAST")
-    override operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = set(value, target) as R
+    override operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = setLens(value, target) as R
 }
 
 /**
