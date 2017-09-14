@@ -1,6 +1,8 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
+import org.http4k.context.RequestContext
+import org.http4k.context.RequestContexts
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -21,6 +23,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.*
 
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
@@ -33,6 +36,9 @@ data class CorsPolicy(val origins: List<String>,
 
 object ServerFilters {
 
+    /**
+     * Add Cors headers to the Response, according to the passed CorsPolicy
+     */
     object Cors {
         private fun List<String>.joined() = this.joinToString(", ")
 
@@ -146,5 +152,21 @@ object ServerFilters {
      */
     object GZip {
         operator fun invoke(): Filter = RequestFilters.GunZip().then(ResponseFilters.GZip())
+    }
+
+    /**
+     * Initialise a RequestContext for each request which passes through the Filter stack, and remove the
+     */
+    object InitialiseRequestContext {
+        operator fun invoke(contexts: RequestContexts): Filter = Filter { next ->
+            {
+                val context = RequestContext(UUID.randomUUID())
+                try {
+                    next(contexts.inject(context, it))
+                } finally {
+                    contexts.remove(context)
+                }
+            }
+        }
     }
 }
