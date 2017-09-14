@@ -18,7 +18,10 @@ class RequestContext internal constructor(internal val id: UUID) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any> get(key: String): T = objects[key]!! as T
+    fun <T : Any> get(key: String): T {
+        if(!objects.containsKey(key)) throw IllegalStateException("No RequestContext property initialised for key $key")
+        return objects[key]!! as T
+    }
 
     fun set(key: String, value: Any) {
         objects[key] = value

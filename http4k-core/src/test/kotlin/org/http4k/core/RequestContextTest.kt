@@ -14,7 +14,7 @@ class RequestContextTest {
         assertThat(requestContext.get("foo"), equalTo(123))
     }
 
-    @Test(expected = KotlinNullPointerException::class)
+    @Test(expected = IllegalStateException::class)
     fun `throws when missing`() {
         RequestContext(UUID.randomUUID()).get<String>("foo")
     }

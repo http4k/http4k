@@ -1,11 +1,7 @@
 package org.http4k.core
 
 import org.http4k.lens.LensExtractor
-import org.http4k.lens.LensFailure
 import org.http4k.lens.LensInjector
-import org.http4k.lens.Meta
-import org.http4k.lens.Missing
-import org.http4k.lens.ParamMeta
 import java.util.*
 
 class RequestContexts : LensInjector<Request, RequestContext>, LensExtractor<Request, RequestContext> {
@@ -13,7 +9,7 @@ class RequestContexts : LensInjector<Request, RequestContext>, LensExtractor<Req
     private val requests = mutableMapOf<UUID, RequestContext>()
 
     override fun invoke(target: Request): RequestContext =
-        requests[RequestContext.extract(target)] ?: throw LensFailure(Missing(Meta(true, "context", ParamMeta.ObjectParam, "context")))
+        requests[RequestContext.extract(target)] ?: throw IllegalStateException("No RequestContext initialised")
 
     override fun <R : Request> invoke(value: RequestContext, target: R): R {
         requests[value.id] = value

@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
-import org.http4k.lens.LensFailure
 import org.junit.Test
 import java.util.*
 
@@ -21,7 +20,7 @@ class RequestContextsTest {
 
         requestContexts.remove(value)
 
-        assertThat({requestContexts.extract(updated)}, throws<LensFailure>())
+        assertThat({requestContexts.extract(updated)}, throws<IllegalStateException>())
     }
 
 }

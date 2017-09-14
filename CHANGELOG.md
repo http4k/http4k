@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.27.1
+- Raise proper Exception (instead of LensFailure) when RequestContexts are not set up correctly, so we don't accidentally classify developer errors as BadRequests
+
 ### v2.27.0
 - Added facility to assign values into a `RequestContext` which is passed down the Filter chain. 
 
