@@ -5,12 +5,14 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -189,6 +191,21 @@ class ServerFiltersTest {
         val response = handler(Request(GET, "/"))
 
         response shouldMatch hasStatus(UNSUPPORTED_MEDIA_TYPE)
+    }
+
+    @Test
+    fun `initialises request context for use further down the stack`() {
+        val contexts = RequestContexts()
+        val handler = ServerFilters.InitialiseRequestContext(contexts)
+            .then(Filter { next ->
+                {
+                    contexts[it].set("foo", "manchu")
+                    next(it)
+                }
+            })
+            .then { Response(OK).body(contexts[it].get<String>("foo")) }
+
+        handler(Request(GET, "/")) shouldMatch hasBody("manchu")
     }
 
 }

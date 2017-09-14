@@ -1,14 +1,14 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
-import org.http4k.context.RequestContext
-import org.http4k.context.RequestContexts
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
+import org.http4k.core.RequestContext
+import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST

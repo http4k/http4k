@@ -1,13 +1,12 @@
-package org.http4k.context
+package org.http4k.core
 
-import org.http4k.core.Request
 import org.http4k.lens.Header
 import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensInjector
 import java.util.*
 
-class RequestContext internal constructor(val id: UUID) {
-    private val objects = mutableMapOf<RequestContextKey, Any>()
+class RequestContext internal constructor(internal val id: UUID) {
+    private val objects = mutableMapOf<String, Any>()
 
     companion object : LensExtractor<Request, UUID>, LensInjector<Request, UUID> {
 
@@ -19,9 +18,9 @@ class RequestContext internal constructor(val id: UUID) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T : Any> get(key: RequestContextKey): T = objects[key]!! as T
+    fun <T : Any> get(key: String): T = objects[key]!! as T
 
-    operator fun <T : Any> set(key: RequestContextKey, value: T) {
+    fun set(key: String, value: Any) {
         objects[key] = value
     }
 }

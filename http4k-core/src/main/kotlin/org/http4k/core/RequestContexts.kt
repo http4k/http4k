@@ -1,6 +1,5 @@
-package org.http4k.context
+package org.http4k.core
 
-import org.http4k.core.Request
 import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensFailure
 import org.http4k.lens.LensInjector

@@ -2,23 +2,26 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.27.0
+- Added facility to assign values into a `RequestContext` which is passed down the Filter chain. 
+
 ### v2.26.3
-- Fix #44 - Request cookies should not be wrapped in quotes 
+- Fix #44 - Request cookies should not be wrapped in quotes.
 
 ### v2.26.2
-- Fix #43 - AWS does not sign binary requests correctly 
+- Fix #43 - AWS does not sign binary requests correctly.
 
 ### v2.26.1
-- Fix #41 - Sending binary body alters the size of the payload 
+- Fix #41 - Sending binary body alters the size of the payload.
 
 ### v2.26.0
-- Added "catch all" routing option, which matches all methods to a handler
+- Added "catch all" routing option, which matches all methods to a handler.
 
 ### v2.25.4
-- Fix #40 - GZip filters now use content-encoding headers instead of transfer-encoding
+- Fix #40 - GZip filters now use content-encoding headers instead of transfer-encoding.
 
 ### v2.25.3
-- Fix #39 - ResponseBodyMode.Memory properly closes streams (breaks jetty + gzip)
+- Fix #39 - ResponseBodyMode.Memory properly closes streams (breaks jetty + gzip).
 
 ### v2.25.2
 - Ensure that streams are closed properly when consuming from an upstream client.
