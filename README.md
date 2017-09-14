@@ -49,7 +49,7 @@ plugging together of services without HTTP container being required.
     * Base HTTP handler and **immutable HTTP message** objects, cookie handling. 
     * Commonly used HTTP functionalities provided as reusable Filters (caching, debugging, **Zipkin request tracing**)
     * **Path-based routing**, including nestable contexts
-    * **Typesafe HTTP message construction/desconstruction** using Lenses
+    * **Typesafe HTTP message construction/desconstruction and Request Contexts** using Lenses
     * **Static file-serving** capability with **Caching and Hot-Reload** 
     * Servlet implementation to allow **
     -dependency plugin to any Servlet container**
