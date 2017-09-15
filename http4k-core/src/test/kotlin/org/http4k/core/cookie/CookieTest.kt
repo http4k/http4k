@@ -100,14 +100,14 @@ class CookieTest {
     }
 
     @Test
-    fun `cookes can be stored in request`() {
+    fun `cookies can be stored in request`() {
         val request = Request(Method.GET, "ignore").cookie("foo", "bar")
 
-        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=bar") as Parameters))
+        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"") as Parameters))
     }
 
     @Test
-    fun `cookes can be retrieved from request`() {
+    fun `cookies can be retrieved from request`() {
         val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
@@ -117,7 +117,14 @@ class CookieTest {
     fun `request stores multiple cookies in single header`() {
         val request = Request(Method.GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
-        assertThat(request.headers, equalTo(listOf("Cookie" to "foo=one; bar=two") as Parameters))
+        assertThat(request.headers, equalTo(listOf("Cookie" to """foo="one"; bar="two"""") as Parameters))
+    }
+
+    @Test
+    fun `request can store cookies with special characters`() {
+        val request = Request(Method.GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
+
+        assertThat(request.headers, equalTo(listOf("Cookie" to """foo="\"one\""; bar="two=three"""") as Parameters))
     }
 
     @Test
