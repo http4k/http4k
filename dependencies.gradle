@@ -1,8 +1,8 @@
 ext {
-    ext.kotlin_version = '1.1.4'
+    ext.kotlin_version = '1.1.4-3'
 
     kotlin_lib = [
-            "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+            "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     ]
 
     hamkrest = [
