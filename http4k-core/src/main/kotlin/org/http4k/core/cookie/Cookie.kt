@@ -75,6 +75,7 @@ data class Cookie(val name: String, val value: String,
     }
 
     fun fullCookieString(): String = "$name=${value.quoted()}; ${attributes()}"
+    fun keyValueCookieString(): String = "$name=${value.quoted()}"
 }
 
 private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")

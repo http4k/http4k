@@ -26,7 +26,7 @@ fun Request.cookies(): List<Cookie> = header("Cookie")?.toCookieList() ?: listOf
 
 fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.path?.length ?: 0 }.firstOrNull()
 
-private fun List<Cookie>.toCookieString() = map { it.name + "=" + it.value }.joinToString("; ")
+private fun List<Cookie>.toCookieString() = map(Cookie::keyValueCookieString).joinToString("; ")
 
 fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull().map { Cookie.parse(it) }.filterNotNull()
 
