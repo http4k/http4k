@@ -1,4 +1,6 @@
 ### Installation (Gradle)
+**Dust:** ```compile group: "org.http4k", name: "http4k-template-dust", version: "2.27.2"```
+
 **Handlebars:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "2.27.2"```
 
 **Pebble:** ```compile group: "org.http4k", name: "http4k-template-pebble", version: "2.27.2"```

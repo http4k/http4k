@@ -39,7 +39,7 @@ plugging together of services without HTTP container being required.
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp
     * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
-    * Templating support: Caching and Hot-Reload engine support for Handlebars
+    * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * AWS request signing: super-simple interactions with AWS services
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
     * Testing: Hamkrest Matchers for **http4k** objects
@@ -73,6 +73,7 @@ plugging together of services without HTTP container being required.
     * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
 * [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
+        * **Dust** 
         * **Handlebars** 
         * **Pebble**
         * **Thymeleaf**

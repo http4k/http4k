@@ -22,6 +22,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-aws:bintrayUpload \
     :http4k-core:bintrayUpload \
     :http4k-contract:bintrayUpload \
+    :http4k-template-dust:bintrayUpload \
     :http4k-template-handlebars:bintrayUpload \
     :http4k-template-pebble:bintrayUpload \
     :http4k-template-thymeleaf:bintrayUpload \

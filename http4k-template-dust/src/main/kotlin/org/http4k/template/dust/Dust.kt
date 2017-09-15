@@ -21,12 +21,11 @@ interface TemplateExpansion {
     ): String
 }
 
-interface TemplateExpansionService: AutoCloseable, TemplateExpansion
+interface TemplateExpansionService : AutoCloseable, TemplateExpansion
 
 private object TEMPLATE_NOT_FOUND
 
-private fun missingTemplateIllegalArgument(templateName: String): Nothing =
-    throw IllegalArgumentException("template $templateName not found")
+private fun missingTemplateIllegalArgument(templateName: String): Nothing = throw IllegalArgumentException("template $templateName not found")
 
 // Must only be used on one thread.
 private class SingleThreadedDust(
@@ -35,7 +34,7 @@ private class SingleThreadedDust(
     private val notifyOnClosed: (SingleThreadedDust) -> Unit
 
 ) : TemplateExpansionService {
-    
+
     private val dust: JSObject = run {
         javaClass.getResourceAsStream("dust-full-2.7.5.js").reader().use(js::eval)
         js.eval(
@@ -55,14 +54,14 @@ private class SingleThreadedDust(
                 }
             }
             """)
-        
+
         js["dust"] as? JSObject ?: throw IllegalStateException("could not initialise Dust")
     }
-    
+
     override fun close() {
         notifyOnClosed(this)
     }
-    
+
     override fun expandTemplate(
         templateName: String,
         params: Any,
@@ -70,7 +69,7 @@ private class SingleThreadedDust(
     ): String {
         val writer = StringWriter()
         var error: Any? = null
-        
+
         val bindings = SimpleBindings(mapOf(
             "dust" to dust,
             "templateName" to templateName,
@@ -78,7 +77,7 @@ private class SingleThreadedDust(
             "writer" to writer,
             "reportError" to { e: Any -> error = e }
         ))
-        
+
         js.eval(
             //language=JavaScript
             """
@@ -90,7 +89,7 @@ private class SingleThreadedDust(
                 }
             });
             """, bindings)
-        
+
         return when (error) {
             null -> writer.toString();
             TEMPLATE_NOT_FOUND -> onMissingTemplate(templateName)
@@ -100,36 +99,33 @@ private class SingleThreadedDust(
 }
 
 
-class Dust(private val cacheTemplates: Boolean, private val precache: Int, loader: TemplateLoader) {
-    constructor(loader: TemplateLoader) : this(cacheTemplates = true, precache = 0, loader = loader)
-    
+class Dust(private val cacheTemplates: Boolean, private val precachePoolSize: Int, loader: TemplateLoader) {
+
     private val scriptEngineManager = ScriptEngineManager().apply {
         bindings = SimpleBindings(mapOf(
             "loader" to loader,
             "TEMPLATE_NOT_FOUND" to TEMPLATE_NOT_FOUND))
     }
-    
+
     private val pool = GenericObjectPool<SingleThreadedDust>(
         object : BasePooledObjectFactory<SingleThreadedDust>() {
             override fun create(): SingleThreadedDust {
                 return SingleThreadedDust(scriptEngineManager.getEngineByName("nashorn"), cacheTemplates, { returnDustEngine(it) })
             }
-            
+
             override fun wrap(obj: SingleThreadedDust): PooledObject<SingleThreadedDust> {
                 return DefaultPooledObject(obj)
             }
         },
         GenericObjectPoolConfig().apply {
-            minIdle = precache
+            minIdle = precachePoolSize
         })
-    
+
     private fun returnDustEngine(dustEngine: SingleThreadedDust) {
         pool.returnObject(dustEngine)
     }
-    
-    fun openTemplates(): TemplateExpansionService =
-        pool.borrowObject()
-    
-    inline fun <T> withTemplates(block: (TemplateExpansion) -> T): T =
-        openTemplates().use(block)
+
+    fun openTemplates(): TemplateExpansionService = pool.borrowObject()
+
+    inline fun <T> withTemplates(block: (TemplateExpansion) -> T): T = openTemplates().use(block)
 }
