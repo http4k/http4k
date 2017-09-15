@@ -9,10 +9,11 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.FileNotFoundException
 
-class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngine = { it }) : Templates {
+class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngine = { it },
+                         private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         val templateEngine = TemplateEngine()
-        val loader = ClassLoaderTemplateResolver()
+        val loader = ClassLoaderTemplateResolver(classLoader)
         loader.prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
         templateEngine.setTemplateResolver(loader)
         return ThymeleafTemplateRenderer(configure(templateEngine))

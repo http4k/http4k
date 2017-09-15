@@ -7,7 +7,8 @@ import com.mitchellbosecke.pebble.loader.FileLoader
 import java.io.StringWriter
 
 
-class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEngine.Builder = { it }) : Templates {
+class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEngine.Builder = { it },
+                      private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
 
     private class PebbleTemplateRenderer(private val engine: PebbleEngine) : TemplateRenderer {
         override fun invoke(viewModel: ViewModel): String = try {
@@ -15,13 +16,12 @@ class PebbleTemplates(private val configure: (PebbleEngine.Builder) -> PebbleEng
             engine.getTemplate(viewModel.template() + ".peb").evaluate(writer, mapOf("model" to viewModel))
             writer.toString()
         } catch (e: LoaderException) {
-            e.printStackTrace()
             throw ViewNotFound(viewModel)
         }
     }
 
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
-        val loader = ClasspathLoader()
+        val loader = ClasspathLoader(classLoader)
         loader.prefix = if (baseClasspathPackage.isEmpty()) "." else "./" + baseClasspathPackage.replace('.', '/')
         return PebbleTemplateRenderer(configure(PebbleEngine.Builder().loader(loader)).build())
     }
