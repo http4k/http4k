@@ -8,7 +8,7 @@ data class OnClasspath(val items: List<Item>) : ViewModel {
     override fun template() = javaClass.name.replace('.', '/')
 }
 
-class OnClasspathNotAtRoot(val items: List<Item>) : ViewModel {
+data class OnClasspathNotAtRoot(val items: List<Item>) : ViewModel {
     override fun template() = this.javaClass.simpleName
 }
 
