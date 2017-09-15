@@ -13,13 +13,15 @@ import javax.script.SimpleBindings
 
 typealias TemplateLoader = (templateName: String) -> String?
 
-interface TemplateExpansion : AutoCloseable {
+interface TemplateExpansion {
     fun expandTemplate(
         templateName: String,
         params: Any,
         onMissingTemplate: (templateName: String) -> Nothing = ::missingTemplateIllegalArgument
     ): String
 }
+
+interface TemplateExpansionService: AutoCloseable, TemplateExpansion
 
 private object TEMPLATE_NOT_FOUND
 
@@ -32,7 +34,7 @@ private class SingleThreadedDust(
     private val cacheTemplates: Boolean = true,
     private val notifyOnClosed: (SingleThreadedDust) -> Unit
 
-) : TemplateExpansion {
+) : TemplateExpansionService {
     
     private val dust: JSObject = run {
         javaClass.getResourceAsStream("dust-full-2.7.5.js").reader().use(js::eval)
@@ -125,7 +127,7 @@ class Dust(private val cacheTemplates: Boolean, private val precache: Int, loade
         pool.returnObject(dustEngine)
     }
     
-    fun openTemplates(): TemplateExpansion =
+    fun openTemplates(): TemplateExpansionService =
         pool.borrowObject()
     
     inline fun <T> withTemplates(block: (TemplateExpansion) -> T): T =
