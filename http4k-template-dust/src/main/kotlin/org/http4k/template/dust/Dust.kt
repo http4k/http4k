@@ -7,6 +7,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject
 import org.apache.commons.pool2.impl.GenericObjectPool
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import java.io.StringWriter
+import java.net.URL
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import javax.script.SimpleBindings
@@ -27,16 +28,23 @@ private object TEMPLATE_NOT_FOUND
 
 private fun missingTemplateIllegalArgument(templateName: String): Nothing = throw IllegalArgumentException("template $templateName not found")
 
+private fun ScriptEngine.eval(srcUrl: URL) {
+    eval(srcUrl.readText())
+}
+
+
 // Must only be used on one thread.
 private class SingleThreadedDust(
     private val js: ScriptEngine,
     private val cacheTemplates: Boolean = true,
+    private val dustPluginScripts: List<URL>,
     private val notifyOnClosed: (SingleThreadedDust) -> Unit
 
 ) : TemplateExpansionService {
 
     private val dust: JSObject = run {
-        javaClass.getResourceAsStream("dust-full-2.7.5.js").reader().use(js::eval)
+        js.eval(javaClass.getResource("dust-full-2.7.5.js"))
+        dustPluginScripts.forEach(js::eval)
         js.eval(
             //language=JavaScript
             """
@@ -99,8 +107,12 @@ private class SingleThreadedDust(
 }
 
 
-class Dust(private val cacheTemplates: Boolean, private val precachePoolSize: Int, loader: TemplateLoader) {
-
+class Dust(
+    private val cacheTemplates: Boolean,
+    private val precachePoolSize: Int,
+    private val dustPluginScripts: List<URL>,
+    loader: TemplateLoader
+) {
     private val scriptEngineManager = ScriptEngineManager().apply {
         bindings = SimpleBindings(mapOf(
             "loader" to loader,
@@ -110,7 +122,11 @@ class Dust(private val cacheTemplates: Boolean, private val precachePoolSize: In
     private val pool = GenericObjectPool<SingleThreadedDust>(
         object : BasePooledObjectFactory<SingleThreadedDust>() {
             override fun create(): SingleThreadedDust {
-                return SingleThreadedDust(scriptEngineManager.getEngineByName("nashorn"), cacheTemplates, { returnDustEngine(it) })
+                return SingleThreadedDust(
+                    js = scriptEngineManager.getEngineByName("nashorn"),
+                    cacheTemplates = cacheTemplates,
+                    dustPluginScripts = dustPluginScripts,
+                    notifyOnClosed = { returnDustEngine(it) })
             }
 
             override fun wrap(obj: SingleThreadedDust): PooledObject<SingleThreadedDust> {
