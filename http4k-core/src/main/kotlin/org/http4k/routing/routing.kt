@@ -39,7 +39,11 @@ class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
 }
 
-infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
+class PredicateMethod(private val predicate: RequestPredicate, val method: Method) {
+    infix fun to(action: HttpHandler): RoutingHttpHandler = PredicatingRoutingHttpHandler({
+        r: Request -> predicate(r) && r.method == method
+    }, action)
+}
 
 @Deprecated("For consistency with routing API", ReplaceWith("this.first bind this.second to action"))
 infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(second, UriTemplate.from(first), action)
@@ -47,3 +51,11 @@ infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = T
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
 
 infix fun String.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(null, UriTemplate.from(this), action)
+
+typealias RequestPredicate = (Request) -> Boolean
+
+infix fun RequestPredicate.bind(handler: HttpHandler): RoutingHttpHandler = PredicatingRoutingHttpHandler(this, handler)
+
+infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
+
+infix fun RequestPredicate.bind(method: Method): PredicateMethod = PredicateMethod(this, method)
