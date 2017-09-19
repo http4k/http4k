@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -14,7 +13,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.hamkrest.hasStatus
 import org.junit.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
@@ -233,19 +231,6 @@ class RoutingTest {
             "/a/thing" bind GET to routes
         )
         assertThat(routingHttpHandler(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
-    }
-
-    @Test
-    fun `predicate handler`() {
-        val passes: RequestPredicate = { true }
-        val fails: RequestPredicate = { false }
-
-        routes(passes bind { Response(OK) })(Request(GET, "/a/something")) shouldMatch hasStatus(OK)
-        routes(passes bind GET to { Response(OK) })(Request(GET, "/a/something")) shouldMatch hasStatus(OK)
-
-        routes(passes bind POST to { Response(OK) })(Request(GET, "/a/something")) shouldMatch hasStatus(NOT_FOUND)
-        routes(fails bind { Response(OK) })(Request(GET, "/a/something")) shouldMatch hasStatus(NOT_FOUND)
-        routes(fails bind GET to { Response(OK) })(Request(GET, "/a/something")) shouldMatch hasStatus(NOT_FOUND)
     }
 
     @Test
