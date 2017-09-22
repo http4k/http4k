@@ -34,6 +34,13 @@ object Traffic {
             }
         }
 
+        class MemoryCache(private val cache: MutableMap<Request, Response>,
+                          private val shouldStore: (HttpMessage) -> Boolean = { true }) : Storage {
+            override fun set(request: Request, response: Response) {
+                if (shouldStore(request) || shouldStore(response)) cache += request to response
+            }
+        }
+
         class DiskQueue(private val baseDir: String = ".",
                         private val shouldStore: (HttpMessage) -> Boolean = { true },
                         private val id: () -> String = { System.currentTimeMillis().toString() + UUID.randomUUID().toString() }) : Storage {
@@ -48,13 +55,6 @@ object Traffic {
                           private val shouldStore: (HttpMessage) -> Boolean = { true }) : Storage {
             override fun set(request: Request, response: Response) {
                 if (shouldStore(request) || shouldStore(response)) queue += request to response
-            }
-        }
-
-        class MemoryCache(private val cache: MutableMap<Request, Response>,
-                          private val shouldStore: (HttpMessage) -> Boolean = { true }) : Storage {
-            override fun set(request: Request, response: Response) {
-                if (shouldStore(request) || shouldStore(response)) cache += request to response
             }
         }
     }
