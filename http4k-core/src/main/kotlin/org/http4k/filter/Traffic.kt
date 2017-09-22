@@ -11,14 +11,14 @@ object Traffic {
     interface Recall {
         operator fun get(request: Request): Response?
 
-        open class DiskCache(private val baseDir: String = ".") : Recall {
+        class DiskCache(private val baseDir: String = ".") : Recall {
             override fun get(request: Request): Response? =
                 request.toFile(baseDir.toBaseFolder()).run {
                     if (exists()) Response.parse(String(readBytes())) else null
                 }
         }
 
-        open class MemoryCache(private val cache: MutableMap<Request, Response>) : Recall {
+        class MemoryCache(private val cache: MutableMap<Request, Response>) : Recall {
             override fun get(request: Request): Response? = cache[request]
         }
     }
