@@ -61,14 +61,14 @@ object Traffic {
 
     interface Cache : Storage, Recall {
         companion object {
-            fun Disk(baseDir: String = ".",
-                     shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
+            fun DiskCache(baseDir: String = ".",
+                          shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
                 object : Cache,
                     Storage by Storage.DiskCache(baseDir, shouldStore),
                     Recall by Recall.DiskCache(baseDir) {}
 
-            fun Memory(cache: MutableMap<Request, Response> = mutableMapOf(),
-                       shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
+            fun MemoryCache(cache: MutableMap<Request, Response> = mutableMapOf(),
+                            shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
                 object : Cache,
                     Storage by Storage.MemoryCache(cache, shouldStore),
                     Recall by Recall.MemoryCache(cache) {}
