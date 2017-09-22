@@ -1,79 +1,144 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
+import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.parse
+import org.http4k.core.then
 import java.io.File
 import java.util.*
 
-/**
- * Ultra-simple storage of request and responses objects. DOES NOT PROVIDE ANY CACHE-CONTROL
- */
-object RecordTraffic {
-
-    enum class RecordMode(private vararg val record: RecordMode) {
-        None(), RequestOnly(), ResponseOnly(), All(RequestOnly, ResponseOnly);
-
-        fun store(file: File, r: org.http4k.core.Request) {
-            if (record.contains(RequestOnly)) r.writeTo(file)
-        }
-
-        fun store(file: File, r: org.http4k.core.Response) {
-            if (record.contains(ResponseOnly)) r.writeTo(file)
-        }
-
-        private fun HttpMessage.writeTo(file: File) {
-            file.createNewFile()
-            file.writeBytes(toString().toByteArray())
-        }
-    }
-
-    /**
-     * Permanently store responses in memory - DOES NOT PROVIDE ANY EXPIRY FUNCTIONALITY
-     */
-    fun toMemoryCache(): Filter {
-        val cache = linkedMapOf<String, org.http4k.core.Response>()
-        return Filter { next ->
-            { req ->
-                cache.getOrPut(req.identify(), { next(req) })
+object ServeCachedTrafficFrom {
+    object Disk {
+        operator fun invoke(baseDir: String = ".") = Filter { next ->
+            {
+                it.toFile(baseDir.toBaseFolder()).run {
+                    if (exists()) Response.parse(String(readBytes())) else next(it)
+                }
             }
         }
     }
 
-    fun toDisk(baseDir: String = ".", mode: RecordMode = RecordMode.All) = Filter { next ->
-        {
-            val requestFolder = File(File(if (baseDir.isEmpty()) "." else baseDir, it.uri.path), it.identify())
-            if (!requestFolder.exists()) requestFolder.mkdirs()
-
-            val requestFile = File(requestFolder, "request.txt")
-            val responseFile = File(requestFolder, "response.txt")
-
-            if (!responseFile.exists()) {
-                mode.store(requestFile, it)
-                next(it).apply {
-                    mode.store(responseFile, this)
-                }
-            } else Response.parse(String(responseFile.readBytes()))
+    object Memory {
+        operator fun invoke(cache: Map<Request, Response>) = Filter { next ->
+            {
+                cache[it] ?: next(it)
+            }
         }
     }
-
-    fun toDiskCache(baseDir: String = ".", mode: RecordMode = RecordMode.All) = Filter { next ->
-        {
-            val requestFolder = File(File(if (baseDir.isEmpty()) "." else baseDir, it.uri.path), it.identify())
-            if (!requestFolder.exists()) requestFolder.mkdirs()
-
-            val requestFile = File(requestFolder, "request.txt")
-            val responseFile = File(requestFolder, "response.txt")
-
-            if (!responseFile.exists()) {
-                mode.store(requestFile, it)
-                next(it).apply {
-                    mode.store(responseFile, this)
-                }
-            } else Response.parse(String(responseFile.readBytes()))
-        }
-    }
-
-    private fun HttpMessage.identify() = String(Base64.getEncoder().encode(toString().toByteArray()))
 }
+
+object Replay {
+    object RequestsFrom {
+        object Disk {
+            operator fun invoke(baseDir: String = ".",
+                                shouldReplay: (Request) -> Boolean = { true }): Iterator<Request> =
+                read(baseDir, Request.Companion::parse, shouldReplay, "request.txt")
+        }
+    }
+
+    private fun <T : HttpMessage> read(baseDir: String,
+                                       convert: (String) -> T,
+                                       shouldReplay: (T) -> Boolean,
+                                       file: String): Iterator<T> =
+        baseDir.toBaseFolder()
+            .listFiles()
+            .map { File(it, file).run { convert(String(readBytes())) } }
+            .filter(shouldReplay)
+            .iterator()
+
+
+    object ResponsesFrom {
+        object Disk {
+            operator fun invoke(baseDir: String = ".",
+                                shouldReplay: (Response) -> Boolean = { true }): HttpHandler {
+                val responses = read(baseDir, Response.Companion::parse, shouldReplay, "response.txt")
+                return {
+                    if (responses.hasNext()) responses.next() else Response(Status.SERVICE_UNAVAILABLE)
+                }
+            }
+        }
+    }
+
+}
+
+object RecordTrafficTo {
+    object Disk {
+        operator fun invoke(baseDir: String = ".",
+                            shouldSave: (HttpMessage) -> Boolean = { true },
+                            id: () -> String = { System.currentTimeMillis().toString() }): Filter =
+            Filter { next ->
+                {
+                    if (shouldSave(it)) it.writeTo(File(baseDir.toBaseFolder(), id()))
+                    next(it).apply {
+                        if (shouldSave(this)) writeTo(File(baseDir.toBaseFolder(), id()))
+                    }
+                }
+            }
+    }
+
+    object Memory {
+        operator fun invoke(list: MutableList<Pair<Request, Response>>, shouldSave: (HttpMessage) -> Boolean = { true }): Filter =
+            Filter { next ->
+                { req ->
+                    next(req).apply {
+                        if (shouldSave(req) || shouldSave(this)) list += req to this
+                    }
+                }
+            }
+
+    }
+}
+
+object CacheTrafficTo {
+
+    object Disk {
+        operator fun invoke(baseDir: String = ".", shouldSave: (HttpMessage) -> Boolean = { true }) = Filter { next ->
+            {
+                val requestFolder = File(File(baseDir.toBaseFolder(), it.uri.path), String(Base64.getEncoder().encode(it.toString().toByteArray())))
+
+                if (shouldSave(it)) it.writeTo(requestFolder)
+
+                next(it).apply {
+                    if (shouldSave(this)) this.writeTo(requestFolder)
+                }
+            }
+        }
+    }
+
+    object Memory {
+        operator fun invoke(cache: MutableMap<Request, Response>, shouldSave: (HttpMessage) -> Boolean = { true }) = Filter { next ->
+            { req: Request ->
+                next(req).apply {
+                    if (shouldSave(req) || shouldSave(this)) cache[req] = this
+                }
+            }
+        }
+    }
+}
+
+object SimpleCachingFrom {
+    fun Disk(baseDir: String = ".", shouldSave: (HttpMessage) -> Boolean = { true }): Filter =
+        ServeCachedTrafficFrom.Disk(baseDir).then(CacheTrafficTo.Disk(baseDir, shouldSave))
+
+    fun Memory(shouldSave: (HttpMessage) -> Boolean = { true }): Filter {
+        val cache = linkedMapOf<Request, Response>()
+        return ServeCachedTrafficFrom.Memory(cache).then(CacheTrafficTo.Memory(cache, shouldSave))
+    }
+}
+
+private fun HttpMessage.writeTo(folder: File) {
+    toFile(folder).apply {
+        folder.mkdirs()
+        createNewFile()
+        writeBytes(toString().toByteArray())
+    }
+}
+
+private fun String.toBaseFolder(): File = File(if (isEmpty()) "." else this)
+
+private fun HttpMessage.toFile(folder: File): File = File(folder, if (this is Request) "request.txt" else "response.txt")
+
