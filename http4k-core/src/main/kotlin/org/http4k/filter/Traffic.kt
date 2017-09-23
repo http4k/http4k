@@ -8,24 +8,8 @@ import java.io.File
 import java.util.*
 
 object Traffic {
-    interface Recall {
-        operator fun get(request: Request): Response?
-
-        companion object {
-            fun DiskCache(baseDir: String = ".") = object : Recall {
-                override fun get(request: Request): Response? =
-                    request.toFile(baseDir.toBaseFolder()).run {
-                        if (exists()) Response.parse(String(readBytes())) else null
-                    }
-            }
-
-            fun MemoryCache(cache: MutableMap<Request, Response>) = object : Recall {
-                override fun get(request: Request): Response? = cache[request]
-            }
-        }
-    }
-
     interface Storage {
+        operator fun get(request: Request): Response?
         operator fun set(request: Request, response: Response)
 
         companion object {
@@ -35,6 +19,11 @@ object Traffic {
                     if (shouldStore(request)) request.writeTo(requestFolder)
                     if (shouldStore(response)) request.writeTo(requestFolder)
                 }
+
+                override fun get(request: Request): Response? =
+                    request.toFile(baseDir.toBaseFolder()).run {
+                        if (exists()) Response.parse(String(readBytes())) else null
+                    }
             }
 
             fun MemoryCache(cache: MutableMap<Request, Response>,
@@ -42,6 +31,8 @@ object Traffic {
                 override fun set(request: Request, response: Response) {
                     if (shouldStore(request) || shouldStore(response)) cache += request to response
                 }
+
+                override fun get(request: Request): Response? = cache[request]
             }
 
             fun DiskQueue(baseDir: String = ".",
@@ -52,6 +43,12 @@ object Traffic {
                     if (shouldStore(request)) request.writeTo(folder)
                     if (shouldStore(response)) response.writeTo(folder)
                 }
+
+                override fun get(request: Request): Response? = baseDir
+                    .toBaseFolder()
+                    .listFiles()
+                    .find { request.toFile(it).run { Request.parse(String(readBytes())) } == request }
+                    ?.run { Response.parse(String(readBytes())) }
             }
 
             fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
@@ -59,23 +56,9 @@ object Traffic {
                 override fun set(request: Request, response: Response) {
                     if (shouldStore(request) || shouldStore(response)) queue += request to response
                 }
+
+                override fun get(request: Request): Response? = queue.find { it.first == request }?.second
             }
-        }
-    }
-
-    interface Cache : Storage, Recall {
-        companion object {
-            fun DiskCache(baseDir: String = ".",
-                          shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
-                object : Cache,
-                    Storage by Storage.DiskCache(baseDir, shouldStore),
-                    Recall by Recall.DiskCache(baseDir) {}
-
-            fun MemoryCache(cache: MutableMap<Request, Response> = mutableMapOf(),
-                            shouldStore: (HttpMessage) -> Boolean = { true }): Cache =
-                object : Cache,
-                    Storage by Storage.MemoryCache(cache, shouldStore),
-                    Recall by Recall.MemoryCache(cache) {}
         }
     }
 
@@ -86,19 +69,21 @@ object Traffic {
         companion object {
             fun DiskQueue(baseDir: String = ".",
                           shouldReplay: (HttpMessage) -> Boolean = { true }) = object : Replay {
-                override fun requests(): Iterator<Request> = read(baseDir, Request.Companion::parse, shouldReplay, "request.txt")
+                override fun requests(): Iterator<Request> =
+                    read(baseDir, Request.Companion::parse, "request.txt")
+                        .filter(shouldReplay).iterator()
 
-                override fun responses(): Iterator<Response> = read(baseDir, Response.Companion::parse, shouldReplay, "response.txt")
+                override fun responses(): Iterator<Response> =
+                    read(baseDir, Response.Companion::parse, "response.txt")
+                        .filter(shouldReplay).iterator()
 
                 private fun <T : HttpMessage> read(baseDir: String,
                                                    convert: (String) -> T,
-                                                   shouldReplay: (T) -> Boolean,
-                                                   file: String): Iterator<T> =
+                                                   file: String): List<T> =
                     baseDir.toBaseFolder()
                         .listFiles()
                         .map { File(it, file).run { convert(String(readBytes())) } }
                         .filter(shouldReplay)
-                        .iterator()
             }
 
             fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
