@@ -26,7 +26,7 @@ object Responder {
 }
 
 object Requester {
-    fun from(trafficStream: Replay): Sequence<Request> = trafficStream.requests()
+    fun from(replay: Replay): Sequence<Request> = replay.requests()
 }
 
 object TrafficFilters {

@@ -90,9 +90,9 @@ object Traffic {
                         .map { File(it, file).run { convert(String(readBytes())) } }
             }
 
-            fun MemoryStream(queue: MutableList<Pair<Request, Response>>) = object : Replay {
-                override fun requests() = queue.map { it.first }.asSequence()
-                override fun responses() = queue.map { it.second }.asSequence()
+            fun MemoryStream(stream: MutableList<Pair<Request, Response>>) = object : Replay {
+                override fun requests() = stream.map { it.first }.asSequence()
+                override fun responses() = stream.map { it.second }.asSequence()
             }
         }
     }
@@ -100,21 +100,36 @@ object Traffic {
     interface Cache : Write, Read {
         companion object {
             /**
-             * Serialises HTTP traffic to the FS, optimised for retrieval.
+             * Serialise and retrieve HTTP traffic to/from the FS
              */
             fun Disk(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }): Cache = object : Cache,
                 Read by Read.DiskMap(baseDir),
                 Write by Write.DiskMap(baseDir, shouldStore) {}
 
             /**
-             * Serialises HTTP traffic into memory, optimised for retrieval.
+             * Serialise and retrieve HTTP traffic to/from Memory
              */
-
             fun Memory(cache: MutableMap<Request, Response> = mutableMapOf(), shouldStore: (HttpMessage) -> Boolean = { true }): Cache {
                 return object : Cache,
                     Read by Read.MemoryMap(cache),
                     Write by Write.MemoryMap(cache, shouldStore) {}
             }
+        }
+    }
+
+    interface Stream : Write, Replay {
+        companion object {
+            /**
+             * Serialise and replay HTTP traffic to/from the FS in order
+             */
+            fun Disk(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }): Stream =
+                object : Stream, Replay by Replay.DiskStream(baseDir), Write by Write.DiskStream(baseDir, shouldStore) {}
+
+            /**
+             * Serialise and replay HTTP traffic to/from Memory in order
+             */
+            fun Memory(stream: MutableList<Pair<Request, Response>> = mutableListOf(), shouldStore: (HttpMessage) -> Boolean = { true }): Stream =
+                object : Stream, Replay by Replay.MemoryStream(stream), Write by Write.MemoryStream(stream, shouldStore) {}
         }
     }
 }
