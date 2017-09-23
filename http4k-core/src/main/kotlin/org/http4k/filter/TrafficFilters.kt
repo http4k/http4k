@@ -7,17 +7,16 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
-import org.http4k.filter.Traffic.Cache
 import org.http4k.filter.Traffic.Replay
 
 object Responder {
     private val fallback: (Request) -> Response = { Response(SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
 
-    fun from(storage: Cache): HttpHandler = TrafficFilters.ServeCacheFrom(storage).then(fallback)
+    fun from(read: Traffic.Read): HttpHandler = TrafficFilters.ServeCacheFrom(read).then(fallback)
 
-    fun from(trafficStream: Replay,
+    fun from(replay: Replay,
              shouldReplay: (HttpMessage) -> Boolean = { true }): HttpHandler =
-        trafficStream.responses()
+        replay.responses()
             .filter(shouldReplay)
             .iterator()
             .let {
@@ -34,7 +33,7 @@ object TrafficFilters {
     /**
      * Responds to requests with a stored Response if possible, or falls back to the next Http Handler
      */
-    fun ServeCacheFrom(storage: Cache): Filter = Filter { next -> { storage[it] ?: next(it) } }
+    fun ServeCacheFrom(read: Traffic.Read): Filter = Filter { next -> { read[it] ?: next(it) } }
 
     /**
      * Intercepts and stores Request/Response traffic in the Storage
