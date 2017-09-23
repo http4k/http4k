@@ -13,6 +13,10 @@ object Traffic {
         operator fun set(request: Request, response: Response)
 
         companion object {
+
+            /**
+             * Serialises HTTP traffic to the FS, optimised for retrieval.
+             */
             fun DiskCache(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
                 override fun set(request: Request, response: Response) {
                     val requestFolder = File(File(baseDir.toBaseFolder(), request.uri.path), String(Base64.getEncoder().encode(request.toString().toByteArray())))
@@ -26,6 +30,9 @@ object Traffic {
                     }
             }
 
+            /**
+             * Serialises HTTP traffic into memory, optimised for retrieval.
+             */
             fun MemoryCache(cache: MutableMap<Request, Response>,
                             shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
                 override fun set(request: Request, response: Response) {
@@ -35,6 +42,9 @@ object Traffic {
                 override fun get(request: Request): Response? = cache[request]
             }
 
+            /**
+             * Serialises HTTP traffic to the FS, optimised for replaying in order.
+             */
             fun DiskQueue(baseDir: String = ".",
                           shouldStore: (HttpMessage) -> Boolean = { true },
                           id: () -> String = { System.currentTimeMillis().toString() + UUID.randomUUID().toString() }) = object : Storage {
@@ -51,6 +61,9 @@ object Traffic {
                     ?.run { Response.parse(String(readBytes())) }
             }
 
+            /**
+             * Serialises HTTP traffic into memory, optimised for replaying in order.
+             */
             fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
                             shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
                 override fun set(request: Request, response: Response) {
@@ -62,32 +75,25 @@ object Traffic {
         }
     }
 
-    interface Replay {
+    interface TrafficStream {
         fun requests(): Iterator<Request>
         fun responses(): Iterator<Response>
 
         companion object {
             fun DiskQueue(baseDir: String = ".",
-                          shouldReplay: (HttpMessage) -> Boolean = { true }) = object : Replay {
-                override fun requests(): Iterator<Request> =
-                    read(baseDir, Request.Companion::parse, "request.txt")
-                        .filter(shouldReplay).iterator()
+                          shouldReplay: (HttpMessage) -> Boolean = { true }) = object : TrafficStream {
+                override fun requests() = read(Request.Companion::parse, "request.txt").iterator()
 
-                override fun responses(): Iterator<Response> =
-                    read(baseDir, Response.Companion::parse, "response.txt")
-                        .filter(shouldReplay).iterator()
+                override fun responses() = read(Response.Companion::parse, "response.txt").iterator()
 
-                private fun <T : HttpMessage> read(baseDir: String,
-                                                   convert: (String) -> T,
-                                                   file: String): List<T> =
-                    baseDir.toBaseFolder()
-                        .listFiles()
+                private fun <T : HttpMessage> read(convert: (String) -> T, file: String) =
+                    baseDir.toBaseFolder().listFiles()
                         .map { File(it, file).run { convert(String(readBytes())) } }
                         .filter(shouldReplay)
             }
 
             fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
-                            shouldReplay: (HttpMessage) -> Boolean = { true }) = object : Replay {
+                            shouldReplay: (HttpMessage) -> Boolean = { true }) = object : TrafficStream {
                 override fun requests(): Iterator<Request> = queue.filter { shouldReplay(it.first) }.map { it.first }.iterator()
                 override fun responses(): Iterator<Response> = queue.filter { shouldReplay(it.second) }.map { it.second }.iterator()
             }

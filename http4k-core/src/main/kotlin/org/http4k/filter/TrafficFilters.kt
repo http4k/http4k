@@ -6,32 +6,32 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
-import org.http4k.filter.Traffic.Replay
 import org.http4k.filter.Traffic.Storage
+import org.http4k.filter.Traffic.TrafficStream
 
 object Responder {
     private val fallback: (Request) -> Response = { Response(SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
 
-    fun from(storage: Storage): HttpHandler = TrafficFilters.ServeCachedFrom(storage).then(fallback)
+    fun from(storage: Storage): HttpHandler = TrafficFilters.ServeCacheFrom(storage).then(fallback)
 
-    fun from(replay: Replay): HttpHandler = replay.responses().let {
+    fun from(trafficStream: TrafficStream): HttpHandler = trafficStream.responses().let {
         Filter { next -> { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
     }
 }
 
 object Requester {
-    fun from(replay: Replay): Iterator<Request> = replay.requests()
+    fun from(trafficStream: TrafficStream): Iterator<Request> = trafficStream.requests()
 }
 
 object TrafficFilters {
 
     /**
-     *
+     * Responds to requests with a stored Response if possible, or falls back to the next Http Handler
      */
-    fun ServeCachedFrom(storage: Storage): Filter = Filter { next -> { storage[it] ?: next(it) } }
+    fun ServeCacheFrom(storage: Storage): Filter = Filter { next -> { storage[it] ?: next(it) } }
 
     /**
-     *
+     * Intercepts and stores Request/Response traffic in the Storage
      */
     fun RecordTo(storage: Storage): Filter = Filter { next -> { next(it).apply { storage[it] = this } } }
 }
