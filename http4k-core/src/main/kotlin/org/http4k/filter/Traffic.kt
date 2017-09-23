@@ -109,3 +109,15 @@ object Traffic {
         }
     }
 }
+
+private fun HttpMessage.writeTo(folder: File) {
+    toFile(folder).apply {
+        folder.mkdirs()
+        createNewFile()
+        writeBytes(toString().toByteArray())
+    }
+}
+
+private fun String.toBaseFolder(): File = File(if (isEmpty()) "." else this)
+
+private fun HttpMessage.toFile(folder: File): File = File(folder, if (this is Request) "request.txt" else "response.txt")
