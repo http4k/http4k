@@ -76,26 +76,23 @@ object Traffic {
     }
 
     interface TrafficStream {
-        fun requests(): Iterator<Request>
-        fun responses(): Iterator<Response>
+        fun requests(): Sequence<Request>
+        fun responses(): Sequence<Response>
 
         companion object {
-            fun DiskQueue(baseDir: String = ".",
-                          shouldReplay: (HttpMessage) -> Boolean = { true }) = object : TrafficStream {
-                override fun requests() = read(Request.Companion::parse, "request.txt").iterator()
+            fun DiskQueue(baseDir: String = ".") = object : TrafficStream {
+                override fun requests() = read(Request.Companion::parse, "request.txt").asSequence()
 
-                override fun responses() = read(Response.Companion::parse, "response.txt").iterator()
+                override fun responses() = read(Response.Companion::parse, "response.txt").asSequence()
 
                 private fun <T : HttpMessage> read(convert: (String) -> T, file: String) =
                     baseDir.toBaseFolder().listFiles()
                         .map { File(it, file).run { convert(String(readBytes())) } }
-                        .filter(shouldReplay)
             }
 
-            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
-                            shouldReplay: (HttpMessage) -> Boolean = { true }) = object : TrafficStream {
-                override fun requests(): Iterator<Request> = queue.filter { shouldReplay(it.first) }.map { it.first }.iterator()
-                override fun responses(): Iterator<Response> = queue.filter { shouldReplay(it.second) }.map { it.second }.iterator()
+            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>) = object : TrafficStream {
+                override fun requests() = queue.map { it.first }.asSequence()
+                override fun responses() = queue.map { it.second }.asSequence()
             }
         }
     }

@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -14,13 +15,18 @@ object Responder {
 
     fun from(storage: Storage): HttpHandler = TrafficFilters.ServeCacheFrom(storage).then(fallback)
 
-    fun from(trafficStream: TrafficStream): HttpHandler = trafficStream.responses().let {
-        Filter { next -> { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
-    }
+    fun from(trafficStream: TrafficStream,
+             shouldReplay: (HttpMessage) -> Boolean = { true }): HttpHandler =
+        trafficStream.responses()
+            .filter(shouldReplay)
+            .iterator()
+            .let {
+                Filter { next -> { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
+            }
 }
 
 object Requester {
-    fun from(trafficStream: TrafficStream): Iterator<Request> = trafficStream.requests()
+    fun from(trafficStream: TrafficStream): Sequence<Request> = trafficStream.requests()
 }
 
 object TrafficFilters {

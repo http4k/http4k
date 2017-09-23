@@ -15,8 +15,8 @@ fun main(args: Array<String>) {
     val recordToMemoryQueue: Filter = TrafficFilters.RecordTo(Traffic.Storage.MemoryQueue(mutableListOf()))
     val recordToDiskQueeu: Filter = TrafficFilters.RecordTo(Traffic.Storage.DiskQueue())
 
-    val requestsFromDisk: Iterator<Request> = Requester.from(Traffic.TrafficStream.DiskQueue())
-    val requestsFromMemory: Iterator<Request> = Requester.from(Traffic.TrafficStream.MemoryQueue(mutableListOf()))
+    val requestsFromDisk: Sequence<Request> = Requester.from(Traffic.TrafficStream.DiskQueue())
+    val requestsFromMemory: Sequence<Request> = Requester.from(Traffic.TrafficStream.MemoryQueue(mutableListOf()))
 
     val responderFromCache: HttpHandler = Responder.from(Traffic.Storage.DiskCache())
     val responderFromRecall: HttpHandler = Responder.from(Traffic.Storage.DiskCache())
