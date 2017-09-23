@@ -75,12 +75,12 @@ object Traffic {
         }
     }
 
-    interface TrafficStream {
+    interface Stream {
         fun requests(): Sequence<Request>
         fun responses(): Sequence<Response>
 
         companion object {
-            fun DiskQueue(baseDir: String = ".") = object : TrafficStream {
+            fun DiskQueue(baseDir: String = ".") = object : Stream {
                 override fun requests() = read(Request.Companion::parse, "request.txt").asSequence()
 
                 override fun responses() = read(Response.Companion::parse, "response.txt").asSequence()
@@ -90,7 +90,7 @@ object Traffic {
                         .map { File(it, file).run { convert(String(readBytes())) } }
             }
 
-            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>) = object : TrafficStream {
+            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>) = object : Stream {
                 override fun requests() = queue.map { it.first }.asSequence()
                 override fun responses() = queue.map { it.second }.asSequence()
             }

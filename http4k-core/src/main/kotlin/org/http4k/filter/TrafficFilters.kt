@@ -8,14 +8,14 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
 import org.http4k.filter.Traffic.Storage
-import org.http4k.filter.Traffic.TrafficStream
+import org.http4k.filter.Traffic.Stream
 
 object Responder {
     private val fallback: (Request) -> Response = { Response(SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
 
     fun from(storage: Storage): HttpHandler = TrafficFilters.ServeCacheFrom(storage).then(fallback)
 
-    fun from(trafficStream: TrafficStream,
+    fun from(trafficStream: Stream,
              shouldReplay: (HttpMessage) -> Boolean = { true }): HttpHandler =
         trafficStream.responses()
             .filter(shouldReplay)
@@ -26,7 +26,7 @@ object Responder {
 }
 
 object Requester {
-    fun from(trafficStream: TrafficStream): Sequence<Request> = trafficStream.requests()
+    fun from(trafficStream: Stream): Sequence<Request> = trafficStream.requests()
 }
 
 object TrafficFilters {
