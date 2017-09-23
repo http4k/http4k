@@ -8,79 +8,79 @@ import java.io.File
 import java.util.*
 
 object Traffic {
-    interface Storage {
+    interface Read {
         operator fun get(request: Request): Response?
-        operator fun set(request: Request, response: Response)
 
         companion object {
-
-            /**
-             * Serialises HTTP traffic to the FS, optimised for retrieval.
-             */
-            fun DiskCache(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
-                override fun set(request: Request, response: Response) {
-                    val requestFolder = File(File(baseDir.toBaseFolder(), request.uri.path), String(Base64.getEncoder().encode(request.toString().toByteArray())))
-                    if (shouldStore(request)) request.writeTo(requestFolder)
-                    if (shouldStore(response)) request.writeTo(requestFolder)
-                }
-
+            fun DiskMap(baseDir: String = ".") = object : Read {
                 override fun get(request: Request): Response? =
                     request.toFile(baseDir.toBaseFolder()).run {
                         if (exists()) Response.parse(String(readBytes())) else null
                     }
             }
 
-            /**
-             * Serialises HTTP traffic into memory, optimised for retrieval.
-             */
-            fun MemoryCache(cache: MutableMap<Request, Response>,
-                            shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
-                override fun set(request: Request, response: Response) {
-                    if (shouldStore(request) || shouldStore(response)) cache += request to response
-                }
-
+            fun MemoryMap(cache: MutableMap<Request, Response>) = object : Read {
                 override fun get(request: Request): Response? = cache[request]
+            }
+        }
+    }
+
+    interface Write {
+        operator fun set(request: Request, response: Response)
+
+        companion object {
+            /**
+             * Serialises HTTP traffic to the FS, optimised for retrieval.
+             */
+            fun DiskMap(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }) = object : Write {
+                override fun set(request: Request, response: Response) {
+                    val requestFolder = File(File(baseDir.toBaseFolder(), request.uri.path), String(Base64.getEncoder().encode(request.toString().toByteArray())))
+                    if (shouldStore(request)) request.writeTo(requestFolder)
+                    if (shouldStore(response)) request.writeTo(requestFolder)
+                }
             }
 
             /**
-             * Serialises HTTP traffic to the FS, optimised for replaying in order.
+             * Serialises HTTP traffic in memory, optimised for retrieval.
              */
-            fun DiskQueue(baseDir: String = ".",
-                          shouldStore: (HttpMessage) -> Boolean = { true },
-                          id: () -> String = { System.currentTimeMillis().toString() + UUID.randomUUID().toString() }) = object : Storage {
+            fun MemoryMap(cache: MutableMap<Request, Response>,
+                          shouldStore: (HttpMessage) -> Boolean = { true }) = object : Write {
+                override fun set(request: Request, response: Response) {
+                    if (shouldStore(request) || shouldStore(response)) cache += request to response
+                }
+            }
+
+            /**
+             * Serialises HTTP traffic to the FS in order.
+             */
+            fun DiskStream(baseDir: String = ".",
+                           shouldStore: (HttpMessage) -> Boolean = { true },
+                           id: () -> String = { System.currentTimeMillis().toString() + UUID.randomUUID().toString() }) = object : Write {
                 override fun set(request: Request, response: Response) {
                     val folder = File(baseDir, id())
                     if (shouldStore(request)) request.writeTo(folder)
                     if (shouldStore(response)) response.writeTo(folder)
                 }
-
-                override fun get(request: Request): Response? = baseDir
-                    .toBaseFolder()
-                    .listFiles()
-                    .find { request.toFile(it).run { Request.parse(String(readBytes())) } == request }
-                    ?.run { Response.parse(String(readBytes())) }
             }
 
             /**
-             * Serialises HTTP traffic into memory, optimised for replaying in order.
+             * Serialises HTTP traffic to Memory in order.
              */
-            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>,
-                            shouldStore: (HttpMessage) -> Boolean = { true }) = object : Storage {
+            fun MemoryStream(queue: MutableList<Pair<Request, Response>>,
+                             shouldStore: (HttpMessage) -> Boolean = { true }) = object : Write {
                 override fun set(request: Request, response: Response) {
                     if (shouldStore(request) || shouldStore(response)) queue += request to response
                 }
-
-                override fun get(request: Request): Response? = queue.find { it.first == request }?.second
             }
         }
     }
 
-    interface Stream {
+    interface Replay {
         fun requests(): Sequence<Request>
         fun responses(): Sequence<Response>
 
         companion object {
-            fun DiskQueue(baseDir: String = ".") = object : Stream {
+            fun DiskStream(baseDir: String = ".") = object : Replay {
                 override fun requests() = read(Request.Companion::parse, "request.txt").asSequence()
 
                 override fun responses() = read(Response.Companion::parse, "response.txt").asSequence()
@@ -90,9 +90,30 @@ object Traffic {
                         .map { File(it, file).run { convert(String(readBytes())) } }
             }
 
-            fun MemoryQueue(queue: MutableList<Pair<Request, Response>>) = object : Stream {
+            fun MemoryStream(queue: MutableList<Pair<Request, Response>>) = object : Replay {
                 override fun requests() = queue.map { it.first }.asSequence()
                 override fun responses() = queue.map { it.second }.asSequence()
+            }
+        }
+    }
+
+    interface Cache : Write, Read {
+        companion object {
+            /**
+             * Serialises HTTP traffic to the FS, optimised for retrieval.
+             */
+            fun Disk(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }): Cache = object : Cache,
+                Read by Read.DiskMap(baseDir),
+                Write by Write.DiskMap(baseDir, shouldStore) {}
+
+            /**
+             * Serialises HTTP traffic into memory, optimised for retrieval.
+             */
+
+            fun Memory(cache: MutableMap<Request, Response> = mutableMapOf(), shouldStore: (HttpMessage) -> Boolean = { true }): Cache {
+                return object : Cache,
+                    Read by Read.MemoryMap(cache),
+                    Write by Write.MemoryMap(cache, shouldStore) {}
             }
         }
     }
