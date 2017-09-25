@@ -7,9 +7,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
-import org.http4k.traffic.Traffic
-import org.http4k.traffic.Traffic.Replay
-import org.http4k.traffic.Traffic.Source
+import org.http4k.traffic.Replay
+import org.http4k.traffic.Sink
+import org.http4k.traffic.Source
 
 /**
  * Provides HTTP Handlers which respond using pre-stored Requests.
@@ -44,5 +44,5 @@ object TrafficFilters {
     /**
      * Intercepts and Writes Request/Response traffic
      */
-    fun RecordTo(sink: Traffic.Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
+    fun RecordTo(sink: Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
 }
