@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -e
+set -o errexit
+set -o pipefail
+set -o nounset
 
 NEW_VERSION=$1
 
