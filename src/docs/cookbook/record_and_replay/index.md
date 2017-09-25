@@ -22,6 +22,7 @@ Using `Filters` it's possible to record a stream traffic and then replay recorde
 ### Concepts
 
 The `org.http4k.traffic` package contains the interfaces which make up the core concepts for traffic capture and replay. These interfaces are:
+
 - A `Sink` consumes request/response pairs for storage. 
 - A `Source` provides lookup of pre-stored Response based on an HTTP Request.
 - `Replay` instances provide streams of HTTP messages as they were received.
