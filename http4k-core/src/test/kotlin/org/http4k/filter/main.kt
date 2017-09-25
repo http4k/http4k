@@ -14,11 +14,10 @@ fun main(args: Array<String>) {
     val recordToDiskStream: Filter = TrafficFilters.RecordTo(Traffic.Sink.DiskStream())
     val recordToDiskTree: Filter = TrafficFilters.RecordTo(Traffic.Sink.DiskTree())
 
-    val requestsFromDisk: Sequence<Request> = Requester.from(Traffic.Replay.DiskStream())
-    val requestsFromMemory: Sequence<Request> = Requester.from(Traffic.Replay.MemoryStream(mutableListOf()))
-
-    val responderFromCache: HttpHandler = Responder.from(Traffic.ReadWriteCache.Disk())
-    val responderFromMemory: HttpHandler = Responder.from(Traffic.ReadWriteCache.Memory())
+    val responderFromDiskStream: HttpHandler = Responder.from(Traffic.ReadWriteStream.Disk())
+    val responderFromMemoryStream: HttpHandler = Responder.from(Traffic.ReadWriteStream.Memory())
+    val responderFromDiskCache: HttpHandler = Responder.from(Traffic.ReadWriteCache.Disk())
+    val responderFromDiskMemory: HttpHandler = Responder.from(Traffic.ReadWriteCache.Memory())
 
     val responderFromDiskReplay: HttpHandler = Responder.from(Traffic.Replay.DiskStream())
     val responderFromMemoryReplay: HttpHandler = Responder.from(Traffic.Replay.MemoryStream(stream = mutableListOf()))

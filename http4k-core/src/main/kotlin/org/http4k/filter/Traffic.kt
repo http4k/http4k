@@ -7,7 +7,14 @@ import org.http4k.core.parse
 import java.io.File
 import java.util.*
 
+/**
+ * Classes used for capturing and replaying HTTP traffic.
+ */
 object Traffic {
+
+    /**
+     * Tries to retrieve a stored response for a given request.
+     */
     interface Source {
         operator fun get(request: Request): Response?
 
@@ -31,6 +38,9 @@ object Traffic {
         }
     }
 
+    /**
+     * Consumes HTTP traffic for storage.
+     */
     interface Sink {
         operator fun set(request: Request, response: Response)
 
@@ -81,6 +91,9 @@ object Traffic {
         }
     }
 
+    /**
+     * Provides a stream of traffic for replaying purposes.
+     */
     interface Replay {
         fun requests(): Sequence<Request>
         fun responses(): Sequence<Response>
@@ -109,6 +122,9 @@ object Traffic {
         }
     }
 
+    /**
+     * Combined Read/Write storage models, optimised for retrieval.
+     */
     interface ReadWriteCache : Sink, Source {
         companion object {
             /**
@@ -129,19 +145,22 @@ object Traffic {
         }
     }
 
-    interface Stream : Sink, Replay {
+    /**
+     * Combined Read/Write storage models, optimised for replay.
+     */
+    interface ReadWriteStream : Sink, Replay {
         companion object {
             /**
              * Serialise and replay HTTP traffic to/from the FS in order.
              */
-            fun Disk(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }): Stream =
-                object : Stream, Replay by Replay.DiskStream(baseDir), Sink by Sink.DiskStream(baseDir, shouldStore) {}
+            fun Disk(baseDir: String = ".", shouldStore: (HttpMessage) -> Boolean = { true }): ReadWriteStream =
+                object : ReadWriteStream, Replay by Replay.DiskStream(baseDir), Sink by Sink.DiskStream(baseDir, shouldStore) {}
 
             /**
              * Serialise and replay HTTP traffic to/from Memory in order.
              */
-            fun Memory(stream: MutableList<Pair<Request, Response>> = mutableListOf(), shouldStore: (HttpMessage) -> Boolean = { true }): Stream =
-                object : Stream, Replay by Replay.MemoryStream(stream), Sink by Sink.MemoryStream(stream, shouldStore) {}
+            fun Memory(stream: MutableList<Pair<Request, Response>> = mutableListOf(), shouldStore: (HttpMessage) -> Boolean = { true }): ReadWriteStream =
+                object : ReadWriteStream, Replay by Replay.MemoryStream(stream), Sink by Sink.MemoryStream(stream, shouldStore) {}
         }
     }
 }

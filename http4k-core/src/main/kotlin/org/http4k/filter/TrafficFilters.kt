@@ -10,11 +10,20 @@ import org.http4k.core.then
 import org.http4k.filter.Traffic.Replay
 import org.http4k.filter.Traffic.Source
 
+/**
+ * Provides HTTP Handlers which respond using pre-stored Requests.
+ */
 object Responder {
     private val fallback: (Request) -> Response = { Response(SERVICE_UNAVAILABLE.description("no more traffic to replay")) }
 
+    /**
+     * An HTTP Handler which responds to particular requests with the matching cached responses, or a 503.
+     */
     fun from(source: Source): HttpHandler = TrafficFilters.ServeCachedFrom(source).then(fallback)
 
+    /**
+     * An HTTP Handler which responds to from a stream of cached responses, or a 503 once the stream is exhausted.
+     */
     fun from(replay: Replay, shouldReplay: (HttpMessage) -> Boolean = { true }): HttpHandler =
         replay.responses()
             .filter(shouldReplay)
@@ -22,10 +31,6 @@ object Responder {
             .let {
                 Filter { next -> { req -> if (it.hasNext()) it.next() else next(req) } }.then(fallback)
             }
-}
-
-object Requester {
-    fun from(replay: Replay): Sequence<Request> = replay.requests()
 }
 
 object TrafficFilters {
