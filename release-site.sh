@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 pip install -r requirements.txt
 
 TMP=/tmp/http4k.github.io/
