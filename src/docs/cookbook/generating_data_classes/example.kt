@@ -1,4 +1,4 @@
-package cookbook.generating_data_classes_from_json
+package cookbook.generating_data_classes
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method.GET
