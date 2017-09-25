@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.29.0
+- Added `TrafficFilters` for recording and replaying HTTP traffic. See `org.http4k.traffic` package for details.
+
 ### v2.28.0
 - Added `http4k-template-dust` for Dust template engine support 
 
