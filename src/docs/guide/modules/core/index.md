@@ -12,6 +12,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - Abstractions for Servers, Clients, JSON Message formats, Templating etc.
 - `SunHttp` Single-LOC development Server-backend
 - Static file-serving capability with **Caching** and **Hot-Reload**
+- APIs to **record and replay** HTTP traffic to disk or memory
 
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:

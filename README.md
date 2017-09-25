@@ -54,7 +54,8 @@ plugging together of services without HTTP container being required.
     * Servlet implementation to allow **
     -dependency plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
-    * Core abstraction APIs implemented by the other modules 
+    * APIs to **record and replay** HTTP traffic to disk or memory
+    * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** HTTP client adapters 
         * **Apache**

@@ -33,5 +33,6 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 - `org.http4k.filter.CachingFilters.Request` & `org.http4k.filter.CachingFilters.Response` 
 - `org.http4k.filter.ClientFilters`
-- `org.http4k.filter.ServerFilters` 
 - `org.http4k.filter.DebuggingFilters`
+- `org.http4k.filter.ServerFilters` 
+- `org.http4k.filter.TrafficFilters`
