@@ -1,4 +1,4 @@
-package cookbook.forms
+package cookbook.html_forms
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType

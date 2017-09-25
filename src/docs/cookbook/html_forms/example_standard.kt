@@ -1,4 +1,4 @@
-package cookbook.forms
+package cookbook.html_forms
 
 import org.http4k.core.Method
 import org.http4k.core.Request

@@ -11,4 +11,4 @@ This example show the usage of the `GenerateDataClasses` to generate Kotlin data
 ```
 
 ### Code
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/generating_data_classes_from_json/example.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/generating_data_classes/example.kt"></script>
