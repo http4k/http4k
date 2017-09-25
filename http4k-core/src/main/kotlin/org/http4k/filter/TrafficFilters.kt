@@ -7,8 +7,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.then
-import org.http4k.filter.Traffic.Replay
-import org.http4k.filter.Traffic.Source
+import org.http4k.traffic.Traffic
+import org.http4k.traffic.Traffic.Replay
+import org.http4k.traffic.Traffic.Source
 
 /**
  * Provides HTTP Handlers which respond using pre-stored Requests.

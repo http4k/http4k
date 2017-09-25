@@ -1,4 +1,4 @@
-package org.http4k.filter
+package org.http4k.traffic
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.Request
