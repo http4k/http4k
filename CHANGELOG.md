@@ -2,11 +2,14 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.29.1
+- Tweaks to how recorded traffic is stored on disk. Thanks to @dkandalov for the PR around this.
+
 ### v2.29.0
 - Added `TrafficFilters` for recording and replaying HTTP traffic. See `org.http4k.traffic` package for details.
 
 ### v2.28.0
-- Added `http4k-template-dust` for Dust template engine support 
+- Added `http4k-template-dust` for Dust template engine support. Thanks to @npryce for the PR to add this.
 
 ### v2.27.2
 - Fix #44 - Use quotes around cookie values
