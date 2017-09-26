@@ -17,6 +17,6 @@ internal fun String.toBaseFolder(): File = File(if (isEmpty()) "." else this)
 
 internal fun Request.toFolder(baseDir: File) = File(File(baseDir, uri.path),
     String(getEncoder().encode(toString().toByteArray()))
-        .replace(File.pathSeparatorChar, '_'))
+        .replace(File.separatorChar, '_'))
 
 internal fun HttpMessage.toFile(folder: File): File = File(folder, if (this is Request) "request.txt" else "response.txt")
