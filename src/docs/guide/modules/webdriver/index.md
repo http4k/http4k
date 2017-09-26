@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-webdriver", version: "2.29.0"```
+```compile group: "org.http4k", name: "http4k-testing-webdriver", version: "2.29.1"```
 
 ### About
 
