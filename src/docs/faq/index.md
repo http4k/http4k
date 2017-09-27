@@ -14,6 +14,10 @@ Find here answers to the most common questions that we get asked about **http4k*
 **A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll probably use co-routines and they're still marked as experimental which is another reason we are holding off. As for the scaling arguments, see the above answer relating to production usage.
 
 ### API
+**Q. I'm attempting to build HTTP messages using the API, but changes don't affect the object (e.g. calling `request.body("hello")`)?**
+
+**A.** **http4k** HTTP message objects are *immutable*, so you need to chain or reassign the value from the method call to get the updated version.
+
 **Q. Auto-marshalling: where is the `Body.auto` method defined?**
 
 **A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
