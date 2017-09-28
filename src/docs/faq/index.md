@@ -23,7 +23,7 @@ Find here answers to the most common questions that we get asked about **http4k*
 **A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
 `import org.http4k.format.Jackson.auto`
 
-**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters **
+**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
 
 **A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class fields with `@JsonAlias` to get the deserialisation to work correctly.
 
