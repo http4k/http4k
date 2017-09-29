@@ -7,6 +7,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import java.net.SocketTimeoutException
 
 class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: ResponseBodyMode = ResponseBodyMode.Memory) : HttpHandler {
 
@@ -34,7 +35,12 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         }
     }
 
-    override fun invoke(request: Request): Response = client.newCall(request.asOkHttp()).execute().asHttp4k()
+    override fun invoke(request: Request): Response =
+        try {
+            client.newCall(request.asOkHttp()).execute().asHttp4k()
+        } catch (e: SocketTimeoutException) {
+            Response(Status.CLIENT_TIMEOUT)
+        }
 
     companion object {
         private fun defaultOkHttpClient() = OkHttpClient.Builder()

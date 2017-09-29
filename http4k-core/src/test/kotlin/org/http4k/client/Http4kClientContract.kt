@@ -34,7 +34,9 @@ import org.junit.Test
 import java.nio.ByteBuffer
 import java.util.*
 
-abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig, val client: HttpHandler) {
+abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig,
+                                    val client: HttpHandler,
+                                    private val timeoutClient: HttpHandler) {
     @Rule
     @JvmField
     var retryRule = RetryRule(5)
@@ -164,6 +166,13 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     fun `send binary data`() {
         val response = client(Request(Method.POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
         response.status.shouldMatch(equalTo(OK))
+    }
+
+    @Test
+    fun `socket timeouts are converted into 504`() {
+        val response = timeoutClient(Request(GET, "http://httpbin.org/delay/2"))
+
+        assertThat(response.status, equalTo(Status.CLIENT_TIMEOUT))
     }
 
     private fun testImageBytes() = this::class.java.getResourceAsStream("/test.png").readBytes()

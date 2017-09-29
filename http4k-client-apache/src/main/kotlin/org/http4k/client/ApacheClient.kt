@@ -17,15 +17,19 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import java.net.SocketTimeoutException
 import java.net.URI
 
 class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient(), private val bodyMode: ResponseBodyMode = ResponseBodyMode.Memory) : HttpHandler {
 
-    override fun invoke(request: Request): Response = client.execute(request.toApacheRequest()).toHttp4kResponse()
+    override fun invoke(request: Request): Response = try {
+        client.execute(request.toApacheRequest()).toHttp4kResponse()
+    } catch (e: SocketTimeoutException) {
+        Response(Status.CLIENT_TIMEOUT)
+    }
 
     private fun CloseableHttpResponse.toHttp4kResponse(): Response =
-        allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity?.toTarget() ?: Body.EMPTY)) {
-            memo, (first, second) ->
+        allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity?.toTarget() ?: Body.EMPTY)) { memo, (first, second) ->
             memo.header(first, second)
         }
 
