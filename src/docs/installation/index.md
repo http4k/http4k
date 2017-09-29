@@ -1,6 +1,6 @@
 All **http4k** libraries are available on Maven Central and JCenter and are released under a single version. For the core module, add the following to your Gradle file:
 ```
-compile group: "org.http4k", name: "http4k-core", version: "2.29.1"
+compile group: "org.http4k", name: "http4k-core", version: "2.29.2"
 ```
 
 
