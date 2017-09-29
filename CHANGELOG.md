@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v2.29.2
 - Http client modules now catch and convert Socket Timeout exceptions to HTTP 504s (with a custom message)
+
 ### v2.29.1
 - Tweaks to how recorded traffic is stored on disk. Thanks to @dkandalov for the PR around this.
 
