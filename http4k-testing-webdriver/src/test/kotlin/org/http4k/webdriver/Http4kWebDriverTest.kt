@@ -111,11 +111,15 @@ class Http4kWebDriverTest {
     @Test
     fun `normalise links when clicking`() {
         assertLlinkGoesTo(By.tagName("a"), "/link")
+        assertLlinkGoesTo(By.id("noPath"), "/bill")
         assertLlinkGoesTo(By.id("sameDirPath"), "/bill/bob")
+        assertLlinkGoesTo(By.id("backForwardPath"), "/bob/link")
+        assertLlinkGoesTo(By.id("backPath"), "/")
         assertLlinkGoesTo(By.id("dotPath"), "/bill/bob/link")
         assertLlinkGoesTo(By.id("dotBackPath"), "/bob/link")
-        assertLlinkGoesTo(By.id("rooBackPath"), "/bob/link")
+        assertLlinkGoesTo(By.id("rootBackPath"), "/bob/link")
     }
+
 
     private fun assertLlinkGoesTo(by: By, expected: String) {
         driver.get("/bill")
