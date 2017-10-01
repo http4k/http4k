@@ -35,7 +35,7 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
         response.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
         }
-        current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), response.bodyString(), current)
+        current = Page(this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
     }
 
     private fun normalized(request: Request): Request {

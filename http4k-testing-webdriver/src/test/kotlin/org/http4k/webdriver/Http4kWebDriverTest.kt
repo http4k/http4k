@@ -118,14 +118,14 @@ class Http4kWebDriverTest {
         assertLinkGoesTo("/bill", By.id("dotPath"), "/bill/bob/link")
         assertLinkGoesTo("/bill", By.id("dotBackPath"), "/bob/link")
         assertLinkGoesTo("/bill", By.id("rootBackPath"), "/bob/link")
-        assertLinkGoesTo("", By.tagName("a"), "/link")
-        assertLinkGoesTo("", By.id("noPath"), "/")
-        assertLinkGoesTo("", By.id("sameDirPath"), "/bob")
-        assertLinkGoesTo("", By.id("backForwardPath"), "/bob/link")
-        assertLinkGoesTo("", By.id("backPath"), "/")
-        assertLinkGoesTo("", By.id("dotPath"), "/bob/link")
-        assertLinkGoesTo("", By.id("dotBackPath"), "/bob/link")
-        assertLinkGoesTo("", By.id("rootBackPath"), "/bob/link")
+        assertLinkGoesTo("/", By.tagName("a"), "/link")
+        assertLinkGoesTo("/", By.id("noPath"), "/")
+        assertLinkGoesTo("/", By.id("sameDirPath"), "/bob")
+        assertLinkGoesTo("/", By.id("backForwardPath"), "/bob/link")
+        assertLinkGoesTo("/", By.id("backPath"), "/")
+        assertLinkGoesTo("/", By.id("dotPath"), "/bob/link")
+        assertLinkGoesTo("/", By.id("dotBackPath"), "/bob/link")
+        assertLinkGoesTo("/", By.id("rootBackPath"), "/bob/link")
     }
 
 
