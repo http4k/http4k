@@ -1,11 +1,12 @@
 package org.http4k.webdriver
 
+import org.http4k.core.Status
 import org.jsoup.Jsoup
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
 import java.util.*
 
-data class Page(private val navigate: Navigate, val handle: UUID, val url: String, val contents: String, val previous: Page? = null, val next: Page? = null) {
+data class Page(val status: Status, private val navigate: Navigate, val handle: UUID, val url: String, val contents: String, val previous: Page? = null, val next: Page? = null) {
 
     private val parsed = Jsoup.parse(contents)
 

@@ -2,6 +2,7 @@ package org.http4k.webdriver
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Status
 import org.junit.Test
 import org.openqa.selenium.By
 import java.io.File
@@ -10,7 +11,7 @@ import java.util.*
 class PageTest {
     private val contents = File("src/test/resources/test.html").readText()
 
-    private val state = Page({}, UUID.randomUUID(), "someUrl", contents)
+    private val state = Page(Status.OK, {}, UUID.randomUUID(), "someUrl", contents)
 
     @Test
     fun `title`() = assertThat(state.title, equalTo("Page title"))

@@ -4,6 +4,7 @@ package org.http4k.webdriver
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
@@ -30,21 +31,24 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private val siteCookies = mutableMapOf<String, Cookie>()
 
     private fun navigateTo(request: Request) {
-        val requestWithCookies = siteCookies.entries.fold(normalized(request)) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
+        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+        val requestWithCookies = siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
         val response = handler(requestWithCookies)
         response.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
         }
-        current = Page(this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
     }
 
-    private fun normalized(request: Request): Request {
-        val path =
-            if (request.uri.path.startsWith("/")) Paths.get(request.uri.path)
-            else Paths.get(currentUrl?.let {
+    fun normalized(path: String): String {
+        val newPath = if (path.startsWith("/")) Paths.get(path)
+        else {
+            val currentPath = currentUrl?.let {
                 Uri.of(it).path.let { if (it.isEmpty()) "/" else it }
-            } ?: "/", request.uri.path)
-        return request.uri(request.uri.path(path.normalize().toString()))
+            } ?: "/"
+            Paths.get(currentPath, path)
+        }
+        return newPath.normalize().toString()
     }
 
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
@@ -57,6 +61,9 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     override fun getCurrentUrl(): String? = current?.url
 
     override fun getTitle(): String? = current?.title
+
+    val status: Status?
+        get() = current?.status
 
     override fun findElements(by: By): List<WebElement>? = current?.findElements(by)
 
