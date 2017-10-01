@@ -5,7 +5,7 @@ HTML form support is provided on 2 levels:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.29.2"
+    compile group: "org.http4k", name: "http4k-core", version: "2.29.3"
 ```
 
 ### Standard (non-typesafe) API
