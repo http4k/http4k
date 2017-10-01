@@ -110,19 +110,27 @@ class Http4kWebDriverTest {
 
     @Test
     fun `normalise links when clicking`() {
-        assertLlinkGoesTo(By.tagName("a"), "/link")
-        assertLlinkGoesTo(By.id("noPath"), "/bill")
-        assertLlinkGoesTo(By.id("sameDirPath"), "/bill/bob")
-        assertLlinkGoesTo(By.id("backForwardPath"), "/bob/link")
-        assertLlinkGoesTo(By.id("backPath"), "/")
-        assertLlinkGoesTo(By.id("dotPath"), "/bill/bob/link")
-        assertLlinkGoesTo(By.id("dotBackPath"), "/bob/link")
-        assertLlinkGoesTo(By.id("rootBackPath"), "/bob/link")
+        assertLinkGoesTo("/bill", By.tagName("a"), "/link")
+        assertLinkGoesTo("/bill", By.id("noPath"), "/bill")
+        assertLinkGoesTo("/bill", By.id("sameDirPath"), "/bill/bob")
+        assertLinkGoesTo("/bill", By.id("backForwardPath"), "/bob/link")
+        assertLinkGoesTo("/bill", By.id("backPath"), "/")
+        assertLinkGoesTo("/bill", By.id("dotPath"), "/bill/bob/link")
+        assertLinkGoesTo("/bill", By.id("dotBackPath"), "/bob/link")
+        assertLinkGoesTo("/bill", By.id("rootBackPath"), "/bob/link")
+        assertLinkGoesTo("", By.tagName("a"), "/link")
+        assertLinkGoesTo("", By.id("noPath"), "/")
+        assertLinkGoesTo("", By.id("sameDirPath"), "/bob")
+        assertLinkGoesTo("", By.id("backForwardPath"), "/bob/link")
+        assertLinkGoesTo("", By.id("backPath"), "/")
+        assertLinkGoesTo("", By.id("dotPath"), "/bob/link")
+        assertLinkGoesTo("", By.id("dotBackPath"), "/bob/link")
+        assertLinkGoesTo("", By.id("rootBackPath"), "/bob/link")
     }
 
 
-    private fun assertLlinkGoesTo(by: By, expected: String) {
-        driver.get("/bill")
+    private fun assertLinkGoesTo(initial: String, by: By, expected: String) {
+        driver.get(initial)
         driver.findElement(by)!!.click()
         driver.assertOnPage(expected)
     }

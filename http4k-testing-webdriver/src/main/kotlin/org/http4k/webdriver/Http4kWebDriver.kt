@@ -41,7 +41,9 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private fun normalized(request: Request): Request {
         val path =
             if (request.uri.path.startsWith("/")) Paths.get(request.uri.path)
-            else Paths.get(currentUrl?.let { Uri.of(it).path } ?: "/", request.uri.path)
+            else Paths.get(currentUrl?.let {
+                Uri.of(it).path.let { if (it.isEmpty()) "/" else it }
+            } ?: "/", request.uri.path)
         return request.uri(request.uri.path(path.normalize().toString()))
     }
 
