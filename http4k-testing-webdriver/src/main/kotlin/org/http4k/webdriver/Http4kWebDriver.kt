@@ -38,16 +38,12 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
         current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), response.bodyString(), current)
     }
 
-    private fun normalized(request: Request): Request =
-        if (request.uri.path.startsWith("/")) request.uri(request.uri.path(
-            Paths.get(request.uri.path).normalize().toString()
-        ))
-        else {
-            val currentPath = currentUrl?.let { Uri.of(it).path } ?: "/"
-            request.uri(request.uri.path(
-                Paths.get(currentPath, request.uri.path).normalize().toString())
-            )
-        }
+    private fun normalized(request: Request): Request {
+        val path =
+            if (request.uri.path.startsWith("/")) Paths.get(request.uri.path)
+            else Paths.get(currentUrl?.let { Uri.of(it).path } ?: "/", request.uri.path)
+        return request.uri(request.uri.path(path.normalize().toString()))
+    }
 
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
         expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
