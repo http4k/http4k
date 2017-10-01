@@ -109,10 +109,17 @@ class Http4kWebDriverTest {
     }
 
     @Test
-    fun `click`() {
+    fun `normalise links when clicking`() {
+        assertLlinkGoesTo(By.tagName("a"), "/link")
+        assertLlinkGoesTo(By.id("dotPath"), "/bill/bob/link")
+        assertLlinkGoesTo(By.id("dotBackPath"), "/bob/link")
+        assertLlinkGoesTo(By.id("rooBackPath"), "/bob/link")
+    }
+
+    private fun assertLlinkGoesTo(by: By, expected: String) {
         driver.get("/bill")
-        driver.findElement(By.tagName("a"))!!.click()
-        driver.assertOnPage("/link")
+        driver.findElement(by)!!.click()
+        driver.assertOnPage(expected)
     }
 
     @Test

@@ -4,6 +4,7 @@ package org.http4k.webdriver
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.openqa.selenium.Alert
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriver.Navigation
 import org.openqa.selenium.WebElement
 import java.net.URL
+import java.nio.file.Paths
 import java.time.ZoneId
 import java.util.*
 import kotlin.NoSuchElementException
@@ -28,7 +30,7 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private val siteCookies = mutableMapOf<String, Cookie>()
 
     private fun navigateTo(request: Request) {
-        val requestWithCookies = siteCookies.entries.fold(request) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
+        val requestWithCookies = siteCookies.entries.fold(normalized(request)) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
         val response = handler(requestWithCookies)
         response.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
@@ -36,8 +38,19 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
         current = Page(this::navigateTo, UUID.randomUUID(), request.uri.toString(), response.bodyString(), current)
     }
 
+    private fun normalized(request: Request): Request =
+        if (request.uri.path.startsWith("/")) request.uri(request.uri.path(
+            Paths.get(request.uri.path).normalize().toString()
+        ))
+        else {
+            val currentPath = currentUrl?.let { Uri.of(it).path } ?: "/"
+            request.uri(request.uri.path(
+                Paths.get(currentPath, request.uri.path).normalize().toString())
+            )
+        }
+
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
-        expires?.let {  Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
+        expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
 
     override fun get(url: String) {
         navigateTo(Request(GET, url).body(""))
