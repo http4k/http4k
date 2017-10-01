@@ -111,6 +111,7 @@ class Http4kWebDriverTest {
     @Test
     fun `normalise links when clicking`() {
         assertLlinkGoesTo(By.tagName("a"), "/link")
+        assertLlinkGoesTo(By.id("sameDirPath"), "/bill/bob")
         assertLlinkGoesTo(By.id("dotPath"), "/bill/bob/link")
         assertLlinkGoesTo(By.id("dotBackPath"), "/bob/link")
         assertLlinkGoesTo(By.id("rooBackPath"), "/bob/link")
