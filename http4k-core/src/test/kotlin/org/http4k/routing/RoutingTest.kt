@@ -52,6 +52,18 @@ class RoutingTest {
     }
 
     @Test
+    @Ignore("this doesn't have a name so isn't bound...")
+    fun `matches empty uri template and method`() {
+        val routes = routes(
+            "/{.*}" bind GET to { Response(OK).body("matched") }
+        )
+
+        val response = routes(Request(GET, "/a/something"))
+
+        assertThat(response.bodyString(), equalTo("matched"))
+    }
+
+    @Test
     fun `matches uri template only`() {
         val routes = routes(
             "/a/{route}" bind { Response(OK).body("matched") }
