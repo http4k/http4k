@@ -23,7 +23,6 @@ sealed class Multipart {
     }
 }
 
-
 data class MultipartForm(val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
     constructor(vararg formParts: Multipart, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
