@@ -1,6 +1,5 @@
 package org.http4k.multipart.internal
 
-import org.http4k.multipart.internal.MultipartFormBuilder
 import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Test
 import java.nio.charset.Charset
@@ -50,10 +49,10 @@ class StreamingMultipartFormEncodingTests {
         val boundaryBytes = boundary.toByteArray(encoding)
         return getMultipartFormParts(boundaryBytes,
             MultipartFormBuilder(boundaryBytes, encoding)
-                .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9".byteInputStream())
+                .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9".byteInputStream(encoding))
                 .field("field\uD83D\uDCA9", "fieldValue\u00E9\uD83D\uDCA9")
                 .field("multi", "value1\u00E9")
-                .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9".byteInputStream())
+                .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9".byteInputStream(encoding))
                 .field("multi", "value2\u00E9")
                 .build(), encoding)
     }
