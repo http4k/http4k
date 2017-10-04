@@ -67,11 +67,11 @@ class MultipartFormMapTest {
     @Test
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
-        val multipartFormContentsStream = ByteArrayInputStream(ValidMultipartFormBuilder(boundary)
-            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n")
+        val multipartFormContentsStream = ByteArrayInputStream(MultipartFormBuilder(boundary)
+            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream())
             .field("field", "fieldValue" + CR_LF + "with cr lf")
             .field("multi", "value1")
-            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n")
+            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream())
             .field("multi", "value2")
             .build())
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
@@ -217,9 +217,9 @@ class MultipartFormMapTest {
     }
 }
 
-fun Part.isInMemory(): Boolean = this is Part.InMemory
+internal fun Part.isInMemory(): Boolean = this is Part.InMemory
 
-fun Part.string(): String = when (this) {
+internal fun Part.string(): String = when (this) {
     is Part.DiskBacked -> throw RuntimeException("wat?")
     is Part.InMemory -> String(bytes, encoding)
 }

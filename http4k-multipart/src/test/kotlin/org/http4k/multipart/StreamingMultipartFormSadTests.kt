@@ -34,9 +34,9 @@ class StreamingMultipartFormSadTests {
     @Test
     fun failsWhenGettingNextPastEndOfParts() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here")
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here").build())
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
+            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).build())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -52,9 +52,9 @@ class StreamingMultipartFormSadTests {
     @Test
     fun failsWhenGettingNextPastEndOfPartsAfterHasNext() {
         val boundary = "-----1234"
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
-            .file("aFile", "file.name", "application/octet-stream", "File contents here")
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here").build())
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
+            .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).build())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -72,7 +72,7 @@ class StreamingMultipartFormSadTests {
     @Ignore("this is not a valid test case according to the RFC - we should blow up..")
     fun partHasNoHeaders() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .field("multi", "value0")
             .part("" + CR_LF + "value with no headers")
             .field("multi", "value2")
@@ -91,7 +91,7 @@ class StreamingMultipartFormSadTests {
     @Test
     fun overwritesPartHeaderIfHeaderIsRepeated() {
         val boundary = "-----2345"
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("contents of StreamingPart",
                 "Content-Disposition" to listOf("form-data" to null, "bit" to "first", "name" to "first-name"),
                 "Content-Disposition" to listOf("form-data" to null, "bot" to "second", "name" to "second-name"))
@@ -202,8 +202,8 @@ class StreamingMultipartFormSadTests {
 
         val chars = CharArray(StreamingMultipartFormParts.HEADER_SIZE_MAX)
         chars.fill('x')
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
-            .file("aFile", String(chars), "application/octet-stream", "File contents here").build())
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
+            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream()).build())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Token <<\r\n>> within 10240 bytes")
     }
@@ -214,7 +214,7 @@ class StreamingMultipartFormSadTests {
 
         val chars = CharArray(1024)
         chars.fill('x')
-        val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("some contents",
                 "Content-Disposition" to listOf("form-data" to null, "name" to "fieldName", "filename" to "filename"),
                 "Content-Type" to listOf("text/plain" to null),

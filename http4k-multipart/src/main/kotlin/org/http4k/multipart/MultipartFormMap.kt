@@ -12,7 +12,7 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
 
-object MultipartFormMap {
+internal object MultipartFormMap {
 
     /**
      * Returns a Parts object containing a map of FieldName -> Part, serialised from parts using the encoding

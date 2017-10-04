@@ -48,11 +48,11 @@ class StreamingMultipartFormEncodingTests {
         val boundary = "-----\u00E91234\uD83D\uDCA9"
         val boundaryBytes = boundary.toByteArray(encoding)
         return getMultipartFormParts(boundaryBytes,
-            ValidMultipartFormBuilder(boundaryBytes, encoding)
-                .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9")
+            MultipartFormBuilder(boundaryBytes, encoding)
+                .file("file", "foo.tab\uD83D\uDCA9", "text/whatever\u00E9\uD83D\uDCA9", "This is the content of the file\u00E9\uD83D\uDCA9".byteInputStream())
                 .field("field\uD83D\uDCA9", "fieldValue\u00E9\uD83D\uDCA9")
                 .field("multi", "value1\u00E9")
-                .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9")
+                .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9".byteInputStream())
                 .field("multi", "value2\u00E9")
                 .build(), encoding)
     }

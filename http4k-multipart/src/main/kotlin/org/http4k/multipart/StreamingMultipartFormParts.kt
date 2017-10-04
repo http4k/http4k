@@ -11,7 +11,7 @@ import java.util.*
 /**
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
  */
-class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
+internal class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
     private val iterator: Iterator<StreamingPart>
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
