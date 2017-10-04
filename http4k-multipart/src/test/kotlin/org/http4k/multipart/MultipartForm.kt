@@ -24,6 +24,12 @@ sealed class Multipart {
 data class MultipartForm(val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
     constructor(vararg formParts: Multipart, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
+    fun file(name: String): Multipart.FormFile? = files(name).firstOrNull()
+    fun files(name: String): List<Multipart.FormFile> = formParts.filter { it.name == name }.mapNotNull { it as? Multipart.FormFile }
+
+    fun field(name: String): String? = fields(name).firstOrNull()
+    fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? Multipart.FormField }.map { it.value }
+
     fun toBody(): Body =
         Body(ByteBuffer.wrap(
             formParts.fold(ValidMultipartFormBuilder(boundary.toByteArray())) { memo, next ->
