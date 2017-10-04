@@ -1,8 +1,8 @@
-package org.http4k.multipart
+package org.http4k.multipart.internal
 
 import org.apache.commons.fileupload.util.ParameterParser
-import org.http4k.multipart.part.StreamingPart
-import org.http4k.multipart.stream.TokenBoundedInputStream
+import org.http4k.multipart.internal.part.StreamingPart
+import org.http4k.multipart.internal.stream.TokenBoundedInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -149,7 +149,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 }
             }
         }
-        throw TokenNotFoundException("Didn't find end of Header section within $HEADER_SIZE_MAX bytes")
+        throw TokenNotFoundException("Didn't find end of Header section within ${HEADER_SIZE_MAX} bytes")
     }
 
     inner class StreamingMulipartFormPartIterator : Iterator<StreamingPart> {

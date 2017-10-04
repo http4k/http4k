@@ -1,4 +1,4 @@
-package org.http4k.multipart.stream
+package org.http4k.multipart.internal.stream
 
 import java.io.InputStream
 import java.nio.InvalidMarkException
