@@ -67,13 +67,13 @@ class MultipartFormMapTest {
     @Test
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
-        val multipartFormContentsStream = ByteArrayInputStream(MultipartFormBuilder(boundary)
+        val multipartFormContentsStream = MultipartFormBuilder(boundary)
             .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream())
             .field("field", "fieldValue" + CR_LF + "with cr lf")
             .field("multi", "value1")
             .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream())
             .field("multi", "value2")
-            .build())
+            .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
         val parts = MultipartFormMap.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)

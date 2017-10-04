@@ -5,7 +5,6 @@ import org.http4k.core.ContentType
 import org.http4k.multipart.internal.MultipartFormBuilder
 import org.http4k.multipart.internal.StreamingMultipartFormParts
 import java.io.InputStream
-import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -33,10 +32,7 @@ data class MultipartForm(val formParts: List<Multipart>, val boundary: String = 
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? Multipart.FormField }.map { it.value }
 
     fun toBody(): Body =
-        Body(ByteBuffer.wrap(
-            formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next ->
-                next.applyTo(memo)
-            }.build()))
+        Body(formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream())
 
     companion object {
         fun fromBody(body: Body, boundary: String): MultipartForm {

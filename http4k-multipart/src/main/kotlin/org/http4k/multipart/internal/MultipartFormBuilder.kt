@@ -17,12 +17,12 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
         this.boundary.push(StreamingMultipartFormParts.prependBoundaryWithStreamTerminator(boundary))
     }
 
-    fun build(): ByteArray {
+    fun stream(): InputStream {
         add(boundary.peek())
         add(StreamingMultipartFormParts.STREAM_TERMINATOR)
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
 
-        return SequenceInputStream(Collections.enumeration(waitingToStream)).readBytes()
+        return SequenceInputStream(Collections.enumeration(waitingToStream))
     }
 
 
