@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
     )
 
     val s = ServerFilters.CatchAll().then({ r: Request ->
-        val a = MultipartForm.toMultipartForm(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
+        val a = MultipartForm.fromBody(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
         println("received the same? ${a.fields("field")}")
         println("received the same? ${a.files("file")}")
 
