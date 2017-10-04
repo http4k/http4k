@@ -2,6 +2,8 @@ package org.http4k.multipart
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.multipart.internal.MultipartFormBuilder
+import org.http4k.multipart.internal.StreamingMultipartFormParts
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets

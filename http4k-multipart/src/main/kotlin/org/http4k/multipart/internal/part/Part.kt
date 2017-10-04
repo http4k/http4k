@@ -1,4 +1,4 @@
-package org.http4k.multipart.part
+package org.http4k.multipart.internal.part
 
 import java.io.ByteArrayInputStream
 import java.io.Closeable

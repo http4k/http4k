@@ -1,7 +1,7 @@
-package org.http4k.multipart.stream
+package org.http4k.multipart.internal.stream
 
-import org.http4k.multipart.StreamTooLongException
-import org.http4k.multipart.TokenNotFoundException
+import org.http4k.multipart.internal.StreamTooLongException
+import org.http4k.multipart.internal.TokenNotFoundException
 
 import java.io.IOException
 import java.io.InputStream

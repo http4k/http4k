@@ -1,10 +1,10 @@
-package org.http4k.multipart
+package org.http4k.multipart.internal
 
-import org.http4k.multipart.part.Part
-import org.http4k.multipart.part.Part.DiskBacked
-import org.http4k.multipart.part.Part.InMemory
-import org.http4k.multipart.part.Parts
-import org.http4k.multipart.part.StreamingPart
+import org.http4k.multipart.internal.part.Part
+import org.http4k.multipart.internal.part.Part.DiskBacked
+import org.http4k.multipart.internal.part.Part.InMemory
+import org.http4k.multipart.internal.part.Parts
+import org.http4k.multipart.internal.part.StreamingPart
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException

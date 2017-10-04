@@ -1,9 +1,12 @@
-package org.http4k.multipart
+package org.http4k.multipart.internal
 
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNot.not
-import org.http4k.multipart.part.StreamingPart
+import org.http4k.multipart.internal.AlreadyClosedException
+import org.http4k.multipart.internal.MultipartFormBuilder
+import org.http4k.multipart.internal.StreamingMultipartFormParts
+import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
