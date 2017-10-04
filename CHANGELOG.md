@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.29.4
+- Refactor release.
+
 ### v2.29.3
 - Fix #50 - Webdriver does not normalise relative links correctly.
 
