@@ -36,18 +36,10 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun file(fieldName: String, filename: String, contentType: String, contents: String): ValidMultipartFormBuilder {
-        part(contents,
-            "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
-            "Content-Type" to listOf(contentType to null)
-        )
-        return this
-    }
-
     fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): ValidMultipartFormBuilder {
         builder.write(boundary.peek())
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        if(headers.isNotEmpty()) {
+        if (headers.isNotEmpty()) {
             headers.toList().forEach { (first, second) -> appendHeader(first, second) }
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
         }
@@ -66,13 +58,18 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
         return this
     }
 
-    fun attachment(fileName: String, contentType: String, contents: String): ValidMultipartFormBuilder {
+    fun attachment(fileName: String, contentType: String, contents: String): ValidMultipartFormBuilder =
         part(contents,
             Pair("Content-Disposition", listOf(Pair("attachment", null), Pair("filename", fileName))),
             Pair("Content-Type", listOf(Pair(contentType, null)))
         )
-        return this
-    }
+
+    fun file(fieldName: String, filename: String, contentType: String, contents: String): ValidMultipartFormBuilder =
+        part(contents,
+            "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
+            "Content-Type" to listOf(contentType to null)
+        )
+
 
     fun endMultipart(): ValidMultipartFormBuilder {
         builder.write(boundary.pop())
