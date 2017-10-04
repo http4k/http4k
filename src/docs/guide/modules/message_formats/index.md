@@ -1,11 +1,11 @@
 ### Installation (Gradle)
-**Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "2.29.3"```
+**Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "2.29.4"```
 
-**Gson:**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "2.29.3"```
+**Gson:**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "2.29.4"```
 
-**Jackson:** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "2.29.3"```
+**Jackson:** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "2.29.4"```
 
-**Xml:** ```compile group: "org.http4k", name: "http4k-format-xml", version: "2.29.3"```
+**Xml:** ```compile group: "org.http4k", name: "http4k-format-xml", version: "2.29.4"```
 
 ### About
 These modules add the ability to use JSON/XML as a first-class citizen when reading from and to HTTP messages. Each implementation adds a set of 
