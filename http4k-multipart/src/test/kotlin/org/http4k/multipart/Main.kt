@@ -18,14 +18,13 @@ fun main(args: Array<String>) {
 
     val form = MultipartForm(
         Multipart.FormField("field", "value"),
-        Multipart.FormFile("filefiold", "file.yxy", ContentType.TEXT_HTML, "some html")
+        Multipart.FormFile("file", "file.yxy", ContentType.TEXT_HTML, "some html")
     )
 
     val s = ServerFilters.CatchAll().then({ r: Request ->
-        //here!
-
         val a = MultipartForm.toMultipartForm(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
-        println("received the same? $a")
+        println("received the same? ${a.fields("field")}")
+        println("received the same? ${a.files("file")}")
 
         Response(OK).body(r.toString())
     }).asServer(SunHttp(8000)).start()
@@ -36,8 +35,7 @@ fun main(args: Array<String>) {
         .with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(form.boundary))
         .body(form.toBody())
 
-    println(req)
-    println(ApacheClient()(req))
+    ApacheClient()(req)
 
     s.stop()
 }
