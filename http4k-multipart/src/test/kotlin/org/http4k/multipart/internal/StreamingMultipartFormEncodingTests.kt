@@ -54,6 +54,6 @@ class StreamingMultipartFormEncodingTests {
                 .field("multi", "value1\u00E9")
                 .file("anotherFile", "BAR.tab", "text/something\u00E9", "This is another file\u00E9".byteInputStream(encoding))
                 .field("multi", "value2\u00E9")
-                .build(), encoding)
+                .stream(), encoding)
     }
 }

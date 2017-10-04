@@ -5,9 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
-import org.http4k.multipart.internal.MultipartFormBuilder
-import org.http4k.multipart.internal.ParseError
-import org.http4k.multipart.internal.StreamingMultipartFormParts
 import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Assert.fail
 import org.junit.Ignore
@@ -19,11 +16,11 @@ class StreamingMultipartFormSadTests {
     @Test
     fun failsWhenNoBoundaryInStream() {
         val boundary = "---1234"
-        var form = getMultipartFormParts(boundary, "No boundary anywhere".toByteArray())
+        var form = getMultipartFormParts(boundary, "No boundary anywhere".byteInputStream())
 
         assertParseErrorWrapsTokenNotFound(form, "Boundary not found <<-----1234>>")
 
-        form = getMultipartFormParts(boundary, "No boundary anywhere".toByteArray())
+        form = getMultipartFormParts(boundary, "No boundary anywhere".byteInputStream())
 
         try {
             form.next()
@@ -39,7 +36,7 @@ class StreamingMultipartFormSadTests {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).build())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).stream())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -57,7 +54,7 @@ class StreamingMultipartFormSadTests {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .file("aFile", "file.name", "application/octet-stream", "File contents here".byteInputStream())
-            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).build())
+            .file("anotherFile", "your.name", "application/octet-stream", "Different file contents here".byteInputStream()).stream())
 
         form.next() // aFile
         form.next() // anotherFile
@@ -79,7 +76,7 @@ class StreamingMultipartFormSadTests {
             .field("multi", "value0")
             .part("" + CR_LF + "value with no headers")
             .field("multi", "value2")
-            .build())
+            .stream())
 
         form.next()
         val StreamingPart = form.next()
@@ -98,7 +95,7 @@ class StreamingMultipartFormSadTests {
             .part("contents of StreamingPart",
                 "Content-Disposition" to listOf("form-data" to null, "bit" to "first", "name" to "first-name"),
                 "Content-Disposition" to listOf("form-data" to null, "bot" to "second", "name" to "second-name"))
-            .build())
+            .stream())
 
         val StreamingPart = form.next()
         assertThat(StreamingPart.fieldName, equalTo("second-name"))
@@ -115,7 +112,7 @@ class StreamingMultipartFormSadTests {
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +
             "" + CR_LF +
             "value" + CR_LF +
-            "-----2345--" + CR_LF).toByteArray())
+            "-----2345--" + CR_LF).byteInputStream())
 
         assertParseErrorWrapsTokenNotFound(form, "Boundary must be followed by field separator, but didn't find it")
     }
@@ -129,14 +126,14 @@ class StreamingMultipartFormSadTests {
 
             "" + CR_LF +
             "value" + CR_LF +
-            "-----2345--" + CR_LF).toByteArray()), "Header didn't include a colon <<value>>")
+            "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
 
 
         assertParseError(getMultipartFormParts(boundary, ("-----2345" + CR_LF +
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +
             // no CR_LF
             "value" + CR_LF +
-            "-----2345--" + CR_LF).toByteArray()), "Header didn't include a colon <<value>>")
+            "-----2345--" + CR_LF).byteInputStream()), "Header didn't include a colon <<value>>")
     }
 
     @Test
@@ -148,7 +145,7 @@ class StreamingMultipartFormSadTests {
             "" + CR_LF +
             "value" + // no CR_LF
 
-            "-----2345--" + CR_LF).toByteArray())
+            "-----2345--" + CR_LF).byteInputStream())
 
         form.next()
         // StreamingPart's content stream hasn't been closed
@@ -164,7 +161,7 @@ class StreamingMultipartFormSadTests {
             "" + CR_LF +
             "value" + // no CR_LF
 
-            "-----2345--" + CR_LF).toByteArray())
+            "-----2345--" + CR_LF).byteInputStream())
 
         val StreamingPart = form.next()
         StreamingPart.contentsAsString
@@ -179,7 +176,7 @@ class StreamingMultipartFormSadTests {
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +
             "" + CR_LF +
             "value" + CR_LF +
-            "-----2345--").toByteArray()) // no CR_LF
+            "-----2345--").byteInputStream()) // no CR_LF
 
         form.next()
         assertParseErrorWrapsTokenNotFound(form, "Stream terminator must be followed by field separator, but didn't find it")
@@ -193,7 +190,7 @@ class StreamingMultipartFormSadTests {
             "Content-Disposition: form-data; name=\"name\"" + CR_LF +
             "" + CR_LF +
             "value" + CR_LF +
-            "-----2345" + CR_LF).toByteArray())
+            "-----2345" + CR_LF).byteInputStream())
 
         form.next()
         assertParseErrorWrapsTokenNotFound(form, "Reached end of stream before finding Token <<\r\n>>. Last 2 bytes read were <<>>")
@@ -206,7 +203,7 @@ class StreamingMultipartFormSadTests {
         val chars = CharArray(StreamingMultipartFormParts.HEADER_SIZE_MAX)
         chars.fill('x')
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
-            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream()).build())
+            .file("aFile", String(chars), "application/octet-stream", "File contents here".byteInputStream()).stream())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Token <<\r\n>> within 10240 bytes")
     }
@@ -231,7 +228,7 @@ class StreamingMultipartFormSadTests {
                 "extra-8" to listOf(String(chars) to null),
                 "extra-9" to listOf(String(chars) to null),
                 "extra-10" to listOf(String(chars, 0, 816) to null) // header section exactly 10240 bytes big!
-            ).build())
+            ).stream())
 
         assertParseErrorWrapsTokenNotFound(form, "Didn't find end of Header section within 10240 bytes")
     }
