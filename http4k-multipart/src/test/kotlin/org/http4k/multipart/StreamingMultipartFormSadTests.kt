@@ -74,7 +74,7 @@ class StreamingMultipartFormSadTests {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, ValidMultipartFormBuilder(boundary)
             .field("multi", "value0")
-            .rawPart("" + CR_LF + "value with no headers")
+            .part("" + CR_LF + "value with no headers")
             .field("multi", "value2")
             .build())
 

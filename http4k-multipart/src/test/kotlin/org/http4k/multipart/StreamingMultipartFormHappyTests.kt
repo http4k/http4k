@@ -136,16 +136,14 @@ class StreamingMultipartFormHappyTests {
         val boundary = "-----1234"
         val form = getMultipartFormParts(boundary,
             ValidMultipartFormBuilder(boundary)
-                .rawPart(
-                    "Content-Disposition: form-data; \r\n" +
-                        "\tname=\"field\"\r\n" +
-                        "\r\n" +
-                        "fieldValue")
-                .rawPart(
-                    "Content-Disposition: form-data;\r\n" +
-                        "     name=\"multi\"\r\n" +
-                        "\r\n" +
-                        "value1")
+                .part("Content-Disposition: form-data; \r\n" +
+                    "\tname=\"field\"\r\n" +
+                    "\r\n" +
+                    "fieldValue")
+                .part("Content-Disposition: form-data;\r\n" +
+                    "     name=\"multi\"\r\n" +
+                    "\r\n" +
+                    "value1")
                 .field("multi", "value2")
                 .build())
 

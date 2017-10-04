@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.Arrays.asList
 
-class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Charset) {
+class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
     private val builder = ByteArrayOutputStream()
 
@@ -37,16 +37,6 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): ValidMultipartFormBuilder {
-        builder.write(boundary.peek())
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        asList(*headers).forEach { (first, second) -> appendHeader(first, second) }
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        builder.write(contents.toByteArray(encoding))
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        return this
-    }
-
     fun file(fieldName: String, filename: String, contentType: String, contents: String): ValidMultipartFormBuilder {
         part(contents,
             "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
@@ -55,10 +45,14 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
         return this
     }
 
-    fun rawPart(raw: String): ValidMultipartFormBuilder {
+    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): ValidMultipartFormBuilder {
         builder.write(boundary.peek())
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        builder.write(raw.toByteArray(encoding))
+        if(headers.isNotEmpty()) {
+            asList(*headers).forEach { (first, second) -> appendHeader(first, second) }
+            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        }
+        builder.write(contents.toByteArray(encoding))
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
         return this
     }
