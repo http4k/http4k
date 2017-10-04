@@ -3,7 +3,7 @@ package org.http4k.multipart.stream
 import java.io.InputStream
 import java.nio.InvalidMarkException
 
-open class CircularBufferedInputStream(private val inputStream: InputStream, maxExpectedBufSize: Int) : InputStream() {
+internal open class CircularBufferedInputStream(private val inputStream: InputStream, maxExpectedBufSize: Int) : InputStream() {
     private val bufferSize: Int = Integer.highestOneBit(maxExpectedBufSize) * 2
     private val bufferIndexMask: Long = (bufferSize - 1).toLong()
     private val buffer: ByteArray = ByteArray(bufferSize)

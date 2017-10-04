@@ -7,7 +7,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 
-class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream, bufSize: Int, private val maxStreamLength: Int = -1) : CircularBufferedInputStream(inputStream, bufSize) {
+internal class TokenBoundedInputStream @JvmOverloads constructor(inputStream: InputStream, bufSize: Int, private val maxStreamLength: Int = -1) : CircularBufferedInputStream(inputStream, bufSize) {
 
     /**
      * Consumes all bytes up to and including the matched endOfToken bytes.

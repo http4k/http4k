@@ -8,7 +8,7 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.FileSystemException
 
-sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, fileName: String?, headers: Map<String, String>, val length: Int) : PartMetaData(fieldName, formField, contentType, fileName, headers), Closeable {
+internal sealed class Part(fieldName: String?, formField: Boolean, contentType: String?, fileName: String?, headers: Map<String, String>, val length: Int) : PartMetaData(fieldName, formField, contentType, fileName, headers), Closeable {
 
     abstract val newInputStream: InputStream
 
