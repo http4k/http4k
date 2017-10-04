@@ -1,14 +1,15 @@
 package org.http4k.multipart.internal
 
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.io.SequenceInputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 
 internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
-    private val builder = ByteArrayOutputStream()
+
+    private val waitingToStream = mutableListOf<InputStream>()
 
     constructor(boundary: String) : this(boundary.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8) {}
 
@@ -17,11 +18,13 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
     }
 
     fun build(): ByteArray {
-        builder.write(boundary.peek())
-        builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        return builder.toByteArray()
+        add(boundary.peek())
+        add(StreamingMultipartFormParts.STREAM_TERMINATOR)
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
+
+        return SequenceInputStream(Collections.enumeration(waitingToStream)).readBytes()
     }
+
 
     fun field(name: String, value: String): MultipartFormBuilder {
         part(value, Pair("Content-Disposition", listOf("form-data" to null, "name" to name)))
@@ -33,30 +36,34 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
             if (second != null) """$first="$second"""" else first
         }
 
-        builder.write(headers.toByteArray(encoding))
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        add(headers.toByteArray(encoding))
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
     fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = part(contents.byteInputStream(encoding), *headers)
 
     fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder {
-        builder.write(boundary.peek())
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        add(boundary.peek())
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if (headers.isNotEmpty()) {
             headers.toList().forEach { (first, second) -> appendHeader(first, second) }
-            builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+            add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         }
-        contents.use { builder.write(it.readBytes()) }
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        waitingToStream.add(contents)
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         return this
     }
 
+    private fun add(bytes: ByteArray) {
+        waitingToStream.add(bytes.inputStream())
+    }
+
     fun startMultipart(multipartFieldName: String, subpartBoundary: String): MultipartFormBuilder {
-        builder.write(boundary.peek())
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        add(boundary.peek())
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         appendHeader("Content-Disposition", listOf(Pair("form-data", null), Pair("name", multipartFieldName)))
         appendHeader("Content-Type", listOf(Pair("multipart/mixed", null), Pair("boundary", subpartBoundary)))
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
         return this
     }
@@ -75,9 +82,9 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
 
 
     fun endMultipart(): MultipartFormBuilder {
-        builder.write(boundary.pop())
-        builder.write(StreamingMultipartFormParts.STREAM_TERMINATOR)
-        builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
+        add(boundary.pop())
+        add(StreamingMultipartFormParts.STREAM_TERMINATOR)
+        add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         return this
     }
 }
