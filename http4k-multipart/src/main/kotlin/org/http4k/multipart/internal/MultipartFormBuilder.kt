@@ -37,7 +37,7 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = part(contents.byteInputStream(), *headers)
+    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = part(contents.byteInputStream(encoding), *headers)
 
     fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder {
         builder.write(boundary.peek())
