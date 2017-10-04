@@ -8,5 +8,5 @@ fun main(args: Array<String>) {
 
     val builder = ValidMultipartFormBuilder("bob".toByteArray())
     builder.part("content")
-    builder.attachment()
+//    builder.attachment()
 }
