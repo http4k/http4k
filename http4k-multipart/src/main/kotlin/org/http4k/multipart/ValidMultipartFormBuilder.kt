@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
-import java.util.Arrays.asList
 
 class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
@@ -49,7 +48,7 @@ class ValidMultipartFormBuilder(boundary: ByteArray, private val encoding: Chars
         builder.write(boundary.peek())
         builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if(headers.isNotEmpty()) {
-            asList(*headers).forEach { (first, second) -> appendHeader(first, second) }
+            headers.toList().forEach { (first, second) -> appendHeader(first, second) }
             builder.write(StreamingMultipartFormParts.FIELD_SEPARATOR)
         }
         builder.write(contents.toByteArray(encoding))
