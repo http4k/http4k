@@ -39,7 +39,7 @@ data class MultipartForm(val formParts: List<Multipart>, val boundary: String = 
             }.build()))
 
     companion object {
-        fun toMultipartForm(body: Body, boundary: String): MultipartForm {
+        fun fromBody(body: Body, boundary: String): MultipartForm {
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(StandardCharsets.UTF_8), body.stream, StandardCharsets.UTF_8)
             return MultipartForm(form.map {
                 if (it.isFormField) Multipart.FormField(it.fieldName!!, it.contentsAsString)
