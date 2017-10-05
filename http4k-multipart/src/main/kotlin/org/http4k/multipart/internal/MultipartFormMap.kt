@@ -52,6 +52,17 @@ internal object MultipartFormMap {
         return Parts(partMap)
     }
 
+    fun formParts(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): List<Part> {
+        val result = mutableListOf<Part>()
+        val bytes = ByteArray(writeToDiskThreshold)
+
+        for (part in parts) {
+            if (part.fieldName == null) throw ParseError("no name for part")
+
+            result.add(serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
+        }
+        return result
+    }
 
     private fun serialisePart(encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File, part: StreamingPart, partInputStream: InputStream, bytes: ByteArray): Part {
         var length = 0
