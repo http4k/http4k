@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
@@ -8,7 +7,6 @@ import org.http4k.core.toUrlEncoded
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
-import java.nio.ByteBuffer
 
 object FormField : BiDiLensSpec<WebForm, String, String>("form",
     StringParam,
@@ -18,7 +16,7 @@ object FormField : BiDiLensSpec<WebForm, String, String>("form",
 
 data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {
     operator fun plus(kv: Pair<String, String>): WebForm =
-        copy(fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+        copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
 }
@@ -34,7 +32,7 @@ enum class FormValidator : (WebForm) -> WebForm {
 
 fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
-        .map(ByteBuffer::asString, String::asByteBuffer)
+        .map({it.payload.asString()}, {it: String -> Body(it)})
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })

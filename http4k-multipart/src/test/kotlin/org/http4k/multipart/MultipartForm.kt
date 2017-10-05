@@ -62,4 +62,6 @@ data class MultipartForm(val formParts: List<Multipart>, val boundary: String = 
             return MultipartForm(parts, boundary)
         }
     }
+
+    operator fun plus(part: Multipart): MultipartForm = copy(formParts = formParts + part)
 }

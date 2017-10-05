@@ -1,6 +1,5 @@
 package org.http4k.lens
 
-import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -10,7 +9,6 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
-import java.nio.ByteBuffer
 
 /**
  * A BodyLens provides the uni-directional extraction of an entity from a target body.
@@ -43,7 +41,7 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
 /**
  * Represents a uni-directional extraction of an entity from a target Body.
  */
-open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, ByteBuffer, OUT>) {
+open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, Body, OUT>) {
     /**
      * Create a lens for this Spec
      */
@@ -64,8 +62,8 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
  */
 open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
                                  contentType: ContentType,
-                                 get: LensGet<HttpMessage, ByteBuffer, OUT>,
-                                 private val set: LensSet<HttpMessage, ByteBuffer, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
+                                 get: LensGet<HttpMessage, Body, OUT>,
+                                 private val set: LensSet<HttpMessage, Body, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -90,9 +88,9 @@ fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation
     BiDiBodyLensSpec(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
-            target.body.let { listOf(it.payload) }
+            target.body.let { listOf(it) }
         },
-        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(Body(b)) }.with(CONTENT_TYPE of acceptedContentType) }
+        LensSet { _, values, target -> values.fold(target) { memo, next -> memo.body(next) }.with(CONTENT_TYPE of acceptedContentType) }
     )
 
 /**
@@ -140,7 +138,8 @@ interface ContentNegotiation {
 }
 
 fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
-    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation).map(ByteBuffer::asString, String::asByteBuffer)
+    = root(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
+    .map({ it.payload.asString() }, { it: String -> Body(it) })
 
 fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
     = string(contentType, description, contentNegotiation).map(::nonEmpty, { it })

@@ -1,6 +1,5 @@
 package org.http4k.format
 
-import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -13,7 +12,6 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.root
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.nio.ByteBuffer
 
 /**
  * This is the contract for all JSON implementations
@@ -63,7 +61,7 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> =
         root(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
-            .map(ByteBuffer::asString, String::asByteBuffer)
+            .map({it.payload.asString()}, {it: String -> Body(it)})
             .map({ parse(it) }, { compact(it) })
 
     fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
