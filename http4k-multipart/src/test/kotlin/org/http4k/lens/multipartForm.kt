@@ -1,5 +1,7 @@
 package org.http4k.lens
 
+import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.multipart.Multipart
 import org.http4k.multipart.MultipartForm
 
@@ -14,18 +16,21 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, Multipart.FormFile, Multi
     LensGet { name, form -> form.files(name) },
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(next) }) }
 )
-//
-//
-//fun Body.Companion.multipartForm(validator: FormValidator, boundary: String, vararg formFields: Lens<MultipartForm, *>): BodyLensSpec<MultipartForm> =
-//    BodyLensSpec<MultipartForm>(formFields.map { it.meta }, ContentType.MultipartForm(boundary),
-//        LensGet { _, target ->
-//            ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target))
-//            val a: MultipartForm = target.body.let { MultipartForm.fromBody(it, boundary) }
-//            a
-//        }
-////        },
-////        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(b.b) }.with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(boundary)) }
-//    )
+
+
+fun Body.Companion.multipartForm(validator: FormValidator, boundary: String, vararg formFields: Lens<MultipartForm, *>): BodyLensSpec<MultipartForm> =
+    BodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(boundary),
+        LensGet { _, target ->
+            ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target))
+            listOf(target.body)
+//            ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target.body))
+//            listOf(MultipartForm.fromBody(target.body, boundary))
+        }
+//        },
+//        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(b.b) }.with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(boundary)) }
+    ).map {
+        MultipartForm.fromBody(it, boundary)
+    }
 //
 //
 //root(formFields.map { it.meta }, ContentType.MultipartForm(boundary), ContentNegotiation.StrictNoDirective)
