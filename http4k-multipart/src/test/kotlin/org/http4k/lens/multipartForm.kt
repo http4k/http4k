@@ -2,8 +2,11 @@ package org.http4k.lens
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.HttpMessage
+import org.http4k.core.with
 import org.http4k.multipart.Multipart
 import org.http4k.multipart.MultipartForm
+import java.util.*
 
 object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
     ParamMeta.StringParam,
@@ -17,24 +20,22 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, Multipart.FormFile, Multi
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(next) }) }
 )
 
+private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate
 
-fun Body.Companion.multipartForm(validator: FormValidator, boundary: String, vararg formFields: Lens<MultipartForm, *>): BodyLensSpec<MultipartForm> =
-    BodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(boundary),
+fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Lens<MultipartForm, *>): BodyLensSpec<MultipartForm> =
+    BiDiBodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(""),
         LensGet { _, target ->
-            ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target))
-            listOf(target.body)
+            val actual = Header.Common.CONTENT_TYPE(target)
+            val boundary = actual?.directive?.second ?: ""
+            ContentNegotiation.Strict(ContentType.MultipartForm(boundary), actual)
+            listOf(MultipartBody(boundary, target.body))
+        },
+        LensSet { _: String, values: List<Body>, target: HttpMessage ->
+            values.fold(target) { a, b -> a.body(b) }
+                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(UUID.randomUUID().toString()))
         }
-//        },
-//        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(b.b) }.with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(boundary)) }
-    ).map {
-        MultipartForm.fromBody(it, boundary)
-    }
-//
-//
-//root(formFields.map { it.meta }, ContentType.MultipartForm(boundary), ContentNegotiation.StrictNoDirective)
-//.map(ByteBuffer::asString, String::asByteBuffer)
-//.map(
-//{ Muli(formParametersFrom(it), emptyList()) },
-//{ (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
-//.map({ validateFields(it, validator, *formFields) },
-//{ validateFields(it, validator, *formFields) })
+    ).map({
+        (it as MultipartBody).let {
+            MultipartForm.fromBody(it, it.boundary)
+        }
+    })
