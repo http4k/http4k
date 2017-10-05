@@ -17,12 +17,12 @@ object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
 object MultipartFormFile : BiDiLensSpec<MultipartForm, Multipart.FormFile, Multipart.FormFile>("form",
     ParamMeta.FileParam,
     LensGet { name, form -> form.files(name) },
-    LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(next) }) }
+    LensSet { _, values, target -> values.fold(target, { m, next -> m.plus(next) }) }
 )
 
 private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate
 
-fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Lens<MultipartForm, *>): BodyLensSpec<MultipartForm> =
+fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(""),
         LensGet { _, target ->
             val actual = Header.Common.CONTENT_TYPE(target)
@@ -38,4 +38,4 @@ fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Le
         (it as MultipartBody).let {
             MultipartForm.fromBody(it, it.boundary)
         }
-    })
+    }, { it.toBody() })
