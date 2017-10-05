@@ -23,8 +23,6 @@ fun Body.Companion.multipartForm(validator: FormValidator, boundary: String, var
         LensGet { _, target ->
             ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target))
             listOf(target.body)
-//            ContentNegotiation.StrictNoDirective(ContentType.MultipartForm(boundary), Header.Common.CONTENT_TYPE(target.body))
-//            listOf(MultipartForm.fromBody(target.body, boundary))
         }
 //        },
 //        LensSet { _, values, target -> values.fold(target) { a, b -> a.body(b.b) }.with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(boundary)) }
