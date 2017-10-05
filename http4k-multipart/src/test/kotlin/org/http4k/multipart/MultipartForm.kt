@@ -3,12 +3,12 @@ package org.http4k.multipart
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.multipart.internal.MultipartFormBuilder
-import org.http4k.multipart.internal.MultipartFormMap
+import org.http4k.multipart.internal.MultipartFormMap.formParts
 import org.http4k.multipart.internal.StreamingMultipartFormParts
 import org.http4k.multipart.internal.string
 import java.io.File
 import java.io.InputStream
-import java.nio.charset.StandardCharsets
+import java.nio.charset.StandardCharsets.UTF_8
 import java.util.*
 
 sealed class Multipart {
@@ -16,7 +16,7 @@ sealed class Multipart {
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
     data class FormField(override val name: String, val value: String) : Multipart() {
-        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.field(name, value)
+        override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
     }
 
     data class FormFile(override val name: String, val filename: String, val contentType: ContentType, val content: InputStream) : Multipart() {
@@ -51,13 +51,15 @@ data class MultipartForm(val formParts: List<Multipart>, val boundary: String = 
         Body(formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream())
 
     companion object {
-        fun fromBody(body: Body, boundary: String): MultipartForm {
-            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(StandardCharsets.UTF_8), body.stream, StandardCharsets.UTF_8)
-            val parts = MultipartFormMap.formParts(form, StandardCharsets.UTF_8, 10000, File("./out/tmp"))
-            return MultipartForm(parts.map {
+        val DEFAULT_DISK_THRESHOLD = 10000
+
+        fun fromBody(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartForm {
+            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
+            val parts = formParts(form, UTF_8, diskThreshold, File("./out/tmp")).map {
                 if (it.isFormField) Multipart.FormField(it.fieldName!!, it.string())
                 else Multipart.FormFile(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
-            }, boundary)
+            }
+            return MultipartForm(parts, boundary)
         }
     }
 }
