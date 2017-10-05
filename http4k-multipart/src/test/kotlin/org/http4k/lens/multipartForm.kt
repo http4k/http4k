@@ -34,8 +34,4 @@ fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Le
             values.fold(target) { a, b -> a.body(b) }
                 .with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(UUID.randomUUID().toString()))
         }
-    ).map({
-        (it as MultipartBody).let {
-            MultipartForm.fromBody(it, it.boundary)
-        }
-    }, { it.toBody() })
+    ).map({ (it as MultipartBody).let { MultipartForm.fromBody(it, it.boundary) } }, { it.toBody() })
