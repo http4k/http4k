@@ -26,7 +26,7 @@ fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Le
     BiDiBodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(""),
         LensGet { _, target ->
             val actual = Header.Common.CONTENT_TYPE(target)
-            val boundary = actual?.directive?.second ?: ""
+            val boundary = actual?.directive?.second ?: throw LensFailure(Unsupported(Header.Common.CONTENT_TYPE.meta))
             ContentNegotiation.Strict(ContentType.MultipartForm(boundary), actual)
             listOf(MultipartBody(boundary, target.body))
         },
