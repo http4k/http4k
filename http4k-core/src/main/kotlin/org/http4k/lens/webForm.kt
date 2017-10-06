@@ -28,29 +28,27 @@ enum class FormValidator : (WebForm) -> WebForm {
     Feedback {
         override fun invoke(form: WebForm): WebForm = form
     };
+
+    fun validateFields(webForm: WebForm, vararg formFields: Lens<WebForm, *>): WebForm {
+        val failures = formFields.fold(listOf<Failure>()) { memo, next ->
+            try {
+                next(webForm)
+                memo
+            } catch (e: LensFailure) {
+                memo.plus(e.failures)
+            }
+        }
+        return this(webForm.copy(errors = failures))
+    }
 }
 
 fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
-        .map({it.payload.asString()}, {it: String -> Body(it)})
+        .map({ it.payload.asString() }, { it: String -> Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
-        .map({ validateFields(it, validator, *formFields) },
-            { validateFields(it, validator, *formFields) })
-
-private fun validateFields(webForm: WebForm, validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
-    val failures = formFields.fold(listOf<Failure>()) {
-        memo, next ->
-        try {
-            next(webForm)
-            memo
-        } catch (e: LensFailure) {
-            memo.plus(e.failures)
-        }
-    }
-    return validator(webForm.copy(errors = failures))
-}
+        .map({ validator.validateFields(it, *formFields) }, { validator.validateFields(it, *formFields) })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> {
     return target

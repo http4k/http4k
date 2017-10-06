@@ -23,15 +23,15 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, Multipart.FormFile, Multi
 private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate
 
 fun Body.Companion.multipartForm(validator: FormValidator, vararg formFields: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
-    BiDiBodyLensSpec(formFields.map { it.meta }, ContentType.MultipartForm(""),
+    BiDiBodyLensSpec(formFields.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
             val actual = Header.Common.CONTENT_TYPE(target)
-            val boundary = actual?.directive?.second ?: throw LensFailure(Unsupported(Header.Common.CONTENT_TYPE.meta))
-            ContentNegotiation.Strict(ContentType.MultipartForm(boundary), actual)
+            val boundary = actual?.directive?.second ?: ""
+            ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), actual)
             listOf(MultipartBody(boundary, target.body))
         },
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
             values.fold(target) { a, b -> a.body(b) }
-                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(UUID.randomUUID().toString()))
+                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(UUID.randomUUID().toString()))
         }
-    ).map({ (it as MultipartBody).let { MultipartForm.fromBody(it, it.boundary) } }, { it.toBody() })
+    ).map({ (it as MultipartBody).let { MultipartForm.fromBody(it, it.boundary) } }, MultipartForm::toBody)

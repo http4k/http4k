@@ -6,9 +6,9 @@ import org.http4k.multipart.internal.MultipartFormBuilder
 import org.http4k.multipart.internal.MultipartFormMap.formParts
 import org.http4k.multipart.internal.StreamingMultipartFormParts
 import org.http4k.multipart.internal.string
-import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.Files
 import java.util.*
 
 sealed class Multipart {
@@ -38,7 +38,7 @@ sealed class Multipart {
     }
 }
 
-data class MultipartForm(val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
+data class MultipartForm(private val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
     constructor(vararg formParts: Multipart, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
     fun file(name: String): Multipart.FormFile? = files(name).firstOrNull()
@@ -55,7 +55,8 @@ data class MultipartForm(val formParts: List<Multipart>, val boundary: String = 
 
         fun fromBody(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartForm {
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
-            val parts = formParts(form, UTF_8, diskThreshold, File("./out/tmp")).map {
+            val dir = Files.createTempDirectory("./out/tmp").toFile().apply { this.deleteOnExit() }
+            val parts = formParts(form, UTF_8, diskThreshold, dir).map {
                 if (it.isFormField) Multipart.FormField(it.fieldName!!, it.string())
                 else Multipart.FormFile(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
             }

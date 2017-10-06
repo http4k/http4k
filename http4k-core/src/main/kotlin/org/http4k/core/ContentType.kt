@@ -9,10 +9,11 @@ data class ContentType(val value: String, val directive: Pair<String, String>? =
     companion object {
 
         fun Text(value: String, charset: Charset? = Charsets.UTF_8) = ContentType(value, charset?.let { "charset" to charset.name().toLowerCase() })
-        fun MultipartForm(boundary: String): ContentType = ContentType("multipart/form-data", "boundary" to boundary)
+        fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", "boundary" to boundary)
 
         val APPLICATION_JSON = Text("application/json")
         val APPLICATION_FORM_URLENCODED = Text("application/x-www-form-urlencoded")
+        val MULTIPART_FORM_DATA = Text("multipart/form-data")
         val APPLICATION_XML = Text("application/xml")
         val TEXT_HTML = Text("text/html")
         val TEXT_XML = Text("text/xml")

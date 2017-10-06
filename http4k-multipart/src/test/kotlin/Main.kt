@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
 
     val req = Request(Method.POST, "http://localhost:8000/bob")
 //    val req = Request(Method.POST, "http://httpbin.org/post")
-        .with(Header.Common.CONTENT_TYPE of ContentType.MultipartForm(form.boundary))
+        .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
         .body(form.toBody())
 
     ApacheClient()(req)
