@@ -16,9 +16,8 @@ class Jetty(private val server: Server) : ServerConfig {
         })
 
         return object : Http4kServer {
-            override fun start(): Http4kServer {
+            override fun start(): Http4kServer = apply {
                 server.start()
-                return this
             }
 
             override fun stop() = server.stop()

@@ -52,13 +52,12 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         val out = ByteBufOutputStream(nettyBody)
         val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), nettyBody)
         headers.forEach { (key, value) -> res.headers().set(key, value) }
-        body.stream.use{ input -> out.use { output -> input.copyTo(output) }}
+        body.stream.use { input -> out.use { output -> input.copyTo(output) } }
         return res
     }
 
     private fun FullHttpRequest.asRequest(): Request =
-        headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) {
-            memo, next ->
+        headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) { memo, next ->
             memo.header(next.key, next.value)
         }.body(Body(ByteBufInputStream(content())))
 }
@@ -70,7 +69,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             private val workerGroup = NioEventLoopGroup()
             private var closeFuture: ChannelFuture? = null
 
-            override fun start(): Http4kServer {
+            override fun start(): Http4kServer = apply {
                 val bootstrap = ServerBootstrap()
                 bootstrap.group(masterGroup, workerGroup)
                     .channel(NioServerSocketChannel::class.java)
@@ -85,7 +84,6 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
 
                 closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
-                return this
             }
 
             override fun stop() {

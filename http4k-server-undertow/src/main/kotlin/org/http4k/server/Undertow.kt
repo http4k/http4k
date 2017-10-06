@@ -30,8 +30,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         val uri = Uri.of(relativePath + "?" + queryString)
         return requestHeaders
             .flatMap { header -> header.map { header.headerName to it } }
-            .fold(Request(Method.valueOf(requestMethod.toString()), uri)) {
-                memo, (first, second) ->
+            .fold(Request(Method.valueOf(requestMethod.toString()), uri)) { memo, (first, second) ->
                 memo.header(first.toString(), second)
             }.body(inputStream)
     }
@@ -48,9 +47,8 @@ data class Undertow(val port: Int = 8000) : ServerConfig {
                 .addHttpListener(port, "localhost")
                 .setHandler(BlockingHandler(HttpUndertowHandler(handler))).build()
 
-            override fun start(): Http4kServer {
+            override fun start(): Http4kServer = apply {
                 server.start()
-                return this
             }
 
             override fun stop() = server.stop()

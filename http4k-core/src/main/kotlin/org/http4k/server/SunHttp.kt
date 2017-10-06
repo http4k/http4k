@@ -13,7 +13,7 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
     override fun toServer(handler: HttpHandler): Http4kServer {
         return object : Http4kServer {
             private val server = HttpServer.create(InetSocketAddress(port), 0)
-            override fun start(): Http4kServer {
+            override fun start(): Http4kServer = apply {
                 server.createContext("/") {
                     try {
                         it.populate(handler(it.toRequest()))
@@ -23,7 +23,6 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
                     it.close()
                 }
                 server.start()
-                return this
             }
 
             override fun stop() = server.stop(0)
@@ -41,8 +40,7 @@ private fun HttpExchange.toRequest(): Request {
     val uri = requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) } ?: Uri.of(requestURI.rawPath)
     Request(Method.valueOf(requestMethod), uri)
         .body(requestBody).let {
-        return requestHeaders.toList().fold(it) {
-            memo, (name, values) ->
+        return requestHeaders.toList().fold(it) { memo, (name, values) ->
             values.fold(memo) { memo2, value -> memo2.header(name, value) }
         }
     }

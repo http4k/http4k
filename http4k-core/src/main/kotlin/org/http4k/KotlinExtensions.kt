@@ -21,9 +21,8 @@ fun StringBuilder.appendIfNotEmpty(valueToCheck: List<Any>, vararg toAppend: Str
 fun StringBuilder.appendIfPresent(valueToCheck: Any?, vararg toAppend: String): StringBuilder =
     appendIf({ valueToCheck != null }, *toAppend)
 
-fun StringBuilder.appendIf(condition: () -> Boolean, vararg toAppend: String): StringBuilder {
+fun StringBuilder.appendIf(condition: () -> Boolean, vararg toAppend: String): StringBuilder = apply {
     if (condition()) toAppend.forEach { append(it) }
-    return this
 }
 
 fun String.base64Decoded(): String = String(Base64.getDecoder().decode(this))
