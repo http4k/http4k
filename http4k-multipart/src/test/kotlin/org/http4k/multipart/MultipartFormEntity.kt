@@ -38,7 +38,7 @@ sealed class Multipart {
     }
 }
 
-data class MultipartForm(private val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
+data class MultipartFormEntity(private val formParts: List<Multipart>, val boundary: String = UUID.randomUUID().toString()) {
     constructor(vararg formParts: Multipart, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
     fun file(name: String): Multipart.FormFile? = files(name).firstOrNull()
@@ -53,16 +53,16 @@ data class MultipartForm(private val formParts: List<Multipart>, val boundary: S
     companion object {
         private val DEFAULT_DISK_THRESHOLD = 10000
 
-        fun fromBody(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartForm {
+        fun fromBody(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormEntity {
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { this.deleteOnExit() }
             val parts = formParts(form, UTF_8, diskThreshold, dir).map {
                 if (it.isFormField) Multipart.FormField(it.fieldName!!, it.string())
                 else Multipart.FormFile(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
             }
-            return MultipartForm(parts, boundary)
+            return MultipartFormEntity(parts, boundary)
         }
     }
 
-    operator fun plus(part: Multipart): MultipartForm = copy(formParts = formParts + part)
+    operator fun plus(part: Multipart): MultipartFormEntity = copy(formParts = formParts + part)
 }
