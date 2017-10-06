@@ -49,12 +49,5 @@ fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<Mu
     ).map({ (it as MultipartBody).let { MultipartFormEntity.fromBody(it, it.boundary) } }, MultipartFormEntity::toBody)
         .map(MultipartFormEntity::toMultipartForm, MultipartForm::toMultipartFormEntity)
 
-fun main(args: Array<String>) {
-    val required = FormFile.required("goo")
-
-    val a = Body.multipartForm(FormValidator.Feedback, required)
-
-}
-
 fun MultipartFormEntity.toMultipartForm() = MultipartForm()
 fun MultipartForm.toMultipartFormEntity() = MultipartFormEntity()

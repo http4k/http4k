@@ -18,8 +18,6 @@ data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(
     operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
-    fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
-
     fun validateFields(validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
         val errors = formFields.fold(listOf<Failure>()) { memo, next ->
             try {
