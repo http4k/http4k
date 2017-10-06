@@ -8,21 +8,21 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
-import org.http4k.multipart.Multipart
-import org.http4k.multipart.MultipartForm
+import org.http4k.multipart.MultipartEntity
+import org.http4k.multipart.MultipartFormEntity
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 
 fun main(args: Array<String>) {
 
-    val form = MultipartForm(
-        Multipart.FormField("field", "value"),
-        Multipart.FormFile("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
+    val form = MultipartFormEntity(
+        MultipartEntity.Form("field", "value"),
+        MultipartEntity.File("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
     )
 
     val s = ServerFilters.CatchAll().then({ r: Request ->
-        val a = MultipartForm.fromBody(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
+        val a = MultipartFormEntity.fromBody(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
         println("received the same? ${a.fields("field")}")
         println("received the same? ${a.files("file")}")
 
