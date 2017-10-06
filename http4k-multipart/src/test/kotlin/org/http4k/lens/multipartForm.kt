@@ -32,8 +32,6 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
 
 }
 
-private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate
-
 fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
@@ -45,9 +43,13 @@ fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<Mu
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
             values.fold(target) { a, b -> a.body(b) }
                 .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(UUID.randomUUID().toString()))
-        }
-    ).map({ (it as MultipartBody).let { MultipartFormEntity.fromBody(it, it.boundary) } }, MultipartFormEntity::toBody)
+        })
+        .map(Body::asMultipartFormEntity, MultipartFormEntity::toBody)
         .map(MultipartFormEntity::toMultipartForm, MultipartForm::toMultipartFormEntity)
 
 fun MultipartFormEntity.toMultipartForm() = MultipartForm()
 fun MultipartForm.toMultipartFormEntity() = MultipartFormEntity()
+
+private fun Body.asMultipartFormEntity() = (this as MultipartBody).let { MultipartFormEntity.fromBody(it, it.boundary) }
+
+private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate

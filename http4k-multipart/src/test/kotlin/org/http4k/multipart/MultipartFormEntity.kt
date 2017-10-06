@@ -47,8 +47,7 @@ data class MultipartFormEntity(private val formParts: List<MultipartEntity>, val
     fun field(name: String): String? = fields(name).firstOrNull()
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Form }.map { it.value }
 
-    fun toBody(): Body =
-        Body(formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream())
+    fun toBody(): Body = Body(formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream())
 
     companion object {
         private val DEFAULT_DISK_THRESHOLD = 10000
