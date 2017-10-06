@@ -10,15 +10,15 @@ class MultipartFormEntityTest {
     @Test
     fun `roundtrip`() {
         val form = MultipartFormEntity(listOf(
-            Multipart.FormField("field", "bar"),
-            Multipart.FormFile("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
+            MultipartEntity.Form("field", "bar"),
+            MultipartEntity.File("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
         ), "bob")
 
         form.toBody()
             .let { MultipartFormEntity.fromBody(it, form.boundary) }
             .shouldMatch(equalTo(MultipartFormEntity(listOf(
-                Multipart.FormField("field", "bar"),
-                Multipart.FormFile("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
+                MultipartEntity.Form("field", "bar"),
+                MultipartEntity.File("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
             ), "bob")
             ))
     }

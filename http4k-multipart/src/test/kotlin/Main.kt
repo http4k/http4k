@@ -8,7 +8,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
-import org.http4k.multipart.Multipart
+import org.http4k.multipart.MultipartEntity
 import org.http4k.multipart.MultipartFormEntity
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -17,8 +17,8 @@ import org.http4k.server.asServer
 fun main(args: Array<String>) {
 
     val form = MultipartFormEntity(
-        Multipart.FormField("field", "value"),
-        Multipart.FormFile("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
+        MultipartEntity.Form("field", "value"),
+        MultipartEntity.File("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
     )
 
     val s = ServerFilters.CatchAll().then({ r: Request ->
