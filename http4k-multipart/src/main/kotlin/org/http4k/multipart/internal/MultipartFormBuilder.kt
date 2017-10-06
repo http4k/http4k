@@ -6,15 +6,15 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
+internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
 
     private val waitingToStream = mutableListOf<InputStream>()
 
-    constructor(boundary: String) : this(boundary.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8) {}
+    constructor(boundary: String) : this(boundary.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
 
     init {
-        this.boundary.push(StreamingMultipartFormParts.prependBoundaryWithStreamTerminator(boundary))
+        boundary.push(StreamingMultipartFormParts.prependBoundaryWithStreamTerminator(inBoundary))
     }
 
     fun stream(): InputStream {
@@ -25,10 +25,8 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
         return SequenceInputStream(Collections.enumeration(waitingToStream))
     }
 
-
-    fun field(name: String, value: String): MultipartFormBuilder {
+    fun field(name: String, value: String): MultipartFormBuilder = apply {
         part(value, Pair("Content-Disposition", listOf("form-data" to null, "name" to name)))
-        return this
     }
 
     private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) {
@@ -42,7 +40,7 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
 
     fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = part(contents.byteInputStream(encoding), *headers)
 
-    fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder {
+    fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if (headers.isNotEmpty()) {
@@ -51,21 +49,19 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
         }
         waitingToStream.add(contents)
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        return this
     }
 
     private fun add(bytes: ByteArray) {
         waitingToStream.add(bytes.inputStream())
     }
 
-    fun startMultipart(multipartFieldName: String, subpartBoundary: String): MultipartFormBuilder {
+    fun startMultipart(multipartFieldName: String, subpartBoundary: String): MultipartFormBuilder = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         appendHeader("Content-Disposition", listOf(Pair("form-data", null), Pair("name", multipartFieldName)))
         appendHeader("Content-Type", listOf(Pair("multipart/mixed", null), Pair("boundary", subpartBoundary)))
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
-        return this
     }
 
     fun attachment(fileName: String, contentType: String, contents: String): MultipartFormBuilder =
@@ -80,11 +76,9 @@ internal class MultipartFormBuilder(boundary: ByteArray, private val encoding: C
             "Content-Type" to listOf(contentType to null)
         )
 
-
-    fun endMultipart(): MultipartFormBuilder {
+    fun endMultipart(): MultipartFormBuilder = apply {
         add(boundary.pop())
         add(StreamingMultipartFormParts.STREAM_TERMINATOR)
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        return this
     }
 }

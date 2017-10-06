@@ -28,10 +28,10 @@ sealed class Multipart {
 
         override fun toString(): String = realised.toString()
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is FormFile?) return false
-            return realised == other?.realised
+        override fun equals(other: Any?): Boolean = when {
+            this === other -> true
+            other !is FormFile? -> false
+            else -> realised == other?.realised
         }
 
         override fun hashCode(): Int = realised.hashCode()
@@ -51,7 +51,7 @@ data class MultipartForm(private val formParts: List<Multipart>, val boundary: S
         Body(formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream())
 
     companion object {
-        val DEFAULT_DISK_THRESHOLD = 10000
+        private val DEFAULT_DISK_THRESHOLD = 10000
 
         fun fromBody(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartForm {
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
