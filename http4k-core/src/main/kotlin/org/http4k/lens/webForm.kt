@@ -19,27 +19,32 @@ data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(
         copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     fun with(vararg modifiers: (WebForm) -> WebForm): WebForm = modifiers.fold(this, { memo, next -> next(memo) })
-}
 
-enum class FormValidator : (WebForm) -> WebForm {
-    Strict {
-        override fun invoke(form: WebForm): WebForm = if (form.errors.isEmpty()) form else throw LensFailure(form.errors)
-    },
-    Feedback {
-        override fun invoke(form: WebForm): WebForm = form
-    };
-
-    fun validateFields(webForm: WebForm, vararg formFields: Lens<WebForm, *>): WebForm {
-        val failures = formFields.fold(listOf<Failure>()) { memo, next ->
+    fun validateFields(validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
+        val errors = formFields.fold(listOf<Failure>()) { memo, next ->
             try {
-                next(webForm)
+                next(this)
                 memo
             } catch (e: LensFailure) {
                 memo.plus(e.failures)
             }
         }
-        return this(webForm.copy(errors = failures))
+        validator(errors)
+        return copy(errors = errors)
     }
+}
+
+enum class FormValidator {
+    Strict {
+        override fun invoke(errors: List<Failure>) {
+            if (errors.isNotEmpty()) throw LensFailure(errors)
+        }
+    },
+    Feedback {
+        override fun invoke(errors: List<Failure>) {}
+    };
+
+    abstract operator fun invoke(errors: List<Failure>)
 }
 
 fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
@@ -48,14 +53,12 @@ fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<Web
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
-        .map({ validator.validateFields(it, *formFields) }, { validator.validateFields(it, *formFields) })
+        .map({ it.validateFields(validator, *formFields) }, { it.validateFields(validator, *formFields) })
 
-private fun formParametersFrom(target: String): Map<String, List<String>> {
-    return target
-        .split("&")
-        .filter { it.contains("=") }
-        .map { it.split("=") }
-        .map { decode(it[0], "UTF-8") to if (it.size > 1) decode(it[1], "UTF-8") else "" }
-        .groupBy { it.first }
-        .mapValues { it.value.map { it.second } }
-}
+private fun formParametersFrom(target: String): Map<String, List<String>> = target
+    .split("&")
+    .filter { it.contains("=") }
+    .map { it.split("=") }
+    .map { decode(it[0], "UTF-8") to if (it.size > 1) decode(it[1], "UTF-8") else "" }
+    .groupBy { it.first }
+    .mapValues { it.value.map { it.second } }
