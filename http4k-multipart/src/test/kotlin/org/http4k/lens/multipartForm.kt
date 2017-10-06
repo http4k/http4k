@@ -27,9 +27,6 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
     @JvmName("plusFile")
     operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
         copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
-
-    fun with(vararg modifiers: (MultipartForm) -> MultipartForm): MultipartForm = modifiers.fold(this, { memo, next -> next(memo) })
-
 }
 
 fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
