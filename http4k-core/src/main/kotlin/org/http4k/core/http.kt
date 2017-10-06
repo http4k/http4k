@@ -170,7 +170,6 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun toString(): String = toMessage()
 }
 
-@Deprecated("use org.http4k.lens.with", ReplaceWith("this.with(modifiers)", "org.http4k.lens.with"))
 fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
 
 fun String.toBody(): Body = Body(this)
