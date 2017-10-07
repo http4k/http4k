@@ -37,15 +37,15 @@ class MultipartFormMapTest {
                     boundary, body, ISO_8859_1, maxStreamLength)
 
                 val parts = MultipartFormMap.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory!!)
-                try {
-                    val articleType = parts.partMap["articleType"]!![0]
+                parts.use {
+                    val articleType = it.partMap["articleType"]!![0]
                     println(articleType.fieldName) // "articleType"
                     println(articleType.headers) // {Content-Disposition=form-data; name="articleType"}
                     println(articleType.length) // 8 bytes
                     println(articleType.isInMemory()) // true
                     println(articleType.string()) // "obituary"
 
-                    val simple7bit = parts.partMap["uploadManuscript"]!![0]
+                    val simple7bit = it.partMap["uploadManuscript"]!![0]
                     println(simple7bit.fieldName) // "uploadManuscript"
                     println(simple7bit.fileName) // "simple7bit.txt"
                     println(simple7bit.headers) // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
@@ -53,8 +53,6 @@ class MultipartFormMapTest {
                     println(simple7bit.length) // 8221 bytes
                     println(simple7bit.isInMemory()) // false
                     simple7bit.newInputStream // stream of the contents of the file
-                } finally {
-                    parts.close()
                 }
             }
         } catch (e: IOException) {

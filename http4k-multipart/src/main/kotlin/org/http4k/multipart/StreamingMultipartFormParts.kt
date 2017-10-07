@@ -50,8 +50,8 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 } else state = MultipartFormStreamState.eos
             } else throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
         } else {
-            if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
-            else state = MultipartFormStreamState.header
+            state = if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
+            else MultipartFormStreamState.header
         }
     }
 
@@ -120,7 +120,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 }
             }
         }
-        throw TokenNotFoundException("Didn't find end of Header section within ${HEADER_SIZE_MAX} bytes")
+        throw TokenNotFoundException("Didn't find end of Header section within $HEADER_SIZE_MAX bytes")
     }
 
     inner class StreamingMulipartFormPartIterator : Iterator<StreamingPart> {

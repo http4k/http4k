@@ -35,7 +35,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val noMatch: HttpHandler? = null
 
-    override fun toString(): String = contractRoot.toString() + "\n" + routes.map { it.toString() }.joinToString("\n")
+    override fun toString(): String = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
     override fun match(request: Request): HttpHandler? =
         if (request.isIn(contractRoot)) {

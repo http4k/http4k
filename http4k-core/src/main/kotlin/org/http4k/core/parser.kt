@@ -6,7 +6,7 @@ fun Request.Companion.parse(request: String): Request {
     val headers = parseHeaders(headerLines(lines))
     val body = parseBody(bodyLines(lines))
     return headers.fold(Request(method, uri).body(body),
-        { memo, param -> memo.header(param.first, param.second) })
+        { memo, (first, second) -> memo.header(first, second) })
 }
 
 fun Response.Companion.parse(response: String): Response {
@@ -15,7 +15,7 @@ fun Response.Companion.parse(response: String): Response {
     val headers = parseHeaders(headerLines(lines))
     val body = parseBody(bodyLines(lines))
     return headers.fold(Response(status).body(body),
-        { memo, param -> memo.header(param.first, param.second) })
+        { memo, (first, second) -> memo.header(first, second) })
 }
 
 private fun lines(request: String): List<String> {

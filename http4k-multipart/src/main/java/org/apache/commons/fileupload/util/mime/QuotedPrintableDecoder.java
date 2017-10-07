@@ -45,11 +45,10 @@ final class QuotedPrintableDecoder {
      * @return the number of bytes produced.
      * @throws IOException
      */
-    public static int decode(byte[] data, OutputStream out) throws IOException {
+    static void decode(byte[] data, OutputStream out) throws IOException {
         int off = 0;
         int length = data.length;
         int endOffset = off + length;
-        int bytesWritten = 0;
 
         while (off < endOffset) {
             byte ch = data[off++];
@@ -79,17 +78,12 @@ final class QuotedPrintableDecoder {
                     int c1 = hexToBinary(b1);
                     int c2 = hexToBinary(b2);
                     out.write((c1 << UPPER_NIBBLE_SHIFT) | c2);
-                    // 3 bytes in, one byte out
-                    bytesWritten++;
                 }
             } else {
                 // simple character, just write it out.
                 out.write(ch);
-                bytesWritten++;
             }
         }
-
-        return bytesWritten;
     }
 
     /**

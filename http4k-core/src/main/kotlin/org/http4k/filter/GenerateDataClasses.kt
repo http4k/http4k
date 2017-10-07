@@ -39,7 +39,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
         fun asDefinitionString(): String? = null
     }
 
-    enum class Primitives(val clazz: String) : Gen {
+    enum class Primitives(private val clazz: String) : Gen {
         Number("Number"), StringValue("String"), Boolean("Boolean"), Null("Any");
 
         override fun asClassName() = clazz
@@ -54,7 +54,7 @@ class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<RO
         override fun iterator(): Iterator<Gen> = elements.iterator()
     }
 
-    data class ObjectGen(val clazz: String = "", val fields: Map<String, Gen> = emptyMap()) : Gen {
+    data class ObjectGen(private val clazz: String = "", val fields: Map<String, Gen> = emptyMap()) : Gen {
         override fun asClassName(): String = clazz.capitalize()
         override fun iterator(): Iterator<Gen> = fields.map { it.value }.plus(listOf(this)).toSet().iterator()
         override fun asDefinitionString(): String = """data class ${clazz.capitalize()}(${fields.map { "val ${it.key}: ${it.value.asClassName()}?" }.joinToString(", ")})"""

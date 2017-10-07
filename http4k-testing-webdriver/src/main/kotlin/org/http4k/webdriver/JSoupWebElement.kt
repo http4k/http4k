@@ -79,7 +79,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
             if (isSelected) clear()
             else element.attr("checked", "checked")
         } else if (isA("option")) {
-            val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") ?: false
+            val currentSelectIsMultiple = current("select")?.element?.hasAttr("multiple") == true
 
             val oldValue = isSelected
 

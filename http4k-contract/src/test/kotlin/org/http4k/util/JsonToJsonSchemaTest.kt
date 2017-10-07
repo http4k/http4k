@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Argo
 import org.http4k.format.Argo.obj
 import org.junit.Test
-import util.JsonToJsonSchema
+import org.http4k.util.JsonToJsonSchema
 import java.io.InputStream
 import java.math.BigDecimal
 

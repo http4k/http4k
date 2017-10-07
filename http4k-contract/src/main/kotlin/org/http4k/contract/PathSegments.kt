@@ -26,7 +26,7 @@ sealed class PathSegments {
     }
 }
 
-data class Slash(override val parent: PathSegments, val child: String) : PathSegments() {
+data class Slash(override val parent: PathSegments, private val child: String) : PathSegments() {
     override fun toList(): List<String> = parent.toList().plus(child)
     override fun toString(): String = "$parent/$child"
     override fun startsWith(other: PathSegments): Boolean = other.toList().let {toList().take(it.size) == it}

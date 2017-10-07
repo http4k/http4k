@@ -5,13 +5,12 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-data class LocalCookie(val cookie: Cookie, val created: LocalDateTime) {
+data class LocalCookie(val cookie: Cookie, private val created: LocalDateTime) {
     fun isExpired(now: LocalDateTime) =
         cookie.maxAge?.let { maxAge ->
             Duration.between(created, now).seconds >= maxAge
         }
-            ?: cookie.expires?.let { expires -> Duration.between(created, now).seconds > Duration.between(created, expires).seconds }
-            ?: false
+            ?: cookie.expires?.let { expires -> Duration.between(created, now).seconds > Duration.between(created, expires).seconds } == true
 }
 
 interface CookieStorage {

@@ -68,13 +68,6 @@ public class ParameterParser {
     private boolean lowerCaseNames = false;
 
     /**
-     * Default ParameterParser constructor.
-     */
-    public ParameterParser() {
-        super();
-    }
-
-    /**
      * Are there any characters left to parse?
      *
      * @return {@code true} if there are unparsed characters,
@@ -104,9 +97,9 @@ public class ParameterParser {
         }
         // Strip away quotation marks if necessary
         if (quoted
-                && ((i2 - i1) >= 2)
-                && (chars[i1] == '"')
-                && (chars[i2 - 1] == '"')) {
+            && ((i2 - i1) >= 2)
+            && (chars[i1] == '"')
+            && (chars[i2 - 1] == '"')) {
             i1++;
             i2--;
         }
@@ -120,7 +113,7 @@ public class ParameterParser {
     /**
      * Tests if the given character is present in the array of characters.
      *
-     * @param ch      the character to test for presense in the array of characters
+     * @param ch      the character to test for presence in the array of characters
      * @param charray the array of characters to test against
      * @return {@code true} if the character is present in the array of
      * characters, {@code false} otherwise.
@@ -191,27 +184,12 @@ public class ParameterParser {
     }
 
     /**
-     * Returns {@code true} if parameter names are to be converted to lower
-     * case when name/value pairs are parsed.
-     *
-     * @return {@code true} if parameter names are to be
-     * converted to lower case when name/value pairs are parsed.
-     * Otherwise returns {@code false}
-     */
-    public boolean isLowerCaseNames() {
-        return this.lowerCaseNames;
-    }
-
-    /**
      * Sets the flag if parameter names are to be converted to lower case when
      * name/value pairs are parsed.
      *
-     * @param b {@code true} if parameter names are to be
-     *          converted to lower case when name/value pairs are parsed.
-     *          {@code false} otherwise.
      */
-    public void setLowerCaseNames(boolean b) {
-        this.lowerCaseNames = b;
+    void setLowerCaseNames() {
+        this.lowerCaseNames = true;
     }
 
     /**
@@ -224,9 +202,7 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     public Map<String, String> parse(final String str, char[] separators) {
-        if (separators == null || separators.length == 0) {
-            return new HashMap<>();
-        }
+        if (separators == null || separators.length == 0) return new HashMap<>();
         char separator = separators[0];
         if (str != null) {
             int idx = str.length();
@@ -250,9 +226,7 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     public Map<String, String> parse(final String str, char separator) {
-        if (str == null) {
-            return new HashMap<>();
-        }
+        if (str == null) return new HashMap<>();
         return parse(str.toCharArray(), separator);
     }
 
@@ -265,11 +239,9 @@ public class ParameterParser {
      * @param separator the name/value pairs separator
      * @return a map of name/value pairs
      */
-    public Map<String, String> parse(final char[] charArray, char separator) {
-        if (charArray == null) {
-            return new HashMap<>();
-        }
-        return parse(charArray, 0, charArray.length, separator);
+    private Map<String, String> parse(final char[] charArray, char separator) {
+        if (charArray == null) return new HashMap<>();
+        return parse(charArray, charArray.length, separator);
     }
 
     /**
@@ -278,51 +250,42 @@ public class ParameterParser {
      *
      * @param charArray the array of characters that contains a sequence of
      *                  name/value pairs
-     * @param offset    - the initial offset.
      * @param length    - the length.
      * @param separator the name/value pairs separator
      * @return a map of name/value pairs
      */
-    public Map<String, String> parse(
-            final char[] charArray,
-            int offset,
-            int length,
-            char separator) {
+    private Map<String, String> parse(
+        final char[] charArray,
+        int length,
+        char separator) {
 
         if (charArray == null) {
             return new HashMap<>();
         }
         HashMap<String, String> params = new HashMap<>();
         this.chars = charArray;
-        this.pos = offset;
+        this.pos = 0;
         this.len = length;
 
-        String paramName;
-        String paramValue;
         while (hasChar()) {
-            paramName = parseToken(new char[]{
-                    '=', separator});
-            paramValue = null;
+            String paramName = parseToken(new char[]{'=', separator});
+            String paramValue = null;
             if (hasChar() && (charArray[pos] == '=')) {
                 pos++; // skip '='
-                paramValue = parseQuotedToken(new char[]{
-                        separator});
+                paramValue = parseQuotedToken(new char[]{separator});
 
-                if (paramValue != null) {
+                if (paramValue != null)
                     try {
                         paramValue = MimeUtility.decodeText(paramValue);
                     } catch (UnsupportedEncodingException e) {
                         // let's keep the original value in this case
                     }
-                }
             }
             if (hasChar() && (charArray[pos] == separator)) {
                 pos++; // skip separator
             }
             if ((paramName != null) && (paramName.length() > 0)) {
-                if (this.lowerCaseNames) {
-                    paramName = paramName.toLowerCase(Locale.ENGLISH);
-                }
+                if (this.lowerCaseNames) paramName = paramName.toLowerCase(Locale.ENGLISH);
 
                 params.put(paramName, paramValue);
             }

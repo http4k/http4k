@@ -7,8 +7,8 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Meta
-import util.JsonSchema
-import util.JsonToJsonSchema
+import org.http4k.util.JsonSchema
+import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
@@ -38,7 +38,7 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
         return routes
             .groupBy { it.describeFor(contractRoot) }.entries
-            .fold(FieldsAndDefinitions<NODE>(), { memo, (path, routes) ->
+            .fold(FieldsAndDefinitions(), { memo, (path, routes) ->
                 val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), { memoFields, route ->
                     memoFields.add(render(contractRoot, security, route))
                 })

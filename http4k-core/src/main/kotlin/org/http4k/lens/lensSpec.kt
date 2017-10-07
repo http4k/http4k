@@ -212,6 +212,8 @@ fun <IN> BiDiLensSpec<IN, String, String>.regex(pattern: String, group: Int = 1)
 internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
 
 internal fun safeBooleanFrom(value: String): Boolean =
-    if (value.toUpperCase() == "TRUE") true
-    else if (value.toUpperCase() == "FALSE") false
-    else throw kotlin.IllegalArgumentException("illegal boolean")
+    when {
+        value.toUpperCase() == "TRUE" -> true
+        value.toUpperCase() == "FALSE" -> false
+        else -> throw kotlin.IllegalArgumentException("illegal boolean")
+    }

@@ -63,7 +63,7 @@ public final class MimeUtility {
     /**
      * Mappings between MIME and Java charset.
      */
-    private static final Map<String, String> MIME2JAVA = new HashMap<String, String>();
+    private static final Map<String, String> MIME2JAVA = new HashMap<>();
 
     static {
         MIME2JAVA.put("iso-2022-cn", "ISO2022CN");
@@ -98,9 +98,7 @@ public final class MimeUtility {
     public static String decodeText(String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
         // source string doesn't contain that sequent, no decoding is required.
-        if (text.indexOf(ENCODED_TOKEN_MARKER) < 0) {
-            return text;
-        }
+        if (!text.contains(ENCODED_TOKEN_MARKER)) return text;
 
         int offset = 0;
         int endOffset = text.length();
@@ -240,12 +238,15 @@ public final class MimeUtility {
             byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
 
             // Base64 encoded?
-            if (encoding.equals(BASE64_ENCODING_MARKER)) {
-                Base64Decoder.decode(encodedData, out);
-            } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
-                QuotedPrintableDecoder.decode(encodedData, out);
-            } else {
-                throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
+            switch (encoding) {
+                case BASE64_ENCODING_MARKER:
+                    Base64Decoder.decode(encodedData, out);
+                    break;
+                case QUOTEDPRINTABLE_ENCODING_MARKER:  // maybe quoted printable.
+                    QuotedPrintableDecoder.decode(encodedData, out);
+                    break;
+                default:
+                    throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }
             // get the decoded byte data and convert into a string.
             byte[] decodedData = out.toByteArray();

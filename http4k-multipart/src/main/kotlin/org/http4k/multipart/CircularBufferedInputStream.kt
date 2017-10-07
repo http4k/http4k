@@ -17,14 +17,11 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
 
 
     override fun read(): Int {
-        dumpState(">>> READ")
 
         return if (EOS) {
             -1
         } else {
             val result = read1()
-
-            dumpState("<<< READ")
 
             result
         }
@@ -96,7 +93,6 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
 
     @Synchronized
     override fun reset() {
-        dumpState(">>> RESET")
 
         if (markInvalid) {
             // The mark has been moved because you have read past your readlimit
@@ -106,40 +102,15 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
         readLimit = 0
         markInvalid = false
 
-        dumpState("<<< RESET")
     }
 
     @Synchronized override fun mark(readlimit: Int) {
-        dumpState(">>> MARK")
-
         if (readlimit > bufferSize) {
             throw ArrayIndexOutOfBoundsException(String.format("Readlimit (%d) cannot be bigger than buffer size (%d)", readlimit, bufferSize))
         }
         leftBounds = cursor
         markInvalid = false
-        this.readLimit = readlimit.toLong()
-
-        dumpState("<<< MARK")
-    }
-
-    private fun dumpState(description: String) {
-        if (DEBUG) {
-            println(description)
-            println(
-                "l=" + leftBounds + "(" + (leftBounds and bufferIndexMask) + ") " +
-                    "c=" + cursor + "(" + (cursor and bufferIndexMask) + ") " +
-                    "r=" + rightBounds + "(" + (rightBounds and bufferIndexMask) + ") '" +
-                    "rl=" + readLimit + " " +
-                    buffer[(cursor and bufferIndexMask).toInt()].toChar() + "'")
-            for (b in buffer) {
-                print(b.toChar())
-            }
-            println()
-        }
-    }
-
-    companion object {
-        private val DEBUG = false
+        readLimit = readlimit.toLong()
     }
 
 }

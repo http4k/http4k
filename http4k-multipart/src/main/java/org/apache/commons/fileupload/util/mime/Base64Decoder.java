@@ -102,8 +102,7 @@ final class Base64Decoder {
      * @return the number of bytes produced.
      * @throws IOException thrown when the padding is incorrect or the input is truncated.
      */
-    public static int decode(byte[] data, OutputStream out) throws IOException {
-        int outLen = 0;
+    static void decode(byte[] data, OutputStream out) throws IOException {
         byte[] cache = new byte[INPUT_BYTES_PER_CHUNK];
         int cachedBytes = 0;
 
@@ -125,15 +124,12 @@ final class Base64Decoder {
                 // Convert 4 6-bit bytes to 3 8-bit bytes
                 // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
                 out.write((b1 << 2) | (b2 >> 4)); // 6 bits of b1 plus 2 bits of b2
-                outLen++;
                 if (b3 != PAD_BYTE) {
                     // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
                     out.write((b2 << 4) | (b3 >> 2)); // 4 bits of b2 plus 4 bits of b3
-                    outLen++;
                     if (b4 != PAD_BYTE) {
                         // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
                         out.write((b3 << 6) | b4);        // 2 bits of b3 plus 6 bits of b4
-                        outLen++;
                     }
                 } else if (b4 != PAD_BYTE) { // if byte 3 is pad, byte 4 must be pad too
                     throw new // line wrap to avoid 120 char limit
@@ -146,6 +142,5 @@ final class Base64Decoder {
         if (cachedBytes != 0) {
             throw new IOException("Invalid Base64 input: truncated");
         }
-        return outLen;
     }
 }

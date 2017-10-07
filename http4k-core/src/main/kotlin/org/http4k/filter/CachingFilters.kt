@@ -93,8 +93,7 @@ object CachingFilters {
                 val response = next(it)
                 if (predicate(response)) {
                     val hashedBody = MessageDigest.getInstance("MD5")
-                        .digest(response.body.toString().toByteArray())
-                        .map { "%02x".format(it) }.joinToString("")
+                        .digest(response.body.toString().toByteArray()).joinToString("") { "%02x".format(it) }
                     response.header("Etag", hashedBody)
                 } else
                     response

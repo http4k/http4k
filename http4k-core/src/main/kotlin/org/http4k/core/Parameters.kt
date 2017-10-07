@@ -7,7 +7,7 @@ typealias Parameters = List<Parameter>
 
 fun Uri.queries(): Parameters = query.toParameters()
 
-fun Parameters.toUrlEncoded(): String = this.map { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }.joinToString("&")
+fun Parameters.toUrlEncoded(): String = this.joinToString("&") { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }
 
 fun String.toParameters() = if(isNotEmpty()) split("&").map(String::toParameter) else listOf()
 

@@ -28,7 +28,7 @@ fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }
 
 private fun List<Cookie>.toCookieString() = map(Cookie::keyValueCookieString).joinToString("; ")
 
-fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull().map { Cookie.parse(it) }.filterNotNull()
+fun Response.cookies(): List<Cookie> = headerValues("set-cookie").filterNotNull().mapNotNull { Cookie.parse(it) }
 
 fun Cookie.invalidate(): Cookie = copy(value = "").maxAge(0).expires(LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC))
 

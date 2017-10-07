@@ -25,7 +25,7 @@ object NoSecurity : Security() {
 /**
  * Checks the presence of the named Api Key parameter. Filter returns 401 if Api-Key is not found in request.
  */
-data class ApiKey<T>(val param: Lens<Request, T>, val validateKey: (T) -> Boolean) : Security() {
+data class ApiKey<out T>(val param: Lens<Request, T>, private val validateKey: (T) -> Boolean) : Security() {
     override val filter = Filter {
         next ->
         {
