@@ -38,16 +38,12 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
     private fun findBoundary() {
         if (state == MultipartFormStreamState.findPrefix) {
-            if (!inputStream.matchInStream(FIELD_SEPARATOR)) {
-                throw TokenNotFoundException("Boundary must be proceeded by field separator, but didn't find it")
-            }
+            if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be proceeded by field separator, but didn't find it")
             state = MultipartFormStreamState.findBoundary
         }
 
-        if (state == MultipartFormStreamState.findBoundary) {
-            if (!inputStream.matchInStream(boundary)) {
-                throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
-            }
+        if (state == MultipartFormStreamState.findBoundary && !inputStream.matchInStream(boundary)) {
+            throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
         }
 
         state = MultipartFormStreamState.boundaryFound
@@ -63,15 +59,10 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 } else {
                     state = MultipartFormStreamState.eos
                 }
-            } else {
-                throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
-            }
+            } else throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
         } else {
-            if (!inputStream.matchInStream(FIELD_SEPARATOR)) {
-                throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
-            } else {
-                state = MultipartFormStreamState.header
-            }
+            if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
+            else state = MultipartFormStreamState.header
         }
     }
 
@@ -85,7 +76,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         val headers = parseHeaderLines()
 
         val contentType = headers["Content-Type"]
-        if (contentType != null && contentType.startsWith("multipart/mixed")) {
+        return if (contentType != null && contentType.startsWith("multipart/mixed")) {
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
             val contentTypeParams = ParameterParser().parse(contentType, ';')
 
@@ -98,33 +89,27 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
             state = MultipartFormStreamState.findBoundary
 
-            return parseNextPart()
+            parseNextPart()
         } else {
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
             val fieldName = (if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"])) ?: throw ParseError("no name for part")
-            val filename = filenameFromMap(contentDisposition)
 
-            return StreamingPart(
+            StreamingPart(
                 fieldName,
                 !contentDisposition.containsKey("filename"),
                 contentType,
-                filename,
+                filenameFromMap(contentDisposition),
                 BoundedInputStream(),
                 headers)
         }
     }
 
-    private fun filenameFromMap(contentDisposition: Map<String, String>): String? =
-        if (contentDisposition.containsKey("filename")) trim(contentDisposition["filename"] ?: "") else null
-
+    private fun filenameFromMap(contentDisposition: Map<String, String>): String? = if (contentDisposition.containsKey("filename")) trim(contentDisposition["filename"] ?: "") else null
 
     private fun trim(string: String?): String? = string?.trim { it <= ' ' }
 
-
     private fun parseHeaderLines(): Map<String, String> {
-        if (MultipartFormStreamState.header != state) {
-            throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got $state")
-        }
+        if (MultipartFormStreamState.header != state) throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got $state")
 
         val result = HashMap<String, String>()
         var previousHeaderName: String? = null
@@ -135,9 +120,8 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 state = MultipartFormStreamState.contents
                 return result
             }
-            if (header.matches("\\s+.*".toRegex())) {
-                result.put(previousHeaderName!!, result[previousHeaderName] + "; " + header.trim { it <= ' ' })
-            } else {
+            if (header.matches("\\s+.*".toRegex())) result.put(previousHeaderName!!, result[previousHeaderName] + "; " + header.trim { it <= ' ' })
+            else {
                 val index = header.indexOf(":")
                 if (index < 0) {
                     throw ParseError("Header didn't include a colon <<$header>>")
@@ -177,20 +161,14 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
          */
         override fun next(): StreamingPart {
             if (nextIsKnown) {
-                if (isEndOfStream) {
-                    throw NoSuchElementException("No more parts in this MultipartForm")
-                }
+                if (isEndOfStream) throw NoSuchElementException("No more parts in this MultipartForm")
                 nextIsKnown = false
             } else {
 
-                if (state == MultipartFormStreamState.contents) {
-                    currentPart!!.inputStream.close()
-                }
+                if (state == MultipartFormStreamState.contents) currentPart!!.inputStream.close()
 
                 currentPart = safelyParseNextPart()
-                if (isEndOfStream) {
-                    throw NoSuchElementException("No more parts in this MultipartForm")
-                }
+                if (isEndOfStream) throw NoSuchElementException("No more parts in this MultipartForm")
             }
             return currentPart!!
         }
