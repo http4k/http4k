@@ -6,9 +6,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.FormField
-import org.http4k.lens.FormValidator
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
+import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.int
 import org.http4k.lens.webForm
@@ -22,8 +22,8 @@ fun main(args: Array<String>) {
     val nameField = FormField.map(::Name, Name::value).optional("name")
 
     // add fields to a form definition, along with a validator
-    val strictFormBody = Body.webForm(FormValidator.Strict, nameField, ageField).toLens()
-    val feedbackFormBody = Body.webForm(FormValidator.Feedback, nameField, ageField).toLens()
+    val strictFormBody = Body.webForm(Validator.Strict, nameField, ageField).toLens()
+    val feedbackFormBody = Body.webForm(Validator.Feedback, nameField, ageField).toLens()
 
     val invalidRequest = Request(Method.GET, "/")
         .with(Header.Common.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)

@@ -9,9 +9,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.toBody
 import org.http4k.core.with
-import org.http4k.lens.FormValidator.Feedback
-import org.http4k.lens.FormValidator.Strict
 import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Validator.Feedback
+import org.http4k.lens.Validator.Strict
 import org.junit.Test
 
 class WebFormTest {

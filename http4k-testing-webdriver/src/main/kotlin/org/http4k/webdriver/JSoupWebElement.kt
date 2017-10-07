@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.FormField
-import org.http4k.lens.FormValidator
+import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
@@ -57,7 +57,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
                 .groupBy { it.first }
                 .mapValues { it.value.map { it.second }.flatMap { it } })
 
-            val body = Body.webForm(FormValidator.Strict,
+            val body = Body.webForm(Validator.Strict,
                 *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
 
             val uri = it.element.attr("action") ?: "<unknown>"

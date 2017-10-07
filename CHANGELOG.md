@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.30.0 (uncut)
+- Multipart form support through new module `http4k-multipart`.
+- Deprecation: Replaced `FormValidator` with `Validator` and deprecated the former.
+
 ### v2.29.4
 - Refactor release.
 

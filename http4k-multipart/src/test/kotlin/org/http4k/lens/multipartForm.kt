@@ -29,7 +29,7 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
         copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 }
 
-fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
+fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
             MultipartFormBody.from(target)

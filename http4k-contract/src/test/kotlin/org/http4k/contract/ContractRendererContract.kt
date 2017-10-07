@@ -18,7 +18,6 @@ import org.http4k.format.Argo
 import org.http4k.format.Argo.json
 import org.http4k.format.Argo.parse
 import org.http4k.lens.FormField
-import org.http4k.lens.FormValidator.Strict
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
 import org.http4k.lens.Meta
@@ -27,6 +26,7 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.lens.Validator
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
@@ -82,7 +82,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
                 query Query.boolean().required("query", "description of the query")
-                body Body.webForm(Strict, FormField.int().required("form", "description of the form")).toLens()
+                body Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens()
                 bindContract GET to { a, _, _ -> { Response(OK).body(a) } }
                 meta RouteMeta("a friendly endpoint"),
 

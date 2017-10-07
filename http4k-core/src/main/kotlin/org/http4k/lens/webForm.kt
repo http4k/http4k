@@ -18,40 +18,16 @@ data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(
     operator fun plus(kv: Pair<String, String>): WebForm =
         copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
-    fun validateFields(validator: FormValidator, vararg formFields: Lens<WebForm, *>): WebForm {
-        val errors = formFields.fold(listOf<Failure>()) { memo, next ->
-            try {
-                next(this)
-                memo
-            } catch (e: LensFailure) {
-                memo.plus(e.failures)
-            }
-        }
-        validator(errors)
-        return copy(errors = errors)
-    }
 }
 
-enum class FormValidator {
-    Strict {
-        override fun invoke(errors: List<Failure>) {
-            if (errors.isNotEmpty()) throw LensFailure(errors)
-        }
-    },
-    Feedback {
-        override fun invoke(errors: List<Failure>) {}
-    };
-
-    abstract operator fun invoke(errors: List<Failure>)
-}
-
-fun Body.Companion.webForm(validator: FormValidator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
+fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     root(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
         .map({ it.payload.asString() }, { it: String -> Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
-        .map({ it.validateFields(validator, *formFields) }, { it.validateFields(validator, *formFields) })
+        .map({ it.apply { validator(this, *formFields) } },
+            { it -> it.apply { validator(it, *formFields) } })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> = target
     .split("&")
@@ -60,3 +36,7 @@ private fun formParametersFrom(target: String): Map<String, List<String>> = targ
     .map { decode(it[0], "UTF-8") to if (it.size > 1) decode(it[1], "UTF-8") else "" }
     .groupBy { it.first }
     .mapValues { it.value.map { it.second } }
+
+
+@Deprecated("Use Validator instead", ReplaceWith("Validator", "org.http4k.lens.Validator"))
+typealias FormValidator = Validator
