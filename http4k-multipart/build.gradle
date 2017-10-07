@@ -1,7 +1,4 @@
-description = 'http4k multipart form support'
-
-ext {
-}
+description = 'Http4k multipart form support'
 
 dependencies {
     provided kotlin_lib
