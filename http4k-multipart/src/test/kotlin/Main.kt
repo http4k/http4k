@@ -9,20 +9,20 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header
 import org.http4k.multipart.MultipartEntity
-import org.http4k.multipart.MultipartFormEntity
+import org.http4k.multipart.MultipartFormBody
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 
 fun main(args: Array<String>) {
 
-    val form = MultipartFormEntity(
+    val form = MultipartFormBody(
         MultipartEntity.Form("field", "value"),
         MultipartEntity.File("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
     )
 
     val s = ServerFilters.CatchAll().then({ r: Request ->
-        val a = MultipartFormEntity.fromBody(r.body, Header.Common.CONTENT_TYPE.extract(r)!!.directive!!.second)
+        val a = MultipartFormBody.from(r)
         println("received the same? ${a.fields("field")}")
         println("received the same? ${a.files("file")}")
 
@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
     val req = Request(Method.POST, "http://localhost:8000/bob")
 //    val req = Request(Method.POST, "http://httpbin.org/post")
         .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
-        .body(form.toBody())
+        .body(form)
 
     ApacheClient()(req)
 

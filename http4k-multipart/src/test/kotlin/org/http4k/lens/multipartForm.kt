@@ -4,7 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
-import org.http4k.multipart.MultipartFormEntity
+import org.http4k.multipart.MultipartFormBody
 import java.io.InputStream
 import java.util.*
 
@@ -32,21 +32,18 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
 fun Body.Companion.multipartForm(validator: FormValidator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            val actual = Header.Common.CONTENT_TYPE(target)
-            val boundary = actual?.directive?.second ?: ""
-            ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), actual)
-            listOf(MultipartBody(boundary, target.body))
+            MultipartFormBody.from(target)
+            listOf(MultipartFormBody.from(target).apply {
+                ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.Common.CONTENT_TYPE(target))
+            })
         },
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
-            values.fold(target) { a, b -> a.body(b) }
-                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(UUID.randomUUID().toString()))
+            values.fold(target) { a, b ->
+                a.body(b)
+                    .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(UUID.randomUUID().toString()))
+            }
         })
-        .map(Body::asMultipartFormEntity, MultipartFormEntity::toBody)
-        .map(MultipartFormEntity::toMultipartForm, MultipartForm::toMultipartFormEntity)
+        .map(Body::toMultipartForm, MultipartForm::toMultipartFormEntity)
 
-fun MultipartFormEntity.toMultipartForm() = MultipartForm()
-fun MultipartForm.toMultipartFormEntity() = MultipartFormEntity()
-
-private fun Body.asMultipartFormEntity() = (this as MultipartBody).let { MultipartFormEntity.fromBody(it, it.boundary) }
-
-private data class MultipartBody(val boundary: String, val delegate: Body) : Body by delegate
+fun Body.toMultipartForm() = MultipartForm()
+fun MultipartForm.toMultipartFormEntity() = MultipartFormBody()

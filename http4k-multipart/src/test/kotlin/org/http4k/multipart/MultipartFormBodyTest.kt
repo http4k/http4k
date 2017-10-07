@@ -5,18 +5,18 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.ContentType
 import org.junit.Test
 
-class MultipartFormEntityTest {
+class MultipartFormBodyTest {
 
     @Test
     fun `roundtrip`() {
-        val form = MultipartFormEntity(listOf(
+        val form = MultipartFormBody(listOf(
             MultipartEntity.Form("field", "bar"),
             MultipartEntity.File("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
         ), "bob")
 
-        form.toBody()
-            .let { MultipartFormEntity.fromBody(it, form.boundary) }
-            .shouldMatch(equalTo(MultipartFormEntity(listOf(
+        form
+            .let { MultipartFormBody.from(it, form.boundary) }
+            .shouldMatch(equalTo(MultipartFormBody(listOf(
                 MultipartEntity.Form("field", "bar"),
                 MultipartEntity.File("file", "foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())
             ), "bob")
