@@ -39,7 +39,12 @@ class MultipartFormTest {
 
     @Test
     fun `multipart form blows up if not correct content type`() {
-        val request = emptyRequest.header("Content-Type", "unknown; boundary=hello").body(validBody)
+        val request = emptyRequest.with(
+            multipartFormLens(Validator.Strict) of MultipartForm().with(
+                stringRequiredField of "world",
+                intRequiredField of 123,
+                requiredFile of validFile()
+            )).replaceHeader("Content-Type", "unknown; boundary=hello")
 
         assertThat({
             multipartFormLens(Validator.Strict)(request)
