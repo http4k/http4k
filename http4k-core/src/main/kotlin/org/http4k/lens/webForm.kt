@@ -26,8 +26,7 @@ fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
-        .map({ it.apply { validator(this, *formFields) } },
-            { it -> it.apply { validator(it, *formFields) } })
+        .map({ it.apply { validator(this, *formFields) } }, { it -> it.apply { validator(it, *formFields) } })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> = target
     .split("&")
