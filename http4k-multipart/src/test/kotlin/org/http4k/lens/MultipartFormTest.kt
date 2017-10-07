@@ -53,17 +53,27 @@ class MultipartFormTest {
     @Test
     @Ignore
     fun `multipart form extracts ok form values`() {
-        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody)
+        val request = emptyRequest.with(
+            multipartFormLens(Validator.Strict) of MultipartForm().with(
+                stringRequiredField of "world",
+                intRequiredField of 123,
+                requiredFile of validFile
+            )
+        )
+//        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody)
 
-        val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
-
-        assertThat(multipartFormLens(Validator.Strict)(request), equalTo(MultipartForm(expected)))
+        val expected = MultipartForm(
+            mapOf("hello" to listOf("world"),
+                "another" to listOf("123")),
+            mapOf("file" to listOf(validFile)))
+        assertThat(multipartFormLens(Validator.Strict)(request), equalTo(expected))
     }
 
     @Test
     @Ignore
     fun `feedback multipart form extracts ok form values and errors`() {
-        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody)
+
+        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody.dropLast(1))
 
         val requiredString = MultipartFormField.required("hello")
         assertThat(multipartFormLens(Validator.Feedback)(request), equalTo(MultipartForm(mapOf("another" to listOf("123")), emptyMap(), listOf(Missing(requiredString.meta)))))
@@ -83,6 +93,7 @@ class MultipartFormTest {
     }
 
     @Test
+    @Ignore
     fun `can set multiple values on a form`() {
         val stringField = MultipartFormField.required("hello")
         val intField = MultipartFormField.int().required("another")
