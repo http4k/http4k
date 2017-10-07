@@ -50,8 +50,7 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
             }
         })
         .map(Body::toMultipartForm, MultipartForm::toMultipartFormEntity)
-        .map({ it.apply { validator(this, *parts) } }, { it -> it.apply { validator(it, *parts) } })
-
+        .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 
 fun Body.toMultipartForm() = MultipartForm()
 fun MultipartForm.toMultipartFormEntity() = MultipartFormBody()
