@@ -3,6 +3,7 @@ package org.http4k.multipart
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
+import org.http4k.core.string
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Ignore
@@ -111,7 +112,6 @@ class MultipartFormMapTest {
         } catch (e: Throwable) {
             assertThat<String>(e.message, containsString("Form contents was longer than 1024 bytes"))
         }
-
     }
 
     @Test
@@ -164,7 +164,6 @@ class MultipartFormMapTest {
         } catch (e: Throwable) {
             assertThat<String>(e.message, containsString("Boundary must be proceeded by field separator, but didn't find it"))
         }
-
     }
 
     private fun safariExample(): Iterable<StreamingPart> = StreamingMultipartFormParts.parse(
@@ -184,7 +183,6 @@ class MultipartFormMapTest {
 
         assertFileIsCorrect(partMap["uploadManuscript"]!![3], "utf8\uD83D\uDCA9.txt", txt)
         assertFileIsCorrect(partMap["uploadManuscript"]!![1], "starbucks.jpeg", jpeg)
-
     }
 
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
@@ -216,8 +214,3 @@ class MultipartFormMapTest {
 }
 
 internal fun Part.isInMemory(): Boolean = this is Part.InMemory
-
-internal fun Part.string(): String = when (this) {
-    is Part.DiskBacked -> throw RuntimeException("wat?")
-    is Part.InMemory -> String(bytes, encoding)
-}

@@ -3,8 +3,8 @@ package org.http4k.core
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormMap.formParts
+import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
-import org.http4k.multipart.string
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
@@ -69,5 +69,9 @@ data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary:
     override val stream: InputStream by lazy { formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream() }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
     override fun toString(): String = String(payload.array())
+}
 
+internal fun Part.string(): String = when (this) {
+    is Part.DiskBacked -> throw RuntimeException("wat?")
+    is Part.InMemory -> String(bytes, encoding)
 }
