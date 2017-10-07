@@ -10,7 +10,7 @@ import java.util.*
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
  */
 internal class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
-    private val iterator: Iterator<StreamingPart>
+    private val iterator: Iterator<StreamingPart> = StreamingMulipartFormPartIterator()
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
     private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
@@ -20,13 +20,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
     private var oldBoundary: ByteArray = boundary
     private var oldBoundaryWithPrefix: ByteArray = boundaryWithPrefix
 
-    init {
-        iterator = StreamingMulipartFormPartIterator()
-    }
-
-    override fun iterator(): Iterator<StreamingPart> {
-        return iterator
-    }
+    override fun iterator(): Iterator<StreamingPart> = iterator
 
     private fun addPrefixToBoundary(boundary: ByteArray?): ByteArray {
         val b = ByteArray(boundary!!.size + FIELD_SEPARATOR.size) // in apache they just use BOUNDARY_PREFIX
@@ -35,16 +29,13 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         return b
     }
 
-
     private fun findBoundary() {
         if (state == MultipartFormStreamState.findPrefix) {
             if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be proceeded by field separator, but didn't find it")
             state = MultipartFormStreamState.findBoundary
         }
 
-        if (state == MultipartFormStreamState.findBoundary && !inputStream.matchInStream(boundary)) {
-            throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
-        }
+        if (state == MultipartFormStreamState.findBoundary && !inputStream.matchInStream(boundary)) throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
 
         state = MultipartFormStreamState.boundaryFound
         if (inputStream.matchInStream(STREAM_TERMINATOR)) {
@@ -56,9 +47,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
                     state = MultipartFormStreamState.findBoundary
                     findBoundary()
-                } else {
-                    state = MultipartFormStreamState.eos
-                }
+                } else state = MultipartFormStreamState.eos
             } else throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
         } else {
             if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
