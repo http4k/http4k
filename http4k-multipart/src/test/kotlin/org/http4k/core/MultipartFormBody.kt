@@ -51,12 +51,11 @@ data class MultipartFormBody(private val formParts: List<MultipartEntity>, val b
     companion object {
         private val DEFAULT_DISK_THRESHOLD = 10000
 
-        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody =
-            from(httpMessage.body, CONTENT_TYPE(httpMessage)?.directive?.second ?: "", diskThreshold)
+        fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
+            val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
+            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), httpMessage.body.stream, UTF_8)
+            val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
-        fun from(body: Body, boundary: String, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
-            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
-            val dir = Files.createTempDirectory("http4k-mp").toFile().apply { this.deleteOnExit() }
             val parts = formParts(form, UTF_8, diskThreshold, dir).map {
                 if (it.isFormField) MultipartEntity.Form(it.fieldName!!, it.string())
                 else MultipartEntity.File(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
