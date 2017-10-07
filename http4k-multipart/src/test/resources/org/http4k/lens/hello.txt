@@ -1,0 +1,14 @@
+--hello
+Content-Disposition: form-data; name="hello"
+
+world
+--hello
+Content-Disposition: form-data; name="another"
+
+123
+--hello
+Content-Disposition: form-data; name="file"; filename="hello.txt"
+Content-Type: text/html
+
+bits
+--hello--

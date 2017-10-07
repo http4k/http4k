@@ -3,6 +3,7 @@ package org.http4k.lens
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
+import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.with
 import java.io.InputStream
@@ -35,7 +36,9 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
         copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 }
 
-fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>): BiDiBodyLensSpec<MultipartForm> =
+val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
+
+fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, boundary: String = MULTIPART_BOUNDARY): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
             MultipartFormBody.from(target)
@@ -46,11 +49,27 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
             values.fold(target) { a, b ->
                 a.body(b)
-                    .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(UUID.randomUUID().toString()))
+                    .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
             }
         })
-        .map(Body::toMultipartForm, MultipartForm::toMultipartFormEntity)
+        .map(Body::toMultipartForm, { it.toMultipartFormEntity(boundary) })
         .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 
-fun Body.toMultipartForm() = MultipartForm()
-fun MultipartForm.toMultipartFormEntity() = MultipartFormBody()
+internal fun Body.toMultipartForm(): MultipartForm {
+    return MultipartForm()
+}
+
+internal fun MultipartForm.toMultipartFormEntity(boundary: String): MultipartFormBody {
+    val multipartFormBody = MultipartFormBody(boundary = boundary)
+    val withFields = fields.toList().fold(multipartFormBody) { memo, (name, values) ->
+        values.fold(memo) { memo2, next2 ->
+            memo2.plus(MultipartEntity.Form(name, next2))
+        }
+    }
+
+    return files.toList().fold(withFields) { memo, (name, values) ->
+        values.fold(memo) { memo2, (filename, contentType, content) ->
+            memo2.plus(MultipartEntity.File(name, filename, contentType, content))
+        }
+    }
+}
