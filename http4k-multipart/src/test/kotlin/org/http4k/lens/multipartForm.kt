@@ -8,16 +8,22 @@ import org.http4k.core.with
 import java.io.InputStream
 import java.util.*
 
-data class FormFile(val filename: String, val contentType: ContentType, val content: InputStream) {
-    companion object : BiDiLensSpec<MultipartForm, FormFile, FormFile>("form",
+object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
+    ParamMeta.StringParam,
+    LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
+    LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+)
+
+data class MultipartFormFile(val filename: String, val contentType: ContentType, val content: InputStream) {
+    companion object : BiDiLensSpec<MultipartForm, MultipartFormFile, MultipartFormFile>("form",
         ParamMeta.FileParam,
-        LensGet { name, form -> form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList() },
+        LensGet { name, form -> form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content) } ?: emptyList() },
         LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
     )
 }
 
 data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
-                         val files: Map<String, List<FormFile>> = emptyMap(),
+                         val files: Map<String, List<MultipartFormFile>> = emptyMap(),
                          val errors: List<Failure> = emptyList()) {
 
     @JvmName("plusField")
@@ -25,7 +31,7 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
         copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     @JvmName("plusFile")
-    operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
+    operator fun plus(kv: Pair<String, MultipartFormFile>): MultipartForm =
         copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 }
 
