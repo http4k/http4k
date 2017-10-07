@@ -33,7 +33,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     abstract fun serverConfig(port: Int): ServerConfig
     abstract fun createClient(): HttpHandler
 
-    var countdown: CountDownLatch = CountDownLatch(config.beeps * 2)
+    private var countdown: CountDownLatch = CountDownLatch(config.beeps * 2)
 
     val server = routes(
         "/stream-response" bind GET to { _: Request -> Response(Status.OK).body(beeper()) },
@@ -80,7 +80,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
             val responseStream = streamSource()
             var currentReceived: Long
 
-            responseStream.bufferedReader().forEachLine { line ->
+            responseStream.bufferedReader().forEachLine {
                 if (runningInIdea) println("received")
 
                 currentReceived = System.currentTimeMillis()

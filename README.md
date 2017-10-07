@@ -37,7 +37,7 @@ plugging together of services without HTTP container being required.
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
     * Pluggable HTTP client adapters for Apache and OkHttp
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp
-    * Typesafe, auto-validating, self-documenting (via Swagger) contracts for HTTP services
+    * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * AWS request signing: super-simple interactions with AWS services
@@ -71,7 +71,7 @@ plugging together of services without HTTP container being required.
     * Definite **Typesafe** HTTP contracts, defining required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **Swagger** description endpoints including **JSON Schema** model breakdown. 
+    * Self-documenting for all routes - eg. Built in support for live **OpenApi/Swagger** description endpoints including **JSON Schema** model breakdown. 
 * [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 

@@ -4,7 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v2.30.0 (uncut)
 - Multipart form support through new module `http4k-multipart`.
-- Deprecation: Replaced `FormValidator` with `Validator` and deprecated the former.
+- Deprecation: Replaced `Swagger` with `OpenApi` and deprecated the former (via typealias).
+- Deprecation: Replaced `FormValidator` with `Validator` and deprecated the former (via typealias).
 
 ### v2.29.4
 - Refactor release.

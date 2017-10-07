@@ -2,8 +2,8 @@ package guide.modules.contracts
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
+import org.http4k.contract.OpenApi
 import org.http4k.contract.RouteMeta
-import org.http4k.contract.Swagger
 import org.http4k.contract.bind
 import org.http4k.contract.bindContract
 import org.http4k.contract.body
@@ -48,14 +48,14 @@ fun echo(nameFromPath: String): HttpHandler = { request: Request ->
 }
 
 //3. Combining Routes into a contract and bind to a context
-//Finally, the `ContractRoutes` are added into a reusable `Contract` in the standard way, defining a renderer (in this example Swagger) and a security model (in this case an API-Key):
+//Finally, the `ContractRoutes` are added into a reusable `Contract` in the standard way, defining a renderer (in this example OpenApi/Swagger) and a security model (in this case an API-Key):
 
 val routeWithBindings = route to ::echo meta RouteMeta("echo")
 
 val security = ApiKey(Query.int().required("api"), { it == 42 })
 
 val handler: HttpHandler = routes(
-    "/api/v1" bind contract(Swagger(ApiInfo("My great API", "v1.0"), Argo), "", security,
+    "/api/v1" bind contract(OpenApi(ApiInfo("My great API", "v1.0"), Argo), "", security,
         routeWithBindings
     )
 )

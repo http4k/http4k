@@ -2,8 +2,8 @@ package cookbook.typesafe_http_contracts
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
+import org.http4k.contract.OpenApi
 import org.http4k.contract.RouteMeta
-import org.http4k.contract.Swagger
 import org.http4k.contract.bind
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
         it == 42
     })
 
-    val contract = contract(Swagger(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
+    val contract = contract(OpenApi(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
         "/add" / Path.int().of("value1") / Path.int().of("value2")
             bindContract GET
             to ::add
@@ -75,7 +75,7 @@ fun main(args: Array<String>) {
     val handler = routes(
         "/context" bind filter.then(contract),
         "/static" bind NoCache().then(static(Classpath("cookbook"))),
-        "/" bind contract(Swagger(ApiInfo("my great super api", "v1.0"), Argo),
+        "/" bind contract(OpenApi(ApiInfo("my great super api", "v1.0"), Argo),
             "/echo" / Path.of("name")
                 query ageQuery
                 bindContract GET to ::echo
@@ -90,5 +90,5 @@ fun main(args: Array<String>) {
 // Echo (fail):             curl -v "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42"
 // API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
 // Static content:          curl -v "http://localhost:8000/static/someStaticFile.txt"
-// Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
+// OpenApi/Swagger documentation:   curl -v "http://localhost:8000/context/docs/swagger.json"
 // Echo endpoint (at root): curl -v "http://localhost:8000/echo/hello?age=123"

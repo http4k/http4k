@@ -12,9 +12,10 @@ import util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
-private typealias ReasonToResponse = Pair<String, Response>
+@Deprecated("replace with OpenApi", ReplaceWith("OpenApi", "org.http4k.contract.OpenApi"))
+typealias Swagger<ROOT, NODE> = OpenApi<ROOT, NODE>
 
-class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
+class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
     private val errors = JsonErrorResponseRenderer(json)
@@ -37,10 +38,8 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
         return routes
             .groupBy { it.describeFor(contractRoot) }.entries
-            .fold(FieldsAndDefinitions<NODE>(), {
-                memo, (path, routes) ->
-                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), {
-                    memoFields, route ->
+            .fold(FieldsAndDefinitions<NODE>(), { memo, (path, routes) ->
+                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), { memoFields, route ->
                     memoFields.add(render(contractRoot, security, route))
                 })
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
@@ -91,8 +90,7 @@ class Swagger<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
     private fun render(responses: List<Pair<String, Response>>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
-            {
-                memo, (reason, response) ->
+            { memo, (reason, response) ->
                 val (node, definitions) = response.asSchema()
                 val newField = response.status.code.toString() to json.obj(
                     "description" to json.string(reason),
