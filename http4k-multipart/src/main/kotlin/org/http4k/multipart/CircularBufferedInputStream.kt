@@ -1,6 +1,5 @@
 package org.http4k.multipart
 
-import org.http4k.multipart.stream.BitFiddling
 import java.io.InputStream
 import java.nio.InvalidMarkException
 
