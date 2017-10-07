@@ -1,13 +1,10 @@
-package org.http4k.multipart
+package org.http4k.core
 
-import org.http4k.core.Body
-import org.http4k.core.ContentType
-import org.http4k.core.HttpMessage
 import org.http4k.lens.Header.Common.CONTENT_TYPE
-import org.http4k.multipart.internal.MultipartFormBuilder
-import org.http4k.multipart.internal.MultipartFormMap.formParts
-import org.http4k.multipart.internal.StreamingMultipartFormParts
-import org.http4k.multipart.internal.string
+import org.http4k.multipart.MultipartFormBuilder
+import org.http4k.multipart.MultipartFormMap.formParts
+import org.http4k.multipart.StreamingMultipartFormParts
+import org.http4k.multipart.string
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8

@@ -1,4 +1,4 @@
-package org.http4k.multipart.internal
+package org.http4k.multipart
 
 import java.io.IOException
 

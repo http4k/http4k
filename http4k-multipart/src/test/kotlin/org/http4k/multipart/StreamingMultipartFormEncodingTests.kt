@@ -1,6 +1,5 @@
-package org.http4k.multipart.internal
+package org.http4k.multipart
 
-import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Test
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets

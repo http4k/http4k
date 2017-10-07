@@ -1,8 +1,6 @@
-package org.http4k.multipart.internal
+package org.http4k.multipart
 
 import org.apache.commons.fileupload.util.ParameterParser
-import org.http4k.multipart.internal.part.StreamingPart
-import org.http4k.multipart.internal.stream.TokenBoundedInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset

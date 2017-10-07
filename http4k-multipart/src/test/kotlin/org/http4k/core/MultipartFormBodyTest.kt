@@ -1,8 +1,7 @@
-package org.http4k.multipart
+package org.http4k.core
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.ContentType
 import org.junit.Test
 
 class MultipartFormBodyTest {

@@ -1,11 +1,10 @@
-package org.http4k.multipart.internal
+package org.http4k.multipart
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
-import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Assert.fail
 import org.junit.Ignore
 import org.junit.Test

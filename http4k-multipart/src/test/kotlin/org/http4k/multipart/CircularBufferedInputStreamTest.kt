@@ -1,4 +1,4 @@
-package org.http4k.multipart.internal.stream
+package org.http4k.multipart
 
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo

@@ -1,10 +1,8 @@
-package org.http4k.multipart.internal
+package org.http4k.multipart
 
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
-import org.http4k.multipart.internal.part.Part
-import org.http4k.multipart.internal.part.StreamingPart
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Ignore

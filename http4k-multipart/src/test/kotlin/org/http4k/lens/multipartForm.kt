@@ -3,8 +3,8 @@ package org.http4k.lens
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
+import org.http4k.core.MultipartFormBody
 import org.http4k.core.with
-import org.http4k.multipart.MultipartFormBody
 import java.io.InputStream
 import java.util.*
 
