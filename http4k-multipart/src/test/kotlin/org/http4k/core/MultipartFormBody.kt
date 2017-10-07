@@ -15,7 +15,7 @@ sealed class MultipartEntity {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
-    data class Form(override val name: String, val value: String) : MultipartEntity() {
+    data class Field(override val name: String, val value: String) : MultipartEntity() {
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
     }
 
@@ -38,7 +38,7 @@ sealed class MultipartEntity {
     }
 }
 
-data class MultipartFormBody(private val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body {
+data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body {
 
     constructor(vararg formParts: MultipartEntity, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
@@ -46,7 +46,7 @@ data class MultipartFormBody(private val formParts: List<MultipartEntity>, val b
     fun files(name: String): List<MultipartEntity.File> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.File }
 
     fun field(name: String): String? = fields(name).firstOrNull()
-    fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Form }.map { it.value }
+    fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     companion object {
         private val DEFAULT_DISK_THRESHOLD = 10000
@@ -57,7 +57,7 @@ data class MultipartFormBody(private val formParts: List<MultipartEntity>, val b
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = formParts(form, UTF_8, diskThreshold, dir).map {
-                if (it.isFormField) MultipartEntity.Form(it.fieldName!!, it.string())
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string())
                 else MultipartEntity.File(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
             }
             return MultipartFormBody(parts, boundary)

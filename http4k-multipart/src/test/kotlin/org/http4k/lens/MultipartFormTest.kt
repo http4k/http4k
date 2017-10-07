@@ -51,14 +51,13 @@ class MultipartFormTest {
     fun `multipart form extracts ok form values`() {
         val request = emptyRequest.header("Content-Type", ContentType.MultipartFormWithBoundary("hello").value).body(validBody)
 
-        println(request)
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
         val stringField = MultipartFormField.required("hello")
         val intField = MultipartFormField.int().required("another")
         val aFile = MultipartFormFile.required("file")
 
-        assertThat(Body.multipartForm(Validator.Strict,stringField, intField, aFile).toLens()(request), equalTo(MultipartForm(expected)))
+        assertThat(Body.multipartForm(Validator.Strict, stringField, intField, aFile).toLens()(request), equalTo(MultipartForm(expected)))
     }
 
     @Test

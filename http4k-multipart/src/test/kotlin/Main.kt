@@ -18,7 +18,7 @@ import org.http4k.server.asServer
 fun main(args: Array<String>) {
 
     val form = MultipartFormBody(
-        MultipartEntity.Form("field", "value"),
+        MultipartEntity.Field("field", "value"),
         MultipartEntity.File("file", "file.yxy", ContentType.TEXT_HTML, "some html".byteInputStream())
     )
 

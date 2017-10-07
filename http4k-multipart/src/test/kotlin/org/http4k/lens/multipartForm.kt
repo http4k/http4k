@@ -51,24 +51,32 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
                     .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(boundary))
             }
         })
-        .map(Body::toMultipartForm, { it.toMultipartFormEntity(boundary) })
+        .map({ it.toMultipartForm() }, { it.toMultipartFormEntity(boundary) })
         .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 
 internal fun Body.toMultipartForm(): MultipartForm {
-    return MultipartForm()
+    return (this as MultipartFormBody).let {
+        it.formParts.fold(MultipartForm()) { memo, next ->
+            when (next) {
+                is MultipartEntity.File -> memo + (next.name to MultipartFormFile(next.filename, next.contentType, next.content))
+                is MultipartEntity.Field -> memo + (next.name to next.value)
+            }
+        }
+    }
 }
 
 internal fun MultipartForm.toMultipartFormEntity(boundary: String): MultipartFormBody {
-    val multipartFormBody = MultipartFormBody(boundary = boundary)
-    val withFields = fields.toList().fold(multipartFormBody) { memo, (name, values) ->
-        values.fold(memo) { memo2, next2 ->
-            memo2.plus(MultipartEntity.Form(name, next2))
+    val withFields = fields.toList()
+        .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
+            values.fold(body) { bodyMemo, fieldValue ->
+                bodyMemo.plus(MultipartEntity.Field(name, fieldValue))
+            }
         }
-    }
 
-    return files.toList().fold(withFields) { memo, (name, values) ->
-        values.fold(memo) { memo2, (filename, contentType, content) ->
-            memo2.plus(MultipartEntity.File(name, filename, contentType, content))
+    return files.toList()
+        .fold(withFields) { body, (name, values) ->
+            values.fold(body) { bodyMemo, (filename, contentType, content) ->
+                bodyMemo.plus(MultipartEntity.File(name, filename, contentType, content))
+            }
         }
-    }
 }
