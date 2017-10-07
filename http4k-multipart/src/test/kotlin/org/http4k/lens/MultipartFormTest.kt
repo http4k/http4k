@@ -38,7 +38,6 @@ class MultipartFormTest {
     }
 
     @Test
-    @Ignore
     fun `multipart form blows up if not correct content type`() {
         val request = emptyRequest.header("Content-Type", "unknown; boundary=hello").body(validBody)
 
