@@ -7,9 +7,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.toBody
 import org.http4k.core.with
-import org.junit.Ignore
 import org.junit.Test
 
 class MultipartFormTest {
@@ -20,19 +18,18 @@ class MultipartFormTest {
     private val requiredFile = MultipartFormFile.required("file")
 
     private val validBody = String(javaClass.getResourceAsStream("hello.txt").readBytes())
-    private val validFile = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
+    private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"
     private val CONTENT_TYPE_WITH_BOUNDARY = ContentType.MultipartFormWithBoundary(DEFAULT_BOUNDARY)
 
     @Test
-    @Ignore
     fun `multipart form serialized into request`() {
         val populatedRequest = emptyRequest.with(
             multipartFormLens(Validator.Strict) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
-                requiredFile of validFile
+                requiredFile of validFile()
             )
         )
 
@@ -41,7 +38,6 @@ class MultipartFormTest {
     }
 
     @Test
-    @Ignore
     fun `multipart form blows up if not correct content type`() {
         val request = emptyRequest.header("Content-Type", "unknown; boundary=hello").body(validBody)
 
@@ -51,49 +47,58 @@ class MultipartFormTest {
     }
 
     @Test
-    @Ignore
     fun `multipart form extracts ok form values`() {
         val request = emptyRequest.with(
             multipartFormLens(Validator.Strict) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
-                requiredFile of validFile
+                requiredFile of validFile()
             )
         )
-//        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody)
 
         val expected = MultipartForm(
             mapOf("hello" to listOf("world"),
                 "another" to listOf("123")),
-            mapOf("file" to listOf(validFile)))
+            mapOf("file" to listOf(validFile())))
         assertThat(multipartFormLens(Validator.Strict)(request), equalTo(expected))
     }
 
     @Test
-    @Ignore
     fun `feedback multipart form extracts ok form values and errors`() {
 
-        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body(validBody.dropLast(1))
+        val request = emptyRequest.with(
+            multipartFormLens(Validator.Feedback) of MultipartForm().with(
+                intRequiredField of 123,
+                requiredFile of validFile()
+            )
+        )
 
         val requiredString = MultipartFormField.required("hello")
-        assertThat(multipartFormLens(Validator.Feedback)(request), equalTo(MultipartForm(mapOf("another" to listOf("123")), emptyMap(), listOf(Missing(requiredString.meta)))))
+        assertThat(multipartFormLens(Validator.Feedback)(request), equalTo(MultipartForm(
+            mapOf("another" to listOf("123")),
+            mapOf("file" to listOf(validFile())),
+            listOf(Missing(requiredString.meta)))))
     }
 
     @Test
-    @Ignore
     fun `strict multipart form blows up with invalid form values`() {
-        val request = emptyRequest.header("Content-Type", CONTENT_TYPE_WITH_BOUNDARY.value).body("another=notANumber".toBody())
+        val intStringField = MultipartFormField.required("another")
 
-        val stringRequiredField = MultipartFormField.required("hello")
-        val intRequiredField = MultipartFormField.int().required("another")
+        val request = emptyRequest.with(
+            Body.multipartForm(Validator.Strict, stringRequiredField, intStringField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY).toLens() of
+                MultipartForm().with(
+                    stringRequiredField of "hello",
+                    intStringField of "world",
+                    requiredFile of validFile()
+                )
+        )
         assertThat(
             { multipartFormLens(Validator.Strict)(request) },
-            throws(lensFailureWith(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+            throws(lensFailureWith(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 
     @Test
-    @Ignore
     fun `can set multiple values on a form`() {
         val stringField = MultipartFormField.required("hello")
         val intField = MultipartFormField.int().required("another")
