@@ -16,6 +16,21 @@ object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
 )
 
 data class MultipartFormFile(val filename: String, val contentType: ContentType, val content: InputStream) {
+
+    private data class Realised(val filename: String, val contentType: ContentType, val content: String)
+
+    private val realised by lazy { Realised(filename, contentType, content.use { String(it.readBytes()) }) }
+
+    override fun toString(): String = realised.toString()
+
+    override fun equals(other: Any?): Boolean = when {
+        this === other -> true
+        other !is MultipartFormFile? -> false
+        else -> realised == other?.realised
+    }
+
+    override fun hashCode(): Int = realised.hashCode()
+
     companion object : BiDiLensSpec<MultipartForm, MultipartFormFile, MultipartFormFile>("form",
         ParamMeta.FileParam,
         LensGet { name, form -> form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content) } ?: emptyList() },

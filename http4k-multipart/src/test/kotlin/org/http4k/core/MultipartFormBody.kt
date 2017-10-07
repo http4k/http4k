@@ -20,11 +20,10 @@ sealed class MultipartEntity {
     }
 
     data class File(override val name: String, val filename: String, val contentType: ContentType, val content: InputStream) : MultipartEntity() {
-        private data class RealisedFormField(val name: String, val filename: String, val contentType: ContentType, val content: String)
 
-        private val realised by lazy { RealisedFormField(name, filename, contentType, content.use { String(it.readBytes()) }) }
+        private data class Realised(val name: String, val filename: String, val contentType: ContentType, val content: String)
 
-        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, filename, contentType.value, content)
+        private val realised by lazy { Realised(name, filename, contentType, content.use { String(it.readBytes()) }) }
 
         override fun toString(): String = realised.toString()
 
@@ -35,6 +34,8 @@ sealed class MultipartEntity {
         }
 
         override fun hashCode(): Int = realised.hashCode()
+
+        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, filename, contentType.value, content)
     }
 }
 

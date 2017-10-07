@@ -8,56 +8,55 @@ import org.http4k.core.ContentType
 import org.junit.Test
 
 class MultipartFormFileTest {
-    private val file1 = MultipartFormFile("world", ContentType.TEXT_HTML, "world".byteInputStream())
-    private val file2 = MultipartFormFile("world2", ContentType.TEXT_PLAIN, "world2".byteInputStream())
+    private fun file1() = MultipartFormFile("world", ContentType.TEXT_HTML, "world".byteInputStream())
+    private fun file2() = MultipartFormFile("world2", ContentType.TEXT_PLAIN, "world2".byteInputStream())
 
-    private val form = MultipartForm()
-        .plus("hello" to file1)
-        .plus("hello" to file2)
+    private fun form() = MultipartForm()
+        .plus("hello" to file1())
+        .plus("hello" to file2())
 
     @Test
     fun `value present`() {
-        assertThat(MultipartFormFile.optional("hello")(form), equalTo(file1))
-        assertThat(MultipartFormFile.required("hello")(form), equalTo(file1))
-        assertThat(MultipartFormFile.map { it.filename }.required("hello")(form), equalTo(file1.filename))
-        assertThat(MultipartFormFile.map { it.filename }.optional("hello")(form), equalTo(file1.filename))
+        assertThat(MultipartFormFile.optional("hello")(form()), equalTo(file1()))
+        assertThat(MultipartFormFile.required("hello")(form()), equalTo(file1()))
+        assertThat(MultipartFormFile.map { it.filename }.required("hello")(form()), equalTo(file1().filename))
+        assertThat(MultipartFormFile.map { it.filename }.optional("hello")(form()), equalTo(file1().filename))
 
-        val expected = listOf(file1, file2)
-        assertThat(MultipartFormFile.multi.required("hello")(form), equalTo(expected))
-        assertThat(MultipartFormFile.multi.optional("hello")(form), equalTo(expected))
+        assertThat(MultipartFormFile.multi.required("hello")(form()), equalTo(listOf(file1(), file2())))
+        assertThat(MultipartFormFile.multi.optional("hello")(form()), equalTo(listOf(file1(), file2())))
     }
 
     @Test
     fun `value missing`() {
-        assertThat(MultipartFormFile.optional("world")(form), absent())
+        assertThat(MultipartFormFile.optional("world")(form()), absent())
         val requiredFormFile = MultipartFormFile.required("world")
-        assertThat({ requiredFormFile(form) }, throws(lensFailureWith(Missing(requiredFormFile.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith(Missing(requiredFormFile.meta), overallType = Failure.Type.Missing)))
 
-        assertThat(MultipartFormFile.multi.optional("world")(form), absent())
+        assertThat(MultipartFormFile.multi.optional("world")(form()), absent())
         val optionalMultiFormFile = MultipartFormFile.multi.required("world")
-        assertThat({ optionalMultiFormFile(form) }, throws(lensFailureWith(Missing(optionalMultiFormFile.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith(Missing(optionalMultiFormFile.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).required("hello")
-        assertThat({ requiredFormFile(form) }, throws(lensFailureWith(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val optionalFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).optional("hello")
-        assertThat({ optionalFormFile(form) }, throws(lensFailureWith(Invalid(optionalFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalFormFile(form()) }, throws(lensFailureWith(Invalid(optionalFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormFile(form) }, throws(lensFailureWith(Invalid(requiredMultiFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMultiFormFile(form()) }, throws(lensFailureWith(Invalid(requiredMultiFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormFile(form) }, throws(lensFailureWith(Invalid(optionalMultiFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith(Invalid(optionalMultiFormFile.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
     fun `sets value on form`() {
         val formFile = MultipartFormFile.required("bob")
-        val withFormFile = formFile(file1, form)
-        assertThat(formFile(withFormFile), equalTo(file1))
+        val withFormFile = formFile(file1(), form())
+        assertThat(formFile(withFormFile), equalTo(file1()))
     }
 
     @Test
