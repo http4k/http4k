@@ -15,6 +15,7 @@ import org.junit.Test
 class MultipartFormTest {
 
     private val emptyRequest = Request(Method.GET, "")
+    private val validBody = String(javaClass.getResourceAsStream("hello.txt").readBytes())
 
     @Test
     fun `multipart form serialized into request`() {
@@ -31,34 +32,33 @@ class MultipartFormTest {
             )
         )
 
+        println(populatedRequest)
         assertThat(Header.Common.CONTENT_TYPE(populatedRequest), equalTo(ContentType.MultipartFormWithBoundary("hello")))
-        assertThat(populatedRequest.bodyString(), equalTo(String(this.javaClass.getResourceAsStream("hello.txt").readBytes())))
+        assertThat(populatedRequest.bodyString(), equalTo(validBody))
     }
 
     @Test
-    @Ignore
-    fun `multipart form blows up if not URL content type`() {
-        val request = emptyRequest.header("Content-Type", "unknown").body("hello=world&another=123".toBody())
+    fun `multipart form blows up if not correct content type`() {
+        val request = emptyRequest.header("Content-Type", "unknown; boundary=hello").body(validBody)
 
         assertThat({
-            Body.multipartForm(Validator.Strict,
-                MultipartFormField.required("hello"),
-                MultipartFormField.int().required("another")
-            ).toLens()(request)
+            Body.multipartForm(Validator.Strict, MultipartFormField.required("hello")).toLens()(request)
         }, throws(lensFailureWith(Unsupported(Header.Common.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
     @Ignore
     fun `multipart form extracts ok form values`() {
-        val request = emptyRequest.header("Content-Type", ContentType.APPLICATION_FORM_URLENCODED.value).body("hello=world&another=123".toBody())
+        val request = emptyRequest.header("Content-Type", ContentType.MultipartFormWithBoundary("hello").value).body(validBody)
 
+        println(request)
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
-        assertThat(Body.multipartForm(Validator.Strict,
-            MultipartFormField.required("hello"),
-            MultipartFormField.int().required("another")
-        ).toLens()(request), equalTo(MultipartForm(expected)))
+        val stringField = MultipartFormField.required("hello")
+        val intField = MultipartFormField.int().required("another")
+        val aFile = MultipartFormFile.required("file")
+
+        assertThat(Body.multipartForm(Validator.Strict,stringField, intField, aFile).toLens()(request), equalTo(MultipartForm(expected)))
     }
 
     @Test

@@ -41,7 +41,6 @@ val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
 fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, boundary: String = MULTIPART_BOUNDARY): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            MultipartFormBody.from(target)
             listOf(MultipartFormBody.from(target).apply {
                 ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.Common.CONTENT_TYPE(target))
             })
