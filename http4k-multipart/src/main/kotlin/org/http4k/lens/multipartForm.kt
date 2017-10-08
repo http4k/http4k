@@ -49,7 +49,7 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
                     .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(defaultBoundary))
             }
         })
-        .map({ it.toMultipartForm() }, { it.toMultipartFormEntity(defaultBoundary) })
+        .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
         .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 
 internal fun Body.toMultipartForm(): MultipartForm {
@@ -63,7 +63,7 @@ internal fun Body.toMultipartForm(): MultipartForm {
     }
 }
 
-internal fun MultipartForm.toMultipartFormEntity(boundary: String): MultipartFormBody {
+internal fun MultipartForm.toMultipartFormBody(boundary: String): MultipartFormBody {
     val withFields = fields.toList()
         .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
             values.fold(body) { bodyMemo, fieldValue ->
