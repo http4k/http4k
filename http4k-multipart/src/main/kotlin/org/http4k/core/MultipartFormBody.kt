@@ -19,23 +19,8 @@ sealed class MultipartEntity {
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
     }
 
-    data class File(override val name: String, val filename: String, val contentType: ContentType, val content: InputStream) : MultipartEntity() {
-
-        private data class Realised(val name: String, val filename: String, val contentType: ContentType, val content: String)
-
-        private val realised by lazy { Realised(name, filename, contentType, content.use { String(it.readBytes()) }) }
-
-        override fun toString(): String = realised.toString()
-
-        override fun equals(other: Any?): Boolean = when {
-            this === other -> true
-            other !is File? -> false
-            else -> realised == other?.realised
-        }
-
-        override fun hashCode(): Int = realised.hashCode()
-
-        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, filename, contentType.value, content)
+    data class File(override val name: String, val file: FormFile) : MultipartEntity() {
+        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content)
     }
 }
 
@@ -59,13 +44,17 @@ data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary:
 
             val parts = formParts(form, UTF_8, diskThreshold, dir).map {
                 if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string())
-                else MultipartEntity.File(it.fieldName!!, it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream)
+                else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
             }
             return MultipartFormBody(parts, boundary)
         }
     }
 
-    operator fun plus(part: MultipartEntity): MultipartFormBody = copy(formParts = formParts + part)
+    @JvmName("plusField")
+    fun plus(field: Pair<String, String>): MultipartFormBody = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
+
+    @JvmName("plusFile")
+    fun plus(field: Pair<String, FormFile>): MultipartFormBody = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
 
     override val stream: InputStream by lazy { formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream() }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }

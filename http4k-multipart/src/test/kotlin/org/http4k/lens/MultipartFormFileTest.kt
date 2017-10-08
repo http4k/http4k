@@ -5,11 +5,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType
+import org.http4k.core.FormFile
 import org.junit.Test
 
 class MultipartFormFileTest {
-    private fun file1() = MultipartFormFile("world", ContentType.TEXT_HTML, "world".byteInputStream())
-    private fun file2() = MultipartFormFile("world2", ContentType.TEXT_PLAIN, "world2".byteInputStream())
+    private fun file1() = FormFile("world", ContentType.TEXT_HTML, "world".byteInputStream())
+    private fun file2() = FormFile("world2", ContentType.TEXT_PLAIN, "world2".byteInputStream())
 
     private fun form() = MultipartForm()
         .plus("hello" to file1())

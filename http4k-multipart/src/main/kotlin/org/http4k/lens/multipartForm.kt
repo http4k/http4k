@@ -2,11 +2,11 @@ package org.http4k.lens
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.FormFile
 import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.with
-import java.io.InputStream
 import java.util.*
 
 object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
@@ -15,31 +15,14 @@ object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
 
-data class MultipartFormFile(val filename: String, val contentType: ContentType, val content: InputStream) {
-
-    private data class Realised(val filename: String, val contentType: ContentType, val content: String)
-
-    private val realised by lazy { Realised(filename, contentType, content.use { String(it.readBytes()) }) }
-
-    override fun toString(): String = realised.toString()
-
-    override fun equals(other: Any?): Boolean = when {
-        this === other -> true
-        other !is MultipartFormFile? -> false
-        else -> realised == other?.realised
-    }
-
-    override fun hashCode(): Int = realised.hashCode()
-
-    companion object : BiDiLensSpec<MultipartForm, MultipartFormFile, MultipartFormFile>("form",
-        ParamMeta.FileParam,
-        LensGet { name, form -> form.files[name]?.map { MultipartFormFile(it.filename, it.contentType, it.content) } ?: emptyList() },
-        LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
-    )
-}
+object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile, FormFile>("form",
+    ParamMeta.FileParam,
+    LensGet { name, form -> form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList() },
+    LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+)
 
 data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
-                         val files: Map<String, List<MultipartFormFile>> = emptyMap(),
+                         val files: Map<String, List<FormFile>> = emptyMap(),
                          val errors: List<Failure> = emptyList()) {
 
     @JvmName("plusField")
@@ -47,7 +30,7 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
         copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 
     @JvmName("plusFile")
-    operator fun plus(kv: Pair<String, MultipartFormFile>): MultipartForm =
+    operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
         copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
 }
 
@@ -73,7 +56,7 @@ internal fun Body.toMultipartForm(): MultipartForm {
     return (this as MultipartFormBody).let {
         it.formParts.fold(MultipartForm()) { memo, next ->
             when (next) {
-                is MultipartEntity.File -> memo + (next.name to MultipartFormFile(next.filename, next.contentType, next.content))
+                is MultipartEntity.File -> memo + (next.name to next.file)
                 is MultipartEntity.Field -> memo + (next.name to next.value)
             }
         }
@@ -84,14 +67,14 @@ internal fun MultipartForm.toMultipartFormEntity(boundary: String): MultipartFor
     val withFields = fields.toList()
         .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
             values.fold(body) { bodyMemo, fieldValue ->
-                bodyMemo.plus(MultipartEntity.Field(name, fieldValue))
+                bodyMemo.plus(name to fieldValue)
             }
         }
 
     return files.toList()
         .fold(withFields) { body, (name, values) ->
-            values.fold(body) { bodyMemo, (filename, contentType, content) ->
-                bodyMemo.plus(MultipartEntity.File(name, filename, contentType, content))
+            values.fold(body) { bodyMemo, file ->
+                bodyMemo.plus(name to file)
             }
         }
 }

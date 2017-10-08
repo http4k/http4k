@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
@@ -19,7 +20,7 @@ class MultipartFormTest {
     private val requiredFile = MultipartFormFile.required("file")
 
     private val validBody = javaClass.getResourceAsStream("hello.txt").reader().readText()
-    private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
+    private fun validFile() = FormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"
     private val CONTENT_TYPE_WITH_BOUNDARY = ContentType.MultipartFormWithBoundary(DEFAULT_BOUNDARY)

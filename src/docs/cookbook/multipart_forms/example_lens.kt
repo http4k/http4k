@@ -3,6 +3,7 @@ package cookbook.multipart_forms
 import org.http4k.client.ApacheClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -38,7 +39,7 @@ fun main(args: Array<String>) {
     // creating valid form using "with()" and setting it onto the request
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
-        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        imageFile of FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
     val validRequest = Request(Method.POST, "http://localhost:8000").with(strictFormBody of multipartform)
 
     println(ApacheClient()(validRequest))
