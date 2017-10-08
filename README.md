@@ -41,6 +41,7 @@ plugging together of services without HTTP container being required.
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * AWS request signing: super-simple interactions with AWS services
+    * Multipart form handling.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
     * Testing: Hamkrest Matchers for **http4k** objects
 
@@ -85,6 +86,8 @@ plugging together of services without HTTP container being required.
         * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo** - lightweight Java JSON API with zero dependencies.
         * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
+* [Multipart:](https://http4k.org/guide/modules/multipart) 
+    * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
