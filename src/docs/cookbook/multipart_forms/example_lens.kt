@@ -36,7 +36,8 @@ fun main(args: Array<String>) {
         Response(Status.OK)
     }.asServer(SunHttp(8000)).start()
 
-    // creating valid form using "with()" and setting it onto the request
+    // creating valid form using "with()" and setting it onto the request. The content type and boundary are
+    // taken care of automatically
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
         imageFile of FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
