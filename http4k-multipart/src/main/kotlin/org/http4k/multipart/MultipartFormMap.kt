@@ -12,7 +12,7 @@ import java.util.*
 internal object MultipartFormMap {
 
     /**
-     * Returns a Parts object containing a map of FieldName -> Part, serialised from parts using the encoding
+     * Returns a list of Parts, serialised from parts using the encoding
      * and maximum Part size specified. If a Part is bigger than the writeToDiskThreshold, then it will be written to
      * disk in temporaryFileDirectory (or the default temp dir if null).
      *
@@ -33,21 +33,6 @@ internal object MultipartFormMap {
      * be closed so that it is cleaned up after.
      * @throws IOException
      */
-
-    fun formMap(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): Parts {
-        val partMap = HashMap<String, List<Part>>()
-        val bytes = ByteArray(writeToDiskThreshold)
-
-        for (part in parts) {
-            if (part.fieldName == null) throw ParseError("no name for part")
-
-            val keyParts = (partMap[part.fieldName] ?: listOf()).let {
-                it + (serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
-            }
-            partMap.put(part.fieldName, keyParts)
-        }
-        return Parts(partMap)
-    }
 
     fun formParts(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): List<Part> {
         val result = mutableListOf<Part>()

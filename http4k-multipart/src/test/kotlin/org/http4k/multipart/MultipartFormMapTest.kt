@@ -36,16 +36,16 @@ class MultipartFormMapTest {
                 val streamingParts = StreamingMultipartFormParts.parse(
                     boundary, body, ISO_8859_1, maxStreamLength)
 
-                val parts = MultipartFormMap.formMap(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory!!)
-                parts.use {
-                    val articleType = it.partMap["articleType"]!![0]
+                val parts = MultipartFormMap.formParts(streamingParts, UTF_8, writeToDiskThreshold, temporaryFileDirectory!!)
+                parts.let {
+                    val articleType = it.parts("articleType")[0]
                     println(articleType.fieldName) // "articleType"
                     println(articleType.headers) // {Content-Disposition=form-data; name="articleType"}
                     println(articleType.length) // 8 bytes
                     println(articleType.isInMemory()) // true
                     println(articleType.string()) // "obituary"
 
-                    val simple7bit = it.partMap["uploadManuscript"]!![0]
+                    val simple7bit = it.parts("uploadManuscript")[0]
                     println(simple7bit.fieldName) // "uploadManuscript"
                     println(simple7bit.fileName) // "simple7bit.txt"
                     println(simple7bit.headers) // {Content-Disposition => form-data; name="uploadManuscript"; filename="simple7bit.txt"
@@ -73,14 +73,13 @@ class MultipartFormMapTest {
             .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
-        val parts = MultipartFormMap.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)
-        val partMap = parts.partMap
+        val parts = MultipartFormMap.formParts(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)
 
-        assertThat<String>(partMap["file"]!![0].fileName, equalTo("foo.tab"))
-        assertThat<String>(partMap["anotherFile"]!![0].fileName, equalTo("BAR.tab"))
-        compareOneStreamToAnother(partMap["field"]!![0].newInputStream, ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
-        compareOneStreamToAnother(partMap["multi"]!![0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
-        compareOneStreamToAnother(partMap["multi"]!![1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
+        assertThat<String>(parts.parts("file")[0].fileName, equalTo("foo.tab"))
+        assertThat<String>(parts.parts("anotherFile")[0].fileName, equalTo("BAR.tab"))
+        compareOneStreamToAnother(parts.parts("field")[0].newInputStream, ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
+        compareOneStreamToAnother(parts.parts("multi")[0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
+        compareOneStreamToAnother(parts.parts("multi")[1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
         parts.close()
     }
 
@@ -88,11 +87,9 @@ class MultipartFormMapTest {
     fun canLoadComplexRealLifeSafariExample() {
         val form = safariExample()
 
-        val parts = MultipartFormMap.formMap(form, UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY)
-        val partMap = parts.partMap
-        allFieldsAreLoadedCorrectly(partMap, true, true, true, true)
-        parts.close()
-
+        val parts = MultipartFormMap.formParts(form, UTF_8, 1024000, TEMPORARY_FILE_DIRECTORY)
+        allFieldsAreLoadedCorrectly(parts, true, true, true, true)
+        parts.forEach { it.close() }
     }
 
     @Test
@@ -105,7 +102,7 @@ class MultipartFormMapTest {
         )
 
         try {
-            MultipartFormMap.formMap(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)
+            MultipartFormMap.formParts(form, UTF_8, 1024, TEMPORARY_FILE_DIRECTORY)
             fail("should have failed because the form is too big")
         } catch (e: Throwable) {
             assertThat<String>(e.message, containsString("Form contents was longer than 1024 bytes"))
@@ -116,10 +113,9 @@ class MultipartFormMapTest {
     fun savesAllPartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormMap.formMap(form, UTF_8, 100, TEMPORARY_FILE_DIRECTORY)
-        val partMap = parts.partMap
+        val parts = MultipartFormMap.formParts(form, UTF_8, 100, TEMPORARY_FILE_DIRECTORY)
 
-        allFieldsAreLoadedCorrectly(partMap, false, false, false, false)
+        allFieldsAreLoadedCorrectly(parts, false, false, false, false)
 
         assertThat(temporaryFileList()!!.size, equalTo(4))
         parts.close()
@@ -130,10 +126,9 @@ class MultipartFormMapTest {
     fun savesSomePartsToDisk() {
         val form = safariExample()
 
-        val parts = MultipartFormMap.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)
-        val partMap = parts.partMap
+        val parts = MultipartFormMap.formParts(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)
 
-        allFieldsAreLoadedCorrectly(partMap, false, true, true, false)
+        allFieldsAreLoadedCorrectly(parts, false, true, true, false)
 
         val files = temporaryFileList()
         assertPartSaved("simple7bit.txt", files)
@@ -157,7 +152,7 @@ class MultipartFormMapTest {
             UTF_8)
 
         try {
-            MultipartFormMap.formMap(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)
+            MultipartFormMap.formParts(form, UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY)
             fail("Should have thrown an Exception")
         } catch (e: Throwable) {
             assertThat<String>(e.message, containsString("Boundary must be proceeded by field separator, but didn't find it"))
@@ -170,17 +165,17 @@ class MultipartFormMapTest {
         UTF_8
     )
 
-    private fun allFieldsAreLoadedCorrectly(partMap: Map<String, List<Part>>, simple7bit: Boolean, file: Boolean, txt: Boolean, jpeg: Boolean) {
+    private fun allFieldsAreLoadedCorrectly(partMap: List<Part>, simple7bit: Boolean, file: Boolean, txt: Boolean, jpeg: Boolean) {
+        assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[0], "simple7bit.txt", simple7bit)
+        assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[2], "utf8\uD83D\uDCA9.file", file)
 
-        assertFileIsCorrect(partMap["uploadManuscript"]!![0], "simple7bit.txt", simple7bit)
-        assertFileIsCorrect(partMap["uploadManuscript"]!![2], "utf8\uD83D\uDCA9.file", file)
-
-        val articleType = partMap["articleType"]!![0]
+        val articleType = partMap.filter { it.fieldName == "articleType" }[0]
         assertTrue("articleType", articleType.isInMemory())
         assertThat(articleType.string(), equalTo("obituary"))
 
-        assertFileIsCorrect(partMap["uploadManuscript"]!![3], "utf8\uD83D\uDCA9.txt", txt)
-        assertFileIsCorrect(partMap["uploadManuscript"]!![1], "starbucks.jpeg", jpeg)
+        assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[3], "utf8\uD83D\uDCA9.txt", txt)
+        assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[1], "starbucks.jpeg", jpeg)
+
     }
 
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
@@ -188,7 +183,6 @@ class MultipartFormMapTest {
             "couldn't find " + fileName + " in " + Arrays.toString(files),
             files!![0].contains(fileName) || files[1].contains(fileName))
     }
-
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
         assertFileIsCorrect(filePart, expectedFilename, filePart.newInputStream, inMemory)
@@ -210,5 +204,9 @@ class MultipartFormMapTest {
         }
     }
 }
+
+private fun List<Part>.close() = forEach(Part::close)
+
+private fun List<Part>.parts(name:String): List<Part> = filter { it.fieldName == name }
 
 internal fun Part.isInMemory(): Boolean = this is Part.InMemory
