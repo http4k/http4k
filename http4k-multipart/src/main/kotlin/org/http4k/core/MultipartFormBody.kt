@@ -5,26 +5,32 @@ import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormMap.formParts
 import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
+import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
 import java.util.*
 
-sealed class MultipartEntity {
+sealed class MultipartEntity : Closeable {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
     data class Field(override val name: String, val value: String) : MultipartEntity() {
+        override fun close() = Unit
+
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
     }
 
     data class File(override val name: String, val file: FormFile) : MultipartEntity() {
+        override fun close() = file.content.close()
+
         override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content)
     }
 }
 
-data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body {
+data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+    override fun close() = formParts.forEach(MultipartEntity::close)
 
     constructor(vararg formParts: MultipartEntity, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
 
