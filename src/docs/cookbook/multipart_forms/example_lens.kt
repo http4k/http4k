@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator
-    val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile).toLens()
+    val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
 
     val server = ServerFilters.CatchAll().then { r: Request ->
 

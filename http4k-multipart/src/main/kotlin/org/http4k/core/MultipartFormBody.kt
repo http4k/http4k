@@ -42,7 +42,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     companion object {
-        val DEFAULT_DISK_THRESHOLD = 10000
+        val DEFAULT_DISK_THRESHOLD = 1000 * 1024
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
@@ -69,6 +69,6 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
 }
 
 internal fun Part.string(diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): String = when (this) {
-    is Part.DiskBacked -> throw RuntimeException("Field should not be greater than $diskThreshold bytes")
+    is Part.DiskBacked -> throw RuntimeException("Fields configured to not be greater than $diskThreshold bytes.")
     is Part.InMemory -> String(bytes, encoding)
 }
