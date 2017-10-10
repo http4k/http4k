@@ -29,7 +29,7 @@ sealed class MultipartEntity : Closeable {
     }
 }
 
-data class MultipartFormBody private constructor(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+data class MultipartFormBody private constructor(internal val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
 
