@@ -107,47 +107,8 @@ Once the lens is declared, you can use it on a target object to either get or se
 - Retrieving a value: use `<lens>.extract(<target>)`, or the more concise invoke form: `<lens>(<target>)`
 - Setting a value: use `<lens>.inject(<value>, <target>)`, or the more concise invoke form: `<lens>(<value>, <target>)`
 
-```kotlin
-val pathLocalDate = Path.localDate().of("date")
-val requiredQuery = Query.required("myQueryName")
-val nonEmptyQuery = Query.nonEmptyString().required("myNonEmptyQuery")
-val optionalHeader = Header.int().optional("Content-Length")
-val responseBody = Body.string(PLAIN_TEXT).toLens()
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/example.kt"></script>
 
-// Most of the useful common JDK types are covered. However, if we want to use our own types, we can just use `map()`
-data class CustomType(val value: String)
-val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
-
-//To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
-val handler = routes(
-    "/hello/{date:*}" bind GET to { request: Request -> 
-         val pathDate: LocalDate = pathLocalDate(request) 
-         // SAME AS: 
-         // val pathDate: LocalDate = pathLocalDate.extract(request)
-         
-         val customType: CustomType = requiredCustomQuery(request)
-         val anIntHeader: Int? = optionalHeader(request)
-
-         val baseResponse = Response(OK)
-         val responseWithHeader = optionalHeader(anIntHeader, baseResponse)
-         // SAME AS:
-         // val responseWithHeader = optionalHeader.inject(anIntHeader, baseResponse)
-         
-         responseBody("you sent $pathDate and $customType", responseWithHeader) 
-      }
-)
-
-val app = ServerFilters.CatchLensFailure.then(handler(Request(Method.GET, "/hello/2000-01-01?myCustomType=someValue")))
-//With the addition of the `CatchLensFailure` filter, no other validation is required when using Lenses, as **http4k** will handle invalid requests by returning a BAD_REQUEST (400) response.
-
-//More conveniently for construction of HTTP messages, multiple lenses can be used at once to modify a message, which is useful for properly building both requests and responses in a typesafe way without resorting to string values (especially in URLs which should never be constructed using String concatenation):
-
-val modifiedRequest: Request = Request(Method.GET, "http://google.com/{pathLocalDate}").with(
-    pathLocalDate of LocalDate.now(),
-    requiredQuery of "myAmazingString",
-    optionalHeader of 123
-)
-```
 ### Serving static assets
 For serving static assets, just bind a path to a Static block as below, using either a Classpath or HotReload based ResourceLoader instance. Typically, HotReload is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
 ```kotlin
