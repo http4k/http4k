@@ -2,8 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.31.0 (uncut)
+### v2.31.0
 - Multipart module tweaked to provide a more consistent API.
+- Fix FollowRedirects for POST/PUT request
 
 ### v2.30.0
 - Multipart form support through new module `http4k-multipart`.

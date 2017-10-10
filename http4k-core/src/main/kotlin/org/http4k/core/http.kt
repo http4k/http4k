@@ -79,6 +79,8 @@ interface Request : HttpMessage {
     val method: Method
     val uri: Uri
 
+    fun method(method: Method): Request
+
     fun uri(uri: Uri): Request
 
     fun query(name: String, value: String): Request
@@ -108,6 +110,8 @@ interface Request : HttpMessage {
 }
 
 data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
+    override fun method(method: Method): Request = copy(method = method)
+
     override fun uri(uri: Uri) = copy(uri = uri)
 
     override fun query(name: String, value: String) = copy(uri = uri.query(name, value))

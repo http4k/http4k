@@ -30,6 +30,7 @@ class ClientFiltersTest {
             "/absolute-redirect" -> Response(Status.MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
             "/redirect-with-charset" -> Response(Status.MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
             "/destination" -> Response(OK).body("destination")
+            "/ok" -> Response(Status.OK).body("ok")
             else -> Response(Status.OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
@@ -44,17 +45,17 @@ class ClientFiltersTest {
 
     @Test
     fun `follows redirect for temporary redirect response`() {
-        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(Status.OK)))
+        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(Status.OK).body("ok")))
     }
 
     @Test
-    fun `does not follow redirect for post`() {
-        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+    fun `follows redirect for post`() {
+        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(Status.OK).body("ok")))
     }
 
     @Test
-    fun `does not follow redirect for put`() {
-        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+    fun `follows redirect for put`() {
+        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(Status.OK).body("ok")))
     }
 
     @Test
@@ -64,7 +65,7 @@ class ClientFiltersTest {
 
     @Test
     fun `discards query parameters in relative redirects`() {
-        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(Status.OK)))
+        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(Status.OK).body("ok")))
     }
 
     @Test

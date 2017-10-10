@@ -63,15 +63,18 @@ object ClientFilters {
 
         private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response {
             val response = next(request)
-            return if (response.isRedirection() && request.allowsRedirection()) {
+            return if (response.isRedirection()) {
                 if (attempt == 10) throw IllegalStateException("Too many redirection")
                 val location = response.header("location")?.removeCharset().orEmpty()
                 response.assureBodyIsConsumed()
-                makeRequest(next, request.uri(request.newLocation(location)), attempt + 1)
+                makeRequest(next, request.ensureValidMethod().uri(request.newLocation(location)), attempt + 1)
             } else {
                 response
             }
         }
+
+        private fun Request.ensureValidMethod(): Request =
+            if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)
 
         private fun Request.newLocation(location: String): Uri {
             val locationUri = Uri.of(location)
@@ -85,8 +88,6 @@ object ClientFilters {
         private fun Response.isRedirection(): Boolean {
             return status.redirection && header("location")?.let(String::isNotBlank) == true
         }
-
-        private fun Request.allowsRedirection(): Boolean = method != Method.POST && method != Method.PUT
 
         private fun String.removeCharset(): String = this.replace(";\\s*charset=.*$".toRegex(), "")
     }
