@@ -1,16 +1,9 @@
 package org.http4k.filter
 
 import org.http4k.base64Encode
-import org.http4k.core.Credentials
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Uri
+import org.http4k.core.*
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
-import org.http4k.core.then
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
@@ -65,31 +58,12 @@ object ClientFilters {
             val response = next(request)
             return if (response.isRedirection()) {
                 if (attempt == 10) throw IllegalStateException("Too many redirection")
-                val location = response.header("location")?.removeCharset().orEmpty()
                 response.assureBodyIsConsumed()
-                makeRequest(next, request.ensureValidMethod().uri(request.newLocation(location)), attempt + 1)
+                makeRequest(next, request.toNewLocation(response.location()), attempt + 1)
             } else {
                 response
             }
         }
-
-        private fun Request.ensureValidMethod(): Request =
-            if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)
-
-        private fun Request.newLocation(location: String): Uri {
-            val locationUri = Uri.of(location)
-            return if (locationUri.host.isBlank()) {
-                locationUri.authority(uri.authority).scheme(uri.scheme)
-            } else locationUri
-        }
-
-        private fun Response.assureBodyIsConsumed() = body.stream.close()
-
-        private fun Response.isRedirection(): Boolean {
-            return status.redirection && header("location")?.let(String::isNotBlank) == true
-        }
-
-        private fun String.removeCharset(): String = this.replace(";\\s*charset=.*$".toRegex(), "")
     }
 
     object Cookies {
