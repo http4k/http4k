@@ -1,11 +1,8 @@
 package org.http4k.webdriver
 
 
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Status
-import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.openqa.selenium.Alert
@@ -33,11 +30,17 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
         val requestWithCookies = siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
-        val response = handler(requestWithCookies)
-        response.cookies().forEach {
+        val response = getResponseFollowingRedirects(requestWithCookies)
+
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
+    }
+
+    private fun getResponseFollowingRedirects(requestWithCookies: Request): Response {
+        val res = handler(requestWithCookies)
+        res.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
         }
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
+        return res
     }
 
     fun normalized(path: String): String {
