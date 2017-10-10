@@ -12,20 +12,16 @@ class MultipartFormBodyTest {
 
     @Test
     fun `roundtrip`() {
-        val form = MultipartFormBody(listOf(
-            MultipartEntity.Field("field", "bar"),
-            MultipartEntity.File("file", FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
-        ), "bob")
+        val form = MultipartFormBody("bob").plus("field" to "bar")
+            .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
             .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
         MultipartFormBody.from(req) shouldMatch equalTo(
-            MultipartFormBody(listOf(
-                MultipartEntity.Field("field", "bar"),
-                MultipartEntity.File("file", FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
-            ), "bob")
+            MultipartFormBody("bob").plus("field" to "bar")
+                .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
         )
     }
 
@@ -69,8 +65,8 @@ class MultipartFormBodyTest {
     }
 
     private fun List<TestInputStream>.toMultipartForm() =
-        MultipartFormBody(
-            foldIndexed(listOf<MultipartEntity>(), { index, acc, stream -> acc.plus(MultipartEntity.File("file$index", FormFile("foo$index.txt", ContentType.TEXT_PLAIN, stream))) }))
+        foldIndexed(MultipartFormBody())
+        { index, acc, stream -> acc.plus("file$index" to FormFile("foo$index.txt", ContentType.TEXT_PLAIN, stream)) }
 
     private class TestInputStream(private var text: String) : InputStream() {
         private val stream = text.byteInputStream()

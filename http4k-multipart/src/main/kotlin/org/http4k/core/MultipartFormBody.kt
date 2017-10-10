@@ -29,13 +29,14 @@ sealed class MultipartEntity : Closeable {
     }
 }
 
-data class MultipartFormBody(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+data class MultipartFormBody private constructor(val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+
+    constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
+
     override fun close() = formParts.forEach(MultipartEntity::close)
 
-    constructor(vararg formParts: MultipartEntity, boundary: String = UUID.randomUUID().toString()) : this(formParts.toList(), boundary)
-
-    fun file(name: String): MultipartEntity.File? = files(name).firstOrNull()
-    fun files(name: String): List<MultipartEntity.File> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.File }
+    fun file(name: String): FormFile? = files(name).firstOrNull()
+    fun files(name: String): List<FormFile> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.File }.map { it.file }
 
     fun field(name: String): String? = fields(name).firstOrNull()
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
