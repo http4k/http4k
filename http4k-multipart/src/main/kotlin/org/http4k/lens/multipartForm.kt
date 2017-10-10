@@ -57,13 +57,11 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
         .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })
         .map({ it.copy(errors = validator(it, *parts)) }, { it.copy(errors = validator(it, *parts)) })
 
-internal fun Body.toMultipartForm(): MultipartForm {
-    return (this as MultipartFormBody).let {
-        it.formParts.fold(MultipartForm()) { memo, next ->
-            when (next) {
-                is MultipartEntity.File -> memo + (next.name to next.file)
-                is MultipartEntity.Field -> memo + (next.name to next.value)
-            }
+internal fun Body.toMultipartForm(): MultipartForm = (this as MultipartFormBody).let {
+    it.formParts.fold(MultipartForm()) { memo, next ->
+        when (next) {
+            is MultipartEntity.File -> memo + (next.name to next.file)
+            is MultipartEntity.Field -> memo + (next.name to next.value)
         }
     }
 }
