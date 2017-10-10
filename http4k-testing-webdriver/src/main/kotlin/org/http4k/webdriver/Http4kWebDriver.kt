@@ -29,16 +29,18 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private val siteCookies = mutableMapOf<String, Cookie>()
 
     private fun navigateTo(request: Request) {
-        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
-        val requestWithCookies = siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
-        val (response, finalURI) = getResponseFollowingRedirects(requestWithCookies)
-
+        val (response, finalURI) = getResponseFollowingRedirects(request)
         current = Page(response.status, this::navigateTo, UUID.randomUUID(), finalURI, response.bodyString(), current)
+    }
+
+    private fun addCookiesToRequest(request: Request): Request{
+        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+        return siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
     }
 
     private fun getResponseFollowingRedirects(request: Request, attempt: Int = 0): Pair<Response, String> {
 
-        val res = handler(request)
+        val res = handler(addCookiesToRequest(request))
         res.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
         }
