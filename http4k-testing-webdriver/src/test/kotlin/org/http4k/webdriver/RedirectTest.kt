@@ -12,6 +12,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.Ignore
 import org.junit.Test
+import org.openqa.selenium.Cookie
 import org.http4k.core.cookie.Cookie as HCookie
 
 class RedirectTest {
@@ -30,6 +31,7 @@ class RedirectTest {
     fun `follows redirects and sets cookies`() {
         driver.get("/")
         assertThat(driver.currentUrl, equalTo("/final-destination"))
+        assertThat(driver.manage().cookies.contains(Cookie("http4k", "hello, cookie")), equalTo(true)) //todo: bleh
     }
 
 }
