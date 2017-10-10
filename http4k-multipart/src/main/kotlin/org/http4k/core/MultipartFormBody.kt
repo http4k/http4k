@@ -42,7 +42,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     companion object {
-        internal val DEFAULT_DISK_THRESHOLD = 10000
+        val DEFAULT_DISK_THRESHOLD = 10000
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""

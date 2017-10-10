@@ -41,10 +41,10 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
 
-fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY): BiDiBodyLensSpec<MultipartForm> =
+fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY, diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
         LensGet { _, target ->
-            listOf(MultipartFormBody.from(target).apply {
+            listOf(MultipartFormBody.from(target, diskThreshold).apply {
                 ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.Common.CONTENT_TYPE(target))
             })
         },
