@@ -21,8 +21,7 @@ For our purposes, we needed something that:
 
 **http4k** ticks all of these boxes. 
 
-It allow us to construct entire suites of services which can be tested either wired together without HTTP, or spun up in containers 
-in 1 LOC. The symmetric HTTP API also allows Filter chains (often called "Middleware" or "Interceptors" in other frameworks) to be constructed into reusable units/stacks for both 
+It allow us to construct entire suites of services which can be tested either wired together without HTTP, or spun up in containers using a single line of code. The symmetric HTTP API also allows Filter chains (often called "Middleware" or "Interceptors" in other frameworks) to be constructed into reusable units/stacks for both 
 server and client sides (eg. logging/metrics/caching...) since they can be composed together for later use. 
 
 As a bonus, we can also easily create simple Fake servers for any HTTP contract, which means (in combination with CDC suites) you can end-to-end test micro-services in an outside-in way (using GOOS-style acceptance tests).
