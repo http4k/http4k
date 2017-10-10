@@ -42,7 +42,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     companion object {
-        private val DEFAULT_DISK_THRESHOLD = 10000
+        internal val DEFAULT_DISK_THRESHOLD = 10000
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
@@ -50,7 +50,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = formParts(form, UTF_8, diskThreshold, dir).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string())
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold))
                 else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
             }
             return MultipartFormBody(parts, boundary)
@@ -68,7 +68,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     override fun toString(): String = String(payload.array())
 }
 
-internal fun Part.string(): String = when (this) {
-    is Part.DiskBacked -> throw RuntimeException("wat?")
+internal fun Part.string(diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): String = when (this) {
+    is Part.DiskBacked -> throw RuntimeException("Field should not be greater than $diskThreshold bytes")
     is Part.InMemory -> String(bytes, encoding)
 }

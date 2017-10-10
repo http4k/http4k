@@ -8,7 +8,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ServerFilters
 import org.http4k.lens.MultipartForm
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
@@ -27,11 +29,14 @@ fun main(args: Array<String>) {
     // add fields to a form definition, along with a validator
     val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile).toLens()
 
-    val server = { r: Request ->
+    val server = ServerFilters.CatchAll().then { r: Request ->
+
         // to extract the contents, we first extract the form and then extract the fields from it using the lenses
-        val validForm = strictFormBody.extract(r)
-        println(nameField.extract(validForm))
-        println(imageFile.extract(validForm))
+        // NOTE: we are "using" the form body here because we want to close the underlying file streams
+        strictFormBody.extract(r).use {
+            println(nameField.extract(it))
+            println(imageFile.extract(it))
+        }
 
         Response(Status.OK)
     }.asServer(SunHttp(8000)).start()

@@ -1,8 +1,12 @@
 package org.http4k.core
 
+import java.io.Closeable
 import java.io.InputStream
 
-data class FormFile(val filename: String, val contentType: ContentType, val content: InputStream) {
+data class FormFile(val filename: String, val contentType: ContentType, val content: InputStream) : Closeable {
+    override fun close() {
+        content.close()
+    }
 
     private data class Realised(val filename: String, val contentType: ContentType, val content: String)
 

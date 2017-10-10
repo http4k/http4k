@@ -7,6 +7,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.with
+import java.io.Closeable
 import java.util.*
 
 object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
@@ -23,7 +24,11 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile, FormFile>("form
 
 data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
                          val files: Map<String, List<FormFile>> = emptyMap(),
-                         val errors: List<Failure> = emptyList()) {
+                         val errors: List<Failure> = emptyList()) : Closeable {
+
+    override fun close() {
+        files.values.flatten().forEach(FormFile::close)
+    }
 
     @JvmName("plusField")
     operator fun plus(kv: Pair<String, String>): MultipartForm =
