@@ -5,6 +5,7 @@ import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.filter.ClientFilters
 import org.openqa.selenium.Alert
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
@@ -30,17 +31,26 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
         val requestWithCookies = siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
-        val response = getResponseFollowingRedirects(requestWithCookies)
+        val (response, finalURI) = getResponseFollowingRedirects(requestWithCookies)
 
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), finalURI, response.bodyString(), current)
     }
 
-    private fun getResponseFollowingRedirects(requestWithCookies: Request): Response {
-        val res = handler(requestWithCookies)
+    private fun getResponseFollowingRedirects(request: Request, attempt: Int = 0): Pair<Response, String> {
+
+        val res = handler(request)
         res.cookies().forEach {
             siteCookies.put(it.name, it.toWebDriver())
         }
-        return res
+
+        return if (res.isRedirection()) {
+            if (attempt == 10) throw IllegalStateException("Too many redirection")
+            res.assureBodyIsConsumed()
+            val newRequest = request.toNewLocation(res.location())
+            getResponseFollowingRedirects(newRequest, attempt + 1)
+        } else {
+            res to request.uri.toString()
+        }
     }
 
     fun normalized(path: String): String {

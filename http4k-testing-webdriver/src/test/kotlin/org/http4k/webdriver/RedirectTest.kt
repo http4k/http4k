@@ -27,7 +27,6 @@ class RedirectTest {
     private val driver = Http4kWebDriver(redirectingHandler)
 
     @Test
-    @Ignore
     fun `follows redirects and sets cookies`() {
         driver.get("/")
         assertThat(driver.currentUrl, equalTo("/final-destination"))
