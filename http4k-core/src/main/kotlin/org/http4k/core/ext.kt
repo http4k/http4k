@@ -1,6 +1,16 @@
 package org.http4k.core
 
-private fun Request.ensureValidMethod(): Request =
+fun Request.toNewLocation(location: String) = ensureValidMethodForRedirect().uri(newLocation(location))
+
+fun Response.location() = header("location")?.replace(";\\s*charset=.*$".toRegex(), "").orEmpty()
+
+fun Response.assureBodyIsConsumed() = body.stream.close()
+
+fun Response.isRedirection(): Boolean {
+    return status.redirection && header("location")?.let(String::isNotBlank) == true
+}
+
+private fun Request.ensureValidMethodForRedirect(): Request =
     if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)
 
 private fun Request.newLocation(location: String): Uri {
@@ -10,14 +20,3 @@ private fun Request.newLocation(location: String): Uri {
     } else locationUri
 }
 
-fun Request.toNewLocation(location: String) = ensureValidMethod().uri(newLocation(location))
-
-fun Response.location() = header("location")?.removeCharset().orEmpty()
-
-fun Response.assureBodyIsConsumed() = body.stream.close()
-
-fun Response.isRedirection(): Boolean {
-    return status.redirection && header("location")?.let(String::isNotBlank) == true
-}
-
-private fun String.removeCharset(): String = this.replace(";\\s*charset=.*$".toRegex(), "")
