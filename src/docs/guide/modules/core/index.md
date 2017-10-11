@@ -7,7 +7,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - Immutable versions of the HTTP spec objects (Request, Response, Cookies etc).
 - HTTP handler and filter abstractions which models services as simple, composable functions.
 - Simple routing implementation, plus `HttpHandlerServlet` to enable plugging into any Servlet engine. 
-- [Lens](https://www21.in.tum.de/teaching/fp/SS15/papers/17.pdf) mechanism for typesafe destructuring and construction of HTTP messages.
+- [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) mechanism for typesafe destructuring and construction of HTTP messages.
 - Typesafe Request Context operations using Lenses.
 - Abstractions for Servers, Clients, JSON Message formats, Templating etc.
 - `SunHttp` Single-LOC development Server-backend
