@@ -18,19 +18,23 @@ import org.http4k.core.cookie.Cookie as HCookie
 
 class RedirectTest {
 
-    private val startingURI = "/"
-    private val finalURI = "/final-destination"
+    private val startingUrl = "/"
+    private val finalUrl = "/final-destination"
     private val cookieKey = "http4k"
     private val cookieValue = "hello, cookie. give me more cookie"
 
+    private var cookiesSentToFinalDestination = listOf<HCookie>()
+
     private val redirectingHandler = routes(
-        finalURI bind Method.GET to { req: Request -> {
-            println("cookies ${req.cookies()}") //todo: somehow need to test that all cookies were sent
-            Response(OK).body("You made it!")
-        }() },
-        startingURI bind Method.GET to { _: Request ->
+        finalUrl bind Method.GET to { req: Request ->
+            {
+                cookiesSentToFinalDestination = req.cookies()
+                Response(OK).body("You made it!")
+            }()
+        },
+        startingUrl bind Method.GET to { _: Request ->
             Response(SEE_OTHER)
-                .header("Location", finalURI)
+                .header("Location", finalUrl)
                 .cookie(org.http4k.core.cookie.Cookie(cookieKey, cookieValue))
         }
     )
@@ -43,12 +47,19 @@ class RedirectTest {
         val redirectAddedCookie = Cookie(cookieKey, cookieValue)
 
         driver.manage().addCookie(someOtherCookie)
-        driver.get(startingURI)
 
-        assertThat(driver.currentUrl, equalTo(finalURI))
+        driver.get(startingUrl)
 
+        assertThat(driver.currentUrl, equalTo(finalUrl))
         assertThat(driver.manage().cookies, hasElement(redirectAddedCookie))
-        assertThat(driver.manage().cookies, hasElement(someOtherCookie))
+
+        val expectedCookiesInLastRequest = cookiesSentToFinalDestination.map { it.toSeleniumCookie() }.toSet()
+        assertThat(
+            expectedCookiesInLastRequest,
+            equalTo(setOf(redirectAddedCookie, someOtherCookie))
+        )
     }
+
+    private fun HCookie.toSeleniumCookie() = Cookie(this.name, this.value, this.path)
 
 }
