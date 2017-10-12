@@ -39,7 +39,7 @@ interface Sink {
          */
         fun DiskStream(baseDir: String = ".",
                        shouldStore: (HttpMessage) -> Boolean = { true },
-                       id: () -> String = { System.currentTimeMillis().toString() + UUID.randomUUID().toString() }) = object : Sink {
+                       id: () -> String = { System.nanoTime().toString() + UUID.randomUUID().toString() }) = object : Sink {
             override fun set(request: Request, response: Response) {
                 val folder = File(baseDir, id())
                 if (shouldStore(request)) request.writeTo(folder)
