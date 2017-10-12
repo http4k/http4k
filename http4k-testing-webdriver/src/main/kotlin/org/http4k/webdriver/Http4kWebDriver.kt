@@ -31,17 +31,18 @@ typealias Navigate = (Request) -> Unit
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private val handler = ClientFilters.FollowRedirects()
         .then(ClientFilters.Cookies(storage = cookieStorage()))
-        .then(Filter { next -> { request -> next(request).header("x-webdriver-uri", request.uri.toString()) } })
+        .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
         .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
     private val siteCookies = mutableMapOf<String, StoredCookie>()
+    private var latestUri: String = ""
 
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
         val response = handler(normalizedPath)
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), normalized(response.header("x-webdriver-uri").orEmpty()), response.bodyString(), current)
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), normalized(latestUri), response.bodyString(), current)
     }
 
     private fun normalized(path: String): String {
