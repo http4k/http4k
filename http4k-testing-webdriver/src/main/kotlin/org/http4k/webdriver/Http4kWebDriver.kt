@@ -1,55 +1,50 @@
 package org.http4k.webdriver
 
 
-import org.http4k.core.*
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.cookie.cookie
-import org.http4k.core.cookie.cookies
-import org.openqa.selenium.*
+import org.http4k.core.Request
+import org.http4k.core.Status
+import org.http4k.core.Uri
+import org.http4k.core.then
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.cookie.CookieStorage
+import org.http4k.filter.cookie.LocalCookie
+import org.openqa.selenium.Alert
+import org.openqa.selenium.By
+import org.openqa.selenium.Cookie
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebDriver.Navigation
+import org.openqa.selenium.WebElement
 import java.net.URL
 import java.nio.file.Paths
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.NoSuchElementException
 import org.http4k.core.cookie.Cookie as HCookie
 
 
 typealias Navigate = (Request) -> Unit
 
-class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
+class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
+    private val handler = ClientFilters.FollowRedirects()
+        .then(ClientFilters.Cookies(storage = cookieStorage()))
+        .then(Filter { next -> { request -> next(request).header("x-webdriver-uri", request.uri.toString()) } })
+        .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
-    private val siteCookies = mutableMapOf<String, Cookie>()
+    private val siteCookies = mutableMapOf<String, StoredCookie>()
 
     private fun navigateTo(request: Request) {
-        val (response, finalURI) = getResponseFollowingRedirects(request)
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), finalURI, response.bodyString(), current)
-    }
-
-    private fun addCookiesToRequest(request: Request): Request {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
-        return siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
+        val response = handler(normalizedPath)
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), normalized(response.header("x-webdriver-uri").orEmpty()), response.bodyString(), current)
     }
 
-    private fun getResponseFollowingRedirects(request: Request, attempt: Int = 0): Pair<Response, String> {
-
-        val res = handler(addCookiesToRequest(request))
-        addCookies(res.cookies())
-
-        return if (res.isRedirection()) {
-            if (attempt == 10) throw IllegalStateException("Too many redirection")
-            res.assureBodyIsConsumed()
-            getResponseFollowingRedirects(request.toNewLocation(res.location()), attempt + 1)
-        } else {
-            res to request.uri.toString()
-        }
-    }
-
-    private fun addCookies(cookies: List<org.http4k.core.cookie.Cookie>) =
-        cookies.forEach { siteCookies.put(it.name, it.toWebDriver()) }
-
-    fun normalized(path: String): String {
+    private fun normalized(path: String): String {
         val newPath = if (path.startsWith("/")) Paths.get(path)
         else {
             val currentPath = currentUrl?.let {
@@ -62,6 +57,8 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
         expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
+
+    private fun LocalCookie.toWebDriver(): Http4kWebDriver.StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
     override fun get(url: String) {
         navigateTo(Request(GET, url).body(""))
@@ -135,16 +132,16 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
     override fun manage() = object : WebDriver.Options {
         override fun addCookie(cookie: Cookie) {
-            siteCookies.put(cookie.name, cookie)
+            siteCookies.put(cookie.name, StoredCookie(cookie, LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now())))
         }
 
-        override fun getCookies() = siteCookies.values.toSet()
+        override fun getCookies() = siteCookies.values.map { it.cookie }.toSet()
 
         override fun deleteCookieNamed(name: String?) {
             siteCookies.remove(name)
         }
 
-        override fun getCookieNamed(name: String) = siteCookies[name]
+        override fun getCookieNamed(name: String) = siteCookies[name]?.cookie
 
         override fun deleteAllCookies() {
             siteCookies.clear()
@@ -162,4 +159,19 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
 
         override fun window() = throw FeatureNotImplementedYet
     }
+
+    private fun cookieStorage() = object : CookieStorage {
+        override fun store(cookies: List<LocalCookie>) {
+            cookies.forEach { siteCookies.put(it.cookie.name, it.toWebDriver()) }
+        }
+
+        override fun remove(name: String) {
+            siteCookies.remove(name)
+        }
+
+        override fun retrieve(): List<LocalCookie> = siteCookies.entries.map { it.value.localCookie }
+    }
+
+    private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
+
 }
