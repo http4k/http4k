@@ -2,8 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.31.1 (uncut)
+### v2.31.1
 - Increased granularity of `Replay.DiskStream` and ensure that traffic is returned in exact order on all OSes.
+- Add support for redirects to Webdriver 
 
 ### v2.31.0
 - Multipart module tweaked to provide a more consistent API.
