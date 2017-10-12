@@ -1,24 +1,16 @@
 package org.http4k.webdriver
 
 
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Status
-import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
-import org.openqa.selenium.Alert
-import org.openqa.selenium.By
-import org.openqa.selenium.Cookie
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.*
 import org.openqa.selenium.WebDriver.Navigation
-import org.openqa.selenium.WebElement
 import java.net.URL
 import java.nio.file.Paths
 import java.time.ZoneId
 import java.util.*
-import kotlin.NoSuchElementException
 import org.http4k.core.cookie.Cookie as HCookie
 
 
@@ -31,14 +23,31 @@ class Http4kWebDriver(private val handler: HttpHandler) : WebDriver {
     private val siteCookies = mutableMapOf<String, Cookie>()
 
     private fun navigateTo(request: Request) {
-        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
-        val requestWithCookies = siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
-        val response = handler(requestWithCookies)
-        response.cookies().forEach {
-            siteCookies.put(it.name, it.toWebDriver())
-        }
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), requestWithCookies.uri.toString(), response.bodyString(), current)
+        val (response, finalURI) = getResponseFollowingRedirects(request)
+        current = Page(response.status, this::navigateTo, UUID.randomUUID(), finalURI, response.bodyString(), current)
     }
+
+    private fun addCookiesToRequest(request: Request): Request {
+        val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
+        return siteCookies.entries.fold(normalizedPath) { memo, next -> memo.cookie(HCookie(next.key, next.value.value)) }
+    }
+
+    private fun getResponseFollowingRedirects(request: Request, attempt: Int = 0): Pair<Response, String> {
+
+        val res = handler(addCookiesToRequest(request))
+        addCookies(res.cookies())
+
+        return if (res.isRedirection()) {
+            if (attempt == 10) throw IllegalStateException("Too many redirection")
+            res.assureBodyIsConsumed()
+            getResponseFollowingRedirects(request.toNewLocation(res.location()), attempt + 1)
+        } else {
+            res to request.uri.toString()
+        }
+    }
+
+    private fun addCookies(cookies: List<org.http4k.core.cookie.Cookie>) =
+        cookies.forEach { siteCookies.put(it.name, it.toWebDriver()) }
 
     fun normalized(path: String): String {
         val newPath = if (path.startsWith("/")) Paths.get(path)
