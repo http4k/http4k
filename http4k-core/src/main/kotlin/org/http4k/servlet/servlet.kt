@@ -26,10 +26,8 @@ private fun Response.transferTo(destination: HttpServletResponse) {
 }
 
 private fun HttpServletRequest.asHttp4kRequest(): Request =
-    inputStream.use {
-        Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-            .body(it).headers(headerParameters())
-    }
+    Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
+        .body(inputStream).headers(headerParameters())
 
 private fun HttpServletRequest.headerParameters(): Headers =
     headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })

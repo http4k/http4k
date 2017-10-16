@@ -36,13 +36,8 @@ private fun HttpExchange.populate(httpResponse: Response) {
     httpResponse.body.stream.use { input -> responseBody.use { input.copyTo(it) } }
 }
 
-private fun HttpExchange.toRequest(): Request {
-    val uri = requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) } ?: Uri.of(requestURI.rawPath)
-    Request(Method.valueOf(requestMethod), uri)
-        .body(requestBody).let {
-        return requestHeaders.toList().fold(it) { memo, (name, values) ->
-            values.fold(memo) { memo2, value -> memo2.header(name, value) }
-        }
-    }
-
-}
+private fun HttpExchange.toRequest(): Request =
+    Request(Method.valueOf(requestMethod),
+        requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) } ?: Uri.of(requestURI.rawPath))
+        .body(requestBody)
+        .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
