@@ -29,6 +29,17 @@ sealed class MultipartEntity : Closeable {
     }
 }
 
+fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
+    val boundary = CONTENT_TYPE(this)?.directive?.second ?: ""
+
+    return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
+        .asSequence()
+        .map {
+            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString)
+            else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream))
+        }.iterator()
+}
+
 data class MultipartFormBody private constructor(internal val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
