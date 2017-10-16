@@ -53,6 +53,14 @@ class CurlTest {
     }
 
     @Test
+    fun `does not realise stream body`() {
+        val request = Request(Method.POST, "http://httpbin.org").body("any stream".byteInputStream())
+        val curl = request.toCurl()
+        assertThat(curl, equalTo("""curl -X POST --data "<<stream>>" "http://httpbin.org""""))
+        assertThat(String(request.body.stream.readBytes()), equalTo("any stream"))
+    }
+
+    @Test
     fun `limits the entity if it's too large`() {
         val largeBody = (0..500).joinToString(" ")
         val curl = org.http4k.core.Request(Method.GET, "http://httpbin.org").body(largeBody).toCurl()

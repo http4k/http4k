@@ -8,7 +8,7 @@ fun Request.toCurl(): String =
     StringBuilder("curl")
         .append(" -X $method")
         .appendIfNotEmpty(headers, " " + headers.joinToString(" ") { """-H ${(it.first + ":" + it.second).quoted()}""" })
-        .appendIfNotBlank(bodyString(), " --data ${body.toString().truncated().quoted()}")
+        .appendIfNotBlank(body.toString(), " --data ${body.toString().truncated().quoted()}")
         .append(" \"$uri\"")
         .toString()
 
