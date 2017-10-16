@@ -5,12 +5,13 @@ package org.http4k.core
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.version
+import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
 
 typealias Headers = Parameters
 
-interface Body {
+interface Body : Closeable {
     val stream: InputStream
     val payload: ByteBuffer
 
@@ -26,6 +27,7 @@ interface Body {
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
 
+    override fun close() {}
     override val stream: InputStream get() = payload.array().inputStream()
     override fun toString(): String = payload.asString()
 }
@@ -33,7 +35,11 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
 class StreamBody(override val stream: InputStream) : Body {
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
 
-    override fun toString(): String = String(payload.array())
+    override fun close() {
+        stream.close()
+    }
+
+    override fun toString(): String = "<<stream>>"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -44,7 +50,7 @@ class StreamBody(override val stream: InputStream) : Body {
     override fun hashCode(): Int = payload.hashCode()
 }
 
-interface HttpMessage {
+interface HttpMessage : Closeable {
     val headers: Headers
     val body: Body
 
@@ -68,11 +74,16 @@ interface HttpMessage {
 
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
-    fun bodyString(): String = body.toString()
+    /**
+     * This will realise any underlying stream
+     */
+    fun bodyString(): String = String(body.payload.array())
 
     companion object {
         val version = "HTTP/1.1"
     }
+
+    override fun close() = body.close()
 }
 
 enum class Method { GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD }
@@ -114,7 +125,6 @@ interface Request : HttpMessage {
 }
 
 data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
-
     override fun method(method: Method): Request = copy(method = method)
 
     override fun uri(uri: Uri) = copy(uri = uri)

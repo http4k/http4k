@@ -19,7 +19,7 @@ class BodyTest {
 
     @Test
     fun `body stream`() {
-        Response(Status.OK).body(Body("abc".byteInputStream())).bodyString()
+        Response(Status.OK).body(Body("abc".byteInputStream())).let { String(it.body.stream.readBytes()) }
                 .shouldMatch(equalTo("abc"))
     }
 
@@ -34,10 +34,10 @@ class BodyTest {
     }
 
     @Test
-    fun `can consume stream body as string more than once`(){
+    fun `can consume stream body as payload more than once`(){
         val body = Body("abc".byteInputStream())
-        body.toString()
-        body.toString().shouldMatch(equalTo("abc"))
+        String(body.payload.array())
+        String(body.payload.array()).shouldMatch(equalTo("abc"))
     }
 
     @Test
