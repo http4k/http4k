@@ -23,7 +23,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         headers.forEach {
             exchange.responseHeaders.put(HttpString(it.first), it.second)
         }
-        body.stream.use { input -> exchange.outputStream.use { output -> input.copyTo(output) } }
+        body.stream.use { it.copyTo(exchange.outputStream) }
     }
 
     private fun HttpServerExchange.asRequest(): Request =
@@ -38,8 +38,8 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
 }
 
 data class Undertow(val port: Int = 8000) : ServerConfig {
-    override fun toServer(handler: HttpHandler): Http4kServer {
-        return object : Http4kServer {
+    override fun toServer(handler: HttpHandler): Http4kServer =
+        object : Http4kServer {
             val server = Undertow.builder()
                 .addHttpListener(port, "localhost")
                 .setHandler(BlockingHandler(HttpUndertowHandler(handler))).build()
@@ -50,5 +50,4 @@ data class Undertow(val port: Int = 8000) : ServerConfig {
 
             override fun stop() = server.stop()
         }
-    }
 }

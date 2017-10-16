@@ -4,7 +4,6 @@ package org.http4k.server
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.ByteBufOutputStream
-import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
@@ -47,14 +46,11 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         }
     }
 
-    private fun Response.asNettyResponse(): DefaultFullHttpResponse {
-        val nettyBody = Unpooled.buffer()
-        val out = ByteBufOutputStream(nettyBody)
-        val res = DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description), nettyBody)
-        headers.forEach { (key, value) -> res.headers().set(key, value) }
-        body.stream.use { input -> out.use { output -> input.copyTo(output) } }
-        return res
-    }
+    private fun Response.asNettyResponse(): DefaultFullHttpResponse =
+        DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
+            headers.forEach { (key, value) -> headers().set(key, value) }
+            body.stream.use { responseBodyStream -> responseBodyStream.copyTo(ByteBufOutputStream(content())) }
+        }
 
     private fun FullHttpRequest.asRequest(): Request =
         Request(valueOf(method().name()), Uri.Companion.of(uri()))
