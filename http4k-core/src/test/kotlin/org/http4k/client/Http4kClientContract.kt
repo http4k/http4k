@@ -45,6 +45,34 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
 
     val port = Random().nextInt(1000) + 8000
 
+    @Before
+    fun before() {
+        val defaultHandler = { request: Request ->
+            Response(OK)
+                    .header("uri", request.uri.toString())
+                    .header("header", request.header("header"))
+                    .header("query", request.query("query"))
+                    .body(request.body)
+        }
+        server = routes("/someUri" bind POST to defaultHandler,
+            "/empty" bind GET to { _: Request -> Response(OK).body("") },
+            "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") },
+            "/stream" bind GET to { _: Request -> Response(OK).body("stream".byteInputStream()) },
+            "/echo" bind POST to { request: Request -> Response(OK).body(request.bodyString()) },
+            "/check-image" bind POST to { request: Request ->
+                if (Arrays.equals(testImageBytes(), request.body.payload.array()))
+                    Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
+            })
+            .asServer(serverConfig(port)).start()
+    }
+
+    @Test
+    fun `can forward response body to another request`() {
+        val response = client(Request(GET, "http://localhost:$port/stream"))
+        val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
+        echoResponse.bodyString().shouldMatch(equalTo("stream"))
+    }
+
     @Test
     fun `supports gzipped content`() {
         val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp())
@@ -56,25 +84,6 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
         client(request)
         client(request)
         asServer.stop()
-    }
-
-    @Before
-    fun before() {
-        val defaultHandler = { request: Request ->
-            Response(OK)
-                    .header("uri", request.uri.toString())
-                    .header("header", request.header("header"))
-                    .header("query", request.query("query"))
-                    .body(request.body)
-        }
-        server = routes("/someUri" bind POST to defaultHandler,
-                "/empty" bind GET to { _: Request -> Response(OK).body("") },
-            "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") },
-            "/check-image" bind POST to { request: Request ->
-                if (Arrays.equals(testImageBytes(), request.body.payload.array()))
-                    Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
-            })
-                .asServer(serverConfig(port)).start()
     }
 
     @After
