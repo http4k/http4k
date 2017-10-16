@@ -1,11 +1,11 @@
 ### Installation (Gradle)
-**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "2.31.3"```
+**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "2.31.4"```
 
-**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "2.31.3"```
+**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "2.31.4"```
 
-**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "2.31.3"```
+**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "2.31.4"```
 
-**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "2.31.3"```
+**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "2.31.4"```
 
 ### About
 Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
