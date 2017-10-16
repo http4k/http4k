@@ -41,26 +41,26 @@ internal object MultipartFormMap {
         for (part in parts) {
             if (part.fieldName == null) throw ParseError("no name for part")
 
-            result.add(serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, part.inputStream, bytes))
+            result.add(serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, bytes))
         }
         return result
     }
 
-    private fun serialisePart(encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File, part: StreamingPart, partInputStream: InputStream, bytes: ByteArray): Part {
+    private fun serialisePart(encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File, part: StreamingPart, bytes: ByteArray): Part {
         var length = 0
 
         while (true) {
-            val count = partInputStream.read(bytes, length, writeToDiskThreshold - length)
+            val count = part.inputStream.read(bytes, length, writeToDiskThreshold - length)
             if (count < 0) {
                 return InMemory(
                     part,
-                    storeInMemory(bytes, length, partInputStream), encoding)
+                    storeInMemory(bytes, length, part.inputStream), encoding)
             }
             length += count
             if (length >= writeToDiskThreshold) {
                 return DiskBacked(
                     part,
-                    writeToDisk(part.fileName, writeToDiskThreshold, temporaryFileDirectory, bytes, length, partInputStream))
+                    writeToDisk(part.fileName, writeToDiskThreshold, temporaryFileDirectory, bytes, length, part.inputStream))
             }
         }
     }
