@@ -23,16 +23,11 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         else null
 
     private fun okhttp3.Response.asHttp4k(): Response {
-        val initial = body()?.let {
-            Response(Status(code(), ""))
-                .body(bodyMode(it.byteStream()))
-        } ?: Response(Status(code(), ""))
-        return headers().toMultimap().asSequence().fold(
-            initial) { memo, headerValues ->
-            headerValues.value.fold(memo) { memo2, headerValue ->
-                memo2.header(headerValues.key, headerValue)
-            }
-        }
+        val init = Response(Status(code(), ""))
+        val headers = headers().toMultimap().flatMap { it.value.map { hValue -> it.key to hValue } }
+
+        return (body()?.let { init.body(bodyMode(it.byteStream())) } ?: init)
+            .headers(headers)
     }
 
     override fun invoke(request: Request): Response =

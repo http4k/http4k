@@ -1,7 +1,6 @@
 package org.http4k.client
 
 import org.apache.http.Header
-import org.apache.http.HttpEntity
 import org.apache.http.StatusLine
 import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
 import org.apache.http.client.config.RequestConfig
@@ -11,7 +10,6 @@ import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -28,27 +26,23 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
         Response(Status.CLIENT_TIMEOUT)
     }
 
-    private fun CloseableHttpResponse.toHttp4kResponse(): Response =
-        allHeaders.toTarget().fold(Response(statusLine.toTarget()).body(entity?.toTarget() ?: Body.EMPTY)) { memo, (first, second) ->
-            memo.header(first, second)
+    private fun CloseableHttpResponse.toHttp4kResponse(): Response {
+        val baseResponse = Response(statusLine.toTarget()).headers(allHeaders.toTarget())
+        return entity?.let { baseResponse.body(bodyMode(it.content)) } ?: baseResponse
+    }
+
+    private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
+        init {
+            val request = this@toApacheRequest
+            uri = URI(request.uri.toString())
+            entity = InputStreamEntity(request.body.stream)
+            request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
         }
 
-    private fun Request.toApacheRequest(): HttpRequestBase {
-        return object : HttpEntityEnclosingRequestBase() {
-            init {
-                val request = this@toApacheRequest
-                uri = URI(request.uri.toString())
-                entity = InputStreamEntity(request.body.stream)
-                request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
-            }
-
-            override fun getMethod(): String = this@toApacheRequest.method.name
-        }
+        override fun getMethod(): String = this@toApacheRequest.method.name
     }
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
-
-    private fun HttpEntity.toTarget(): Body = bodyMode(content)
 
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 
