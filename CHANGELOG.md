@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.31.3 (uncut)
+- Tweaks to Server backends to improve efficiency.
+
 ### v2.31.2
 - Webdriver will keep only the final URI after redirects.
 
