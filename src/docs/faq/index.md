@@ -18,19 +18,6 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 **A.** **http4k** HTTP message objects are *immutable*, so you need to chain or reassign the value from the method call to get the updated version.
 
-**Q. Auto-marshalling: where is the `Body.auto` method defined?**
-
-**A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
-`import org.http4k.format.Jackson.auto`
-
-**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
-
-**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class fields with `@JsonAlias` to get the deserialisation to work correctly.
-
-**Q. My application uses Lenses, but when they fail I get an HTTP 500 instead of the promised 400.**
-
-**A.** You forgot to add the `ServerFilters.CatchLensFailure` filter to your Server stack.
-
 **Q. Where are all the useful Filters defined?**
 
 **A.** Filters are all in the `import org.http4k.filter` package and are located as methods on a singleton `object` relevant to their use:
@@ -40,3 +27,22 @@ Find here answers to the most common questions that we get asked about **http4k*
 - `org.http4k.filter.DebuggingFilters`
 - `org.http4k.filter.ServerFilters` 
 - `org.http4k.filter.TrafficFilters`
+
+### Lenses & Auto-Marshalling
+
+**Q. Where is the `Body.auto` method defined?**
+
+**A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
+`import org.http4k.format.Jackson.auto`
+
+**Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
+
+**A.** This is a Jackson-ism. Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
+
+**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
+
+**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class fields with `@JsonAlias` to get the deserialisation to work correctly.
+
+**Q. My application uses Lenses, but when they fail I get an HTTP 500 instead of the promised 400.**
+
+**A.** You forgot to add the `ServerFilters.CatchLensFailure` filter to your Server stack.
