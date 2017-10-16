@@ -1,3 +1,4 @@
+
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -16,39 +17,41 @@ import kotlin.concurrent.thread
 
 data class Result(val name: String, val time: Long, val totalRequests: Int, val errors: Long) {
     private val errorPct = errors.toDouble() / totalRequests
-    private val latency = time / totalRequests
+    private val latency = time.toDouble() / totalRequests
     override fun toString(): String = """$name $totalRequests requests took ${time}ms with $errors errors ($errorPct), ${latency}ms}"""
 }
 
 fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Result {
     val config = fn(port)
-    val server = { _: Request -> Response(Status.OK) }.asServer(config).start()
+    val server = { _: Request -> Response(Status.OK).body(System.nanoTime().toString()) }.asServer(config).start()
     Thread.sleep(1000)
 
     val client = ApacheClient()
     val latch = CountDownLatch(threads)
     val start = System.currentTimeMillis()
     val errors = AtomicLong(0)
-    (0..threads).forEach({
+    (0..threads).forEach {
         thread {
-            (0..reps).map {
+            (0..reps).forEach {
                 if (client(Request(Method.GET, "http://localhost:$port")).status != OK) {
                     errors.incrementAndGet()
                 }
             }
             latch.countDown()
         }
-    })
+    }
     latch.await()
     server.stop()
-    return Result(config.javaClass.simpleName, System.currentTimeMillis() - start, threads * reps, errors.get())
+    val result = Result(config.javaClass.simpleName, System.currentTimeMillis() - start, threads * reps, errors.get())
+    println(result)
+    return result
 }
 
 fun main(args: Array<String>) {
-    val threads = 200
-    val reps = 100
+    val threads = 250
+    val reps = 400
 
-    listOf(::SunHttp, ::Jetty, ::Netty, ::Undertow)
+    listOf(::Jetty, ::Undertow, ::SunHttp, ::Netty)
         .map { testWith(threads, reps, it, 8000) }
         .sortedBy { it.time }
         .forEach(::println)
