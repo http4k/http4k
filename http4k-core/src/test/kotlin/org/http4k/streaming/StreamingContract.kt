@@ -1,5 +1,7 @@
 package org.http4k.streaming
 
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -14,13 +16,13 @@ import org.http4k.server.asServer
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import java.io.InputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.lang.management.ManagementFactory
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -30,6 +32,8 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     private val port = Random().nextInt(1000) + 8000
     private var runningServer: Http4kServer? = null
 
+    private val sharedList = CopyOnWriteArrayList<Char>()
+
     abstract fun serverConfig(port: Int): ServerConfig
     abstract fun createClient(): HttpHandler
 
@@ -38,7 +42,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     val server = routes(
         "/stream-response" bind GET to { _: Request -> Response(Status.OK).body(beeper()) },
         "/stream-request" bind POST to { request: Request ->
-            testStreamConsumption { request.body.stream }; Response(Status.OK)
+            captureReceivedStream { request.body.stream }; Response(Status.OK)
         }
     )
 
@@ -55,42 +59,40 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     fun `can stream response`() {
-        testStreamConsumption { createClient()(Request(GET, "http://localhost:$port/stream-response")).body.stream }
+        captureReceivedStream { createClient()(Request(GET, "http://localhost:$port/stream-response")).body.stream }
 
         waitForCompletion()
+
+        verifyStreamed()
     }
 
     @Test
-    @Ignore("not supported in jetty yet")
     fun `can stream request`() {
         createClient()(Request(POST, "http://localhost:$port/stream-request").body(beeper()))
 
         waitForCompletion()
+
+        verifyStreamed()
+    }
+
+    private fun verifyStreamed() {
+        assertThat(sharedList.joinToString(""), !equalTo("sssssrrrrr"))
     }
 
     private fun waitForCompletion() {
         val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
-        if (!succeeded)
-            Assert.fail("Timed out waiting for server response")
+        if (!succeeded) Assert.fail("Timed out waiting for server response")
     }
 
-    private fun testStreamConsumption(streamSource: () -> InputStream) {
-        Thread {
-            var lastReceived = System.currentTimeMillis()
-            val responseStream = streamSource()
-            var currentReceived: Long
+    private fun captureReceivedStream(streamSource: () -> InputStream) {
+        val responseStream = streamSource()
 
-            responseStream.bufferedReader().forEachLine {
-                if (runningInIdea) println("received")
+        responseStream.bufferedReader().forEachLine {
+            if (runningInIdea) println("received")
 
-                currentReceived = System.currentTimeMillis()
-                if ((currentReceived - lastReceived) > config.maxWaitBetweenBeepsInMillis) {
-                    Assert.fail("Timed out waiting for next line")
-                }
-                lastReceived = currentReceived
-                countdown.countDown()
-            }
-        }.start()
+            sharedList.add('r')
+            countdown.countDown()
+        }
     }
 
     private fun beeper(): InputStream {
@@ -104,6 +106,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
                 if (runningInIdea) println("sent")
 
                 output.write(line.toByteArray())
+                sharedList.add('s')
                 output.flush()
                 countdown.countDown()
                 Thread.sleep(config.sleepTimeBetweenBeepsInMillis)
@@ -118,6 +121,5 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 data class StreamingTestConfiguration(val beeps: Int = 5,
                                       val beepSize: Int = 20000,
                                       val sleepTimeBetweenBeepsInMillis: Long = 500) {
-    val maxWaitBetweenBeepsInMillis = sleepTimeBetweenBeepsInMillis * 3
     val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * 2
 }
