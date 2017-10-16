@@ -57,9 +57,9 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 
     private fun FullHttpRequest.asRequest(): Request =
-        headers().fold(Request(valueOf(method().name()), Uri.Companion.of(uri()))) { memo, next ->
-            memo.header(next.key, next.value)
-        }.body(Body(ByteBufInputStream(content())))
+        Request(valueOf(method().name()), Uri.Companion.of(uri()))
+            .headers(headers().map { it.key to it.value })
+            .body(Body(ByteBufInputStream(content())))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {

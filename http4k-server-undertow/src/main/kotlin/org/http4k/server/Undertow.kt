@@ -26,14 +26,11 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         body.stream.use { input -> exchange.outputStream.use { output -> input.copyTo(output) } }
     }
 
-    private fun HttpServerExchange.asRequest(): Request {
-        val uri = Uri.of(relativePath + "?" + queryString)
-        return requestHeaders
-            .flatMap { header -> header.map { header.headerName to it } }
-            .fold(Request(Method.valueOf(requestMethod.toString()), uri)) { memo, (first, second) ->
-                memo.header(first.toString(), second)
-            }.body(inputStream)
-    }
+    private fun HttpServerExchange.asRequest(): Request =
+        Request(Method.valueOf(requestMethod.toString()), Uri.of(relativePath + "?" + queryString))
+            .headers(requestHeaders
+                .flatMap { header -> header.map { header.headerName.toString() to it } })
+            .body(inputStream)
 
     override fun handleRequest(exchange: HttpServerExchange) {
         if (exchange.isInIoThread) exchange.dispatch(this) else safeHandler(exchange.asRequest()).into(exchange)

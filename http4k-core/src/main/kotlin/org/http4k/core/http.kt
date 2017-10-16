@@ -54,6 +54,8 @@ interface HttpMessage {
 
     fun header(name: String, value: String?): HttpMessage
 
+    fun headers(headers: Headers): HttpMessage
+
     fun replaceHeader(name: String, value: String?): HttpMessage
 
     fun removeHeader(name: String): HttpMessage
@@ -91,6 +93,8 @@ interface Request : HttpMessage {
 
     override fun header(name: String, value: String?): Request
 
+    override fun headers(headers: Headers): Request
+
     override fun replaceHeader(name: String, value: String?): Request
 
     override fun removeHeader(name: String): Request
@@ -110,6 +114,7 @@ interface Request : HttpMessage {
 }
 
 data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
+
     override fun method(method: Method): Request = copy(method = method)
 
     override fun uri(uri: Uri) = copy(uri = uri)
@@ -121,6 +126,8 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+
+    override fun headers(headers: Headers) = copy(headers = this.headers.plus(headers))
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
 
@@ -141,6 +148,8 @@ interface Response : HttpMessage {
 
     override fun header(name: String, value: String?): Response
 
+    override fun headers(headers: Headers): Response
+
     override fun replaceHeader(name: String, value: String?): Response
 
     override fun removeHeader(name: String): Response
@@ -160,6 +169,8 @@ interface Response : HttpMessage {
 
 data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+
+    override fun headers(headers: Headers) = copy(headers = this.headers.plus(headers))
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
 
