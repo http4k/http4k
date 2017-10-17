@@ -101,7 +101,7 @@ private val upload = Filter { next ->
 
                 val partEtags = it.chunks()
                     .withIndex()
-                    .map { IndexedValue(it.index + 1, it.value) }
+                    .map { it.copy(index = it.index + 1) }
                     .mapNotNull { (index, part) ->
                         val upload = next(Request(PUT, it.uri
                             .query("partNumber", index.toString())
