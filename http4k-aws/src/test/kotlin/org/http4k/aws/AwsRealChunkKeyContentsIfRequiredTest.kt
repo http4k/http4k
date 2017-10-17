@@ -25,10 +25,11 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
     @Test
     fun `default usage`() {
-        val client = awsClientFilter(Payload.Mode.Signed)
-            .then(ClientFilters.ChunkKeyContentsIfRequired())
-            .then(DebuggingFilters.PrintRequestAndResponse())
-            .then(ApacheClient(requestBodyMode = BodyMode.Request.Memory))
+        val client =
+            ClientFilters.ChunkKeyContentsIfRequired()
+                .then(awsClientFilter(Payload.Mode.Signed))
+                .then(DebuggingFilters.PrintRequestAndResponse())
+                .then(ApacheClient(requestBodyMode = BodyMode.Request.Memory))
         bucketLifecycle((client))
     }
 
@@ -61,8 +62,8 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
             containsSubstring(key!!))
         assertThat(
             "Key contents should be as expected",
-            client(Request(GET, keyUrl!!)).bodyString(),
-            equalTo(contentOriginal))
+            client(Request(GET, keyUrl!!)).bodyString().length,
+            equalTo(contentOriginal.length))
         assertThat(
             "Delete of key should succeed",
             client(Request(DELETE, keyUrl!!)).status,
@@ -83,10 +84,14 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
 }
 
-fun ClientFilters.ChunkKeyContentsIfRequired(): Filter = Filter { next ->
-    {
-        if (it.method == PUT && it.uri.path == "") chunk.then(next)(it)
-        else next(it)
+fun ClientFilters.ChunkKeyContentsIfRequired(size: Int = 5 * 1024 * 1024): Filter {
+    val chunker = chunker(size)
+    return Filter { next ->
+        {
+            if (it.method == PUT && it.uri.path.trimEnd('/').isNotBlank()) {
+                chunker.then(next)(it)
+            } else next(it)
+        }
     }
 }
 
@@ -94,12 +99,12 @@ private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (
 
 private data class UploadError(val response: Response, val uploadId: UploadId?) : Exception()
 
-private val chunk = Filter { next ->
+private fun chunker(size: Int) = Filter { next ->
     { request ->
         try {
             val uploadId = UploadId.from(next(Request(POST, request.uri.query("uploads", ""))).orFail())
 
-            val partEtags = request.chunks()
+            val partEtags = request.chunks(size)
                 .withIndex()
                 .map { it.copy(index = it.index + 1) }
                 .mapNotNull { (index, part) ->
@@ -120,10 +125,16 @@ private val chunk = Filter { next ->
     }
 }
 
-private fun Request.chunks() = listOf(
-    bodyString().substring((0..5000)),
-    bodyString().substring((5000..10000))
-).asSequence()
+private fun Request.chunks(size: Int): Sequence<String> {
+    val bodyString = bodyString()
+    println(size)
+    println(bodyString.length)
+    println(size * 2)
+    return listOf(
+        bodyString.substring((0..size)),
+        bodyString.substring((size until (size * 2)))
+    ).asSequence()
+}
 
 internal data class UploadId(val value: String) {
     companion object {

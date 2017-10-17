@@ -48,13 +48,11 @@ abstract class AbstractAwsRealS3TestCase {
 
     @After
     fun removeBucket() {
-        val client = standardClien()
+        val client = awsClientFilter(Payload.Mode.Signed)
+            .then(ApacheClient())
 
         client(Request(Method.DELETE, bucketUrl!!))
     }
-
-    private fun standardClien() = awsClientFilter(Payload.Mode.Signed)
-        .then(ApacheClient())
 
     fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
 
@@ -66,7 +64,7 @@ abstract class AbstractAwsRealS3TestCase {
         }
 
         private fun properties(): InputStream? {
-            return AwsRealChunkKeyContentsIfRequiredTest::class.java.getResourceAsStream("/aws.properties")
+            return AbstractAwsRealS3TestCase::class.java.getResourceAsStream("/aws.properties")
         }
     }
 }
