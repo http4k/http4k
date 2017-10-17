@@ -6,6 +6,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.FormFile
 import org.http4k.core.Method
+import org.http4k.core.MultipartEntity
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -22,16 +23,19 @@ import org.http4k.lens.webForm
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
+data class AName(val value: String)
+
 fun main(args: Array<String>) {
 
-    val server = ServerFilters.ProcessFiles {
+    val server = ServerFilters.ProcessFiles { multipartFile: MultipartEntity.File ->
         // do something with the file right here... like stream it to another server and return the reference
-        it.file.filename
+        println(String(multipartFile.file.content.readBytes()))
+        multipartFile.file.filename
     }
         .then { req: Request ->
             // this is the web-form definition - it it DIFFERENT to the multipart form definition,
             // because the fields and content-type have been replaced in the ProcessFiles filter
-            val nameField = FormField.map(::Name, Name::value).required("name")
+            val nameField = FormField.map(::AName, AName::value).required("name")
             val imageFile = FormField.optional("image")
             val body = Body.webForm(Validator.Strict, nameField, imageFile).toLens()
 
@@ -47,14 +51,14 @@ fun main(args: Array<String>) {
 
 private fun buildValidMultipartRequest(): Request {
     // define fields using the standard lens syntax
-    val nameField = MultipartFormField.map(::Name, Name::value).required("name")
+    val nameField = MultipartFormField.map(::AName, AName::value).required("name")
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator
     val strictFormBody = Body.multipartForm(Validator.Strict, nameField, imageFile, diskThreshold = 5).toLens()
 
     val multipartform = MultipartForm().with(
-        nameField of Name("rita"),
+        nameField of AName("rita"),
         imageFile of FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
     return Request(Method.POST, "http://localhost:8000").with(strictFormBody of multipartform)
 }
