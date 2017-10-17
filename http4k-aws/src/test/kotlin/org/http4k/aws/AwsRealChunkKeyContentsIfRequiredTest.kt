@@ -5,17 +5,14 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.query
 import org.http4k.core.then
+import org.http4k.filter.ChunkKeyContentsIfRequired
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
@@ -84,62 +81,3 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
             !containsSubstring(bucketName!!))
     }
 }
-
-fun ClientFilters.ChunkKeyContentsIfRequired(size: Int = 5 * 1024 * 1024): Filter {
-    val chunker = chunker(size)
-    return Filter { next ->
-        {
-            if (it.method == PUT && it.uri.path.trimEnd('/').isNotBlank()) chunker.then(next)(it) else next(it)
-        }
-    }
-}
-
-private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (this.status != Status.OK) throw UploadError(this, uploadId) }
-
-private data class UploadError(val response: Response, val uploadId: UploadId?) : Exception()
-
-private fun chunker(size: Int) = Filter { next ->
-    { request ->
-        try {
-            val uploadId = UploadId.from(next(Request(POST, request.uri.query("uploads", ""))).orFail())
-
-            val partEtags = request.chunks(size)
-                .withIndex()
-                .map { it.copy(index = it.index + 1) }
-                .mapNotNull { (index, part) ->
-                    val upload = next(Request(PUT, request.uri
-                        .query("partNumber", index.toString())
-                        .query("uploadId", uploadId.value))
-                        .body(part)
-                    ).orFail(uploadId)
-                    upload.header("ETag")
-                }
-
-            next(Request(POST, request.uri.query("uploadId", uploadId.value))
-                .body(partEtags.toCompleteMultipartUploadXml()))
-        } catch (e: UploadError) {
-            e.uploadId?.let { next(Request(DELETE, request.uri.query("uploadId", it.value))) }
-            e.response
-        }
-    }
-}
-
-private fun Request.chunks(size: Int): Sequence<String> {
-    val bodyString = bodyString()
-    return listOf(
-        bodyString.substring((0 until size)),
-        bodyString.substring(size)
-    ).asSequence()
-}
-
-internal data class UploadId(val value: String) {
-    companion object {
-        fun from(response: Response) =
-            Regex(""".*UploadId>(.+)</UploadId.*""").find(response.bodyString())?.groupValues?.get(1)!!.let(::UploadId)
-    }
-}
-
-internal fun Sequence<String>.toCompleteMultipartUploadXml(): String =
-    """<CompleteMultipartUpload>${mapIndexed { index, etag ->
-        """<Part><PartNumber>${index + 1}</PartNumber><ETag>$etag</ETag></Part>"""
-    }.joinToString("")}</CompleteMultipartUpload>"""
