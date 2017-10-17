@@ -3,8 +3,10 @@ package org.http4k.filter
 import org.http4k.aws.AwsCanonicalRequest
 import org.http4k.aws.AwsCredentialScope
 import org.http4k.aws.AwsCredentials
+import org.http4k.aws.AwsHmacSha256
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import java.time.Clock
 
@@ -14,18 +16,20 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
     Filter {
         next ->
         {
+            val payload = CanonicalPayload.from(it.body)
+
             val date = AwsRequestDate.of(clock.instant())
 
             val fullRequest = it
                 .header("host", it.uri.host)
                 .header("x-amz-date", date.full)
-                .replaceHeader("content-length", it.body.payload.array().size.toString())
+                .replaceHeader("content-length", payload.length.toString())
 
-            val canonicalRequest = AwsCanonicalRequest.of(fullRequest)
+            val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
 
             val signedRequest = fullRequest
                 .header("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
-                .header("x-amz-content-sha256", canonicalRequest.payloadHash)
+                .header("x-amz-content-sha256", payload.hash)
 
             next(signedRequest)
         }
@@ -39,3 +43,10 @@ private fun buildAuthHeader(scope: AwsCredentialScope,
         credentials.accessKey, scope.datedScope(date),
         canonicalRequest.signedHeaders,
         AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date))
+
+data class CanonicalPayload(val hash: String, val length: Int){
+    companion object {
+        val EMPTY = from(Body.EMPTY)
+        fun from(body: Body) = CanonicalPayload( AwsHmacSha256.hash(body.payload.array()), body.payload.array().size)
+    }
+}

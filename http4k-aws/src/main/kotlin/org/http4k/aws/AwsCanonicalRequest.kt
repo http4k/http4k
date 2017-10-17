@@ -3,13 +3,13 @@ package org.http4k.aws
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.toParameters
+import org.http4k.filter.CanonicalPayload
 import org.http4k.urlEncoded
 
 internal data class AwsCanonicalRequest(val value: String, val signedHeaders: String, val payloadHash: String) {
     companion object {
-        fun of(request: Request): AwsCanonicalRequest {
+        fun of(request: Request, payload: CanonicalPayload): AwsCanonicalRequest {
             val signedHeaders = request.signedHeaders()
-            val payloadHash = request.payloadHash()
             val canonical = request.method.name +
                 "\n" +
                 request.uri.normalisedPath() +
@@ -20,8 +20,8 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 "\n\n" +
                 signedHeaders +
                 "\n" +
-                payloadHash
-            return AwsCanonicalRequest(canonical, signedHeaders, payloadHash)
+                payload.hash
+            return AwsCanonicalRequest(canonical, signedHeaders, payload.hash)
         }
 
         private fun Request.signedHeaders(): String =
@@ -38,8 +38,6 @@ internal data class AwsCanonicalRequest(val value: String, val signedHeaders: St
                 .map { (first, second) -> first.urlEncoded() + "=" + second?.urlEncoded() }
                 .sorted()
                 .joinToString("&")
-
-        private fun Request.payloadHash(): String = AwsHmacSha256.hash(body.payload.array())
 
         private fun Uri.normalisedPath() = if(path.isBlank()) "/" else path.split("/").joinToString("/") { it.urlEncoded() }
     }

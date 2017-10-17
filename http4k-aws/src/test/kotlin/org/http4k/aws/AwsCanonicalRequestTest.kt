@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.filter.CanonicalPayload
 import org.junit.Test
 import java.nio.ByteBuffer
 
@@ -12,7 +13,7 @@ class AwsCanonicalRequestTest {
 
     @Test
     fun `creates canonical version of simple request`() {
-        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com/a/b").query("foo", "bar").header("abc", "def"))
+        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com/a/b").query("foo", "bar").header("abc", "def"), CanonicalPayload.EMPTY)
         canonical.value.shouldMatch(equalTo("""GET
 /a/b
 foo=bar
@@ -24,7 +25,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
 
     @Test
     fun `normalises path`() {
-        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com/a:b:c/d e/f"))
+        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com/a:b:c/d e/f"), CanonicalPayload.EMPTY)
         canonical.value.shouldMatch(equalTo("""GET
 /a%3Ab%3Ac/d+e/f
 
@@ -36,7 +37,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
 
     @Test
     fun `normalises empty path`() {
-        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com"))
+        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com"), CanonicalPayload.EMPTY)
         canonical.value.shouldMatch(equalTo("""GET
 /
 
@@ -49,7 +50,8 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"""))
     @Test
     fun `generates payload hash of binary body`() {
         val image = this::class.java.getResourceAsStream("/test.png").readBytes()
-        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com").body(Body(ByteBuffer.wrap(image))))
+        val body = Body(ByteBuffer.wrap(image))
+        val canonical = AwsCanonicalRequest.of(Request(Method.GET, "http://www.google.com").body(body), CanonicalPayload.from(body))
         canonical.value.shouldMatch(equalTo("""GET
 /
 
