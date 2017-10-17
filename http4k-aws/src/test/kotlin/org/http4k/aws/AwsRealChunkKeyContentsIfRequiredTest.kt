@@ -88,9 +88,7 @@ fun ClientFilters.ChunkKeyContentsIfRequired(size: Int = 5 * 1024 * 1024): Filte
     val chunker = chunker(size)
     return Filter { next ->
         {
-            if (it.method == PUT && it.uri.path.trimEnd('/').isNotBlank()) {
-                chunker.then(next)(it)
-            } else next(it)
+            if (it.method == PUT && it.uri.path.trimEnd('/').isNotBlank()) chunker.then(next)(it) else next(it)
         }
     }
 }
