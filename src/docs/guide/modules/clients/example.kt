@@ -4,7 +4,7 @@ import org.apache.http.client.config.CookieSpecs
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.impl.client.HttpClients
 import org.http4k.client.ApacheClient
-import org.http4k.client.ResponseBodyMode
+import org.http4k.core.BodyMode
 import org.http4k.core.Method
 import org.http4k.core.Request
 
@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
     println(response.bodyString())
 
     // streaming client
-    val streamingClient = ApacheClient(bodyMode = ResponseBodyMode.Stream)
+    val streamingClient = ApacheClient(responseBodyMode = BodyMode.Response.Stream)
     val streamingRequest = Request(Method.GET, "http://httpbin.org/stream/100")
     println(streamingClient(streamingRequest).bodyString())
 

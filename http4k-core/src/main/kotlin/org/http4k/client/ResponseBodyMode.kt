@@ -1,17 +1,6 @@
 package org.http4k.client
 
-import org.http4k.core.Body
-import java.io.InputStream
-import java.nio.ByteBuffer
+import org.http4k.core.BodyMode
 
-sealed class ResponseBodyMode : (InputStream) -> Body {
-
-    object Memory : ResponseBodyMode() {
-        override fun invoke(stream: InputStream): Body = stream.use { Body(ByteBuffer.wrap(it.readBytes())) }
-    }
-
-    object Stream : ResponseBodyMode() {
-        override fun invoke(stream: InputStream): Body = Body(stream)
-    }
-
-}
+@Deprecated("Use BodyMode.Response instead", replaceWith = ReplaceWith("BodyMode.Response", "org.http4k.core.BodyMode"))
+typealias ResponseBodyMode = BodyMode.Response

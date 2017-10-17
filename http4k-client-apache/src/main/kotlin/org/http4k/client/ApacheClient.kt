@@ -7,9 +7,13 @@ import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
+import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Request.Memory
+import org.http4k.core.BodyMode.Request.Stream
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -18,7 +22,11 @@ import org.http4k.core.Status
 import java.net.SocketTimeoutException
 import java.net.URI
 
-class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpClient(), private val bodyMode: ResponseBodyMode = ResponseBodyMode.Memory) : HttpHandler {
+class ApacheClient(
+    private val client: CloseableHttpClient = defaultApacheHttpClient(),
+    private val responseBodyMode: BodyMode.Response = BodyMode.Response.Memory,
+    private val requestBodyMode: BodyMode.Request = Memory
+) : HttpHandler {
 
     override fun invoke(request: Request): Response = try {
         client.execute(request.toApacheRequest()).toHttp4kResponse()
@@ -28,14 +36,17 @@ class ApacheClient(private val client: CloseableHttpClient = defaultApacheHttpCl
 
     private fun CloseableHttpResponse.toHttp4kResponse(): Response {
         val baseResponse = Response(statusLine.toTarget()).headers(allHeaders.toTarget())
-        return entity?.let { baseResponse.body(bodyMode(it.content)) } ?: baseResponse
+        return entity?.let { baseResponse.body(responseBodyMode(it.content)) } ?: baseResponse
     }
 
     private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
         init {
             val request = this@toApacheRequest
             uri = URI(request.uri.toString())
-            entity = InputStreamEntity(request.body.stream)
+            entity = when (requestBodyMode) {
+                Stream -> InputStreamEntity(request.body.stream)
+                Memory -> ByteArrayEntity(request.body.payload.array())
+            }
             request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
         }
 

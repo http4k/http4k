@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.33.0
+- Added `BodyMode.Request` to configure streaming for clients .
+- `ResponseBodyMode` is now `BodyMode.Response`. (Breaking change. Fixable with simple find/replace)
+
 ### v2.32.0
 - Added `ServerFilter.ProcessFiles` filter to stream Multipart Files, convert them into references and replace inline in the Form.
 
