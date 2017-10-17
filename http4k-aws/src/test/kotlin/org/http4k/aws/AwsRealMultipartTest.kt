@@ -6,9 +6,9 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Status
@@ -47,30 +47,30 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
             !containsSubstring(key!!))
 
         /* initialise multipart */
-        val initialiseUpload = client(Request(Method.POST, keyUrl!!.query("uploads", "")))
+        val initialiseUpload = client(Request(POST, keyUrl!!.query("uploads", "")))
         assertThat("Initialise of key should succeed", initialiseUpload.status, equalTo(Status.OK))
         val uploadId = UploadId.from(initialiseUpload)
 
         /* upload a part */
-        val firstPart = client(Request(Method.PUT, keyUrl!!
+        val firstPart = client(Request(PUT, keyUrl!!
             .query("partNumber", "1")
-            .query("uploadId", uploadId))
+            .query("uploadId", uploadId.value))
             .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong())
         )
         assertThat("First part upload", firstPart.status, equalTo(Status.OK))
         val etag1 = firstPart.header("ETag")!!
 
         /* upload another part */
-        val secondPart = client(Request(Method.PUT, keyUrl!!
+        val secondPart = client(Request(PUT, keyUrl!!
             .query("partNumber", "2")
-            .query("uploadId", uploadId))
+            .query("uploadId", uploadId.value))
             .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong())
         )
         assertThat("Second part upload", secondPart.status, equalTo(Status.OK))
         val etag2 = secondPart.header("ETag")!!
 
         /* finalise multipart */
-        val finaliseUpload = client(Request(Method.POST, keyUrl!!.query("uploadId", uploadId))
+        val finaliseUpload = client(Request(POST, keyUrl!!.query("uploadId", uploadId.value))
             .body(listOf(etag1, etag2).asSequence().toCompleteMultipartUploadXml()))
         assertThat("Finalize of key should succeed", finaliseUpload.status, equalTo(Status.OK))
 

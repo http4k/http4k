@@ -90,31 +90,31 @@ fun ClientFilters.ChunkKeyContentsIfRequired(): Filter = Filter { next ->
     }
 }
 
-private fun Response.orFail(): Response = apply { if (this.status != Status.OK) throw UploadError(this) }
+private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (this.status != Status.OK) throw UploadError(this, uploadId) }
 
-private data class UploadError(val response: Response) : Exception()
+private data class UploadError(val response: Response, val uploadId: UploadId?) : Exception()
 
 private val chunk = Filter { next ->
-    {
+    { request ->
         try {
-            val initialiseUpload = next(Request(POST, it.uri.query("uploads", ""))).orFail()
-            val uploadId = UploadId.from(initialiseUpload)
+            val uploadId = UploadId.from(next(Request(POST, request.uri.query("uploads", ""))).orFail())
 
-            val partEtags = it.chunks()
+            val partEtags = request.chunks()
                 .withIndex()
                 .map { it.copy(index = it.index + 1) }
                 .mapNotNull { (index, part) ->
-                    val upload = next(Request(PUT, it.uri
+                    val upload = next(Request(PUT, request.uri
                         .query("partNumber", index.toString())
-                        .query("uploadId", uploadId))
+                        .query("uploadId", uploadId.value))
                         .body(part)
-                    ).orFail()
+                    ).orFail(uploadId)
                     upload.header("ETag")
                 }
 
-            next(Request(POST, it.uri.query("uploadId", uploadId))
+            next(Request(POST, request.uri.query("uploadId", uploadId.value))
                 .body(partEtags.toCompleteMultipartUploadXml()))
         } catch (e: UploadError) {
+            e.uploadId?.let { next(Request(DELETE, request.uri.query("uploadId", it.value))) }
             e.response
         }
     }
@@ -128,7 +128,7 @@ private fun Request.chunks() = listOf(
 internal data class UploadId(val value: String) {
     companion object {
         fun from(response: Response) =
-            Regex(""".*UploadId>(.+)</UploadId.*""").find(response.bodyString())?.groupValues?.get(1)
+            Regex(""".*UploadId>(.+)</UploadId.*""").find(response.bodyString())?.groupValues?.get(1)!!.let(::UploadId)
     }
 }
 
