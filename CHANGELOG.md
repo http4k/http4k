@@ -2,15 +2,18 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v2.33.1
+- Added support for unsigned AWS requests, which enables streaming content to S3. 
+
 ### v2.33.0
-- Added `BodyMode.Request` to configure streaming for clients .
-- `ResponseBodyMode` is now `BodyMode.Response`. (Breaking change. Fixable with simple find/replace)
+- Added `BodyMode.Request` to configure streaming for clients.
+- `ResponseBodyMode` is now `BodyMode.Response` (Breaking change. Fixable with simple find/replace).
 
 ### v2.32.0
 - Added `ServerFilter.ProcessFiles` filter to stream Multipart Files, convert them into references and replace inline in the Form.
 
 ### v2.31.4
-- Avoid realising StreamBody unless necessary, which could break common usages of streaming 
+- Avoid realising StreamBody unless necessary, which could break common usages of streaming. 
 
 ### v2.31.3
 - Tweaks to Server backends to improve efficiency.
@@ -20,11 +23,11 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v2.31.1
 - Increased granularity of `Replay.DiskStream` and ensure that traffic is returned in exact order on all OSes.
-- Add support for redirects to Webdriver 
+- Add support for redirects to Webdriver.
 
 ### v2.31.0
 - Multipart module tweaked to provide a more consistent API.
-- Fix FollowRedirects for POST/PUT request
+- Fix FollowRedirects for POST/PUT request.
 
 ### v2.30.0
 - Multipart form support through new module `http4k-multipart`.
