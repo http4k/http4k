@@ -10,7 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import java.net.SocketTimeoutException
 
-class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode.Response = BodyMode.Response.Memory) : HttpHandler {
+class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler {
 
     private fun Request.asOkHttp(): okhttp3.Request =
         headers.fold(okhttp3.Request.Builder()

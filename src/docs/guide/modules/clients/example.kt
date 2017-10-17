@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
     println(response.bodyString())
 
     // streaming client
-    val streamingClient = ApacheClient(responseBodyMode = BodyMode.Response.Stream)
+    val streamingClient = ApacheClient(responseBodyMode = BodyMode.Stream)
     val streamingRequest = Request(Method.GET, "http://httpbin.org/stream/100")
     println(streamingClient(streamingRequest).bodyString())
 

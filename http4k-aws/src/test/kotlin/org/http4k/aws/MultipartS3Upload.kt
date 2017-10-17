@@ -1,5 +1,7 @@
 package org.http4k.aws
 
+import org.http4k.core.Body
+import org.http4k.core.BodyMode
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -10,14 +12,14 @@ import org.http4k.core.Status
 import org.http4k.core.query
 
 object MultipartS3Upload {
-    operator fun invoke(size: Int) = Filter { next ->
+    operator fun invoke(size: Int, bodyMode: BodyMode) = Filter { next ->
         {
             try {
                 val uploadId = UploadId.from(next(it.initialiseMultipart()).orFail())
 
-                val partEtags = it.chunks(size)
+                val partEtags = it.parts(size)
                     .withIndex()
-                    .mapNotNull { (index, part) -> next(it.uploadPart(index, uploadId, part)).orFail(uploadId).header("ETag") }
+                    .mapNotNull { (index, part) -> next(it.uploadPart(index, uploadId, bodyMode(part))).orFail(uploadId).header("ETag") }
 
                 next(it.completeMultipart(uploadId, partEtags))
             } catch (e: UploadError) {
@@ -29,22 +31,22 @@ object MultipartS3Upload {
 
     private fun Request.initialiseMultipart() = Request(POST, uri.query("uploads", ""))
 
-    private fun Request.uploadPart(index: Int, uploadId: UploadId, part: String): Request = Request(Method.PUT, uri
+    private fun Request.uploadPart(index: Int, uploadId: UploadId, body: Body): Request = Request(Method.PUT, uri
         .query("partNumber", (index + 1).toString())
         .query("uploadId", uploadId.value))
-        .body(part)
+        .body(body)
 
     private fun Request.completeMultipart(uploadId: UploadId, partEtags: Sequence<String>) = Request(POST, uri.query("uploadId", uploadId.value))
         .body(partEtags.toCompleteMultipartUploadXml())
 
     private fun Request.terminateMultipart(it: UploadId) = Request(DELETE, uri.query("uploadId", it.value))
 
-    private fun Request.chunks(size: Int): Sequence<String> = bodyString().run {
+    private fun Request.parts(size: Int) = bodyString().run {
         // todo this need to actually work!
         listOf(
             substring((0 until size)),
             substring(size)
-        ).asSequence()
+        ).asSequence().map { it.byteInputStream() }
     }
 
     private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (this.status != Status.OK) throw UploadError(this, uploadId) }

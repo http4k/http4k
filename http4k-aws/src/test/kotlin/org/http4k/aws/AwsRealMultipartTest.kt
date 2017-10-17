@@ -22,7 +22,7 @@ class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `default usage`() {
         val client = awsClientFilter(Payload.Mode.Signed)
-            .then(ApacheClient(requestBodyMode = BodyMode.Request.Memory))
+            .then(ApacheClient(requestBodyMode = BodyMode.Memory))
         bucketLifecycle((client))
     }
 

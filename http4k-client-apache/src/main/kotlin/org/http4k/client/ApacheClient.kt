@@ -12,8 +12,8 @@ import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.http4k.core.BodyMode
-import org.http4k.core.BodyMode.Request.Memory
-import org.http4k.core.BodyMode.Request.Stream
+import org.http4k.core.BodyMode.Memory
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -24,8 +24,8 @@ import java.net.URI
 
 class ApacheClient(
     private val client: CloseableHttpClient = defaultApacheHttpClient(),
-    private val responseBodyMode: BodyMode.Response = BodyMode.Response.Memory,
-    private val requestBodyMode: BodyMode.Request = Memory
+    private val responseBodyMode: BodyMode = Memory,
+    private val requestBodyMode: BodyMode = Memory
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response = try {

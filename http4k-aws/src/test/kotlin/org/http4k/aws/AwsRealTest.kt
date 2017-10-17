@@ -29,7 +29,7 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `streaming`() {
         val client = awsClientFilter(Payload.Mode.Unsigned)
-            .then(ApacheClient(requestBodyMode = BodyMode.Request.Stream))
+            .then(ApacheClient(requestBodyMode = BodyMode.Stream))
 
         bucketLifecycle((client))
     }

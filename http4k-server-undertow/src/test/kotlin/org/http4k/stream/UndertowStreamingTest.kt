@@ -11,6 +11,6 @@ class UndertowStreamingTest : StreamingContract() {
     override fun serverConfig(port: Int): ServerConfig = Undertow(port)
 
     override fun createClient(): HttpHandler =
-        ApacheClient(requestBodyMode = BodyMode.Request.Stream, responseBodyMode = BodyMode.Response.Stream)
+        ApacheClient(requestBodyMode = BodyMode.Stream, responseBodyMode = BodyMode.Stream)
 
 }
