@@ -6,7 +6,6 @@ import org.http4k.aws.AwsCredentials
 import org.http4k.aws.AwsHmacSha256
 import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
-import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.Request
 import java.time.Clock
@@ -46,21 +45,19 @@ private fun buildAuthHeader(scope: AwsCredentialScope,
         canonicalRequest.signedHeaders,
         AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date))
 
-data class CanonicalPayload(val hash: String, val length: Int){
-    companion object {
-        val EMPTY = from(Body.EMPTY)
-        fun from(body: Body) = CanonicalPayload( AwsHmacSha256.hash(body.payload.array()), body.payload.array().size)
-    }
-}
+data class CanonicalPayload(val hash: String, val length: Long)
 
 object Payload {
     sealed class Mode : (Request) -> CanonicalPayload {
         object Signed : Mode() {
-            override operator fun invoke(request: Request) = CanonicalPayload.from(request.body)
+            override operator fun invoke(request: Request): CanonicalPayload {
+                val content = request.body.payload.array()
+                return CanonicalPayload(AwsHmacSha256.hash(content), content.size.toLong())
+            }
         }
 
         object Unsigned : Mode() {
-            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.header("content-length")?.toInt() ?: 0)
+            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.body.length)
         }
     }
 }

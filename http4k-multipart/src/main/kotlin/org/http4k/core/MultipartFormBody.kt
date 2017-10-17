@@ -41,6 +41,7 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
 }
 
 data class MultipartFormBody private constructor(internal val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+    override val length: Long by lazy { throw IllegalStateException("Length is not available in MultipartFormBody") }
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
 

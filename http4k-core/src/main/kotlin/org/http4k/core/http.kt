@@ -14,11 +14,12 @@ typealias Headers = Parameters
 interface Body : Closeable {
     val stream: InputStream
     val payload: ByteBuffer
+    val length: Long
 
     companion object {
         operator fun invoke(body: String): Body = MemoryBody(body)
         operator fun invoke(body: ByteBuffer): Body = MemoryBody(body)
-        operator fun invoke(body: InputStream): Body = StreamBody(body)
+        operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
         val EMPTY: Body = MemoryBody("")
     }
@@ -27,12 +28,14 @@ interface Body : Closeable {
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
 
+    override val length: Long by lazy { payload.array().size.toLong() }
     override fun close() {}
     override val stream: InputStream get() = payload.array().inputStream()
     override fun toString(): String = payload.asString()
 }
 
-class StreamBody(override val stream: InputStream) : Body {
+class StreamBody(override val stream: InputStream, length: Long?) : Body {
+    override val length: Long by lazy { length ?: throw IllegalStateException("Length is not set on StreamBody") }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
 
     override fun close() {
@@ -70,7 +73,7 @@ interface HttpMessage : Closeable {
 
     fun body(body: String): HttpMessage
 
-    fun body(body: InputStream): HttpMessage
+    fun body(body: InputStream, length: Long? = null): HttpMessage
 
     fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
 
@@ -114,7 +117,7 @@ interface Request : HttpMessage {
 
     override fun body(body: String): Request
 
-    override fun body(body: InputStream): Request
+    override fun body(body: InputStream, length: Long?): Request
 
     override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
 
@@ -147,7 +150,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun body(body: String) = copy(body = Body(body))
 
-    override fun body(body: InputStream) = copy(body = Body(body))
+    override fun body(body: InputStream, length: Long?) = copy(body = Body(body, length))
 
     override fun toString(): String = toMessage()
 
@@ -168,7 +171,7 @@ interface Response : HttpMessage {
 
     override fun body(body: String): Response
 
-    override fun body(body: InputStream): Response
+    override fun body(body: InputStream, length: Long?): Response
 
     override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
 
@@ -190,7 +193,7 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 
     override fun body(body: String) = copy(body = Body(body))
 
-    override fun body(body: InputStream) = copy(body = Body(body))
+    override fun body(body: InputStream, length: Long?) = copy(body = Body(body, length))
 
     override fun toString(): String = toMessage()
 }

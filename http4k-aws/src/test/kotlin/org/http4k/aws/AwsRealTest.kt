@@ -93,7 +93,7 @@ class AwsRealTest {
             !containsSubstring(key!!))
         assertThat(
             "Put of key should succeed",
-            client(Request(PUT, keyUrl!!).header("content-length", contentOriginal.length.toString()).body(contents)).status,
+            client(Request(PUT, keyUrl!!).body(contents, contentOriginal.length.toLong())).status,
             equalTo(OK))
         assertThat(
             "Key should appear in bucket listing",
