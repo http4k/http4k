@@ -23,7 +23,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `default usage`() {
         val client =
-            ClientFilters.ChunkKeyContentsIfRequired(bodyMode = BodyMode.Memory)
+            ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = BodyMode.Memory)
                 .then(awsClientFilter(Payload.Mode.Signed))
                 .then(DebuggingFilters.PrintResponse())
                 .then(ApacheClient(requestBodyMode = BodyMode.Memory))

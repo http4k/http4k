@@ -6,8 +6,8 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.then
 
-fun ClientFilters.ChunkKeyContentsIfRequired(bodyMode: BodyMode, size: Int = 5 * 1024 * 1024): Filter {
-    val upload = MultipartS3Upload(size, bodyMode)
+fun ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode: BodyMode, size: Int = 5 * 1024 * 1024): Filter {
+    val upload = MultipartS3Upload(size, requestBodyMode)
     return Filter { next ->
         {
             if (it.method == Method.PUT && it.uri.path.trimEnd('/').isNotBlank()) upload.then(next)(it) else next(it)

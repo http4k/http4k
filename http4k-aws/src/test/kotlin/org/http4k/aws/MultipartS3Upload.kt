@@ -12,14 +12,14 @@ import org.http4k.core.Status
 import org.http4k.core.query
 
 object MultipartS3Upload {
-    operator fun invoke(size: Int, bodyMode: BodyMode) = Filter { next ->
+    operator fun invoke(size: Int, requestBodyMode: BodyMode) = Filter { next ->
         {
             try {
                 val uploadId = UploadId.from(next(it.initialiseMultipart()).orFail())
 
                 val partEtags = it.parts(size)
                     .withIndex()
-                    .mapNotNull { (index, part) -> next(it.uploadPart(index, uploadId, bodyMode(part))).orFail(uploadId).header("ETag") }
+                    .mapNotNull { (index, part) -> next(it.uploadPart(index, uploadId, requestBodyMode(part))).orFail(uploadId).header("ETag") }
 
                 next(it.completeMultipart(uploadId, partEtags))
             } catch (e: UploadError) {
