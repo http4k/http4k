@@ -16,7 +16,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.Payload
 import org.junit.After
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -26,12 +26,13 @@ import java.io.InputStream
 import java.util.*
 
 class AwsRealTest {
-    private var client: HttpHandler? = null
     private var bucketName: String? = null
     private var key: String? = null
     private var bucketUrl: Uri? = null
     private var keyUrl: Uri? = null
     private var s3Root: Uri? = null
+    private var scope: AwsCredentialScope? = null
+    private var credentials: AwsCredentials? = null
 
     @Before
     fun createClient() {
@@ -43,11 +44,8 @@ class AwsRealTest {
             properties.getProperty("signMyLifeAway"),
             equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
 
-        client = ClientFilters.AwsAuth(AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service")),
-            AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey")))
-            .then(DebuggingFilters.PrintRequestAndResponse())
-            .then(ApacheClient(requestBodyMode = BodyMode.Request.Stream))
-//            .then(ApacheClient())
+        scope = AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service"))
+        credentials = AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))
 
         bucketName = UUID.randomUUID().toString()
         key = UUID.randomUUID().toString()
@@ -56,60 +54,79 @@ class AwsRealTest {
         s3Root = Uri.of("https://s3.amazonaws.com/")
     }
 
-     @Test
-     fun putThenGetThenDelete() {
-        val contents = UUID.randomUUID().toString()
+    private fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
+
+    @Test
+    fun `default usage`() {
+        val client = awsClientFilter(Payload.Mode.Signed)
+            .then(ApacheClient())
+        bucketLifecycle((client))
+    }
+
+    @Test
+    fun `streaming`() {
+        val client = awsClientFilter(Payload.Mode.Unsigned)
+            .then(ApacheClient(requestBodyMode = BodyMode.Request.Stream))
+
+        bucketLifecycle((client))
+    }
+
+    private fun bucketLifecycle(client: HttpHandler) {
+        val contentOriginal = UUID.randomUUID().toString()
+        val contents = contentOriginal.byteInputStream()
 
         assertThat(
             "Bucket should not exist in root listing",
-            client!!(Request(GET, s3Root!!)).bodyString(),
+            client(Request(GET, s3Root!!)).bodyString(),
             !containsSubstring(bucketName!!))
         assertThat(
             "Put of bucket should succeed",
-            client!!(Request(PUT, bucketUrl!!)).status,
+            client(Request(PUT, bucketUrl!!)).status,
             equalTo(OK))
         assertThat(
             "Bucket should exist in root listing",
-            client!!(Request(GET, s3Root!!)).bodyString(),
+            client(Request(GET, s3Root!!)).bodyString(),
             containsSubstring(bucketName!!))
         assertThat(
             "Key should not exist in bucket listing",
-            client!!(Request(GET, bucketUrl!!)).bodyString(),
+            client(Request(GET, bucketUrl!!)).bodyString(),
             !containsSubstring(key!!))
         assertThat(
             "Put of key should succeed",
-            client!!(Request(PUT, keyUrl!!).body(contents)).status,
+            client(Request(PUT, keyUrl!!).header("content-length", contentOriginal.length.toString()).body(contents)).status,
             equalTo(OK))
         assertThat(
             "Key should appear in bucket listing",
-            client!!(Request(GET, bucketUrl!!)).bodyString(),
+            client(Request(GET, bucketUrl!!)).bodyString(),
             containsSubstring(key!!))
         assertThat(
             "Key contents should be as expected",
-            client!!(Request(GET, keyUrl!!)).bodyString(),
-            equalTo(contents))
+            client(Request(GET, keyUrl!!)).bodyString(),
+            equalTo(contentOriginal))
         assertThat(
             "Delete of key should succeed",
-            client!!(Request(DELETE, keyUrl!!)).status,
+            client(Request(DELETE, keyUrl!!)).status,
             equalTo(NO_CONTENT))
         assertThat(
             "Key should no longer appear in bucket listing",
-            client!!(Request(GET, bucketUrl!!)).bodyString(),
+            client(Request(GET, bucketUrl!!)).bodyString(),
             !containsSubstring(key!!))
         assertThat(
             "Delete of bucket should succeed",
-            client!!(Request(DELETE, bucketUrl!!)).status,
+            client(Request(DELETE, bucketUrl!!)).status,
             equalTo(NO_CONTENT))
         assertThat(
             "Bucket should no longer exist in root listing",
-            client!!(Request(GET, s3Root!!)).bodyString(),
+            client(Request(GET, s3Root!!)).bodyString(),
             !containsSubstring(bucketName!!))
     }
 
     @After
-
     fun removeBucket() {
-        client!!(Request(DELETE, bucketUrl!!))
+        val client = awsClientFilter(Payload.Mode.Signed)
+            .then(ApacheClient())
+
+        client(Request(DELETE, bucketUrl!!))
     }
 
     companion object {

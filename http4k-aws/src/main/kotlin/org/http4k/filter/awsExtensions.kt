@@ -8,15 +8,17 @@ import org.http4k.aws.AwsRequestDate
 import org.http4k.aws.AwsSignatureV4Signer
 import org.http4k.core.Body
 import org.http4k.core.Filter
+import org.http4k.core.Request
 import java.time.Clock
 
 fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                           credentials: AwsCredentials,
-                          clock: Clock = Clock.systemDefaultZone()) =
+                          clock: Clock = Clock.systemDefaultZone(),
+                          payloadMode: Payload.Mode = Payload.Mode.Signed) =
     Filter {
         next ->
         {
-            val payload = CanonicalPayload.from(it.body)
+            val payload = payloadMode(it)
 
             val date = AwsRequestDate.of(clock.instant())
 
@@ -48,5 +50,17 @@ data class CanonicalPayload(val hash: String, val length: Int){
     companion object {
         val EMPTY = from(Body.EMPTY)
         fun from(body: Body) = CanonicalPayload( AwsHmacSha256.hash(body.payload.array()), body.payload.array().size)
+    }
+}
+
+object Payload {
+    sealed class Mode : (Request) -> CanonicalPayload {
+        object Signed : Mode() {
+            override operator fun invoke(request: Request) = CanonicalPayload.from(request.body)
+        }
+
+        object Unsigned : Mode() {
+            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.header("content-length")?.toInt() ?: 0)
+        }
     }
 }
