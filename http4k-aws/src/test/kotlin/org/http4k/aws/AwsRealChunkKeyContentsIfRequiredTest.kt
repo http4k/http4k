@@ -28,29 +28,31 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         val client =
             ClientFilters.ChunkKeyContentsIfRequired()
                 .then(awsClientFilter(Payload.Mode.Signed))
-                .then(DebuggingFilters.PrintRequestAndResponse())
+                .then(DebuggingFilters.PrintResponse())
                 .then(ApacheClient(requestBodyMode = BodyMode.Request.Memory))
         bucketLifecycle((client))
     }
 
     private fun bucketLifecycle(client: HttpHandler) {
+        val aClient = aClient()
+
         val contentOriginal = (1..10 * 1024 * 1024).map { 'a' }.joinToString("")
 
         assertThat(
             "Bucket should not exist in root listing",
-            client(Request(GET, s3Root!!)).bodyString(),
+            aClient(Request(GET, s3Root!!)).bodyString(),
             !containsSubstring(bucketName!!))
         assertThat(
             "Put of bucket should succeed",
-            client(Request(PUT, bucketUrl!!)).status,
+            aClient(Request(PUT, bucketUrl!!)).status,
             equalTo(Status.OK))
         assertThat(
             "Bucket should exist in root listing",
-            client(Request(GET, s3Root!!)).bodyString(),
+            aClient(Request(GET, s3Root!!)).bodyString(),
             containsSubstring(bucketName!!))
         assertThat(
             "Key should not exist in bucket listing",
-            client(Request(GET, bucketUrl!!)).bodyString(),
+            aClient(Request(GET, bucketUrl!!)).bodyString(),
             !containsSubstring(key!!))
 
         client(Request(PUT, keyUrl!!)
@@ -58,30 +60,29 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
         assertThat(
             "Key should appear in bucket listing",
-            client(Request(GET, bucketUrl!!)).bodyString(),
+            aClient(Request(GET, bucketUrl!!)).bodyString(),
             containsSubstring(key!!))
         assertThat(
             "Key contents should be as expected",
-            client(Request(GET, keyUrl!!)).bodyString().length,
+            aClient(Request(GET, keyUrl!!)).bodyString().length,
             equalTo(contentOriginal.length))
         assertThat(
             "Delete of key should succeed",
-            client(Request(DELETE, keyUrl!!)).status,
+            aClient(Request(DELETE, keyUrl!!)).status,
             equalTo(Status.NO_CONTENT))
         assertThat(
             "Key should no longer appear in bucket listing",
-            client(Request(GET, bucketUrl!!)).bodyString(),
+            aClient(Request(GET, bucketUrl!!)).bodyString(),
             !containsSubstring(key!!))
         assertThat(
             "Delete of bucket should succeed",
-            client(Request(DELETE, bucketUrl!!)).status,
+            aClient(Request(DELETE, bucketUrl!!)).status,
             equalTo(Status.NO_CONTENT))
         assertThat(
             "Bucket should no longer exist in root listing",
-            client(Request(GET, s3Root!!)).bodyString(),
+            aClient(Request(GET, s3Root!!)).bodyString(),
             !containsSubstring(bucketName!!))
     }
-
 }
 
 fun ClientFilters.ChunkKeyContentsIfRequired(size: Int = 5 * 1024 * 1024): Filter {
@@ -125,12 +126,9 @@ private fun chunker(size: Int) = Filter { next ->
 
 private fun Request.chunks(size: Int): Sequence<String> {
     val bodyString = bodyString()
-    println(size)
-    println(bodyString.length)
-    println(size * 2)
     return listOf(
-        bodyString.substring((0..size)),
-        bodyString.substring((size until (size * 2)))
+        bodyString.substring((0 until size)),
+        bodyString.substring(size)
     ).asSequence()
 }
 

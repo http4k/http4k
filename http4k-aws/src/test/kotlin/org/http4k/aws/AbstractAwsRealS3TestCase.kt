@@ -18,13 +18,13 @@ import java.io.InputStream
 import java.util.*
 
 abstract class AbstractAwsRealS3TestCase {
-    var bucketName: String? = null
-    var key: String? = null
-    var bucketUrl: Uri? = null
-    var keyUrl: Uri? = null
-    var s3Root: Uri? = null
-    var scope: AwsCredentialScope? = null
-    var credentials: AwsCredentials? = null
+    protected var bucketName: String? = null
+    protected var key: String? = null
+    protected var bucketUrl: Uri? = null
+    protected var keyUrl: Uri? = null
+    protected var s3Root: Uri? = null
+    protected var scope: AwsCredentialScope? = null
+    protected var credentials: AwsCredentials? = null
 
     @Before
     fun setup() {
@@ -48,13 +48,13 @@ abstract class AbstractAwsRealS3TestCase {
 
     @After
     fun removeBucket() {
-        val client = awsClientFilter(Payload.Mode.Signed)
-            .then(ApacheClient())
-
-        client(Request(Method.DELETE, bucketUrl!!))
+        aClient()(Request(Method.DELETE, bucketUrl!!))
     }
 
-    fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
+    protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
+        .then(ApacheClient())
+
+    protected fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
 
     companion object {
         @BeforeClass
