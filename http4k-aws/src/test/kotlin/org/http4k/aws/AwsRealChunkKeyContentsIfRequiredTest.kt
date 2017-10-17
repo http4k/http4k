@@ -90,41 +90,42 @@ fun ClientFilters.ChunkKeyContentsIfRequired(): Filter = Filter { next ->
     }
 }
 
-private fun Response.onSuccess(fn: (Response) -> Response): Response =
-    if (this.status == Status.OK) fn(this) else this
+private fun Response.orFail(): Response = apply { if (this.status != Status.OK) throw UploadError(this) }
+
+private data class UploadError(val response: Response) : Exception()
 
 private val chunk = Filter { next ->
     {
-        next(Request(POST, it.uri.query("uploads", "")))
-            .onSuccess { initialiseUpload ->
-                val uploadId = UploadId.from(initialiseUpload)
+        try {
+            val initialiseUpload = next(Request(POST, it.uri.query("uploads", ""))).orFail()
+            val uploadId = UploadId.from(initialiseUpload)
 
-                val partEtags = it.chunks()
-                    .withIndex()
-                    .map { it.copy(index = it.index + 1) }
-                    .mapNotNull { (index, part) ->
-                        val upload = next(Request(PUT, it.uri
-                            .query("partNumber", index.toString())
-                            .query("uploadId", uploadId))
-                            .body(part)
-                        )
-                        // todo: stop on failure
-                        upload.header("ETag")
-                    }
+            val partEtags = it.chunks()
+                .withIndex()
+                .map { it.copy(index = it.index + 1) }
+                .mapNotNull { (index, part) ->
+                    val upload = next(Request(PUT, it.uri
+                        .query("partNumber", index.toString())
+                        .query("uploadId", uploadId))
+                        .body(part)
+                    ).orFail()
+                    upload.header("ETag")
+                }
 
-                next(Request(POST, it.uri.query("uploadId", uploadId))
-                    .body(partEtags.toCompleteMultipartUploadXml()))
-            }
+            next(Request(POST, it.uri.query("uploadId", uploadId))
+                .body(partEtags.toCompleteMultipartUploadXml()))
+        } catch (e: UploadError) {
+            e.response
+        }
     }
 }
 
-private fun Request.chunks() =
-    listOf(
-        bodyString().substring((0..5000)),
-        bodyString().substring((5000..10000))
-    ).asSequence()
+private fun Request.chunks() = listOf(
+    bodyString().substring((0..5000)),
+    bodyString().substring((5000..10000))
+).asSequence()
 
-private data class UploadId(val value: String) {
+internal data class UploadId(val value: String) {
     companion object {
         fun from(response: Response) =
             Regex(""".*UploadId>(.+)</UploadId.*""").find(response.bodyString())?.groupValues?.get(1)
