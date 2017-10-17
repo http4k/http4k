@@ -132,7 +132,7 @@ internal data class UploadId(val value: String) {
     }
 }
 
-fun Sequence<String>.toCompleteMultipartUploadXml(): String =
+internal fun Sequence<String>.toCompleteMultipartUploadXml(): String =
     """<CompleteMultipartUpload>${mapIndexed { index, etag ->
         """<Part><PartNumber>${index + 1}</PartNumber><ETag>$etag</ETag></Part>"""
     }.joinToString("")}</CompleteMultipartUpload>"""
