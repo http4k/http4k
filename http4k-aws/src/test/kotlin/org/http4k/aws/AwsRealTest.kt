@@ -12,49 +12,12 @@ import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.filter.AwsAuth
-import org.http4k.filter.ClientFilters
 import org.http4k.filter.Payload
-import org.junit.After
-import org.junit.Assume.assumeTrue
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
-import java.io.InputStream
 import java.util.*
 
-class AwsRealTest {
-    private var bucketName: String? = null
-    private var key: String? = null
-    private var bucketUrl: Uri? = null
-    private var keyUrl: Uri? = null
-    private var s3Root: Uri? = null
-    private var scope: AwsCredentialScope? = null
-    private var credentials: AwsCredentials? = null
-
-    @Before
-    fun createClient() {
-        val properties = Properties()
-        properties.load(properties())
-
-        assertThat(
-            "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
-            properties.getProperty("signMyLifeAway"),
-            equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
-
-        scope = AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service"))
-        credentials = AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))
-
-        bucketName = UUID.randomUUID().toString()
-        key = UUID.randomUUID().toString()
-        bucketUrl = Uri.of("https://$bucketName.s3.amazonaws.com/")
-        keyUrl = Uri.of("https://$bucketName.s3.amazonaws.com/$key")
-        s3Root = Uri.of("https://s3.amazonaws.com/")
-    }
-
-    private fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
+class AwsRealTest : AbstractAwsRealS3TestCase() {
 
     @Test
     fun `default usage`() {
@@ -119,25 +82,6 @@ class AwsRealTest {
             "Bucket should no longer exist in root listing",
             client(Request(GET, s3Root!!)).bodyString(),
             !containsSubstring(bucketName!!))
-    }
-
-    @After
-    fun removeBucket() {
-        val client = awsClientFilter(Payload.Mode.Signed)
-            .then(ApacheClient())
-
-        client(Request(DELETE, bucketUrl!!))
-    }
-
-    companion object {
-        @BeforeClass @JvmStatic
-        fun checkPropertiesExist() {
-            assumeTrue(properties() != null)
-        }
-
-        private fun properties(): InputStream? {
-            return AwsRealTest::class.java.getResourceAsStream("/aws.properties")
-        }
     }
 }
 
