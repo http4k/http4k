@@ -66,7 +66,7 @@ abstract class AbstractAwsRealS3TestCase {
         }
 
         private fun properties(): InputStream? {
-            return AwsRealMultipartTest::class.java.getResourceAsStream("/aws.properties")
+            return AwsRealChunkKeyContentsIfRequiredTest::class.java.getResourceAsStream("/aws.properties")
         }
     }
 }

@@ -21,7 +21,7 @@ import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
 import org.junit.Test
 
-class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
+class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
     @Test
     fun `default usage`() {
