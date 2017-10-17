@@ -19,6 +19,7 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
             val fullRequest = it
                 .header("host", it.uri.host)
                 .header("x-amz-date", date.full)
+                .replaceHeader("content-length", it.body.payload.array().size.toString())
 
             val canonicalRequest = AwsCanonicalRequest.of(fullRequest)
 

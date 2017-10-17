@@ -44,7 +44,7 @@ class ApacheClient(
             val request = this@toApacheRequest
             uri = URI(request.uri.toString())
             entity = when (requestBodyMode) {
-                Stream -> InputStreamEntity(request.body.stream)
+                Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
                 Memory -> ByteArrayEntity(request.body.payload.array())
             }
             request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
@@ -58,7 +58,8 @@ class ApacheClient(
     private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 
     companion object {
-        private fun defaultApacheHttpClient() = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
+        private fun defaultApacheHttpClient() = HttpClients.custom()
+            .setDefaultRequestConfig(RequestConfig.custom()
             .setRedirectsEnabled(false)
             .setCookieSpec(IGNORE_COOKIES)
             .build()).build()

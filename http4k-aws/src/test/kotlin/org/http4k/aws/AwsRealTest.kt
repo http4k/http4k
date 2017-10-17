@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
+import org.http4k.core.BodyMode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -42,10 +43,11 @@ class AwsRealTest {
             properties.getProperty("signMyLifeAway"),
             equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
 
-        client = DebuggingFilters.PrintRequestAndResponse()
-            .then(ClientFilters.AwsAuth(AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service")),
-                AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey")))
-                .then(ApacheClient()))
+        client = ClientFilters.AwsAuth(AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service")),
+            AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey")))
+            .then(DebuggingFilters.PrintRequestAndResponse())
+            .then(ApacheClient(requestBodyMode = BodyMode.Request.Stream))
+//            .then(ApacheClient())
 
         bucketName = UUID.randomUUID().toString()
         key = UUID.randomUUID().toString()
@@ -55,7 +57,7 @@ class AwsRealTest {
     }
 
      @Test
-fun putThenGetThenDelete() {
+     fun putThenGetThenDelete() {
         val contents = UUID.randomUUID().toString()
 
         assertThat(
@@ -117,7 +119,7 @@ fun putThenGetThenDelete() {
         }
 
         private fun properties(): InputStream? {
-            return AwsRealTest::class.java.getResourceAsStream("aws.properties")
+            return AwsRealTest::class.java.getResourceAsStream("/aws.properties")
         }
     }
 }
