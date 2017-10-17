@@ -16,18 +16,28 @@ import org.http4k.filter.ChunkKeyContentsIfRequired
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
+import org.junit.Ignore
 import org.junit.Test
 
 class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
     @Test
     fun `default usage`() {
-        val client =
-            ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = BodyMode.Memory)
-                .then(awsClientFilter(Payload.Mode.Signed))
-                .then(DebuggingFilters.PrintResponse())
-                .then(ApacheClient(requestBodyMode = BodyMode.Memory))
-        bucketLifecycle((client))
+        val requestBodyMode = BodyMode.Memory
+        bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
+            .then(awsClientFilter(Payload.Mode.Signed))
+            .then(DebuggingFilters.PrintResponse())
+            .then(ApacheClient(requestBodyMode = requestBodyMode)))
+    }
+
+    @Test
+    @Ignore
+    fun `streaming usage`() {
+        val requestBodyMode = BodyMode.Stream
+        bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)
+            .then(awsClientFilter(Payload.Mode.Unsigned))
+            .then(DebuggingFilters.PrintResponse())
+            .then(ApacheClient(requestBodyMode = requestBodyMode)))
     }
 
     private fun bucketLifecycle(client: HttpHandler) {
