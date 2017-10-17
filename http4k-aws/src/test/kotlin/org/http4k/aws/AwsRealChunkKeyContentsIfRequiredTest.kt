@@ -85,7 +85,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
 fun ClientFilters.ChunkKeyContentsIfRequired(): Filter = Filter { next ->
     {
-        if (it.method == PUT && it.uri.path == "") upload.then(next)(it)
+        if (it.method == PUT && it.uri.path == "") chunk.then(next)(it)
         else next(it)
     }
 }
@@ -93,7 +93,7 @@ fun ClientFilters.ChunkKeyContentsIfRequired(): Filter = Filter { next ->
 private fun Response.onSuccess(fn: (Response) -> Response): Response =
     if (this.status == Status.OK) fn(this) else this
 
-private val upload = Filter { next ->
+private val chunk = Filter { next ->
     {
         next(Request(POST, it.uri.query("uploads", "")))
             .onSuccess { initialiseUpload ->
