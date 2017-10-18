@@ -8,7 +8,7 @@ import java.util.*
 class RequestContext internal constructor(internal val id: UUID) {
     private val objects = mutableMapOf<String, Any>()
 
-    companion object : LensExtractor<Request, UUID>, LensInjector<Request, UUID> {
+    companion object : LensExtractor<Request, UUID>, LensInjector<UUID, Request> {
 
         private val X_HTTP4K_CONTEXT = Header.map(UUID::fromString, UUID::toString).required("x-http4k-context")
 

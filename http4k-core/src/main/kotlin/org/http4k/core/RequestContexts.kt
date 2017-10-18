@@ -4,7 +4,7 @@ import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensInjector
 import java.util.*
 
-class RequestContexts : LensInjector<Request, RequestContext>, LensExtractor<Request, RequestContext> {
+class RequestContexts : LensInjector<RequestContext, Request>, LensExtractor<Request, RequestContext> {
 
     private val requests = mutableMapOf<UUID, RequestContext>()
 

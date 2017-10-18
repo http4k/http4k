@@ -32,7 +32,7 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
                           contentType: ContentType,
                           get: (HttpMessage) -> FINAL,
                           private val setLens: (FINAL, HttpMessage) -> HttpMessage)
-    : LensInjector<HttpMessage, FINAL>, BodyLens<FINAL>(metas, contentType, get) {
+    : LensInjector<FINAL, HttpMessage>, BodyLens<FINAL>(metas, contentType, get) {
 
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : HttpMessage> invoke(value: FINAL, target: R): R = setLens(value, target) as R

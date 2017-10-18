@@ -24,7 +24,7 @@ open class Lens<in IN, out FINAL>(val meta: Meta,
  */
 class BiDiLens<in IN, FINAL>(meta: Meta,
                              get: (IN) -> FINAL,
-                             private val lensSet: (FINAL, IN) -> IN) : LensInjector<IN, FINAL>, Lens<IN, FINAL>(meta, get) {
+                             private val lensSet: (FINAL, IN) -> IN) : LensInjector<FINAL, IN>, Lens<IN, FINAL>(meta, get) {
 
     @Suppress("UNCHECKED_CAST")
     override operator fun <R : IN> invoke(value: FINAL, target: R): R = lensSet(value, target) as R
