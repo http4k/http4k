@@ -10,13 +10,13 @@ import org.http4k.core.with
 import java.io.Closeable
 import java.util.*
 
-object MultipartFormField : BiDiLensSpec<MultipartForm, String, String>("form",
+object MultipartFormField : BiDiLensSpec<MultipartForm, String>("form",
     ParamMeta.StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
 )
 
-object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile, FormFile>("form",
+object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
     ParamMeta.FileParam,
     LensGet { name, form -> form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList() },
     LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }

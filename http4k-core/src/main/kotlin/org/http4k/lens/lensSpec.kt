@@ -9,23 +9,23 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class LensGet<in IN, MID, out OUT> private constructor(private val rootFn: (String, IN) -> List<MID>, private val fn: (MID) -> OUT) {
-    operator fun invoke(name: String) = { target: IN -> rootFn(name, target).map(fn) }
+class LensGet<in IN, out OUT> private constructor(private val rootFn: (String, IN) -> List<OUT>) {
+    operator fun invoke(name: String) = { target: IN -> rootFn(name, target) }
 
-    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet(rootFn, { nextFn(fn(it)) })
+    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet({ x, y: IN -> rootFn(x, y).map(nextFn) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): LensGet<IN, OUT, OUT> = LensGet(rootFn, { it })
+        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): LensGet<IN, OUT> = LensGet(rootFn)
     }
 }
 
-class LensSet<IN, MID, in OUT> private constructor(private val rootFn: (String, List<MID>, IN) -> IN, private val fn: (OUT) -> MID) {
-    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values.map(fn), target) }
+class LensSet<IN, in OUT> private constructor(private val rootFn: (String, List<OUT>, IN) -> IN) {
+    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values, target) }
 
-    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet(rootFn, { value: NEXT -> fn(nextFn(value)) })
+    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet({ a, b: List<NEXT>, c: IN -> rootFn(a, b.map(nextFn), c) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT, OUT> = LensSet(rootFn, { it })
+        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT> = LensSet(rootFn)
     }
 }
 
@@ -41,9 +41,9 @@ interface MultiLensSpec<in IN, OUT> {
 /**
  * Represents a uni-directional extraction of an entity from a target.
  */
-open class LensSpec<IN, MID, OUT>(protected val location: String,
-                                  protected val paramMeta: ParamMeta,
-                                  internal val get: LensGet<IN, MID, OUT>) {
+open class LensSpec<IN, OUT>(protected val location: String,
+                             protected val paramMeta: ParamMeta,
+                             internal val get: LensGet<IN, OUT>) {
     /**
      * Create another LensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be
      * used to extract the final type from a target.
@@ -119,10 +119,10 @@ interface BiDiMultiLensSpec<in IN, OUT> : MultiLensSpec<IN, OUT> {
 /**
  * Represents a bi-directional extraction of an entity from a target, or an insertion into a target.
  */
-open class BiDiLensSpec<IN, MID, OUT>(location: String,
-                                      paramMeta: ParamMeta,
-                                      get: LensGet<IN, MID, OUT>,
-                                      private val set: LensSet<IN, MID, OUT>) : LensSpec<IN, MID, OUT>(location, paramMeta, get) {
+open class BiDiLensSpec<IN, OUT>(location: String,
+                                 paramMeta: ParamMeta,
+                                 get: LensGet<IN, OUT>,
+                                 private val set: LensSet<IN, OUT>) : LensSpec<IN, OUT>(location, paramMeta, get) {
 
     /**
      * Create another BiDiLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -193,18 +193,18 @@ open class BiDiLensSpec<IN, MID, OUT>(location: String,
     }
 }
 
-fun <IN> BiDiLensSpec<IN, String, String>.string() = this
-fun <IN> BiDiLensSpec<IN, String, String>.nonEmptyString() = this.map(::nonEmpty, { it })
-fun <IN> BiDiLensSpec<IN, String, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun <IN> BiDiLensSpec<IN, String, String>.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
-fun <IN> BiDiLensSpec<IN, String, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-fun <IN> BiDiLensSpec<IN, String, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
-fun <IN> BiDiLensSpec<IN, String, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String, String> {
+fun <IN> BiDiLensSpec<IN, String>.string() = this
+fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = this.map(::nonEmpty, { it })
+fun <IN> BiDiLensSpec<IN, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun <IN> BiDiLensSpec<IN, String>.localDate() = this.map(LocalDate::parse, DateTimeFormatter.ISO_LOCAL_DATE::format)
+fun <IN> BiDiLensSpec<IN, String>.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String>.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+fun <IN> BiDiLensSpec<IN, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
+fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> {
     val toRegex = pattern.toRegex()
     return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
 }

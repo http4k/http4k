@@ -39,7 +39,7 @@ object Xml {
         return it.toString()
     }
 
-    fun <IN> BiDiLensSpec<IN, String, String>.xml() = this.map({ it.asXmlDocument() }, { it.asXmlString() })
+    fun <IN> BiDiLensSpec<IN, String>.xml() = this.map({ it.asXmlDocument() }, { it.asXmlString() })
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =

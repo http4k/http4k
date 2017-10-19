@@ -35,7 +35,7 @@ class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (
 /**
  * Represents a uni-directional extraction of an entity from a target path segment.
  */
-open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, String, OUT>) {
+open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         return PathLens(Meta(true, "path", paramMeta, name, description),
@@ -50,8 +50,8 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
 }
 
 open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
-                                 get: LensGet<String, String, OUT>,
-                                 private val set: LensSet<Request, String, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
+                                 get: LensGet<String, OUT>,
+                                 private val set: LensSet<Request, OUT>) : PathLensSpec<OUT>(paramMeta, get) {
 
     /**
      * Create another BiDiPathLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be

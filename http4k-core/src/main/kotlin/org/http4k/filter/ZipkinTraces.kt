@@ -31,7 +31,7 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
         private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")
         private val X_B3_PARENTSPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-parentspanid")
 
-        private val lens = BiDiLensSpec<HttpMessage, ZipkinTraces, ZipkinTraces>("headers",
+        private val lens = BiDiLensSpec<HttpMessage, ZipkinTraces>("headers",
             StringParam,
             LensGet { _, target ->
                 listOf(ZipkinTraces(

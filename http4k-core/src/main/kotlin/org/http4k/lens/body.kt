@@ -41,7 +41,7 @@ class BiDiBodyLens<FINAL>(metas: List<Meta>,
 /**
  * Represents a uni-directional extraction of an entity from a target Body.
  */
-open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, Body, OUT>) {
+open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val contentType: ContentType, internal val get: LensGet<HttpMessage, OUT>) {
     /**
      * Create a lens for this Spec
      */
@@ -62,8 +62,8 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
  */
 open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
                                  contentType: ContentType,
-                                 get: LensGet<HttpMessage, Body, OUT>,
-                                 private val set: LensSet<HttpMessage, Body, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
+                                 get: LensGet<HttpMessage, OUT>,
+                                 private val set: LensSet<HttpMessage, OUT>) : BodyLensSpec<OUT>(metas, contentType, get) {
 
     /**
      * Create another BiDiBodyLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
@@ -85,7 +85,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
 }
 
 fun root(metas: List<Meta>, acceptedContentType: ContentType, contentNegotiation: ContentNegotiation) =
-    BiDiBodyLensSpec(metas, acceptedContentType,
+    BiDiBodyLensSpec<Body>(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
             target.body.let { listOf(it) }

@@ -57,8 +57,8 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun parse(s: String): ROOT = s.asJsonObject()
     fun pretty(node: ROOT): String = node.asPrettyJsonString()
     fun compact(node: ROOT): String = node.asCompactJsonString()
-    fun <IN> lens(spec: BiDiLensSpec<IN, String, String>) = spec.map({ parse(it) }, { compact(it) })
-    fun <IN> BiDiLensSpec<IN, String, String>.json() = lens(this)
+    fun <IN> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })
+    fun <IN> BiDiLensSpec<IN, String>.json() = lens(this)
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> =
         root(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
             .map({it.payload.asString()}, {it: String -> Body(it)})
