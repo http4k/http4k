@@ -185,10 +185,10 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `catch lens failure - invalid from response is rethrown`() {
-        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), clazz = Response::class.java)
+    fun `catch lens failure - invalid from Response is rethrown`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Response(OK))
         val handler = ServerFilters.CatchLensFailure.then { throw e }
-        assertThat({ handler(Request(GET, "/"))}, throws(equalTo(e)))
+        assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
     }
 
     @Test

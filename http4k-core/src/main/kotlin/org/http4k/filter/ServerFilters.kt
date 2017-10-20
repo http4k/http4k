@@ -111,7 +111,7 @@ object ServerFilters {
                 next(it)
             } catch (lensFailure: LensFailure) {
                 when {
-                    lensFailure.clazz == Response::class.java -> throw lensFailure
+                    lensFailure.target is Response -> throw lensFailure
                     lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
                     else -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
                 }
