@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.35.0
+### v2.35.0 (uncut)
 - Fix #56. Altered behaviour of `CatchLensFailure` to NOT catch errors from unmarshalling Response objects. This was causing BAD_REQUEST to be incorrectly generated.
 - Simplification of generics around LensSpecs. This should not be a breaking change, (there were 3 generics, now the MID has been removed so there are just 2) but could break if signatures are used explicitly.
 
