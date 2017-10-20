@@ -103,14 +103,18 @@ object ServerFilters {
     /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
      * This is required when using lenses to automatically unmarshall inbound requests.
+     * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
     object CatchLensFailure : Filter {
         override fun invoke(next: HttpHandler): HttpHandler = {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
-                if (lensFailure.overall() == Failure.Type.Unsupported) Response(UNSUPPORTED_MEDIA_TYPE)
-                else Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+                when {
+                    lensFailure.clazz == Response::class.java -> throw lensFailure
+                    lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
+                    else -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+                }
             }
         }
     }

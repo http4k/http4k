@@ -20,7 +20,7 @@ open class BodyLens<out FINAL>(val metas: List<Meta>, val contentType: ContentTy
     } catch (e: LensFailure) {
         throw e
     } catch (e: Exception) {
-        throw LensFailure(metas.map(::Invalid), cause = e)
+        throw LensFailure(metas.map(::Invalid), cause = e, clazz = target.javaClass)
     }
 }
 

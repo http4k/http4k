@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
@@ -181,6 +182,13 @@ class ServerFiltersTest {
 
         response shouldMatch hasStatus(BAD_REQUEST)
         response.status.description shouldMatch equalTo("header 'bob' must be string; header 'bill' is required")
+    }
+
+    @Test
+    fun `catch lens failure - invalid from response is rethrown`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), clazz = Response::class.java)
+        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        assertThat({ handler(Request(GET, "/"))}, throws(equalTo(e)))
     }
 
     @Test
