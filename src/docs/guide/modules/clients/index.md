@@ -6,7 +6,7 @@
 ### About
 Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC.
 
-Activate streaming mode by passing a `ResponseBodyMode` (default is non-streaming).
+Activate streaming mode by passing a `BodyMode` (default is non-streaming).
 
 These examples are for the Apache HTTP client, but the API is similar for the others:
 
