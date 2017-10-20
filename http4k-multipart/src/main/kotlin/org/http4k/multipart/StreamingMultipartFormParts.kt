@@ -10,24 +10,24 @@ import java.util.*
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
  */
 internal class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
-    private val iterator: Iterator<StreamingPart> = StreamingMulipartFormPartIterator()
+    private val iterator = StreamingMulipartFormPartIterator()
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
     private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
     private var state: MultipartFormStreamState = MultipartFormStreamState.findBoundary
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
-    private var oldBoundary: ByteArray = boundary
-    private var oldBoundaryWithPrefix: ByteArray = boundaryWithPrefix
+    private var oldBoundary = boundary
+    private var oldBoundaryWithPrefix = boundaryWithPrefix
 
-    override fun iterator(): Iterator<StreamingPart> = iterator
+    override fun iterator() = iterator
 
-    private fun addPrefixToBoundary(boundary: ByteArray?): ByteArray {
-        val b = ByteArray(boundary!!.size + FIELD_SEPARATOR.size) // in apache they just use BOUNDARY_PREFIX
-        System.arraycopy(boundary, 0, b, 2, boundary.size)
-        System.arraycopy(FIELD_SEPARATOR, 0, b, 0, FIELD_SEPARATOR.size)
-        return b
-    }
+    private fun addPrefixToBoundary(boundary: ByteArray?): ByteArray =
+        // in apache they just use BOUNDARY_PREFIX
+        ByteArray(boundary!!.size + FIELD_SEPARATOR.size).apply {
+            System.arraycopy(boundary, 0, this, 2, boundary.size)
+            System.arraycopy(FIELD_SEPARATOR, 0, this, 0, FIELD_SEPARATOR.size)
+        }
 
     private fun findBoundary() {
         if (state == MultipartFormStreamState.findPrefix) {
