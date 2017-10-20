@@ -14,7 +14,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
     private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
-    private var state: MultipartFormStreamState = MultipartFormStreamState.findBoundary
+    private var state: MultipartFormStreamState = MultipartFormStreamState.FindBoundary
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
     private var oldBoundary = boundary
@@ -30,35 +30,36 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         }
 
     private fun findBoundary() {
-        if (state == MultipartFormStreamState.findPrefix) {
+        if (state == MultipartFormStreamState.FindPrefix) {
             if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be proceeded by field separator, but didn't find it")
-            state = MultipartFormStreamState.findBoundary
+            state = MultipartFormStreamState.FindBoundary
         }
 
-        if (state == MultipartFormStreamState.findBoundary && !inputStream.matchInStream(boundary)) throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
+        if (state == MultipartFormStreamState.FindBoundary && !inputStream.matchInStream(boundary)) throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
 
-        state = MultipartFormStreamState.boundaryFound
+        state = MultipartFormStreamState.BoundaryFound
         if (inputStream.matchInStream(STREAM_TERMINATOR)) {
             if (inputStream.matchInStream(FIELD_SEPARATOR)) {
-                if (mixedName != null) {
-                    boundary = oldBoundary
-                    boundaryWithPrefix = oldBoundaryWithPrefix
-                    mixedName = null
+                when {
+                    mixedName != null -> {
+                        boundary = oldBoundary
+                        boundaryWithPrefix = oldBoundaryWithPrefix
+                        mixedName = null
 
-                    state = MultipartFormStreamState.findBoundary
-                    findBoundary()
-                } else state = MultipartFormStreamState.eos
+                        state = MultipartFormStreamState.FindBoundary
+                        findBoundary()
+                    }
+                    else -> state = MultipartFormStreamState.Eos
+                }
             } else throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
         } else {
             state = if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
-            else MultipartFormStreamState.header
+            else MultipartFormStreamState.Header
         }
     }
 
-
-    private fun parseNextPart(): StreamingPart? {
-        findBoundary()
-        return if (state == MultipartFormStreamState.header) parsePart() else null
+    private fun parseNextPart(): StreamingPart? = findBoundary().run {
+        if (state == MultipartFormStreamState.Header) parsePart() else null
     }
 
     private fun parsePart(): StreamingPart? {
@@ -76,7 +77,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
             boundary = (String(STREAM_TERMINATOR, encoding) + trim(contentTypeParams["boundary"])!!).toByteArray(encoding)
             boundaryWithPrefix = addPrefixToBoundary(this.boundary)
 
-            state = MultipartFormStreamState.findBoundary
+            state = MultipartFormStreamState.FindBoundary
 
             parseNextPart()
         } else {
@@ -98,25 +99,26 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
     private fun trim(string: String?): String? = string?.trim { it <= ' ' }
 
     private fun parseHeaderLines(): Map<String, String> {
-        if (MultipartFormStreamState.header != state) throw IllegalStateException("Expected state ${MultipartFormStreamState.header} but got $state")
+        if (MultipartFormStreamState.Header != state) throw IllegalStateException("Expected state ${MultipartFormStreamState.Header} but got $state")
 
         val result = HashMap<String, String>()
         var previousHeaderName: String? = null
         val maxByteIndexForHeader = inputStream.currentByteIndex() + HEADER_SIZE_MAX
         while (inputStream.currentByteIndex() < maxByteIndexForHeader) {
             val header = readStringFromStreamUntilMatched(inputStream, FIELD_SEPARATOR, (maxByteIndexForHeader - inputStream.currentByteIndex()).toInt(), encoding)
-            if (header == "") {
-                state = MultipartFormStreamState.contents
-                return result
-            }
-            if (header.matches("\\s+.*".toRegex())) result.put(previousHeaderName!!, result[previousHeaderName] + "; " + header.trim { it <= ' ' })
-            else {
-                val index = header.indexOf(":")
-                if (index < 0) {
-                    throw ParseError("Header didn't include a colon <<$header>>")
-                } else {
-                    previousHeaderName = header.substring(0, index).trim { it <= ' ' }
-                    result.put(previousHeaderName, header.substring(index + 1).trim { it <= ' ' })
+            when {
+                header == "" -> {
+                    state = MultipartFormStreamState.Contents
+                    return result
+                }
+                header.matches("\\s+.*".toRegex()) -> result.put(previousHeaderName!!, result[previousHeaderName] + "; " + header.trim { it <= ' ' })
+                else -> {
+                    val index = header.indexOf(":")
+                    if (index < 0) throw ParseError("Header didn't include a colon <<$header>>")
+                    else {
+                        previousHeaderName = header.substring(0, index).trim { it <= ' ' }
+                        result.put(previousHeaderName, header.substring(index + 1).trim { it <= ' ' })
+                    }
                 }
             }
         }
@@ -131,7 +133,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
             if (!nextIsKnown) {
                 nextIsKnown = true
 
-                if (state == MultipartFormStreamState.contents) {
+                if (state == MultipartFormStreamState.Contents) {
                     currentPart!!.inputStream.close()
                 }
 
@@ -154,7 +156,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                 nextIsKnown = false
             } else {
 
-                if (state == MultipartFormStreamState.contents) currentPart!!.inputStream.close()
+                if (state == MultipartFormStreamState.Contents) currentPart!!.inputStream.close()
 
                 currentPart = safelyParseNextPart()
                 if (isEndOfStream) throw NoSuchElementException("No more parts in this MultipartForm")
@@ -187,12 +189,12 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
             val result = inputStream.readByteFromStreamUnlessTokenMatched(boundaryWithPrefix)
             return when (result) {
                 -1 -> {
-                    state = MultipartFormStreamState.findPrefix
+                    state = MultipartFormStreamState.FindPrefix
                     endOfStream = true
                     -1
                 }
                 -2 -> {
-                    state = MultipartFormStreamState.boundaryFound
+                    state = MultipartFormStreamState.BoundaryFound
                     endOfStream = true
                     -1 // inputStream.read(byte b[], int off, int len) checks for exactly -1
                 }
@@ -217,7 +219,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
     }
 
     private enum class MultipartFormStreamState {
-        findPrefix, findBoundary, boundaryFound, eos, header, contents, error
+        FindPrefix, FindBoundary, BoundaryFound, Eos, Header, Contents, Error
     }
 
     companion object {
