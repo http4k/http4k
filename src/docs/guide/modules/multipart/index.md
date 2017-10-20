@@ -1,5 +1,5 @@
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-multipart", version: "2.34.0"```
+```compile group: "org.http4k", name: "http4k-multipart", version: "2.35.0"```
 
 ### About
 
