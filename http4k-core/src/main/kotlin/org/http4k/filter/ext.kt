@@ -8,17 +8,13 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 fun Body.gzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
-else ByteArrayOutputStream().let {
-    GZIPOutputStream(it).let {
-        it.write(payload.array())
-        it.close()
-    }
-    Body(ByteBuffer.wrap(it.toByteArray()))
+else ByteArrayOutputStream().run {
+    GZIPOutputStream(this).use { it.write(payload.array()) }
+    Body(ByteBuffer.wrap(toByteArray()))
 }
 
 fun Body.gunzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
-else ByteArrayOutputStream().let {
-    GZIPInputStream(ByteArrayInputStream(payload.array())).copyTo(it, 4096)
-    it.close()
+else ByteArrayOutputStream().use {
+    GZIPInputStream(ByteArrayInputStream(payload.array())).copyTo(it)
     Body(ByteBuffer.wrap(it.toByteArray()))
 }
