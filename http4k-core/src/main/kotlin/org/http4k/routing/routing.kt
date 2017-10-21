@@ -6,7 +6,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 
 interface Router {
@@ -21,7 +21,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
-    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(Status.NOT_FOUND.description("Route not found"))
+    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(NOT_FOUND.description("Route not found"))
 
     override fun match(request: Request): HttpHandler? = list.find { it.match(request) != null }
 
@@ -37,7 +37,14 @@ fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
 class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
-    infix fun to(action: StaticRoutingHttpHandler): RoutingHttpHandler = action.withBasePath(path)
+    infix fun to(action: StaticRoutingHttpHandler): RoutingHttpHandler = action.withBasePath(path).let {
+        object : RoutingHttpHandler by it {
+            override fun match(request: Request): HttpHandler? = when (method) {
+                request.method -> it.match(request)
+                else -> null
+            }
+        }
+    }
 }
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)

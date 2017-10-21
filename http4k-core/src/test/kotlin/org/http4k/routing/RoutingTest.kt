@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -25,11 +26,14 @@ class RoutingTest {
     fun `can bind a verb to a static handler`() {
         val routes = routes(
             "/path1" bind GET to static(),
-            "/path2" bind static()
+            "/path2" bind static(),
+            "/path3" bind POST to static(), // this will never match, but we're proving that it will fall through
+            "/path3/{path:.*}" bind { Response(CREATED) }
         )
 
         routes(Request(GET, "/path1/index.html")) shouldMatch hasStatus(OK)
         routes(Request(GET, "/path2/index.html")) shouldMatch hasStatus(OK)
+        routes(Request(GET, "/path3/index.html")) shouldMatch hasStatus(CREATED)
     }
 
     @Test
