@@ -30,13 +30,14 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : Routi
     override fun withBasePath(new: String): RoutingHttpHandler = routes(*list.map { it.withBasePath(new) }.toTypedArray())
 }
 
-fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
+fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): StaticRoutingHttpHandler =
     StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
 class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
+    infix fun to(action: StaticRoutingHttpHandler): RoutingHttpHandler = action.withBasePath(path)
 }
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)

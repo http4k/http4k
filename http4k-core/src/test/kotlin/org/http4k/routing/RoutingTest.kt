@@ -2,6 +2,7 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -13,11 +14,23 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.hamkrest.hasStatus
 import org.junit.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
 
 class RoutingTest {
+
+    @Test
+    fun `can bind a verb to a static handler`() {
+        val routes = routes(
+            "/path1" bind GET to static(),
+            "/path2" bind static()
+        )
+
+        routes(Request(GET, "/path1/index.html")) shouldMatch hasStatus(OK)
+        routes(Request(GET, "/path2/index.html")) shouldMatch hasStatus(OK)
+    }
 
     @Test
     fun `not found`() {
