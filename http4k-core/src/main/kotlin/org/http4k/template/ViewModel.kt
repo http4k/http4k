@@ -8,7 +8,7 @@ import org.http4k.lens.string
 
 interface ViewModel {
     /**
-     * This is the path of the template file - which matches the filly qualified classname. The templating suffix
+     * This is the path of the template file - which matches the fully qualified classname. The templating suffix
      * is added by the template implementation (eg. java.lang.String -> java/lang/String.hbs)
      */
     fun template(): String = javaClass.name.replace('.', '/')
