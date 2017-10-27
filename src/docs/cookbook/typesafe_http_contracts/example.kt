@@ -36,6 +36,7 @@ import org.http4k.routing.static
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
+import java.time.Duration
 
 fun main(args: Array<String>) {
 
@@ -52,7 +53,7 @@ fun main(args: Array<String>) {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), { name, latency ->
+    val filter: Filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), { name: String, latency: Duration ->
         println(name + " took " + latency)
     })
 
