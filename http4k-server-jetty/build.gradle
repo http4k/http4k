@@ -1,7 +1,7 @@
 description = 'Http4k HTTP Server built on top of jetty'
 
 ext {
-    ext.jetty_version = '9.4.6.v20170531'
+    ext.jetty_version = '9.4.7.v20170914'
 
     jetty = [
             "org.eclipse.jetty:jetty-server:$jetty_version",
