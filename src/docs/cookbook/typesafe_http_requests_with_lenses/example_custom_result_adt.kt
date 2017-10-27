@@ -10,11 +10,13 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.Query
 import org.http4k.lens.int
 
+// This is our custom Result/Either ADT, although it could be anything, like a Result4k Result (which has map() etc)
 sealed class Result<out T>
-
 data class Succeeded<out T>(val value: T) : Result<T>()
 data class Failed<out T>(val e: Exception) : Result<T>()
 
+
+// This simple extension method can be used to convert all Lenses to return our custom Result type instead of the standard exception
 fun <IN, OUT> LensExtractor<IN, OUT>.toResult(): LensExtractor<IN, Result<OUT>> = object : LensExtractor<IN, Result<OUT>> {
     override fun invoke(target: IN): Result<OUT> = try {
         Succeeded(this@toResult.invoke(target))
@@ -23,6 +25,7 @@ fun <IN, OUT> LensExtractor<IN, OUT>.toResult(): LensExtractor<IN, Result<OUT>> 
     }
 }
 
+// examples of using the above extension function
 fun main(args: Array<String>) {
 
     val queryResultLens = Query.int().required("foo").toResult()
