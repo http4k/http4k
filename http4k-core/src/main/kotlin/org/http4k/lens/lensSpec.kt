@@ -9,23 +9,23 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class LensGet<in IN, out OUT> private constructor(private val rootFn: (String, IN) -> List<OUT>) {
-    operator fun invoke(name: String) = { target: IN -> rootFn(name, target) }
+class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN) -> List<OUT>) {
+    operator fun invoke(name: String) = { target: IN -> getFn(name, target) }
 
-    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet({ x, y: IN -> rootFn(x, y).map(nextFn) })
+    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet({ x, y: IN -> getFn(x, y).map(nextFn) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, IN) -> List<OUT>): LensGet<IN, OUT> = LensGet(rootFn)
+        operator fun <IN, OUT> invoke(getFn: (String, IN) -> List<OUT>): LensGet<IN, OUT> = LensGet(getFn)
     }
 }
 
-class LensSet<IN, in OUT> private constructor(private val rootFn: (String, List<OUT>, IN) -> IN) {
-    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> rootFn(name, values, target) }
+class LensSet<IN, in OUT> private constructor(private val setFn: (String, List<OUT>, IN) -> IN) {
+    operator fun invoke(name: String) = { values: List<OUT>, target: IN -> setFn(name, values, target) }
 
-    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet({ a, b: List<NEXT>, c: IN -> rootFn(a, b.map(nextFn), c) })
+    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet({ a, b: List<NEXT>, c: IN -> setFn(a, b.map(nextFn), c) })
 
     companion object {
-        operator fun <IN, OUT> invoke(rootFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT> = LensSet(rootFn)
+        operator fun <IN, OUT> invoke(setFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT> = LensSet(setFn)
     }
 }
 
