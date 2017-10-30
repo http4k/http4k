@@ -62,7 +62,7 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
             if (length >= writeToDiskThreshold) {
                 return DiskBacked(
                     part,
-                    writeToDisk(part, writeToDiskThreshold, temporaryFileDirectory, bytes, length))
+                    writeToDisk(part, bytes, length))
             }
         }
     }
@@ -76,7 +76,7 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
     }
 
 
-    private fun writeToDisk(part: StreamingPart, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int): File {
+    private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int): File {
         val tempFile = File.createTempFile(part.fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
         tempFile.deleteOnExit()
         val outputStream = FileOutputStream(tempFile)
