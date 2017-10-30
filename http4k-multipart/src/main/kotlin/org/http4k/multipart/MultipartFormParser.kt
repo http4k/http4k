@@ -69,26 +69,17 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
 
     private fun storeInMemory(bytes: ByteArray, length: Int, partInputStream: InputStream): ByteArray {
         partInputStream.close()
-
         val result = ByteArray(length)
         System.arraycopy(bytes, 0, result, 0, length)
         return result
     }
-
 
     private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int): File {
         val tempFile = File.createTempFile(part.fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
         tempFile.deleteOnExit()
         val outputStream = FileOutputStream(tempFile)
         outputStream.write(bytes, 0, length)
-        while (true) {
-            val readLength = part.inputStream.read(bytes, 0, writeToDiskThreshold)
-            if (readLength < 0) {
-                break
-            }
-            outputStream.write(bytes, 0, readLength)
-        }
-        part.inputStream.close()
+        outputStream.use { out -> part.inputStream.use { it.copyTo(out, writeToDiskThreshold) } }
         return tempFile
     }
 }
