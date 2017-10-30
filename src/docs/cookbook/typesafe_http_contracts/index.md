@@ -1,3 +1,6 @@
+title: http4k Typesafe, Documented Applications
+description: Recipes for using the http4k-contract module to provide typesafe endpoints with automatically generated OpenAPI documentation
+
 This contract example shows:
 
 - 2 endpoints with typesafe contracts (marshalling of path parameters and bodies)

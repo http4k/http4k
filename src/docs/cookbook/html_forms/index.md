@@ -1,3 +1,6 @@
+title: http4k HTML Forms
+description: Recipes for using http4k with HTML forms
+
 HTML form support is provided on 2 levels:
 
 1. Through the use of `form()` extension methods on `Request` to get/set String values.

@@ -1,3 +1,6 @@
+title: http4k JSON APIs
+description: Recipes for using JSON in http4k applications with a variety of popular JSON APIS
+
 Example of how to use the JSON library API wrappers, in this case the module used is Jackson. **http4k** provides an identical interface for all JSON implementations.
 
 ### Gradle setup
