@@ -6,18 +6,27 @@
     <meta charset="utf-8">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta itemprop="name" content="http4k - a functional Kotlin HTTP toolkit">
+    <meta name="twitter:title" content="http4k - a functional Kotlin HTTP toolkit">
+    <meta property="og:title" content="http4k - a functional Kotlin HTTP toolkit" />
     {% if page and page.meta.description %}
     <meta name="description" content="{{ page.meta.description | first }}">
+    <meta property="og:description" content="{{ page.meta.description | first }}" />
+    <meta name="twitter:description" content="{{ page.meta.description | first }}">
     {% elif config.site_description %}
     <meta name="description" content="{{ config.site_description }}">
+    <meta property="og:description" content="{{ config.site_description }}" />
+    <meta name="twitter:description" content="{{ config.site_description }}">
     {% endif %}
     {% if page.canonical_url %}
     <link rel="canonical" href="{{ page.canonical_url }}">
     {% endif %}
     {% if page and page.meta.author %}
     <meta name="author" content="{{ page.meta.author | first }}">
+    <meta name="twitter:creator" content="{{ page.meta.author | first }}">
     {% elif config.site_author %}
     <meta name="author" content="{{ config.site_author }}">
+    <meta name="twitter:creator" content="{{ config.site_author }}">
     {% endif %}
     <!-- ****** faviconit.com favicons ****** -->
     <link rel="shortcut icon" href="/img/favicon.ico">
@@ -43,17 +52,10 @@
     <!-- ****** faviconit.com favicons ****** -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@http4k">
-    <meta name="twitter:creator" content="@http4k">
-    <meta name="twitter:title" content="http4k - a functional Kotlin HTTP toolkit">
-    <meta name="twitter:description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.">
-    <meta name="twitter:image" content="https://www.http4k.org/img/logo_card_blue_on_white.png">
-    <meta property="og:title" content="http4k - a functional Kotlin HTTP toolkit" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://www.http4k.org/" />
+    <meta name="twitter:image" content="https://www.http4k.org/img/logo_card_blue_on_white.png">
     <meta property="og:image" content="https://www.http4k.org/img/logo_card_blue_on_white.png" />
-    <meta property="og:description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way." />
-    <meta itemprop="name" content="http4k">
-    <meta itemprop="description" content="http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.">
     <meta itemprop="image" content="https://www.http4k.org/img/logo_card_blue_on_white.png">
 
     <meta name="generator" content="mkdocs-{{ mkdocs_version }}, mkdocs-material-1.7.3">

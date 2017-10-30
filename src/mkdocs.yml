@@ -1,6 +1,6 @@
 site_name: http4k
 site_url: https://http4k.org
-site_description: Documentation site for the http4k functional web toolkit written in Kotlin
+site_description: http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.
 site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
 copyright: 'Copyright &copy; 2017 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
 remote_branch: master
