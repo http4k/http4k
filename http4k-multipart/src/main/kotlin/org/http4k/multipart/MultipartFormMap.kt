@@ -60,7 +60,7 @@ internal object MultipartFormMap {
             if (length >= writeToDiskThreshold) {
                 return DiskBacked(
                     part,
-                    writeToDisk(part.fileName, writeToDiskThreshold, temporaryFileDirectory, bytes, length, part.inputStream))
+                    writeToDisk(part, writeToDiskThreshold, temporaryFileDirectory, bytes, length))
             }
         }
     }
@@ -74,19 +74,19 @@ internal object MultipartFormMap {
     }
 
 
-    private fun writeToDisk(fileName: String?, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int, partInputStream: InputStream): File {
-        val tempFile = File.createTempFile(fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
+    private fun writeToDisk(part: StreamingPart, writeToDiskThreshold: Int, temporaryFileDirectory: File, bytes: ByteArray, length: Int): File {
+        val tempFile = File.createTempFile(part.fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
         tempFile.deleteOnExit()
         val outputStream = FileOutputStream(tempFile)
         outputStream.write(bytes, 0, length)
         while (true) {
-            val readLength = partInputStream.read(bytes, 0, writeToDiskThreshold)
+            val readLength = part.inputStream.read(bytes, 0, writeToDiskThreshold)
             if (readLength < 0) {
                 break
             }
             outputStream.write(bytes, 0, readLength)
         }
-        partInputStream.close()
+        part.inputStream.close()
         return tempFile
     }
 }
