@@ -2,7 +2,7 @@ package org.http4k.core
 
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.multipart.MultipartFormBuilder
-import org.http4k.multipart.MultipartFormMap.formParts
+import org.http4k.multipart.MultipartFormParser
 import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
 import java.io.Closeable
@@ -61,7 +61,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), httpMessage.body.stream, UTF_8)
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
-            val parts = formParts(form, UTF_8, diskThreshold, dir).map {
+            val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
                 if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold))
                 else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
             }

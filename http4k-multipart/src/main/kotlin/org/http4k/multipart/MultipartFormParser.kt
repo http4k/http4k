@@ -9,44 +9,46 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
 
-internal object MultipartFormMap {
+/**
+ * Parser for creating serialised form parts using the encoding
+ * and maximum Part size specified. If a Part is bigger than the writeToDiskThreshold, then it will be written to
+ * disk in temporaryFileDirectory (or the default temp dir if null).
+ *
+ * @param encoding               encoding of the stream
+ * @param writeToDiskThreshold   if a Part is bigger than this threshold it will be purged from memory
+ * and written to disk
+ * @param temporaryFileDirectory where to write the files for Parts that are too big. Uses the default
+ * temporary directory if null.
+ */
+internal class MultipartFormParser(private val encoding: Charset, private val writeToDiskThreshold: Int, private val temporaryFileDirectory: File) {
 
     /**
-     * Returns a list of Parts, serialised from parts using the encoding
-     * and maximum Part size specified. If a Part is bigger than the writeToDiskThreshold, then it will be written to
-     * disk in temporaryFileDirectory (or the default temp dir if null).
-     *
+     * Returns a list of Parts.
      *
      * To limit the overall size of the stream, pass the appropriate parameter to StreamingMultipartFormParts
-     *
      *
      * The Parts object must be closed when finished with so that the files that have been written to disk can be
      * deleted.
      *
      * @param parts                  streaming parts
-     * @param encoding               encoding of the stream
-     * @param writeToDiskThreshold   if a Part is bigger than this threshold it will be purged from memory
-     * and written to disk
-     * @param temporaryFileDirectory where to write the files for Parts that are too big. Uses the default
-     * temporary directory if null.
      * @return Parts object, which contains the Map of Fieldname to List of Parts. This object must
      * be closed so that it is cleaned up after.
      * @throws IOException
      */
 
-    fun formParts(parts: Iterable<StreamingPart>, encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File): List<Part> {
+    fun formParts(parts: Iterable<StreamingPart>): List<Part> {
         val result = mutableListOf<Part>()
         val bytes = ByteArray(writeToDiskThreshold)
 
         for (part in parts) {
             if (part.fieldName == null) throw ParseError("no name for part")
 
-            result.add(serialisePart(encoding, writeToDiskThreshold, temporaryFileDirectory, part, bytes))
+            result.add(serialisePart(part, bytes))
         }
         return result
     }
 
-    private fun serialisePart(encoding: Charset, writeToDiskThreshold: Int, temporaryFileDirectory: File, part: StreamingPart, bytes: ByteArray): Part {
+    private fun serialisePart(part: StreamingPart, bytes: ByteArray): Part {
         var length = 0
 
         while (true) {
