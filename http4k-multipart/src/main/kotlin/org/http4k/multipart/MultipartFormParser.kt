@@ -5,7 +5,6 @@ import org.http4k.multipart.Part.InMemory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
 
@@ -54,32 +53,31 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
         while (true) {
             val count = part.inputStream.read(bytes, length, writeToDiskThreshold - length)
             if (count < 0) {
-                return InMemory(
-                    part,
-                    storeInMemory(bytes, length, part.inputStream), encoding)
+                part.inputStream.use {
+                    return InMemory(
+                        part,
+                        storeInMemory(bytes, length), encoding)
+                }
             }
             length += count
             if (length >= writeToDiskThreshold) {
-                return DiskBacked(
-                    part,
-                    writeToDisk(part, bytes, length))
+                part.inputStream.use {
+                    return DiskBacked(
+                        part,
+                        writeToDisk(part, bytes, length))
+                }
             }
         }
     }
 
-    private fun storeInMemory(bytes: ByteArray, length: Int, partInputStream: InputStream): ByteArray {
-        partInputStream.close()
-        val result = ByteArray(length)
-        System.arraycopy(bytes, 0, result, 0, length)
-        return result
-    }
+    private fun storeInMemory(bytes: ByteArray, length: Int) = ByteArray(length).apply { System.arraycopy(bytes, 0, this, 0, length) }
 
-    private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int): File {
-        val tempFile = File.createTempFile(part.fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory)
-        tempFile.deleteOnExit()
-        val outputStream = FileOutputStream(tempFile)
-        outputStream.write(bytes, 0, length)
-        outputStream.use { out -> part.inputStream.use { it.copyTo(out, writeToDiskThreshold) } }
-        return tempFile
-    }
+    private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
+        File.createTempFile(part.fileName ?: UUID.randomUUID().toString() + "-", ".tmp", temporaryFileDirectory).apply {
+            deleteOnExit()
+            FileOutputStream(this).apply {
+                write(bytes, 0, length)
+                use { part.inputStream.copyTo(it, writeToDiskThreshold) }
+            }
+        }
 }
