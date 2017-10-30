@@ -39,19 +39,18 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
         state = MultipartFormStreamState.BoundaryFound
         if (inputStream.matchInStream(STREAM_TERMINATOR)) {
-            if (inputStream.matchInStream(FIELD_SEPARATOR)) {
-                when {
-                    mixedName != null -> {
-                        boundary = oldBoundary
-                        boundaryWithPrefix = oldBoundaryWithPrefix
-                        mixedName = null
+            if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
+            when {
+                mixedName != null -> {
+                    boundary = oldBoundary
+                    boundaryWithPrefix = oldBoundaryWithPrefix
+                    mixedName = null
 
-                        state = MultipartFormStreamState.FindBoundary
-                        findBoundary()
-                    }
-                    else -> state = MultipartFormStreamState.Eos
+                    state = MultipartFormStreamState.FindBoundary
+                    findBoundary()
                 }
-            } else throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
+                else -> state = MultipartFormStreamState.Eos
+            }
         } else {
             state = if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Boundary must be followed by field separator, but didn't find it")
             else MultipartFormStreamState.Header
