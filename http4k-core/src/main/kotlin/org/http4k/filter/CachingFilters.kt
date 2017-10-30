@@ -63,40 +63,46 @@ object CachingFilters {
          * By default, only applies when the status code of the response is < 400. This is overridable and useful -
          * For example you could combine this with a MaxAge for everything >= 400
          */
-        fun NoCache(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
-            override fun headersFor(response: org.http4k.core.Response) = listOf("Cache-Control" to "private, must-revalidate", "Expires" to "0")
+        object NoCache {
+            operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
+                override fun headersFor(response: org.http4k.core.Response) = listOf("Cache-Control" to "private, must-revalidate", "Expires" to "0")
+            }
         }
 
         /**
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
-        fun MaxAge(clock: Clock, maxAge: Duration, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
-            override fun headersFor(response: org.http4k.core.Response) = listOf(
-                "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", "),
-                "Expires" to RFC_1123_DATE_TIME.format(now(response).plusSeconds(maxAge.seconds))
-            )
+        object MaxAge {
+            operator fun invoke(clock: Clock, maxAge: Duration, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : CacheFilter(predicate) {
+                override fun headersFor(response: org.http4k.core.Response) = listOf(
+                    "Cache-Control" to listOf("public", MaxAgeTtl(maxAge).toHeaderValue()).joinToString(", "),
+                    "Expires" to RFC_1123_DATE_TIME.format(now(response).plusSeconds(maxAge.seconds))
+                )
 
-            private fun now(response: org.http4k.core.Response) =
-                try {
-                    response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from) ?: ZonedDateTime.now(clock)
-                } catch (e: Exception) {
-                    ZonedDateTime.now(clock)
-                }
+                private fun now(response: org.http4k.core.Response) =
+                    try {
+                        response.header("Date")?.let(RFC_1123_DATE_TIME::parse)?.let(ZonedDateTime::from) ?: ZonedDateTime.now(clock)
+                    } catch (e: Exception) {
+                        ZonedDateTime.now(clock)
+                    }
+            }
         }
 
         /**
          * Hash algo stolen from http://stackoverflow.com/questions/26423662/scalatra-response-hmac-calulation
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
-        fun AddETag(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
-            {
-                val response = next(it)
-                if (predicate(response)) {
-                    val hashedBody = MessageDigest.getInstance("MD5")
-                        .digest(response.body.toString().toByteArray()).joinToString("") { "%02x".format(it) }
-                    response.header("Etag", hashedBody)
-                } else
-                    response
+        object AddETag {
+            operator fun invoke(predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = Filter { next ->
+                {
+                    val response = next(it)
+                    if (predicate(response)) {
+                        val hashedBody = MessageDigest.getInstance("MD5")
+                            .digest(response.body.toString().toByteArray()).joinToString("") { "%02x".format(it) }
+                        response.header("Etag", hashedBody)
+                    } else
+                        response
+                }
             }
         }
 
@@ -105,23 +111,24 @@ object CachingFilters {
          * Use this for adding default cache settings.
          * By default, only applies when the status code of the response is < 400. This is overridable.
          */
-        fun FallbackCacheControl(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : Filter {
-            override fun invoke(next: HttpHandler): HttpHandler =
-                {
-                    val response = next(it)
-                    if (it.method == GET && predicate(response)) addDefaultCacheHeadersIfAbsent(response) else response
-                }
+        object FallbackCacheControl {
+            operator fun invoke(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter = object : Filter {
+                override fun invoke(next: HttpHandler): HttpHandler =
+                    {
+                        val response = next(it)
+                        if (it.method == GET && predicate(response)) addDefaultCacheHeadersIfAbsent(response) else response
+                    }
 
-            private fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
-                response.header(header, response.header(header) ?: defaultProducer())
+                private fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
+                    response.header(header, response.header(header) ?: defaultProducer())
 
-            private fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
-                addDefaultHeaderIfAbsent(response, "Cache-Control", {
-                    listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
-                })
-                    .let { addDefaultHeaderIfAbsent(it, "Expires", { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) }) }
-                    .let { addDefaultHeaderIfAbsent(it, "Vary", { "Accept-Encoding" }) }
+                private fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
+                    addDefaultHeaderIfAbsent(response, "Cache-Control", {
+                        listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
+                    })
+                        .let { addDefaultHeaderIfAbsent(it, "Expires", { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) }) }
+                        .let { addDefaultHeaderIfAbsent(it, "Vary", { "Accept-Encoding" }) }
+            }
         }
     }
-
 }

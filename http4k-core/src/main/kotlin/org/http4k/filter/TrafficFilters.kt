@@ -9,10 +9,14 @@ object TrafficFilters {
     /**
      * Responds to requests with a stored Response if possible, or falls back to the next Http Handler
      */
-    fun ServeCachedFrom(source: Source): Filter = Filter { next -> { source[it] ?: next(it) } }
+    object ServeCachedFrom {
+        operator fun invoke(source: Source): Filter = Filter { next -> { source[it] ?: next(it) } }
+    }
 
     /**
      * Intercepts and Writes Request/Response traffic
      */
-    fun RecordTo(sink: Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
+    object RecordTo {
+        operator fun invoke(sink: Sink): Filter = Filter { next -> { next(it).apply { sink[it] = this } } }
+    }
 }

@@ -8,35 +8,42 @@ import java.io.PrintStream
 
 object DebuggingFilters {
     private val defaultDebugStream = true
+
     /**
      * Print details of the request before it is sent to the next service.
      */
-    fun PrintRequest(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = RequestFilters.Tap { req ->
-        out.println(listOf("***** REQUEST: ${req.method}: ${req.uri} *****", req.printable(debugStream)).joinToString("\n"))
+    object PrintRequest {
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = RequestFilters.Tap { req ->
+            out.println(listOf("***** REQUEST: ${req.method}: ${req.uri} *****", req.printable(debugStream)).joinToString("\n"))
+        }
     }
 
     /**
      * Print details of the response before it is returned.
      */
-    fun PrintResponse(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = Filter { next ->
-        {
-            try {
-                next(it).let { response ->
-                    out.println(listOf("***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****", response.printable(debugStream)).joinToString("\n"))
-                    response
+    object PrintResponse {
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream): Filter = Filter { next ->
+            {
+                try {
+                    next(it).let { response ->
+                        out.println(listOf("***** RESPONSE ${response.status.code} to ${it.method}: ${it.uri} *****", response.printable(debugStream)).joinToString("\n"))
+                        response
+                    }
+                } catch (e: Exception) {
+                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri}  *****")
+                    e.printStackTrace(out)
+                    throw e
                 }
-            } catch (e: Exception) {
-                out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri}  *****")
-                e.printStackTrace(out)
-                throw e
             }
         }
     }
 
-    private fun HttpMessage.printable(debugStream:Boolean): HttpMessage = if (!debugStream && body is StreamBody) body("<<stream>>") else this
+    private fun HttpMessage.printable(debugStream: Boolean): HttpMessage = if (!debugStream && body is StreamBody) body("<<stream>>") else this
 
     /**
      * Print details of a request and it's response.
      */
-    fun PrintRequestAndResponse(out: PrintStream = System.out, debugStream:Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
+    object PrintRequestAndResponse {
+        operator fun invoke(out: PrintStream = System.out, debugStream: Boolean = defaultDebugStream) = PrintRequest(out, debugStream).then(PrintResponse(out, debugStream))
+    }
 }

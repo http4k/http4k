@@ -8,30 +8,36 @@ object RequestFilters {
     /**
      * Intercept the request before it is sent to the next service.
      */
-    fun Tap(fn: (Request) -> Unit) = Filter { next ->
-        {
-            fn(it)
-            next(it)
+    object Tap {
+        operator fun invoke(fn: (Request) -> Unit) = Filter { next ->
+            {
+                fn(it)
+                next(it)
+            }
         }
     }
 
     /**
      * Basic GZipping of Request. Does not currently support GZipping streams
      */
-    fun GZip(): Filter = Filter { next ->
-        { request ->
-            next(request.body(request.body.gzipped()).replaceHeader("content-encoding", "gzip"))
+    object GZip {
+        operator fun invoke() = Filter { next ->
+            { request ->
+                next(request.body(request.body.gzipped()).replaceHeader("content-encoding", "gzip"))
+            }
         }
     }
 
     /**
      * Basic UnGZipping of Request. Does not currently support GZipping streams
      */
-    fun GunZip() = Filter { next ->
-        { request ->
-            request.header("content-encoding")
-                ?.let { if (it.contains("gzip")) it else null }
-                ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
+    object GunZip {
+        operator fun invoke() = Filter { next ->
+            { request ->
+                request.header("content-encoding")
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
+            }
         }
     }
 
