@@ -1,11 +1,29 @@
 package org.http4k.core
 
-fun Response.noCache() = removeCachingHeaderIfSet().header("Cache-Control", "no-cache")
+fun Response.public() = addCachingHeader("public")
 
-fun Response.private() = removeCachingHeaderIfSet().header("Cache-Control", "private")
+fun Response.private() = addCachingHeader("private")
 
-fun Response.public() = removeCachingHeaderIfSet().header("Cache-Control", "public")
+fun Response.noCache() = addCachingHeader("no-cache")
 
-fun Response.onlyIfCached() = removeCachingHeaderIfSet().header("Cache-Control", "only-if-cached")
+fun Response.onlyIfCached() = addCachingHeader("only-if-cached")
 
-private fun Response.removeCachingHeaderIfSet(): Response = if(header("Cache-Control") != null) removeHeader("Cache-Control") else this
+fun Response.mustRevalidate() = addCachingHeader("must-revalidate")
+
+fun Response.noStore() = addCachingHeader("no-store")
+
+fun Response.noTransform() = addCachingHeader("no-transform")
+
+fun Response.proxyRevalidate() = addCachingHeader("proxy-revalidate")
+
+fun Response.maxAge(seconds: Int) = addCachingHeader("max-age=$seconds")
+
+fun Response.sMaxAge(seconds: Int) = addCachingHeader("s-maxage=$seconds")
+
+
+private fun Response.addCachingHeader(value: String) =
+        if(header("Cache-Control").isNullOrEmpty()) header("Cache-Control", value) else extendCachingHeader(value)
+
+private fun Response.extendCachingHeader(additionalValue: String) =
+        replaceHeader("Cache-Control", "${header("Cache-Control")}, $additionalValue")
+
