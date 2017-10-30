@@ -1,3 +1,6 @@
+title: http4k Templating Modules
+description: Feature overview of the http4k-templating modules
+
 ### Installation (Gradle)
 **Dust:** ```compile group: "org.http4k", name: "http4k-template-dust", version: "2.35.1"```
 

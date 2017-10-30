@@ -1,3 +1,6 @@
+title: http4k Core Module
+description: Feature overview of the http4k-core module, including the Lens system for typesafe HTTP
+
 ### Installation (Gradle)
 ```compile group: "org.http4k", name: "http4k-core", version: "2.35.1"```
 

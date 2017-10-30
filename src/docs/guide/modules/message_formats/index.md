@@ -1,3 +1,6 @@
+title: http4k Message Format Modules
+description: Feature overview of the http4k-format modules, including JSON and XML automarshalling
+
 ### Installation (Gradle)
 **Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "2.35.1"```
 

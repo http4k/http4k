@@ -1,3 +1,6 @@
+title: http4k Client Modules
+description: Feature overview of the http4k-client modules
+
 ### Installation (Gradle)
 **Apache:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "2.35.1"```
 

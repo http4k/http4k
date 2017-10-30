@@ -1,3 +1,6 @@
+title: Testing http4k applications
+description: How to test http4k endpoints and applications, and modules that support testing
+
 The creators of **http4k** takes testing very seriously - so seriously that there really isn't that much to say here! 
 The API has been designed to make it as simple as possible to test both individual endpoints and entire applications in a consistent fashion, which is aided by remembering that:
 
