@@ -1,3 +1,6 @@
+title: http4k Extended Example
+description: A step-by-step guide to TDDing a simple http4k application
+
 ## Application Design
 What follows is a guide to *how* we build **http4k** applications test first to provide excellent test coverage driven by decoupled tests. 
 

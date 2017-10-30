@@ -1,3 +1,6 @@
+title: http4k in Action
+description: Example applications and usages of http4k, including TDD approach 
+
 # Rationale & design
 [Presentation about the development of http4k given at the Kotlin London meetup](https://www.http4k.org/server_as_a_function_in_kotlin)
 

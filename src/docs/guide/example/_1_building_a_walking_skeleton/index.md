@@ -1,3 +1,6 @@
+title: http4k Extended Step 1
+description: A step-by-step guide to TDDing a simple http4k application
+
 Until we have an application that can be deployed, we cannot create any business value. The Walking Skeleton
 model dictates that putting the most trivial endpoint into a production environment will prove our deployment
 pipeline is sound, and helps to set the direction for the testing strategy that we will use going forward.

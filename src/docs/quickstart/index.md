@@ -1,3 +1,6 @@
+title: http4k Quickstart
+description: Easy ways to get started using http4k
+
 # Quickstart
 
 This simple example demonstates how to serve and consume HTTP services using **http4k**. 

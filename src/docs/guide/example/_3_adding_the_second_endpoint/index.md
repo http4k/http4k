@@ -1,3 +1,6 @@
+title: http4k Extended Step 3
+description: A step-by-step guide to TDDing a simple http4k application
+
 ## Requirements:
 - Implement a "multiply" service, which will find the product of a number of integer values.
 

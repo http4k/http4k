@@ -1,4 +1,7 @@
-<h2 class="github">Contributers' Guide</h2>
+title: http4k Contributors' Guide
+description: http4k Contributor's Guide
+
+<h2 class="github">Contributors' Guide</h2>
 
 There are many ways in which you can contribute to the development of the library:
 

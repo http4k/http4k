@@ -1,3 +1,6 @@
+title: http4k FAQ
+description: Find answers to frequently asked questions about http4k
+
 Find here answers to the most common questions that we get asked about **http4k**
 
 ### General

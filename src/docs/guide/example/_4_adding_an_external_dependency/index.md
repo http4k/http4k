@@ -1,3 +1,6 @@
+title: http4k Extended Step 4
+description: A step-by-step guide to TDDing a simple http4k application
+
 At this point, the separation of the layers starts to become clear:
 - The server layer is responsible for taking external configuration and instantiating the app layer.
 - The application layer API is only in terms of HTTP transports - it constructs business level abstractions

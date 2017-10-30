@@ -1,3 +1,6 @@
+title: http4k Rationale & Concepts
+description: Overview of why we created http4k, the problems it solves, and the core concepts
+
 ## tldr;
 [Presentation](https://www.http4k.org/server_as_a_function_in_kotlin) about the development of http4k given at the Kotlin London meetup.
 
