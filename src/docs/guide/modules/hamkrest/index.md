@@ -2,7 +2,7 @@ title: http4k Hamcrest Module
 description: Feature overview of the http4k-hamkrest module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "2.35.1"```
+```compile group: "org.http4k", name: "http4k-testing-hamkrest", version: "2.36.0"```
 
 ### About
 

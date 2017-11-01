@@ -5,7 +5,7 @@ Example showing how to create and apply lenses to requests and responses to both
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.35.1"
+    compile group: "org.http4k", name: "http4k-core", version: "2.36.0"
 ```
 
 ### Standard (exception based) approach

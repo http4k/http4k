@@ -13,7 +13,7 @@ This is a fairly comprehensive example of the core-routing logic available:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.35.1"
+    compile group: "org.http4k", name: "http4k-core", version: "2.36.0"
 ```
 
 ### Code

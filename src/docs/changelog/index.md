@@ -8,7 +8,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v2.36.0 (uncut)
 - Upgrade various dependency versions
 
-### v2.35.1
+### v2.36.0
 - Make Route a Router so we can nest them together.
 
 ### v2.2.1
