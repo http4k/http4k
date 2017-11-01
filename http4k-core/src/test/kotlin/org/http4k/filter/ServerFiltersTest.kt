@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
+import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Filter
 import org.http4k.core.Headers
 import org.http4k.core.Method.DELETE
@@ -15,15 +16,18 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
@@ -214,6 +218,21 @@ class ServerFiltersTest {
             .then { Response(OK).body(contexts[it].get<String>("foo")) }
 
         handler(Request(GET, "/")) shouldMatch hasBody("manchu")
+    }
+
+    @Test
+    fun `replace response contents with static file`() {
+        fun returning(status: Status) = ServerFilters.ReplaceResponseContentsWithStaticFile().then { Response(status).body(status.toString()) }
+
+        returning(NOT_FOUND)(Request(GET, "/")) shouldMatch hasBody("404 contents")
+        returning(OK)(Request(GET, "/")) shouldMatch hasBody(Status.OK.toString())
+    }
+
+    @Test
+    fun `set content type`() {
+        val handler = ServerFilters.SetContentType(OCTET_STREAM).then { Response(OK) }
+
+        handler(Request(GET, "/")) shouldMatch hasContentType(OCTET_STREAM)
     }
 
 }

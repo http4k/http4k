@@ -1,6 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
+import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -21,6 +22,8 @@ import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
+import org.http4k.routing.ResourceLoader
+import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
@@ -170,6 +173,36 @@ object ServerFilters {
                 } finally {
                     contexts.remove(context)
                 }
+            }
+        }
+    }
+
+    /**
+     * Sets the Content Type response header on the Response, but only if it that header is NOT currently set
+     */
+    object SetContentType {
+        operator fun invoke(contentType: ContentType): Filter = Filter { next ->
+            {
+                next(it).with(Header.Common.CONTENT_TYPE of contentType)
+            }
+        }
+    }
+
+    /**
+     * Intercepts responses and replaces the contents with contents of the statically loaded resource.
+     * By default, this Filter replaces the contents of unsuccessful requests with the contents of a file named
+     * after the status code.
+     */
+    object ReplaceResponseContentsWithStaticFile {
+        operator fun invoke(loader: ResourceLoader = Classpath(),
+                            toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
+                            ): Filter = Filter { next ->
+            {
+                val response = next(it)
+                toResourceName(response)
+                    ?.let {
+                        response.body(loader.load(it)?.readText() ?: "")
+                    } ?: response
             }
         }
     }

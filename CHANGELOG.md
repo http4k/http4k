@@ -2,8 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.36.0 (uncut)
-- Upgrade various dependency versions
+### v2.36.0
+- Added a couple of useful `ServerFilters`.
+- Upgrade various dependency versions.
+- Tidying of Multipart code.
 
 ### v2.35.1
 - Fix #57. Static handlers behave oddly when combined with an HTTP verb in the routing tree.
