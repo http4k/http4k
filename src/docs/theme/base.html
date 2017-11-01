@@ -105,6 +105,23 @@
     <link rel="stylesheet" href="{{ path }}">
     {% endfor %}
     {% block extrahead %}{% endblock %}
+    <script type="application/ld+json">
+        {
+          "@context" : "http://schema.org",
+          "@type" : "WebSite",
+    {% if page and page.meta.title %}
+          "name" : "{{ page.meta.title | first }}",
+    {% else %}
+          "name" : "http4k - a functional Kotlin HTTP toolkit",
+    {% endif %}
+    {% if page and page.meta.description %}
+          "alternateName" : "{{ page.meta.description | first }}",
+    {% else %}
+          "alternateName" : "{{ config.site_description }}",
+    {% endif %}
+          "url" : "{{ page.canonical_url }}"
+        }
+        </script>
 </head>
 {% set palette = config.extra.get("palette", {}) %}
 {% set primary = palette.primary | replace(" ", "-") | lower %}
