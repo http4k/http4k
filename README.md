@@ -42,6 +42,7 @@ plugging together of services without HTTP container being required.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * AWS request signing: super-simple interactions with AWS services
     * Multipart form handling.
+    * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
     * Testing: Hamkrest Matchers for **http4k** objects
 
@@ -86,6 +87,8 @@ plugging together of services without HTTP container being required.
         * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo** - lightweight Java JSON API with zero dependencies.
         * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
+* [Resilience:](https://http4k.org/guide/modules/resilience) 
+    * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 

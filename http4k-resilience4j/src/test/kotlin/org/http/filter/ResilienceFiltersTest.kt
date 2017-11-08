@@ -102,10 +102,7 @@ class ResilienceFiltersTest {
             .limitForPeriod(1)
             .timeoutDuration(Duration.ofMillis(10)).build()
 
-        val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then {
-            Thread.sleep(20)
-            Response(OK)
-        }
+        val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then { Response(OK) }
 
         rateLimits(Request(GET, "/")).status shouldMatch equalTo(OK)
         rateLimits(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
