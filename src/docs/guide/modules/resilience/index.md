@@ -28,4 +28,3 @@ A Retrying Filter retries requests if a failure is generated.
 A Bulkhead Filter limits the amount of parallel calls that can be executed.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/resilience/example_bulkheadingg.kt"></script>
-
