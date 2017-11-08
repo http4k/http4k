@@ -74,7 +74,7 @@ class ResilienceFiltersTest {
     @Test
     fun `retrying eventually runs out and returns the last result`() {
 
-        val config = RetryConfig.custom().maxAttempts(3).intervalFunction { 0 }.build()
+        val config = RetryConfig.custom().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
         val responses = ArrayDeque<Response>()
