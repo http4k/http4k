@@ -45,6 +45,7 @@ data class Status(val code: Int, val description: String) {
         val REQUESTED_RANGE_NOT_SATISFIABLE = status(416, "Requested Range Not Satisfiable")
         val EXPECTATION_FAILED = status(417, "Expectation Failed")
         val I_M_A_TEAPOT = status(418, "I'm a teapot") //RFC2324
+        val TOO_MANY_REQUESTS = status(429, "Too many requests")
 
         private val SERVER_ERROR = 500..599
         val INTERNAL_SERVER_ERROR = status(500, "Internal Server Error")

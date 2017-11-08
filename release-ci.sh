@@ -33,6 +33,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-format-jackson:bintrayUpload \
     :http4k-format-xml:bintrayUpload \
     :http4k-multipart:bintrayUpload \
+    :http4k-resilience4j:bintrayUpload \
     :http4k-server-jetty:bintrayUpload \
     :http4k-server-netty:bintrayUpload \
     :http4k-server-undertow:bintrayUpload \
