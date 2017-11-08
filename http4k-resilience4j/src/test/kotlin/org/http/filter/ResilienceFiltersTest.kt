@@ -7,9 +7,12 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.retry.Retry
+import io.github.resilience4j.retry.RetryConfig
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -38,7 +41,7 @@ class ResilienceFiltersTest {
 
         val circuitBreaker = of("hello", config)
 
-        val circuited = ResilienceFilters.Circuit(circuitBreaker).then { responses.removeFirst() }
+        val circuited = ResilienceFilters.CircuitBreak(circuitBreaker).then { responses.removeFirst() }
 
         circuitBreaker.state shouldMatch equalTo(CLOSED)
         circuited(Request(GET, "/")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
@@ -50,4 +53,39 @@ class ResilienceFiltersTest {
         circuited(Request(GET, "/")) shouldMatch hasStatus(OK)
         circuitBreaker.state shouldMatch equalTo(CLOSED)
     }
+
+    @Test
+    fun `retrying stops when successful result returned`() {
+
+        val config = RetryConfig.custom().intervalFunction { 0 }.build()
+        val retry = Retry.of("retrying", config)
+
+        val responses = ArrayDeque<Response>()
+        responses.add(Response(INTERNAL_SERVER_ERROR))
+        responses.add(Response(OK))
+
+        val retrying = ResilienceFilters.RetryFailures(retry).then {
+            responses.removeFirst()
+        }
+
+        retrying(Request(GET, "/")).status shouldMatch equalTo(OK)
+    }
+
+    @Test
+    fun `retrying eventually runs out and returns the last result`() {
+
+        val config = RetryConfig.custom().maxAttempts(3).intervalFunction { 0 }.build()
+        val retry = Retry.of("retrying", config)
+
+        val responses = ArrayDeque<Response>()
+        responses.add(Response(INTERNAL_SERVER_ERROR))
+        responses.add(Response(BAD_GATEWAY))
+        responses.add(Response(SERVICE_UNAVAILABLE))
+        val retrying = ResilienceFilters.RetryFailures(retry).then {
+            responses.removeFirst()
+        }
+
+        retrying(Request(GET, "/")).status shouldMatch equalTo(SERVICE_UNAVAILABLE)
+    }
+
 }
