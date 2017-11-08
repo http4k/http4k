@@ -41,7 +41,7 @@ data class Undertow(val port: Int = 8000) : ServerConfig {
     override fun toServer(handler: HttpHandler): Http4kServer =
         object : Http4kServer {
             val server = Undertow.builder()
-                .addHttpListener(port, "localhost")
+                .addHttpListener(port, "0.0.0.0")
                 .setHandler(BlockingHandler(HttpUndertowHandler(handler))).build()
 
             override fun start(): Http4kServer = apply {

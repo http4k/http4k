@@ -5,7 +5,6 @@ ext {
 
     resilience4j = [
             "io.github.resilience4j:resilience4j-bulkhead:$resilience4j_version",
-            "io.github.resilience4j:resilience4j-cache:$resilience4j_version",
             "io.github.resilience4j:resilience4j-circuitbreaker:$resilience4j_version",
             "io.github.resilience4j:resilience4j-ratelimiter:$resilience4j_version",
             "io.github.resilience4j:resilience4j-retry:$resilience4j_version"
