@@ -118,19 +118,19 @@ class ResilienceFiltersTest {
             .maxWaitTime(0)
             .build()
 
+        val latch = CountDownLatch(1)
         val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
-            Thread.sleep(100)
+            latch.countDown()
+            Thread.sleep(1000)
             Response(OK)
         }
 
-        val latch = CountDownLatch(1)
         thread {
-            latch.countDown()
-            bulkheading(Request(GET, "/"))
+            bulkheading(Request(GET, "/first"))
         }
 
         latch.await()
-        bulkheading(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
+        bulkheading(Request(GET, "/second")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
     }
 
 }
