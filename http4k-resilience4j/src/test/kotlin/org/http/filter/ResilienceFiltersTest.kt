@@ -119,7 +119,7 @@ class ResilienceFiltersTest {
             .build()
 
         val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
-            Thread.sleep(10)
+            Thread.sleep(100)
             Response(OK)
         }
 
