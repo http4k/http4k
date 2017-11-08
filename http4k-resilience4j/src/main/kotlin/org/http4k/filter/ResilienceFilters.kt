@@ -1,5 +1,7 @@
 package org.http4k.filter
 
+import io.github.resilience4j.bulkhead.Bulkhead
+import io.github.resilience4j.bulkhead.BulkheadFullException
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException
 import io.github.resilience4j.ratelimiter.RateLimiter
@@ -61,6 +63,10 @@ object ResilienceFilters {
         }
     }
 
+    /**
+     * Provide simple Bulkhead functionality.
+     * By default, handles 25 parallel requests, with zero wait time.
+     */
     object RateLimit {
         operator fun invoke(rateLimit: RateLimiter = RateLimiter.ofDefaults("RateLimit"),
                             onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Rate limit exceeded")) }) = Filter { next ->
@@ -73,4 +79,22 @@ object ResilienceFilters {
             }
         }
     }
+
+    /**
+     * Provide simple Bulkhead functionality.
+     * By default, handles 25 parallel requests, with zero wait time.
+     */
+    object Bulkheading {
+        operator fun invoke(bulkhead: Bulkhead = Bulkhead.ofDefaults("Bulkhead"),
+                            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Bulkhead limit exceeded")) }) = Filter { next ->
+            {
+                try {
+                    bulkhead.executeCallable { next(it) }
+                } catch (e: BulkheadFullException) {
+                    onError()
+                }
+            }
+        }
+    }
+
 }

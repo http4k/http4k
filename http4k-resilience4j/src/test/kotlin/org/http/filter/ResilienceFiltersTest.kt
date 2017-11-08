@@ -2,6 +2,8 @@ package org.http.filter
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import io.github.resilience4j.bulkhead.Bulkhead
+import io.github.resilience4j.bulkhead.BulkheadConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
@@ -25,6 +27,8 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.Test
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class ResilienceFiltersTest {
 
@@ -105,6 +109,28 @@ class ResilienceFiltersTest {
 
         rateLimits(Request(GET, "/")).status shouldMatch equalTo(OK)
         rateLimits(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
+    }
+
+    @Test
+    fun `bulkhead filter`() {
+        val config = BulkheadConfig.custom()
+            .maxConcurrentCalls(1)
+            .maxWaitTime(0)
+            .build()
+
+        val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
+            Thread.sleep(10)
+            Response(OK)
+        }
+
+        val latch = CountDownLatch(1)
+        thread {
+            latch.countDown()
+            bulkheading(Request(GET, "/"))
+        }
+
+        latch.await()
+        bulkheading(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
     }
 
 }
