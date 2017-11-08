@@ -20,6 +20,7 @@ cp -R src/mkdocs.yml ${TMP}
 cd ${TMP}
 mkdocs gh-deploy
 
+git pull --rebase
 sed s/\>\</\>`date '+%Y-%m-%d'`\</g sitemap.xml > new ; mv new sitemap.xml
 git add sitemap.xml
 git commit -m "sitemap update"
