@@ -7,6 +7,8 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.ratelimiter.RateLimiter
+import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig
 import org.http4k.core.Method.GET
@@ -16,6 +18,7 @@ import org.http4k.core.Status.Companion.BAD_GATEWAY
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
+import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import org.http4k.hamkrest.hasStatus
@@ -26,7 +29,7 @@ import java.util.*
 class ResilienceFiltersTest {
 
     @Test
-    fun `circuit breaker filter`() {
+    fun `circuit break filter`() {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
             .ringBufferSizeInClosedState(2)
@@ -86,6 +89,22 @@ class ResilienceFiltersTest {
         }
 
         retrying(Request(GET, "/")).status shouldMatch equalTo(SERVICE_UNAVAILABLE)
+    }
+
+    @Test
+    fun `rate limit filter`() {
+        val config = RateLimiterConfig.custom()
+            .limitRefreshPeriod(Duration.ofSeconds(1))
+            .limitForPeriod(1)
+            .timeoutDuration(Duration.ofMillis(10)).build()
+
+        val rateLimits = ResilienceFilters.RateLimit(RateLimiter.of("ratelimiter", config)).then {
+            Thread.sleep(20)
+            Response(OK)
+        }
+
+        rateLimits(Request(GET, "/")).status shouldMatch equalTo(OK)
+        rateLimits(Request(GET, "/")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
     }
 
 }

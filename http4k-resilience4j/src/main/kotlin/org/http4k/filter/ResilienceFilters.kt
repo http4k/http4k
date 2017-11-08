@@ -2,11 +2,14 @@ package org.http4k.filter
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException
+import io.github.resilience4j.ratelimiter.RateLimiter
+import io.github.resilience4j.ratelimiter.RequestNotPermitted
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.Retry.ofDefaults
 import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
+import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 
 object ResilienceFilters {
 
@@ -53,6 +56,19 @@ object ResilienceFilters {
                     }
                 } catch (e: RetryError) {
                     e.response
+                }
+            }
+        }
+    }
+
+    object RateLimit {
+        operator fun invoke(rateLimit: RateLimiter = RateLimiter.ofDefaults("RateLimit"),
+                            onError: () -> Response = { Response(TOO_MANY_REQUESTS.description("Rate limit exceeded")) }) = Filter { next ->
+            {
+                try {
+                    rateLimit.executeCallable { next(it) }
+                } catch (e: RequestNotPermitted) {
+                    onError()
                 }
             }
         }
