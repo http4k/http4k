@@ -49,9 +49,6 @@ class PathMethod(val path: String, val method: Method) {
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
 
-@Deprecated("For consistency with routing API", ReplaceWith("this.first bind this.second to action"))
-infix fun Pair<String, Method>.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(second, UriTemplate.from(first), action)
-
 infix fun String.bind(router: RoutingHttpHandler): RoutingHttpHandler = router.withBasePath(this)
 
 infix fun String.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(null, UriTemplate.from(this), action)

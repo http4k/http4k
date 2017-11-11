@@ -12,9 +12,6 @@ import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
-@Deprecated("replace with OpenApi", ReplaceWith("OpenApi", "org.http4k.contract.OpenApi"))
-typealias Swagger<ROOT, NODE> = OpenApi<ROOT, NODE>
-
 class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)

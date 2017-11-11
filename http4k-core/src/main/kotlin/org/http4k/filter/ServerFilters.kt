@@ -9,7 +9,6 @@ import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
-import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -17,6 +16,7 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
+import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Failure
@@ -162,10 +162,10 @@ object ServerFilters {
     }
 
     /**
-     * Initialise a RequestContext for each request which passes through the Filter stack, and remove the
+     * Initialise a RequestContext for each request which passes through the Filter stack,
      */
     object InitialiseRequestContext {
-        operator fun invoke(contexts: RequestContexts): Filter = Filter { next ->
+        operator fun invoke(contexts: Store<RequestContext>): Filter = Filter { next ->
             {
                 val context = RequestContext(UUID.randomUUID())
                 try {
@@ -178,7 +178,7 @@ object ServerFilters {
     }
 
     /**
-     * Sets the Content Type response header on the Response, but only if it that header is NOT currently set
+     * Sets the Content Type response header on the Response.
      */
     object SetContentType {
         operator fun invoke(contentType: ContentType): Filter = Filter { next ->

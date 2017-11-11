@@ -35,6 +35,3 @@ private fun formParametersFrom(target: String): Map<String, List<String>> = targ
     .groupBy { it.first }
     .mapValues { it.value.map { it.second } }
 
-
-@Deprecated("Use Validator instead", ReplaceWith("Validator", "org.http4k.lens.Validator"))
-typealias FormValidator = Validator
