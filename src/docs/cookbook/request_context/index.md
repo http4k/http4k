@@ -15,7 +15,7 @@ the shared bag of state for each request, and to remove the state after the requ
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.37.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.38.0"
 ```
 
 ### Code
