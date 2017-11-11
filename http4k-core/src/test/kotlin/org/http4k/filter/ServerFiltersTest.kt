@@ -14,6 +14,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.RequestContext
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -196,6 +197,13 @@ class ServerFiltersTest {
     }
 
     @Test
+    fun `catch lens failure - invalid from RequestContext is rethrown`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = RequestContext())
+        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
+    }
+
+    @Test
     fun `catch lens failure - unsupported`() {
         val e = LensFailure(Unsupported(Header.required("bob").meta))
         val handler = ServerFilters.CatchLensFailure.then { throw e }
@@ -215,7 +223,7 @@ class ServerFiltersTest {
                     next(it)
                 }
             })
-            .then { Response(OK).body(contexts[it].get<String>("foo")) }
+            .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
 
         handler(Request(GET, "/")) shouldMatch hasBody("manchu")
     }

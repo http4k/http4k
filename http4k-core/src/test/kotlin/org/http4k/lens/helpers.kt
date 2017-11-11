@@ -81,3 +81,5 @@ fun lensFailureWith(vararg failures: Failure, overallType: Failure.Type) = objec
         } else
             MatchResult.Match
 }
+
+inline fun <reified T> targetIsA() = Matcher<LensFailure>("target", { it.target is T })

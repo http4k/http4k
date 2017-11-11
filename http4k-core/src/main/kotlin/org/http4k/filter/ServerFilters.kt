@@ -26,7 +26,6 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.*
 
 data class CorsPolicy(val origins: List<String>,
                       val headers: List<String>,
@@ -115,6 +114,7 @@ object ServerFilters {
             } catch (lensFailure: LensFailure) {
                 when {
                     lensFailure.target is Response -> throw lensFailure
+                    lensFailure.target is RequestContext -> throw lensFailure
                     lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
                     else -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
                 }
@@ -167,7 +167,7 @@ object ServerFilters {
     object InitialiseRequestContext {
         operator fun invoke(contexts: Store<RequestContext>): Filter = Filter { next ->
             {
-                val context = RequestContext(UUID.randomUUID())
+                val context = RequestContext()
                 try {
                     next(contexts.inject(context, it))
                 } finally {

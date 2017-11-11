@@ -36,7 +36,8 @@ fun main(args: Array<String>) {
 
     // this Lens is the key we use to set and get the type-safe state. By using this, we gain
     // typesafety and the guarantee that there will be no clash of keys.
-    val key = RequestContextKey.of<SharedState>(contexts)
+    // RequestContextKeys can be required, optional, or defaulted, as per the standard Lens mechanism.
+    val key = RequestContextKey.required<SharedState>(contexts)
 
     // The first Filter is required to initialise the bag of state.
     // The second Filter modifies the bag.

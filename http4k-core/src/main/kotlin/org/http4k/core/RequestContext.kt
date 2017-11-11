@@ -5,7 +5,7 @@ import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensInjector
 import java.util.*
 
-class RequestContext internal constructor(internal val id: UUID) {
+class RequestContext internal constructor(internal val id: UUID = UUID.randomUUID()) {
     private val objects = mutableMapOf<String, Any>()
 
     companion object : LensExtractor<Request, UUID>, LensInjector<UUID, Request> {
@@ -18,12 +18,9 @@ class RequestContext internal constructor(internal val id: UUID) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any> get(key: String): T {
-        if(!objects.containsKey(key)) throw IllegalStateException("No RequestContext property initialised for key $key")
-        return objects[key]!! as T
-    }
+    operator fun <T : Any?> get(key: String): T? = objects[key] as T?
 
-    fun set(key: String, value: Any) {
-        objects[key] = value
+    operator fun set(key: String, value: Any?) {
+        value?.let { objects[key] = value } ?: objects.remove(key)
     }
 }

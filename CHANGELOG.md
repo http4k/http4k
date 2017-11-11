@@ -2,7 +2,8 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.38.0 (uncut)
+### v2.38.0
+- Request context key-values can not be removed (set to null).
 - Removed previously deprecated values. See below for details on replacements.
 
 ### v2.37.0

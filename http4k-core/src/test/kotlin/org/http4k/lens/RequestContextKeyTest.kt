@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
@@ -14,21 +15,29 @@ import java.util.*
 class RequestContextKeyTest {
     private val contexts = RequestContexts()
 
-    private val key = RequestContextKey.of<String>(contexts)
-
-    private val request = contexts.inject(RequestContext(UUID.randomUUID()), Request(Method.GET, ""))
+    private val request = contexts(RequestContext(UUID.randomUUID()), Request(Method.GET, ""))
 
     @Test
-    fun `can use a request context key to set and get a typed value from the request`() {
-
-        key.inject("hello", request)
-
-        key.extract(request) shouldMatch equalTo("hello")
+    fun `required key behaviour`() {
+        val key = RequestContextKey.required<String>(contexts)
+        assertThat({ key(request) }, throws(targetIsA<RequestContext>()))
+        key("hello", request)
+        key(request) shouldMatch equalTo("hello")
     }
 
     @Test
-    fun `attempt to get a non-existing key throws`() {
-        assertThat({ key.extract(request) }, throws<LensFailure>())
+    fun `optional key behaviour`() {
+        val key = RequestContextKey.optional<String>(contexts)
+        key(request) shouldMatch absent()
+        key("hello", request)
+        key(request) shouldMatch equalTo("hello")
     }
 
+    @Test
+    fun `defaulted key behaviour`() {
+        val key = RequestContextKey.defaulted(contexts, "world")
+        key(request) shouldMatch equalTo("world")
+        key("hello", request)
+        key(request) shouldMatch equalTo("hello")
+    }
 }
