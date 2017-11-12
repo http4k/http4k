@@ -110,7 +110,7 @@ val page: Int = request.query("page")!!.toInt
 ...but we also want to ensure that the expected values are both present and valid, since the above example will fail if either of those things is not true. For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) to enforce the expected HTTP contract.
 
 ### Lens basics
-A Lens is a bi-directional entity which can be used to either *get* or *set* a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). For the above example, we could use the `Query` Lens builder function and then apply the Lens to the message:
+A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
 ```kotlin
 val pageLens = Query.int().required("page")
 val page: Int = pageLens(Request(GET, "http://server/search?page=123"))
@@ -135,10 +135,12 @@ val page: Response = pageLens(Response(OK), 123)
 val updated: Request = Request(GET, "/foo").with(pageLens of 123, pageSizeLens of 10)
 ```
 
-### More advanced lensing
+### Advanced lensing
+Securely extracting JDK primitives from HTTP messages is great, but we really want to avoid primitives entirely and go straight to domain types. During construction of Lens, the builders allow mapping to occur so we can leverage Kotlin data classes:
 ```kotlin
-data class CustomType(val value: LocalDate)
-val requiredCustomQuery = Header.localDate().map(::CustomType, CustomType::value).required("myCustomType")
+data class MyDate(val value: LocalDate)
+val dateQuery = Query.localDate().map(::MyDate, MyDate::value).required("date")
+val myDate: dateQuery = customQuery(Request(GET, "http://server/search?date=2000-01-01"))
 ```
 
 
