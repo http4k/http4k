@@ -18,11 +18,11 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://http4k.org) is serverless. Or rather - server independent. Test an app locally and then deploy it into AWS Lambda with no changes.
 
 ### Oh god not another framework! Why does this even exist?!?
-Firstly - we don't consider [**http4k**](https://http4k.org) to be a framework - it's a set of libraries providing a toolkit to serve and consume HTTP services, focussing on simple, consistent, and testable APIs. Hence, whilst it does provide support for various APIs *relevant to serving and consuming HTTP*, it does not provide every integration under the sun - merely simple points to allow those integrations to be hooked in.
+Firstly - we don't consider [**http4k**](https://http4k.org) to be a framework - it's a set of libraries providing a functional toolkit to serve and consume HTTP services, focusing on simple, consistent, and testable APIs. Hence, whilst it does provide support for various APIs *relevant to serving and consuming HTTP*, it does not provide every integration under the sun - merely simple points to allow those integrations to be hooked in.
 
 Another thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - it's rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). 
 
-With the growing adoption of Kotlin, we wanted something that would fully leverage the functional features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks and focusing on simple, consistent, functional (and therefore) testable APIs. Hence, [**http4k**](https://http4k.org) is primarily designed to be a Kotlin-first library.
+With the growing adoption of Kotlin, we wanted something that would fully leverage the functional features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks. Hence, [**http4k**](https://http4k.org) is primarily designed to be a Kotlin-first library.
 
 ## Claim A: Small, simple, immutable.
 Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of simple, independent function. 
