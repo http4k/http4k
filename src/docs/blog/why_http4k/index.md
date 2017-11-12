@@ -90,7 +90,7 @@ What does that mean in practice? Well - for one thing, it's less for your brain 
 val client: HttpHandler = ApacheClient()
 val response: Response = client(Request(GET, "http://server/path"))
 ```
-For another, it means that if applications and clients are interchangeable, you can plug them together in memory without putting them on the network - which makes testing insanely fast:
+For another, it means that since clients are just functions you can easily stub them for testing, and since applications and clients are interchangeable, they can be plugged together in memory without putting them on the network - which makes testing insanely fast:
 
 ```kotlin
 fun MyApp1(): HttpHandler = { Response(OK) }
