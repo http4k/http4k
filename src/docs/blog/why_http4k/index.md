@@ -18,7 +18,9 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://http4k.org) is serverless. Or rather - server independent. Test an app locally and then deploy it into AWS Lambda with no changes.
 
 ### Why does it even exist?!?
-The first thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks.
+The first thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). 
+
+With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks and focussing on simple, consistent, and testable APIs.
 
 ## Claim A: Small, simple, immutable.
 Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of simple function. This simplicity turns out to be very powerful.
@@ -102,7 +104,7 @@ val app2: HttpHandler = MyApp2(app1)
 ## Claim D. Serverless
 {{tumbleweed}}
 
-## The final word!
+## The final word(s)!
 The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it impossible to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
 * Support for static file serving with HotReload
