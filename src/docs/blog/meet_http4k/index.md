@@ -1,5 +1,3 @@
-# {{WORK IN PROGRESS}}
-
 # Server as a Function. In Kotlin. Typesafe. Without the Server.
 
 ##### [@daviddenton](http://github.com/daviddenton) / november 2017
@@ -161,7 +159,7 @@ This mechanism works for all incoming and outgoing JSON and XML Requests and Res
 ## Claim D. Serverless
 Ah yes - Serverless - the latest in the Cool Kids Club and killer fodder for the resume. Well, since [**http4k**](https://http4k.org) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library.
 
-In order to achieve this, only a single interface - `AppLoader` needs to be implemented - this is responsible for creating the `HttpHandler` which is adapted to the API of the `ApiGatewayProxyRequest/ApiGatewayProxyResponse` used by AWS. As this is AWS, there is a fair amount of configuration required to make this possible, but the only http4k specific config is to:
+In order to achieve this, only a single interface `AppLoader` needs to be implemented - this is responsible for creating the `HttpHandler` which is adapted to the API of the `ApiGatewayProxyRequest/ApiGatewayProxyResponse` used by AWS. As this is AWS, there is a fair amount of configuration required to make this possible, but the only http4k specific config is to:
 1. Set the function execution to call `org.http4k.aws.lambda.LambdaFunction::handle`
 2. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
 
