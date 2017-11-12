@@ -4,7 +4,7 @@
 
 ##### [@daviddenton](http://github.com/daviddenton) / november 2017
 
-##Meet [**http4k**](https://http4k.org).
+## Meet [**http4k**](https://http4k.org).
 
 Whenever (yet another) new JVM HTTP framework is released, the inevitable question that rightly get asked is **"How it this different to X?"**. In this post, I'm going to briefly cover what [**http4k**](https://http4k.org) is, how we think it's different, and address some of those **bold claims** from the title.
 
@@ -20,10 +20,10 @@ Here's a quick rundown of what we think those differences are:
 ### Why does it even exist?!?
 The first thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks.
 
-### Claim 1: Small, simple, immutable.
+## Claim 1: Small, simple, immutable.
 Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of function. 
 
-#### Function 1: HttpHandler
+### Function 1: HttpHandler
 An `HttpHandler` and represents an HTTP endpoint. It's not even an Interface, modelled merely as a [typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
 ```kotlin
 typealias HttpHandler = (Request) -> Response
@@ -44,7 +44,7 @@ class AppTest {
 ```
 To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty) and change the call to `asServer()`.
 
-#### Function 2: Filter
+### Function 2: Filter
 `Filters` provides pre and post Request processing:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
@@ -61,7 +61,7 @@ val composedFilter: Filter = repeatBody.then(setContentType)
 val decoratedApp: HttpHandler = composedFilter.then(app)
 ```
 
-#### Routing
+### Routing
 [http4k](https://http4k.org)'s nestable routing looks a lot like every other Sinatra-style framework these days - and you can infinitely nest `HttpHandlers` - this just exposes another `HttpHandler`, so you can easily extract, test and reuse sets of routes:
 ```kotlin
 val app: HttpHandler = routes(
@@ -70,7 +70,7 @@ val app: HttpHandler = routes(
 )
 ```
 
-### Claim 2. Symmetric HTTP
+## Claim 2. Symmetric HTTP
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
 
 As per a core principle behind "Server as a Function", [**http4k**](https://http4k.org) provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in [**http4k**](https://http4k.org) server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
@@ -93,13 +93,13 @@ val app2: HttpHandler = MyApp2(app1)
 ```
 [**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp.
 
-### 3. Typesafe HTTP
+## Claim 3. Typesafe HTTP
 {{tumbleweed}}
 
-### 4. Serverless
+## Claim 4. Serverless
 {{tumbleweed}}
 
-### 5. The final word!
+## The final word!
 The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it impossible to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
 * Support for static file serving with HotReload
