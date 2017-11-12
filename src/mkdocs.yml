@@ -61,8 +61,6 @@ pages:
     - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
-      - Developer Guide:
-        - Modules:
   - Performance: performance/index.md
   - In action: in_action/index.md
   - Blog:

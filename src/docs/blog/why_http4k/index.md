@@ -2,33 +2,34 @@
 
 # Server as a Function. In Kotlin. Typesafe. Without the Server.
 
-##### @daviddenton / november 2017
+##### [@daviddenton](http://github.com/daviddenton) / november 2017
 
-##Meet http4k.
+##Meet [**http4k**](https://http4k.org).
 
-Whenever (yet another) new HTTP framework is released, the inevitable question that rightly get asked is "How it this different to X?". In this post, I'm going to briefly cover what http4k is, why it's different, and address some of those bold claims from the title.
+Whenever (yet another) new JVM HTTP framework is released, the inevitable question that rightly get asked is **"How it this different to X?"**. In this post, I'm going to briefly cover what [**http4k**](https://http4k.org) is, how it's different, and address some of those **bold claims** from the title.
 
 Here's a quick rundown of what we think those differences are:
-* http4k is small. Written in pure Kotlin, with zero dependencies.
-* http4k is simple. Like, really simple. No magic, no annotations, no reflection.
-* http4k is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
-* http4k is symmetric. The remote HTTP model is the same as the incoming model.
-* http4k is typesafe. Say goodbye to boilerplate and hello to auto-generated documentation.
-* http4k is serverless. Or rather - server independent. Test an app locally and then deploy it into AWS Lambda with no changes.
 
-The first thing to say is that (not very much) of http4k is new - rather the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by UtterlyIdle, the basic "Server as a function" model is stolen from Finagle, and the contract module OpenApi/Swagger generator is ported from Fintrospect. With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
+* [**http4k**](https://http4k.org) is small. Written in pure Kotlin, with zero dependencies.
+* [**http4k**](https://http4k.org) is simple. Like, really simple. No magic, no annotations, no reflection.
+* [**http4k**](https://http4k.org) is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
+* [**http4k**](https://http4k.org) is symmetric. The remote HTTP model is the same as the incoming model.
+* [**http4k**](https://http4k.org) is typesafe. Say goodbye to boilerplate and hello to auto-generated documentation.
+* [**http4k**](https://http4k.org) is serverless. Or rather - server independent. Test an app locally and then deploy it into AWS Lambda with no changes.
+
+The first thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - rather the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
 
 ### 1. Small, simple, immutable.
-Based on the awesome "Your Server as a Function" paper from Twitter, http4k apps are modelled by composing 2 types of function. The first is called `HttpHandler` and represents an HTTP endpoint. It's not even an interface, modelled merely as a typealias:
+Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of function. The first is called `HttpHandler` and represents an HTTP endpoint. It's not even an interface, modelled merely as a [typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
-Here's a entire http4k application, which echoes request body back a the user. It only relies on the `http4k-core` module, which itself has zero dependencies:
+Here's a entire [**http4k**](https://http4k.org) application, which echoes request body back a the user. It only relies on the `http4k-core` module, which itself has zero dependencies:
 ```kotlin
 val app = { request: Request -> Response(OK).body(request.body) }
 val server = app.asServer(SunHttp(8000)).start()
 ```
-The `Request` and `Response` objects in there are immutable data classes, so testing the app requires absolutely no extra infrastructure, and is as easy as:
+The `Request` and `Response` objects in there are immutable data classes/POKOs, so testing the app requires absolutely no extra infrastructure, and is as easy as:
 ```kotlin
 class AppTest {
     @Test
@@ -54,7 +55,7 @@ val repeatBody = Filter { next ->
 val composedFilter: Filter = repeatBody.then(setContentType)
 val decoratedApp: HttpHandler = composedFilter.then(app)
 ```
-http4k's nestable routing looks a lot like every other Sinatra-style framework these days - and you can infinitely nest `HttpHandlers` - this just exposes another `HttpHandler`, so you can extract and reuse:
+[http4k](https://http4k.org)'s nestable routing looks a lot like every other Sinatra-style framework these days - and you can infinitely nest `HttpHandlers` - this just exposes another `HttpHandler`, so you can extract and reuse:
 ```kotlin
 val app: HttpHandler = routes(
     "/app" bind GET to decoratedApp,
@@ -62,12 +63,12 @@ val app: HttpHandler = routes(
 )
 ```
 
-The `http4k-core` module contains a bunch of useful Filters, rocks in at about <1000 lines of code, and has zero dependencies (other than the Kotlin language itself). It's proven in production, driving traffic for a major publishing website (easily serving 10's of million hits per day on a few nodes) since March 2017.
+The `[http4k](https://http4k.org)-core` module contains a bunch of useful Filters, rocks in at about <1000 lines of code, and has zero dependencies (other than the Kotlin language itself). It's proven in production, driving traffic for a major publishing website (easily serving 10's of million hits per day on a few nodes) since March 2017.
 
 ### 2. Symmetric
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
 
-As per a core principle behind "Server as a Function", http4k provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in http4k server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
+As per a core principle behind "Server as a Function", [**http4k**](https://http4k.org) provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in [**http4k**](https://http4k.org) server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
@@ -93,6 +94,6 @@ val app2: HttpHandler = MyApp2(app1)
 {{tumbleweed}}
 
 ##### Footnotes
-*"But... but... but... asynchronous! And Webscale!"*, I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and http4k is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
+*"But... but... but... asynchronous! And Webscale!"*, I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
 
 ### TODO: more things here
