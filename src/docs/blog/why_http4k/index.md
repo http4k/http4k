@@ -20,8 +20,8 @@ Here's a quick rundown of what we think those differences are:
 ### Why does it even exist?!?
 The first thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks.
 
-## Claim 1: Small, simple, immutable.
-Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of function. 
+## Claim A: Small, simple, immutable.
+Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://http4k.org) apps are modelled by composing 2 types of simple function. This simplicity turns out to be very powerful.
 
 ### Function 1: HttpHandler
 An `HttpHandler` and represents an HTTP endpoint. It's not even an Interface, modelled merely as a [typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
@@ -70,7 +70,7 @@ val app: HttpHandler = routes(
 )
 ```
 
-## Claim 2. Symmetric HTTP
+## Claim B. Symmetric HTTP
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
 
 As per a core principle behind "Server as a Function", [**http4k**](https://http4k.org) provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in [**http4k**](https://http4k.org) server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
@@ -93,10 +93,10 @@ val app2: HttpHandler = MyApp2(app1)
 ```
 [**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp.
 
-## Claim 3. Typesafe HTTP
+## Claim C. Typesafe HTTP
 {{tumbleweed}}
 
-## Claim 4. Serverless
+## Claim D. Serverless
 {{tumbleweed}}
 
 ## The final word!
