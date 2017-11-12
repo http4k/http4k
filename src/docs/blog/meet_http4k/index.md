@@ -46,7 +46,7 @@ class AppTest {
     }
 }
 ```
-To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty) and change the call to `asServer()`.
+To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty are available) and change the call to `asServer()`.
 
 ### Function 2: Filter
 `Filters` provides pre and post Request processing:
@@ -85,12 +85,12 @@ As per a core principle behind "Server as a Function", [**http4k**](https://http
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
-What does that mean in practice? Well - for one thing, it's less for your brain to think about because you already know the API:
+What does that mean in practice? Well - for one thing, it's less for your brain to learn  because you already know the API:
 ```kotlin
 val client: HttpHandler = ApacheClient()
 val response: Response = client(Request(GET, "http://server/path"))
 ```
-For another, it means that since clients are just functions you can easily stub them for testing, and since applications and clients are interchangeable, they can be plugged together in memory without putting them on the network - which makes testing insanely fast:
+For another, it means that since clients are *just function*s you can easily stub them for testing, and since applications and clients are interchangeable, they can be plugged together in memory without putting them on the network - which makes testing insanely fast:
 
 ```kotlin
 fun MyApp1(): HttpHandler = { Response(OK) }
@@ -99,10 +99,10 @@ fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
 val app1: HttpHandler = MyApp1()
 val app2: HttpHandler = MyApp2(app1)
 ```
-[**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp, all with streaming support.
+[**http4k**](https://http4k.org) provides a HTTP client adapters for both [Apache](https://hc.apache.org/) and [OkHttp](http://square.github.io/okhttp/), all with streaming support.
 
 ## Claim C. Typesafe HTTP with Lenses
-The immutable [**http4k**](https://http4k.org) model for HTTP objects contains all the usual suspect methods for getting values from the messages. For instance, if we are expecting a search parameter with a page query:
+The immutable [**http4k**](https://http4k.org) model for HTTP objects contains all the usual suspect methods for getting values from the messages. For instance, if we are expecting a search parameter with a query containing a page number:
 ```kotlin
 val request = Request(GET, "http://server/search?page=123")
 val page: Int = request.query("page")!!.toInt
@@ -172,13 +172,14 @@ The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has 
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
 * ViewModel driven templating engines with HotReload.
-* Popular JSON/XML library support.
-* Typesafe, multipart forms processing.
+* Popular JSON/XML library support for HTTP bodies.
+* Typesafe, multipart forms processing, with support for Streaming uploads to a storage service.
+* Typesafe contract module, providing live [OpenApi/Swagger](https://www.openapis.org/) documentation.
 * [AWS](https://aws.amazon.com/) request signing.
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. You can see a few example applications [here](/in_action/).
+Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. You can see a few example applications [here](/in_action/).
 
 ##### Footnotes
-* "But... but... but... asynchronous! And Webscale!"*, I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
+* "But... but... but... asynchronous! And Webscale!", I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.

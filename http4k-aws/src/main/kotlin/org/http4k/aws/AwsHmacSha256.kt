@@ -10,18 +10,17 @@ object AwsHmacSha256 {
     fun hash(payload: String): String = hash(payload.toByteArray())
 
     fun hash(payload: ByteArray): String = try {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val res = digest.digest(payload)
-        hex(res)
+        hex(MessageDigest.getInstance("SHA-256").digest(payload))
     } catch (e: NoSuchAlgorithmException) {
         throw RuntimeException(e)
     }
 
     fun hmacSHA256(key: ByteArray, data: String): ByteArray = try {
         val algorithm = "HmacSHA256"
-        val mac = Mac.getInstance(algorithm)
-        mac.init(SecretKeySpec(key, algorithm))
-        mac.doFinal(data.toByteArray(charset("UTF8")))
+        Mac.getInstance(algorithm).run {
+            init(SecretKeySpec(key, algorithm))
+            doFinal(data.toByteArray(charset("UTF8")))
+        }
     } catch (e: Exception) {
         throw RuntimeException("Could not run HMAC SHA256", e)
     }
