@@ -164,10 +164,10 @@ This mechanism works for all incoming and outgoing JSON and XML Requests and Res
 ## The final word(s)!
 The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
-* Support for static file serving with HotReload
-* A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing
-* A RequestContext mechanism for
-* Facilities to record and replay HTTP traffic
+* Support for static file serving with HotReload.
+* A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing.
+* Support for Request Contexts.
+* Facilities to record and replay HTTP traffic.
 
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
