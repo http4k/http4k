@@ -64,7 +64,7 @@ pages:
   - Performance: performance/index.md
   - In action: in_action/index.md
   - Blog:
-    - Why http4k: blog/why_http4k/index.md
+    - Meet http4k: blog/meet_http4k/index.md
   - Changelog: changelog/index.md
   - Contribute/Support http4k: contributing/index.md
   - FAQ: faq/index.md
