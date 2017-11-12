@@ -113,7 +113,7 @@ There are also a bunch of other modules available, all presented with the same c
 * Popular JSON/XML library support
 * Typesafe, multipart forms processing
 * [AWS](https://aws.amazon.com/) request signing
-* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & RateLimiters
+* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
 Lastly, [http4k](https://http4k.org) is proven in production, driving traffic for a major publishing website (easily serving 10's of million hits per day on a few nodes) since March 2017. 
