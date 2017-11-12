@@ -179,7 +179,9 @@ There are also a bunch of other modules available, all presented with the same c
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. You can see a few example applications [here](/in_action/).
+Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
+
+You can see a few example applications [here](/in_action/), including a bootstrap project for creating a [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
 
 ##### Footnotes
 * "But... but... but... asynchronous! And Webscale!", I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
