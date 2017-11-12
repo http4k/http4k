@@ -62,7 +62,7 @@ val decoratedApp: HttpHandler = composedFilter.then(app)
 ```
 
 ### Routing
-[http4k](https://http4k.org)'s nestable routing looks a lot like every other Sinatra-style framework these days - and you can infinitely nest `HttpHandlers` - this just exposes another `HttpHandler`, so you can easily extract, test and reuse sets of routes:
+[http4k](https://http4k.org)'s nestable routing looks a lot like every other Sinatra-style framework these days - and you can infinitely nest `HttpHandlers` - this just exposes another `HttpHandler`, so you can easily extract, test and reuse sets of routes as easily as you could with one:
 ```kotlin
 val app: HttpHandler = routes(
     "/app" bind GET to decoratedApp,
