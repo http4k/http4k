@@ -112,7 +112,7 @@ val page: Int = request.query("page")!!.toInt
 The use of Lenses in [**http4k**](https://http4k.org) applications can remove the need for writing any parsing or validation code for incoming data, as validations are taken care of by the library. Data received from clients can use exactly the same mechanisms, but violations do need to be handled.
 
 ### Lens basics
-A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
+A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional) and the type. For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
 ```kotlin
 val pageLens = Query.int().required("page")
 val page: Int = pageLens(Request(GET, "http://server/search?page=123"))
@@ -162,7 +162,7 @@ This mechanism works for all incoming and outgoing JSON and XML Requests and Res
 {{tumbleweed}}
 
 ## The final word(s)!
-The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it impossible to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
+The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
 * Support for static file serving with HotReload
 * A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing
@@ -171,14 +171,14 @@ The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has 
 
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
-* Templating engines with HotReload
-* Popular JSON/XML library support
-* Typesafe, multipart forms processing
-* [AWS](https://aws.amazon.com/) request signing
-* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting
+* ViewModel driven templating engines with HotReload.
+* Popular JSON/XML library support.
+* Typesafe, multipart forms processing.
+* [AWS](https://aws.amazon.com/) request signing.
+* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 investment banks (that we know of) and is driving traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. You can see a few example applications [here](/in_action/).
+Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. You can see a few example applications [here](/in_action/).
 
 ##### Footnotes
 * "But... but... but... asynchronous! And Webscale!"*, I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
