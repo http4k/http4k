@@ -101,8 +101,46 @@ val app2: HttpHandler = MyApp2(app1)
 ```
 [**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp, all with streaming support.
 
-## Claim C. Typesafe HTTP
-{{tumbleweed}}
+## Claim C. Typesafe HTTP with Lenses
+The immutable [**http4k**](https://http4k.org) model for HTTP objects contains all the usual suspect methods for getting values from the messages. For instance, if we are expecting a search parameter with a page query:
+```kotlin
+val request = Request(GET, "http://server/search?page=123")
+val page: Int = request.query("page")!!.toInt
+```
+...but we also want to ensure that the expected values are both present and valid, since the above example will fail if either of those things is not true. For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) to enforce the expected HTTP contract.
+
+### Lens basics
+A Lens is a bi-directional entity which can be used to either *get* or *set* a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). For the above example, we could use the `Query` Lens builder function and then apply the Lens to the message:
+```kotlin
+val pageLens = Query.int().required("page")
+val page: Int = pageLens(Request(GET, "http://server/search?page=123"))
+```
+If the query parameter is missing or not an Int, the lens extraction operation will fail. There are similar Lens builder functions for all parts of the HTTP message (`Header`, `Path`, `Body`, `FormField` etc..), and functions for all common JVM primitive types. They are all completely typesafe - there is no reflection or magic going on - just marshalling of the various entities (in this case String to Int conversion).
+
+In the case of failure, we need to apply a Filter to detect the errors and convert them to a BAD_REQUEST response:
+```kotlin
+val queryName = Query.string().of("name")
+val app: HttpHandler = routes(
+      "/post" bind POST to { request: Request -> Response(OK).body(queryName(request)) }
+    )
+
+val app = ServerFilters.CatchLensFailure.then(handler)(Request(GET, "/hello/2000-01-01?myCustomType=someValue"))
+```
+
+Lenses also have a function to set an object *onto* a target object - since HTTP messages in [**http4k**](https://http4k.org) are immutable, this results in a copy of the object with the value set:
+```kotlin
+val pageSizeLens = Header.int().required("page")
+val page: Response = pageLens(Response(OK), 123)
+// or apply multiple lenses using with()
+val updated: Request = Request(GET, "/foo").with(pageLens of 123, pageSizeLens of 10)
+```
+
+### More advanced lensing
+```kotlin
+data class CustomType(val value: LocalDate)
+val requiredCustomQuery = Header.localDate().map(::CustomType, CustomType::value).required("myCustomType")
+```
+
 
 ## Claim D. Serverless
 {{tumbleweed}}
