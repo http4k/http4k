@@ -14,7 +14,7 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://http4k.org) is simple. Like, really simple. No static API magic, no annotations, no reflection.
 * [**http4k**](https://http4k.org) is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
 * [**http4k**](https://http4k.org) is symmetric. The remote HTTP model is the same as the incoming model.
-* [**http4k**](https://http4k.org) is typesafe. Say goodbye to validation and marshalling boilerplate and hello to auto-generated documentation.
+* [**http4k**](https://http4k.org) is typesafe. Say goodbye to validation and marshalling boilerplate and hello to data class-based contracts for HTTP bodies.
 * [**http4k**](https://http4k.org) is serverless. Or rather - server independent. Test an app locally and then deploy it into AWS Lambda with no changes.
 
 ### Oh god not another framework! Why does this even exist?!?
@@ -109,6 +109,8 @@ val page: Int = request.query("page")!!.toInt
 ```
 ...but we also want to ensure that the expected values are both present and valid, since the above example will fail if either of those things is not true. For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) to enforce the expected HTTP contract.
 
+The use of Lenses in [**http4k**](https://http4k.org) applications can remove the need for writing any parsing or validation code for incoming data, as validations are taken care of by the library. Data received from clients can use exactly the same mechanisms, but violations do need to be handled.
+
 ### Lens basics
 A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://http4k.org) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
 ```kotlin
@@ -135,14 +137,26 @@ val page: Response = pageLens(Response(OK), 123)
 val updated: Request = Request(GET, "/foo").with(pageLens of 123, pageSizeLens of 10)
 ```
 
-### Advanced lensing
-Securely extracting JDK primitives from HTTP messages is great, but we really want to avoid primitives entirely and go straight to domain types. During construction of Lens, the builders allow mapping to occur so we can leverage Kotlin data classes:
+Securely extracting JDK primitives from HTTP messages is great, but we really want to avoid primitives entirely and go straight to domain types. During construction of Lens, the builders allow mapping to occur so we can leverage Kotlin data classes. This works for both get and set operations:
 ```kotlin
 data class MyDate(val value: LocalDate)
 val dateQuery = Query.localDate().map(::MyDate, MyDate::value).required("date")
-val myDate: dateQuery = customQuery(Request(GET, "http://server/search?date=2000-01-01"))
+val myDate: dateQuery = dateQuery(Request(GET, "http://server/search?date=2000-01-01"))
 ```
 
+### Lensing HTTP bodies with Data classes
+Some of the supported message libraries (eg. GSON, Jackson, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection (oops - looks like we broke our reflection promise - but technically we're not doing it ;) !). This behaviour is supported in [**http4k**](https://http4k.org) Lenses through the use of the `auto()` method, which will marshall objects to/from HTTP messages:
+
+```kotlin
+data class Email(val value: String)
+data class Message(val subject: String, val from: Email, val to: Email)
+
+val messageLens = Body.auto<Message>().toLens()
+val body = """{"subject":"hello","from":{"value":"bob@git.com"},"to":{"value":"sue@git.com"}}"""
+val message: Message = messageLens(Request(GET, "/").body(body))
+```
+
+This mechanism works for all incoming and outgoing JSON and XML Requests and Responses. To assist with using this way of working, we have created a [tool](http://http4k-data-class-gen.herokuapp.com/) to automatically generate a set of data classes for a given messages.
 
 ## Claim D. Serverless
 {{tumbleweed}}
