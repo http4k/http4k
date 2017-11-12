@@ -162,7 +162,7 @@ This mechanism works for all incoming and outgoing JSON and XML Requests and Res
 {{tumbleweed}}
 
 ## The final word(s)!
-The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
+The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
 * Support for static file serving with HotReload.
 * A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing.
@@ -179,9 +179,9 @@ There are also a bunch of other modules available, all presented with the same c
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Lastly, [http4k](https://http4k.org) is proven in production, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
+Lastly, [**http4k**](https://http4k.org) is **proven in production**, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
 
 You can see a few example applications [here](/in_action/), including a bootstrap project for creating a [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
 
 ##### Footnotes
-* "But... but... but... asynchronous! And Webscale!", I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
+* **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) exposes a synchronous API. However, our experience suggests that for the vast majority of apps, it actually makes API integration harder unless you've got async all the way down - and that is assuming that async clients are actually available for all your various dependency types. We found that this plainly didn't matter for our use-cases so went for *Simple API™* instead... it's possible however that Kotlin co-routines will allow us to revisit this decision.
