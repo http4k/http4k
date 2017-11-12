@@ -66,7 +66,10 @@ val decoratedApp: HttpHandler = composedFilter.then(app)
 ```kotlin
 val app: HttpHandler = routes(
     "/app" bind GET to decoratedApp,
-    "/{name}" bind POST to { request -> Response(OK).body("you POSTed to ${request.path("name")}") }
+    "/other" bind routes(
+        "/delete" bind DELETE to { _: Request -> Response(OK) },
+        "/post/{name}" bind POST to { request: Request -> Response(OK).body("you POSTed to ${request.path("name")}") }
+    )
 )
 ```
 
@@ -91,7 +94,7 @@ fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
 val app1: HttpHandler = MyApp1()
 val app2: HttpHandler = MyApp2(app1)
 ```
-[**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp.
+[**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp, all with streaming support.
 
 ## Claim C. Typesafe HTTP
 {{tumbleweed}}
