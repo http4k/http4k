@@ -6,7 +6,7 @@
 
 ## Meet [**http4k**](https://http4k.org).
 
-Whenever (yet another) new JVM HTTP framework is released, the inevitable question that rightly get asked is **"How it this different to X?"**. In this post, I'm going to briefly cover what [**http4k**](https://http4k.org) is, how we think it's different, and address some of those **bold claims** from the title.
+Whenever (yet another) new JVM HTTP framework is released, the inevitable question that rightly get asked is **"How it this different to X?"**. In this post, I'm going to briefly cover what [**http4k**](https://http4k.org) is, how we think it's different, and address some of those **bold claims** from the title of this post.
 
 Here's a quick rundown of what we think those differences are:
 
