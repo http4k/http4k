@@ -91,7 +91,7 @@ fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
 val app1: HttpHandler = MyApp1()
 val app2: HttpHandler = MyApp2(app1)
 ```
-[http4k](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp.
+[**http4k**](https://http4k.org) provides a HTTP client adapters for both Apache and OkHttp.
 
 ### 3. Typesafe HTTP
 {{tumbleweed}}
@@ -103,17 +103,17 @@ val app2: HttpHandler = MyApp2(app1)
 The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is functional and predictable - there is no static API magic going on under the covers (making it impossible to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
 
 * Support for static file serving with HotReload
-* A bunch of useful Filters for stuff like Zipkin Request Tracing
-* A RequestContext mechanism
+* A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing
+* A RequestContext mechanism for
 * Facilities to record and replay HTTP traffic
 
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
-* Templating engines
-* JSON/XML library support
+* Templating engines with HotReload
+* Popular JSON/XML library support
 * Typesafe, multipart forms processing
-* AWS
-* Resilience4j integration, including Circuit Breakers & RateLimiters
+* [AWS](https://aws.amazon.com/) request signing
+* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & RateLimiters
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
 Lastly, [http4k](https://http4k.org) is proven in production, driving traffic for a major publishing website (easily serving 10's of million hits per day on a few nodes) since March 2017. 
