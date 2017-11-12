@@ -35,7 +35,7 @@ Here's a entire [**http4k**](https://http4k.org) application, which echoes reque
 val app = { request: Request -> Response(OK).body(request.body) }
 val server = app.asServer(SunHttp(8000)).start()
 ```
-The `Request` and `Response` objects in there are immutable data classes/POKOs, so testing the app requires absolutely no extra infrastructure - just call the function, so is as easy as:
+The `Request` and `Response` objects in there are immutable data classes/POKOs, so testing the app requires absolutely no extra infrastructure - just call the function, it's as easy as:
 ```kotlin
 class AppTest {
     @Test
