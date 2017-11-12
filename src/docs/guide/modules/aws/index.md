@@ -19,7 +19,7 @@ http4k provides a `Filter` which does this request signing process. Just decorat
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/aws/example_aws.kt"></script>
 
 #### AWS Lambda integration
-Since [**http4k**](https://http4k.org) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library.
+Since [**http4k**](https://http4k.org) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
 
 This is far from a complete guide, but configuring AWS Lambda and the API Gateway involves several stages:
 1. Users, Roles and Policies for the API Gateway and Lambda.
