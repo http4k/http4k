@@ -2,6 +2,8 @@
 
 # Server as a Function. In Kotlin. Typesafe. Without the Server.
 
+##### @daviddenton / november 2017
+
 ##Meet http4k.
 
 Whenever (yet another) new HTTP framework is released, the inevitable question that rightly get asked is "How it this different to X?". In this post, I'm going to briefly cover what http4k is, why it's different, and address some of those bold claims from the title.
@@ -17,7 +19,7 @@ Here's a quick rundown of what we think those differences are:
 The first thing to say is that (not very much) of http4k is new - rather the distillation of 15 years worth of experience of using various server-side libraries and we've stolen good ideas from everywhere we can. For instance - the routing module is inspired by UtterlyIdle, the basic "Server as a function" model is stolen from Finagle, and the contract module OpenApi/Swagger generator is ported from Fintrospect. With the growing adoption of Kotlin, we wanted something that would fully leverage the features of the language and it felt like a good time to start something from scratch.
 
 ### 1. Small, simple, immutable.
-Based on the awesome "Your Server as a Function" paper from Twitter, http4k apps are modelled by comoosing 2 types of function. The first is called `HttpHandler`, and represents an HTTP endpoint. It's not even an interface, modelled merely as a typealias:
+Based on the awesome "Your Server as a Function" paper from Twitter, http4k apps are modelled by composing 2 types of function. The first is called `HttpHandler` and represents an HTTP endpoint. It's not even an interface, modelled merely as a typealias:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
@@ -61,5 +63,36 @@ val app: HttpHandler = routes(
 ```
 
 The `http4k-core` module contains a bunch of useful Filters, rocks in at about <1000 lines of code, and has zero dependencies (other than the Kotlin language itself). It's proven in production, driving traffic for a major publishing website (easily serving 10's of million hits per day on a few nodes) since March 2017.
+
+### 2. Symmetric
+Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
+
+As per a core principle behind "Server as a Function", http4k provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in http4k server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
+```kotlin
+typealias HttpHandler = (Request) -> Response
+```
+What does that mean in practice? Well - for one thing, it's less for your brain to think about because you already know the API:
+```kotlin
+val client: HttpHandler = ApacheClient()
+val response: Response = client(Request(GET, "http://server/path"))
+```
+
+For another, it means that if applications and clients are interchangeable, you can plug them together in memory without putting them on the network - which makes testing insanely fast:
+
+```kotlin
+fun MyApp1(): HttpHandler = { Response(OK) }
+fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
+
+val app1: HttpHandler = MyApp1()
+val app2: HttpHandler = MyApp2(app1)
+```
+### 3. Typesafe
+{{tumbleweed}}
+
+### 4. Serverless
+{{tumbleweed}}
+
+##### Footnotes
+*"But... but... but... asynchronous! And Webscale!"*, I heard them froth. Yes, you are correct - "Server as a Function" is based on asynchronous functions and http4k is synchronous. However, we tried this already and found that for 99% of apps it actually makes things harder unless you've got async all the way down. We found that this plainly didn't matter for our use-case so went for Simple™... maybe Kotlin co-routines will make this simpler - we'll see.
 
 ### TODO: more things here
