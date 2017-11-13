@@ -1,4 +1,4 @@
-# Server as a Function. In Kotlin. Typesafe. Without the Server.
+# Server as a Function. In Kotlin. Typesafe. And now without the Server.
 
 ##### [@daviddenton](http://github.com/daviddenton) / november 2017
 
@@ -11,11 +11,11 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://http4k.org) is small. Written in pure functional Kotlin, with zero dependencies.
 * [**http4k**](https://http4k.org) is simple. Like, really simple. No static API magic, no annotations, no reflection.
 * [**http4k**](https://http4k.org) is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
-* [**http4k**](https://http4k.org) is symmetric. The remote HTTP model is the same as the incoming model.
-* [**http4k**](https://http4k.org) is typesafe. Say goodbye to validation and marshalling boilerplate and hello to data class-based contracts for HTTP bodies.
+* [**http4k**](https://http4k.org) is symmetric. It supports remote calls as a first-class concern, and the remote HTTP model is identical to the incoming HTTP model.
+* [**http4k**](https://http4k.org) is typesafe. Say goodbye to all your validation and marshalling boilerplate and hello to automatic request validation and data class-based contracts for HTTP bodies.
 * [**http4k**](https://http4k.org) is serverless. Or rather - server independent. Test an app out of container and then deploy it into any supported container - including AWS Lambda.
 
-### Oh god not another framework! Why does this even exist?!?
+### Oh god, not another framework! Why does this even exist?!?
 Firstly - we don't consider [**http4k**](https://http4k.org) to be a framework - it's a set of libraries providing a functional toolkit to serve and consume HTTP services, focusing on simple, consistent, and testable APIs. Hence, whilst it does provide support for various APIs *relevant to serving and consuming HTTP*, it does not provide every integration under the sun - merely simple points to allow those integrations to be hooked in.
 
 Another thing to say is that (not very much) of [**http4k**](https://http4k.org) is new - it's rather the distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic "Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). 
@@ -198,3 +198,4 @@ You can see a few example applications [here](/in_action/), including a bootstra
 
 ##### Footnotes
 * **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://http4k.org) exposes a synchronous API. However, our experience suggests that for the vast majority of apps, it actually makes API integration harder unless you've got async all the way down - and that is assuming that async clients are actually available for all your various dependency types. We found that this plainly didn't matter for our use-cases so went for *Simple API™* instead... it's possible however that Kotlin co-routines will allow us to revisit this decision.
+* **What no websockets?** Nope - not yet. Because [**http4k**](https://http4k.org) has been developed in the context of synchronous HTTP REST-y services, the requirement hasn't actually come up as a use-case yet. And because apps are independent of the actual Server that they are deployed to, would need to be reimplemented on each supported Server backend - which means finding a model that fitted all of them. This *is*, however, entirely doable... we just need the impetus to actually do it. Feel free to contribute a solution... :)
