@@ -36,6 +36,7 @@ pages:
       - AWS: guide/modules/aws/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Resilience: guide/modules/resilience/index.md
+      - Serverless backend: guide/modules/serverless/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
       - WebDriver: guide/modules/webdriver/index.md
     - Application Testing: guide/testing/index.md
