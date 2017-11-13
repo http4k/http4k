@@ -187,6 +187,7 @@ dependencies {
     provided project(":http4k-server-jetty")
     provided project(":http4k-server-netty")
     provided project(":http4k-server-undertow")
+    provided project(":http4k-serverless-lambda")
     provided project(":http4k-template-dust")
     provided project(":http4k-template-handlebars")
     provided project(":http4k-template-pebble")

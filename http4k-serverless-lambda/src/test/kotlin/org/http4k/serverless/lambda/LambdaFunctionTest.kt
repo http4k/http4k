@@ -1,4 +1,4 @@
-package org.http4k.aws.lambda
+package org.http4k.serverless.lambda
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch

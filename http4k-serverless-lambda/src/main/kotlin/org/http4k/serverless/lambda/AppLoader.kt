@@ -1,4 +1,4 @@
-package org.http4k.aws.lambda
+package org.http4k.serverless.lambda
 
 import org.http4k.core.HttpHandler
 

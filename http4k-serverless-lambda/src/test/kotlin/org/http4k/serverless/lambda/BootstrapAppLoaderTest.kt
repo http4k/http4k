@@ -1,4 +1,4 @@
-package org.http4k.aws.lambda
+package org.http4k.serverless.lambda
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -17,6 +17,6 @@ class BootstrapAppLoaderTest {
     fun `complains if the configures class is not an AppLoader`() {
         assertThat({
             BootstrapAppLoader(mapOf(BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS to "java.lang.String"))
-        }, throws(equalTo(BootstrapException("AppLoader class should be an object singleton that implements org.http4k.aws.lambda.AppLoader"))))
+        }, throws(equalTo(BootstrapException("AppLoader class should be an object singleton that implements org.http4k.serverless.lambda.AppLoader"))))
     }
 }
