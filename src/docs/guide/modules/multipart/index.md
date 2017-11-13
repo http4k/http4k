@@ -2,7 +2,7 @@ title: http4k Multipart Module
 description: Feature overview of the http4k-multipart form module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-multipart", version: "2.38.0"```
+```compile group: "org.http4k", name: "http4k-multipart", version: "2.38.1"```
 
 ### About
 

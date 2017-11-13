@@ -5,7 +5,7 @@ This example shows how to use the simple routing functionality to bind several r
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "2.38.0"
+    compile group: "org.http4k", name: "http4k-core", version: "2.38.1"
 ```
 
 ### Code
