@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
+import org.http4k.serverless.TestApp
 import org.junit.Test
 
 class LambdaFunctionTest {
@@ -18,7 +20,7 @@ class LambdaFunctionTest {
         request.queryStringParameters = mapOf("query" to "value")
 
         val env = mapOf(
-            BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name,
+            HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name,
             "a" to "b")
         val response = LambdaFunction(env).handle(request)
 

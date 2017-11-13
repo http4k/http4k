@@ -2,7 +2,7 @@ package guide.modules.aws
 
 
 import org.http4k.serverless.lambda.ApiGatewayProxyRequest
-import org.http4k.serverless.lambda.AppLoader
+import org.http4k.serverless.AppLoader
 import org.http4k.serverless.lambda.BootstrapAppLoader
 import org.http4k.serverless.lambda.LambdaFunction
 import org.http4k.client.ApacheClient

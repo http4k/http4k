@@ -7,6 +7,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.toUrlEncoded
+import org.http4k.serverless.BootstrapAppLoader
 
 /**
  * This is the main entry point for the lambda. It uses the local environment
