@@ -1,4 +1,4 @@
-# Server as a Function. In Kotlin. Typesafe. And now without the Server.
+# Server as a Function. In Kotlin. Typesafe. Without the Server.
 
 ##### [@daviddenton](http://github.com/daviddenton) / november 2017
 

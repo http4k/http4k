@@ -27,17 +27,17 @@ pages:
   - Getting started: quickstart/index.md
   - Developer Guide:
     - Modules:
+      - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
-      - Server backend: guide/modules/servers/index.md
+      - Hamkrest: guide/modules/hamkrest/index.md
       - HTTP client: guide/modules/clients/index.md
       - Message formats: guide/modules/message_formats/index.md
-      - Templating: guide/modules/templating/index.md
-      - Typesafe contracts: guide/modules/contracts/index.md
-      - AWS: guide/modules/aws/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Resilience: guide/modules/resilience/index.md
+      - Server backend: guide/modules/servers/index.md
       - Serverless backend: guide/modules/serverless/index.md
-      - Hamkrest: guide/modules/hamkrest/index.md
+      - Templating: guide/modules/templating/index.md
+      - Typesafe contracts: guide/modules/contracts/index.md
       - WebDriver: guide/modules/webdriver/index.md
     - Application Testing: guide/testing/index.md
     - Worked TDD Example:
