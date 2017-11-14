@@ -4,6 +4,8 @@
 
 ## Meet [**http4k**](https://github.com/http4k/http4k)
 
+[**http4k**](https://github.com/http4k/http4k) is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.
+
 Whenever (yet another) new JVM HTTP framework is released, the inevitable question that rightly get asked is **"How it this different to X?"**. In this post, I'm going to briefly cover what [**http4k**](https://github.com/http4k/http4k) is, how we think it's different, and address some of those **bold claims** from the title of this post.
 
 Here's a quick rundown of what we think those differences are:
@@ -12,7 +14,7 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://github.com/http4k/http4k) is simple. Like, really simple. No static API magic, no annotations, no reflection.
 * [**http4k**](https://github.com/http4k/http4k) is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
 * [**http4k**](https://github.com/http4k/http4k) is symmetric. It supports remote calls as a first-class concern, and the remote HTTP model is identical to the incoming HTTP model.
-* [**http4k**](https://github.com/http4k/http4k) is typesafe. Say goodbye to all your validation and marshalling boilerplate and hello to automatic request validation and data class-based contracts for HTTP bodies.
+* [**http4k**](https://github.com/http4k/http4k) is typesafe. Say goodbye to all your validation and marshalling boilerplate and hello to automatic request validation and data class-based contracts for HTTP bodies using the Lens API.
 * [**http4k**](https://github.com/http4k/http4k) is serverless. Or rather - server independent. Test an app out of container and then deploy it into any supported container - including AWS Lambda.
 
 ### Oh god, not another framework! Why does this even exist?!?
