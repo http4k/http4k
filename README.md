@@ -40,7 +40,7 @@ plugging together of services without HTTP container being required.
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
-   * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
+    * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
