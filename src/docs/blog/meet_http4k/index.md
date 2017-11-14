@@ -190,17 +190,19 @@ As pointed out above, `http4k-core` module has zero dependencies. It is also sma
 
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
-* ViewModel driven templating engines with HotReload.
-* Popular JSON/XML library support for HTTP bodies.
+* ViewModel driven templating engine support (Handlerbars etc) with HotReload.
+* Popular JSON/XML (Gson, Jackson etc) library support for HTTP bodies.
 * Typesafe HTML Form and Multipart Forms processing, with support for Streaming uploads to a storage service. Forms can also be configured to collect errors instead of just rejecting outright.
 * Typesafe contract module, providing live [OpenApi/Swagger](https://www.openapis.org/) documentation.
 * [AWS](https://aws.amazon.com/) request signing.
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Lastly, [**http4k**](https://github.com/http4k/http4k) is **proven in production**, it has been adopted in at least 2 global investment banks (that we know of) and is delivering traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
+Finally, [**http4k**](https://github.com/http4k/http4k) is **proven in production**, it has been adopted in at least 2 global investment banks and is serving the vast majority of traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
 
 You can see a few example applications [here](/in_action/), including a bootstrap project for creating a [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
+
+Well, that's it for this whirlwind tour - we hope you found it worth reading this far! We'd love you to try out [**http4k**](https://github.com/http4k/http4k) and feedback why you love/hate/are indifferent to it :) . And if you want to get involved or chat to the authors, we hang out in the friendly #http4k channel @ [kotlinlang.slack.com](https://kotlinlang.slack.com).
 
 ##### Footnotes
 * **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://github.com/http4k/http4k) exposes a synchronous API. However, our experience suggests that for the vast majority of apps, it actually makes API integration harder unless you've got async all the way down - and that is assuming that async clients are actually available for all your various dependency types. We found that this plainly didn't matter for our use-cases so went for *Simple API™* instead... it's possible however that Kotlin co-routines will allow us to revisit this decision.
