@@ -143,7 +143,7 @@ Securely extracting JDK primitives from HTTP messages is great, but we really wa
 ```kotlin
 data class MyDate(val value: LocalDate)
 val dateQuery = Query.localDate().map(::MyDate, MyDate::value).required("date")
-val myDate: dateQuery = dateQuery(Request(GET, "http://server/search?date=2000-01-01"))
+val myDate: MyDate = dateQuery(Request(GET, "http://server/search?date=2000-01-01"))
 ```
 
 ### Lensing HTTP bodies with Data classes
