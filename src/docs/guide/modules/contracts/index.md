@@ -2,7 +2,7 @@ title: http4k Contract Module
 description: Feature overview of the http4k-contract module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-contract", version: "2.38.1"```
+```compile group: "org.http4k", name: "http4k-contract", version: "3.0.0"```
 
 ### About
 The `http4k-contract` module adds a much more sophisticated routing mechanism to that available in `http4k-core`. It adds the facility 
