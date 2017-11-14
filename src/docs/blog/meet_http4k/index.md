@@ -109,7 +109,7 @@ val page: Int = request.query("page")!!.toInt
 ```
 ...but we also want to ensure that the expected values are both present and valid, since the above example will fail if either of those things is not true. For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) to enforce the expected HTTP contract.
 
-The use of Lenses in [**http4k**](https://github.com/http4k/http4k) applications can remove the need for writing any parsing or validation code for incoming data, as validations are taken care of by the library. Data received from clients can use exactly the same mechanisms, but violations do need to be handled.
+The use of Lenses in [**http4k**](https://github.com/http4k/http4k) applications can remove the need for writing any parsing or validation code for all incoming data (including Forms), as validations are taken care of by the library. 
 
 ### Lens basics
 A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://github.com/http4k/http4k) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional) and the type. For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
@@ -156,7 +156,7 @@ val body = """{"subject":"hello","from":{"value":"bob@git.com"},"to":{"value":"s
 val message: Message = messageLens(Request(GET, "/").body(body))
 ```
 
-This mechanism works for all incoming and outgoing JSON and XML Requests and Responses. To assist with using this way of working, we have created a [tool](http://http4k-data-class-gen.herokuapp.com/) to automatically generate a set of data classes for a given messages.
+This mechanism works for all incoming and outgoing JSON and XML Requests and Responses. To assist with developing whilst using this type of auto-marshalling, we have created a [tool](http://http4k-data-class-gen.herokuapp.com/) to automatically generate a set of data classes for a given messages.
 
 ## Claim D. Serverless
 Ah yes - Serverless - the latest in the Cool Kids Club and killer fodder for the resume. Well, since [**http4k**](https://github.com/http4k/http4k) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library.
@@ -189,7 +189,7 @@ There are also a bunch of other modules available, all presented with the same c
  
 * ViewModel driven templating engines with HotReload.
 * Popular JSON/XML library support for HTTP bodies.
-* Typesafe, multipart forms processing, with support for Streaming uploads to a storage service.
+* Typesafe HTML Form and Multipart Forms processing, with support for Streaming uploads to a storage service. Forms can also be configured to collect errors instead of just rejecting outright.
 * Typesafe contract module, providing live [OpenApi/Swagger](https://www.openapis.org/) documentation.
 * [AWS](https://aws.amazon.com/) request signing.
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
