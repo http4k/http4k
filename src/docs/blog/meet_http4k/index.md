@@ -28,11 +28,11 @@ With the growing adoption of Kotlin, we wanted something that would fully levera
 Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://github.com/http4k/http4k) apps are modelled by composing 2 types of simple, independent function. 
 
 ### Function 1: HttpHandler
-An `HttpHandler` and represents an HTTP endpoint. It's not even an Interface, modelled merely as a [Typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
+An `HttpHandler` represents an HTTP endpoint. It's not even an Interface, modelled merely as a [Typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
-Here's a entire [**http4k**](https://github.com/http4k/http4k) application, which echoes request body back a the user. It only relies on the `http4k-core` module, which itself has zero dependencies:
+Below is a entire [**http4k**](https://github.com/http4k/http4k) application that echoes the request body back in the response. It only relies on the `http4k-core` module, which itself has zero dependencies:
 ```kotlin
 val app = { request: Request -> Response(OK).body(request.body) }
 val server = app.asServer(SunHttp(8000)).start()
