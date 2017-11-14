@@ -10,6 +10,8 @@ These modules provide integration with Serverless deployment environments, such 
 #### AWS Lambda integration
 Since [**http4k**](https://http4k.org) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
 
+In order to achieve this, only a single interface `AppLoader` needs to be implemented.
+
 This is far from a complete guide, but configuring AWS Lambda and the API Gateway involves several stages:
 
 1. Users, Roles and Policies for the API Gateway and Lambda.
@@ -18,6 +20,7 @@ This is far from a complete guide, but configuring AWS Lambda and the API Gatewa
 1. Optionally using Proguard to minify the JAR.
 1. Package up the (minified) JAR into a standard Zip distribution.
 1. Create and configure the Lambda function, and at the same time:
+
     1. Upload the standard Zip file to S3.
     1. Set the function execution to call the main http4k entry point: `org.http4k.serverless.lambda.LambdaFunction::handle`
     1. Set an environment variable for the Lambda `HTTP4K_BOOTSTRAP_CLASS` to the class of your `AppLoader` class.
