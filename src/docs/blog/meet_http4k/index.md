@@ -198,7 +198,7 @@ There are also a bunch of other modules available, all presented with the same c
 * [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory [WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
 
-Finally, [**http4k**](https://github.com/http4k/http4k) is **proven in production**, it has been adopted in at least 2 global investment banks and is serving the vast majority of traffic for a major publishing website (easily serving 10s of million hits per day on a few nodes) since March 2017. 
+Finally, [**http4k**](https://github.com/http4k/http4k) is **proven in production**, it has been adopted in at least 2 global investment banks and is serving the vast majority of traffic for a major publishing website (in the top 1000 sites globally according to [alexa.com](https://alexa.com) - ie. easily serving 10s of million hits per day on a few nodes) since March 2017. 
 
 You can see a few example applications [here](/in_action/), including a bootstrap project for creating a [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
 
