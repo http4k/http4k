@@ -28,7 +28,7 @@ With the growing adoption of Kotlin, we wanted something that would fully levera
 Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [**http4k**](https://github.com/http4k/http4k) apps are modelled by composing 2 types of simple, independent function. 
 
 ### Function 1: HttpHandler
-An `HttpHandler` and represents an HTTP endpoint. It's not even an Interface, modelled merely as a [typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
+An `HttpHandler` and represents an HTTP endpoint. It's not even an Interface, modelled merely as a [Typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
@@ -41,7 +41,7 @@ The `Request` and `Response` objects in there are immutable data classes/POKOs, 
 ```kotlin
 class AppTest {
     @Test
-    fun `responds as expected`() {
+    fun `echoes request body`() {
         assertThat(app(Request(POST, "/").body("hello")), equalTo(Response(OK).body("hello")))
     }
 }
@@ -49,7 +49,7 @@ class AppTest {
 To plug it into a different Server-backend, just depend on the relevant module (Jetty, Undertow, Netty are available) and change the call to `asServer()`.
 
 ### Function 2: Filter
-`Filters` provides pre and post Request processing:
+`Filters` provides pre and post Request processing and are simply:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
 ```
@@ -77,6 +77,8 @@ val app: HttpHandler = routes(
     )
 )
 ```
+
+And that it - those functions are everything you need to know to write a simple [**http4k**](https://github.com/http4k/http4k) application. The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no annotations, no compiler-plugins, and no reflection.
 
 ## Claim B. Symmetric HTTP
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
@@ -174,13 +176,14 @@ object TweetEcho : AppLoader {
     }
 }
 ```
+Since [**http4k**](https://github.com/http4k/http4k) is very dependency-light, full binary uploads of these AWS Lambdas tend to be very small - and by utilising [https://www.guardsquare.com/en/proguard](Proguard) we've seen the size of a Lambda UberJar go as small as 150kb.
 
-Since v3.0.0, this support is available in the `http4k-serverless-lambda` module.
+Introduced in v3.0.0, this support is available in the `http4k-serverless-lambda` module.
 
 ## The final word(s)!
-The `http4k-core` module rocks in at <1000 lines of code (about 600kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no compiler-plugins, and no reflection. It also provides:
+As pointed out above, `http4k-core` module has zero dependencies. It is also small, even though it also provides:
 
-* Support for static file serving with HotReload.
+* Support for static file-serving with HotReload.
 * A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing.
 * Support for Request Contexts.
 * Facilities to record and replay HTTP traffic.
