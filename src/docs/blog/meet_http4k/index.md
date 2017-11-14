@@ -15,7 +15,7 @@ Here's a quick rundown of what we think those differences are:
 * [**http4k**](https://github.com/http4k/http4k) is immutable. It relies on an immutable HTTP model, which makes it a snap to test and debug.
 * [**http4k**](https://github.com/http4k/http4k) is symmetric. It supports remote calls as a first-class concern, and the remote HTTP model is identical to the incoming HTTP model.
 * [**http4k**](https://github.com/http4k/http4k) is typesafe. Say goodbye to all your validation and marshalling boilerplate and hello to automatic request validation and data class-based contracts for HTTP bodies using the Lens API.
-* [**http4k**](https://github.com/http4k/http4k) is serverless. Or rather - server independent. Test an app out of container and then deploy it into any supported container - including AWS Lambda.
+* [**http4k**](https://github.com/http4k/http4k) is serverless. Or rather - server independent. Test an app out of container and then deploy it into any supported local container with 1 LOC - or as a function into AWS Lambda.
 
 ### Oh god, not another framework! Why does this even exist?!?
 Firstly - we don't consider [**http4k**](https://github.com/http4k/http4k) to be a framework - it's a set of libraries providing a functional toolkit to serve and consume HTTP services, focusing on simple, consistent, and testable APIs. Hence, whilst it does provide support for various APIs *relevant to serving and consuming HTTP*, it does not provide every integration under the sun - merely simple points to allow those integrations to be hooked in.
