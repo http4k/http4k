@@ -2,7 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v2.38.0
+### v3.0.0 
+- Added `http4k-serverless-lambda` module, allowing http4k applications to be deployed into AWS Lambda and then called from API Gateway. Effectively, the combination of these two services become just another Server back-end supported by the library. \o/
+
+### v2.38.1
 - `RequestContextKey` now follow the standardised Lens structure of required, optional, defaulted, and can now be removed (set to null). Replace calls
 to `RequestContextKey.of()` with `RequestContextKey.required()` 
 - Removed previously deprecated values. See below for details on replacements.
