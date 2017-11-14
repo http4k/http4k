@@ -14,7 +14,7 @@
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 </span>
 
-**http4k** is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
+ [**http4k**](https://github.com/http4k/http4k)  is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
 servers, clients, templating etc) that are provided as optional add-on libraries.
@@ -44,8 +44,8 @@ plugging together of services without HTTP container being required.
     * AWS request signing: super-simple interactions with AWS services.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
-    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of **http4k** apps
-    * Testing: Hamkrest Matchers for **http4k** objects
+    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k)  apps
+    * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k)  objects
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
@@ -71,7 +71,7 @@ plugging together of services without HTTP container being required.
         * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
-    * Implement a single Factory method, then upload your http4k applications to AWS Lambda to be called from API Gateway. 
+    * Implement a single Factory method, then upload your[http4k](https://github.com/http4k/http4k)applications to AWS Lambda to be called from API Gateway. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
@@ -97,12 +97,12 @@ plugging together of services without HTTP container being required.
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
-    * Ultra-lightweight Selenium WebDriver implementation for **http4k** application.
+    * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
-    * A set of Hamkrest matchers for testing **http4k** Request and Response messages.
+    * A set of Hamkrest matchers for testing [**http4k**](https://github.com/http4k/http4k)  Request and Response messages.
     
 ## Example
-This quick example is designed to convey the simplicity & features of **http4k**. See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
+This quick example is designed to convey the simplicity & features of [**http4k**](https://github.com/http4k/http4k) . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
@@ -207,7 +207,7 @@ This project exists thanks to all the people who [contribute](https://www.http4k
 
 ## Backers & Sponsors
 
-If you use http4k in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
+If you use [http4k](https://github.com/http4k/http4k) in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor. Sponsor logos will show up here with a link to your website.
 
 <a href="https://opencollective.com/http4k/sponsor/1/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/1/avatar.svg"></a>
 <a href="https://opencollective.com/http4k/sponsor/2/website" target="_blank"><img src="https://opencollective.com/http4k/sponsor/2/avatar.svg"></a>
