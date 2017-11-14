@@ -11,8 +11,8 @@ documentation, and checking in a high-level way that the business endpoints are 
 ## Requirements:
 - The service can be pinged over HTTP to prove that is still alive.
 
-## Production:
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_1_building_a_walking_skeleton/project.kt"></script>
-
 ## Tests:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_1_building_a_walking_skeleton/tests.kt"></script>
+
+## Production:
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_1_building_a_walking_skeleton/project.kt"></script>

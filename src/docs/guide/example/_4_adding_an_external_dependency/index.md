@@ -26,9 +26,8 @@ The following process is followed to us to the final state, whilst always allowi
 1. Alter the AddFunctionalTest and MultiplyFunctionalTest to set the expectations on the interactions recorder in FakeRecorderHttp
 1. In MyMathApp, create the Recorder business implementation (Recorder) and pass it to calculate(), then implement the call to record()
 
+## Tests:
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/tests.kt"></script>
 
 ## Production:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/project.kt"></script>
-
-## Tests:
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/example/_4_adding_an_external_dependency/tests.kt"></script>
