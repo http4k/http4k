@@ -35,7 +35,7 @@ fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg e
 
 fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
 
-class PathMethod(val path: String, val method: Method) {
+data class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
     infix fun to(action: StaticRoutingHttpHandler): RoutingHttpHandler = action.withBasePath(path).let {
         object : RoutingHttpHandler by it {

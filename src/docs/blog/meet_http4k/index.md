@@ -112,10 +112,10 @@ val page: Int = request.query("page")!!.toInt
 The use of Lenses in [**http4k**](https://github.com/http4k/http4k) applications can remove the need for writing any parsing or validation code for all incoming data (including Forms), as validations are taken care of by the library. 
 
 ### Lens basics
-A Lens is a bi-directional entity which can be used to either *get* (extract) or *set* (inject) a particular value from/onto an HTTP message. [**http4k**](https://github.com/http4k/http4k) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional) and the type. For the above example, we could use the `Query` Lens builder and then apply the Lens to the message:
+A Lens is a bi-directional entity which can be used to either *get* or *set* a particular value from/onto an HTTP message. [**http4k**](https://github.com/http4k/http4k) provides a DSL to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional) and the type. For the above example, we could use the `Query` Lens builder and then `invoke()` the Lens on the message to extract the target value:
 ```kotlin
 val pageLens = Query.int().required("page")
-val page: Int = pageLens(Request(GET, "http://server/search?page=123"))
+val page: Int = pageLens.extract(Request(GET, "http://server/search?page=123"))
 ```
 If the query parameter is missing or not an Int, the lens extraction operation will fail. There are similar Lens builder functions for all parts of the HTTP message (`Header`, `Path`, `Body`, `FormField` etc..), and functions for all common JVM primitive types. They are all completely typesafe - there is no reflection or magic going on - just marshalling of the various entities (in this case String to Int conversion).
 
@@ -129,7 +129,7 @@ val app: HttpHandler = routes(
 val app = ServerFilters.CatchLensFailure.then(handler)(Request(GET, "/hello/2000-01-01?myCustomType=someValue"))
 ```
 
-Lenses also have a function to set an object *onto* a target object - since HTTP messages in [**http4k**](https://github.com/http4k/http4k) are immutable, this results in a copy of the object with the value set:
+Lenses can also be applied with a value (via `invoke()`) to set it *onto* a target object - and as HTTP messages in [**http4k**](https://github.com/http4k/http4k) are immutable, this results in a copy of the modified message:
 ```kotlin
 val pageSizeLens = Header.int().required("page")
 val page: Response = pageLens(Response(OK), 123)
