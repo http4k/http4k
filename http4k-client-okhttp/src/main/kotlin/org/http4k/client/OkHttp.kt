@@ -1,5 +1,3 @@
-
-
 package org.http4k.client
 
 import okhttp3.OkHttpClient
@@ -14,12 +12,12 @@ import java.net.SocketTimeoutException
 
 class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler {
 
-    private fun Request.asOkHttp(): okhttp3.Request =
-        headers.fold(okhttp3.Request.Builder()
-            .url(uri.toString())
-            .method(method.toString(), requestBody())) { memo, (first, second) ->
-            memo.addHeader(first, second ?: "")
-        }.build()
+    private fun Request.asOkHttp(): okhttp3.Request = headers.fold(okhttp3.Request.Builder()
+        .url(uri.toString())
+        .method(method.toString(), requestBody())) { memo, (first, second) ->
+        val notNullValue = second ?: ""
+        memo.addHeader(first, notNullValue)
+    }.build()
 
     private fun Request.requestBody() =
         if (permitsRequestBody(method.toString())) create(null, body.payload.array())
