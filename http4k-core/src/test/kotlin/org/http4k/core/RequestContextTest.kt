@@ -4,7 +4,8 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
-import java.util.*
+import java.util.UUID
+
 
 class RequestContextTest {
 

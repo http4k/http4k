@@ -7,6 +7,7 @@ import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
+
 fun Body.gzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
 else ByteArrayOutputStream().run {
     GZIPOutputStream(this).use { it.write(payload.array()) }

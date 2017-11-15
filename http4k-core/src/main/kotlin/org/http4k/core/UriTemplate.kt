@@ -4,6 +4,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.regex.Pattern
 
+
 class UriTemplate private constructor(private val template: String) {
     private val templateRegex: Regex
     private val matches: Sequence<MatchResult>

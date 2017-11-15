@@ -4,7 +4,8 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import org.http4k.core.Response
 import java.io.File
-import java.util.*
+import java.util.UUID
+
 
 /**
  * Consumes HTTP traffic for storage.

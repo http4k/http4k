@@ -7,7 +7,8 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
-import java.util.*
+import java.util.Random
+
 import kotlin.experimental.and
 
 data class TraceId(val value: String) {

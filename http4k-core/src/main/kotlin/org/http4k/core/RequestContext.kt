@@ -3,7 +3,8 @@ package org.http4k.core
 import org.http4k.lens.Header
 import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensInjector
-import java.util.*
+import java.util.UUID
+
 
 class RequestContext internal constructor(internal val id: UUID = UUID.randomUUID()) {
     private val objects = mutableMapOf<String, Any>()

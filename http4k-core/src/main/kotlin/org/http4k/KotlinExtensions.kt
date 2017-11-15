@@ -2,7 +2,8 @@ package org.http4k
 
 import java.net.URLEncoder
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Base64
+
 
 fun ByteBuffer.asString(): String = String(array())
 

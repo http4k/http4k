@@ -10,7 +10,8 @@ import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.RequestContexts
 import org.junit.Test
-import java.util.*
+import java.util.UUID
+
 
 class RequestContextKeyTest {
     private val contexts = RequestContexts()

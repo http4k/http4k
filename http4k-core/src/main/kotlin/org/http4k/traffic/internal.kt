@@ -4,7 +4,7 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.Request
 import java.io.File
 import java.security.MessageDigest
-import java.util.*
+import java.util.Base64
 
 
 internal fun HttpMessage.writeTo(folder: File) {

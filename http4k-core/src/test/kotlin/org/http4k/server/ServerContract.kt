@@ -19,7 +19,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
+import java.util.Random
+
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler) {
     private var server: Http4kServer? = null

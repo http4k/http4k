@@ -1,6 +1,7 @@
 package org.http4k.core
 
-import java.util.*
+import java.util.UUID
+
 
 /**
  * In-memory RequestContext store.

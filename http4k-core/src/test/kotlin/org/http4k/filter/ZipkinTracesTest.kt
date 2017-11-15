@@ -8,7 +8,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.junit.Test
-import java.util.*
+import java.util.Random
 
 
 class TraceIdTest {

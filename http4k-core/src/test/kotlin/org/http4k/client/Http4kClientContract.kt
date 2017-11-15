@@ -32,7 +32,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Arrays
+import java.util.Random
+
 
 abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig,
                                     val client: HttpHandler,

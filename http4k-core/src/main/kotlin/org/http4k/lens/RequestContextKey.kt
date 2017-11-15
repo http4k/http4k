@@ -3,7 +3,8 @@ package org.http4k.lens
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.lens.ParamMeta.ObjectParam
-import java.util.*
+import java.util.UUID
+
 
 typealias RequestContextLens<T> = BiDiLens<Request, T>
 
