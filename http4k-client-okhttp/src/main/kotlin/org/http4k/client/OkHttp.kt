@@ -1,3 +1,5 @@
+
+
 package org.http4k.client
 
 import okhttp3.OkHttpClient
@@ -16,7 +18,7 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         headers.fold(okhttp3.Request.Builder()
             .url(uri.toString())
             .method(method.toString(), requestBody())) { memo, (first, second) ->
-            memo.addHeader(first, second)
+            memo.addHeader(first, second ?: "")
         }.build()
 
     private fun Request.requestBody() =

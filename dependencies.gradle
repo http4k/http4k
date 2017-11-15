@@ -5,13 +5,17 @@ ext {
             "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     ]
 
+    kotlin_reflect = [
+            "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
+    ]
+
     hamkrest = [
             "com.natpryce:hamkrest:1.4.2.0"
     ]
 
     testing = [
             "junit:junit:4.12",
-            "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
+            kotlin_reflect,
             hamkrest
     ]
 }
