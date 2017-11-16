@@ -5,7 +5,7 @@ This example is the simplest possible "server" implementation. Note that we are 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.0.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.0.1"
 ```
 
 ### Code

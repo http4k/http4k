@@ -178,7 +178,7 @@ object TweetEcho : AppLoader {
 ```
 Since [**http4k**](https://github.com/http4k/http4k) is very dependency-light, full binary uploads of these AWS Lambdas tend to be very small - and by utilising [Proguard](https://www.guardsquare.com/en/proguard) we've seen the size of a Lambda UberJar go as small as 150kb.
 
-Introduced in v3.0.0, this support is available in the `http4k-serverless-lambda` module.
+Introduced in v3.0.1, this support is available in the `http4k-serverless-lambda` module.
 
 ## The final word(s)!
 As pointed out above, `http4k-core` module has zero dependencies. It is also small, even though it also provides:
