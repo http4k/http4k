@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.0.1
+- Fix #63 - Apache Client Connect. timeout exception handling.
+
 ### v3.0.0 
 - Added `http4k-serverless-lambda` module, allowing http4k applications to be deployed into AWS Lambda and then called from API Gateway. Effectively, the combination of these two services become just another Server back-end supported by the library. \o/
 

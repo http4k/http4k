@@ -7,6 +7,7 @@ import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
@@ -19,6 +20,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import java.net.SocketTimeoutException
 import java.net.URI
 
@@ -30,8 +32,10 @@ class ApacheClient(
 
     override fun invoke(request: Request): Response = try {
         client.execute(request.toApacheRequest()).toHttp4kResponse()
+    } catch (e: ConnectTimeoutException) {
+        Response(CLIENT_TIMEOUT)
     } catch (e: SocketTimeoutException) {
-        Response(Status.CLIENT_TIMEOUT)
+        Response(CLIENT_TIMEOUT)
     }
 
     private fun CloseableHttpResponse.toHttp4kResponse(): Response {
@@ -60,9 +64,9 @@ class ApacheClient(
     companion object {
         private fun defaultApacheHttpClient() = HttpClients.custom()
             .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE_COOKIES)
-            .build()).build()
+                .setRedirectsEnabled(false)
+                .setCookieSpec(IGNORE_COOKIES)
+                .build()).build()
 
     }
 }

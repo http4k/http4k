@@ -1,10 +1,21 @@
 package org.http4k.client
 
+import com.natpryce.hamkrest.should.shouldMatch
+import org.apache.http.HttpHost
+import org.apache.http.HttpRequest
+import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.config.SocketConfig
+import org.apache.http.conn.ConnectTimeoutException
+import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.http4k.core.BodyMode
-import org.http4k.core.BodyMode.*
+import org.apache.http.protocol.HttpContext
+import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
+import org.junit.Test
 
 class ApacheClientTest : Http4kClientContract({ SunHttp(it) }, ApacheClient(),
     ApacheClient(HttpClients.custom()
@@ -13,4 +24,23 @@ class ApacheClientTest : Http4kClientContract({ SunHttp(it) }, ApacheClient(),
                 .setSoTimeout(100)
                 .build()
         ).build()
-        , responseBodyMode = Stream))
+        , responseBodyMode = Stream)) {
+
+    @Test
+    fun `connect timeout is handled`() {
+        ApacheClient(object : CloseableHttpClient() {
+            override fun getParams() = TODO("not implemented")
+
+            override fun getConnectionManager() = TODO("not implemented")
+
+            override fun doExecute(target: HttpHost?, request: HttpRequest?, context: HttpContext?): CloseableHttpResponse {
+                throw ConnectTimeoutException()
+            }
+
+            override fun close() {
+            }
+
+        })(Request(GET, "http://localhost:8000")) shouldMatch hasStatus(CLIENT_TIMEOUT)
+    }
+
+}
