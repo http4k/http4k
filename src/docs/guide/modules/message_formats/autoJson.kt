@@ -9,8 +9,8 @@ data class Email(val value: String)
 data class Message(val subject: String, val from: Email, val to: Email)
 
 fun main(args: Array<String>) {
-    // We can use the auto method here from either Jackson, Gson or the Xml message format objects. Note that the
-    // auto() method is an extension function which needs to be manually imported (IntelliJ won't pick it up automatically)
+    // We can use the auto method here from either Jackson, Gson or the Xml message format objects. 
+    // Note that the auto() method needs to be manually imported as IntelliJ won't pick it up automatically.
     val messageLens = Body.auto<Message>().toLens()
 
     val myMessage = Message("hello", Email("bob@git.com"), Email("sue@git.com"))
