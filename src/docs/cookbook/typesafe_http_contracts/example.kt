@@ -62,6 +62,10 @@ fun main(args: Array<String>) {
     })
 
     val contract = contract(OpenApi(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
+        "/ping"
+            bindContract GET
+            to { Response(OK).body("pong")}
+            meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
         "/add" / Path.int().of("value1") / Path.int().of("value2")
             bindContract GET
             to ::add
@@ -86,6 +90,7 @@ fun main(args: Array<String>) {
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000)).start()
 }
 
+// Ping!                    curl -v "http://localhost:8000/context/ping?apiKey=42"
 // Adding 2 numbers:        curl -v "http://localhost:8000/context/add/123/564?apiKey=42"
 // Echo (fail):             curl -v "http://localhost:8000/context/echo/myName?age=notANumber&apiKey=42"
 // API Key enforcement:     curl -v "http://localhost:8000/context/add/123/564?apiKey=444"
