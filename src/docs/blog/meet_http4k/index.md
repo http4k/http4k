@@ -202,7 +202,7 @@ Finally, [**http4k**](https://github.com/http4k/http4k) is **proven in productio
 
 You can see a few example applications [here](/in_action/), including a bootstrap project for creating a [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
 
-Well, that's it for this whirlwind tour - we hope you found it worth reading this far! We'd love you to try out [**http4k**](https://github.com/http4k/http4k) and feedback why you love/hate/are indifferent to it :) . And if you want to get involved or chat to the authors, we hang out in the friendly #http4k channel @ [kotlinlang.slack.com](https://kotlinlang.slack.com).
+Well, that's it for this whirlwind tour - we hope you found it worth reading this far! We'd love you to try out [**http4k**](https://github.com/http4k/http4k) and feedback why you love/hate/are indifferent to it :) . And if you want to get involved or chat to the authors, we hang out in the friendly #http4k channel @ [slack.kotlinlang,org](http://slack.kotlinlang.org/).
 
 ##### Footnotes
 * **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://github.com/http4k/http4k) exposes a synchronous API. However, our experience suggests that for the vast majority of apps, this actually makes API integration harder unless you've got async all the way down - and that is assuming that async clients are actually available for all your various remote dependencies. We found that this plainly didn't matter for our use-cases so went for *Simple API™* instead... it's possible however that Kotlin co-routines will allow us to revisit this decision.
