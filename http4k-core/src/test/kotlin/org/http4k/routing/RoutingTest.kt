@@ -132,6 +132,16 @@ class RoutingTest {
     }
 
     @Test
+    fun `capture pattern until the end of the path`() {
+        val routes = routes(
+            "/a/{route:.*}" bind GET to { Response(OK).body(it.path("route")!!) }
+        )
+
+        assertThat(routes(Request(GET, "/a/something")).bodyString(), equalTo("something"))
+        assertThat(routes(Request(GET, "/a/something/somethingelse")).bodyString(), equalTo("something/somethingelse"))
+    }
+
+    @Test
     fun `path parameters are available in request`() {
         val routes = routes(
             "/{a}/{b}/{c}" bind GET to { req: Request -> Response(OK).body("matched ${req.path("a")}, ${req.path("b")}, ${req.path("c")}") }
