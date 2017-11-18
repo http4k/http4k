@@ -1,9 +1,6 @@
 package org.http4k.contract
 
-import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.ContentType.Companion.APPLICATION_XML
-import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -11,7 +8,6 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.Header
-import org.http4k.lens.string
 
 data class Tag(val name: String, val description: String? = null)
 
@@ -72,17 +68,4 @@ class MetaDsl {
 
 fun meta(fn: MetaDsl.() -> Unit): RouteMeta = MetaDsl().apply(fn).run {
     RouteMeta(summary, description, request, tags, produces, consumes, responses)
-}
-
-fun main(args: Array<String>) {
-    meta {
-        summary = "summary"
-        description = "description"
-        request = Request(GET, "")
-        produces += APPLICATION_XML
-        tags += Tag("name", "description")
-        consumes += ContentType.TEXT_PLAIN
-        returning("ok" to Status.OK)
-        receiving(Body.string(TEXT_PLAIN).toLens() to "")
-    }
 }
