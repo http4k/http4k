@@ -70,7 +70,7 @@ class MetaDsl {
     }
 }
 
-fun meta(fn: MetaDsl.() -> Unit): MetaDsl = MetaDsl().apply(fn).apply {
+fun meta(fn: MetaDsl.() -> Unit): RouteMeta = MetaDsl().apply(fn).run {
     RouteMeta(summary, description, request, tags, produces, consumes, responses)
 }
 
