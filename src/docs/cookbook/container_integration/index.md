@@ -1,7 +1,9 @@
 title: http4k Container Integration
 description: Recipes for using http4k to with the various Server backends
 
-This example shows how to both how to serve an application HttpHandler using an embedded an HTTP server and to query it using an HTTP client. All server-backend implementations are launched in an identical manner (in 1LOC). Additionally, server instances can be customised using classes available in the implementation JARs - in the case of Jetty, the application is mounted using the `asServlet()` extension method into the Jetty container.
+This example shows how to both how to serve an application HttpHandler using an embedded an HTTP server and to query it using an HTTP client. All server-backend implementations are launched in an identical manner (in 1LOC) using implementations of the `ServerConfig` interface - and a base implementation of this interface is provided for each server backend.
+
+Alternatively, any http4k application can be mounted into any Servlet container using the `asServlet()` extension method. This is the mechanism used in the Jetty implementation.
 
 ### Gradle setup
 ```
