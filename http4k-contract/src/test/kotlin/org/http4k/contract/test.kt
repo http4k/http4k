@@ -25,7 +25,7 @@ class Appendable<T>(val all: MutableList<T> = mutableListOf()) {
         all += t
     }
 
-    operator fun plusAssign(t: List<T>) {
+    operator fun plusAssign(t: Collection<T>) {
         all += t
     }
 }
@@ -71,8 +71,7 @@ val b = contractRoute {
     summary = "summary of this route"
     description = "some rambling description of what this thing actually does"
     produces += ContentType.APPLICATION_JSON
-    tags += Tag("tag3")
-    tags += Tag("tag1")
+    tags += listOf(Tag("tag3"), Tag("tag1"))
     headers += Header.optional("header", "description of the header")
     queries += Query.optional("header", "description of the header")
 } //"/echo" / Path.of("message")
