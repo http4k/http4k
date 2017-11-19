@@ -17,9 +17,9 @@ fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverR
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) =
     ContractRoutingHttpHandler(renderer, security, descriptionPath, "", serverRoutes.map { it }, Filter { { req -> it(req) } })
 
-operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), emptyList(), null) / next
+operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), emptyList(), null, RouteMeta()) / next
 
-operator fun <A, B> PathLens<A>.div(next: PathLens<B>): ContractRouteSpec2<A, B> = ContractRouteSpec1({ it }, emptyList(), null, this) / next
+operator fun <A, B> PathLens<A>.div(next: PathLens<B>): ContractRouteSpec2<A, B> = ContractRouteSpec1({ it }, emptyList(), null, RouteMeta(), this) / next
 
 infix fun String.bind(router: ContractRoutingHttpHandler): ContractRoutingHttpHandler = router.withBasePath(this)
 
@@ -28,10 +28,10 @@ interface RouteBinder<in T> {
     infix fun to(fn: T): ContractRoute
 }
 
-infix fun <A> PathLens<A>.bindContract(method: Method) = ContractRouteSpec1({ it }, emptyList(), null, this).bindContract(method)
+infix fun <A> PathLens<A>.bindContract(method: Method) = ContractRouteSpec1({ it }, emptyList(), null, RouteMeta(), this).bindContract(method)
 
 
-infix fun String.bindContract(method: Method): RouteBinder<HttpHandler> = ContractRouteSpec0(toBaseFn(this), emptyList(), null).bindContract(method)
+infix fun String.bindContract(method: Method): RouteBinder<HttpHandler> = ContractRouteSpec0(toBaseFn(this), emptyList(), null, RouteMeta()).bindContract(method)
 
 infix fun ContractRouteSpec0.bindContract(method: Method) = let { spec ->
     object : RouteBinder<HttpHandler> {
@@ -72,35 +72,35 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.bindContract(method: Metho
 
 // TODO deprecate or remove??
 @JvmName("handler0String")
-infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(toBaseFn(first), emptyList(), null).bindContract(second) to handler
+infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(toBaseFn(first), emptyList(), null, RouteMeta()).bindContract(second) to handler
 
 // TODO deprecate or remove??
 @JvmName("handler1Path")
-infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, emptyList(), null, first).bindContract(second) to fn
+infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, emptyList(), null, RouteMeta(), first).bindContract(second) to fn
 
-infix fun String.query(new: QueryLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null)
-infix fun String.header(new: HeaderLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null)
-infix fun String.body(new: BodyLens<*>) = ContractRouteSpec0(toBaseFn(this), emptyList(), new)
+infix fun String.query(new: QueryLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null, RouteMeta())
+infix fun String.header(new: HeaderLens<*>) = ContractRouteSpec0(toBaseFn(this), listOf(new), null, RouteMeta())
+infix fun String.body(new: BodyLens<*>) = ContractRouteSpec0(toBaseFn(this), emptyList(), new, RouteMeta())
 
-infix fun ContractRouteSpec0.query(new: QueryLens<*>) = ContractRouteSpec0(pathFn, requestParams.plus(listOf(new)), body)
-infix fun ContractRouteSpec0.header(new: HeaderLens<*>) = ContractRouteSpec0(pathFn, requestParams.plus(listOf(new)), body)
-infix fun ContractRouteSpec0.body(new: BodyLens<*>) = ContractRouteSpec0(pathFn, requestParams, new)
+infix fun ContractRouteSpec0.query(new: QueryLens<*>) = ContractRouteSpec0(pathFn, requestParams.plus(listOf(new)), body, routeMeta)
+infix fun ContractRouteSpec0.header(new: HeaderLens<*>) = ContractRouteSpec0(pathFn, requestParams.plus(listOf(new)), body, routeMeta)
+infix fun ContractRouteSpec0.body(new: BodyLens<*>) = ContractRouteSpec0(pathFn, requestParams, new, routeMeta)
 
-infix fun <A> ContractRouteSpec1<A>.query(new: QueryLens<*>) = ContractRouteSpec1(pathFn, requestParams.plus(listOf(new)), body, a)
-infix fun <A> ContractRouteSpec1<A>.header(new: HeaderLens<*>) = ContractRouteSpec1(pathFn, requestParams.plus(listOf(new)), body, a)
-infix fun <A> ContractRouteSpec1<A>.body(new: BodyLens<*>) = ContractRouteSpec1(pathFn, requestParams, new, a)
+infix fun <A> ContractRouteSpec1<A>.query(new: QueryLens<*>) = ContractRouteSpec1(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a)
+infix fun <A> ContractRouteSpec1<A>.header(new: HeaderLens<*>) = ContractRouteSpec1(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a)
+infix fun <A> ContractRouteSpec1<A>.body(new: BodyLens<*>) = ContractRouteSpec1(pathFn, requestParams, new, routeMeta, a)
 
-infix fun <A, B> ContractRouteSpec2<A, B>.query(new: QueryLens<*>) = ContractRouteSpec2(pathFn, requestParams.plus(listOf(new)), body, a, b)
-infix fun <A, B> ContractRouteSpec2<A, B>.header(new: HeaderLens<*>) = ContractRouteSpec2(pathFn, requestParams.plus(listOf(new)), body, a, b)
-infix fun <A, B> ContractRouteSpec2<A, B>.body(new: BodyLens<*>) = ContractRouteSpec2(pathFn, requestParams, new, a, b)
+infix fun <A, B> ContractRouteSpec2<A, B>.query(new: QueryLens<*>) = ContractRouteSpec2(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b)
+infix fun <A, B> ContractRouteSpec2<A, B>.header(new: HeaderLens<*>) = ContractRouteSpec2(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b)
+infix fun <A, B> ContractRouteSpec2<A, B>.body(new: BodyLens<*>) = ContractRouteSpec2(pathFn, requestParams, new, routeMeta, a, b)
 
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.query(new: QueryLens<*>) = ContractRouteSpec3(pathFn, requestParams.plus(listOf(new)), body, a, b, c)
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.header(new: HeaderLens<*>) = ContractRouteSpec3(pathFn, requestParams.plus(listOf(new)), body, a, b, c)
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.body(new: BodyLens<*>) = ContractRouteSpec3(pathFn, requestParams, new, a, b, c)
+infix fun <A, B, C> ContractRouteSpec3<A, B, C>.query(new: QueryLens<*>) = ContractRouteSpec3(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b, c)
+infix fun <A, B, C> ContractRouteSpec3<A, B, C>.header(new: HeaderLens<*>) = ContractRouteSpec3(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b, c)
+infix fun <A, B, C> ContractRouteSpec3<A, B, C>.body(new: BodyLens<*>) = ContractRouteSpec3(pathFn, requestParams, new, routeMeta, a, b, c)
 
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.query(new: QueryLens<*>) = ContractRouteSpec4(pathFn, requestParams.plus(listOf(new)), body, a, b, c, d)
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.header(new: HeaderLens<*>) = ContractRouteSpec4(pathFn, requestParams.plus(listOf(new)), body, a, b, c, d)
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = ContractRouteSpec4(pathFn, requestParams, new, a, b, c, d)
+infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.query(new: QueryLens<*>) = ContractRouteSpec4(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b, c, d)
+infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.header(new: HeaderLens<*>) = ContractRouteSpec4(pathFn, requestParams.plus(listOf(new)), body, routeMeta, a, b, c, d)
+infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = ContractRouteSpec4(pathFn, requestParams, new, routeMeta, a, b, c, d)
 
 infix fun ContractRoute.meta(new: RouteMeta) = ContractRoute(method, spec, toHandler, new)
 

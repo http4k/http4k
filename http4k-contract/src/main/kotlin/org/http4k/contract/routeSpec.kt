@@ -13,6 +13,7 @@ import org.http4k.lens.PathLens
 abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
                                                       val requestParams: List<Lens<Request, *>>,
                                                       val body: BodyLens<*>?,
+                                                      val routeMeta: RouteMeta,
                                                       vararg val pathLenses: PathLens<*>) : Filter {
 
     abstract infix operator fun <T> div(next: PathLens<T>): ContractRouteSpec
@@ -36,33 +37,33 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 }
 
-class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?) : ContractRouteSpec(pathFn, requestParams, body) {
-    override infix operator fun div(next: String) = ContractRouteSpec0({ it / next }, emptyList(), body)
+class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, routeMeta: RouteMeta) : ContractRouteSpec(pathFn, requestParams, body, routeMeta) {
+    override infix operator fun div(next: String) = ContractRouteSpec0({ it / next }, emptyList(), body, routeMeta)
 
-    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec1(pathFn, requestParams, body, next)
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec1(pathFn, requestParams, body, routeMeta, next)
 }
 
-class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, val a: PathLens<A>) : ContractRouteSpec(pathFn, requestParams, body, a) {
+class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, routeMeta: RouteMeta, val a: PathLens<A>) : ContractRouteSpec(pathFn, requestParams, body, routeMeta, a) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec2(pathFn, requestParams, body, a, next)
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec2(pathFn, requestParams, body, routeMeta, a, next)
 }
 
-class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, val a: PathLens<A>, val b: PathLens<B>) : ContractRouteSpec(pathFn, requestParams, body, a, b) {
+class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, routeMeta: RouteMeta, val a: PathLens<A>, val b: PathLens<B>) : ContractRouteSpec(pathFn, requestParams, body, routeMeta, a, b) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec3(pathFn, requestParams, body, a, b, next)
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec3(pathFn, requestParams, body, routeMeta, a, b, next)
 }
 
-class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?,
-                                                                   val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : ContractRouteSpec(pathFn, requestParams, body, a, b, c) {
+class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, routeMeta: RouteMeta,
+                                                                   val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>) : ContractRouteSpec(pathFn, requestParams, body, routeMeta, a, b, c) {
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec4(pathFn, requestParams, body, a, b, c, next)
+    override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec4(pathFn, requestParams, body, routeMeta, a, b, c, next)
 }
 
-class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?,
-                                                                          val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>) : ContractRouteSpec(pathFn, requestParams, body, a, b, c, d) {
+class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (PathSegments) -> PathSegments, requestParams: List<Lens<Request, *>>, body: BodyLens<*>?, routeMeta: RouteMeta,
+                                                                          val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>) : ContractRouteSpec(pathFn, requestParams, body, routeMeta, a, b, c, d) {
     override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")
