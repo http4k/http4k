@@ -10,8 +10,8 @@ This contract example shows:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.1.0"
-    compile group: "org.http4k", name: "http4k-contract", version: "3.1.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.1.1"
+    compile group: "org.http4k", name: "http4k-contract", version: "3.1.1"
 ```
 
 ### Code
