@@ -66,24 +66,24 @@ data class RouteMeta(val summary: String = "<unknown>",
 
     @JvmName("returningResponse")
     @Deprecated("use meta builder returning() instead")
-    fun RouteMeta.returning(new: Pair<String, Response>) =
+    fun returning(new: Pair<String, Response>) =
         copy(
             produces = produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
             responses = responses.plus(new.second.status to new))
 
     @JvmName("returningStatus")
     @Deprecated("use meta builder returning() instead")
-    fun RouteMeta.returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
+    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
 
     @Deprecated("use meta builder receiving() instead")
-    fun <T> RouteMeta.receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
+    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
 
     @Deprecated("use meta builder produces +=() instead")
-    fun RouteMeta.producing(vararg new: ContentType) = copy(produces = produces.plus(new))
+    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
     @Deprecated("use meta builder consumes +=() instead")
-    fun RouteMeta.consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
+    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
     @Deprecated("use meta builder tags +=() instead")
-    fun RouteMeta.taggedWith(tag: String) = taggedWith(Tag(tag))
+    fun taggedWith(tag: String) = taggedWith(Tag(tag))
     @Deprecated("use meta builder tags +=() instead")
-    fun RouteMeta.taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
+    fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
 }
