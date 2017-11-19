@@ -84,8 +84,7 @@ fun main(args: Array<String>) {
             "/echo" / Path.of("name") meta {
                 summary = "echo"
                 queries += ageQuery
-            }
-                bindContract GET to ::echo
+            } bindContract GET to ::echo
         )
     )
 
