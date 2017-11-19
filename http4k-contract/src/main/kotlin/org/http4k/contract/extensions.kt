@@ -67,13 +67,13 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.bindContract(method: Metho
     }
 }
 
-// TODO deprecate or remove??
-@JvmName("handler0String")
-infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(toBaseFn(first), RouteMeta()).bindContract(second) to handler
-
-// TODO deprecate or remove??
-@JvmName("handler1Path")
-infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, RouteMeta(), first).bindContract(second) to fn
+//// TODO deprecate or remove??
+//@JvmName("handler0String")
+//infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(toBaseFn(first), RouteMeta()).bindContract(second) to handler
+//
+//// TODO deprecate or remove??
+//@JvmName("handler1Path")
+//infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, RouteMeta(), first).bindContract(second) to fn
 
 infix fun String.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(toBaseFn(this), metaDsl(new))
 infix fun ContractRouteSpec0.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(pathFn, metaDsl(new))
@@ -82,4 +82,4 @@ infix fun <A, B> ContractRouteSpec2<A, B>.meta(new: RouteMetaDsl.() -> Unit) = C
 infix fun <A, B, C> ContractRouteSpec3<A, B, C>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec3(pathFn, metaDsl(new), a, b, c)
 infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec4(pathFn, metaDsl(new), a, b, c, d)
 
-private fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
+internal fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }

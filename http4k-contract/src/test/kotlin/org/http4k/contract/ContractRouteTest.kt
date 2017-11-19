@@ -32,7 +32,11 @@ class ContractRouteTest {
         val headerLens = Header.required("header")
         val queryLens = Query.required("query")
         val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" header headerLens query queryLens body bodyLens bindContract GET to { _: Request -> Response(OK) }
+        val route = "/" meta {
+            headers += headerLens
+            queries += queryLens
+            body = bodyLens
+        } bindContract GET to { _: Request -> Response(OK) }
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
     }
@@ -42,7 +46,11 @@ class ContractRouteTest {
         val headerLens = Header.required("header")
         val queryLens = Query.required("query")
         val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" header headerLens query queryLens body bodyLens bindContract GET to { _: Request -> Response(OK) }
+        val route = "/" meta {
+            headers += headerLens
+            queries += queryLens
+            body = bodyLens
+        } bindContract GET to { _: Request -> Response(OK) }
 
         val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
         val actual = route.toRouter(Root).match(invalidRequest)
@@ -55,8 +63,11 @@ class ContractRouteTest {
     fun `can build a request from a route`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val pair = path1 / path2 query Query.required("") bindContract GET
-        val route = pair to { _, _ -> { _: Request -> Response(OK) } } meta RouteMeta("")
+        val pair = path1 / path2 meta {
+            summary = ""
+            queries += Query.required("")
+        } bindContract GET
+        val route = pair to { _, _ -> { _: Request -> Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
@@ -76,7 +87,9 @@ class ContractRouteTest {
     fun `can build a request from a routespec`() {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
-        val request = (path1 / path2 query Query.required("") bindContract GET).newRequest(Uri.of("http://rita.com"))
+        val request = (path1 / path2 meta {
+            queries += Query.required("")
+        } bindContract GET).newRequest(Uri.of("http://rita.com"))
 
         request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
     }

@@ -60,5 +60,3 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = C
 
 @Deprecated("use ContractRouteSpec.meta instead to define contract")
 infix fun ContractRoute.meta(new: RouteMeta) = ContractRoute(method, spec, toHandler, new)
-
-private fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
