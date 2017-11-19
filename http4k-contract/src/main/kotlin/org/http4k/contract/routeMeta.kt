@@ -44,39 +44,4 @@ data class RouteMeta(val summary: String = "<unknown>",
 
     fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
     fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
-
-
-}
-
-class MetaDsl {
-    var summary: String = "<unknown>"
-    var description: String? = null
-    var request: Request? = null
-    var body: BodyLens<*>? = null
-    val tags: MutableSet<Tag> = mutableSetOf()
-    val produces: MutableSet<ContentType> = mutableSetOf()
-    val consumes: MutableSet<ContentType> = mutableSetOf()
-    val queries: List<Lens<Request, *>> = mutableListOf()
-    val headers: List<Lens<Request, *>> = mutableListOf()
-    internal val responses: MutableMap<Status, Pair<String, Response>> = mutableMapOf()
-
-    @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) {
-        produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList())
-        responses += responses.plus(new.second.status to new)
-    }
-
-    @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
-
-    @JvmName("returningStatus")
-    fun returning(new: Status) = returning("" to Response(new))
-
-    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>) {
-        request = Request(GET, "").with(new.first of new.second)
-    }
-}
-
-fun meta(fn: MetaDsl.() -> Unit): RouteMeta = MetaDsl().apply(fn).run {
-    RouteMeta(summary, description, request, tags, body, produces, consumes, queries.plus(headers), responses)
 }

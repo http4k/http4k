@@ -1,15 +1,60 @@
 package org.http4k.contract
 
+
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.core.with
+import org.http4k.lens.BiDiBodyLens
+import org.http4k.lens.BodyLens
+import org.http4k.lens.Header
 import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
+import org.http4k.util.Appendable
+
+class ContractRouteDsl internal constructor() {
+    var summary: String = "<unknown>"
+    var description: String? = null
+    var request: Request? = null
+    val tags = Appendable<Tag>()
+    val produces = Appendable<ContentType>()
+    val consumes = Appendable<ContentType>()
+    internal val responses = Appendable<Pair<Status, Pair<String, Response>>>()
+    var headers = Appendable<Lens<Request, *>>()
+    var queries = Appendable<Lens<Request, *>>()
+    var body: BodyLens<*>? = null
+
+    @JvmName("returningResponse")
+    fun returning(new: Pair<String, Response>) {
+        produces += (Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList())
+        responses += new.second.status to new
+    }
+
+    @JvmName("returningStatus")
+    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
+
+    @JvmName("returningStatus")
+    fun returning(new: Status) = returning("" to Response(new))
+
+    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>) {
+        request = Request(Method.GET, "").with(new.first of new.second)
+    }
+}
+
+fun contractRoute(fn: ContractRouteDsl.() -> Unit = {}) = ContractRouteDsl().apply(fn).run {
+    ContractRouteSpec0({ it }, RouteMeta(
+        summary, description, request, tags.all.toSet(), body, produces.all.toSet(), consumes.all.toSet(), queries.all.plus(headers.all), responses.all.toMap()
+    ))
+}
 
 class ContractRoute internal constructor(internal val method: Method,
                                          internal val spec: ContractRouteSpec,

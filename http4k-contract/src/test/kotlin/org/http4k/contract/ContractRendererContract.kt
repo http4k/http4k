@@ -60,37 +60,31 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/echo" / Path.of("message")
                 header Header.optional("header", "description of the header")
                 bindContract GET to { msg -> { Response(OK).body(msg) } }
-                meta meta {
-                summary = "summary of this route"
-                description = "some rambling description of what this thing actually does"
-                produces += APPLICATION_JSON
-                tags += Tag("tag3")
-                tags += Tag("tag1")
-                returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                returning("no way jose" to FORBIDDEN)
-            },
+                meta RouteMeta("summary of this route", "some rambling description of what this thing actually does")
+                .producing(APPLICATION_JSON)
+                .returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                .returning("peachy" to Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                .returning("no way jose" to FORBIDDEN)
+                .taggedWith("tag3")
+                .taggedWith("tag1"),
+
             "/echo" / Path.of("message")
                 query Query.int().required("query")
                 body customBody
                 bindContract POST to { msg -> { Response(OK).body(msg) } }
-                meta meta {
-                summary = "a post endpoint"
-                consumes += ContentType.APPLICATION_XML
-                consumes += ContentType.APPLICATION_JSON
-                produces += ContentType.APPLICATION_JSON
-                tags += Tag("tag1")
-                tags += Tag("tag2", "description of tag")
-                tags += Tag("tag2", "description of tag")
-                returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
-                receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
-            },
+                meta RouteMeta("a post endpoint")
+                .consuming(ContentType.APPLICATION_XML, APPLICATION_JSON)
+                .producing(APPLICATION_JSON)
+                .returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
+                .taggedWith("tag1")
+                .taggedWith(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
+                .receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123)))),
 
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName")
                 query Query.boolean().required("query", "description of the query")
                 body Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens()
                 bindContract GET to { a, _, _ -> { Response(OK).body(a) } }
-                meta meta { summary = "a friendly endpoint" },
+                meta RouteMeta("a friendly endpoint"),
 
             "/simples" bindContract GET to { Response(OK) } meta RouteMeta("a simple endpoint")
         )
