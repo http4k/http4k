@@ -61,23 +61,29 @@ data class RouteMeta(val summary: String = "<unknown>",
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
 
-    fun taggedWith(tag: String) = taggedWith(Tag(tag))
-    fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
-
     operator fun plus(new: Lens<Request, *>): RouteMeta = copy(requestParams = requestParams.plus(listOf(new)))
     operator fun plus(new: BodyLens<*>): RouteMeta = copy(body = new)
 
     @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) =
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.returning(new: Pair<String, Response>) =
         copy(
             produces = produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
             responses = responses.plus(new.second.status to new))
 
     @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
 
-    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
+    @Deprecated("use meta builder instead")
+    fun <T> RouteMeta.receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
 
-    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
-    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.producing(vararg new: ContentType) = copy(produces = produces.plus(new))
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.taggedWith(tag: String) = taggedWith(Tag(tag))
+    @Deprecated("use meta builder instead")
+    fun RouteMeta.taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
 }
