@@ -3,14 +3,11 @@ package guide.modules.contracts
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.OpenApi
-import org.http4k.contract.RouteMeta
 import org.http4k.contract.bind
 import org.http4k.contract.bindContract
-import org.http4k.contract.body
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
-import org.http4k.contract.query
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -31,10 +28,11 @@ import org.http4k.routing.routes
 val ageQuery = Query.int().required("age")
 val stringBody = Body.string(TEXT_PLAIN).toLens()
 
-val route = ("/echo" / Path.of("name")
-    query ageQuery
-    body stringBody
-    bindContract Method.GET)
+val route = ("/echo" / Path.of("name") meta {
+    summary = "echo"
+    queries += ageQuery
+    body = stringBody
+} bindContract Method.GET)
 
 //2. Dynamic binding of calls to an HttpHandler
 //Next, bind this route to a function which creates an `HttpHandler` for each invocation, which receives the dynamic path elements from the path:
@@ -50,7 +48,7 @@ fun echo(nameFromPath: String): HttpHandler = { request: Request ->
 //3. Combining Routes into a contract and bind to a context
 //Finally, the `ContractRoutes` are added into a reusable `Contract` in the standard way, defining a renderer (in this example OpenApi/Swagger) and a security model (in this case an API-Key):
 
-val routeWithBindings = route to ::echo meta RouteMeta("echo")
+val routeWithBindings = route to ::echo
 
 val security = ApiKey(Query.int().required("api"), { it == 42 })
 

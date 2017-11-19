@@ -1,14 +1,7 @@
 package org.http4k.contract
 
-import org.http4k.core.ContentType
-import org.http4k.core.Method.GET
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.format.Argo
-import org.http4k.lens.Header
-import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.lens.int
 
 class ContractDsl {
     var renderer: ContractRenderer = NoRenderer
@@ -19,18 +12,6 @@ class ContractDsl {
 fun contractDsl(fn: ContractDsl.() -> Unit): Any = ContractDsl().apply(fn).run {
     this
 }
-
-val asd = contractRoute {} / "asd" / Path.int().of("hey") bindContract GET to { { Response(Status.OK) } }
-
-
-val b = contractRoute {
-    summary = "summary of this route"
-    description = "some rambling description of what this thing actually does"
-    produces += ContentType.APPLICATION_JSON
-    tags += listOf(Tag("tag3"), Tag("tag1"))
-    headers += Header.optional("header", "description of the header")
-    queries += Query.optional("header", "description of the header")
-} //"/echo" / Path.of("message")
 
 val a = contractDsl {
     renderer = OpenApi(ApiInfo("foo", "bbb", "asd"), Argo)

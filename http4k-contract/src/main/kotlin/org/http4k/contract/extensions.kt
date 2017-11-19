@@ -6,10 +6,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.lens.BodyLens
-import org.http4k.lens.HeaderLens
 import org.http4k.lens.PathLens
-import org.http4k.lens.QueryLens
 
 fun contract(vararg serverRoutes: ContractRoute) = contract(NoRenderer, "", NoSecurity, *serverRoutes)
 fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract(renderer, "", NoSecurity, *serverRoutes)
@@ -78,30 +75,11 @@ infix fun Pair<String, Method>.bind(handler: HttpHandler) = ContractRouteSpec0(t
 @JvmName("handler1Path")
 infix fun <A> Pair<PathLens<A>, Method>.bind(fn: (A) -> HttpHandler) = ContractRouteSpec1({ it }, RouteMeta(), first).bindContract(second) to fn
 
-infix fun String.query(new: QueryLens<*>) = ContractRouteSpec0(toBaseFn(this), RouteMeta(requestParams = listOf(new)))
-infix fun String.header(new: HeaderLens<*>) = ContractRouteSpec0(toBaseFn(this), RouteMeta(requestParams = listOf(new)))
-infix fun String.body(new: BodyLens<*>) = ContractRouteSpec0(toBaseFn(this), RouteMeta(body = new))
-
-infix fun ContractRouteSpec0.query(new: QueryLens<*>) = ContractRouteSpec0(pathFn, routeMeta + new)
-infix fun ContractRouteSpec0.header(new: HeaderLens<*>) = ContractRouteSpec0(pathFn, routeMeta + new)
-infix fun ContractRouteSpec0.body(new: BodyLens<*>) = ContractRouteSpec0(pathFn, routeMeta.copy(body = new))
-
-infix fun <A> ContractRouteSpec1<A>.query(new: QueryLens<*>) = ContractRouteSpec1(pathFn, routeMeta + new, a)
-infix fun <A> ContractRouteSpec1<A>.header(new: HeaderLens<*>) = ContractRouteSpec1(pathFn, routeMeta + new, a)
-infix fun <A> ContractRouteSpec1<A>.body(new: BodyLens<*>) = ContractRouteSpec1(pathFn, routeMeta + new, a)
-
-infix fun <A, B> ContractRouteSpec2<A, B>.query(new: QueryLens<*>) = ContractRouteSpec2(pathFn, routeMeta + new, a, b)
-infix fun <A, B> ContractRouteSpec2<A, B>.header(new: HeaderLens<*>) = ContractRouteSpec2(pathFn, routeMeta + new, a, b)
-infix fun <A, B> ContractRouteSpec2<A, B>.body(new: BodyLens<*>) = ContractRouteSpec2(pathFn, routeMeta + new, a, b)
-
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.query(new: QueryLens<*>) = ContractRouteSpec3(pathFn, routeMeta + new, a, b, c)
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.header(new: HeaderLens<*>) = ContractRouteSpec3(pathFn, routeMeta + new, a, b, c)
-infix fun <A, B, C> ContractRouteSpec3<A, B, C>.body(new: BodyLens<*>) = ContractRouteSpec3(pathFn, routeMeta + new, a, b, c)
-
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.query(new: QueryLens<*>) = ContractRouteSpec4(pathFn, routeMeta + new, a, b, c, d)
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.header(new: HeaderLens<*>) = ContractRouteSpec4(pathFn, routeMeta + new, a, b, c, d)
-infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = ContractRouteSpec4(pathFn, routeMeta + new, a, b, c, d)
-
-infix fun ContractRoute.meta(new: RouteMeta) = ContractRoute(method, spec, toHandler, new)
+infix fun String.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(toBaseFn(this), metaDsl(new))
+infix fun ContractRouteSpec0.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(pathFn, metaDsl(new))
+infix fun <A> ContractRouteSpec1<A>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec1(pathFn, metaDsl(new), a)
+infix fun <A, B> ContractRouteSpec2<A, B>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec2(pathFn, metaDsl(new), a, b)
+infix fun <A, B, C> ContractRouteSpec3<A, B, C>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec3(pathFn, metaDsl(new), a, b, c)
+infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec4(pathFn, metaDsl(new), a, b, c, d)
 
 private fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
