@@ -42,7 +42,7 @@ class RouteMetaDsl internal constructor() {
     }
 }
 
-fun metaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
+fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
         summary, description, request, tags.all.toSet(), body, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all.toMap()
     )

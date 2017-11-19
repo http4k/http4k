@@ -59,4 +59,4 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.header(new: HeaderLens<*>)
 infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.body(new: BodyLens<*>) = ContractRouteSpec4(pathFn, routeMeta + new, a, b, c, d)
 
 @Deprecated("use ContractRouteSpec.meta instead to define contract")
-infix fun ContractRoute.meta(new: RouteMeta) = ContractRoute(method, spec, toHandler, new)
+infix fun ContractRoute.meta(new: RouteMeta) = ContractRoute(method, spec, new, toHandler)

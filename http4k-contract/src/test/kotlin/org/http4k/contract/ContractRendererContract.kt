@@ -61,7 +61,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 summary = "summary of this route"
                 description = "some rambling description of what this thing actually does"
                 headers += Header.optional("header", "description of the header")
-                body = customBody
                 produces += APPLICATION_JSON
                 returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
                 returning("peachy" to Response(Status.ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
@@ -93,7 +92,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-        println(actual)
+//        println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }
