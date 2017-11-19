@@ -3,13 +3,11 @@ package cookbook.typesafe_http_contracts
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.OpenApi
-import org.http4k.contract.RouteMeta
 import org.http4k.contract.bind
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
-import org.http4k.contract.query
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
@@ -62,28 +60,31 @@ fun main(args: Array<String>) {
     })
 
     val contract = contract(OpenApi(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
-        "/ping"
-            bindContract GET
-            to { Response(OK).body("pong")}
-            meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
-        "/add" / Path.int().of("value1") / Path.int().of("value2")
-            bindContract GET
-            to ::add
-            meta RouteMeta("add", "Adds 2 numbers together").returning("The result" to OK),
-        "/echo" / Path.of("name")
-            query ageQuery
-            bindContract GET to ::echo
-            meta RouteMeta("echo")
+        "/ping" meta {
+            summary = "add"
+            description = "Adds 2 numbers together"
+            returning("The result" to OK)
+        } bindContract GET to { Response(OK).body("pong") },
+        "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
+            summary = "add"
+            description = "Adds 2 numbers together"
+            returning("The result" to OK)
+        } bindContract GET
+            to ::add,
+        "/echo" / Path.of("name") meta {
+            summary = "echo"
+            queries += ageQuery
+        } bindContract GET to ::echo
     )
 
     val handler = routes(
         "/context" bind filter.then(contract),
         "/static" bind NoCache().then(static(Classpath("cookbook"))),
         "/" bind contract(OpenApi(ApiInfo("my great super api", "v1.0"), Argo),
-            "/echo" / Path.of("name")
-                query ageQuery
-                bindContract GET to ::echo
-                meta RouteMeta("echo")
+            "/echo" / Path.of("name") meta {
+                summary = "echo"
+                queries += ageQuery
+            } bindContract GET to ::echo
         )
     )
 

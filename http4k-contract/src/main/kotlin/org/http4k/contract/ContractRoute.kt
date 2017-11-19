@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -13,10 +14,10 @@ import org.http4k.routing.Router
 
 class ContractRoute internal constructor(internal val method: Method,
                                          internal val spec: ContractRouteSpec,
-                                         internal val toHandler: (ExtractedParts) -> HttpHandler,
-                                         internal val meta: RouteMeta = RouteMeta()) {
+                                         internal val meta: RouteMeta,
+                                         internal val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    internal val nonBodyParams = spec.requestParams.plus(spec.pathLenses).flatMap { it }
+    internal val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatMap { it }
 
     internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
 
