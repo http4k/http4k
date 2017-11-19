@@ -13,8 +13,8 @@ import org.http4k.lens.Lens
 
 data class Tag(val name: String, val description: String? = null)
 
-data class RouteMeta(val summary: String,
-                     val description: String?,
+data class RouteMeta(val summary: String = "<unknown>",
+                     val description: String? = null,
                      val request: Request? = null,
                      val tags: Set<Tag> = emptySet(),
                      val body: BodyLens<*>? = null,
@@ -27,6 +27,9 @@ data class RouteMeta(val summary: String,
 
     fun taggedWith(tag: String) = taggedWith(Tag(tag))
     fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
+
+    operator fun plus(new: Lens<Request, *>): RouteMeta = copy(requestParams = requestParams.plus(listOf(new)))
+    operator fun plus(new: BodyLens<*>): RouteMeta = copy(body = new)
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) =
@@ -41,6 +44,7 @@ data class RouteMeta(val summary: String,
 
     fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
     fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
+
 
 }
 

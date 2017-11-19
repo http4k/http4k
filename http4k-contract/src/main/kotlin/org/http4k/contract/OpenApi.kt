@@ -58,12 +58,12 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.spec.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { renderMeta(it, schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
-        val consumes = route.meta.consumes.plus(route.spec.body?.let { listOf(it.contentType) } ?: emptyList())
+        val consumes = route.meta.consumes.plus(route.spec.routeMeta.body?.let { listOf(it.contentType) } ?: emptyList())
 
         val pathJson = json.obj(
             "tags" to json.array(routeTags),
