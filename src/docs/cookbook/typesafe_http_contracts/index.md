@@ -12,6 +12,7 @@ This contract example shows:
 ```
     compile group: "org.http4k", name: "http4k-core", version: "3.1.1"
     compile group: "org.http4k", name: "http4k-contract", version: "3.1.1"
+    compile group: "org.http4k", name: "http4k-format-argo", version: "3.1.1"
 ```
 
 ### Code
