@@ -18,13 +18,13 @@ import java.io.InputStream
 import java.util.*
 
 abstract class AbstractAwsRealS3TestCase {
-    protected var bucketName: String? = null
-    protected var key: String? = null
-    protected var bucketUrl: Uri? = null
-    protected var keyUrl: Uri? = null
-    protected var s3Root: Uri? = null
-    protected var scope: AwsCredentialScope? = null
-    protected var credentials: AwsCredentials? = null
+    protected lateinit var bucketName: String
+    protected lateinit var key: String
+    protected lateinit var bucketUrl: Uri
+    protected lateinit var keyUrl: Uri
+    protected lateinit var s3Root: Uri
+    private lateinit var scope: AwsCredentialScope
+    private lateinit var credentials: AwsCredentials
 
     @Before
     fun setup() {

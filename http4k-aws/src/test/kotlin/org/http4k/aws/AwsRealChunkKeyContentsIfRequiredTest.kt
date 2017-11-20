@@ -47,47 +47,47 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
         assertThat(
             "Bucket should not exist in root listing",
-            aClient(Request(GET, s3Root!!)).bodyString(),
-            !containsSubstring(bucketName!!))
+            aClient(Request(GET, s3Root)).bodyString(),
+            !containsSubstring(bucketName))
         assertThat(
             "Put of bucket should succeed",
-            aClient(Request(PUT, bucketUrl!!)).status,
+            aClient(Request(PUT, bucketUrl)).status,
             equalTo(Status.OK))
         assertThat(
             "Bucket should exist in root listing",
-            aClient(Request(GET, s3Root!!)).bodyString(),
-            containsSubstring(bucketName!!))
+            aClient(Request(GET, s3Root)).bodyString(),
+            containsSubstring(bucketName))
         assertThat(
             "Key should not exist in bucket listing",
-            aClient(Request(GET, bucketUrl!!)).bodyString(),
-            !containsSubstring(key!!))
+            aClient(Request(GET, bucketUrl)).bodyString(),
+            !containsSubstring(key))
 
-        client(Request(PUT, keyUrl!!)
+        client(Request(PUT, keyUrl)
             .body(contentOriginal.byteInputStream(), contentOriginal.length.toLong()))
 
         assertThat(
             "Key should appear in bucket listing",
-            aClient(Request(GET, bucketUrl!!)).bodyString(),
-            containsSubstring(key!!))
+            aClient(Request(GET, bucketUrl)).bodyString(),
+            containsSubstring(key))
         assertThat(
             "Key contents should be as expected",
-            aClient(Request(GET, keyUrl!!)).bodyString().length,
+            aClient(Request(GET, keyUrl)).bodyString().length,
             equalTo(contentOriginal.length))
         assertThat(
             "Delete of key should succeed",
-            aClient(Request(DELETE, keyUrl!!)).status,
+            aClient(Request(DELETE, keyUrl)).status,
             equalTo(Status.NO_CONTENT))
         assertThat(
             "Key should no longer appear in bucket listing",
-            aClient(Request(GET, bucketUrl!!)).bodyString(),
-            !containsSubstring(key!!))
+            aClient(Request(GET, bucketUrl)).bodyString(),
+            !containsSubstring(key))
         assertThat(
             "Delete of bucket should succeed",
-            aClient(Request(DELETE, bucketUrl!!)).status,
+            aClient(Request(DELETE, bucketUrl)).status,
             equalTo(Status.NO_CONTENT))
         assertThat(
             "Bucket should no longer exist in root listing",
-            aClient(Request(GET, s3Root!!)).bodyString(),
-            !containsSubstring(bucketName!!))
+            aClient(Request(GET, s3Root)).bodyString(),
+            !containsSubstring(bucketName))
     }
 }
