@@ -44,7 +44,7 @@ object ResponseFilters {
      * for identification. This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportRouteLatency {
-        operator fun invoke(clock: Clock, recordFn: (String, Duration) -> Unit): Filter = ReportLatency(clock, { req, response, duration ->
+        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter = ReportLatency(clock, { req, response, duration ->
             val identify = req.method.toString() + "." + (Header.X_URI_TEMPLATE(req)?.replace('.', '_')?.replace(':', '.') ?: "UNMAPPED")
             recordFn(listOf(identify.replace('/', '_'), "${response.status.code / 100}xx", response.status.code.toString()).joinToString("."), duration)
         })
