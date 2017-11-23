@@ -8,8 +8,8 @@ Multipart form support is provided on 2 levels:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.1.2"
-    compile group: "org.http4k", name: "http4k-multipart", version: "3.1.2"
+    compile group: "org.http4k", name: "http4k-core", version: "3.1.3"
+    compile group: "org.http4k", name: "http4k-multipart", version: "3.1.3"
 ```
 
 ### Standard (non-typesafe) API
