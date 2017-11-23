@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.1.2
+- Remove possibility of empty message for Path Lens failure.
+
 ### v3.1.1
 - New (better!) API for `http4k-contract` module. Old meta DSL has been deprecated.
 

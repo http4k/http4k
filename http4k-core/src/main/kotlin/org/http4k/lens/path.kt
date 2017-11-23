@@ -39,8 +39,9 @@ class BiDiPathLens<FINAL>(meta: Meta, get: (String) -> FINAL, private val set: (
 open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal val get: LensGet<String, OUT>) {
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
-        return PathLens(Meta(true, "path", paramMeta, name, description),
-            { getLens(it).firstOrNull() ?: throw LensFailure() })
+        val meta = Meta(true, "path", paramMeta, name, description)
+        return PathLens(meta,
+            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
     }
 
     /**
@@ -69,8 +70,9 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
         val getLens = get(name)
         val setLens = set(name)
 
-        return BiDiPathLens(Meta(true, "path", paramMeta, name, description),
-            { getLens(it).firstOrNull() ?: throw LensFailure() },
+        val meta = Meta(true, "path", paramMeta, name, description)
+        return BiDiPathLens(meta,
+            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
@@ -81,8 +83,9 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
-        return object : PathLens<String>(Meta(true, "path", StringParam, name),
-            { getLens(it).find { it == name } ?: throw LensFailure() }) {
+        val meta = Meta(true, "path", StringParam, name)
+        return object : PathLens<String>(meta,
+            { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta)) }) {
             override fun toString(): String = name
 
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
