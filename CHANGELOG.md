@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.1.2
+### v3.1.3
 - Fix Request.form() for streaming requests
 
 ### v3.1.2
