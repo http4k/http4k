@@ -29,4 +29,15 @@ class FormTest {
         val form:Form = listOf("foo" to "1", "bar" to "2")
         assertThat(actual, equalTo(form))
     }
+
+    @Test
+    fun `can handle stream body`(){
+        val form: Form = listOf("a" to "b")
+
+        val get = Request(Method.GET, "ignored").body(form.toBody().stream)
+
+        val actual = get.form()
+
+        assertThat(actual, equalTo(form))
+    }
 }
