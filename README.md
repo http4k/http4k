@@ -45,7 +45,7 @@ plugging together of services without HTTP container being required.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k)  apps
-    * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k)  objects
+    * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
