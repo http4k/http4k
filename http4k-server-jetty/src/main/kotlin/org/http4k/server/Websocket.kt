@@ -1,12 +1,17 @@
 package org.http4k.server
 
+import org.http4k.core.Body
 import java.io.Closeable
 
 interface Websocket : Closeable {
     operator fun invoke(message: WsMessage)
 }
 
-data class WsMessage(val content: String)
+data class WsMessage(val body: Body) {
+    companion object {
+
+    }
+}
 
 class WsBuilder {
     fun close(): Unit = println("closing")
@@ -52,11 +57,11 @@ internal data class InMemoryWebsocket internal constructor(val messages: Mutable
 val websocket: Websocket = websocket {
     onMessage = {
         println("foo")
-        send(WsMessage("bar"))
+        send(WsMessage(Body("bar")))
         close()
     }
 }
 
 fun main(args: Array<String>) {
-    websocket(WsMessage("hello"))
+    websocket(WsMessage(Body("foo")))
 }

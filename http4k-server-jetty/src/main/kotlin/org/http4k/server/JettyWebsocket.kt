@@ -4,7 +4,7 @@ import javax.websocket.Session
 
 class JettyWebSocket(private val session: Session) : WS {
     override fun invoke(m: WsMessage) {
-        session.basicRemote.sendText(m.content)
+        session.basicRemote.sendBinary(m.body.payload)
     }
 
     override fun close() {
