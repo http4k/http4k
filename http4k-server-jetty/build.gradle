@@ -13,6 +13,8 @@ dependencies {
     provided kotlin_lib
 
     compile jetty
+    compile "javax.websocket:javax.websocket-api:1.1"
+    compile "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty_version"
 
     provided project(":http4k-core")
 
