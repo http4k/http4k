@@ -12,6 +12,10 @@ import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
 
+data class WsMessage(val body: Body) {
+    companion object
+}
+
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 
 open class WsLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {

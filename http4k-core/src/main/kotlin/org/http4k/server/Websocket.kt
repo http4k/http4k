@@ -7,10 +7,6 @@ interface Websocket : Closeable {
     operator fun invoke(message: WsMessage)
 }
 
-data class WsMessage(val body: Body) {
-    companion object
-}
-
 class WsBuilder {
     fun close() {
         println("closing")
