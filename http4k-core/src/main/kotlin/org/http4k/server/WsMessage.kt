@@ -78,10 +78,10 @@ class BiDiWsLens<FINAL>(get: (WsMessage) -> FINAL,
     operator fun invoke(value: FINAL): WsMessage = setLens(value, WsMessage(Body("")))
 }
 
-private val root =
+private val wsRoot =
     BiDiWsLensSpec<Body>(
         LensGet { _, target -> listOf(target.body) },
         LensSet { _, values, target -> values.fold(target, { m, next -> m.copy(body = next) }) })
 
-fun WsMessage.Companion.binary() = root.map(Body::payload, { Body(it) })
-fun WsMessage.Companion.string() = root.map({ it.payload.asString() }, { it: String -> Body(it) })
+fun WsMessage.Companion.binary() = wsRoot.map(Body::payload, { Body(it) })
+fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { it: String -> Body(it) })
