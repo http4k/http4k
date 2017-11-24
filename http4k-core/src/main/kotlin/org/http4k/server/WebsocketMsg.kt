@@ -1,7 +1,7 @@
 package org.http4k.server
 
+import org.http4k.asString
 import org.http4k.core.Body
-import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Invalid
 import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensFailure
@@ -11,7 +11,6 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
-import java.nio.ByteBuffer
 
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 
@@ -76,6 +75,10 @@ class BiDiWsLens<FINAL>(get: (WsMessage) -> FINAL,
     override operator fun <R : WsMessage> invoke(value: FINAL, target: R): R = setLens(value, target) as R
 }
 
-fun WsMessage.Companion.binary() = BiDiLensSpec<WsMessage, ByteBuffer>("websocket", ParamMeta.StringParam,
-    LensGet { _, target -> listOf(target.body.payload) },
-    LensSet { _, values, target -> values.fold(target, { m, next -> m.copy(body = Body(next)) }) })
+private val root =
+    BiDiWsLensSpec<Body>(
+        LensGet { _, target -> listOf(target.body) },
+        LensSet { _, values, target -> values.fold(target, { m, next -> m.copy(body = next) }) })
+
+fun WsMessage.Companion.binary() = root.map(Body::payload, { Body(it) })
+fun WsMessage.Companion.string() = root.map({ it.payload.asString() }, { it: String -> Body(it) })

@@ -8,13 +8,14 @@ interface Websocket : Closeable {
 }
 
 data class WsMessage(val body: Body) {
-    companion object {
-
-    }
+    companion object
 }
 
 class WsBuilder {
-    fun close(): Unit = println("closing")
+    fun close() {
+        println("closing")
+    }
+
     fun send(message: WsMessage) = println(message)
     lateinit var onMessage: (WsMessage) -> Unit
     lateinit var onClose: () -> Unit
@@ -23,7 +24,6 @@ class WsBuilder {
 fun websocket(fn: WsBuilder.() -> Unit) = WsBuilder().apply(fn).run {
     val configured = this
     object : Websocket {
-        protected fun respond(message: WsMessage): Unit = println(message)
         override fun invoke(message: WsMessage) = configured.onMessage(message)
         override fun close() {
             close()
@@ -63,5 +63,7 @@ val websocket: Websocket = websocket {
 }
 
 fun main(args: Array<String>) {
+
+    WsMessage.binary().toLens()
     websocket(WsMessage(Body("foo")))
 }
