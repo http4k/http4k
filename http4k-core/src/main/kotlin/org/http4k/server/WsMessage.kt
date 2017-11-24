@@ -6,7 +6,6 @@ import org.http4k.lens.Invalid
 import org.http4k.lens.LensExtractor
 import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
-import org.http4k.lens.LensInjector
 import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
@@ -73,10 +72,10 @@ open class WsLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) : LensEx
  */
 class BiDiWsLens<FINAL>(get: (WsMessage) -> FINAL,
                         private val setLens: (FINAL, WsMessage) -> WsMessage)
-    : LensInjector<FINAL, WsMessage>, WsLens<FINAL>(get) {
+    : WsLens<FINAL>(get) {
 
     @Suppress("UNCHECKED_CAST")
-    override operator fun <R : WsMessage> invoke(value: FINAL, target: R): R = setLens(value, target) as R
+    operator fun invoke(value: FINAL): WsMessage = setLens(value, WsMessage(Body("")))
 }
 
 private val root =
