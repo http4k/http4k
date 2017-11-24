@@ -12,7 +12,7 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
-import org.http4k.lens.root
+import org.http4k.lens.httpBodyRoot
 import org.json.XML
 import org.w3c.dom.Document
 import java.io.StringWriter
@@ -43,12 +43,12 @@ object Xml {
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
-        root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
             .map(Body::payload, {it: ByteBuffer -> Body(it)})
             .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BodyLensSpec<T> =
-        root(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
             .map({it.payload.asString()}, {it: String -> Body(it)})
             .map({ it.asA<T>() })
 }

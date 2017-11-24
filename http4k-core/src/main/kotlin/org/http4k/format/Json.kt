@@ -9,7 +9,10 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.root
+import org.http4k.lens.httpBodyRoot
+import org.http4k.server.BiDiWsLensSpec
+import org.http4k.server.WsMessage
+import org.http4k.server.string
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -60,11 +63,13 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun <IN> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String>.json() = lens(this)
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> =
-        root(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
-            .map({it.payload.asString()}, {it: String -> Body(it)})
+        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
+            .map({ it.payload.asString() }, { it: String -> Body(it) })
             .map({ parse(it) }, { compact(it) })
 
     fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
+
+    fun WsMessage.Companion.json(): BiDiWsLensSpec<ROOT> = WsMessage.string().map({ parse(it) }, { compact(it) })
 }
 
 enum class JsonType {
