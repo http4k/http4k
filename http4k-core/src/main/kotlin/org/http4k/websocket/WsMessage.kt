@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.websocket
 
 import org.http4k.asString
 import org.http4k.core.Body
@@ -11,7 +11,19 @@ import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
 
-data class WsMessage(val body: Body) {
+interface WsMessage {
+    val body: Body
+
+    fun body(new: Body): WsMessage
+
+    companion object {
+        operator fun invoke(body: Body): MemoryWsMessage = MemoryWsMessage(body)
+    }
+}
+
+data class MemoryWsMessage(override val body: Body) : WsMessage {
+    override fun body(new: Body): WsMessage = copy(body = new)
+
     companion object
 }
 
@@ -81,7 +93,7 @@ class BiDiWsLens<FINAL>(get: (WsMessage) -> FINAL,
 private val wsRoot =
     BiDiWsLensSpec<Body>(
         LensGet { _, target -> listOf(target.body) },
-        LensSet { _, values, target -> values.fold(target, { m, next -> m.copy(body = next) }) })
+        LensSet { _, values, target -> values.fold(target, { m, next -> m.body(next) }) })
 
 fun WsMessage.Companion.binary() = wsRoot.map(Body::payload, { Body(it) })
 fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { it: String -> Body(it) })

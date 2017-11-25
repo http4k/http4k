@@ -1,7 +1,7 @@
 
 import org.http4k.format.Jackson.auto
-import org.http4k.server.WsMessage
-import org.http4k.server.websocket
+import org.http4k.websocket.WsMessage
+import org.http4k.websocket.websocket
 
 data class SomeJsonBlob(val message: String)
 

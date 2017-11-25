@@ -1,4 +1,4 @@
-package org.http4k.server
+package org.http4k.websocket
 
 import org.http4k.core.Body
 import java.io.Closeable
@@ -32,11 +32,11 @@ interface WS : Closeable {
     operator fun invoke(m: WsMessage)
 
     companion object {
-        operator fun invoke(): WS = InMemoryWebsocket()
+        operator fun invoke(): WS = MemoryWebsocket()
     }
 }
 
-internal data class InMemoryWebsocket internal constructor(val messages: MutableList<WsMessage> = mutableListOf()) : WS {
+internal data class MemoryWebsocket internal constructor(val messages: MutableList<WsMessage> = mutableListOf()) : WS {
 
     private var closed = false
 
