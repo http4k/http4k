@@ -66,3 +66,4 @@ data class Foo(val value: String)
 fun main(args: Array<String>) {
     websocket(WsMessage(Body("foo")))
 }
+
