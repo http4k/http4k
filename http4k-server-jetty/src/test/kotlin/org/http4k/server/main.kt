@@ -8,11 +8,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
+import java.io.Closeable
 import java.lang.Exception
 import java.net.URI
 
 object EventClient {
-    fun bob() {
+    fun bob(): Closeable {
         val a = object : WebSocketClient(URI.create("ws://localhost:8000/bob")) {
             override fun onOpen(handshakedata: ServerHandshake) {
             }
@@ -30,7 +31,7 @@ object EventClient {
 
         a.connectBlocking()
         a.send("sending..")
-//        a.close()
+        return Closeable { a.close() }
     }
 }
 
@@ -47,8 +48,7 @@ fun main(args: Array<String>) {
 
                 override fun onMessage(body: Body, session: WsSession) {
                     println("i got " + body)
-                    session(body)
-//                    session.close()
+                    session(Body("sendnign this back"))
                 }
             }
         }
@@ -57,7 +57,9 @@ fun main(args: Array<String>) {
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
-    EventClient.bob()
+    val a = EventClient.bob()
 
     server.stop()
+
+    a.close()
 }

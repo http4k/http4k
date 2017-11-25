@@ -23,7 +23,7 @@ interface WSocket {
 class JettyWsSession(private val session: Session, private val wSocket: WSocket) {
     private val sender = object : WsSession {
         override fun invoke(p1: Body) {
-            session.remote.sendString(p1.payload.toString())
+            session.remote.sendString(p1.toString())
         }
 
         override fun close() {
