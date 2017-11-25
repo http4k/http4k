@@ -48,18 +48,21 @@ internal data class InMemoryWebsocket internal constructor(val messages: Mutable
     override fun close() {
         closed = true
     }
+
 }
+
+val lens = WsMessage.string().map(::Foo).toLens()
 
 val websocket: Websocket = websocket {
     onMessage = {
-        println("foo")
+        println(lens(it))
         send(WsMessage(Body("bar")))
         close()
     }
 }
 
-fun main(args: Array<String>) {
+data class Foo(val value: String)
 
-    WsMessage.binary().toLens()
+fun main(args: Array<String>) {
     websocket(WsMessage(Body("foo")))
 }
