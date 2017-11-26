@@ -10,6 +10,7 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
+import java.io.InputStream
 
 interface WsMessage {
     val body: Body
@@ -17,7 +18,9 @@ interface WsMessage {
     fun body(new: Body): WsMessage
 
     companion object {
-        operator fun invoke(body: Body): MemoryWsMessage = MemoryWsMessage(body)
+        operator fun invoke(value: String): WsMessage = MemoryWsMessage(Body(value))
+        operator fun invoke(body: Body): WsMessage = MemoryWsMessage(body)
+        operator fun invoke(stream: InputStream) = MemoryWsMessage(Body(stream))
     }
 }
 

@@ -6,6 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.websocket.WsMessage
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.io.Closeable
@@ -69,7 +70,7 @@ val a1: WebsocketRouter = object : WebsocketRouter {
 
             override fun onMessage(body: Body, session: WsSession) {
                 println("i got " + body)
-                session(Body("sending this back".byteInputStream()))
+                session(WsMessage("sending this back".byteInputStream()))
             }
         }
         return value
