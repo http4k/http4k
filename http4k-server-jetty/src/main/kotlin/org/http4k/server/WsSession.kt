@@ -14,7 +14,7 @@ class MemoryWsSession : WsSession {
 
     private val queue = LinkedBlockingQueue<() -> Body?>()
 
-    fun stream() = generateSequence { queue.take()() }
+    val received = generateSequence { queue.take()() }
 
     override fun invoke(p1: Body) {
         queue.add { p1 }
@@ -32,5 +32,5 @@ fun main(args: Array<String>) {
     a.invoke(Body("2"))
     a.close()
 
-    a.stream().forEach { println(it) }
+    a.received.forEach { println(it) }
 }
