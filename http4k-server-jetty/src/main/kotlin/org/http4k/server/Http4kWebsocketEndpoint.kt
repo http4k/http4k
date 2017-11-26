@@ -10,10 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import java.io.Closeable
 import java.nio.ByteBuffer
-
-interface WsSession : Closeable, (Body) -> Unit
 
 interface WSocket {
     fun onError(throwable: Throwable, session: WsSession)

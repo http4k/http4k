@@ -41,25 +41,45 @@ object EventClient {
     }
 }
 
-fun main(args: Array<String>) {
-    val app = { r: Request -> Response(Status.OK).body("hiya world") }
-    val server = WsJetty(8000).toServer(app, object : WebsocketRouter {
-        override fun match(request: Request): WSocket? {
-            return object : WSocket {
-                override fun onError(throwable: Throwable, session: WsSession) {
-                }
+typealias WsHandler = (WsSession) -> WSocket
 
-                override fun onClose(status: Status, session: WsSession) {
-                }
+interface RoutingWsHandler: WsHandler, WebsocketRouter
 
-                override fun onMessage(body: Body, session: WsSession) {
-                    println("i got " + body)
-                    session(Body("sending this back".byteInputStream()))
-                }
+fun ws(): RoutingWsHandler = TODO()
+
+class Bob {
+
+    lateinit var w: WsSession
+
+    fun asd() {
+        val a = ws()(w)
+    }
+
+}
+
+
+val a1: WebsocketRouter = object : WebsocketRouter {
+    override fun match(request: Request): WSocket? {
+        val value: WSocket = object : WSocket {
+            override fun onError(throwable: Throwable, session: WsSession) {
+            }
+
+            override fun onClose(status: Status, session: WsSession) {
+            }
+
+            override fun onMessage(body: Body, session: WsSession) {
+                println("i got " + body)
+                session(Body("sending this back".byteInputStream()))
             }
         }
+        return value
+    }
+}
 
-    }).start()
+val app = { r: Request -> Response(Status.OK).body("hiya world") }
+
+fun main(args: Array<String>) {
+    val server = WsJetty(8000).toServer(app, a1).start()
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
