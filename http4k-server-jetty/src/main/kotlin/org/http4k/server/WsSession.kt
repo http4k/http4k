@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.string
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -23,14 +24,4 @@ class MemoryWsSession : WsSession {
     override fun close() {
         queue.add { null }
     }
-}
-
-fun main(args: Array<String>) {
-    val a = WsSession()
-
-    a.invoke(WsMessage("1"))
-    a.invoke(WsMessage("2"))
-    a.close()
-
-    a.received.forEach { println(it) }
 }

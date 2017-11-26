@@ -44,7 +44,7 @@ object EventClient {
 
 typealias WsHandler = (WsSession) -> WSocket
 
-interface RoutingWsHandler: WsHandler, WebsocketRouter
+interface RoutingWsHandler : WsHandler, WebsocketRouter
 
 fun ws(): RoutingWsHandler = TODO()
 

@@ -36,8 +36,8 @@ open class WsLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {
     /**
      * Create a lens for this Spec
      */
-    open fun toLens(): WsLens<OUT> {
-        return WsLens({ get("")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+    open fun toLens(): WsMessageLens<OUT> {
+        return WsMessageLens({ get("")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
     }
 
     /**
@@ -61,17 +61,17 @@ open class BiDiWsLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
     /**
      * Create a lens for this Spec
      */
-    override fun toLens(): BiDiWsLens<OUT> {
+    override fun toLens(): BiDiWsMessageLens<OUT> {
         val getLens = get("")
         val setLens = set("")
-        return BiDiWsLens(
+        return BiDiWsMessageLens(
             { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta)) else it.first() } },
             { out: OUT, target: WsMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
 }
 
-open class WsLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) : LensExtractor<WsMessage, FINAL> {
+open class WsMessageLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) : LensExtractor<WsMessage, FINAL> {
     override operator fun invoke(target: WsMessage): FINAL = try {
         getLens(target)
     } catch (e: LensFailure) {
@@ -85,12 +85,12 @@ open class WsLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) : LensEx
  * A BiDiWsLens provides the bi-directional extraction of an entity from a target body, or the insertion of an entity
  * into a target body.
  */
-class BiDiWsLens<FINAL>(get: (WsMessage) -> FINAL,
-                        private val setLens: (FINAL, WsMessage) -> WsMessage)
-    : WsLens<FINAL>(get) {
+class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
+                               private val setLens: (FINAL, WsMessage) -> WsMessage)
+    : WsMessageLens<FINAL>(get) {
 
     @Suppress("UNCHECKED_CAST")
-    operator fun invoke(value: FINAL): WsMessage = setLens(value, WsMessage(Body("")))
+    operator fun invoke(value: FINAL): WsMessage = setLens(value, WsMessage(Body.EMPTY))
 }
 
 private val wsRoot =
