@@ -11,10 +11,16 @@ import org.java_websocket.handshake.ServerHandshake
 import java.io.Closeable
 import java.lang.Exception
 import java.net.URI
+import java.nio.ByteBuffer
 
 object EventClient {
     fun bob(): Closeable {
         val a = object : WebSocketClient(URI.create("ws://localhost:8000/bob")) {
+
+            override fun onMessage(bytes: ByteBuffer) {
+                println("I got binary back: " + String(bytes.array()))
+            }
+
             override fun onOpen(handshakedata: ServerHandshake) {
             }
 
@@ -48,7 +54,7 @@ fun main(args: Array<String>) {
 
                 override fun onMessage(body: Body, session: WsSession) {
                     println("i got " + body)
-                    session(Body("sendnign this back"))
+                    session(Body("sending this back".byteInputStream()))
                 }
             }
         }

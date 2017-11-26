@@ -8,6 +8,7 @@ import org.http4k.core.Headers
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import java.io.Closeable
 import java.nio.ByteBuffer
@@ -23,7 +24,10 @@ interface WSocket {
 class JettyWsSession(private val session: Session, private val wSocket: WSocket) {
     private val sender = object : WsSession {
         override fun invoke(p1: Body) {
-            session.remote.sendString(p1.toString())
+            when (p1) {
+                is StreamBody -> session.remote.sendBytes(p1.payload)
+                else -> session.remote.sendString(p1.toString())
+            }
         }
 
         override fun close() {
