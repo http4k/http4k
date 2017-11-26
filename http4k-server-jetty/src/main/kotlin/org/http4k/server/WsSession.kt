@@ -1,7 +1,6 @@
 package org.http4k.server
 
 import org.http4k.websocket.WsMessage
-import org.http4k.websocket.string
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 

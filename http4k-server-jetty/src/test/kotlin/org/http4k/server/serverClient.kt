@@ -14,32 +14,30 @@ import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
 
-object EventClient {
-    fun bob(): Closeable {
-        val a = object : WebSocketClient(URI.create("ws://localhost:8000/bob")) {
+fun clientAction(): Closeable {
+    val a = object : WebSocketClient(URI.create("ws://localhost:8000/bob")) {
 
-            override fun onMessage(bytes: ByteBuffer) {
-                println("I got binary back: " + String(bytes.array()))
-            }
-
-            override fun onOpen(handshakedata: ServerHandshake) {
-            }
-
-            override fun onClose(code: Int, reason: String?, remote: Boolean) {
-            }
-
-            override fun onMessage(message: String?) {
-                println("I got back: " + message)
-            }
-
-            override fun onError(ex: Exception?) {
-            }
+        override fun onMessage(bytes: ByteBuffer) {
+            println("I got binary back: " + String(bytes.array()))
         }
 
-        a.connectBlocking()
-        a.send("sending..")
-        return Closeable { a.close() }
+        override fun onOpen(handshakedata: ServerHandshake) {
+        }
+
+        override fun onClose(code: Int, reason: String?, remote: Boolean) {
+        }
+
+        override fun onMessage(message: String?) {
+            println("I got back: " + message)
+        }
+
+        override fun onError(ex: Exception?) {
+        }
     }
+
+    a.connectBlocking()
+    a.send("sending..")
+    return Closeable { a.close() }
 }
 
 typealias WsHandler = (WsSession) -> WSocket
@@ -84,7 +82,7 @@ fun main(args: Array<String>) {
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
-    val a = EventClient.bob()
+    val a = clientAction()
 
     server.stop()
 
