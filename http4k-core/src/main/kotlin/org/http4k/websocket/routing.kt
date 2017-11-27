@@ -6,7 +6,7 @@ import org.http4k.core.UriTemplate
 import java.io.Closeable
 
 interface WebSocket : Closeable {
-    operator fun invoke(message: WsMessage): WebSocket
+    fun send(message: WsMessage): WebSocket
     fun onError(fn: (Throwable) -> Unit): WebSocket
     fun onClose(fn: (Status) -> Unit): WebSocket
     fun onMessage(fn: (WsMessage) -> Unit): WebSocket

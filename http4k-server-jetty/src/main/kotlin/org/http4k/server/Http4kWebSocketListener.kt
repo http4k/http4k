@@ -16,8 +16,8 @@ import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
 
 internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PullPushWebSocketAdapter) {
-    fun invoke(p1: WsMessage) {
-        innerSocket(p1)
+    fun send(p1: WsMessage) {
+        innerSocket.send(p1)
     }
 
     fun close() {
@@ -46,7 +46,7 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer) : WebSoc
 
     override fun onWebSocketConnect(session: Session) {
         websocket = Http4kWebSocketAdapter(object : PullPushWebSocketAdapter() {
-            override fun invoke(message: WsMessage): PullPushWebSocketAdapter {
+            override fun send(message: WsMessage): PullPushWebSocketAdapter {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
                     else -> session.remote.sendString(message.toString())

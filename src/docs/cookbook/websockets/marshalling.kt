@@ -20,7 +20,7 @@ private val ws: RoutingWsHandler = websocket(
             ws.onMessage {
                 val received = body(it)
                 println("bob got " + received)
-                ws(body(Wrapper2(123 * received.v)))
+                ws.send(body(Wrapper2(123 * received.v)))
             }
         }
     )

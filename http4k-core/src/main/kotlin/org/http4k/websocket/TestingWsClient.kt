@@ -17,7 +17,7 @@ class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushWebSo
         }
     }
 
-    override fun invoke(message: WsMessage): TestingWsClient = apply {
+    override fun send(message: WsMessage): TestingWsClient = apply {
         queue.add { message }
     }
 

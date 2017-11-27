@@ -51,19 +51,20 @@ val webSocketHandler = websocket(
             println("hello bob")
             ws.onMessage {
                 println("bob got " + it)
-                ws(WsMessage("bob sending this back".byteInputStream()))
+                ws.send(WsMessage("bob sending this back".byteInputStream()))
             }
+            ws.onClose { println("bob is closing") }
         },
         "/" bind { ws ->
             println("hello")
             ws
                 .onMessage {
                     println("i got " + it)
-                    ws(WsMessage("sending this back".byteInputStream()))
+                    ws.send(WsMessage("sending this back".byteInputStream()))
                 }
                 .onMessage {
                     println("i also got " + it)
-                }
+                }.onClose { println("hello is closing") }
         }
     )
 )
@@ -74,5 +75,5 @@ fun main(args: Array<String>) {
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
     clientAction("hello")
-    clientAction("hello/bob")
+    clientAction("hello/bob").close()
 }
