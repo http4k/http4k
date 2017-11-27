@@ -10,7 +10,7 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
-import org.http4k.websocket.BiDiWsLensSpec
+import org.http4k.websocket.BiDiWsMessageLensSpec
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.string
 import java.math.BigDecimal
@@ -69,7 +69,7 @@ interface Json<ROOT : NODE, NODE : Any> {
 
     fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
 
-    fun WsMessage.Companion.json(): BiDiWsLensSpec<ROOT> = WsMessage.string().map({ parse(it) }, { compact(it) })
+    fun WsMessage.Companion.json(): BiDiWsMessageLensSpec<ROOT> = WsMessage.string().map({ parse(it) }, { compact(it) })
 }
 
 enum class JsonType {

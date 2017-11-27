@@ -15,12 +15,12 @@ import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
 
-internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) : Http4kWebSocket {
-    override fun invoke(p1: WsMessage) {
+internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) {
+    fun invoke(p1: WsMessage) {
         innerSocket(p1)
     }
 
-    override fun close() {
+    fun close() {
         innerSocket.close()
     }
 

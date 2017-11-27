@@ -1,9 +1,10 @@
 package org.http4k.websocket
 
+import org.http4k.core.Request
 import org.http4k.core.Status
 import java.util.concurrent.LinkedBlockingQueue
 
-class WebSocketClient(handler: WsHandler) : MutableInboundWebSocket() {
+class WebSocketClient internal constructor(handler: WsHandler) : MutableInboundWebSocket() {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
@@ -24,3 +25,5 @@ class WebSocketClient(handler: WsHandler) : MutableInboundWebSocket() {
         triggerClose(Status(0, ""))
     }
 }
+
+fun RoutingWsMatcher.asClient(request: Request) = this.match(request)?.let(::WebSocketClient)!!

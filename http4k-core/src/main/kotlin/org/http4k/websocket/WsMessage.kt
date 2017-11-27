@@ -25,7 +25,7 @@ data class WsMessage(val body: Body) {
 
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 
-open class WsLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {
+open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {
     /**
      * Create a lens for this Spec
      */
@@ -36,20 +36,20 @@ open class WsLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {
     /**
      * Create another WebsocketLensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be used to extract the final type from a WsMessage.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT): WsLensSpec<NEXT> = WsLensSpec(get.map(nextIn))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT): WsMessageLensSpec<NEXT> = WsMessageLensSpec(get.map(nextIn))
 }
 
 /**
  * Represents a bi-directional extraction of an entity from a target Body, or an insertion into a target Body.
  */
-open class BiDiWsLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
-                               private val set: LensSet<WsMessage, OUT>) : WsLensSpec<OUT>(get) {
+open class BiDiWsMessageLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
+                                      private val set: LensSet<WsMessage, OUT>) : WsMessageLensSpec<OUT>(get) {
 
     /**
      * Create another BiDiWsLensSpec which applies the bi-directional transformations to the result. Any resultant Lens can be
      * used to extract or insert the final type from/into a WsMessage.
      */
-    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiWsLensSpec(get.map(nextIn), set.map(nextOut))
+    fun <NEXT> map(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT) = BiDiWsMessageLensSpec(get.map(nextIn), set.map(nextOut))
 
     /**
      * Create a lens for this Spec
@@ -87,7 +87,7 @@ class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
 }
 
 private val wsRoot =
-    BiDiWsLensSpec<Body>(
+    BiDiWsMessageLensSpec<Body>(
         LensGet { _, target -> listOf(target.body) },
         LensSet { _, values, target -> values.fold(target, { m, next -> m.body(next) }) })
 
