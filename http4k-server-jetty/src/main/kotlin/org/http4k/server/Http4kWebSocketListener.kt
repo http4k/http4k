@@ -10,12 +10,12 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import org.http4k.websocket.PullPushWebSocketAdapter
+import org.http4k.websocket.PullPushAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
 
-internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PullPushWebSocketAdapter) {
+internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PullPushAdaptingWebSocket) {
     fun send(p1: WsMessage) {
         innerSocket.send(p1)
     }
@@ -45,8 +45,8 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer) : WebSoc
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = Http4kWebSocketAdapter(object : PullPushWebSocketAdapter() {
-            override fun send(message: WsMessage): PullPushWebSocketAdapter {
+        websocket = Http4kWebSocketAdapter(object : PullPushAdaptingWebSocket() {
+            override fun send(message: WsMessage): PullPushAdaptingWebSocket {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
                     else -> session.remote.sendString(message.toString())

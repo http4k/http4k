@@ -4,7 +4,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import java.util.concurrent.LinkedBlockingQueue
 
-class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushWebSocketAdapter() {
+class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushAdaptingWebSocket() {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
