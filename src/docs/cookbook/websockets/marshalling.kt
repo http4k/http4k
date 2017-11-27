@@ -1,4 +1,4 @@
-package org.http4k.server
+package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -33,5 +33,6 @@ fun main(args: Array<String>) {
     client.triggerMessage(WsMessage("2"))
     client.close()
 
-    client.received.take(3).forEach { println(body(it)) }
-}
+    client.received.take(3).forEach {
+        println("received back: " + body(it)) }
+    }

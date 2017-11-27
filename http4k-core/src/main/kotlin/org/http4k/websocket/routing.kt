@@ -33,6 +33,7 @@ fun websocket(vararg list: RoutingWsMatcher): RoutingWsMatcher = object : Routin
     override fun match(request: Request): WsHandler? = list.firstOrNull { it.match(request) != null }?.match(request)
     override fun withBasePath(new: String): RoutingWsMatcher = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
 }
+
 infix fun String.bind(ws: WsHandler): RoutingWsMatcher = TemplatingRoutingWsMatcher(UriTemplate.from(this), ws)
 
 infix fun String.bind(ws: RoutingWsMatcher): RoutingWsMatcher = ws.withBasePath(this)
