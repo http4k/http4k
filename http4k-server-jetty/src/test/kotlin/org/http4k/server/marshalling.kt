@@ -6,7 +6,7 @@ import org.http4k.websocket.string
 data class Wrapper(val v: Int)
 
 fun main(args: Array<String>) {
-    val session = WsSession()
+    val session = Http4kWebSocket()
 
     val body = WsMessage.string().map { Wrapper(it.toInt()) }.toLens()
 

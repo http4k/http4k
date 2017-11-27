@@ -28,23 +28,22 @@ class Jetty(private val server: Server) : ServerConfig {
     }
 }
 
+class Http4kWebSocketHandler(private val wsRouter: WsRouter) : WebSocketHandler() {
+    override fun configure(factory: WebSocketServletFactory) {
+        factory.setCreator { req, _ ->
+            wsRouter(req.asHttp4kRequest())?.let(::Http4kWebsocketEndpoint)
+        }
+    }
+}
+
 class WsJetty(private val server: Server) {
     constructor(port: Int = 8000) : this(Server(port))
 
-    fun toServer(handler: HttpHandler, a: WebsocketRouter): Http4kServer {
-
+    fun toServer(httpHandler: HttpHandler, wsHandler: WsRouter): Http4kServer {
         server.insertHandler(ServletContextHandler(SESSIONS).apply {
-            addServlet(ServletHolder(handler.asServlet()), "/*")
+            addServlet(ServletHolder(httpHandler.asServlet()), "/*")
         })
-        server.insertHandler(object : WebSocketHandler() {
-            override fun configure(factory: WebSocketServletFactory) {
-                factory.policy.idleTimeout = 10000
-                factory.setCreator { req, _ ->
-                    println("hello")
-                    a.match(req.asHttp4kRequest())?.let { Http4kWebsocketEndpoint(it) }
-                }
-            }
-        })
+        server.insertHandler(Http4kWebSocketHandler(wsHandler))
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {

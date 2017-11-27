@@ -11,35 +11,60 @@ import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.WsMessage
+import java.io.Closeable
 import java.nio.ByteBuffer
 
-interface WSocket {
-    fun onError(throwable: Throwable, session: WsSession)
-    fun onClose(status: Status, session: WsSession)
-    fun onMessage(body: Body, session: WsSession)
+interface InboundWebSocket : Closeable {
+    operator fun invoke(message: WsMessage)
+    fun onError(fn: (Throwable) -> Unit)
+    fun onClose(fn: (Status) -> Unit)
+    fun onMessage(fn: (WsMessage) -> Unit)
 }
 
-class JettyWsSession(private val session: Session, private val wSocket: WSocket) {
-    private val sender = object : WsSession {
-        override fun invoke(p1: WsMessage) {
-            when (p1.body) {
-                is StreamBody -> session.remote.sendBytes(p1.body.payload)
-                else -> session.remote.sendString(p1.toString())
-            }
-        }
+internal class MutableInboundWebSocket(private val session: Session) : InboundWebSocket {
 
-        override fun close() {
-            session.close()
-        }
+    var errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
+    var closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()
+    var messageHandlers: MutableList<(WsMessage) -> Unit> = mutableListOf()
+
+    override fun invoke(message: WsMessage) = when (message.body) {
+        is StreamBody -> session.remote.sendBytes(message.body.payload)
+        else -> session.remote.sendString(message.toString())
     }
 
-    fun onError(throwable: Throwable) = wSocket.onError(throwable, sender)
-    fun onClose(statusCode: Int, reason: String?) = wSocket.onClose(Status(statusCode, reason ?: ""), sender)
-    fun onMessage(body: Body) = wSocket.onMessage(body, sender)
+    fun triggerError(throwable: Throwable) = errorHandlers.forEach { it(throwable) }
+    fun triggerClose(status: Status) = closeHandlers.forEach { it(status) }
+    fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
+
+    override fun onError(fn: (Throwable) -> Unit) {
+        errorHandlers.add(fn)
+    }
+
+    override fun onClose(fn: (Status) -> Unit) {
+        closeHandlers.add(fn)
+    }
+
+    override fun onMessage(fn: (WsMessage) -> Unit) {
+        messageHandlers.add(fn)
+    }
+
+    override fun close() {
+        session.close()
+    }
 }
 
-interface WebsocketRouter {
-    fun match(request: Request): WSocket?
+class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) : Http4kWebSocket {
+    override fun invoke(p1: WsMessage) {
+        innerSocket(p1)
+    }
+
+    override fun close() {
+        innerSocket.close()
+    }
+
+    fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
+    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(Status(statusCode, reason ?: "<unknown>"))
+    fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 
 internal fun ServletUpgradeRequest.asHttp4kRequest(): Request =
@@ -50,26 +75,26 @@ private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequen
 
 private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 
-class Http4kWebsocketEndpoint(private val wSocket: WSocket) : WebSocketListener {
-    private var websocket: JettyWsSession? = null
+class Http4kWebsocketEndpoint(private val wSocket: WsHandler) : WebSocketListener {
+    private lateinit var websocket: Http4kWebSocketAdapter
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {
-        websocket?.onClose(statusCode, reason)
+        websocket.onClose(statusCode, reason)
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = JettyWsSession(session, wSocket)
+        websocket = Http4kWebSocketAdapter(MutableInboundWebSocket(session).apply(wSocket))
     }
 
     override fun onWebSocketText(message: String) {
-        websocket?.onMessage(Body(message))
+        websocket.onMessage(Body(message))
     }
 
     override fun onWebSocketBinary(payload: ByteArray, offset: Int, len: Int) {
-        websocket?.onMessage(Body(ByteBuffer.wrap(payload, offset, len)))
+        websocket.onMessage(Body(ByteBuffer.wrap(payload, offset, len)))
     }
 
     override fun onWebSocketError(cause: Throwable) {
-        websocket?.onError(cause)
+        websocket.onError(cause)
     }
 }

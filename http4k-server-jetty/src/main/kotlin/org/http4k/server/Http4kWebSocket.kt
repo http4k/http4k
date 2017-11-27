@@ -1,16 +1,22 @@
 package org.http4k.server
 
+import org.http4k.core.Request
 import org.http4k.websocket.WsMessage
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
-interface WsSession : Closeable, (WsMessage) -> Unit {
+
+typealias WsHandler = (InboundWebSocket) -> Unit
+
+typealias WsRouter = (Request) -> WsHandler?
+
+interface Http4kWebSocket : Closeable, (WsMessage) -> Unit {
     companion object {
-        operator fun invoke() = MemoryWsSession()
+        operator fun invoke() = MemoryHttp4kWebSocket()
     }
 }
 
-class MemoryWsSession : WsSession {
+class MemoryHttp4kWebSocket : Http4kWebSocket {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 

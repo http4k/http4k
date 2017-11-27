@@ -1,7 +1,6 @@
 package org.http4k.server
 
 import org.http4k.client.ApacheClient
-import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -40,51 +39,26 @@ fun clientAction(): Closeable {
     return Closeable { a.close() }
 }
 
-typealias WsHandler = (WsSession) -> WSocket
-
-interface RoutingWsHandler : WsHandler, WebsocketRouter
-
-fun ws(): RoutingWsHandler = TODO()
-
-class Bob {
-
-    lateinit var w: WsSession
-
-    fun asd() {
-        val a = ws()(w)
-    }
-
-}
-
-
-val a1: WebsocketRouter = object : WebsocketRouter {
-    override fun match(request: Request): WSocket? {
-        val value: WSocket = object : WSocket {
-            override fun onError(throwable: Throwable, session: WsSession) {
-            }
-
-            override fun onClose(status: Status, session: WsSession) {
-            }
-
-            override fun onMessage(body: Body, session: WsSession) {
-                println("i got " + body)
-                session(WsMessage("sending this back".byteInputStream()))
+fun ws(): WsRouter = object : WsRouter {
+    override fun invoke(request: Request): WsHandler? {
+        return { ws ->
+            println("hello")
+            ws.onMessage {
+                println("i got " + it)
+                ws(WsMessage("sending this back".byteInputStream()))
             }
         }
-        return value
     }
 }
 
 val app = { r: Request -> Response(Status.OK).body("hiya world") }
 
+val webSocketHandler = ws()
+
 fun main(args: Array<String>) {
-    val server = WsJetty(8000).toServer(app, a1).start()
+    val server = WsJetty(8000).toServer(app, webSocketHandler).start()
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
     val a = clientAction()
-
-    server.stop()
-
-    a.close()
 }
