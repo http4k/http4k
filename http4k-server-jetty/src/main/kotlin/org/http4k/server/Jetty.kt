@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.server.WebSocketHandler
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory
 import org.http4k.core.HttpHandler
 import org.http4k.servlet.asServlet
+import org.http4k.websocket.WsRouter
 
 
 class Jetty(private val server: Server) : ServerConfig {

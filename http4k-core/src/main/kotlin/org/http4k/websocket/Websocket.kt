@@ -1,69 +1,51 @@
 package org.http4k.websocket
 
-import org.http4k.core.Body
+import org.http4k.core.Request
+import org.http4k.core.Status
 import java.io.Closeable
+import java.util.concurrent.LinkedBlockingQueue
 
-interface Websocket : Closeable {
+interface WebSocket : Closeable {
     operator fun invoke(message: WsMessage)
-}
-
-class WsBuilder {
-    fun close() {
-        println("closing")
-    }
-
-    fun send(message: WsMessage) = println(message)
-    lateinit var onMessage: (WsMessage) -> Unit
-    lateinit var onClose: () -> Unit
-}
-
-fun websocket(fn: WsBuilder.() -> Unit) = WsBuilder().apply(fn).run {
-    val configured = this
-    object : Websocket {
-        override fun invoke(message: WsMessage) = configured.onMessage(message)
-        override fun close() {
-            close()
-            configured.onClose()
-        }
-    }
-}
-
-interface WS : Closeable {
-    operator fun invoke(m: WsMessage)
+    fun onError(fn: (Throwable) -> Unit)
+    fun onClose(fn: (Status) -> Unit)
+    fun onMessage(fn: (WsMessage) -> Unit)
 
     companion object {
-        operator fun invoke(): WS = MemoryWebsocket()
+        operator fun invoke() = MemoryWebSocket()
     }
 }
 
-internal data class MemoryWebsocket internal constructor(val messages: MutableList<WsMessage> = mutableListOf()) : WS {
+class MemoryWebSocket : WebSocket {
+    override fun onError(fn: (Throwable) -> Unit) {
+        TODO("not implemented")
+    }
 
-    private var closed = false
+    override fun onClose(fn: (Status) -> Unit) {
+        TODO("not implemented")
+    }
 
-    override fun invoke(m: WsMessage) {
-        if (closed) throw RuntimeException("socket is closed")
-        messages += m
+    override fun onMessage(fn: (WsMessage) -> Unit) {
+        TODO("not implemented")
+    }
+
+    private val queue = LinkedBlockingQueue<() -> WsMessage?>()
+
+    val received = generateSequence { queue.take()() }
+
+    override fun invoke(p1: WsMessage) {
+        queue.add { p1 }
     }
 
     override fun close() {
-        closed = true
-    }
-
-}
-
-val lens = WsMessage.string().map(::Foo).toLens()
-
-val websocket: Websocket = websocket {
-    onMessage = {
-        println(lens(it))
-        send(WsMessage(Body("bar")))
-        close()
+        queue.add { null }
     }
 }
 
-data class Foo(val value: String)
+typealias WsHandler = (WebSocket) -> Unit
 
-fun main(args: Array<String>) {
-    websocket(WsMessage(Body("foo")))
+typealias WsRouter = (Request) -> WsHandler?
+
+class RoutingWsRouter(private vararg val list: WsRouter) : WsRouter {
+    override fun invoke(p1: Request): WsHandler? = list.firstOrNull { it(p1) != null }?.invoke(p1)
 }
-

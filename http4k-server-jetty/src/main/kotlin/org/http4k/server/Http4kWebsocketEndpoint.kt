@@ -10,18 +10,13 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
+import org.http4k.websocket.WebSocket
+import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
-import java.io.Closeable
 import java.nio.ByteBuffer
 
-interface InboundWebSocket : Closeable {
-    operator fun invoke(message: WsMessage)
-    fun onError(fn: (Throwable) -> Unit)
-    fun onClose(fn: (Status) -> Unit)
-    fun onMessage(fn: (WsMessage) -> Unit)
-}
 
-internal class MutableInboundWebSocket(private val session: Session) : InboundWebSocket {
+internal class MutableInboundWebSocket(private val session: Session) : WebSocket {
 
     var errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
     var closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()
@@ -53,7 +48,7 @@ internal class MutableInboundWebSocket(private val session: Session) : InboundWe
     }
 }
 
-class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) : Http4kWebSocket {
+internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) : Http4kWebSocket {
     override fun invoke(p1: WsMessage) {
         innerSocket(p1)
     }
@@ -75,7 +70,7 @@ private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequen
 
 private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 
-class Http4kWebsocketEndpoint(private val wSocket: WsHandler) : WebSocketListener {
+internal class Http4kWebsocketEndpoint(private val wSocket: WsHandler) : WebSocketListener {
     private lateinit var websocket: Http4kWebSocketAdapter
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {

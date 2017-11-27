@@ -5,7 +5,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsRouter
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.io.Closeable
@@ -39,7 +41,8 @@ fun clientAction(): Closeable {
     return Closeable { a.close() }
 }
 
-fun ws(): WsRouter = object : WsRouter {
+
+class HardcodedRoutingWsRouter : WsRouter {
     override fun invoke(request: Request): WsHandler? {
         return { ws ->
             println("hello")
@@ -51,9 +54,11 @@ fun ws(): WsRouter = object : WsRouter {
     }
 }
 
+fun websocket(vararg routers: WsRouter): WsRouter = HardcodedRoutingWsRouter()
+
 val app = { r: Request -> Response(Status.OK).body("hiya world") }
 
-val webSocketHandler = ws()
+val webSocketHandler = websocket()
 
 fun main(args: Array<String>) {
     val server = WsJetty(8000).toServer(app, webSocketHandler).start()

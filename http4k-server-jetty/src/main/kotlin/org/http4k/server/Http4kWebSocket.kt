@@ -1,14 +1,10 @@
 package org.http4k.server
 
-import org.http4k.core.Request
 import org.http4k.websocket.WsMessage
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
 
-typealias WsHandler = (InboundWebSocket) -> Unit
-
-typealias WsRouter = (Request) -> WsHandler?
 
 interface Http4kWebSocket : Closeable, (WsMessage) -> Unit {
     companion object {
