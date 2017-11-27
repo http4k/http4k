@@ -10,12 +10,12 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import org.http4k.websocket.MutableInboundWebSocket
-import org.http4k.websocket.WsHandler
+import org.http4k.websocket.PullPushWebSocketAdapter
+import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
 
-internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) {
+internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PullPushWebSocketAdapter) {
     fun invoke(p1: WsMessage) {
         innerSocket(p1)
     }
@@ -37,7 +37,7 @@ private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequen
 
 private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 
-internal class Http4kWebSocketListener(private val wSocket: WsHandler) : WebSocketListener {
+internal class Http4kWebSocketListener(private val wSocket: WsConsumer) : WebSocketListener {
     private lateinit var websocket: Http4kWebSocketAdapter
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {
@@ -45,8 +45,8 @@ internal class Http4kWebSocketListener(private val wSocket: WsHandler) : WebSock
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = Http4kWebSocketAdapter(object : MutableInboundWebSocket() {
-            override fun invoke(message: WsMessage): MutableInboundWebSocket {
+        websocket = Http4kWebSocketAdapter(object : PullPushWebSocketAdapter() {
+            override fun invoke(message: WsMessage): PullPushWebSocketAdapter {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
                     else -> session.remote.sendString(message.toString())

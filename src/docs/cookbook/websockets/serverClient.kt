@@ -43,7 +43,7 @@ fun clientAction(path: String): Closeable {
 }
 
 
-val app = { r: Request -> Response(Status.OK).body("hiya world") }
+val app = { _: Request -> Response(Status.OK).body("hiya world") }
 
 val webSocketHandler = websocket(
     "/hello" bind websocket(

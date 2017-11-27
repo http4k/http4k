@@ -2,7 +2,7 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.websocket.RoutingWsMatcher
+import org.http4k.websocket.RoutingWsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.asClient
 import org.http4k.websocket.bind
@@ -13,7 +13,7 @@ data class Wrapper2(val v: Int)
 
 val body = WsMessage.string().map({ Wrapper2(it.toInt()) }, { it.v.toString() }).toLens()
 
-private val ws: RoutingWsMatcher = websocket(
+private val ws: RoutingWsHandler = websocket(
     "/hello" bind websocket(
         "/bob" bind { ws ->
             println("hello bob")

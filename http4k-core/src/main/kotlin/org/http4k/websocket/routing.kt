@@ -12,28 +12,28 @@ interface WebSocket : Closeable {
     fun onMessage(fn: (WsMessage) -> Unit): WebSocket
 }
 
-typealias WsHandler = (WebSocket) -> Unit
+typealias WsConsumer = (WebSocket) -> Unit
 
-interface WsMatcher {
-    fun match(request: Request): WsHandler?
+interface WsHandler {
+    operator fun invoke(request: Request): WsConsumer?
 }
 
-interface RoutingWsMatcher : WsMatcher {
-    fun withBasePath(new: String): RoutingWsMatcher
+fun websocket(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
+    override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it.invoke(request) != null }?.invoke(request)
+    override fun withBasePath(new: String): RoutingWsHandler = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
 }
 
-data class TemplatingRoutingWsMatcher(val template: UriTemplate,
-                                      val router: WsHandler) : RoutingWsMatcher {
-    override fun match(request: Request): WsHandler? = if (template.matches(request.uri.path)) router else null
-
-    override fun withBasePath(new: String): TemplatingRoutingWsMatcher = copy(template = UriTemplate.from("$new/$template"))
+interface RoutingWsHandler : WsHandler {
+    fun withBasePath(new: String): RoutingWsHandler
 }
 
-fun websocket(vararg list: RoutingWsMatcher): RoutingWsMatcher = object : RoutingWsMatcher {
-    override fun match(request: Request): WsHandler? = list.firstOrNull { it.match(request) != null }?.match(request)
-    override fun withBasePath(new: String): RoutingWsMatcher = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
+data class TemplatingRoutingWsHandler(val template: UriTemplate,
+                                      val router: WsConsumer) : RoutingWsHandler {
+    override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) router else null
+
+    override fun withBasePath(new: String): TemplatingRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
-infix fun String.bind(ws: WsHandler): RoutingWsMatcher = TemplatingRoutingWsMatcher(UriTemplate.from(this), ws)
+infix fun String.bind(ws: WsConsumer): RoutingWsHandler = TemplatingRoutingWsHandler(UriTemplate.from(this), ws)
 
-infix fun String.bind(ws: RoutingWsMatcher): RoutingWsMatcher = ws.withBasePath(this)
+infix fun String.bind(ws: RoutingWsHandler): RoutingWsHandler = ws.withBasePath(this)

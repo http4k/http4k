@@ -8,7 +8,7 @@ import org.eclipse.jetty.websocket.server.WebSocketHandler
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory
 import org.http4k.core.HttpHandler
 import org.http4k.servlet.asServlet
-import org.http4k.websocket.WsMatcher
+import org.http4k.websocket.WsHandler
 
 
 class Jetty(private val server: Server) : ServerConfig {
@@ -30,7 +30,7 @@ class Jetty(private val server: Server) : ServerConfig {
 class WsJetty(private val server: Server) {
     constructor(port: Int = 8000) : this(Server(port))
 
-    fun toServer(httpHandler: HttpHandler, wsMatcher: WsMatcher): Http4kServer {
+    fun toServer(httpHandler: HttpHandler, wsMatcher: WsHandler): Http4kServer {
         server.insertHandler(httpHandler.toJettyHandler())
         server.insertHandler(wsMatcher.toJettyHandler())
 
@@ -44,10 +44,10 @@ class WsJetty(private val server: Server) {
     }
 }
 
-private fun WsMatcher.toJettyHandler() = object : WebSocketHandler() {
+private fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
     override fun configure(factory: WebSocketServletFactory) {
         factory.setCreator { req, _ ->
-            this@toJettyHandler.match(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
+            this@toJettyHandler(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
         }
     }
 }

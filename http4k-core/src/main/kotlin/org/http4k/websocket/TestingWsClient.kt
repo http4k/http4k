@@ -4,14 +4,14 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import java.util.concurrent.LinkedBlockingQueue
 
-class WebSocketClient internal constructor(handler: WsHandler) : MutableInboundWebSocket() {
+class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushWebSocketAdapter() {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
     val received = generateSequence { queue.take()() }
 
     init {
-        handler(this)
+        consumer(this)
         this.onClose {
             queue.add { null }
         }
@@ -26,4 +26,4 @@ class WebSocketClient internal constructor(handler: WsHandler) : MutableInboundW
     }
 }
 
-fun RoutingWsMatcher.asClient(request: Request) = this.match(request)?.let(::WebSocketClient)!!
+fun RoutingWsHandler.asClient(request: Request) = invoke(request)?.let(::TestingWsClient)!!
