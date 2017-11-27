@@ -4,8 +4,6 @@ import org.http4k.websocket.WsMessage
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
-
-
 interface Http4kWebSocket : Closeable, (WsMessage) -> Unit {
     companion object {
         operator fun invoke() = MemoryHttp4kWebSocket()

@@ -32,7 +32,7 @@ class Jetty(private val server: Server) : ServerConfig {
 class Http4kWebSocketHandler(private val wsRouter: WsMatcher) : WebSocketHandler() {
     override fun configure(factory: WebSocketServletFactory) {
         factory.setCreator { req, _ ->
-            wsRouter.match(req.asHttp4kRequest())?.let(::Http4kWebsocketEndpoint)
+            wsRouter.match(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
         }
     }
 }

@@ -12,20 +12,13 @@ import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
 import java.io.InputStream
 
-interface WsMessage {
-    val body: Body
 
-    fun body(new: Body): WsMessage
+data class WsMessage(val body: Body) {
 
-    companion object {
-        operator fun invoke(value: String): WsMessage = MemoryWsMessage(Body(value))
-        operator fun invoke(body: Body): WsMessage = MemoryWsMessage(body)
-        operator fun invoke(stream: InputStream) = MemoryWsMessage(Body(stream))
-    }
-}
+    constructor(value: String) : this(Body(value))
+    constructor(value: InputStream) : this(Body(value))
 
-data class MemoryWsMessage(override val body: Body) : WsMessage {
-    override fun body(new: Body): WsMessage = copy(body = new)
+    fun body(new: Body): WsMessage = copy(body = new)
 
     companion object
 }

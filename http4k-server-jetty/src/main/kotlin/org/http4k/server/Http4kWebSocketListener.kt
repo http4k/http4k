@@ -10,49 +10,10 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.MutableInboundWebSocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
-
-
-internal class MutableInboundWebSocket(private val session: Session) : WebSocket {
-
-    var errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
-    var closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()
-    var messageHandlers: MutableList<(WsMessage) -> Unit> = mutableListOf()
-
-    override fun invoke(message: WsMessage): MutableInboundWebSocket {
-        when (message.body) {
-            is StreamBody -> session.remote.sendBytes(message.body.payload)
-            else -> session.remote.sendString(message.toString())
-        }
-        return this
-    }
-
-    fun triggerError(throwable: Throwable) = errorHandlers.forEach { it(throwable) }
-    fun triggerClose(status: Status) = closeHandlers.forEach { it(status) }
-    fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
-
-    override fun onError(fn: (Throwable) -> Unit): MutableInboundWebSocket {
-        errorHandlers.add(fn)
-        return this
-    }
-
-    override fun onClose(fn: (Status) -> Unit): MutableInboundWebSocket {
-        closeHandlers.add(fn)
-        return this
-    }
-
-    override fun onMessage(fn: (WsMessage) -> Unit): MutableInboundWebSocket {
-        messageHandlers.add(fn)
-        return this
-    }
-
-    override fun close() {
-        session.close()
-    }
-}
 
 internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: MutableInboundWebSocket) : Http4kWebSocket {
     override fun invoke(p1: WsMessage) {
@@ -76,7 +37,7 @@ private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequen
 
 private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 
-internal class Http4kWebsocketEndpoint(private val wSocket: WsHandler) : WebSocketListener {
+internal class Http4kWebSocketListener(private val wSocket: WsHandler) : WebSocketListener {
     private lateinit var websocket: Http4kWebSocketAdapter
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {
@@ -84,7 +45,19 @@ internal class Http4kWebsocketEndpoint(private val wSocket: WsHandler) : WebSock
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = Http4kWebSocketAdapter(MutableInboundWebSocket(session).apply(wSocket))
+        websocket = Http4kWebSocketAdapter(object : MutableInboundWebSocket() {
+            override fun invoke(message: WsMessage): MutableInboundWebSocket {
+                when (message.body) {
+                    is StreamBody -> session.remote.sendBytes(message.body.payload)
+                    else -> session.remote.sendString(message.toString())
+                }
+                return this
+            }
+
+            override fun close() {
+                session.close()
+            }
+        }.apply(wSocket))
     }
 
     override fun onWebSocketText(message: String) {
