@@ -12,7 +12,7 @@ class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushWebSo
 
     init {
         consumer(this)
-        this.onClose {
+        onClose {
             queue.add { null }
         }
     }
