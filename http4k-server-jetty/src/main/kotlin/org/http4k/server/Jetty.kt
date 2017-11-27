@@ -15,9 +15,7 @@ class Jetty(private val server: Server) : ServerConfig {
     constructor(port: Int = 8000) : this(Server(port))
 
     override fun toServer(handler: HttpHandler): Http4kServer {
-        server.insertHandler(ServletContextHandler(SESSIONS).apply {
-            addServlet(ServletHolder(handler.asServlet()), "/*")
-        })
+        server.insertHandler(handler.toJettyHandler())
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {
@@ -25,14 +23,6 @@ class Jetty(private val server: Server) : ServerConfig {
             }
 
             override fun stop() = server.stop()
-        }
-    }
-}
-
-class Http4kWebSocketHandler(private val wsRouter: WsMatcher) : WebSocketHandler() {
-    override fun configure(factory: WebSocketServletFactory) {
-        factory.setCreator { req, _ ->
-            wsRouter.match(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
         }
     }
 }
@@ -40,11 +30,9 @@ class Http4kWebSocketHandler(private val wsRouter: WsMatcher) : WebSocketHandler
 class WsJetty(private val server: Server) {
     constructor(port: Int = 8000) : this(Server(port))
 
-    fun toServer(httpHandler: HttpHandler, wsHandler: WsMatcher): Http4kServer {
-        server.insertHandler(ServletContextHandler(SESSIONS).apply {
-            addServlet(ServletHolder(httpHandler.asServlet()), "/*")
-        })
-        server.insertHandler(Http4kWebSocketHandler(wsHandler))
+    fun toServer(httpHandler: HttpHandler, wsMatcher: WsMatcher): Http4kServer {
+        server.insertHandler(httpHandler.toJettyHandler())
+        server.insertHandler(wsMatcher.toJettyHandler())
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {
@@ -54,4 +42,16 @@ class WsJetty(private val server: Server) {
             override fun stop() = server.stop()
         }
     }
+}
+
+private fun WsMatcher.toJettyHandler() = object : WebSocketHandler() {
+    override fun configure(factory: WebSocketServletFactory) {
+        factory.setCreator { req, _ ->
+            this@toJettyHandler.match(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
+        }
+    }
+}
+
+private fun HttpHandler.toJettyHandler() = ServletContextHandler(SESSIONS).apply {
+    addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
 }
