@@ -15,8 +15,8 @@ import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
 
-fun clientAction(): Closeable {
-    val a = object : WebSocketClient(URI.create("ws://localhost:8000/hello")) {
+fun clientAction(path: String): Closeable {
+    val a = object : WebSocketClient(URI.create("ws://localhost:8000/$path")) {
 
         override fun onMessage(bytes: ByteBuffer) {
             println("I got binary back: " + String(bytes.array()))
@@ -37,7 +37,7 @@ fun clientAction(): Closeable {
     }
 
     a.connectBlocking()
-    a.send("sending..")
+    a.send("sending.. to " + path)
     return Closeable { a.close() }
 }
 
@@ -45,13 +45,22 @@ fun clientAction(): Closeable {
 val app = { r: Request -> Response(Status.OK).body("hiya world") }
 
 val webSocketHandler = websocket(
-    "/hello" bind { ws ->
-        println("hello")
-        ws.onMessage {
-            println("i got " + it)
-            ws(WsMessage("sending this back".byteInputStream()))
+    "/hello" bind websocket(
+        "/bob" bind { ws ->
+            println("hello bob")
+            ws.onMessage {
+                println("bob got " + it)
+                ws(WsMessage("sending this back".byteInputStream()))
+            }
+        },
+        "/" bind { ws ->
+            println("hello")
+            ws.onMessage {
+                println("i got " + it)
+                ws(WsMessage("sending this back".byteInputStream()))
+            }
         }
-    }
+    )
 )
 
 fun main(args: Array<String>) {
@@ -59,5 +68,6 @@ fun main(args: Array<String>) {
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
-    val a = clientAction()
+    clientAction("hello")
+    clientAction("hello/bob")
 }

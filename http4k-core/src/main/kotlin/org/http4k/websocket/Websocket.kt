@@ -45,28 +45,26 @@ class MemoryWebSocket : WebSocket {
 
 typealias WsHandler = (WebSocket) -> Unit
 
-interface WsRouter {
+interface WsMatcher {
     fun match(request: Request): WsHandler?
 }
 
-interface SomethingWsRouter : WsRouter {
-    fun withBasePath(new: String): SomethingWsRouter
+interface RoutingWsMatcher : WsMatcher {
+    fun withBasePath(new: String): RoutingWsMatcher
 }
 
-data class TemplatingSomethingWsRouter(val template: UriTemplate,
-                                       val router: WsHandler) : SomethingWsRouter {
-    override fun match(request: Request): WsHandler? {
-        return if (template.matches(request.uri.path)) router else null
-    }
+data class TemplatingRoutingWsMatcher(val template: UriTemplate,
+                                      val router: WsHandler) : RoutingWsMatcher {
+    override fun match(request: Request): WsHandler? = if (template.matches(request.uri.path)) router else null
 
-    override fun withBasePath(new: String): TemplatingSomethingWsRouter = copy(template = UriTemplate.from("$new/$template"))
+    override fun withBasePath(new: String): TemplatingRoutingWsMatcher = copy(template = UriTemplate.from("$new/$template"))
 }
 
-infix fun String.bind(ws: WsHandler): SomethingWsRouter = TemplatingSomethingWsRouter(UriTemplate.from(this), ws)
+infix fun String.bind(ws: WsHandler): RoutingWsMatcher = TemplatingRoutingWsMatcher(UriTemplate.from(this), ws)
 
-infix fun String.bind(ws: SomethingWsRouter): SomethingWsRouter = ws.withBasePath(this)
+infix fun String.bind(ws: RoutingWsMatcher): RoutingWsMatcher = ws.withBasePath(this)
 
-fun websocket(vararg list: SomethingWsRouter): SomethingWsRouter = object : SomethingWsRouter {
+fun websocket(vararg list: RoutingWsMatcher): RoutingWsMatcher = object : RoutingWsMatcher {
     override fun match(request: Request): WsHandler? = list.firstOrNull { it.match(request) != null }?.match(request)
-    override fun withBasePath(new: String): SomethingWsRouter = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
+    override fun withBasePath(new: String): RoutingWsMatcher = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
 }
