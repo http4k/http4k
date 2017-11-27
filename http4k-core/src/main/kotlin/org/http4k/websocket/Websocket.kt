@@ -7,10 +7,10 @@ import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
 interface WebSocket : Closeable {
-    operator fun invoke(message: WsMessage)
-    fun onError(fn: (Throwable) -> Unit)
-    fun onClose(fn: (Status) -> Unit)
-    fun onMessage(fn: (WsMessage) -> Unit)
+    operator fun invoke(message: WsMessage): WebSocket
+    fun onError(fn: (Throwable) -> Unit): WebSocket
+    fun onClose(fn: (Status) -> Unit): WebSocket
+    fun onMessage(fn: (WsMessage) -> Unit): WebSocket
 
     companion object {
         operator fun invoke() = MemoryWebSocket()
@@ -18,24 +18,25 @@ interface WebSocket : Closeable {
 }
 
 class MemoryWebSocket : WebSocket {
-    override fun onError(fn: (Throwable) -> Unit) {
-        TODO("not implemented")
+    override fun onError(fn: (Throwable) -> Unit): MemoryWebSocket {
+        return this
     }
 
-    override fun onClose(fn: (Status) -> Unit) {
-        TODO("not implemented")
+    override fun onClose(fn: (Status) -> Unit): MemoryWebSocket {
+        return this
     }
 
-    override fun onMessage(fn: (WsMessage) -> Unit) {
-        TODO("not implemented")
+    override fun onMessage(fn: (WsMessage) -> Unit): MemoryWebSocket {
+        return this
     }
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
     val received = generateSequence { queue.take()() }
 
-    override fun invoke(p1: WsMessage) {
-        queue.add { p1 }
+    override fun invoke(message: WsMessage): MemoryWebSocket {
+        queue.add { message }
+        return this
     }
 
     override fun close() {

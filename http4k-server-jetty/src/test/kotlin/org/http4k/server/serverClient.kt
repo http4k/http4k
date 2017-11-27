@@ -50,15 +50,19 @@ val webSocketHandler = websocket(
             println("hello bob")
             ws.onMessage {
                 println("bob got " + it)
-                ws(WsMessage("sending this back".byteInputStream()))
+                ws(WsMessage("bob sending this back".byteInputStream()))
             }
         },
         "/" bind { ws ->
             println("hello")
-            ws.onMessage {
-                println("i got " + it)
-                ws(WsMessage("sending this back".byteInputStream()))
-            }
+            ws
+                .onMessage {
+                    println("i got " + it)
+                    ws(WsMessage("sending this back".byteInputStream()))
+                }
+                .onMessage {
+                    println("i also got " + it)
+                }
         }
     )
 )

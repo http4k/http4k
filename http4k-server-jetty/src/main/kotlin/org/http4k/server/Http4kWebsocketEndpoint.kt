@@ -22,25 +22,31 @@ internal class MutableInboundWebSocket(private val session: Session) : WebSocket
     var closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()
     var messageHandlers: MutableList<(WsMessage) -> Unit> = mutableListOf()
 
-    override fun invoke(message: WsMessage) = when (message.body) {
-        is StreamBody -> session.remote.sendBytes(message.body.payload)
-        else -> session.remote.sendString(message.toString())
+    override fun invoke(message: WsMessage): MutableInboundWebSocket {
+        when (message.body) {
+            is StreamBody -> session.remote.sendBytes(message.body.payload)
+            else -> session.remote.sendString(message.toString())
+        }
+        return this
     }
 
     fun triggerError(throwable: Throwable) = errorHandlers.forEach { it(throwable) }
     fun triggerClose(status: Status) = closeHandlers.forEach { it(status) }
     fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
 
-    override fun onError(fn: (Throwable) -> Unit) {
+    override fun onError(fn: (Throwable) -> Unit): MutableInboundWebSocket {
         errorHandlers.add(fn)
+        return this
     }
 
-    override fun onClose(fn: (Status) -> Unit) {
+    override fun onClose(fn: (Status) -> Unit): MutableInboundWebSocket {
         closeHandlers.add(fn)
+        return this
     }
 
-    override fun onMessage(fn: (WsMessage) -> Unit) {
+    override fun onMessage(fn: (WsMessage) -> Unit): MutableInboundWebSocket {
         messageHandlers.add(fn)
+        return this
     }
 
     override fun close() {
