@@ -2,6 +2,7 @@ package org.http4k.websocket
 
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.core.UriTemplate
 import java.io.Closeable
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -44,8 +45,28 @@ class MemoryWebSocket : WebSocket {
 
 typealias WsHandler = (WebSocket) -> Unit
 
-typealias WsRouter = (Request) -> WsHandler?
+interface WsRouter {
+    fun match(request: Request): WsHandler?
+}
 
-class RoutingWsRouter(private vararg val list: WsRouter) : WsRouter {
-    override fun invoke(p1: Request): WsHandler? = list.firstOrNull { it(p1) != null }?.invoke(p1)
+interface SomethingWsRouter : WsRouter {
+    fun withBasePath(new: String): SomethingWsRouter
+}
+
+data class TemplatingSomethingWsRouter(val template: UriTemplate,
+                                       val router: WsHandler) : SomethingWsRouter {
+    override fun match(request: Request): WsHandler? {
+        return if (template.matches(request.uri.path)) router else null
+    }
+
+    override fun withBasePath(new: String): TemplatingSomethingWsRouter = copy(template = UriTemplate.from("$new/$template"))
+}
+
+infix fun String.bind(ws: WsHandler): SomethingWsRouter = TemplatingSomethingWsRouter(UriTemplate.from(this), ws)
+
+infix fun String.bind(ws: SomethingWsRouter): SomethingWsRouter = ws.withBasePath(this)
+
+fun websocket(vararg list: SomethingWsRouter): SomethingWsRouter = object : SomethingWsRouter {
+    override fun match(request: Request): WsHandler? = list.firstOrNull { it.match(request) != null }?.match(request)
+    override fun withBasePath(new: String): SomethingWsRouter = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
 }
