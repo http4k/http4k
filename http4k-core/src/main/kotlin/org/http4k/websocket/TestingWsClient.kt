@@ -6,7 +6,6 @@ import java.net.ConnectException
 import java.util.concurrent.LinkedBlockingQueue
 
 class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest: Request) : PullPushAdaptingWebSocket(upgradeRequest) {
-
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
     val received = generateSequence { queue.take()() }
@@ -22,8 +21,8 @@ class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest:
         queue.add { message }
     }
 
-    override fun close() {
-        triggerClose(Status(0, ""))
+    override fun close(fn: Status): WebSocket = apply {
+        queue.add { null }
     }
 }
 

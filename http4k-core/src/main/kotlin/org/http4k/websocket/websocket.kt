@@ -3,12 +3,12 @@ package org.http4k.websocket
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Status
-import java.io.Closeable
 import java.io.InputStream
 
-interface WebSocket : Closeable {
+interface WebSocket {
     val upgradeRequest: Request
     fun send(message: WsMessage): WebSocket
+    fun close(fn: Status): WebSocket
     fun onError(fn: (Throwable) -> Unit): WebSocket
     fun onClose(fn: (Status) -> Unit): WebSocket
     fun onMessage(fn: (WsMessage) -> Unit): WebSocket

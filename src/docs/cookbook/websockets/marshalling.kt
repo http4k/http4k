@@ -2,6 +2,7 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Status
 import org.http4k.lens.Path
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.routing.bind
@@ -25,6 +26,9 @@ private val ws: RoutingWsHandler = websockets(
                 println("$name got " + received)
                 ws.send(body(Wrapper2(123 * received.v)))
             }
+            ws.onClose {
+                println("closed")
+            }
         }
     )
 )
@@ -34,7 +38,7 @@ fun main(args: Array<String>) {
     val client = ws.asClient(Request(Method.GET, "/hello/barbara"))
     client.triggerMessage(WsMessage("1"))
     client.triggerMessage(WsMessage("2"))
-    client.close()
+    client.triggerClose(Status(200, "bob"))
 
     client.received.take(3).forEach {
         println("received back: " + body(it))

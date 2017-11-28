@@ -11,19 +11,12 @@ import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PullPushAdaptingWebSocket
+import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
 
 internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PullPushAdaptingWebSocket) {
-    fun send(p1: WsMessage) {
-        innerSocket.send(p1)
-    }
-
-    fun close() {
-        innerSocket.close()
-    }
-
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
     fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(Status(statusCode, reason ?: "<unknown>"))
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
@@ -46,15 +39,14 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private 
 
     override fun onWebSocketConnect(session: Session) {
         websocket = Http4kWebSocketAdapter(object : PullPushAdaptingWebSocket(upgradeRequest) {
-            override fun send(message: WsMessage): PullPushAdaptingWebSocket {
+            override fun send(message: WsMessage): PullPushAdaptingWebSocket = apply {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
                     else -> session.remote.sendString(message.bodyString())
                 }
-                return this
             }
 
-            override fun close() {
+            override fun close(fn: Status): WebSocket = apply {
                 session.close()
             }
         }.apply(wSocket))

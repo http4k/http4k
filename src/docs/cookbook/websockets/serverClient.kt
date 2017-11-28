@@ -76,4 +76,6 @@ fun main(args: Array<String>) {
 
     clientAction("hello")
     clientAction("hello/bob").close()
+
+    server.stop()
 }
