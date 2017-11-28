@@ -3,7 +3,6 @@ package org.http4k.websocket
 import org.http4k.core.Request
 import org.http4k.core.Status
 import java.net.ConnectException
-import java.util.Queue
 import java.util.concurrent.LinkedBlockingQueue
 
 interface WsClient {
@@ -13,30 +12,28 @@ interface WsClient {
     operator fun invoke(message: WsMessage)
 }
 
-private class AnAdapter(private val queue: Queue<() -> WsMessage?>, consumer: WsConsumer, request: Request) : PullPushAdaptingWebSocket(request) {
-    init {
-        consumer(this)
-        onClose {
-            queue.add { null }
-        }
-    }
-
-    override fun send(message: WsMessage) = apply {
-        queue.add { message }
-    }
-
-    override fun close(fn: Status): WebSocket = apply {
-        queue.add { null }
-    }
-}
-
 private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
     override val received = generateSequence { queue.take()() }
 
-    private val socket = AnAdapter(queue, consumer, request)
+    private val socket = object: PullPushAdaptingWebSocket(request) {
+        init {
+            consumer(this)
+            onClose {
+                queue.add { null }
+            }
+        }
+
+        override fun send(message: WsMessage) = apply {
+            queue.add { message }
+        }
+
+        override fun close(fn: Status): WebSocket = apply {
+            queue.add { null }
+        }
+    }
 
     override fun invoke(throwable: Throwable) = socket.triggerError(throwable)
 
