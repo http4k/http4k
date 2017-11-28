@@ -2,7 +2,6 @@ package org.http4k.websocket
 
 import org.http4k.core.Request
 import org.http4k.core.Status
-import java.net.ConnectException
 import java.util.concurrent.LinkedBlockingQueue
 
 interface WsClient {
@@ -43,6 +42,5 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
 
 }
 
-fun WsHandler.asClient(request: Request): WsClient = invoke(request)
-    ?.let { WsConsumerClient(it, request) }
-    ?: throw ConnectException("Could not find a websocket to bind to for this request")
+fun WsHandler.asClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
+
