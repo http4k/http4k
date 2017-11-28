@@ -30,9 +30,9 @@ class Jetty(private val server: Server) : ServerConfig {
 class WsJetty(private val server: Server) {
     constructor(port: Int = 8000) : this(Server(port))
 
-    fun toServer(httpHandler: HttpHandler, wsMatcher: WsHandler): Http4kServer {
+    fun toServer(httpHandler: HttpHandler, wsHandler: WsHandler): Http4kServer {
         server.insertHandler(httpHandler.toJettyHandler())
-        server.insertHandler(wsMatcher.toJettyHandler())
+        server.insertHandler(wsHandler.toJettyHandler())
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {
