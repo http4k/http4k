@@ -2,9 +2,9 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.routing.RoutingWsHandler
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
-import org.http4k.websocket.RoutingWsHandler
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.asClient

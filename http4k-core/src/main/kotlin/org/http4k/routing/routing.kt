@@ -8,9 +8,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
-import org.http4k.websocket.RoutingWsHandler
-import org.http4k.websocket.TemplatingRoutingWsHandler
 import org.http4k.websocket.WsConsumer
+import org.http4k.websocket.WsHandler
 
 interface Router {
     fun match(request: Request): HttpHandler?
@@ -35,6 +34,10 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : Routi
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): StaticRoutingHttpHandler =
     StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
+
+interface RoutingWsHandler : WsHandler {
+    fun withBasePath(new: String): RoutingWsHandler
+}
 
 fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it.invoke(request) != null }?.invoke(request)

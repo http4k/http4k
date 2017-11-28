@@ -12,18 +12,6 @@ import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
 import java.io.InputStream
 
-
-data class WsMessage(val body: Body) {
-
-    constructor(value: String) : this(Body(value))
-    constructor(value: InputStream) : this(Body(value))
-
-    fun body(new: Body): WsMessage = copy(body = new)
-    fun bodyString(): String = String(body.payload.array())
-
-    companion object
-}
-
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 
 open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>) {

@@ -14,6 +14,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.findSingle
 import org.http4k.core.then
+import org.http4k.websocket.WsConsumer
 import java.nio.ByteBuffer
 import javax.activation.MimetypesFileTypeMap
 
@@ -60,6 +61,13 @@ data class StaticRoutingHttpHandler(private val pathSegments: String,
     private val handler = filter.then(ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs))
 
     override fun invoke(req: Request): Response = handler(req)
+}
+
+data class TemplatingRoutingWsHandler(val template: UriTemplate,
+                                      val router: WsConsumer) : RoutingWsHandler {
+    override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) router else null
+
+    override fun withBasePath(new: String): TemplatingRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())

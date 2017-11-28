@@ -27,6 +27,6 @@ class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest:
     }
 }
 
-fun RoutingWsHandler.asClient(request: Request) = invoke(request)
+fun WsHandler.asClient(request: Request) = invoke(request)
     ?.let { TestingWsClient(it, request) }
     ?: throw ConnectException("Could not find a websocket to bind to for this request")
