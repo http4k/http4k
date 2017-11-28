@@ -37,7 +37,7 @@ private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequen
 
 private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
 
-internal class Http4kWebSocketListener(private val wSocket: WsConsumer) : WebSocketListener {
+internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private val upgradeRequest: Request) : WebSocketListener {
     private lateinit var websocket: Http4kWebSocketAdapter
 
     override fun onWebSocketClose(statusCode: Int, reason: String?) {
@@ -45,7 +45,7 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer) : WebSoc
     }
 
     override fun onWebSocketConnect(session: Session) {
-        websocket = Http4kWebSocketAdapter(object : PullPushAdaptingWebSocket() {
+        websocket = Http4kWebSocketAdapter(object : PullPushAdaptingWebSocket(upgradeRequest) {
             override fun send(message: WsMessage): PullPushAdaptingWebSocket {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)

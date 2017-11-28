@@ -2,9 +2,10 @@ package org.http4k.websocket
 
 import org.http4k.core.Request
 import org.http4k.core.Status
+import java.net.ConnectException
 import java.util.concurrent.LinkedBlockingQueue
 
-class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushAdaptingWebSocket() {
+class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest: Request) : PullPushAdaptingWebSocket(upgradeRequest) {
 
     private val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
@@ -26,4 +27,6 @@ class TestingWsClient internal constructor(consumer: WsConsumer) : PullPushAdapt
     }
 }
 
-fun RoutingWsHandler.asClient(request: Request) = invoke(request)?.let(::TestingWsClient)!!
+fun RoutingWsHandler.asClient(request: Request) = invoke(request)
+    ?.let { TestingWsClient(it, request) }
+    ?: throw ConnectException("Could not find a websocket to bind to for this request")

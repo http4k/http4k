@@ -1,8 +1,9 @@
 package org.http4k.websocket
 
+import org.http4k.core.Request
 import org.http4k.core.Status
 
-abstract class PullPushAdaptingWebSocket : WebSocket {
+abstract class PullPushAdaptingWebSocket(override val upgradeRequest: Request) : WebSocket {
 
     private val errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
     private val closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()

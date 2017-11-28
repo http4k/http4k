@@ -6,6 +6,7 @@ import org.http4k.core.UriTemplate
 import java.io.Closeable
 
 interface WebSocket : Closeable {
+    val upgradeRequest: Request
     fun send(message: WsMessage): WebSocket
     fun onError(fn: (Throwable) -> Unit): WebSocket
     fun onClose(fn: (Status) -> Unit): WebSocket

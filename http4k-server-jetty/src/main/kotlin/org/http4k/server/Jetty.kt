@@ -30,7 +30,8 @@ class Jetty(private val server: Server) : WsServerConfig {
 private fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
     override fun configure(factory: WebSocketServletFactory) {
         factory.setCreator { req, _ ->
-            this@toJettyHandler(req.asHttp4kRequest())?.let(::Http4kWebSocketListener)
+            val request = req.asHttp4kRequest()
+            this@toJettyHandler(request)?.let { Http4kWebSocketListener(it, request) }
         }
     }
 }
