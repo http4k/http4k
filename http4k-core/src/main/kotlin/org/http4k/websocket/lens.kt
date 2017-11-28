@@ -10,7 +10,6 @@ import org.http4k.lens.LensSet
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta
-import java.io.InputStream
 
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 
@@ -73,6 +72,8 @@ class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
 
     @Suppress("UNCHECKED_CAST")
     operator fun invoke(value: FINAL): WsMessage = setLens(value, WsMessage(Body.EMPTY))
+
+    fun inject(value: FINAL) = invoke(value)
 }
 
 private val wsRoot =
