@@ -2,6 +2,7 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.lens.Path
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
@@ -16,11 +17,12 @@ val body = WsMessage.string().map({ Wrapper2(it.toInt()) }, { it.v.toString() })
 
 private val ws: RoutingWsHandler = websockets(
     "/hello" bind websockets(
-        "/bob" bind { ws: WebSocket ->
-            println("hello bob")
+        "/{name}" bind { ws: WebSocket ->
+            val name = Path.of("name")(ws.upgradeRequest)
+            println("hello " + name)
             ws.onMessage {
                 val received = body(it)
-                println("bob got " + received)
+                println("$name got " + received)
                 ws.send(body(Wrapper2(123 * received.v)))
             }
         }
@@ -29,11 +31,12 @@ private val ws: RoutingWsHandler = websockets(
 
 fun main(args: Array<String>) {
 
-    val client = ws.asClient(Request(Method.GET, "/hello/bob"))
+    val client = ws.asClient(Request(Method.GET, "/hello/barbara"))
     client.triggerMessage(WsMessage("1"))
     client.triggerMessage(WsMessage("2"))
     client.close()
 
     client.received.take(3).forEach {
-        println("received back: " + body(it)) }
+        println("received back: " + body(it))
     }
+}
