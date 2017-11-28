@@ -1,23 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="text/javascript" src="main.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.2.0/min/dropzone.min.css" integrity="sha256-e47xOkXs1JXFbjjpoRr1/LhVcqSzRmGmPqsrUQeVs+g=" crossorigin="anonymous"/>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.2.0/min/dropzone.min.js"
+            integrity="sha256-eO9VTVeZLaplH86Iwt8l39+l7GZpLOTsVWYziS5oY0Q=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>    <script type="text/javascript" src="main.js"></script>
     <style type="text/css">
         body {
             background-color: #f0ffff;
+            padding-top: 100px;
+            padding-left: 30px;
+            padding-right: 30px;
+            bottom: 30px;
+        }
+
+        .logo {
+            max-height: 30px;
+            vertical-align: bottom;
         }
 
         .form {
             position: absolute;
-            bottom: 0;
+            bottom: 30px;
             left: 0;
             right: 0;
             height: 60px;
 
-            padding: 5px;
-        }
-        .header {
-            height: 71px;
             padding: 5px;
         }
         .messages {
@@ -26,7 +37,7 @@
             left: 5px;
             right: 5px;
             padding: 5px;
-            bottom: 70px;
+            bottom: 150px;
             overflow-y: scroll;
             border: 1px solid black;
 
@@ -67,9 +78,17 @@
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>http4k chat</h1>
-</div>
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="/">http4slacK</a>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto"></ul>
+        <div class="error"><a href="https://http4k.org"><img class="logo" src="https://www.http4k.org/img/logo_1100x200_white_on_black_trans.png"/></a></div>
+    </div>
+</nav>
 
 <div class="messages" id="messages">
 </div>
