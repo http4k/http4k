@@ -12,9 +12,9 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.asClient
 import org.http4k.websocket.string
 
-data class Wrapper2(val v: Int)
+data class MyIntWrapper(val v: Int)
 
-val body = WsMessage.string().map({ Wrapper2(it.toInt()) }, { it.v.toString() }).toLens()
+val body = WsMessage.string().map({ MyIntWrapper(it.toInt()) }, { it.v.toString() }).toLens()
 
 private val ws: RoutingWsHandler = websockets(
     "/hello" bind websockets(
@@ -24,7 +24,7 @@ private val ws: RoutingWsHandler = websockets(
             ws.onMessage {
                 val received = body(it)
                 println("$name got " + received)
-                ws.send(body(Wrapper2(123 * received.v)))
+                ws.send(body(MyIntWrapper(123 * received.v)))
             }
             ws.onClose {
                 println("closed")
