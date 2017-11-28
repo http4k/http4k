@@ -39,7 +39,6 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
     override fun close(status: Status) = socket.triggerClose(status)
 
     override fun send(message: WsMessage) = socket.triggerMessage(message)
-
 }
 
 fun WsHandler.asClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
