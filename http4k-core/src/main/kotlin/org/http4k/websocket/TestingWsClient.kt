@@ -25,11 +25,11 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
             }
         }
 
-        override fun send(message: WsMessage) = apply {
+        override fun send(message: WsMessage) {
             queue.add { message }
         }
 
-        override fun close(status: Status): WebSocket = apply {
+        override fun close(status: Status) {
             queue.add { null }
         }
     }

@@ -57,14 +57,17 @@ val webSocketHandler = websockets(
         },
         "/" bind { ws: WebSocket ->
             println("hello")
-            ws
-                .onMessage {
+            ws.apply {
+                onMessage {
                     println("i got " + it)
                     ws.send(WsMessage("sending this back".byteInputStream()))
                 }
-                .onMessage {
+                onMessage {
                     println("i also got " + it)
-                }.onClose { println("hello is closing") }
+                }
+                onClose { println("hello is closing") }
+
+            }
         }
     )
 )

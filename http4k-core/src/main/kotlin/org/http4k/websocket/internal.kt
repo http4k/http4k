@@ -13,18 +13,15 @@ abstract class PushPullAdaptingWebSocket(override val upgradeRequest: Request) :
     fun triggerClose(status: Status) = closeHandlers.forEach { it(status) }
     fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
 
-    override fun onError(fn: (Throwable) -> Unit): PushPullAdaptingWebSocket {
+    override fun onError(fn: (Throwable) -> Unit) {
         errorHandlers.add(fn)
-        return this
     }
 
-    override fun onClose(fn: (Status) -> Unit): PushPullAdaptingWebSocket {
+    override fun onClose(fn: (Status) -> Unit) {
         closeHandlers.add(fn)
-        return this
     }
 
-    override fun onMessage(fn: (WsMessage) -> Unit): PushPullAdaptingWebSocket {
+    override fun onMessage(fn: (WsMessage) -> Unit) {
         messageHandlers.add(fn)
-        return this
     }
 }

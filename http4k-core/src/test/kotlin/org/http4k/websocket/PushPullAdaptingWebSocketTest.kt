@@ -14,11 +14,11 @@ class PushPullAdaptingWebSocketTest {
         val received = mutableListOf<WsMessage>()
         val closed = AtomicReference<Status>(null)
 
-        override fun send(message: WsMessage): WebSocket = apply {
+        override fun send(message: WsMessage) {
             received += message
         }
 
-        override fun close(status: Status): WebSocket = apply {
+        override fun close(status: Status) {
             closed.set(status)
         }
     }
@@ -37,16 +37,17 @@ class PushPullAdaptingWebSocketTest {
         val outboundClose = AtomicReference<Status>(null)
         val outboundMessage = AtomicReference<WsMessage>(null)
         val outboundError = AtomicReference<Throwable>(null)
-        val adapter = TestAdapter()
-            .onMessage {
+        val adapter = TestAdapter().apply {
+            onMessage {
                 outboundMessage.set(it)
             }
-            .onError {
+            onError {
                 outboundError.set(it)
             }
-            .onClose {
+            onClose {
                 outboundClose.set(it)
             }
+        }
 
         adapter.triggerMessage(WsMessage("hello"))
         assertThat(outboundMessage.get(), equalTo(WsMessage("hello")))

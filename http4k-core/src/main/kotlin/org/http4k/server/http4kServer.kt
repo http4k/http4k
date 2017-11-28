@@ -21,10 +21,10 @@ interface ServerConfig {
  */
 interface WsServerConfig : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = toServer(httpHandler, null)
-    fun toServer(wsHandler: WsHandler): Http4kServer = toServer(null, wsHandler)
+    fun toWsServer(wsHandler: WsHandler): Http4kServer = toServer(null, wsHandler)
     fun toServer(httpHandler: HttpHandler? = null, wsHandler: WsHandler? = null): Http4kServer
 }
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
-fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(this)
+fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
 fun Pair<HttpHandler, WsHandler>.asServer(config: WsServerConfig): Http4kServer = config.toServer(first, second)

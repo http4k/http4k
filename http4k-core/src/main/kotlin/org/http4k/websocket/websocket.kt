@@ -7,18 +7,16 @@ import java.io.InputStream
 
 interface WebSocket {
     val upgradeRequest: Request
-    fun send(message: WsMessage): WebSocket
-    fun close(status: Status): WebSocket
-    fun onError(fn: (Throwable) -> Unit): WebSocket
-    fun onClose(fn: (Status) -> Unit): WebSocket
-    fun onMessage(fn: (WsMessage) -> Unit): WebSocket
+    fun send(message: WsMessage)
+    fun close(status: Status)
+    fun onError(fn: (Throwable) -> Unit)
+    fun onClose(fn: (Status) -> Unit)
+    fun onMessage(fn: (WsMessage) -> Unit)
 }
 
 typealias WsConsumer = (WebSocket) -> Unit
 
-interface WsHandler {
-    operator fun invoke(request: Request): WsConsumer?
-}
+typealias WsHandler = (Request) -> WsConsumer?
 
 data class WsMessage(val body: Body) {
 

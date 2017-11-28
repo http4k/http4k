@@ -11,7 +11,6 @@ import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
-import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import java.nio.ByteBuffer
@@ -39,14 +38,14 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private 
 
     override fun onWebSocketConnect(session: Session) {
         websocket = Http4kWebSocketAdapter(object : PushPullAdaptingWebSocket(upgradeRequest) {
-            override fun send(message: WsMessage): PushPullAdaptingWebSocket = apply {
+            override fun send(message: WsMessage) {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
                     else -> session.remote.sendString(message.bodyString())
                 }
             }
 
-            override fun close(status: Status): WebSocket = apply {
+            override fun close(status: Status) {
                 session.close()
             }
         }.apply(wSocket))

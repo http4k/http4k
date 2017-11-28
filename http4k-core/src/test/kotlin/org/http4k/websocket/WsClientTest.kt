@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 class WsClientTest {
 
+    private val message = WsMessage("hello")
+    private val error = RuntimeException("foo") as Throwable
+
     private class TestConsumer : WsConsumer {
         lateinit var websocket: WebSocket
         val messages = mutableListOf<WsMessage>()
@@ -33,21 +36,37 @@ class WsClientTest {
     }
 
     @Test
-    fun `when match, passes a consumer with the matching request and can pass through all messages to the websocket`() {
-        val consumer = TestConsumer()
-        val client: WsClient = object : WsHandler {
-            override fun invoke(request: Request): WsConsumer? = consumer
-        }.asClient(Request(Method.GET, "/"))!!
+    fun `when match, passes a consumer with the matching request`() {
+        val consumer = TestConsumer();
+
+        { _: Request -> consumer }.asClient(Request(Method.GET, "/"))!!
 
         consumer.websocket.upgradeRequest shouldMatch equalTo(Request(Method.GET, "/"))
+    }
 
-        client.send(WsMessage("hello"))
-        consumer.messages shouldMatch equalTo(listOf(WsMessage("hello")))
-        val error = RuntimeException("foo") as Throwable
+    @Test
+    fun `sends outbound messages to the websocket`() {
+        val consumer = TestConsumer()
+        val client: WsClient = { _: Request -> consumer }.asClient(Request(Method.GET, "/"))!!
+
+        client.send(message)
+        consumer.messages shouldMatch equalTo(listOf(message))
         client.error(error)
         consumer.throwable shouldMatch equalTo(listOf(error))
         client.close(Status.OK)
         consumer.closed.get() shouldMatch equalTo(Status.OK)
+    }
+
+    @Test
+    fun `sends inbound messages to the client`() {
+        val client = { _: Request ->
+            { ws: WebSocket ->
+                ws.send(message)
+                ws.close(Status.OK)
+            }
+        }.asClient(Request(Method.GET, "/"))!!
+
+        client.received.toList() shouldMatch equalTo(listOf(message))
     }
 
     @Test

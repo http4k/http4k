@@ -35,7 +35,7 @@ private val ws: RoutingWsHandler = websockets(
 
 fun main(args: Array<String>) {
 
-    val client = ws.asClient(Request(Method.GET, "/hello/barbara"))
+    val client = ws.asClient(Request(Method.GET, "/hello/barbara"))!!
     client.send(WsMessage("1"))
     client.send(WsMessage("2"))
     client.close(Status(200, "bob"))
