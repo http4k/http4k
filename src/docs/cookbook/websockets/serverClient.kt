@@ -5,10 +5,11 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.routing.bind
+import org.http4k.routing.websockets
 import org.http4k.server.Jetty
+import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
-import org.http4k.websocket.bind
-import org.http4k.websocket.websocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.io.Closeable
@@ -44,9 +45,9 @@ fun clientAction(path: String): Closeable {
 
 val httpHandler = { _: Request -> Response(Status.OK).body("hiya world") }
 
-val webSocketHandler = websocket(
-    "/hello" bind websocket(
-        "/bob" bind { ws ->
+val webSocketHandler = websockets(
+    "/hello" bind websockets(
+        "/bob" bind { ws: WebSocket ->
             println("hello bob")
             ws.onMessage {
                 println("bob got " + it)
@@ -54,7 +55,7 @@ val webSocketHandler = websocket(
             }
             ws.onClose { println("bob is closing") }
         },
-        "/" bind { ws ->
+        "/" bind { ws: WebSocket ->
             println("hello")
             ws
                 .onMessage {

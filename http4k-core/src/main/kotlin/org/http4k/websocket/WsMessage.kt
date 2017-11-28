@@ -19,6 +19,7 @@ data class WsMessage(val body: Body) {
     constructor(value: InputStream) : this(Body(value))
 
     fun body(new: Body): WsMessage = copy(body = new)
+    fun bodyString(): String = String(body.payload.array())
 
     companion object
 }

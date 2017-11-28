@@ -19,11 +19,6 @@ interface WsHandler {
     operator fun invoke(request: Request): WsConsumer?
 }
 
-fun websocket(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
-    override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it.invoke(request) != null }?.invoke(request)
-    override fun withBasePath(new: String): RoutingWsHandler = websocket(*list.map { it.withBasePath(new) }.toTypedArray())
-}
-
 interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
 }
@@ -34,7 +29,3 @@ data class TemplatingRoutingWsHandler(val template: UriTemplate,
 
     override fun withBasePath(new: String): TemplatingRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
-
-infix fun String.bind(ws: WsConsumer): RoutingWsHandler = TemplatingRoutingWsHandler(UriTemplate.from(this), ws)
-
-infix fun String.bind(ws: RoutingWsHandler): RoutingWsHandler = ws.withBasePath(this)

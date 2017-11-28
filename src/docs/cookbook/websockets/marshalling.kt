@@ -2,20 +2,21 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.routing.bind
+import org.http4k.routing.websockets
 import org.http4k.websocket.RoutingWsHandler
+import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.asClient
-import org.http4k.websocket.bind
 import org.http4k.websocket.string
-import org.http4k.websocket.websocket
 
 data class Wrapper2(val v: Int)
 
 val body = WsMessage.string().map({ Wrapper2(it.toInt()) }, { it.v.toString() }).toLens()
 
-private val ws: RoutingWsHandler = websocket(
-    "/hello" bind websocket(
-        "/bob" bind { ws ->
+private val ws: RoutingWsHandler = websockets(
+    "/hello" bind websockets(
+        "/bob" bind { ws: WebSocket ->
             println("hello bob")
             ws.onMessage {
                 val received = body(it)
