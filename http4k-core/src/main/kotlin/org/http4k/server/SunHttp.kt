@@ -10,13 +10,13 @@ import org.http4k.core.Uri
 import java.net.InetSocketAddress
 
 data class SunHttp(val port: Int = 8000) : ServerConfig {
-    override fun toServer(handler: HttpHandler): Http4kServer {
+    override fun toServer(httpHandler: HttpHandler): Http4kServer {
         return object : Http4kServer {
             private val server = HttpServer.create(InetSocketAddress(port), 0)
             override fun start(): Http4kServer = apply {
                 server.createContext("/") {
                     try {
-                        it.populate(handler(it.toRequest()))
+                        it.populate(httpHandler(it.toRequest()))
                     } catch (e: Exception) {
                         it.sendResponseHeaders(500, 0)
                     }

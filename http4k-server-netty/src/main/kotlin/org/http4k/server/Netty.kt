@@ -59,7 +59,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
-    override fun toServer(handler: HttpHandler): Http4kServer {
+    override fun toServer(httpHandler: HttpHandler): Http4kServer {
         return object : Http4kServer {
             private val masterGroup = NioEventLoopGroup()
             private val workerGroup = NioEventLoopGroup()
@@ -73,7 +73,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                         public override fun initChannel(ch: SocketChannel) {
                             ch.pipeline().addLast("codec", HttpServerCodec())
                             ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
-                            ch.pipeline().addLast("handler", Http4kChannelHandler(handler))
+                            ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

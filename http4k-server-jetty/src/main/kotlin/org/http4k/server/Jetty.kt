@@ -10,29 +10,12 @@ import org.http4k.core.HttpHandler
 import org.http4k.servlet.asServlet
 import org.http4k.websocket.WsHandler
 
-
-class Jetty(private val server: Server) : ServerConfig {
+class Jetty(private val server: Server) : WsServerConfig {
     constructor(port: Int = 8000) : this(Server(port))
 
-    override fun toServer(handler: HttpHandler): Http4kServer {
-        server.insertHandler(handler.toJettyHandler())
-
-        return object : Http4kServer {
-            override fun start(): Http4kServer = apply {
-                server.start()
-            }
-
-            override fun stop() = server.stop()
-        }
-    }
-}
-
-class WsJetty(private val server: Server) {
-    constructor(port: Int = 8000) : this(Server(port))
-
-    fun toServer(httpHandler: HttpHandler, wsHandler: WsHandler): Http4kServer {
-        server.insertHandler(httpHandler.toJettyHandler())
-        server.insertHandler(wsHandler.toJettyHandler())
+    override fun toServer(httpHandler: HttpHandler?, wsHandler: WsHandler?): Http4kServer {
+        httpHandler?.let { server.insertHandler(httpHandler.toJettyHandler()) }
+        wsHandler?.let { server.insertHandler(it.toJettyHandler()) }
 
         return object : Http4kServer {
             override fun start(): Http4kServer = apply {

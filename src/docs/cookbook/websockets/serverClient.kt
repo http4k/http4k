@@ -5,7 +5,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.server.WsJetty
+import org.http4k.server.Jetty
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.bind
 import org.http4k.websocket.websocket
@@ -42,8 +42,7 @@ fun clientAction(path: String): Closeable {
     return Closeable { a.close() }
 }
 
-
-val app = { _: Request -> Response(Status.OK).body("hiya world") }
+val httpHandler = { _: Request -> Response(Status.OK).body("hiya world") }
 
 val webSocketHandler = websocket(
     "/hello" bind websocket(
@@ -70,7 +69,7 @@ val webSocketHandler = websocket(
 )
 
 fun main(args: Array<String>) {
-    val server = WsJetty(8000).toServer(app, webSocketHandler).start()
+    val server = Jetty(8000).toServer(httpHandler, webSocketHandler).start()
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 
