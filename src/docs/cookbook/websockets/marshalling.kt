@@ -36,9 +36,9 @@ private val ws: RoutingWsHandler = websockets(
 fun main(args: Array<String>) {
 
     val client = ws.asClient(Request(Method.GET, "/hello/barbara"))
-    client.triggerMessage(WsMessage("1"))
-    client.triggerMessage(WsMessage("2"))
-    client.triggerClose(Status(200, "bob"))
+    client(WsMessage("1"))
+    client(WsMessage("2"))
+    client(Status(200, "bob"))
 
     client.received.take(3).forEach {
         println("received back: " + body(it))

@@ -3,13 +3,17 @@ package org.http4k.websocket
 import org.http4k.core.Request
 import org.http4k.core.Status
 import java.net.ConnectException
+import java.util.Queue
 import java.util.concurrent.LinkedBlockingQueue
 
-class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest: Request) : PullPushAdaptingWebSocket(upgradeRequest) {
-    private val queue = LinkedBlockingQueue<() -> WsMessage?>()
+interface WsClient {
+    val received: Sequence<WsMessage>
+    operator fun invoke(throwable: Throwable)
+    operator fun invoke(status: Status)
+    operator fun invoke(message: WsMessage)
+}
 
-    val received = generateSequence { queue.take()() }
-
+private class AnAdapter(private val queue: Queue<() -> WsMessage?>, consumer: WsConsumer, request: Request) : PullPushAdaptingWebSocket(request) {
     init {
         consumer(this)
         onClose {
@@ -17,7 +21,7 @@ class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest:
         }
     }
 
-    override fun send(message: WsMessage): TestingWsClient = apply {
+    override fun send(message: WsMessage) = apply {
         queue.add { message }
     }
 
@@ -26,6 +30,22 @@ class TestingWsClient internal constructor(consumer: WsConsumer, upgradeRequest:
     }
 }
 
-fun WsHandler.asClient(request: Request) = invoke(request)
-    ?.let { TestingWsClient(it, request) }
+private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
+
+    private val queue = LinkedBlockingQueue<() -> WsMessage?>()
+
+    override val received = generateSequence { queue.take()() }
+
+    private val socket = AnAdapter(queue, consumer, request)
+
+    override fun invoke(throwable: Throwable) = socket.triggerError(throwable)
+
+    override fun invoke(status: Status) = socket.triggerClose(status)
+
+    override fun invoke(message: WsMessage) = socket.triggerMessage(message)
+
+}
+
+fun WsHandler.asClient(request: Request): WsClient = invoke(request)
+    ?.let { WsConsumerClient(it, request) }
     ?: throw ConnectException("Could not find a websocket to bind to for this request")
