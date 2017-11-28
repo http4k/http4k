@@ -7,9 +7,9 @@ import java.util.concurrent.LinkedBlockingQueue
 
 interface WsClient {
     val received: Sequence<WsMessage>
-    operator fun invoke(throwable: Throwable)
-    operator fun invoke(status: Status)
-    operator fun invoke(message: WsMessage)
+    fun error(throwable: Throwable)
+    fun close(status: Status)
+    fun send(message: WsMessage)
 }
 
 private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
@@ -18,7 +18,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
 
     override val received = generateSequence { queue.take()() }
 
-    private val socket = object: PullPushAdaptingWebSocket(request) {
+    private val socket = object : PullPushAdaptingWebSocket(request) {
         init {
             consumer(this)
             onClose {
@@ -35,11 +35,11 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
         }
     }
 
-    override fun invoke(throwable: Throwable) = socket.triggerError(throwable)
+    override fun error(throwable: Throwable) = socket.triggerError(throwable)
 
-    override fun invoke(status: Status) = socket.triggerClose(status)
+    override fun close(status: Status) = socket.triggerClose(status)
 
-    override fun invoke(message: WsMessage) = socket.triggerMessage(message)
+    override fun send(message: WsMessage) = socket.triggerMessage(message)
 
 }
 
