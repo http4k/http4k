@@ -8,7 +8,7 @@ import java.io.InputStream
 interface WebSocket {
     val upgradeRequest: Request
     fun send(message: WsMessage): WebSocket
-    fun close(fn: Status): WebSocket
+    fun close(status: Status): WebSocket
     fun onError(fn: (Throwable) -> Unit): WebSocket
     fun onClose(fn: (Status) -> Unit): WebSocket
     fun onMessage(fn: (WsMessage) -> Unit): WebSocket

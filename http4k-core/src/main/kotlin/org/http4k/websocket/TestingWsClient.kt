@@ -18,7 +18,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
 
     override val received = generateSequence { queue.take()() }
 
-    private val socket = object : PullPushAdaptingWebSocket(request) {
+    private val socket = object : PushPullAdaptingWebSocket(request) {
         init {
             consumer(this)
             onClose {
@@ -30,7 +30,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
             queue.add { message }
         }
 
-        override fun close(fn: Status): WebSocket = apply {
+        override fun close(status: Status): WebSocket = apply {
             queue.add { null }
         }
     }

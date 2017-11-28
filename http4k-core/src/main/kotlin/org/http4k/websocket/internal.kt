@@ -3,7 +3,7 @@ package org.http4k.websocket
 import org.http4k.core.Request
 import org.http4k.core.Status
 
-abstract class PullPushAdaptingWebSocket(override val upgradeRequest: Request) : WebSocket {
+abstract class PushPullAdaptingWebSocket(override val upgradeRequest: Request) : WebSocket {
 
     private val errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
     private val closeHandlers: MutableList<(Status) -> Unit> = mutableListOf()
@@ -13,17 +13,17 @@ abstract class PullPushAdaptingWebSocket(override val upgradeRequest: Request) :
     fun triggerClose(status: Status) = closeHandlers.forEach { it(status) }
     fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
 
-    override fun onError(fn: (Throwable) -> Unit): PullPushAdaptingWebSocket {
+    override fun onError(fn: (Throwable) -> Unit): PushPullAdaptingWebSocket {
         errorHandlers.add(fn)
         return this
     }
 
-    override fun onClose(fn: (Status) -> Unit): PullPushAdaptingWebSocket {
+    override fun onClose(fn: (Status) -> Unit): PushPullAdaptingWebSocket {
         closeHandlers.add(fn)
         return this
     }
 
-    override fun onMessage(fn: (WsMessage) -> Unit): PullPushAdaptingWebSocket {
+    override fun onMessage(fn: (WsMessage) -> Unit): PushPullAdaptingWebSocket {
         messageHandlers.add(fn)
         return this
     }
