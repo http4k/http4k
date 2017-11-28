@@ -12,33 +12,38 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
-
+import java.util.concurrent.ConcurrentHashMap
 
 fun main(args: Array<String>) {
 
     val app = routes("/ping" bind { _: Request -> Response(OK) },
-        static(ResourceLoader.Classpath("/cookbook/websockets"))
+        static(ResourceLoader.Directory("src/test/resources/cookbook/websockets"))
     )
 
     val messages = mutableListOf<String>()
-    val participants = mutableSetOf<WebSocket>()
+    val participants = ConcurrentHashMap<String, WebSocket>()
 
-    fun addMessage(wsMessage: WsMessage) {
-        messages.add(wsMessage.bodyString())
+    fun addMessage(new: String) {
+        println("received $new")
+        messages.add(new)
+        participants.values.forEach { it.send(WsMessage(new)) }
     }
 
     fun newConnection(ws: WebSocket) {
-        addMessage(WsMessage("joined"))
-        participants.add(ws)
+        val id = participants.size.toString()
+        participants += id to ws
+        addMessage("$id joined")
         messages.map { WsMessage(it) }.forEach { ws.send(it) }
-        ws.onMessage(::addMessage)
+        ws.onMessage {
+            addMessage("$id: ${it.bodyString()}")
+        }
         ws.onClose {
-            participants.remove(ws)
-            addMessage(WsMessage("left"))
+            participants -= id
+            addMessage("$id left")
         }
     }
 
-    val websockets = websockets("/chat" bind ::newConnection)
+    val websockets = websockets("/ws" bind ::newConnection)
 
     (app to websockets).asServer(Jetty(9001)).start()
 }

@@ -49,7 +49,7 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private 
             override fun send(message: WsMessage): PullPushAdaptingWebSocket {
                 when (message.body) {
                     is StreamBody -> session.remote.sendBytes(message.body.payload)
-                    else -> session.remote.sendString(message.toString())
+                    else -> session.remote.sendString(message.bodyString())
                 }
                 return this
             }
