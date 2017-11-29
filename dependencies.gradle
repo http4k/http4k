@@ -14,6 +14,7 @@ ext {
     ]
 
     testing = [
+            "org.java-websocket:Java-WebSocket:1.3.6",
             "junit:junit:4.12",
             kotlin_reflect,
             hamkrest

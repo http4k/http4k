@@ -197,7 +197,6 @@ dependencies {
     provided project(":http4k-testing-webdriver")
 
     testCompile testing
-    testCompile "org.java-websocket:Java-WebSocket:1.3.6"
 }
 
 sourceSets {
