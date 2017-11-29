@@ -9,5 +9,5 @@ This example demonstrates a client module (in this case the Apache Client). A cl
     compile group: "org.http4k", name: "http4k-client-apache", version: "3.1.3"
 ```
 
-### Code
+### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/client_as_a_function))
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/client_as_a_function/example.kt"></script>

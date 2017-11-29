@@ -8,7 +8,7 @@ Example showing how to create and apply lenses to requests and responses to both
     compile group: "org.http4k", name: "http4k-core", version: "3.1.3"
 ```
 
-### Standard (exception based) approach
+### Standard (exception based) approach ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses))
 Errors in extracting Lenses are propagated as exceptions which are caught and handled by the `CatchLensFailure` Filter.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example.kt"></script>
@@ -20,6 +20,8 @@ don't have a single representation to use without shackling ourselves to another
 Additionally, the lack of Higher Kinded Types in Kotlin means that we are unable to provide a generic method for converting standard lenses. However, it is easy to implement an extension method to use in specific use cases.
 
 Below is an example which uses a custom Result ADT - this will work for all extraction Lenses that you define:
+
+### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses))
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/typesafe_http_requests_with_lenses/example_custom_result_adt.kt"></script>
 
