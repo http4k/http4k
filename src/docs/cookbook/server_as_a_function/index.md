@@ -8,6 +8,6 @@ This example is the simplest possible "server" implementation. Note that we are 
     compile group: "org.http4k", name: "http4k-core", version: "3.1.3"
 ```
 
-### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook))
+### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/server_as_a_function))
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/server_as_a_function/example.kt"></script>
