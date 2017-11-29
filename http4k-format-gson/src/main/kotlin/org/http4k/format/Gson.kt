@@ -10,7 +10,7 @@ import com.google.gson.JsonPrimitive
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.websocket.BiDiWsMessageLensSpec
+import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger

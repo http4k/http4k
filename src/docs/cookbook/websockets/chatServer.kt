@@ -6,6 +6,7 @@ import org.http4k.routing.static
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
+import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
 import java.util.concurrent.ConcurrentHashMap
@@ -35,8 +36,10 @@ fun main(args: Array<String>) {
         }
     }
 
-    val app = static(ResourceLoader.Directory("src/test/resources/cookbook/websockets"))
-    val websockets = websockets("/ws" bind ::newConnection)
+    val app = PolyHandler(
+        static(ResourceLoader.Directory("src/test/resources/cookbook/websockets")),
+        websockets("/ws" bind ::newConnection)
+    )
 
-    (app to websockets).asServer(Jetty(9001)).start()
+    app.asServer(Jetty(9001)).start()
 }

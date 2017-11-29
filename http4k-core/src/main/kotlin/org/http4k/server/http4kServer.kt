@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import org.http4k.core.HttpHandler
+import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WsHandler
 
 interface Http4kServer {
@@ -27,4 +28,4 @@ interface WsServerConfig : ServerConfig {
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
-fun Pair<HttpHandler, WsHandler>.asServer(config: WsServerConfig): Http4kServer = config.toServer(first, second)
+fun PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(httpHandler, wsHandler)

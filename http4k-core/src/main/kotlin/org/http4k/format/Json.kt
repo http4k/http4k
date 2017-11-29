@@ -10,9 +10,9 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.httpBodyRoot
-import org.http4k.websocket.BiDiWsMessageLensSpec
+import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.websocket.WsMessage
-import org.http4k.websocket.string
+import org.http4k.lens.string
 import java.math.BigDecimal
 import java.math.BigInteger
 

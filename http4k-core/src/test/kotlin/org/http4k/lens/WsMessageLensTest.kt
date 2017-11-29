@@ -1,10 +1,9 @@
-package org.http4k.websocket
+package org.http4k.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.lens.LensFailure
-import org.http4k.lens.MyCustomBodyType
+import org.http4k.websocket.WsMessage
 import org.junit.Test
 import java.nio.ByteBuffer
 
@@ -37,7 +36,7 @@ class WsMessageLensTest {
     @Test
     fun `failures produce LensFailure`() {
         val wsMessage = WsMessage.string().map(String::toInt).toLens()
-        assertThat({wsMessage.extract(WsMessage("hello"))}, throws<LensFailure>())
+        assertThat({ wsMessage.extract(WsMessage("hello")) }, throws<LensFailure>())
     }
 
     @Test

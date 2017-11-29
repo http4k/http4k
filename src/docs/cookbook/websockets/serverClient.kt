@@ -8,6 +8,8 @@ import org.http4k.core.Status
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
+import org.http4k.server.asServer
+import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
 import org.java_websocket.client.WebSocketClient
@@ -73,7 +75,8 @@ val webSocketHandler = websockets(
 )
 
 fun main(args: Array<String>) {
-    val server = Jetty(8000).toServer(httpHandler, webSocketHandler).start()
+
+    val server = PolyHandler(httpHandler, webSocketHandler).asServer(Jetty(8000)).start()
 
     println(ApacheClient()(Request(Method.GET, "http://localhost:8000/hello")))
 

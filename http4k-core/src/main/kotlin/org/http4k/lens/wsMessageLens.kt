@@ -1,15 +1,8 @@
-package org.http4k.websocket
+package org.http4k.lens
 
 import org.http4k.asString
 import org.http4k.core.Body
-import org.http4k.lens.Invalid
-import org.http4k.lens.LensExtractor
-import org.http4k.lens.LensFailure
-import org.http4k.lens.LensGet
-import org.http4k.lens.LensSet
-import org.http4k.lens.Meta
-import org.http4k.lens.Missing
-import org.http4k.lens.ParamMeta
+import org.http4k.websocket.WsMessage
 
 internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
 

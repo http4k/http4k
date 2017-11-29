@@ -4,13 +4,13 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.lens.Path
+import org.http4k.lens.string
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.asClient
-import org.http4k.websocket.string
 
 data class MyIntWrapper(val v: Int)
 

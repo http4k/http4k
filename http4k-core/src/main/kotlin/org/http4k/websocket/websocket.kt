@@ -1,6 +1,7 @@
 package org.http4k.websocket
 
 import org.http4k.core.Body
+import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Status
 import java.io.InputStream
@@ -17,6 +18,11 @@ interface WebSocket {
 typealias WsConsumer = (WebSocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
+
+class PolyHandler(internal val httpHandler: HttpHandler, internal val wsHandler: WsHandler) {
+    fun http(request: Request) = httpHandler(request)
+    fun ws(request: Request) = wsHandler.asClient(request)
+}
 
 data class WsMessage(val body: Body) {
 
