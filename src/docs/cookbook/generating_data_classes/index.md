@@ -13,5 +13,5 @@ This example show the usage of the `GenerateDataClasses` to generate Kotlin data
     compile group: "org.http4k", name: "http4k-format-gson", version: "3.1.3"
 ```
 
-### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/generating_data_classes))
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/generating_data_classes/example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/generating_data_classes/example.kt"></script>

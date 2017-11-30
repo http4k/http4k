@@ -18,8 +18,8 @@ the shared bag of state for each request, and to remove the state after the requ
     compile group: "org.http4k", name: "http4k-core", version: "3.1.3"
 ```
 
-#### String-based keys ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context))
+#### String-based keys [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/string_key_example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/string_key_example.kt"></script>
 
-#### Lens-based keys ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context))
+#### Lens-based keys [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/lens_key_example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/request_context/lens_key_example.kt"></script>

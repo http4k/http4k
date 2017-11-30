@@ -33,3 +33,9 @@ ul.statusLink li {
 .github {
     display: none;
 }
+
+.octocat {
+    position: relative;
+    top: 1px;
+    width: 16px ;
+}

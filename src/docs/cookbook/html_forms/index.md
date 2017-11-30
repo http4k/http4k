@@ -11,8 +11,8 @@ HTML form support is provided on 2 levels:
     compile group: "org.http4k", name: "http4k-core", version: "3.1.3"
 ```
 
-### Standard (non-typesafe) API ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook))
+### Standard (non-typesafe) API [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/example_standard.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt"></script>
 
-### Lens (typesafe, validating) API ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook))
+### Lens (typesafe, validating) API [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/example_lens.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_lens.kt"></script>

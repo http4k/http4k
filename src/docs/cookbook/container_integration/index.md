@@ -12,5 +12,5 @@ Alternatively, any http4k application can be mounted into any Servlet container 
     compile group: "org.http4k", name: "http4k-server-jetty", version: "3.1.3"
 ```
 
-### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration))
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration/example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration/example.kt"></script>

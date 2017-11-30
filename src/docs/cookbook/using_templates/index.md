@@ -9,5 +9,5 @@ Example showing how to use the Templating modules - in this case Handlebars, bot
     compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.1.3"
 ```
 
-### Code ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates))
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt"></script>

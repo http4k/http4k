@@ -12,14 +12,14 @@ Multipart form support is provided on 2 levels:
     compile group: "org.http4k", name: "http4k-multipart", version: "3.1.3"
 ```
 
-### Standard (non-typesafe) API ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms))
+### Standard (non-typesafe) API [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_standard.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_standard.kt"></script>
 
-### Lens (typesafe, validating) API - reads ALL contents onto disk/memory ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms))
+### Lens (typesafe, validating) API - reads ALL contents onto disk/memory [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_lens.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_lens.kt"></script>
 
-### Streaming - iterate over Multiparts ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms))
+### Streaming - iterate over Multiparts [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_streaming.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_streaming.kt"></script>
 
-### Processing Files with a Filter and convert to standard form ([src](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms))
+### Processing Files with a Filter and convert to standard form [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_processing.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_processing.kt"></script>
