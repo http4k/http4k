@@ -27,4 +27,6 @@ This is far from a complete guide, but configuring AWS Lambda and the API Gatewa
 
 We hope to soon provide some tools to automate at least some of the above process, or at least document it somewhat. However, AWS is a complicated beast and many people have a preferred way to set it up: CloudFormation templates, Serverless framework, Terraform, etc. In the meantime, here is an example of how the `AppLoader` is created and a sneak peak at launching the app locally:
 
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/serverless/example_lambda.kt)
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_lambda.kt"></script>
