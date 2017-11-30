@@ -7,7 +7,7 @@ import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.ArrayDeque
 
 interface WsClient {
     val received: Sequence<WsMessage>
@@ -16,17 +16,19 @@ interface WsClient {
     fun send(message: WsMessage)
 }
 
+object ClosedWebsocket: Exception()
+
 private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
 
-    private val queue = LinkedBlockingQueue<() -> WsMessage?>()
+    private val queue = ArrayDeque<() -> WsMessage?>()
 
-    override val received = generateSequence { queue.take()() }
+    override val received = generateSequence { queue.remove()()!! }
 
     private val socket = object : PushPullAdaptingWebSocket(request) {
         init {
             consumer(this)
             onClose {
-                queue.add { null }
+                queue.add { throw ClosedWebsocket }
             }
         }
 
@@ -35,7 +37,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
         }
 
         override fun close(status: Status) {
-            queue.add { null }
+            queue.add { throw ClosedWebsocket }
         }
     }
 

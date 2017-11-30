@@ -43,7 +43,7 @@ fun main(args: Array<String>) {
     client.send(WsMessage("2"))
     client.close(Status(200, "bob"))
 
-    client.received.take(3).forEach {
+    client.received.take(2).forEach {
         println("received back: " + body(it))
     }
 }
