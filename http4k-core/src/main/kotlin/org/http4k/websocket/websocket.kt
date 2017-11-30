@@ -19,10 +19,7 @@ typealias WsConsumer = (WebSocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
 
-class PolyHandler(internal val httpHandler: HttpHandler, internal val wsHandler: WsHandler) {
-    fun http(request: Request) = httpHandler(request)
-    fun ws(request: Request) = wsHandler.asClient(request)
-}
+class PolyHandler(val http: HttpHandler, internal val ws: WsHandler)
 
 data class WsMessage(val body: Body) {
 

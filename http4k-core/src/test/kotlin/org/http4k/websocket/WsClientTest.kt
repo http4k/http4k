@@ -7,6 +7,8 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.testing.WsClient
+import org.http4k.testing.testWsClient
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -39,7 +41,7 @@ class WsClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.asClient(Request(Method.GET, "/"))!!
+        { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
 
         consumer.websocket.upgradeRequest shouldMatch equalTo(Request(Method.GET, "/"))
     }
@@ -47,7 +49,7 @@ class WsClientTest {
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client: WsClient = { _: Request -> consumer }.asClient(Request(Method.GET, "/"))!!
+        val client: WsClient = { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
 
         client.send(message)
         consumer.messages shouldMatch equalTo(listOf(message))
@@ -64,7 +66,7 @@ class WsClientTest {
                 ws.send(message)
                 ws.close(Status.OK)
             }
-        }.asClient(Request(Method.GET, "/"))!!
+        }.testWsClient(Request(Method.GET, "/"))!!
 
         client.received.toList() shouldMatch equalTo(listOf(message))
     }
@@ -74,7 +76,7 @@ class WsClientTest {
         assertThat(
             object : WsHandler {
                 override fun invoke(request: Request): WsConsumer? = null
-            }.asClient(Request(Method.GET, "/"))
+            }.testWsClient(Request(Method.GET, "/"))
             , absent())
     }
 }

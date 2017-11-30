@@ -7,10 +7,12 @@ import org.http4k.lens.Path
 import org.http4k.lens.string
 import org.http4k.routing.RoutingWsHandler
 import org.http4k.routing.bind
+import org.http4k.routing.static
 import org.http4k.routing.websockets
+import org.http4k.testing.testWsClient
+import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WebSocket
 import org.http4k.websocket.WsMessage
-import org.http4k.websocket.asClient
 
 data class MyIntWrapper(val v: Int)
 
@@ -32,10 +34,11 @@ private val ws: RoutingWsHandler = websockets(
         }
     )
 )
+val app = PolyHandler(static(), ws)
 
 fun main(args: Array<String>) {
+    val client = app.testWsClient(Request(Method.GET, "ws://localhost:9000/hello/same"))!!
 
-    val client = ws.asClient(Request(Method.GET, "/hello/same"))!!
     client.send(WsMessage("1"))
     client.send(WsMessage("2"))
     client.close(Status(200, "bob"))

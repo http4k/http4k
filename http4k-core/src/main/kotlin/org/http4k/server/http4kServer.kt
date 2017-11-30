@@ -28,4 +28,4 @@ interface WsServerConfig : ServerConfig {
 
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
-fun PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(httpHandler, wsHandler)
+fun PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(http, ws)

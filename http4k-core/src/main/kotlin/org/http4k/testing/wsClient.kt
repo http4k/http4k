@@ -1,7 +1,12 @@
-package org.http4k.websocket
+package org.http4k.testing
 
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.websocket.PolyHandler
+import org.http4k.websocket.PushPullAdaptingWebSocket
+import org.http4k.websocket.WsConsumer
+import org.http4k.websocket.WsHandler
+import org.http4k.websocket.WsMessage
 import java.util.concurrent.LinkedBlockingQueue
 
 interface WsClient {
@@ -41,5 +46,6 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }
 
-fun WsHandler.asClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
+fun WsHandler.testWsClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
+fun PolyHandler.testWsClient(request: Request) = ws.testWsClient(request)
 
