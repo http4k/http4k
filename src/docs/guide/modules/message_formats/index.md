@@ -15,7 +15,7 @@ These modules add the ability to use JSON/XML as a first-class citizen when read
 standard methods and extension methods for converting common types into native JSON/XML objects, including custom Lens methods for each library so that 
 JSON/XML node objects can be written and read directly from HTTP messages:
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/message_formats/example.kt)
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/example.kt"></script>
 
@@ -25,11 +25,11 @@ Some of the message libraries (eg. GSON, Jackson, XML) provide the mechanism to 
 
 We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
-#### JSON [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/message_formats/autoJson.kt)
+#### JSON [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoJson.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoJson.kt"></script>
 
-#### XML [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/message_formats/autoXml.kt)
+#### XML [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt"></script>
 
@@ -47,7 +47,7 @@ This is demonstrated by the following, where you can see that the output of the 
 
 As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLens()` instead, and then compare using `Arrays.equal()`
 
-[<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/message_formats/list_gotcha.kt)
+[<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/list_gotcha.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/list_gotcha.kt"></script>
 
