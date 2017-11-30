@@ -14,10 +14,10 @@
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 </span>
 
- [**http4k**](https://github.com/http4k/http4k)  is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
+ [**http4k**](https://github.com/http4k/http4k) is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
 
 It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
-servers, clients, templating etc) that are provided as optional add-on libraries.
+servers, clients, templating, websockets etc) that are provided as optional add-on libraries.
 
 The principles of the toolkit are:
 
@@ -33,6 +33,7 @@ plugging together of services without HTTP container being required.
 * **Testability** Built by **TDD** enthusiasts, so supports **super-easy** mechanisms for both In and Out of Container testing of:
     * individual endpoints
     * applications
+    * websockets
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
     * Pluggable HTTP client adapters for Apache and OkHttp
@@ -57,6 +58,7 @@ plugging together of services without HTTP container being required.
     * Servlet implementation to allow **
     -dependency plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
+    * **Path-based websockets** including typesafe message marshalling using Lenses
     * APIs to **record and replay** HTTP traffic to disk or memory
     * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
@@ -65,7 +67,7 @@ plugging together of services without HTTP container being required.
         * **OkHttp**
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:
-        * **Jetty**
+        * **Jetty** (including websocket support)
         * **Netty**
         * **Undertow**
         * **SunHttp** (bundled with `http4k-core`)
