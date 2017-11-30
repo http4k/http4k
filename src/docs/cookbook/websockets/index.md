@@ -7,5 +7,11 @@ description: Recipes for using http4k with websockets
     compile group: "org.http4k", name: "http4k-server-jetty", version: "3.1.3"
 ```
 
-### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example.kt)
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example.kt"></script>
+### Mixing HTTP and Websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt)
+Both Websockets and Http handlers in **http4k** are routed using a similar path-based API:
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt"></script>
+
+### Unit testing websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)
+**http4k** provides Websockets that are both typesafe (via the Lens API), and testable. Both `WsHandlers` and `PolyHandlers` are convertible to a `WsClient` which provides a synchronous API for testing reactions to Websocket events in an offline environment:
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt"></script>
