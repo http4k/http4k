@@ -2,10 +2,9 @@
 
 ##### [@daviddenton](http://github.com/daviddenton) / december 2017
 
-### Wat?
 Reaction to the last post introducing [**http4k**](https://github.com/http4k/http4k) was pretty good, and one of the most popular questions was: **"But what about Websockets"**?
 
-The answer to that question was **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to do them in a simple, testable way.
+The answer to that question was **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to do them in a simple, testable way. We were also worried that ignoring it might "turn out bad for us"**.
 
 Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for [**http4k**](https://github.com/http4k/http4k)**, which are:
 - **Simple**: using the same style of API as the rest of [**http4k**](https://github.com/http4k/http4k), allowing the same dynamic path-based routing as is available for standard `HttpHandlers`.
@@ -26,5 +25,8 @@ As well as API simplicity, the [**http4k**](https://github.com/http4k/http4k) te
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example_testing.kt"></script>
 
-### Fin
-Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.0`. We plan to roll out support for other server-backends in due course. 
+#### Fin
+Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.0`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
+
+##### Footnotes
+* **We're dubious about this @kod, but are willing to meet you back at the [HackerNews](https://news.ycombinator.com/item?id=15694616) post in 25 years to find out how it went. Think of it a bit like that time we met Jarvis Cocker in the year [2000](https://www.youtube.com/watch?v=qJS3xnD7Mus). :p
