@@ -20,6 +20,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.BiDiWsMessageLensSpec
+import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
@@ -77,6 +79,8 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : AutoMarshalli
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
+
+    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 object Jackson : ConfigurableJackson(ObjectMapper()

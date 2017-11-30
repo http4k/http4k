@@ -28,7 +28,7 @@ class RoutingTest {
             "/path1" bind GET to static(),
             "/path2" bind static(),
             "/path3" bind POST to static(), // this will never match, but we're proving that it will fall through
-            "/path3/{path:.*}" bind { Response(CREATED) }
+            "/path3/{path:.*}" bind { r: Request -> Response(CREATED) }
         )
 
         routes(Request(GET, "/path1/index.html")) shouldMatch hasStatus(OK)
@@ -83,7 +83,7 @@ class RoutingTest {
     @Test
     fun `matches uri template only`() {
         val routes = routes(
-            "/a/{route}" bind { Response(OK).body("matched") }
+            "/a/{route}" bind { r: Request -> Response(OK).body("matched") }
         )
 
         Method.values().forEach {

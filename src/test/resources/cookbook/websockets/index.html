@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.2.0/min/dropzone.min.css" integrity="sha256-e47xOkXs1JXFbjjpoRr1/LhVcqSzRmGmPqsrUQeVs+g=" crossorigin="anonymous"/>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.2.0/min/dropzone.min.js"
+            integrity="sha256-eO9VTVeZLaplH86Iwt8l39+l7GZpLOTsVWYziS5oY0Q=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>    <script type="text/javascript" src="main.js"></script>
+    <style type="text/css">
+        body {
+            background-color: #f0ffff;
+            padding-top: 100px;
+            padding-left: 30px;
+            padding-right: 30px;
+            bottom: 30px;
+        }
+
+        .logo {
+            max-height: 30px;
+            vertical-align: bottom;
+        }
+
+        .form {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            height: 60px;
+
+            padding: 5px;
+        }
+        .messages {
+            position: absolute;
+            top: 81px;
+            left: 5px;
+            right: 5px;
+            padding: 5px;
+            bottom: 150px;
+            overflow-y: scroll;
+            border: 1px solid black;
+
+            background-color: lightyellow;
+        }
+
+        .form label {
+            display: block;
+            color: #f7861f;
+        }
+
+        .form input {
+            height: 30px;
+        }
+        .form input[type=text] {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form input[type=button] {
+            float: right;
+            margin: 0 5px;
+            width: 50px;
+
+            /*border: 1px solid #d3d3d3;*/
+            border: 0;
+            border-radius: 4px;
+            background-color: #5e79cb;
+            color: white;
+            transition: background-color 500ms;
+        }
+        .form input[type=button]:hover {
+            background-color: #679af5;
+        }
+        .form .input-container {
+            margin-right: 60px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="/">http4slacK</a>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto"></ul>
+        <div class="error"><a href="https://http4k.org"><img class="logo" src="https://www.http4k.org/img/logo_1100x200_white_on_black_trans.png"/></a></div>
+    </div>
+</nav>
+
+<div class="messages" id="messages">
+</div>
+<div class="form">
+    <label for="commandInput">Enter message:</label>
+    <input type="button" id="sendButton" value="send">
+    <div class="input-container">
+        <input type="text" id="commandInput">
+    </div>
+</div>
+</body>
+</html>

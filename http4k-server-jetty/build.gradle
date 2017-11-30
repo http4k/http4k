@@ -6,6 +6,7 @@ ext {
     jetty = [
             "org.eclipse.jetty:jetty-server:$jetty_version",
             "org.eclipse.jetty:jetty-servlet:$jetty_version",
+            "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty_version"
     ]
 }
 
@@ -13,6 +14,7 @@ dependencies {
     provided kotlin_lib
 
     compile jetty
+    compile "javax.websocket:javax.websocket-api:1.1"
 
     provided project(":http4k-core")
 
