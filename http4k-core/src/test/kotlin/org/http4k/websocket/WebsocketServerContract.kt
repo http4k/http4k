@@ -1,5 +1,6 @@
 package org.http4k.websocket
 
+import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
@@ -23,7 +24,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.ByteArrayInputStream
 import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
@@ -37,7 +37,7 @@ private class RemoteClient(uri: Uri) : WebSocketClient(URI.create(uri.toString()
     val received = generateSequence { queue.take()() }
 
     override fun onMessage(bytes: ByteBuffer) {
-        queue.add({ WsMessage(Body(ByteArrayInputStream(bytes.array()))) })
+        queue.add({ WsMessage(Body(bytes.array().inputStream())) })
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
@@ -75,7 +75,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
                     ws.onMessage {
-                        ws.send(WsMessage(name.byteInputStream()))
+                        ws.send(WsMessage("goodbye $name".byteInputStream()))
                     }
                     ws.onClose { println("bob is closing") }
                 }
@@ -85,7 +85,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
     @Test
     fun `can do standard http traffic`() {
-        client(Request(GET, "http://localhost:${port}/hello/bob")) shouldMatch hasBody("bob")
+        client(Request(GET, "http://localhost:$port/hello/bob")) shouldMatch hasBody("bob")
     }
 
     @Test
@@ -94,9 +94,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
         client.connectBlocking()
         client.send("hello")
-
-        println(client.received.take(3))
-
+        client.received.take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
     }
 
     @After
