@@ -16,7 +16,7 @@ interface WsClient {
     fun send(message: WsMessage)
 }
 
-object ClosedWebsocket: Exception()
+data class ClosedWebsocket(val status: Status): Exception()
 
 private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
 
@@ -28,7 +28,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
         init {
             consumer(this)
             onClose {
-                queue.add { throw ClosedWebsocket }
+                queue.add { throw ClosedWebsocket(it) }
             }
         }
 
@@ -37,7 +37,7 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
         }
 
         override fun close(status: Status) {
-            queue.add { throw ClosedWebsocket }
+            queue.add { throw ClosedWebsocket(status) }
         }
     }
 

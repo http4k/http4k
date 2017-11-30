@@ -4,9 +4,11 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.throws
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.testing.ClosedWebsocket
 import org.http4k.testing.WsClient
 import org.http4k.testing.testWsClient
 import org.junit.Test
@@ -68,7 +70,19 @@ class WsClientTest {
             }
         }.testWsClient(Request(Method.GET, "/"))!!
 
-        client.received.toList() shouldMatch equalTo(listOf(message))
+        val received = client.received
+        received.take(1).first() shouldMatch equalTo(message)
+    }
+
+    @Test
+    fun `closed websocket throws when read attempted`() {
+        val client = { _: Request ->
+            { ws: WebSocket ->
+                ws.close(Status.OK)
+            }
+        }.testWsClient(Request(Method.GET, "/"))!!
+
+        assertThat({ client.received.take(2).toList() }, throws<ClosedWebsocket>(equalTo(ClosedWebsocket(Status.OK))))
     }
 
     @Test
