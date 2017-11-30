@@ -18,4 +18,7 @@ The **http4k** templating API provides a standard mechanism for rendering using 
 * Hot-Reloading from the filesystem
 
 The examples below are for Handlebars, but the others have the same APIs:
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt"></script>
+
+#### Code  [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/ddocs/guide/modules/templating/example.kt)
+
+ <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/templating/example.kt"></script>
