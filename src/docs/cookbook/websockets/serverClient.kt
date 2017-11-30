@@ -50,22 +50,15 @@ val httpHandler = { _: Request -> Response(Status.OK).body("hiya world") }
 val webSocketHandler = websockets(
     "/hello" bind websockets(
         "/bob" bind { ws: WebSocket ->
-            println("hello bob")
             ws.onMessage {
-                println("bob got " + it)
                 ws.send(WsMessage("bob sending this back".byteInputStream()))
             }
             ws.onClose { println("bob is closing") }
         },
         "/" bind { ws: WebSocket ->
-            println("hello")
             ws.apply {
                 onMessage {
-                    println("i got " + it)
                     ws.send(WsMessage("sending this back".byteInputStream()))
-                }
-                onMessage {
-                    println("i also got " + it)
                 }
                 onClose { println("hello is closing") }
 

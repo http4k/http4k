@@ -123,6 +123,59 @@ routes(
 )
 ```
 
+### Typesafe Websockets.
+Websockets have been modeled using the same methodology as standard HTTP endpoints - ie. with both simplicity and testability as a first class concern, as well as benefiting from Lens-based typesafety. Websocket communication consists of 3 main concepts:
+    1. `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsConsumer?`. This is responsible for matching an HTTP request to a websocket.
+    1. `WsConsumer` - represented as a typealias: `WsConsumer = (WebSocket) -> Unit`. This function is called on connection of a websocket and allow the API user to react to events coming from the connected websocket.
+    1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API.
+
+The routing aspect of Websockets is done using a very similar API to the standard HTTP routing for HTTP messages and dynamic parts of the upgrade request are available when constructing a websocket instance:
+
+```kotlin
+val body = WsMessage.string().map(::Wrapper, Wrapper::value).toLens()
+
+val nameLens = Path.of("name")
+
+val ws: WsHandler = websockets(
+    "/hello" bind websockets(
+        "/{name}" bind { ws: WebSocket ->
+            val name = nameLens(ws.upgradeRequest)
+            ws.send(WsMessage("hello $name"))
+            ws.onMessage {
+                val received = body(it)
+                ws.send(body(received))
+            }
+            ws.onClose {
+                println("closed")
+            }
+        }
+    )
+)
+```
+
+A `WsHandler` can be combined with an `HttpHandler` into a `PolyHandler` and then mounted into a supported backend server using `asServer()`:
+```kotlin
+val app = PolyHandler(
+    routes(
+        "/" bind { r: Request -> Response(OK) }
+    ),
+    websockets(
+        "/ws" bind { ws: WebSocket -> ws.send(WsMessage("hello!"))
+        }
+    )
+)
+app.asServer(Jetty(9000)).start()
+```
+Alternatively, the `WsHandler` can be also converted to a synchronous `WsClient` - this allows testing to be done completely offline, which allows for super-fast tests:
+```kotlin
+val client = app.testWsClient(Request(Method.GET, "ws://localhost:9000/hello/bob"))!!
+
+client.send(WsMessage("1"))
+client.close(Status(200, "bob"))
+
+client.received.take(2).forEach(::println)
+```
+
 ### Request and Response toString()
 The HttpMessages used by **http4k** toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
 
