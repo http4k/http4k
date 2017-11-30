@@ -113,7 +113,8 @@ dependencies {
 }
 ```
 
-This "Hello World" style example demonstrates how to serve and consume HTTP services with dynamic routing:
+This "Hello World" style example ([<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)) demonstrates how to serve and consume HTTP services with dynamic routing:
+
 ```kotlin
 package cookbook
 
