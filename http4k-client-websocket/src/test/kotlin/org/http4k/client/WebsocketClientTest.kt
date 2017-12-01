@@ -61,16 +61,16 @@ class WebsocketClientTest {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
 
-        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob"))
+        val websocket = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob"))
         var sent = false
-        client.onMessage {
+        websocket.onMessage {
             if(!sent) {
                 sent = true
-                client.send(WsMessage("hello"))
+                websocket.send(WsMessage("hello"))
             }
             queue.add { it }
         }
-        client.onClose {
+        websocket.onClose {
             queue.add { null }
         }
 
