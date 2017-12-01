@@ -11,14 +11,17 @@ import java.util.ArrayDeque
 
 interface WsClient {
     val received: Sequence<WsMessage>
-    fun error(throwable: Throwable)
     fun close(status: Status)
     fun send(message: WsMessage)
 }
 
-data class ClosedWebsocket(val status: Status): Exception()
+interface TestWsClient : WsClient {
+    fun error(throwable: Throwable)
+}
 
-private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
+data class ClosedWebsocket(val status: Status) : Exception()
+
+private class WsConsumerClient(consumer: WsConsumer, request: Request) : TestWsClient {
 
     private val queue = ArrayDeque<() -> WsMessage?>()
 
@@ -48,6 +51,6 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }
 
-fun WsHandler.testWsClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
-fun PolyHandler.testWsClient(request: Request) = ws.testWsClient(request)
+fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
+fun PolyHandler.testWsClient(request: Request): TestWsClient? = ws.testWsClient(request)
 

@@ -1,13 +1,10 @@
 package org.http4k.client
 
 import org.http4k.core.Body
-import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.testing.WsClient
-import org.http4k.websocket.WsConsumer
-import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -18,37 +15,10 @@ import java.util.concurrent.LinkedBlockingQueue
 
 object WebsocketClient {
 
-    fun nonBlocking(uri: Uri): WsHandler {
-
-        val client = object : WebSocketClient(URI.create(uri.toString())) {
-
-            override fun onOpen(handshakedata: ServerHandshake) {}
-
-            override fun onClose(code: Int, reason: String?, remote: Boolean) {
-            }
-
-            override fun onMessage(message: String) {
-            }
-
-            override fun onMessage(bytes: ByteBuffer) {
-            }
-
-            override fun onError(ex: Exception) {
-            }
-        }
-        return object : WsHandler {
-            override fun invoke(p1: Request): WsConsumer? {
-                TODO("not implemented")
-            }
-
-        }
-    }
-
     fun blocking(uri: Uri): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
         val client = object : WebSocketClient(URI.create(uri.toString())) {
-
             override fun onOpen(handshakedata: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -72,8 +42,6 @@ object WebsocketClient {
 
         return object : WsClient {
             override val received = generateSequence { queue.take()() }
-
-            override fun error(throwable: Throwable) = client.onError(throwable as Exception)
 
             override fun close(status: Status) = client.close(status.code, status.description)
 

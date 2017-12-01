@@ -9,7 +9,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.testing.ClosedWebsocket
-import org.http4k.testing.WsClient
 import org.http4k.testing.testWsClient
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
@@ -51,7 +50,7 @@ class WsClientTest {
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client: WsClient = { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
+        val client = { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
 
         client.send(message)
         consumer.messages shouldMatch equalTo(listOf(message))
