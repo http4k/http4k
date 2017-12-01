@@ -11,6 +11,7 @@ dependencies {
     compile "org.java-websocket:Java-WebSocket:$websocket_version"
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
+    testCompile project(path: ":http4k-server-jetty")
     testCompile testing
 }
 

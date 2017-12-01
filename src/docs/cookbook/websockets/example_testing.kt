@@ -8,14 +8,14 @@ import org.http4k.lens.Path
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.testing.testWsClient
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.junit.Test
 
 val namePath = Path.of("name")
 
 val testApp = websockets(
-    "/{name}" bind { ws: WebSocket ->
+    "/{name}" bind { ws: Websocket ->
         val name = namePath(ws.upgradeRequest)
         ws.send(WsMessage("hello $name"))
     }

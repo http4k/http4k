@@ -7,7 +7,7 @@ import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.PolyHandler
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -15,14 +15,14 @@ import java.util.concurrent.atomic.AtomicInteger
 fun main(args: Array<String>) {
     val userCounter = AtomicInteger()
     val messages = mutableListOf<String>()
-    val participants = ConcurrentHashMap<String, WebSocket>()
+    val participants = ConcurrentHashMap<String, Websocket>()
 
     fun addMessage(new: String) {
         messages.add(new)
         participants.values.forEach { it.send(WsMessage(new)) }
     }
 
-    fun newConnection(ws: WebSocket) {
+    fun newConnection(ws: Websocket) {
         val id = "user${userCounter.incrementAndGet()}"
         participants += id to ws
         addMessage("$id joined")

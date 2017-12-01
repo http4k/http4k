@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import java.io.InputStream
 
-interface WebSocket {
+interface Websocket {
     val upgradeRequest: Request
     fun send(message: WsMessage)
     fun close(status: Status)
@@ -15,7 +15,7 @@ interface WebSocket {
     fun onMessage(fn: (WsMessage) -> Unit)
 }
 
-typealias WsConsumer = (WebSocket) -> Unit
+typealias WsConsumer = (Websocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
 

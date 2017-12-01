@@ -11,7 +11,7 @@ import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.PolyHandler
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
     // A WsConsumer is called when a websocket is connected and to attach event handlers to
     // - the websocket instance can be stashed for future communication
-    val consumer: WsConsumer = { ws: WebSocket ->
+    val consumer: WsConsumer = { ws: Websocket ->
         val name = nameLens(ws.upgradeRequest)
         ws.send(WsMessage("hello $name"))
         ws.onMessage {

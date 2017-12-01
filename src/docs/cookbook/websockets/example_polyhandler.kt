@@ -9,14 +9,14 @@ import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.PolyHandler
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 
 fun main(args: Array<String>) {
     val namePath = Path.of("name")
 
     val ws = websockets(
-        "/{name}" bind { ws: WebSocket ->
+        "/{name}" bind { ws: Websocket ->
             val name = namePath(ws.upgradeRequest)
             ws.send(WsMessage("hello $name"))
             ws.onMessage {

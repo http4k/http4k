@@ -40,7 +40,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         )
         val ws = websockets(
             "/hello" bind websockets(
-                "/{name}" bind { ws: WebSocket ->
+                "/{name}" bind { ws: Websocket ->
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
                     ws.onMessage {
@@ -50,6 +50,11 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                 }
             ))
         server = PolyHandler(routes, ws).asServer(serverConfig(port)).start()
+    }
+
+    @After
+    fun after() {
+        server.stop()
     }
 
     @Test
@@ -64,10 +69,4 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         client.send(WsMessage("hello"))
         client.received.take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
     }
-
-    @After
-    fun after() {
-        server.stop()
-    }
-
 }

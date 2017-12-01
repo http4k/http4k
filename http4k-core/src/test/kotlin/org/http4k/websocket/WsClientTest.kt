@@ -20,12 +20,12 @@ class WsClientTest {
     private val error = RuntimeException("foo") as Throwable
 
     private class TestConsumer : WsConsumer {
-        lateinit var websocket: WebSocket
+        lateinit var websocket: Websocket
         val messages = mutableListOf<WsMessage>()
         val throwable = mutableListOf<Throwable>()
         val closed = AtomicReference<Status>()
 
-        override fun invoke(p1: WebSocket) {
+        override fun invoke(p1: Websocket) {
             websocket = p1
             p1.onMessage {
                 messages += it
@@ -64,7 +64,7 @@ class WsClientTest {
     @Test
     fun `sends inbound messages to the client`() {
         val client = { _: Request ->
-            { ws: WebSocket ->
+            { ws: Websocket ->
                 ws.send(message)
                 ws.close(Status.OK)
             }
@@ -77,7 +77,7 @@ class WsClientTest {
     @Test
     fun `closed websocket throws when read attempted`() {
         val client = { _: Request ->
-            { ws: WebSocket ->
+            { ws: Websocket ->
                 ws.close(Status.OK)
             }
         }.testWsClient(Request(Method.GET, "/"))!!

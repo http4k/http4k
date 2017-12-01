@@ -10,7 +10,7 @@ import org.http4k.routing.static
 import org.http4k.routing.websockets
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.PolyHandler
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 
@@ -22,7 +22,7 @@ val nameLens = Path.of("name")
 
 val ws: WsHandler = websockets(
     "/hello" bind websockets(
-        "/{name}" bind { ws: WebSocket ->
+        "/{name}" bind { ws: Websocket ->
             val name = nameLens(ws.upgradeRequest)
             ws.send(WsMessage("hello $name"))
             ws.onMessage {
