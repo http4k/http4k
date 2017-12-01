@@ -13,6 +13,7 @@ Activate streaming mode by passing a `BodyMode` (default is non-streaming).
 
 These examples are for the Apache HTTP client, but the API is similar for the others:
 
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/clients/example.kt"></script>
 
 Alternatively, all client adapter modules allow for custom configuration of the relevant Client configuration by
