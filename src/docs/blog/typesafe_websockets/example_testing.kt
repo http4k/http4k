@@ -1,4 +1,4 @@
-package cookbook.websockets
+package blog.typesafe_websockets
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch

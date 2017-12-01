@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
@@ -20,14 +20,14 @@ class WsRoutingTest {
 
         val ws = websockets(
             "/path1" bind websockets(
-                "/{name}" bind { ws: WebSocket ->
+                "/{name}" bind { ws: Websocket ->
                     request.set(ws.upgradeRequest)
                 }
             ))
 
         val sentRequestWithNoUriTemplateHeader = Request(GET, "/path1/correct")
         val a = ws(sentRequestWithNoUriTemplateHeader)
-        a!!(object : WebSocket {
+        a!!(object : Websocket {
             override val upgradeRequest: Request = sentRequestWithNoUriTemplateHeader
 
             override fun send(message: WsMessage) {

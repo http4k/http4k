@@ -2,7 +2,7 @@ package org.http4k.websocket
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.Body
+import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -18,42 +18,11 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.WsServerConfig
 import org.http4k.server.asServer
 import org.http4k.util.RetryRule
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.lang.Exception
-import java.net.URI
-import java.nio.ByteBuffer
 import java.util.Random
-import java.util.concurrent.LinkedBlockingQueue
-
-private class RemoteClient(uri: Uri) : WebSocketClient(URI.create(uri.toString())) {
-
-    private val queue = LinkedBlockingQueue<() -> WsMessage?>()
-
-    val received = generateSequence { queue.take()() }
-
-    override fun onMessage(bytes: ByteBuffer) {
-        queue.add({ WsMessage(Body(bytes.array().inputStream())) })
-    }
-
-    override fun onOpen(handshakedata: ServerHandshake) {
-    }
-
-    override fun onClose(code: Int, reason: String?, remote: Boolean) {
-        queue.add({ null })
-    }
-
-    override fun onMessage(message: String) {
-        queue.add({ WsMessage(message) })
-    }
-
-    override fun onError(ex: Exception?) {
-    }
-}
 
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
@@ -71,7 +40,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         )
         val ws = websockets(
             "/hello" bind websockets(
-                "/{name}" bind { ws: WebSocket ->
+                "/{name}" bind { ws: Websocket ->
                     val name = ws.upgradeRequest.path("name")!!
                     ws.send(WsMessage(name))
                     ws.onMessage {
@@ -83,6 +52,11 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         server = PolyHandler(routes, ws).asServer(serverConfig(port)).start()
     }
 
+    @After
+    fun after() {
+        server.stop()
+    }
+
     @Test
     fun `can do standard http traffic`() {
         client(Request(GET, "http://localhost:$port/hello/bob")) shouldMatch hasBody("bob")
@@ -90,16 +64,9 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
     @Test
     fun `can send and receive messages from socket`() {
-        val client = RemoteClient(Uri.of("ws://localhost:$port/hello/bob"))
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
 
-        client.connectBlocking()
-        client.send("hello")
+        client.send(WsMessage("hello"))
         client.received.take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
     }
-
-    @After
-    fun after() {
-        server.stop()
-    }
-
 }

@@ -10,7 +10,7 @@ import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.PolyHandler
-import org.http4k.websocket.WebSocket
+import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -49,23 +49,16 @@ val httpHandler = { _: Request -> Response(Status.OK).body("hiya world") }
 
 val webSocketHandler = websockets(
     "/hello" bind websockets(
-        "/bob" bind { ws: WebSocket ->
-            println("hello bob")
+        "/bob" bind { ws: Websocket ->
             ws.onMessage {
-                println("bob got " + it)
                 ws.send(WsMessage("bob sending this back".byteInputStream()))
             }
             ws.onClose { println("bob is closing") }
         },
-        "/" bind { ws: WebSocket ->
-            println("hello")
+        "/" bind { ws: Websocket ->
             ws.apply {
                 onMessage {
-                    println("i got " + it)
                     ws.send(WsMessage("sending this back".byteInputStream()))
-                }
-                onMessage {
-                    println("i also got " + it)
                 }
                 onClose { println("hello is closing") }
 

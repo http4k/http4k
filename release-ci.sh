@@ -33,6 +33,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-template-thymeleaf:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
+    :http4k-client-websocket:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
     :http4k-format-gson:bintrayUpload \
     :http4k-format-jackson:bintrayUpload \

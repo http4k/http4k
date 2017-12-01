@@ -11,14 +11,17 @@ import java.util.ArrayDeque
 
 interface WsClient {
     val received: Sequence<WsMessage>
-    fun error(throwable: Throwable)
     fun close(status: Status)
     fun send(message: WsMessage)
 }
 
-data class ClosedWebsocket(val status: Status): Exception()
+data class ClosedWebsocket(val status: Status) : Exception()
 
-private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClient {
+/**
+ * A class that is used for *offline* testing of a routed Websocket, without starting up a Server. Calls
+ * are routed synchronously to the receiving Websocket.
+ */
+class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
     private val queue = ArrayDeque<() -> WsMessage?>()
 
@@ -41,13 +44,16 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : WsClien
         }
     }
 
-    override fun error(throwable: Throwable) = socket.triggerError(throwable)
+    /**
+     * Push an error to the Websocket
+     */
+    fun error(throwable: Throwable) = socket.triggerError(throwable)
 
     override fun close(status: Status) = socket.triggerClose(status)
 
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }
 
-fun WsHandler.testWsClient(request: Request): WsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
-fun PolyHandler.testWsClient(request: Request) = ws.testWsClient(request)
+fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { TestWsClient(it, request) }
+fun PolyHandler.testWsClient(request: Request): TestWsClient? = ws.testWsClient(request)
 
