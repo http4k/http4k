@@ -18,6 +18,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.Random
+import java.util.concurrent.LinkedBlockingQueue
 
 class WebsocketClientTest {
     private lateinit var server: Http4kServer
@@ -53,5 +54,26 @@ class WebsocketClientTest {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
         client.send(WsMessage("hello"))
         client.received.take(3).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
+    }
+
+    @Test
+    fun `non-blocking`() {
+        val queue = LinkedBlockingQueue<() -> WsMessage?>()
+        val received = generateSequence { queue.take()() }
+
+        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob"))
+        var sent = false
+        client.onMessage {
+            if(!sent) {
+                sent = true
+                client.send(WsMessage("hello"))
+            }
+            queue.add { it }
+        }
+        client.onClose {
+            queue.add { null }
+        }
+
+        received.take(4).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
     }
 }

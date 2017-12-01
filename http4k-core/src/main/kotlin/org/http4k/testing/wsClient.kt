@@ -15,13 +15,10 @@ interface WsClient {
     fun send(message: WsMessage)
 }
 
-interface TestWsClient : WsClient {
-    fun error(throwable: Throwable)
-}
 
 data class ClosedWebsocket(val status: Status) : Exception()
 
-private class WsConsumerClient(consumer: WsConsumer, request: Request) : TestWsClient {
+class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
     private val queue = ArrayDeque<() -> WsMessage?>()
 
@@ -44,13 +41,13 @@ private class WsConsumerClient(consumer: WsConsumer, request: Request) : TestWsC
         }
     }
 
-    override fun error(throwable: Throwable) = socket.triggerError(throwable)
+    fun error(throwable: Throwable) = socket.triggerError(throwable)
 
     override fun close(status: Status) = socket.triggerClose(status)
 
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }
 
-fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { WsConsumerClient(it, request) }
+fun WsHandler.testWsClient(request: Request): TestWsClient? = invoke(request)?.let { TestWsClient(it, request) }
 fun PolyHandler.testWsClient(request: Request): TestWsClient? = ws.testWsClient(request)
 
