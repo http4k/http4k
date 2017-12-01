@@ -3,8 +3,8 @@ description: Recipes for using http4k with websockets
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.2.1"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.2.1"
+    compile group: "org.http4k", name: "http4k-core", version: "3.2.2"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.2.2"
 ```
 
 **http4k** provides Websocket support using a simple, consistent, typesafe, and testable API on supported server backends (see above). Websocket communication consists of 3 main concepts:
