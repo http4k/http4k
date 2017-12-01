@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    // the routing API is virtually identicak to the standard http4k http protocol routing API.
+    // the routing API is virtually identical to the standard http4k http protocol routing API.
     val ws: WsHandler = websockets(
         "/hello" bind websockets(
             "/{name}" bind consumer
