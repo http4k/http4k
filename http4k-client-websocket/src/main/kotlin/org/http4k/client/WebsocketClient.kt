@@ -20,6 +20,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 object WebsocketClient {
 
+    /**
+     * Provides a client-side Websocket instance connected to a remote Websocket. The resultant object
+     * can be have listeners attached to it.
+     */
     fun nonBlocking(uri: Uri): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
         val client = object : WebSocketClient(URI.create(uri.toString())) {
@@ -48,6 +52,10 @@ object WebsocketClient {
         return socket.get()
     }
 
+    /**
+     * Provides a client-side WsClient connected to a remote Websocket. This is a blocking API, so accessing the sequence of "received"
+     * messages will block on iteration until all messages are received (or the socket it closed).
+     */
     fun blocking(uri: Uri): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
