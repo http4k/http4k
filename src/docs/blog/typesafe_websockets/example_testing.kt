@@ -2,6 +2,7 @@ package blog.typesafe_websockets
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import cookbook.websockets.WebsocketContract
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -43,14 +44,14 @@ abstract class WebsocketContract {
 
 // a unit test version of the contract - it connects to the websocket in memory with no network
 class WebsocketUnitTest : WebsocketContract() {
-    override fun client() = testApp.testWsClient(Request(GET, "/bob"))!!
+    override fun client() = cookbook.websockets.testApp.testWsClient(Request(GET, "/bob"))!!
 }
 
 // a integration test version of the contract - it starts a server and connects to the websocket over the network
 class WebsocketServerTest : WebsocketContract() {
     override fun client() = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
 
-    private val server = testApp.asServer(Jetty(8000))
+    private val server = cookbook.websockets.testApp.asServer(Jetty(8000))
 
     @Before
     fun before() {

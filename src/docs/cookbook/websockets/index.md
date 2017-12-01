@@ -17,7 +17,9 @@ description: Recipes for using http4k with websockets
 Both Websockets and Http handlers in **http4k** are routed using a similar path-based API:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt"></script>
 
-### Unit testing websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)
-**http4k** provides Websockets that are both typesafe (via the Lens API), and testable. Both `WsHandlers` and `PolyHandlers` are convertible to a `WsClient` which provides a synchronous API for testing reactions to Websocket events in an offline environment:
+### Testing websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)
+**http4k** provides Websockets that are both typesafe (via the Lens API), and testable. Both `WsHandlers` and `PolyHandlers` are convertible to a `WsClient` which provides a synchronous API for testing reactions to Websocket events in an offline environment.
+
+In the below example, we have gone one step further - defining a contract test case and then providing 2 implementations of it - one for unit-testing (in memory), one using a server. [**http4k**](https://github.com/http4k/http4k) provides clients with an identical interface for both cases, meaning it's possible reuse the same test logic:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt"></script>
