@@ -66,12 +66,12 @@ open class WsMessageLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) :
  */
 class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
                                private val setLens: (FINAL, WsMessage) -> WsMessage)
-    : WsMessageLens<FINAL>(get), LensCreator<FINAL, WsMessage> {
+    : WsMessageLens<FINAL>(get) {
 
     @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY))
+    operator fun invoke(target: FINAL): WsMessage = setLens(target, WsMessage(Body.EMPTY))
 
-    override fun create(value: FINAL): WsMessage = invoke(value)
+    fun create(value: FINAL): WsMessage = invoke(value)
 }
 
 private val wsRoot =

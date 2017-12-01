@@ -30,7 +30,7 @@ class WsMessageLensTest {
     fun `synonym methods roundtrip`() {
         val wsMessage = WsMessage.string().toLens()
 
-        val withBody = wsMessage.create("hello")
+        val withBody: WsMessage = wsMessage.create("hello")
         assertThat(wsMessage.extract(withBody), equalTo("hello"))
     }
 
