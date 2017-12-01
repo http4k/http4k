@@ -67,6 +67,7 @@ pages:
   - In action: in_action/index.md
   - Blog:
     - Meet http4k: blog/meet_http4k/index.md
+    - Typesafe Websockets: blog/typesafe_websockets/index.md
   - Changelog: changelog/index.md
   - Contribute/Support http4k: contributing/index.md
   - FAQ: faq/index.md

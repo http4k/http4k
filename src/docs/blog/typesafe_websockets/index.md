@@ -7,11 +7,13 @@ Reaction to the last post introducing [**http4k**](https://github.com/http4k/htt
 The answer to that question was **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to do them in a simple, testable way. We were also worried that ignoring it might "turn out bad for us"**.
 
 Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for [**http4k**](https://github.com/http4k/http4k)**, which are:
+
 - **Simple**: using the same style of API as the rest of [**http4k**](https://github.com/http4k/http4k), allowing the same dynamic path-based routing as is available for standard `HttpHandlers`.
 - **Typesafe**: Marshall and unmarshall typed objects from Websocket Messages using the established Lens API.
 - **Testable**: This is something that is massively important to us - and just like standard HttpHandlers, [**http4k**](https://github.com/http4k/http4k) Websockets are completely testable in a synchronous offline environment. No. Server. Required.
 
 There are 3 basic components to the API:
+
 - A `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsConsumer?`. This is responsible for matching an incoming HTTP upgrade request to a websocket.
 - `WsConsumer` - represented as a typealias: `WsConsumer = (WebSocket) -> Unit`. This function is called on connection and allow the API user to react to events coming from the connected websocket.
 - `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the [**http4k**](https://github.com/http4k/http4k) HTTP message model, WsMessages are immutable data classes.
