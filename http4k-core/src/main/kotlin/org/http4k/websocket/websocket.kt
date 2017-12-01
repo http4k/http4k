@@ -6,6 +6,10 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import java.io.InputStream
 
+/**
+ * Represents a connected Websocket instance, and can be passed around an application. This is configured
+ * to react to events on the WS event stream by attaching listeners.
+ */
 interface Websocket {
     val upgradeRequest: Request
     fun send(message: WsMessage)
@@ -19,6 +23,10 @@ typealias WsConsumer = (Websocket) -> Unit
 
 typealias WsHandler = (Request) -> WsConsumer?
 
+/**
+ * A PolyHandler represents the combined routing logic of an Http handler and a Websocket handler.
+ * ws:// and http:// protocol calls are passed relevantly.
+ */
 class PolyHandler(val http: HttpHandler, internal val ws: WsHandler)
 
 data class WsMessage(val body: Body) {

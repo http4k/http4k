@@ -15,9 +15,12 @@ interface WsClient {
     fun send(message: WsMessage)
 }
 
-
 data class ClosedWebsocket(val status: Status) : Exception()
 
+/**
+ * A class that is used for *offline* testing of a routed Websocket, without starting up a Server. Calls
+ * are routed synchronously to the receiving Websocket.
+ */
 class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
     private val queue = ArrayDeque<() -> WsMessage?>()
@@ -41,6 +44,9 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
         }
     }
 
+    /**
+     * Push an error to the Websocket
+     */
     fun error(throwable: Throwable) = socket.triggerError(throwable)
 
     override fun close(status: Status) = socket.triggerClose(status)

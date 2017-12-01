@@ -64,7 +64,7 @@ class WebsocketClientTest {
         val websocket = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob"))
         var sent = false
         websocket.onMessage {
-            if(!sent) {
+            if (!sent) {
                 sent = true
                 websocket.send(WsMessage("hello"))
             }
