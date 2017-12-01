@@ -81,7 +81,7 @@ val app: HttpHandler = routes(
 )
 ```
 
-And that it - those functions are everything you need to know to write a simple [**http4k**](https://github.com/http4k/http4k) application. The `http4k-core` module rocks in at <1000 lines of code (about 700kb), and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no annotations, no compiler-plugins, and no reflection.
+And that it - those functions are everything you need to know to write a simple [**http4k**](https://github.com/http4k/http4k) application. The `http4k-core` module rocks in at about 700kb, and has zero dependencies (other than the Kotlin language itself). Additionally, everything in the core is *functional and predictable* - there is no static API magic going on under the covers (making it difficult to have multiple apps in the same JVM), no annotations, no compiler-plugins, and no reflection.
 
 ## Claim B. Symmetric HTTP
 Out of the multitude of JVM http frameworks out there, not many actually consider how you app talks to other services, yet in this Microservice™ world that's an absolutely massive part of what many apps do!
