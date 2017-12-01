@@ -28,7 +28,7 @@ As well as API simplicity, the [**http4k**](https://github.com/http4k/http4k) te
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example_testing.kt"></script>
 
 #### Fin
-Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.0`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
+Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.1`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
 
 ##### Footnotes
 * **We're dubious about this @kod, but are willing to meet you back at the [HackerNews](https://news.ycombinator.com/item?id=15694616) post in 25 years to find out how it went. Think of it a bit like that time we met Jarvis Cocker in the year [2000](https://www.youtube.com/watch?v=qJS3xnD7Mus). :p
