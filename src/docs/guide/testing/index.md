@@ -32,5 +32,5 @@ We have developed the following modules to help with testing:
 #### Testing Filters [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/FilterTest.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/FilterTest.kt"></script>
 
-#### Testing Websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/TestingWebsockets.kt)
+#### Testing Websockets with offline and online clients [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/TestingWebsockets.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/testing/TestingWebsockets.kt"></script>
