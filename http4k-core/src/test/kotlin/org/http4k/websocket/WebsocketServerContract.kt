@@ -67,6 +67,6 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
 
         client.send(WsMessage("hello"))
-        client.received.take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
+        client.received().take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
     }
 }

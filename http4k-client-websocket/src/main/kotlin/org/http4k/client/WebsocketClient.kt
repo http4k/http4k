@@ -82,7 +82,7 @@ object WebsocketClient {
         client.connectBlocking()
 
         return object : WsClient {
-            override val received = generateSequence { queue.take()() }
+            override fun received() = generateSequence { queue.take()() }
 
             override fun close(status: Status) = client.close(status.code, status.description)
 

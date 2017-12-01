@@ -30,7 +30,6 @@ val ws: WsHandler = websockets(
                 ws.send(body(received))
             }
             ws.onClose {
-                println("closed")
             }
         }
     )
@@ -43,5 +42,6 @@ fun main(args: Array<String>) {
     client.send(WsMessage("1"))
     client.close(Status(200, "bob"))
 
-    client.received.take(2).forEach(::println)
+    client.received().take(1).forEach(::println)
+    client.received().take(1).forEach(::println)
 }

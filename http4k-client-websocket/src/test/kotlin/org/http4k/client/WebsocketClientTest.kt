@@ -53,7 +53,7 @@ class WebsocketClientTest {
     fun `blocking`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
         client.send(WsMessage("hello"))
-        client.received.take(3).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
+        client.received().take(3).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
     }
 
     @Test

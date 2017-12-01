@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.2.0 
+### v3.2.1 
 - Typesafe Websockets! Jetty now supports websockets, using the same style of API in the main http4k routing.
 - (Possible) Breaking change: Because `WsHandler` (typealias) implements the same inbound interface as `HttpHandler`, you now cannot declare `HttpHandlers` without specifying the input type, so any "anonymous" handlers will not compile as a result. The required fix is very simple, but manual:
  `{ Response(OK) } should become { _:Request -> Response(OK) }

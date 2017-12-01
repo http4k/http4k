@@ -69,7 +69,7 @@ class WsClientTest {
             }
         }.testWsClient(Request(Method.GET, "/"))!!
 
-        val received = client.received
+        val received = client.received()
         received.take(1).first() shouldMatch equalTo(message)
     }
 
@@ -81,7 +81,7 @@ class WsClientTest {
             }
         }.testWsClient(Request(Method.GET, "/"))!!
 
-        assertThat({ client.received.take(2).toList() }, throws<ClosedWebsocket>(equalTo(ClosedWebsocket(Status.OK))))
+        assertThat({ client.received().take(2).toList() }, throws<ClosedWebsocket>(equalTo(ClosedWebsocket(Status.OK))))
     }
 
     @Test

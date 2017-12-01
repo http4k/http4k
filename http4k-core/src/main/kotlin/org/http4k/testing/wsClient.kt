@@ -10,7 +10,7 @@ import org.http4k.websocket.WsMessage
 import java.util.ArrayDeque
 
 interface WsClient {
-    val received: Sequence<WsMessage>
+    fun received(): Sequence<WsMessage>
     fun close(status: Status)
     fun send(message: WsMessage)
 }
@@ -25,7 +25,7 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
 
     private val queue = ArrayDeque<() -> WsMessage?>()
 
-    override val received = generateSequence { queue.remove()()!! }
+    override fun received() = generateSequence { queue.remove()()!! }
 
     private val socket = object : PushPullAdaptingWebSocket(request) {
         init {

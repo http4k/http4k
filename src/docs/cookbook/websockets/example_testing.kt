@@ -25,6 +25,6 @@ class WebsocketAppTest {
     @Test
     fun `echoes back connected name`() {
         val client = testApp.testWsClient(Request(GET, "/bob"))!!
-        client.received.take(1).toList() shouldMatch equalTo(listOf(WsMessage("hello bob")))
+        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("hello bob")))
     }
 }
