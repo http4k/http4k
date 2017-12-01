@@ -9,5 +9,6 @@ description: Example applications and usages of http4k, including TDD approach
 * [Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)
 * [Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)
 * [S3-backed Dropbox clone in <100 lines of code)](https://github.com/daviddenton/http4k-demo-s3box)
+* [Simple websocket driven chat-server in 30 lines of code)](https://github.com/daviddenton/http4k-demo-irc)
 * [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
 * [Stage-by-stage example of development process (London TDD style)](/guide/example)
