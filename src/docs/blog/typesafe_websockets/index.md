@@ -20,6 +20,8 @@ There are 3 basic components to the API:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example.kt"></script>
 
+Alternatively, you can check out the websocket enabled http4k [IRC clone in 30 lines of Kotlin)](https://github.com/daviddenton/http4k-demo-irc).
+
 #### Testability [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example_testing.kt)
 As well as API simplicity, the [**http4k**](https://github.com/http4k/http4k) team are very passionate about testing, and it was very important that this could be done in an out-of-container fashion - ie. in memory and with no server being started. As such, it is possible to call `testWsClient()` on an `WsHandler` to provide a synchronous API for testing. Messages and other events can be "sent" to a connected websocket and responses will be received back in a completely predictable way from the application under test:
 
