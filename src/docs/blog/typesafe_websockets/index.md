@@ -1,3 +1,6 @@
+title: http4k blog: Websockets. But Unit Testable. And Typesafe. Without the Server.
+description: An overview of Websocket support in http4k
+
 # Websockets. But Unit Testable. And Typesafe. Without the Server.
 
 ##### [@daviddenton](http://github.com/daviddenton) / december 2017
