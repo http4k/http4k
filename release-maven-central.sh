@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then
-    echo "not master branch, so skipping"
-    exit 0
-fi
+#if [[ `git rev-parse --abbrev-ref HEAD` != "master" ]]; then
+#    echo "not master branch, so skipping"
+#    exit 0
+#fi
 
 set -e
 set -o errexit
