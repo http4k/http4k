@@ -1,21 +1,22 @@
 package org.http4k.testing
 
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.util.ArrayDeque
 
 interface WsClient {
     fun received(): Sequence<WsMessage>
-    fun close(status: Status)
+    fun close(status: WsStatus = NORMAL)
     fun send(message: WsMessage)
 }
 
-data class ClosedWebsocket(val status: Status) : Exception()
+data class ClosedWebsocket(val status: WsStatus = NORMAL) : Exception()
 
 /**
  * A class that is used for *offline* testing of a routed Websocket, without starting up a Server. Calls
@@ -39,7 +40,7 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
             queue.add { message }
         }
 
-        override fun close(status: Status) {
+        override fun close(status: WsStatus) {
             queue.add { throw ClosedWebsocket(status) }
         }
     }
@@ -49,7 +50,7 @@ class TestWsClient internal constructor(consumer: WsConsumer, request: Request) 
      */
     fun error(throwable: Throwable) = socket.triggerError(throwable)
 
-    override fun close(status: Status) = socket.triggerClose(status)
+    override fun close(status: WsStatus) = socket.triggerClose(status)
 
     override fun send(message: WsMessage) = socket.triggerMessage(message)
 }

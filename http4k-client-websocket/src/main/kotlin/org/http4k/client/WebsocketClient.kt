@@ -3,13 +3,13 @@ package org.http4k.client
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.testing.WsClient
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
@@ -29,7 +29,7 @@ object WebsocketClient {
         val client = object : WebSocketClient(URI.create(uri.toString())) {
             override fun onOpen(handshakedata: ServerHandshake?) {}
 
-            override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(Status(code, reason))
+            override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(WsStatus(code, reason))
 
             override fun onMessage(message: String) = socket.get().triggerMessage(WsMessage(message))
 
@@ -43,7 +43,7 @@ object WebsocketClient {
                     else -> client.send(message.bodyString())
                 }
 
-            override fun close(status: Status) {
+            override fun close(status: WsStatus) {
                 client.close(status.code, status.description)
             }
         })
@@ -84,7 +84,7 @@ object WebsocketClient {
         return object : WsClient {
             override fun received() = generateSequence { queue.take()() }
 
-            override fun close(status: Status) = client.close(status.code, status.description)
+            override fun close(status: WsStatus) = client.close(status.code, status.description)
 
             override fun send(message: WsMessage): Unit =
                 when (message.body) {

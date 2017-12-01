@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -12,13 +12,13 @@ class PushPullAdaptingWebSocketTest {
 
     class TestAdapter : PushPullAdaptingWebSocket(Request(Method.GET, "/bob")) {
         val received = mutableListOf<WsMessage>()
-        val closed = AtomicReference<Status>(null)
+        val closed = AtomicReference<WsStatus>(null)
 
         override fun send(message: WsMessage) {
             received += message
         }
 
-        override fun close(status: Status) {
+        override fun close(status: WsStatus) {
             closed.set(status)
         }
     }
@@ -28,13 +28,13 @@ class PushPullAdaptingWebSocketTest {
         val adapter = TestAdapter()
         adapter.send(WsMessage("hello"))
         assertThat(adapter.received, equalTo(listOf(WsMessage("hello"))))
-        adapter.close(Status.OK)
-        assertThat(adapter.closed.get(), equalTo(Status.OK))
+        adapter.close(NEVER_CONNECTED)
+        assertThat(adapter.closed.get(), equalTo(NEVER_CONNECTED))
     }
 
     @Test
     fun `outbound comms are pushed to socket`() {
-        val outboundClose = AtomicReference<Status>(null)
+        val outboundClose = AtomicReference<WsStatus>(null)
         val outboundMessage = AtomicReference<WsMessage>(null)
         val outboundError = AtomicReference<Throwable>(null)
         val adapter = TestAdapter().apply {
@@ -56,8 +56,8 @@ class PushPullAdaptingWebSocketTest {
         adapter.triggerError(throwable)
         assertThat(outboundError.get(), equalTo(throwable))
 
-        adapter.triggerClose(Status.OK)
-        assertThat(outboundClose.get(), equalTo(Status.OK))
+        adapter.triggerClose(NEVER_CONNECTED)
+        assertThat(outboundClose.get(), equalTo(NEVER_CONNECTED))
     }
 
 }

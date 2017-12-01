@@ -3,7 +3,7 @@ package org.http4k.websocket
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.io.InputStream
 
 /**
@@ -13,9 +13,9 @@ import java.io.InputStream
 interface Websocket {
     val upgradeRequest: Request
     fun send(message: WsMessage)
-    fun close(status: Status)
+    fun close(status: WsStatus = NORMAL)
     fun onError(fn: (Throwable) -> Unit)
-    fun onClose(fn: (Status) -> Unit)
+    fun onClose(fn: (WsStatus) -> Unit)
     fun onMessage(fn: (WsMessage) -> Unit)
 }
 

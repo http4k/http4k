@@ -5,9 +5,9 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -33,13 +33,13 @@ class WsRoutingTest {
             override fun send(message: WsMessage) {
             }
 
-            override fun close(status: Status) {
+            override fun close(status: WsStatus) {
             }
 
             override fun onError(fn: (Throwable) -> Unit) {
             }
 
-            override fun onClose(fn: (Status) -> Unit) {
+            override fun onClose(fn: (WsStatus) -> Unit) {
             }
 
             override fun onMessage(fn: (WsMessage) -> Unit) {

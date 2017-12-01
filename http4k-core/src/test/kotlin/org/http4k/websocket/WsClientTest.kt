@@ -7,9 +7,9 @@ import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.testing.ClosedWebsocket
 import org.http4k.testing.testWsClient
+import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
 
@@ -22,7 +22,7 @@ class WsClientTest {
         lateinit var websocket: Websocket
         val messages = mutableListOf<WsMessage>()
         val throwable = mutableListOf<Throwable>()
-        val closed = AtomicReference<Status>()
+        val closed = AtomicReference<WsStatus>()
 
         override fun invoke(p1: Websocket) {
             websocket = p1
@@ -56,8 +56,8 @@ class WsClientTest {
         consumer.messages shouldMatch equalTo(listOf(message))
         client.error(error)
         consumer.throwable shouldMatch equalTo(listOf(error))
-        client.close(Status.OK)
-        consumer.closed.get() shouldMatch equalTo(Status.OK)
+        client.close(NEVER_CONNECTED)
+        consumer.closed.get() shouldMatch equalTo(NEVER_CONNECTED)
     }
 
     @Test
@@ -65,7 +65,7 @@ class WsClientTest {
         val client = { _: Request ->
             { ws: Websocket ->
                 ws.send(message)
-                ws.close(Status.OK)
+                ws.close(NEVER_CONNECTED)
             }
         }.testWsClient(Request(Method.GET, "/"))!!
 
@@ -77,11 +77,11 @@ class WsClientTest {
     fun `closed websocket throws when read attempted`() {
         val client = { _: Request ->
             { ws: Websocket ->
-                ws.close(Status.OK)
+                ws.close(NEVER_CONNECTED)
             }
         }.testWsClient(Request(Method.GET, "/"))!!
 
-        assertThat({ client.received().take(2).toList() }, throws<ClosedWebsocket>(equalTo(ClosedWebsocket(Status.OK))))
+        assertThat({ client.received().take(2).toList() }, throws(equalTo(ClosedWebsocket(NEVER_CONNECTED))))
     }
 
     @Test

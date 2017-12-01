@@ -2,7 +2,6 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -13,6 +12,7 @@ import org.http4k.server.asServer
 import org.http4k.util.RetryRule
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus.Companion.NORMAL
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -37,7 +37,7 @@ class WebsocketClientTest {
                 ws.send(WsMessage(name))
                 ws.onMessage {
                     ws.send(it)
-                    ws.close(OK)
+                    ws.close(NORMAL)
                 }
             }
         )

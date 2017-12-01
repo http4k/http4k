@@ -7,17 +7,17 @@ import org.http4k.core.Body
 import org.http4k.core.Headers
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 import java.nio.ByteBuffer
 
 internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PushPullAdaptingWebSocket) {
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
-    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(Status(statusCode, reason ?: "<unknown>"))
+    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(WsStatus(statusCode, reason ?: "<unknown>"))
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 
@@ -45,8 +45,8 @@ internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private 
                 }
             }
 
-            override fun close(status: Status) {
-                session.close()
+            override fun close(status: WsStatus) {
+                session.close(status.code, status.description)
             }
         }.apply(wSocket))
     }

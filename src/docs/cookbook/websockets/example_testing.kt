@@ -16,7 +16,7 @@ val namePath = Path.of("name")
 
 val testApp = websockets(
     "/{name}" bind { ws: Websocket ->
-        val name = namePath(ws.upgradeRequest)
+        val name = namePath.extract(ws.upgradeRequest)
         ws.send(WsMessage("hello $name"))
     }
 )
@@ -25,6 +25,6 @@ class WebsocketAppTest {
     @Test
     fun `echoes back connected name`() {
         val client = testApp.testWsClient(Request(GET, "/bob"))!!
-        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("hello bob")))
+        client.received().map(WsMessage::bodyString).first() shouldMatch equalTo("hello bob")
     }
 }

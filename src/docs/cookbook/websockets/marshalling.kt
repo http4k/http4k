@@ -2,7 +2,6 @@ package cookbook.websockets
 
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Status
 import org.http4k.lens.Path
 import org.http4k.lens.string
 import org.http4k.routing.bind
@@ -13,6 +12,7 @@ import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
 
 data class Wrapper(val value: String)
 
@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
     val client = app.testWsClient(Request(Method.GET, "ws://localhost:9000/hello/bob"))!!
 
     client.send(WsMessage("1"))
-    client.close(Status(200, "bob"))
+    client.close(NEVER_CONNECTED)
 
     client.received().take(1).forEach(::println)
     client.received().take(1).forEach(::println)
