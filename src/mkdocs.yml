@@ -30,7 +30,7 @@ pages:
       - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
-      - HTTP client: guide/modules/clients/index.md
+      - HTTP/Websocket client: guide/modules/clients/index.md
       - Message formats: guide/modules/message_formats/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Resilience: guide/modules/resilience/index.md

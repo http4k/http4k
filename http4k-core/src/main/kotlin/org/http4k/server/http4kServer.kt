@@ -3,11 +3,13 @@ package org.http4k.server
 import org.http4k.core.HttpHandler
 import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WsHandler
+import java.io.Closeable
 
-interface Http4kServer {
+interface Http4kServer: Closeable {
     fun start(): Http4kServer
     fun stop()
     fun block() = Thread.currentThread().join()
+    override fun close() = stop()
 }
 
 /**
