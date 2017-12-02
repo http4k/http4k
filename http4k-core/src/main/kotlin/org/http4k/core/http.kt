@@ -127,6 +127,7 @@ interface Request : HttpMessage {
     }
 }
 
+@Suppress("EqualsOrHashCode")
 data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
     override fun method(method: Method): Request = copy(method = method)
 
@@ -154,15 +155,14 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?): Boolean {
-        return other is Request
+    override fun equals(other: Any?) = (other is Request
         && headers.areSameAs(other.headers)
         && method == other.method
         && uri == other.uri
-        && body == other.body
-    }
+        && body == other.body)
 }
 
+@Suppress("EqualsOrHashCode")
 interface Response : HttpMessage {
     val status: Status
 
@@ -187,6 +187,7 @@ interface Response : HttpMessage {
     }
 }
 
+@Suppress("EqualsOrHashCode")
 data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
@@ -204,12 +205,10 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 
     override fun toString(): String = toMessage()
 
-    override fun equals(other: Any?): Boolean {
-        return other is Response
-            && headers.areSameAs(other.headers)
-            && status == other.status
-            && body == other.body
-    }
+    override fun equals(other: Any?) = (other is Response
+        && headers.areSameAs(other.headers)
+        && status == other.status
+        && body == other.body)
 }
 
 fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
@@ -220,11 +219,14 @@ private fun Headers.remove(name: String) = filterNot { it.first.equals(name, tru
 
 private fun Headers.toMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
 
-private fun Headers.areSameAs(other: Headers): Boolean {
-    return all { header ->  other.any { otherHeader -> otherHeader == header }} &&
-        other.all { otherHeader -> any { header -> header == otherHeader } } &&
-        this.withSameFieldNames().all { headers -> other.withSameFieldNames().any { otherHeaders -> headers == otherHeaders } }
-}
+private fun Headers.areSameAs(other: Headers) =
+    all { header -> other.any { it == header } } &&
+        other.all { otherHeader -> any { it == otherHeader } } &&
+        withSameFieldNames()
+            .all {
+                other.withSameFieldNames()
+                    .any { otherHeaders -> it == otherHeaders }
+            }
 
 private fun Headers.withSameFieldNames() =
     groupBy { (fieldName, _) -> fieldName }

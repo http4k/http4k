@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.2.3
+- PR #70: Header order equality for Request/Response - H/T @gypsydave5.
+
 ### v3.2.2
 - Switched out `Status` for `WsStatus` (with proper RFC code set) in Websockets.
 

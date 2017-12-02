@@ -8,7 +8,7 @@ import org.junit.Test
 
 class RequestTest {
     @Test
-    fun extracts_query_parameters() {
+    fun `extracts query parameters`() {
         assertThat(requestWithQuery("foo=one&foo=two").queries("foo"), equalTo(listOf<String?>("one", "two")))
         assertThat(requestWithQuery("foo=one&foo=two").query("foo")!!, equalTo("one"))
         assertThat(requestWithQuery("foo=one&foo&foo=two").queries("foo"), equalTo(listOf("one", null, "two")))
