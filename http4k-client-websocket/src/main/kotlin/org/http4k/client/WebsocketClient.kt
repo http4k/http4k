@@ -60,7 +60,7 @@ object WebsocketClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
         val client = object : WebSocketClient(URI.create(uri.toString())) {
-            override fun onOpen(handshakedata: ServerHandshake) {}
+            override fun onOpen(sh: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
                 queue.add({ null })
