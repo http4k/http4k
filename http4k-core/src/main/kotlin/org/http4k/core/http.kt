@@ -154,6 +154,13 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun toString(): String = toMessage()
 
+    override fun equals(other: Any?): Boolean {
+        return other is Request
+        && headers.areSameAs(other.headers)
+        && method == other.method
+        && uri == other.uri
+        && body == other.body
+    }
 }
 
 interface Response : HttpMessage {
@@ -196,6 +203,13 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun body(body: InputStream, length: Long?) = copy(body = Body(body, length))
 
     override fun toString(): String = toMessage()
+
+    override fun equals(other: Any?): Boolean {
+        return other is Response
+            && headers.areSameAs(other.headers)
+            && status == other.status
+            && body == other.body
+    }
 }
 
 fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
@@ -205,3 +219,15 @@ fun String.toBody(): Body = Body(this)
 private fun Headers.remove(name: String) = filterNot { it.first.equals(name, true) }
 
 private fun Headers.toMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
+
+private fun Headers.areSameAs(other: Headers): Boolean {
+    return all { header ->  other.any { otherHeader -> otherHeader == header }} &&
+        other.all { otherHeader -> any { header -> header == otherHeader } } &&
+        this.withSameFieldNames().all { headers -> other.withSameFieldNames().any { otherHeaders -> headers == otherHeaders } }
+}
+
+private fun Headers.withSameFieldNames() =
+    groupBy { (fieldName, _) -> fieldName }
+        .filter { (_, headers) -> headers.size > 1 }
+        .values
+        .toList()
