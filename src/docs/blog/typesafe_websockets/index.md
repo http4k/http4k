@@ -25,7 +25,11 @@ Just as with HttpHandlers, the here are 2 basic function types which make up the
 Additionally, `WsMessage` objects are used for actual communication - ie. a message which is sent or received on a Websocket. This message can take advantage of the typesafety accorded to other entities in [**http4k**](https://github.com/http4k/http4k) by using the Lens API. And just like the [**http4k**](https://github.com/http4k/http4k) HTTP message model, WsMessages are **immutable data classes**.
 
 #### An example server [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example.kt)
-The example below shows how Websockets are dynamically routed, and how a `WsHandler` can be combined with an `HttpHandler` to make a `PolyHandler` - an application which can serve many protocols. Conversion of the `PolyHandler` to a supporting Server can be done via the standard `asServer()` mechanism, or it can be kept offline for ultra-fast in-memory testing:
+The example below shows how:
+ 
+- Websockets can be dynamically routed
+- Lens-based marshalling of Websocket message objects using Jackson. 
+- `WsHandler` can be combined with an `HttpHandler` to make a `PolyHandler` - an application which can serve many protocols. Conversion of the `PolyHandler` to a supporting Server can be done via the standard `asServer()` mechanism, or it can be kept offline for ultra-fast in-memory testing:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_websockets/example.kt"></script>
 
