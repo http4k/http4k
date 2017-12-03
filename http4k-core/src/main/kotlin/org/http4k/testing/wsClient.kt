@@ -20,7 +20,7 @@ data class ClosedWebsocket(val status: WsStatus = NORMAL) : Exception()
 
 /**
  * A class that is used for *offline* testing of a routed Websocket, without starting up a Server. Calls
- * are routed synchronously to the receiving Websocket.
+ * are routed synchronously to the receiving Websocket, and error are propagated to the caller.
  */
 class TestWsClient internal constructor(consumer: WsConsumer, request: Request) : WsClient {
 
