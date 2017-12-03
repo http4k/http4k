@@ -7,7 +7,7 @@ description: An overview of Websocket support in http4k
 
 Reaction to the last post introducing [**http4k**](https://github.com/http4k/http4k) was pretty good, and one of the most popular questions was: **"But what about Websockets"**?
 
-The answer to that question at the time was an emphatic **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to deliver them in a simple, offline testable** way. We were also worried that ignoring it might "turn out bad for us"***.
+The answer to that question at the time was an emphatic **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to deliver them in a simple, offline testable&ast; way. We were also worried that ignoring it might "turn out bad for us"&ast;&ast;.
 
 Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for [**http4k**](https://github.com/http4k/http4k)**, which are:
 
@@ -47,5 +47,5 @@ In the below example, we have gone one step further - defining a contract test c
 Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.3`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
 
 ##### Footnotes
-* ** We had a bit of a search for "unit testing websockets", half through curiosity and half because we wanted to swipe other people's ideas for implementing it. But we came up with nothing - it seems like all the existing JVM HTTP libraries rely on running servers for testing websockets. We hope we're wrong - because the alternative makes us a little &lt;insert sadface emoji/&gt;. If we are, then please let us know! 
-* *** We're dubious about this @kod, but are willing to meet you back at the [HackerNews](https://news.ycombinator.com/item?id=15694616) post in 25 years to find out how it went. Think of it a bit like that time we met Jarvis Cocker in the year [2000](https://www.youtube.com/watch?v=qJS3xnD7Mus). 😝
+* &ast; We had a bit of a search for "unit testing websockets", half through curiosity and half because we wanted to swipe other people's ideas for implementing it. But we came up with nothing - it seems like all the existing JVM HTTP libraries rely on running servers for testing websockets. We hope we're wrong - because the alternative makes us a little &lt;insert sadface emoji/&gt;. If we are, then please let us know! 
+* &ast;&ast; We're dubious about this @kod, but are willing to meet you back at the [HackerNews](https://news.ycombinator.com/item?id=15694616) post in 25 years to find out how it went. Think of it a bit like that time we met Jarvis Cocker in the year [2000](https://www.youtube.com/watch?v=qJS3xnD7Mus). 😝
