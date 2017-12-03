@@ -4,7 +4,7 @@ import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.websocket.WsMessage
 
-internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "")
+internal val meta = Meta(true, "websocket", ParamMeta.ObjectParam, "message")
 
 /**
  * Represents a extraction of an entity from a target WsMessage.
@@ -14,7 +14,7 @@ open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>)
      * Create a lens for this Spec
      */
     open fun toLens(): WsMessageLens<OUT> {
-        return WsMessageLens({ get("")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+        return WsMessageLens({ get("message")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
     }
 
     /**
@@ -56,7 +56,7 @@ open class WsMessageLens<out FINAL>(private val getLens: (WsMessage) -> FINAL) :
     } catch (e: LensFailure) {
         throw e
     } catch (e: Exception) {
-        throw LensFailure(Invalid(Meta(true, "websocket", ParamMeta.ObjectParam, "")), cause = e, target = target)
+        throw LensFailure(Invalid(meta), cause = e, target = target)
     }
 }
 
