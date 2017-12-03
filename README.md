@@ -35,7 +35,7 @@ plugging together of services without HTTP container being required.
     * applications
     * websockets
     * full suites of microservices
-* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-ons cover:
+* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
     * Pluggable HTTP client adapters for Apache, OkHttp and Websockets
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
