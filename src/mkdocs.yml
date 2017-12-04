@@ -61,6 +61,7 @@ pages:
     - Generating data classes for messages: cookbook/generating_data_classes/index.md
     - Websockets: cookbook/websockets/index.md
     - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
+    - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
   - Performance: performance/index.md
