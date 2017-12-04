@@ -31,12 +31,12 @@ fun main(args: Array<String>) {
         "/hello" bind websockets(
             "/{name}" bind { ws: Websocket ->
                 val name = nameLens(ws.upgradeRequest)
-                ws.send(WsMessage("hello $name"))
                 ws.onMessage {
                     val received = moneyLens(it)
                     ws.send(moneyLens(received))
                 }
                 ws.onClose { println("closed") }
+                ws.send(WsMessage("hello $name"))
             }
         )
     )
