@@ -12,7 +12,6 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 
@@ -26,22 +25,19 @@ fun main(args: Array<String>) {
     val moneyLens = WsMessage.auto<Money>().toLens()
     val nameLens = Path.of("name")
 
-    // A WsConsumer is called when a websocket is connected and to attach event handlers to
-    // - the websocket instance can be stored for future communication
-    val consumer: WsConsumer = { ws: Websocket ->
-        val name = nameLens(ws.upgradeRequest)
-        ws.send(WsMessage("hello $name"))
-        ws.onMessage {
-            val received = moneyLens(it)
-            ws.send(moneyLens(received))
-        }
-        ws.onClose { println("closed") }
-    }
-
     // the routing API is virtually identical to the standard http4k http protocol routing API.
+    // on connection, the bound WsConsumer is called with the Websocket instance
     val ws: WsHandler = websockets(
         "/hello" bind websockets(
-            "/{name}" bind consumer
+            "/{name}" bind { ws: Websocket ->
+                val name = nameLens(ws.upgradeRequest)
+                ws.send(WsMessage("hello $name"))
+                ws.onMessage {
+                    val received = moneyLens(it)
+                    ws.send(moneyLens(received))
+                }
+                ws.onClose { println("closed") }
+            }
         )
     )
 
