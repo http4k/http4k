@@ -7,7 +7,7 @@ description: An overview of Websocket support in http4k
 
 Reaction to the last post introducing [**http4k**](https://github.com/http4k/http4k) was pretty good, and one of the most popular questions was: **"But what about Websockets"**?
 
-The answer to that question at the time was an emphatic **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to deliver them in a simple, offline testable&ast; way. We were also worried that ignoring it might "turn out bad for us".
+The answer to that question at the time was an emphatic **"Not yet"** - because they didn't fit the "Server as a Function" model, and the team hadn't worked out a way to deliver them in a simple, offline testable&ast; way.
 
 Well, a month is a long time, and we've been beavering away, so now we're thrilled to release **Websockets for [**http4k**](https://github.com/http4k/http4k)**, which are:
 
