@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
     val moneyLens = WsMessage.auto<Money>().toLens()
     val nameLens = Path.of("name")
 
-    // the routing API is virtually identical to the standard http4k http protocol routing API.
+    // the routing API is virtually identical to the standard http4k http routing API.
     // on connection, the bound WsConsumer is called with the Websocket instance
     val ws: WsHandler = websockets(
         "/hello" bind websockets(
