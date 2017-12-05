@@ -181,7 +181,7 @@ object TweetEcho : AppLoader {
 ```
 Since [**http4k**](https://github.com/http4k/http4k) is very dependency-light, full binary uploads of these AWS Lambdas tend to be very small - and by utilising [Proguard](https://www.guardsquare.com/en/proguard) we've seen the size of a Lambda UberJar go as small as 150kb.
 
-Introduced in v3.2.3, this support is available in the `http4k-serverless-lambda` module.
+Introduced in v3.3.0, this support is available in the `http4k-serverless-lambda` module.
 
 ## The final word(s)!
 As pointed out above, `http4k-core` module has zero dependencies. It is also small, even though it also provides:
@@ -210,4 +210,4 @@ Well, that's it for this whirlwind tour - we hope you found it worth reading thi
 ##### Footnotes
 * **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" is based on asynchronous functions and [**http4k**](https://github.com/http4k/http4k) exposes a synchronous API. However, our experience suggests that for the vast majority of apps, this actually makes API integration harder unless you've got async all the way down - and that is assuming that async clients are actually available for all your various remote dependencies. We found that this plainly didn't matter for our use-cases so went for *Simple API™* instead... it's possible however that Kotlin co-routines will allow us to revisit this decision.
 * **What no websockets?** Nope - not yet. Because [**http4k**](https://github.com/http4k/http4k) has been developed in the context of synchronous HTTP REST-y services, the requirement hasn't actually come up as a use-case yet. And because apps are independent of the actual Server that they are deployed to, would need to be reimplemented on each supported Server backend - which means finding a model that fitted all of them. This *is*, however, entirely doable... we just need the impetus to actually do it. Feel free to contribute a solution... :)
-* **^^Websockets!!** Simple, testable, and available in v3.2.3!
+* **^^Websockets!!** Simple, testable, and available in v3.3.0!

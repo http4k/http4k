@@ -44,7 +44,7 @@ In the below example, we have gone one step further - defining a contract test c
 
 #### Fin
 
-Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.2.3`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
+Websocket support is now available for the Jetty server backend in [**http4k**](https://github.com/http4k/http4k) `v3.3.0`. We plan to roll out support for other server-backends in due course. Have a play a let us know what you think... 
 
 ##### Footnotes
 * &ast; We had a bit of a search for "unit testing websockets", half through curiosity and half because we wanted to swipe other people's ideas for implementing it. But we came up with nothing - it seems like all the existing JVM HTTP libraries rely on running servers for testing websockets. We hope we're wrong - because the alternative makes us a little &lt;insert sadface emoji/&gt;. If we are, then please let us know! 😝
