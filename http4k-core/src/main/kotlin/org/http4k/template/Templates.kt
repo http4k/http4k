@@ -29,3 +29,13 @@ interface Templates {
     fun HotReload(baseTemplateDir: String = "./"): TemplateRenderer
 }
 
+/**
+ * Compose a TemplateRenderer with another, so you can fall back.
+ */
+fun TemplateRenderer.then(that: TemplateRenderer): TemplateRenderer = {
+    try {
+        this(it)
+    } catch (e: ViewNotFound) {
+        that(it)
+    }
+}
