@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.3.0
-- Ability to compose `TemplateRenderers` with `then()` to provide fallback behaviour.
+- Facility to compose `TemplateRenderers` with `then()` to provide fallback behaviour.
 
 ### v3.2.3
 - PR #70: Header order equality for Request/Response - H/T @gypsydave5.
