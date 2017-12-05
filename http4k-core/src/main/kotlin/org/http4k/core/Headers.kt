@@ -1,0 +1,26 @@
+package org.http4k.core
+
+internal fun Headers.headerValue(name: String) = find { it.first.equals(name, true) }?.second
+
+internal fun Headers.headerValues(name: String) = filter { it.first.equals(name, true) }.map { it.second }
+
+internal fun Headers.removeHeader(name: String) = filterNot { it.first.equals(name, true) }
+
+internal fun Headers.replaceHeader(name: String, value: String?) = removeHeader(name).plus(name to value)
+
+internal fun Headers.toHeaderMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
+
+internal fun Headers.areSameHeadersAs(other: Headers) =
+    all { header -> other.any { it == header } } &&
+        other.all { otherHeader -> any { it == otherHeader } } &&
+        withSameFieldNames()
+            .all {
+                other.withSameFieldNames()
+                    .any { otherHeaders -> it == otherHeaders }
+            }
+
+private fun Headers.withSameFieldNames() =
+    groupBy { (fieldName, _) -> fieldName }
+        .filter { (_, headers) -> headers.size > 1 }
+        .values
+        .toList()

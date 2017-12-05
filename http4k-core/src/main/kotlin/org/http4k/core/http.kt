@@ -59,7 +59,7 @@ interface HttpMessage : Closeable {
 
     fun toMessage(): String
 
-    fun header(name: String): String? = headers.find { it.first.equals(name, true) }?.second
+    fun header(name: String): String? = headers.headerValue(name)
 
     fun header(name: String, value: String?): HttpMessage
 
@@ -75,7 +75,7 @@ interface HttpMessage : Closeable {
 
     fun body(body: InputStream, length: Long? = null): HttpMessage
 
-    fun headerValues(name: String): List<String?> = headers.filter { it.first.equals(name, true) }.map { it.second }
+    fun headerValues(name: String): List<String?> = headers.headerValues(name)
 
     /**
      * This will realise any underlying stream
@@ -119,7 +119,7 @@ interface Request : HttpMessage {
 
     override fun body(body: InputStream, length: Long?): Request
 
-    override fun toMessage() = listOf("$method $uri $version", headers.toMessage(), bodyString()).joinToString("\r\n")
+    override fun toMessage() = listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
         operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), EMPTY)
@@ -143,9 +143,9 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun headers(headers: Headers) = copy(headers = this.headers.plus(headers))
 
-    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
+    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
-    override fun removeHeader(name: String) = copy(headers = headers.remove(name))
+    override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
     override fun body(body: Body) = copy(body = body)
 
@@ -156,7 +156,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun toString(): String = toMessage()
 
     override fun equals(other: Any?) = (other is Request
-        && headers.areSameAs(other.headers)
+        && headers.areSameHeadersAs(other.headers)
         && method == other.method
         && uri == other.uri
         && body == other.body)
@@ -180,7 +180,7 @@ interface Response : HttpMessage {
 
     override fun body(body: InputStream, length: Long?): Response
 
-    override fun toMessage(): String = listOf("$version $status", headers.toMessage(), bodyString()).joinToString("\r\n")
+    override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
         operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), EMPTY)
@@ -193,9 +193,9 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 
     override fun headers(headers: Headers) = copy(headers = this.headers.plus(headers))
 
-    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.remove(name).plus(name to value))
+    override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
-    override fun removeHeader(name: String) = copy(headers = headers.remove(name))
+    override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 
     override fun body(body: Body) = copy(body = body)
 
@@ -206,7 +206,7 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun toString(): String = toMessage()
 
     override fun equals(other: Any?) = (other is Response
-        && headers.areSameAs(other.headers)
+        && headers.areSameHeadersAs(other.headers)
         && status == other.status
         && body == other.body)
 }
@@ -215,21 +215,3 @@ fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, nex
 
 fun String.toBody(): Body = Body(this)
 
-private fun Headers.remove(name: String) = filterNot { it.first.equals(name, true) }
-
-private fun Headers.toMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
-
-private fun Headers.areSameAs(other: Headers) =
-    all { header -> other.any { it == header } } &&
-        other.all { otherHeader -> any { it == otherHeader } } &&
-        withSameFieldNames()
-            .all {
-                other.withSameFieldNames()
-                    .any { otherHeaders -> it == otherHeaders }
-            }
-
-private fun Headers.withSameFieldNames() =
-    groupBy { (fieldName, _) -> fieldName }
-        .filter { (_, headers) -> headers.size > 1 }
-        .values
-        .toList()
