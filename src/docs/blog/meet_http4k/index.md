@@ -126,7 +126,7 @@ If the query parameter is missing or not an Int, the lens extraction operation w
 
 In the case of failure, we need to apply a Filter to detect the errors and convert them to a BAD_REQUEST response:
 ```kotlin
-val queryName = Query.string().of("name")
+val queryName = Query.string().required("name")
 val app: HttpHandler = routes(
       "/post" bind POST to { request: Request -> Response(OK).body(queryName(request)) }
     )
