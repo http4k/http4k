@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.3.1
+- Handlebars now uses combination of Class and Template name to cache templates.
+
 ### v3.3.0
 - Facility to compose `TemplateRenderers` with `then()` to provide fallback behaviour.
 
