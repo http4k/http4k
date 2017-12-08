@@ -1,7 +1,9 @@
 package org.http4k.server
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -12,6 +14,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.StreamBody
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.util.RetryRule
@@ -45,6 +50,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
                 "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
                 "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+                "/length" bind POST to { req: Request ->
+                    when (req.body) {
+                        is StreamBody -> Response(OK).body(req.body.length.toString())
+                        else -> Response(INTERNAL_SERVER_ERROR)
+                    }
+                },
                 "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
                 "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
             ))
@@ -78,6 +89,19 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(ACCEPTED))
         assertThat(response.header("content-type"), equalTo("text/plain"))
+    }
+
+    @Test
+    fun `length is set on body if it is sent`() {
+        val response = client(Request(POST, "http://localhost:$port/length")
+            .body("12345").header("Content-Length", "5"))
+        response shouldMatch hasStatus(OK).and(hasBody("5"))
+    }
+
+    @Test
+    fun `length is ignored on body if it not well formed`() {
+        val response = client(Request(POST, "http://localhost:$port/length").header("Content-Length", "nonsense").body("12345"))
+        response shouldMatch hasStatus(OK).and(hasBody("5"))
     }
 
     @Test

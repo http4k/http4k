@@ -25,6 +25,7 @@ import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
@@ -55,7 +56,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     private fun FullHttpRequest.asRequest(): Request =
         Request(valueOf(method().name()), Uri.Companion.of(uri()))
             .headers(headers().map { it.key to it.value })
-            .body(Body(ByteBufInputStream(content())))
+            .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {

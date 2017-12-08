@@ -7,8 +7,8 @@ import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.safeLong
 import java.util.Enumeration
-
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -28,7 +28,7 @@ private fun Response.transferTo(destination: HttpServletResponse) {
 
 private fun HttpServletRequest.asHttp4kRequest(): Request =
     Request(Method.valueOf(method), Uri.of(requestURI + queryString.toQueryString()))
-        .body(inputStream).headers(headerParameters())
+        .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
 
 private fun HttpServletRequest.headerParameters(): Headers =
     headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })

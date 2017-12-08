@@ -9,6 +9,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
@@ -30,7 +31,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
         Request(Method.valueOf(requestMethod.toString()), Uri.of(relativePath + "?" + queryString))
             .headers(requestHeaders
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
-            .body(inputStream)
+            .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
 
     override fun handleRequest(exchange: HttpServerExchange) {
         if (exchange.isInIoThread) exchange.dispatch(this) else safeHandler(exchange.asRequest()).into(exchange)

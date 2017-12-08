@@ -24,3 +24,9 @@ private fun Headers.withSameFieldNames() =
         .filter { (_, headers) -> headers.size > 1 }
         .values
         .toList()
+
+fun String.safeLong(): Long? = try {
+    toLong()
+} catch (e: Exception) {
+    null
+}

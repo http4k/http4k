@@ -7,6 +7,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.safeLong
 import java.net.InetSocketAddress
 
 data class SunHttp(val port: Int = 8000) : ServerConfig {
@@ -39,5 +40,5 @@ private fun HttpExchange.populate(httpResponse: Response) {
 private fun HttpExchange.toRequest(): Request =
     Request(Method.valueOf(requestMethod),
         requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) } ?: Uri.of(requestURI.rawPath))
-        .body(requestBody)
+        .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
         .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })
