@@ -50,7 +50,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
                 "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
                 "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-                "/length" bind POST to { req: Request ->
+                "/length" bind { req: Request ->
                     when (req.body) {
                         is StreamBody -> Response(OK).body(req.body.length.toString())
                         else -> Response(INTERNAL_SERVER_ERROR)
@@ -102,6 +102,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun `length is ignored on body if it not well formed`() {
         val response = client(Request(POST, "http://localhost:$port/length").header("Content-Length", "nonsense").body("12345"))
         response shouldMatch hasStatus(OK).and(hasBody("5"))
+    }
+
+    @Test
+    fun `length is zero on GET body`() {
+        val response = client(Request(GET, "http://localhost:$port/length"))
+        response shouldMatch hasStatus(OK).and(hasBody("0"))
     }
 
     @Test
