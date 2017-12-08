@@ -111,6 +111,7 @@ class EndToEndTest {
     @Test
     fun `adds numbers`() {
         val response = client(Request(GET, "http://localhost:8000/add").query("first", "123").query("second", "456"))
+        println(response)
         response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
         recorderHttp.calls shouldMatch equalTo(listOf(579))
     }
