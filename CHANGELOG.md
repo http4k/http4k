@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.3.2 (uncut)
-- We now set the length of the incoming request body when it is available in the incming request.
+- We now set the length of the incoming request body when it is available in the incoming request.
 
 ### v3.3.1
 - Handlebars now uses combination of Class and Template name to cache templates.
