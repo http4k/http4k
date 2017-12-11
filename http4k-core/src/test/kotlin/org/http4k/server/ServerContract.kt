@@ -27,7 +27,8 @@ import org.junit.Test
 import java.util.Random
 
 
-abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler) {
+abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler,
+                              private val requiredMethods: Array<Method> = Method.values()) {
     private var server: Http4kServer? = null
 
     @Rule
@@ -40,7 +41,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun before() {
 
         val routes =
-            Method.values().map {
+            requiredMethods.map {
                 "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
             }.plus(listOf(
                 "/headers" bind GET to { _: Request ->
@@ -65,7 +66,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Test
     fun `can call an endpoint with all supported Methods`() {
-        for (method in Method.values()) {
+        for (method in requiredMethods) {
 
             val response = client(Request(method, "http://localhost:$port/" + method.name))
 
