@@ -19,3 +19,7 @@ data class AtRoot(val items: List<Item>) : ViewModel {
 data class Feature(val description: String)
 
 data class Item(val name: String, val price: String, val features: List<Feature>)
+
+object TemplateA : ViewModel
+object TemplateB : ViewModel
+object TemplateC : ViewModel

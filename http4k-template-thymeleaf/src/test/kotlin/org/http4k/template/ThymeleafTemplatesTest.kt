@@ -8,7 +8,7 @@ data class HtmlFeature(val description: String) : ViewModel {
     override fun template() = super.template() + ".html"
 }
 
-class ThymeleafTemplatesTest : TemplatesContract(ThymeleafTemplates())
+class ThymeleafTemplatesTest : TemplatesContract<ThymeleafTemplates>(ThymeleafTemplates())
 
 class ThymeleafViewModelTest : ViewModelContract(ThymeleafTemplates()) {
 

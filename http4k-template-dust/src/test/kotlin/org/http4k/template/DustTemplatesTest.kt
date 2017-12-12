@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
 
-class DustTemplatesTest : TemplatesContract(DustTemplates())
+class DustTemplatesTest : TemplatesContract<DustTemplates>(DustTemplates())
 
 class DustViewModelTest : ViewModelContract(DustTemplates())
 

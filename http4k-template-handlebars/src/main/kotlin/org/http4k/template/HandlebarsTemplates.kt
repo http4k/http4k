@@ -3,6 +3,7 @@ package org.http4k.template
 import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader
+import com.github.jknack.handlebars.io.CompositeTemplateLoader
 import com.github.jknack.handlebars.io.FileTemplateLoader
 import java.io.File
 import java.io.FileNotFoundException
@@ -35,6 +36,23 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer = object : TemplateRenderer {
         val handlebars = configure(Handlebars(FileTemplateLoader(File(baseTemplateDir))))
+        override fun invoke(viewModel: ViewModel): String =
+            safeRender {
+                handlebars.compile(it.template()).apply(it)
+            }(viewModel)
+    }
+
+
+    /**
+     * Hot-reloads (no-caching) templates from a file path
+     *
+     * @param firstBaseDir the first dir to load templates from
+     * @param secondBaseDir the second dir to load templates from
+     * @param rest the rest
+     */
+    fun HotReload(firstBaseDir: String, secondBaseDir: String, vararg rest: String): TemplateRenderer = object : TemplateRenderer {
+        val loaders = listOf(firstBaseDir, secondBaseDir, *rest).map { FileTemplateLoader(File(it)) }
+        val handlebars = configure(Handlebars(CompositeTemplateLoader(*loaders.toTypedArray())))
         override fun invoke(viewModel: ViewModel): String =
             safeRender {
                 handlebars.compile(it.template()).apply(it)
