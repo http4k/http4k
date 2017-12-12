@@ -71,6 +71,7 @@ plugging together of services without HTTP container being required.
         * **Netty**
         * **Undertow**
         * **SunHttp** (bundled with `http4k-core`)
+        * **Apache** (from httpcore)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * Implement a single Factory method, then upload your[http4k](https://github.com/http4k/http4k)applications to AWS Lambda to be called from API Gateway. 

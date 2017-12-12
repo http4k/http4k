@@ -187,6 +187,7 @@ dependencies {
     provided project(":http4k-format-xml")
     provided project(":http4k-multipart")
     provided project(":http4k-resilience4j")
+    provided project(":http4k-server-apache")
     provided project(":http4k-server-jetty")
     provided project(":http4k-server-netty")
     provided project(":http4k-server-undertow")
