@@ -66,7 +66,7 @@ object ServerFilters {
             {
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
-                ZipkinTraces.THREAD_LOCAL.set(fromRequest.copy(parentSpanId = fromRequest.spanId, spanId = TraceId.new()))
+                ZipkinTraces.THREAD_LOCAL.set(fromRequest)
 
                 try {
                     val response = ZipkinTraces(fromRequest, next(ZipkinTraces(fromRequest, it)))

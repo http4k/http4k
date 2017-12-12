@@ -28,11 +28,13 @@ object ClientFilters {
             startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
             endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
-                val traces = THREAD_LOCAL.get()
-                startReportFn(it, traces)
-                val response = next(ZipkinTraces(traces, it))
-                endReportFn(it, response, traces)
-                response
+                THREAD_LOCAL.get().run {
+                    val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
+                    startReportFn(it, updated)
+                    val response = next(ZipkinTraces(updated, it))
+                    endReportFn(it, response, updated)
+                    response
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -53,20 +54,24 @@ class ServerFiltersTest {
         var newThreadLocal: ZipkinTraces? = null
         val svc = ServerFilters.RequestTracing().then {
             newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()!!
+            newThreadLocal!!.traceId shouldMatch present()
             newThreadLocal!!.spanId shouldMatch present()
+            newThreadLocal!!.parentSpanId shouldMatch absent()
+
             val setOnRequest = ZipkinTraces(it)
             setOnRequest.traceId shouldMatch equalTo(newThreadLocal!!.traceId)
-            setOnRequest.spanId shouldMatch equalTo(newThreadLocal!!.parentSpanId)
+            setOnRequest.spanId shouldMatch equalTo(newThreadLocal!!.spanId)
+            setOnRequest.parentSpanId shouldMatch absent()
             Response(OK)
         }
 
         val received = ZipkinTraces(svc(Request(GET, "")))
 
-        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.parentSpanId!!, null))
+        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null))
     }
 
     @Test
-    fun `uses existing request tracing from request and sets on outgoing response not present`() {
+    fun `uses existing request tracing from request and sets on outgoing response`() {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")
         val originalParentSpanId = TraceId("originalParentSpanId")
@@ -81,12 +86,9 @@ class ServerFiltersTest {
         ).then {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
             val setOnRequest = ZipkinTraces(it)
-            setOnRequest.traceId shouldMatch equalTo(actual.traceId)
-            setOnRequest.spanId shouldMatch equalTo(actual.parentSpanId)
 
-            actual.traceId shouldMatch equalTo(originalTraceId)
-            actual.spanId shouldMatch present()
-            actual.parentSpanId shouldMatch equalTo(originalSpanId)
+            actual shouldMatch equalTo(originalTraces)
+            setOnRequest shouldMatch equalTo(originalTraces)
             Response(OK)
         }
 
@@ -96,7 +98,6 @@ class ServerFiltersTest {
 
         start!!.first shouldMatch equalTo(originalRequest)
         start!!.second shouldMatch equalTo(originalTraces)
-
 
         end!!.first shouldMatch equalTo(originalRequest)
         end!!.second shouldMatch equalTo(ZipkinTraces(originalTraces, Response(OK)))

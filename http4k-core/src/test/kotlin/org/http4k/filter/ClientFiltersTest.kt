@@ -90,7 +90,7 @@ class ClientFiltersTest {
 
     @Test
     fun `adds request tracing to outgoing request when already present`() {
-        val zipkinTraces = ZipkinTraces(TraceId.new(), TraceId.new(), TraceId.new())
+        val zipkinTraces = ZipkinTraces(TraceId("originalTraceId"), TraceId("originalSpanId"), TraceId("originalParentId"))
         ZipkinTraces.THREAD_LOCAL.set(zipkinTraces)
 
         var start: Pair<Request, ZipkinTraces>? = null
@@ -100,13 +100,15 @@ class ClientFiltersTest {
             { req, trace -> start = req to trace },
             { req, resp, trace -> end = Triple(req, resp, trace) }
         ).then { it ->
-            assertThat(ZipkinTraces(it), equalTo(zipkinTraces))
+            val actual = ZipkinTraces(it)
+            assertThat(actual, equalTo(ZipkinTraces(TraceId("originalTraceId"), actual.spanId, TraceId("originalSpanId"))))
+            assertThat(actual.spanId, !equalTo(zipkinTraces.spanId))
             Response(OK)
         }
 
         svc(Request(GET, "")) shouldMatch equalTo(Response(OK))
-        assertThat(start, equalTo(Request(GET, "") to zipkinTraces))
-        assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), zipkinTraces)))
+        assertThat(start, equalTo(Request(GET, "") to ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"))))
+        assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId")))))
     }
 
     @Test
