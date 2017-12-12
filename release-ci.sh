@@ -42,10 +42,11 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-format-xml:bintrayUpload \
     :http4k-multipart:bintrayUpload \
     :http4k-resilience4j:bintrayUpload \
+    :http4k-server-apache:bintrayUpload \
     :http4k-server-jetty:bintrayUpload \
     :http4k-server-netty:bintrayUpload \
-    :http4k-serverless-lambda:bintrayUpload \
     :http4k-server-undertow:bintrayUpload \
+    :http4k-serverless-lambda:bintrayUpload \
     :http4k-testing-hamkrest:bintrayUpload \
     :http4k-testing-webdriver:bintrayUpload
 

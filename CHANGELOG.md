@@ -2,7 +2,8 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.3.2 (uncut)
+### v3.4.0 (uncut)
+- New server backend `http4k-server-apache`. H/T @kirderf for the PR :)
 - We now set the length of the incoming request body when it is available in the incoming request.
 
 ### v3.3.1

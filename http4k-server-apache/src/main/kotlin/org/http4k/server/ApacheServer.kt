@@ -6,6 +6,7 @@ import org.apache.http.config.SocketConfig
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.bootstrap.ServerBootstrap
 import org.apache.http.impl.io.EmptyInputStream
+import org.apache.http.protocol.HttpContext
 import org.apache.http.protocol.HttpRequestHandler
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
@@ -16,6 +17,8 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import java.util.concurrent.TimeUnit
+import org.apache.http.HttpRequest as ApacheRequest
+import org.apache.http.HttpResponse as ApacheResponse
 
 /**
  * Exposed to allow for insertion into a customised Apache WebServer instance
@@ -24,22 +27,20 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
-    override fun handle(request: org.apache.http.HttpRequest,
-                        response: org.apache.http.HttpResponse,
-                        context: org.apache.http.protocol.HttpContext) {
+    override fun handle(request: ApacheRequest, response: ApacheResponse, context: HttpContext) {
         safeHandler(request.asHttp4kRequest()).into(response)
     }
 
-    private fun org.apache.http.HttpRequest.asHttp4kRequest(): Request {
-        val request = Request(Method.valueOf(requestLine.method), requestLine.uri)
-                .headers(allHeaders.toHttp4kHeaders())
-        return when (this) {
-            is HttpEntityEnclosingRequest -> request.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
-            else -> request.body(EmptyInputStream.INSTANCE, 0)
+    private fun ApacheRequest.asHttp4kRequest(): Request =
+        Request(Method.valueOf(requestLine.method), requestLine.uri)
+            .headers(allHeaders.toHttp4kHeaders()).let {
+            when (this) {
+                is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
+                else -> it.body(EmptyInputStream.INSTANCE, 0)
+            }
         }
-    }
 
-    private fun Response.into(response: org.apache.http.HttpResponse) {
+    private fun Response.into(response: ApacheResponse) {
         with(response) {
             setStatusCode(status.code)
             setReasonPhrase(status.description)
@@ -52,18 +53,17 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 }
 
 data class ApacheServer(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer = object:Http4kServer {
-
-        val server = ServerBootstrap.bootstrap()
-                .setListenerPort(port)
-                .setSocketConfig(SocketConfig.custom()
-                        .setTcpNoDelay(true)
-                        .setSoKeepAlive(true)
-                        .setSoReuseAddress(true)
-                        .setBacklogSize(128)
-                        .build())
-                .registerHandler("*", Http4kRequestHandler(httpHandler))
-                .create()
+    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+        private val server = ServerBootstrap.bootstrap()
+            .setListenerPort(port)
+            .setSocketConfig(SocketConfig.custom()
+                .setTcpNoDelay(true)
+                .setSoKeepAlive(true)
+                .setSoReuseAddress(true)
+                .setBacklogSize(128)
+                .build())
+            .registerHandler("*", Http4kRequestHandler(httpHandler))
+            .create()
 
         override fun start(): Http4kServer = apply {
             server.start()
@@ -72,6 +72,5 @@ data class ApacheServer(val port: Int = 8000) : ServerConfig {
         override fun stop() {
             server.shutdown(15, TimeUnit.SECONDS)
         }
-
     }
 }

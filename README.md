@@ -37,7 +37,7 @@ plugging together of services without HTTP container being required.
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
     * Pluggable HTTP client adapters for Apache, OkHttp and Websockets
-    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow and SunHttp. 
+    * Pluggable Server backends: Single LOC Server spinup for Apache, Jetty, Netty, Undertow, Apache (Httpcore) and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
@@ -70,8 +70,8 @@ plugging together of services without HTTP container being required.
         * **Jetty** (including websocket support)
         * **Netty**
         * **Undertow**
-        * **SunHttp** (bundled with `http4k-core`)
         * **Apache** (from httpcore)
+        * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
     * Implement a single Factory method, then upload your[http4k](https://github.com/http4k/http4k)applications to AWS Lambda to be called from API Gateway. 
