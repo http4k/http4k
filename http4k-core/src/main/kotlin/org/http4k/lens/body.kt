@@ -79,7 +79,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
         val setLens = set("")
         return BiDiBodyLens(metas, contentType,
             { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing)) else it.first() } },
-            { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: kotlin.collections.emptyList(), target) }
+            { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
 }
@@ -88,7 +88,7 @@ fun httpBodyRoot(metas: List<Meta>, acceptedContentType: ContentType, contentNeg
     BiDiBodyLensSpec<Body>(metas, acceptedContentType,
         LensGet { _, target ->
             contentNegotiation(acceptedContentType, CONTENT_TYPE(target))
-            target.body.let { listOf(it) }
+            listOf(target.body)
         },
         LensSet { _, values, target -> values.fold(target) { memo, next -> memo.body(next) }.with(CONTENT_TYPE of acceptedContentType) }
     )
