@@ -2,6 +2,8 @@ package org.http4k.core
 
 import org.http4k.appendIfNotBlank
 import org.http4k.appendIfPresent
+import java.net.URI
+import java.net.URLDecoder
 
 data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) {
     companion object {
@@ -51,3 +53,7 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 }
 
 fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())
+
+fun String.toPathEncoded(): String = URI("http", null, "/$this", null).toURL().path.drop(1).replace("/", "%2F")
+
+fun String.fromPathEncoded(): String = URLDecoder.decode(this, "UTF-8")

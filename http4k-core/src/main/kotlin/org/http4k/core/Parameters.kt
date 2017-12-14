@@ -10,18 +10,18 @@ fun Uri.queries(): Parameters = query.toParameters()
 @Deprecated("rename for clarity", ReplaceWith("this.toUrlFormEncoded()"))
 fun Parameters.toUrlEncoded(): String = toUrlFormEncoded()
 
-fun Parameters.toUrlFormEncoded(): String = this.joinToString("&") { it.first.encode() + it.second?.let { "=" + it.encode() }.orEmpty() }
+fun Parameters.toUrlFormEncoded(): String = this.joinToString("&") { it.first.toFormEncoded() + it.second?.let { "=" + it.toFormEncoded() }.orEmpty() }
 
-fun String.toParameters() = if(isNotEmpty()) split("&").map(String::toParameter) else listOf()
+fun String.toParameters() = if (isNotEmpty()) split("&").map(String::toParameter) else listOf()
 
 internal fun Parameters.findSingle(name: String): String? = find { it.first == name }?.second
 
 internal fun Parameters.findMultiple(name: String) = filter { it.first == name }.map { it.second }
 
-private fun String.toParameter(): Parameter = split("=").map(String::decode).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
+private fun String.toParameter(): Parameter = split("=").map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
 
-internal fun String.decode() = URLDecoder.decode(this, "UTF-8")
+internal fun String.fromFormEncoded() = URLDecoder.decode(this, "UTF-8")
 
-internal fun String.encode() = URLEncoder.encode(this, "UTF-8")
+internal fun String.toFormEncoded() = URLEncoder.encode(this, "UTF-8")
 
 private typealias Parameter = Pair<String, String?>

@@ -70,7 +70,7 @@ class ContractRouteTest {
         val route = pair to { _, _ -> { _: Request -> Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
-        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
+        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello%20world"))
     }
 
     @Test
@@ -91,7 +91,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest(Uri.of("http://rita.com"))
 
-        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello+world"))
+        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello%20world"))
     }
 
     @Test

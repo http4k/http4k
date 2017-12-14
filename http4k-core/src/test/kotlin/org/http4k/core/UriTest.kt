@@ -51,18 +51,25 @@ class UriTest {
 
     @Test
     fun handles_empty_uri() {
-        val uri = Uri.of("")
-        assertThat(uri.toString(), equalTo(""))
+        assertThat(Uri.of("").toString(), equalTo(""))
     }
 
     @Test
     fun can_add_parameter() {
-        val uri = Uri.of(value = "http://ignore").query("a", "b")
-        assertThat(uri.toString(), equalTo("http://ignore?a=b"))
+        assertThat(Uri.of(value = "http://ignore").query("a", "b").toString(), equalTo("http://ignore?a=b"))
     }
 
     @Test
     fun parameters_can_be_defined_in_value(){
         assertThat(Uri.of("http://www.google.com?a=b"), equalTo(Uri.of("http://www.google.com").query("a", "b")))
     }
+
+    @Test
+    fun `can encode and decode a path segment correctly`() {
+        val original = "123 / 456"
+        val encoded = "123%20%2F%20456"
+        assertThat(original.toPathEncoded(), equalTo(encoded))
+        assertThat(encoded.fromPathEncoded(), equalTo(original))
+    }
+
 }
