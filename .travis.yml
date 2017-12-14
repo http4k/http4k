@@ -20,12 +20,15 @@ matrix:
         - "$HOME/.m2"
         - "$HOME/.gradle"
     - stage: bintray
+      if: branch = master
       language: bash
       script: "./release-ci.sh"
     - stage: docs
+      if: branch = master
       language: python
       script:
       - "./release-site.sh"
     - stage: maven central
+      if: branch = master
       script: "travis_wait 90 ./release-maven-central.sh"
       language: bash
