@@ -22,6 +22,6 @@ class ParametersTest {
 
     @Test
     fun round_trip() {
-        assertThat("a=1&b&c+d=three+four&a=2".toParameters().toUrlEncoded(), equalTo("a=1&b&c+d=three+four&a=2"))
+        assertThat("a=1&b&c+d=three+four&a=2".toParameters().toUrlFormEncoded(), equalTo("a=1&b&c+d=three+four&a=2"))
     }
 }

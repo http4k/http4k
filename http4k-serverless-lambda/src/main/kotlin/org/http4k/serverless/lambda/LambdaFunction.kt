@@ -6,7 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
-import org.http4k.core.toUrlEncoded
+import org.http4k.core.toUrlFormEncoded
 import org.http4k.serverless.BootstrapAppLoader
 
 /**
@@ -27,4 +27,4 @@ internal fun ApiGatewayProxyRequest.asHttp4k() = (headers ?: emptyMap()).toList(
     memo.header(first, second)
 }
 
-internal fun ApiGatewayProxyRequest.uri() = Uri.of(path ?: "").query((queryStringParameters ?: emptyMap()).toList().toUrlEncoded())
+internal fun ApiGatewayProxyRequest.uri() = Uri.of(path ?: "").query((queryStringParameters ?: emptyMap()).toList().toUrlFormEncoded())

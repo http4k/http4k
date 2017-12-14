@@ -2,11 +2,11 @@ package org.http4k.lens
 
 import org.http4k.core.Request
 import org.http4k.core.decode
-import org.http4k.core.encode
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.routing.path
+import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -79,7 +79,7 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
 
 object Path : BiDiPathLensSpec<String>(StringParam,
     LensGet { _, target -> listOf(target.decode()) },
-    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().encode()))) }) {
+    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().encodePath()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
@@ -92,6 +92,8 @@ object Path : BiDiPathLensSpec<String>(StringParam,
         }
     }
 }
+
+private fun String.encodePath(): String = URI("http", null, "/$this", null).toURL().path.drop(1).replace("/", "%2F")
 
 fun Path.string() = this
 fun Path.nonEmptyString() = this.map(::nonEmpty, { it })

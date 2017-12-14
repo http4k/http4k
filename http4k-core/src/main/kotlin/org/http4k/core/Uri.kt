@@ -50,4 +50,4 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
 
 }
 
-fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlEncoded())
+fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParameters().plus(name to value).toUrlFormEncoded())

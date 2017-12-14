@@ -5,13 +5,13 @@ import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.findSingle
 import org.http4k.core.toParameters
-import org.http4k.core.toUrlEncoded
+import org.http4k.core.toUrlFormEncoded
 
 typealias Form = Parameters
 
 fun Request.form(name: String): String? = form().findSingle(name)
 
-fun Form.toBody(): Body = Body(toUrlEncoded())
+fun Form.toBody(): Body = Body(toUrlFormEncoded())
 
 fun Request.form(): Form = bodyString().toParameters()
 

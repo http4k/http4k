@@ -3,7 +3,7 @@ package org.http4k.lens
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.toUrlEncoded
+import org.http4k.core.toUrlFormEncoded
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.ParamMeta.StringParam
 import java.net.URLDecoder.decode
@@ -24,7 +24,7 @@ fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm
         .map({ it.payload.asString() }, { it: String -> Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
-            { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlEncoded() })
+            { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlFormEncoded() })
         .map({ it.copy(errors = validator(it, *formFields)) }, { it.copy(errors = validator(it, *formFields)) })
 
 private fun formParametersFrom(target: String): Map<String, List<String>> = target

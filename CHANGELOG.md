@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.5.1
+- Fix #76 - encoding of path segments to use URI encoding instead of URL form encoding.
+
 ### v3.5.0
 - Added support for multiple HotReload template directories in `HandlebarsTemplates`. H/T @TomShacham
 - Fix #74 - Request tracing span/parentSpan set too early so was shared between outgoing requests.
