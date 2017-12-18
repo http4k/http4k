@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.6.0
+- Added `http4k-format-moshi` to support the Square auto-marshalling library.
+
 ### v3.5.1
 - Fix #76 - encoding of path segments to use URI encoding instead of URL form encoding.
 

@@ -1,16 +1,17 @@
 package org.http4k.format
 
-import com.google.gson.JsonElement
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import org.http4k.format.Gson.auto
+import org.http4k.format.Moshi.auto
 import org.junit.Test
 
-class GsonAutoTest : AutoMarshallingContract<JsonElement>(Gson) {
+class MoshiAutoTest : AutoMarshallingContract<Map<*, *>>(Moshi) {
+
+    override val expectedAutoMarshallingResult = """{"bool":false,"child":{"bool":true,"numbers":[1],"string":"world"},"numbers":[],"string":"hello"}"""
 
     @Test
     fun `roundtrip list of arbitary objects to and from object`() {
@@ -21,7 +22,3 @@ class GsonAutoTest : AutoMarshallingContract<JsonElement>(Gson) {
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).asList(), equalTo(arrayOf(obj).asList()))
     }
 }
-
-class GsonTest : JsonContract<JsonElement, JsonElement>(Gson)
-class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement, JsonElement>(Gson)
-class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement, JsonElement>(Gson)

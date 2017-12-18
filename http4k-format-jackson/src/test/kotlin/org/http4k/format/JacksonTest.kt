@@ -10,7 +10,7 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.junit.Test
 
-class JacksonAutoTest : JsonLibAutoMarshallingContract<JsonNode>(Jackson) {
+class JacksonAutoTest : AutoMarshallingContract<JsonNode>(Jackson) {
     @Test
     fun `roundtrip list of arbitary objects to and from object`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
