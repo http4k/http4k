@@ -10,9 +10,17 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.junit.Test
 
-class JacksonAutoTest : AutoMarshallingContract<JsonNode>(Jackson) {
+class JacksonAutoTest : AutoMarshallingContract(Jackson) {
+
     @Test
-    fun `roundtrip list of arbitary objects to and from object`() {
+    fun ` roundtrip arbitary object to and from JSON element`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = Jackson.asJsonObject(obj)
+        assertThat(Jackson.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip list of arbitary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)

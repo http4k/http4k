@@ -10,10 +10,17 @@ import org.http4k.core.with
 import org.http4k.format.Gson.auto
 import org.junit.Test
 
-class GsonAutoTest : AutoMarshallingContract<JsonElement>(Gson) {
+class GsonAutoTest : AutoMarshallingContract(Gson) {
 
     @Test
-    fun `roundtrip list of arbitary objects to and from object`() {
+    fun ` roundtrip arbitary object to and from JSON element`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        val out = Gson.asJsonObject(obj)
+        assertThat(Gson.asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip list of arbitary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)

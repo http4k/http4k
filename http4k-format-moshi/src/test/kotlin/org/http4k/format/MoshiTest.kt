@@ -9,7 +9,7 @@ import org.http4k.core.with
 import org.http4k.format.Moshi.auto
 import org.junit.Test
 
-class MoshiAutoTest : AutoMarshallingContract<Map<*, *>>(Moshi) {
+class MoshiAutoTest : AutoMarshallingContract(Moshi) {
 
     override val expectedAutoMarshallingResult = """{"bool":false,"child":{"bool":true,"numbers":[1],"string":"world"},"numbers":[],"string":"hello"}"""
 
