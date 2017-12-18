@@ -10,7 +10,7 @@ import org.http4k.core.with
 import org.http4k.format.Gson.auto
 import org.junit.Test
 
-class GsonAutoTest : AutoMarshallingContract<JsonElement>(Gson) {
+class GsonAutoTest : JsonLibAutoMarshallingContract<JsonElement>(Gson) {
 
     @Test
     fun `roundtrip list of arbitary objects to and from object`() {

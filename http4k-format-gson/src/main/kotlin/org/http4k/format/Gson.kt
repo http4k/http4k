@@ -9,8 +9,8 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
-import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.BiDiWsMessageLensSpec
+import org.http4k.lens.ContentNegotiation
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 
 class InvalidJsonException : Exception("Could not convert to a JSON Object or Array")
 
-open class ConfigurableGson(builder: GsonBuilder) : AutoMarshallingJson<JsonElement>() {
+open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
     override fun typeOf(value: JsonElement): JsonType =
         when {
             value.isJsonArray -> JsonType.Array
