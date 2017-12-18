@@ -8,6 +8,8 @@ description: Feature overview of the http4k-format modules, including JSON and X
 
 **Jackson:** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.6.0"```
 
+**Moshi:** ```compile group: "org.http4k", name: "http4k-format-moshi", version: "3.6.0"```
+
 **Xml:** ```compile group: "org.http4k", name: "http4k-format-xml", version: "3.6.0"```
 
 ### About
@@ -21,7 +23,7 @@ JSON/XML node objects can be written and read directly from HTTP messages:
 
 ### Auto-marshalling capabilities
 
-Some of the message libraries (eg. GSON, Jackson, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection.
+Some of the message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection.
 
 We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 

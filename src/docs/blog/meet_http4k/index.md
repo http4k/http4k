@@ -150,7 +150,7 @@ val myDate: MyDate = dateQuery(Request(GET, "http://server/search?date=2000-01-0
 ```
 
 ### Lensing HTTP bodies with Data classes
-Some of the supported message libraries (eg. GSON, Jackson, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection (oops - looks like we broke our reflection promise - but technically we're not doing it ;) !). This behaviour is supported in [**http4k**](https://github.com/http4k/http4k) Lenses through the use of the `auto()` method, which will marshall objects to/from HTTP messages:
+Some of the supported message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechanism to automatically marshall data objects to/from JSON and XML using reflection (oops - looks like we broke our reflection promise - but technically we're not doing it ;) !). This behaviour is supported in [**http4k**](https://github.com/http4k/http4k) Lenses through the use of the `auto()` method, which will marshall objects to/from HTTP messages:
 
 ```kotlin
 data class Email(val value: String)
@@ -194,7 +194,7 @@ As pointed out above, `http4k-core` module has zero dependencies. It is also sma
 There are also a bunch of other modules available, all presented with the same concentration on Testability, API simplicity and consistency:
  
 * ViewModel driven templating engine support (Handlerbars etc) with HotReload.
-* Popular JSON/XML (Gson, Jackson etc) library support for HTTP bodies.
+* Popular JSON/XML (Gson, Jackson, Moshi, etc) library support for HTTP bodies.
 * Typesafe HTML Form and Multipart Forms processing, with support for Streaming uploads to a storage service. Forms can also be configured to collect errors instead of just rejecting outright.
 * Typesafe contract module, providing live [OpenApi/Swagger](https://www.openapis.org/) documentation.
 * [AWS](https://aws.amazon.com/) request signing.

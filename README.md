@@ -40,7 +40,7 @@ plugging together of services without HTTP container being required.
     * Pluggable Server backends: Single LOC Server spinup for Apache, Jetty, Netty, Undertow, Apache (Httpcore) and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
-    * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
+    * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
     * Multipart form handling, including stream processing for uploaded files.
@@ -91,6 +91,7 @@ plugging together of services without HTTP container being required.
     * Consistent API provides first class support for marshalling JSON to/from HTTP messages for:
         * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
+        * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
         * **Argo** - lightweight Java JSON API with zero dependencies.
         * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
 * [Resilience:](https://http4k.org/guide/modules/resilience) 
