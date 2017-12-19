@@ -1,7 +1,7 @@
 description = 'HTTP Client built on top of okhttp'
 
 ext {
-    ext.okhttp_version = '3.9.0'
+    ext.okhttp_version = '3.9.1'
 }
 
 dependencies {

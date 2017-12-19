@@ -1,7 +1,7 @@
 description = 'Http4k HTTP Client built on top of apache-httpclient'
 
 ext{
-    ext.apache_http_version = '4.5.3'
+    ext.apache_http_version = '4.5.4'
 }
 
 dependencies {

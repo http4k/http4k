@@ -21,6 +21,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
+import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
@@ -60,6 +61,9 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
             "/empty" bind GET to { _: Request -> Response(OK).body("") },
             "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") },
             "/stream" bind GET to { _: Request -> Response(OK).body("stream".byteInputStream()) },
+            "/delay/{millis}" bind GET to { r: Request ->
+                Thread.sleep(r.path("millis")!!.toLong())
+                Response(OK) },
             "/echo" bind POST to { request: Request -> Response(OK).body(request.bodyString()) },
             "/check-image" bind POST to { request: Request ->
                 if (Arrays.equals(testImageBytes(), request.body.payload.array()))
@@ -180,8 +184,8 @@ abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerCon
     }
 
     @Test
-    fun `socket timeouts are converted into 504`() {
-        val response = timeoutClient(Request(GET, "http://httpbin.org/delay/2"))
+    open fun `socket timeouts are converted into 504`() {
+        val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
 
         assertThat(response.status, equalTo(Status.CLIENT_TIMEOUT))
     }
