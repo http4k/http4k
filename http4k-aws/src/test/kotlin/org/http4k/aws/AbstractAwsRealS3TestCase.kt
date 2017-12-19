@@ -15,7 +15,8 @@ import org.junit.Assume
 import org.junit.Before
 import org.junit.BeforeClass
 import java.io.InputStream
-import java.util.*
+import java.util.Properties
+import java.util.UUID
 
 abstract class AbstractAwsRealS3TestCase {
     protected lateinit var bucketName: String
@@ -48,13 +49,13 @@ abstract class AbstractAwsRealS3TestCase {
 
     @After
     fun removeBucket() {
-        aClient()(Request(Method.DELETE, bucketUrl!!))
+        aClient()(Request(Method.DELETE, bucketUrl))
     }
 
     protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
         .then(ApacheClient())
 
-    protected fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope!!, credentials!!, payloadMode = signed)
+    protected fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope, credentials, payloadMode = signed)
 
     companion object {
         @BeforeClass
