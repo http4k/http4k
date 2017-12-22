@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.Test
+import java.time.Duration
 
 class ResponseCacheExtTest {
 
@@ -50,14 +51,14 @@ class ResponseCacheExtTest {
 
     @Test
     fun `adds max-age to response Cache-Control header`() {
-        val maxAgeResponse = Response(Status.OK).maxAge(360)
+        val maxAgeResponse = Response(Status.OK).maxAge(Duration.ofMinutes(1))
 
-        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("max-age=360"))
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("max-age=60"))
     }
 
     @Test
     fun `can chain together multiple calls to add to the header`() {
-        val chainedResponse = Response(Status.OK).public().maxAge(60)
+        val chainedResponse = Response(Status.OK).public().maxAge(Duration.ofMinutes(1))
 
         assertThat(chainedResponse.header("Cache-Control"), equalTo("public, max-age=60"))
     }

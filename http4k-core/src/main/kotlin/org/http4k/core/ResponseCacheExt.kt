@@ -1,5 +1,8 @@
 package org.http4k.core
 
+import org.http4k.filter.MaxAgeTtl
+import java.time.Duration
+
 fun Response.public() = addCacheability(Cacheability.public)
 
 private fun Response.addCacheability(cacheability: Cacheability): Response =
@@ -16,7 +19,7 @@ fun Response.mustRevalidate() = addCachingHeader("must-revalidate")
 
 fun Response.noStore() = addCachingHeader("no-store")
 
-fun Response.maxAge(seconds: Int) = addCachingHeader("max-age=$seconds")
+fun Response.maxAge(duration: Duration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
 
 private fun Response.addCachingHeader(value: String) =
         if (header("Cache-Control").isNullOrEmpty()) header("Cache-Control", value) else extendCachingHeader(value)
