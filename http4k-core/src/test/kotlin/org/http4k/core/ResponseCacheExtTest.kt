@@ -49,20 +49,6 @@ class ResponseCacheExtTest {
     }
 
     @Test
-    fun `adds no-transform to response Cache-Control header`() {
-        val noTransformResponse = Response(Status.OK).noTransform()
-
-        assertThat(noTransformResponse.header("Cache-Control"), equalTo("no-transform"))
-    }
-
-    @Test
-    fun `adds proxy-revalidate to response Cache-Control header`() {
-        val proxyRevalidateResp = Response(Status.OK).proxyRevalidate()
-
-        assertThat(proxyRevalidateResp.header("Cache-Control"), equalTo("proxy-revalidate"))
-    }
-
-    @Test
     fun `adds max-age to response Cache-Control header`() {
         val maxAgeResponse = Response(Status.OK).maxAge(360)
 
@@ -70,16 +56,16 @@ class ResponseCacheExtTest {
     }
 
     @Test
-    fun `adds s-maxage to response Cache-Control header`() {
-        val sMaxAgeResponse = Response(Status.OK).sMaxAge(100)
-
-        assertThat(sMaxAgeResponse.header("Cache-Control"), equalTo("s-maxage=100"))
-    }
-
-    @Test
     fun `can chain together multiple calls to add to the header`() {
         val chainedResponse = Response(Status.OK).public().maxAge(60)
 
         assertThat(chainedResponse.header("Cache-Control"), equalTo("public, max-age=60"))
+    }
+
+    @Test
+    fun `should overwrite existing headers with new values`() {
+        val chainedResponse = Response(Status.OK).public().private()
+
+        assertThat(chainedResponse.header("Cache-Control"), equalTo("private"))
     }
 }
