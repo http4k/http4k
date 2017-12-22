@@ -1,6 +1,8 @@
 package org.http4k.core
 
 import org.http4k.filter.MaxAgeTtl
+import org.http4k.filter.StaleIfErrorTtl
+import org.http4k.filter.StaleWhenRevalidateTtl
 import java.time.Duration
 
 fun Response.public() = addCacheability(Cacheability.public)
@@ -14,12 +16,15 @@ fun Response.noCache() = addCacheability(Cacheability.`no-cache`)
 
 fun Response.onlyIfCached() = addCacheability(Cacheability.`only-if-cached`)
 
-
 fun Response.mustRevalidate() = addCachingHeader("must-revalidate")
 
 fun Response.noStore() = addCachingHeader("no-store")
 
 fun Response.maxAge(duration: Duration) = replaceHeader("Cache-Control", MaxAgeTtl(duration).replaceIn(header("Cache-Control")))
+
+fun Response.staleWhileRevalidate(duration: Duration) = replaceHeader("Cache-Control", StaleWhenRevalidateTtl(duration).replaceIn(header("Cache-Control")))
+
+fun Response.staleIfError(duration: Duration) = replaceHeader("Cache-Control", StaleIfErrorTtl(duration).replaceIn(header("Cache-Control")))
 
 private fun Response.addCachingHeader(value: String) =
         if (header("Cache-Control").isNullOrEmpty()) header("Cache-Control", value) else extendCachingHeader(value)

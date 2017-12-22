@@ -57,10 +57,24 @@ class ResponseCacheExtTest {
     }
 
     @Test
-    fun `can chain together multiple calls to add to the header`() {
-        val chainedResponse = Response(Status.OK).public().maxAge(Duration.ofMinutes(1))
+    fun `adds stale-while-revalidate to response Cache-Control header`() {
+        val maxAgeResponse = Response(Status.OK).staleWhileRevalidate(Duration.ofMinutes(1))
 
-        assertThat(chainedResponse.header("Cache-Control"), equalTo("public, max-age=60"))
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-while-revalidate=60"))
+    }
+
+    @Test
+    fun `adds stale-if-error to response Cache-Control header`() {
+        val maxAgeResponse = Response(Status.OK).staleIfError(Duration.ofMinutes(1))
+
+        assertThat(maxAgeResponse.header("Cache-Control"), equalTo("stale-if-error=60"))
+    }
+
+    @Test
+    fun `can chain together multiple calls to add to the header`() {
+        val chainedResponse = Response(Status.OK).public().private().maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2))
+
+        assertThat(chainedResponse.header("Cache-Control"), equalTo("private, max-age=120"))
     }
 
     @Test
