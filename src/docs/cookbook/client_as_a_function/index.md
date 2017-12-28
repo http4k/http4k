@@ -5,8 +5,8 @@ This example demonstrates a client module (in this case the Apache Client). A cl
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.6.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "3.6.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.6.1"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "3.6.1"
 ```
 
 ### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/client_as_a_function/example.kt)
