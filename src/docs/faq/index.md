@@ -40,7 +40,7 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 **Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
 
-**A.** This is a Jackson-ism. Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
+**A.** This occurs in Jackson and Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
 
 **Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
 

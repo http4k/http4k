@@ -14,11 +14,17 @@ import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
-    private val moshi = builder.build()
+    private val moshi: Moshi = builder.build()
 
-    override fun asJsonString(a: Any): String = moshi.adapter(a.javaClass).failOnUnknown().toJson(a)
+    private fun <T : Any> adapterFor(c: Class<T>): JsonAdapter<T> = moshi.adapter(c).failOnUnknown()
 
-    override fun <T : Any> asA(s: String, c: KClass<T>): T = (moshi.adapter(c.java).failOnUnknown() as JsonAdapter<T>).fromJson(s)!!
+    override fun asJsonString(a: Any): String = adapterFor(a.javaClass).toJson(a)
+
+    fun <T : Any> asJsonString(t: T, c: KClass<T>): String = adapterFor(c.java).toJson(t)
+
+    override fun <T : Any> asA(s: String, c: KClass<T>): T = adapterFor(c.java).fromJson(s)!!
+
+    inline fun <reified T : Any> asA(s: String): T = asA(s, T::class)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
         Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asJsonString(it) })

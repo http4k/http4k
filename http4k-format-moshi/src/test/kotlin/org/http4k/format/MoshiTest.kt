@@ -13,12 +13,28 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
 
     override val expectedAutoMarshallingResult = """{"bool":false,"child":{"bool":true,"numbers":[1],"string":"world"},"numbers":[],"string":"hello"}"""
 
+
+    val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
     @Test
-    fun `roundtrip list of arbitary objects to and from object`() {
+    fun `roundtrip list of arbitary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
-        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))), equalTo(arrayOf(obj)))
+    }
 
-        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).asList(), equalTo(arrayOf(obj).asList()))
+    @Test
+    fun `roundtrip array of arbitary objects to and from JSON`() {
+        val input = arrayOf(obj)
+        val asJsonString = Moshi.asJsonString(input)
+        assertThat(Moshi.asA(asJsonString), equalTo(input))
+    }
+
+    @Test
+    fun `roundtrip list of arbitary objects to and from JSON`() {
+        val jsonString = Moshi.asJsonString(listOf(obj), List::class)
+        assertThat(Moshi.asA(jsonString), equalTo(arrayOf(obj)))
+//        val fromJson = Moshi.adapterFor(List::class.java).fromJson(Moshi.adapterFor(List::class.java).toJson(listOf(obj)))
+//        println(fromJson!![0])
     }
 }
