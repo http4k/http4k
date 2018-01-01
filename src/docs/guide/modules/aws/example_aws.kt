@@ -10,12 +10,12 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import java.util.*
+import java.util.UUID
 
 fun main(args: Array<String>) {
 
     val region = "us-east-1"
-    val service = "S3"
+    val service = "s3"
     val accessKey = "myGreatAwsAccessKey"
     val secretKey = "myGreatAwsSecretKey"
 
