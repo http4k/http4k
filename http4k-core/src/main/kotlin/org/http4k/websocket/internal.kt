@@ -8,10 +8,12 @@ abstract class PushPullAdaptingWebSocket(override val upgradeRequest: Request) :
     private val errorHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
     private val closeHandlers: MutableList<(WsStatus) -> Unit> = mutableListOf()
     private val messageHandlers: MutableList<(WsMessage) -> Unit> = mutableListOf()
+    private val onConnectHandlers: MutableList<() -> Unit> = mutableListOf()
 
     fun triggerError(throwable: Throwable) = errorHandlers.forEach { it(throwable) }
     fun triggerClose(status: WsStatus = NORMAL) = closeHandlers.forEach { it(status) }
     fun triggerMessage(message: WsMessage) = messageHandlers.forEach { it(message) }
+    fun triggerOnConnect() = onConnectHandlers.forEach { it() }
 
     override fun onError(fn: (Throwable) -> Unit) {
         errorHandlers.add(fn)
@@ -23,5 +25,9 @@ abstract class PushPullAdaptingWebSocket(override val upgradeRequest: Request) :
 
     override fun onMessage(fn: (WsMessage) -> Unit) {
         messageHandlers.add(fn)
+    }
+
+    override fun onConnect(fn: () -> Unit) {
+        onConnectHandlers.add(fn)
     }
 }
