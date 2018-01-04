@@ -17,6 +17,9 @@ interface Websocket {
     fun onError(fn: (Throwable) -> Unit)
     fun onClose(fn: (WsStatus) -> Unit)
     fun onMessage(fn: (WsMessage) -> Unit)
+    fun onConnect(fn: () -> Unit) {
+        // optional callback
+    }
 }
 
 typealias WsConsumer = (Websocket) -> Unit

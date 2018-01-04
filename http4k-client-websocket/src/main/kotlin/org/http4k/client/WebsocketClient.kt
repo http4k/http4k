@@ -27,7 +27,7 @@ object WebsocketClient {
     fun nonBlocking(uri: Uri): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
         val client = object : WebSocketClient(URI.create(uri.toString())) {
-            override fun onOpen(handshakedata: ServerHandshake?) {}
+            override fun onOpen(handshakedata: ServerHandshake?) = socket.get().triggerOnConnect()
 
             override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(WsStatus(code, reason))
 
@@ -38,10 +38,10 @@ object WebsocketClient {
         }
         socket.set(object : PushPullAdaptingWebSocket(Request(GET, uri)) {
             override fun send(message: WsMessage) =
-                when (message.body) {
-                    is StreamBody -> client.send(message.body.payload)
-                    else -> client.send(message.bodyString())
-                }
+                    when (message.body) {
+                        is StreamBody -> client.send(message.body.payload)
+                        else -> client.send(message.bodyString())
+                    }
 
             override fun close(status: WsStatus) {
                 client.close(status.code, status.description)
@@ -87,10 +87,10 @@ object WebsocketClient {
             override fun close(status: WsStatus) = client.close(status.code, status.description)
 
             override fun send(message: WsMessage): Unit =
-                when (message.body) {
-                    is StreamBody -> client.send(message.body.payload)
-                    else -> client.send(message.bodyString())
-                }
+                    when (message.body) {
+                        is StreamBody -> client.send(message.body.payload)
+                        else -> client.send(message.bodyString())
+                    }
         }
     }
 }
