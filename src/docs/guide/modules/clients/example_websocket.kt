@@ -24,27 +24,29 @@ fun main(args: Array<String>) {
 
     // blocking client - connection is done on construction
     val blockingClient = WebsocketClient.blocking(Uri.of("ws://localhost:8000/bob"))
-    blockingClient.send(WsMessage("hello"))
+    blockingClient.send(WsMessage("server sent on connection"))
     blockingClient.received().take(2).forEach { println("blocking client received: " + it) }
     blockingClient.close()
 
     // non-blocking client - exposes a Websocket interface for attaching listeners,
-    // and connection is done on construction, but doesn't block
-    val websocket = WebsocketClient.nonBlocking(Uri.of("ws://localhost:8000/bob"))
+    // and connection is done on construction, but doesn't block - the (optional) handler
+    // passed to the construction is called on connection.
+    val nonBlockingClient = WebsocketClient.nonBlocking(Uri.of("ws://localhost:8000/bob")) {
+        it.run {
+            send(WsMessage("client sent on connection"))
+        }
+    }
+
+    nonBlockingClient.onMessage {
+        println("non-blocking client received:" + it)
+    }
+
+    nonBlockingClient.onClose {
+        println("non-blocking client closing")
+    }
+
 
     Thread.sleep(100)
-
-    websocket.run {
-        onMessage {
-            println("non-blocking client received:" + it)
-        }
-
-        onClose {
-            println("non-blocking client closing")
-        }
-
-        send(WsMessage("hello"))
-    }
 
     server.stop()
 }

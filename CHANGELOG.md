@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.8.0
+- Added facility for non-blocking websocket client to react to onConnect event. This API is
+the same as the inbound, server-side API - ie. there are no explicit connection event handlers. H/T @tom for the idea.
+
 ### v3.7.0
 - P/R #13 Create extension methods for Response to add caching headers. H/T @k0zakinio.
 

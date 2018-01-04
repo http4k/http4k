@@ -8,6 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.testing.WsClient
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.java_websocket.client.WebSocketClient
@@ -22,12 +23,14 @@ object WebsocketClient {
 
     /**
      * Provides a client-side Websocket instance connected to a remote Websocket. The resultant object
-     * can be have listeners attached to it.
+     * can be have listeners attached to it. Optionally pass a WsConsumer which will be called onConnect
      */
-    fun nonBlocking(uri: Uri): Websocket {
+    fun nonBlocking(uri: Uri, onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
         val client = object : WebSocketClient(URI.create(uri.toString())) {
-            override fun onOpen(handshakedata: ServerHandshake?) {}
+            override fun onOpen(handshakedata: ServerHandshake?) {
+                onConnect(socket.get())
+            }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) = socket.get().triggerClose(WsStatus(code, reason))
 
@@ -54,7 +57,8 @@ object WebsocketClient {
 
     /**
      * Provides a client-side WsClient connected to a remote Websocket. This is a blocking API, so accessing the sequence of "received"
-     * messages will block on iteration until all messages are received (or the socket it closed).
+     * messages will block on iteration until all messages are received (or the socket it closed). This call will also
+     * block while connection happens.
      */
     fun blocking(uri: Uri): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()

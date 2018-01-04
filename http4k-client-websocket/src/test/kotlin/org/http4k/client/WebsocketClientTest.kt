@@ -60,8 +60,11 @@ class WebsocketClientTest {
     fun `non-blocking`() {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
         val received = generateSequence { queue.take()() }
+        var connected = false
 
-        val websocket = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob"))
+        val websocket = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/bob")) {
+            connected = true
+        }
         var sent = false
         websocket.onMessage {
             if (!sent) {
@@ -75,5 +78,6 @@ class WebsocketClientTest {
         }
 
         received.take(4).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
+        connected shouldMatch equalTo(true)
     }
 }
