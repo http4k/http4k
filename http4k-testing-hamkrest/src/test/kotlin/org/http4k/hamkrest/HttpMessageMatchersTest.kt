@@ -1,4 +1,3 @@
-
 package org.http4k.hamkrest
 
 import com.natpryce.hamkrest.equalTo
@@ -10,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.toBody
 import org.http4k.core.with
+import org.http4k.format.Jackson
 import org.http4k.lens.Header
 import org.http4k.lens.string
 import org.junit.Test
@@ -39,6 +39,15 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob")), hasBody(equalTo("bill")))
+
+    @Test
+    fun `json body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody("""{"hello":"world"}"""), hasBody(equalTo("""{"hello":"w2orld"}""")))
+
+    @Test
+    fun `json node body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody(equalTo(Jackson.obj("hello" to Jackson.string("world")))), Jackson.hasBody(equalTo(Jackson.obj("hello" to Jackson.string("wo2rld")))))
+
+    @Test
+    fun `json node body equal matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":"world"}"""), Jackson.hasBody(Jackson.obj("hello" to Jackson.string("world"))), Jackson.hasBody(Jackson.obj("hello" to Jackson.string("wo2rld"))))
 
     @Test
     fun `body lens`() =

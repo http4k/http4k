@@ -29,6 +29,11 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     }
 }
 
-class GsonTest : JsonContract<JsonElement, JsonElement>(Gson)
+class GsonTest : JsonContract<JsonElement, JsonElement>(Gson) {
+    override val prettyString = """{
+  "hello": "world"
+}"""
+}
+
 class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement, JsonElement>(Gson)
 class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement, JsonElement>(Gson)

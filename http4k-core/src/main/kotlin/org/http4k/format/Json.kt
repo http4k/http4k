@@ -39,6 +39,10 @@ interface Json<ROOT : NODE, NODE : Any> {
     fun elements(value: NODE): Iterable<NODE>
     fun text(value: NODE): String
 
+    fun compactify(s: String) = parse(s).asCompactJsonString()
+
+    fun prettify(s: String) = parse(s).asPrettyJsonString()
+
     // Utility methods - used when we don't know which implementation we are using
     fun string(value: String): NODE = value.asJsonValue()
 

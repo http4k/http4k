@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.has
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
+import org.http4k.format.Json
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
 import org.http4k.lens.HeaderLens
@@ -26,3 +27,9 @@ fun hasBody(expected: Matcher<String>): Matcher<HttpMessage> = has("Body", { m: 
 fun hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, equalTo(expected))
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))
+
+fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: ROOT): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
+
+fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: Matcher<ROOT>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+
+fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))

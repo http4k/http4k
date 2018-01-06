@@ -29,6 +29,10 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
     }
 }
 
-class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson)
+class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
+    override val prettyString = """{
+  "hello" : "world"
+}"""
+}
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Jackson)

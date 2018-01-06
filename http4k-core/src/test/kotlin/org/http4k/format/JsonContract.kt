@@ -15,6 +15,8 @@ import java.math.BigInteger
 
 abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE>) {
 
+    abstract val prettyString: String
+
     @Test
     fun `looks up types`() {
         assertThat(j.typeOf(j.string("")), equalTo(JsonType.String))
@@ -90,5 +92,15 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE
     fun `invalid json blows up parse`() {
         assertThat({ j.parse("") }, throws(anything))
         assertThat({ j.parse("somevalue") }, throws(anything))
+    }
+
+    @Test
+    fun `compactify`() {
+        assertThat(j.compactify("""{   "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
+    }
+
+    @Test
+    fun `prettify`() {
+        assertThat(j.prettify("""{"hello":"world"}"""), equalTo(prettyString))
     }
 }
