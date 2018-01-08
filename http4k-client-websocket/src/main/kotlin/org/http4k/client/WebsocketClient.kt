@@ -12,6 +12,7 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.java_websocket.client.WebSocketClient
+import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.net.URI
@@ -25,9 +26,9 @@ object WebsocketClient {
      * Provides a client-side Websocket instance connected to a remote Websocket. The resultant object
      * can be have listeners attached to it. Optionally pass a WsConsumer which will be called onConnect
      */
-    fun nonBlocking(uri: Uri, onConnect: WsConsumer = {}): Websocket {
+    fun nonBlocking(uri: Uri, headers: Map<String, String> = mapOf(), timeoutInMillis: Int = 0, onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
-        val client = object : WebSocketClient(URI.create(uri.toString())) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers, timeoutInMillis) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 onConnect(socket.get())
             }
@@ -41,10 +42,10 @@ object WebsocketClient {
         }
         socket.set(object : PushPullAdaptingWebSocket(Request(GET, uri)) {
             override fun send(message: WsMessage) =
-                when (message.body) {
-                    is StreamBody -> client.send(message.body.payload)
-                    else -> client.send(message.bodyString())
-                }
+                    when (message.body) {
+                        is StreamBody -> client.send(message.body.payload)
+                        else -> client.send(message.bodyString())
+                    }
 
             override fun close(status: WsStatus) {
                 client.close(status.code, status.description)
@@ -60,10 +61,10 @@ object WebsocketClient {
      * messages will block on iteration until all messages are received (or the socket it closed). This call will also
      * block while connection happens.
      */
-    fun blocking(uri: Uri): WsClient {
+    fun blocking(uri: Uri, headers: Map<String, String> = mapOf(), timeoutInMillis: Int = 0): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-        val client = object : WebSocketClient(URI.create(uri.toString())) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers, timeoutInMillis) {
             override fun onOpen(sh: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -91,10 +92,10 @@ object WebsocketClient {
             override fun close(status: WsStatus) = client.close(status.code, status.description)
 
             override fun send(message: WsMessage): Unit =
-                when (message.body) {
-                    is StreamBody -> client.send(message.body.payload)
-                    else -> client.send(message.bodyString())
-                }
+                    when (message.body) {
+                        is StreamBody -> client.send(message.body.payload)
+                        else -> client.send(message.bodyString())
+                    }
         }
     }
 }
