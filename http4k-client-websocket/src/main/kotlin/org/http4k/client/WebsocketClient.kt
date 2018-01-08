@@ -1,6 +1,7 @@
 package org.http4k.client
 
 import org.http4k.core.Body
+import org.http4k.core.Headers
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
@@ -17,6 +18,8 @@ import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
+import java.time.Duration
+import java.time.Duration.ZERO
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
 
@@ -26,9 +29,9 @@ object WebsocketClient {
      * Provides a client-side Websocket instance connected to a remote Websocket. The resultant object
      * can be have listeners attached to it. Optionally pass a WsConsumer which will be called onConnect
      */
-    fun nonBlocking(uri: Uri, headers: Map<String, String> = mapOf(), timeoutInMillis: Int = 0, onConnect: WsConsumer = {}): Websocket {
+    fun nonBlocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
-        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers, timeoutInMillis) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.seconds.toInt()) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 onConnect(socket.get())
             }
@@ -61,10 +64,10 @@ object WebsocketClient {
      * messages will block on iteration until all messages are received (or the socket it closed). This call will also
      * block while connection happens.
      */
-    fun blocking(uri: Uri, headers: Map<String, String> = mapOf(), timeoutInMillis: Int = 0): WsClient {
+    fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers, timeoutInMillis) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.seconds.toInt()) {
             override fun onOpen(sh: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -99,3 +102,5 @@ object WebsocketClient {
         }
     }
 }
+
+private fun Headers.combineToMap() = this.groupBy { it.first }.mapValues { it.value.joinToString(", ") }

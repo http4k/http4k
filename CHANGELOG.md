@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.10.0
+- P/R 81 - adding headers and timeout to websocket client.
+
 ### v3.9.0
 - Added compactify and prettify to Json implementations
 - Added `Json.hasBody` Hamkrest matchers for comparing bodies. Note these are extension methods and need to be referenced/imported as such.
