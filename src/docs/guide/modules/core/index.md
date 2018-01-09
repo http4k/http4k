@@ -29,7 +29,7 @@ need to launch a real HTTP container to exercise it:
 ```kotlin
 val handler = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 val get = Request(Method.GET, "/").query("name", "John Doe")
-val response = app(get)
+val response = handler(get)
 
 println(response.status)
 println(response.bodyString())
