@@ -8,6 +8,8 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.lens.Header
+import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.routing.RoutingHttpHandler
 import java.time.Duration
 
@@ -20,11 +22,10 @@ object MetricFilters {
             return Filter { next ->
                 { request ->
                     val startTime = clock.monotonicTime()
-                    val response = next(request)
-                    response.let {
+                    with(next(request)) {
                         val duration = Duration.ofNanos(clock.monotonicTime() - startTime)
 
-                        val tags = Tags.zip(config.methodName, request.method.name, config.statusName, it.status.code.toString())
+                        val tags = Tags.zip(config.methodName, request.method.name, config.statusName, status.code.toString())
 
                         Counter.builder(config.httpServerRequestsCounter.name)
                                 .description(config.httpServerRequestsCounter.description)
@@ -32,7 +33,7 @@ object MetricFilters {
                                 .register(meterRegistry)
                                 .increment()
 
-                        extractMetricHeadersFrom(it)?.let { (type, path) ->
+                        processHandlerMetrics({ (type, path) ->
                             val formattedPath = config.pathFormatter(path)
                             when (type) {
                                 HandlerMeter.Timer -> Timer.builder(config.httpServerHandlersTimer.name)
@@ -46,9 +47,8 @@ object MetricFilters {
                                         .register(meterRegistry)
                                         .increment()
                             }
-                        }
 
-                        removeMetricHeadersFrom(response)
+                        }).cleanupMetricHeaders()
                     }
                 }
             }
@@ -88,17 +88,20 @@ object MetricFilters {
         private val meterTypeHeader = "x-http4k-metrics-type"
 
         private fun Response.copyUriTemplateHeader(request: Request, type: HandlerMeter) =
-                replaceHeader(uriTemplateHeader, request.header("x-uri-template")).
-                        replaceHeader(meterTypeHeader, header(meterTypeHeader) ?: type.name)
+                replaceHeader(uriTemplateHeader, X_URI_TEMPLATE(request)).
+                        replaceHeader(meterTypeHeader, Header.defaulted(meterTypeHeader, type.name)(this))
 
-        private fun extractMetricHeadersFrom(response: Response): Pair<HandlerMeter, String>? {
-            val type = response.header(meterTypeHeader)?.let { HandlerMeter.valueOf(it) }
-            val path = response.header(uriTemplateHeader)
-            return if (type != null && path != null) type to path else null
+        private fun Response.processHandlerMetrics(block: (Pair<HandlerMeter, String>) -> Unit): Response {
+            val type = Header.map({ HandlerMeter.valueOf(it) }).optional(meterTypeHeader)(this)
+            val path = Header.optional(uriTemplateHeader)(this)
+            if (type != null && path != null) {
+                block(type to path)
+            }
+            return this
         }
 
-        private fun removeMetricHeadersFrom(response: Response): Response =
-                response.removeHeader(uriTemplateHeader).removeHeader(meterTypeHeader)
+        private fun Response.cleanupMetricHeaders(): Response =
+                removeHeader(uriTemplateHeader).removeHeader(meterTypeHeader)
     }
 
     data class MeterName(val name: String, val description: String?)
