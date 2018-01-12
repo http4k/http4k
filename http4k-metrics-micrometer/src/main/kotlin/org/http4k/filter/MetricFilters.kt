@@ -32,7 +32,7 @@ object MetricFilters {
                                 .register(meterRegistry)
                                 .increment()
 
-                        HandlerMetrics.extractFrom(it)?.let { (type, path) ->
+                        extractMetricHeadersFrom(it)?.let { (type, path) ->
                             val formattedPath = config.pathFormatter(path)
                             when (type) {
                                 HandlerMeter.Timer -> Timer.builder(config.httpServerHandlersTimer.name)
@@ -48,7 +48,7 @@ object MetricFilters {
                             }
                         }
 
-                        HandlerMetrics.removeMetricHeadersFrom(response)
+                        removeMetricHeadersFrom(response)
                     }
                 }
             }
@@ -71,50 +71,40 @@ object MetricFilters {
             }
         }
 
+        enum class HandlerMeter : Filter {
+            Timer {
+                override fun invoke(next: HttpHandler): HttpHandler = {
+                    request -> next(request).copyUriTemplateHeader(request, this)
+                }
+            },
+            Counter {
+                override fun invoke(next: HttpHandler): HttpHandler = {
+                    request -> next(request).copyUriTemplateHeader(request, this)
+                }
+            }
+        }
+
+        private val uriTemplateHeader = "x-http4k-metrics-uri-template"
+        private val meterTypeHeader = "x-http4k-metrics-type"
+
+        private fun Response.copyUriTemplateHeader(request: Request, type: HandlerMeter) =
+                replaceHeader(uriTemplateHeader, request.header("x-uri-template")).
+                        replaceHeader(meterTypeHeader, header(meterTypeHeader) ?: type.name)
+
+        private fun extractMetricHeadersFrom(response: Response): Pair<HandlerMeter, String>? {
+            val type = response.header(meterTypeHeader)?.let { HandlerMeter.valueOf(it) }
+            val path = response.header(uriTemplateHeader)
+            return if (type != null && path != null) type to path else null
+        }
+
+        private fun removeMetricHeadersFrom(response: Response): Response =
+                response.removeHeader(uriTemplateHeader).removeHeader(meterTypeHeader)
     }
 
     data class MeterName(val name: String, val description: String?)
 }
 
-val timer = HandlerMeter.Timer
-val counter = HandlerMeter.Counter
+val timer = MetricFilters.Server.HandlerMeter.Timer
+val counter = MetricFilters.Server.HandlerMeter.Counter
 
-enum class HandlerMeter {
-    Timer,
-    Counter
-}
-
-infix fun RoutingHttpHandler.with(type: HandlerMeter) = withFilter(when (type) {
-    HandlerMeter.Timer -> HandlerMetrics.Timer
-    HandlerMeter.Counter -> HandlerMetrics.Counter
-})
-
-private object HandlerMetrics {
-    private val uriTemplateHeader = "x-http4k-metrics-uri-template"
-    private val meterTypeHeader = "x-http4k-metrics-type"
-
-    fun extractFrom(response: Response): Pair<HandlerMeter, String>? {
-        val type = response.header(meterTypeHeader)?.let { HandlerMeter.valueOf(it) }
-        val path = response.header(uriTemplateHeader)
-        return if (type != null && path != null) type to path else null
-    }
-
-    fun removeMetricHeadersFrom(response: Response): Response =
-            response.removeHeader(uriTemplateHeader).removeHeader(meterTypeHeader)
-
-    private fun Response.copyUriTemplateHeader(request: Request, type: HandlerMeter) =
-            replaceHeader(uriTemplateHeader, request.header("x-uri-template")).
-                    replaceHeader(meterTypeHeader, header(meterTypeHeader) ?: type.name)
-
-    object Timer : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
-            request -> next(request).copyUriTemplateHeader(request, HandlerMeter.Timer)
-        }
-    }
-
-    object Counter : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
-            request -> next(request).copyUriTemplateHeader(request, HandlerMeter.Counter)
-        }
-    }
-}
+infix fun RoutingHttpHandler.with(type: MetricFilters.Server.HandlerMeter) = withFilter(type)
