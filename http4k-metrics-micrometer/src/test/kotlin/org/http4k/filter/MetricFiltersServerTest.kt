@@ -1,4 +1,4 @@
-package org.http4k.metrics
+package org.http4k.filter
 
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
@@ -23,7 +23,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Path
@@ -34,13 +33,13 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ServerMetricsTest {
+class MetricFiltersServerTest {
 
-    private var config = ServerMetrics.Config()
+    private var config = MetricFilters.Server.Config()
     private val clock = MockClock()
     private val registry by lazy { SimpleMeterRegistry(SimpleConfig.DEFAULT, clock) }
     private val server by lazy {
-        ServerMetrics(registry, config)
+        MetricFilters.Server(registry, config)
                 .then(ServerFilters.CatchAll())
                 .then(ServerFilters.CatchLensFailure)
                 .then(SimulateResponseTime(clock))
@@ -127,12 +126,12 @@ class ServerMetricsTest {
 
     @Test
     fun `meter names and path formatter can be configured`() {
-        config = ServerMetrics.Config(
-                ServerMetrics.MeterName("custom.serverRequests", "Custom server requests counter"),
-                ServerMetrics.MeterName("custom.handlerRequests", "Custom handler requests timer"),
-                ServerMetrics.MeterName("custom.handlerRequests", "Custom handler requests counter"),
+        config = MetricFilters.Server.Config(
+                MetricFilters.MeterName("custom.serverRequests", "Custom server requests counter"),
+                MetricFilters.MeterName("custom.handlerRequests", "Custom handler requests timer"),
+                MetricFilters.MeterName("custom.handlerRequests", "Custom handler requests counter"),
                 "customMethod", "customStatus", "customPath",
-                { ServerMetrics.Config.defaultPathFormatter(it).plus("-custom") }
+                { MetricFilters.Server.Config.defaultPathFormatter(it).plus("-custom") }
         )
 
         server(Request(Method.GET, "/timed/one")) shouldMatch hasStatus(Status.OK)
