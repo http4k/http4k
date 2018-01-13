@@ -37,9 +37,9 @@ import java.util.Arrays
 import java.util.Random
 
 
-abstract class Http4kClientContract(private val serverConfig: (Int) -> ServerConfig,
-                                    val client: HttpHandler,
-                                    private val timeoutClient: HttpHandler) {
+abstract class Http4kClientContract<out T : HttpHandler>(private val serverConfig: (Int) -> ServerConfig,
+                                                         val client: T,
+                                                         val timeoutClient: T) {
     @Rule
     @JvmField
     var retryRule = RetryRule(5)

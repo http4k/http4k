@@ -10,6 +10,7 @@ import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HttpContext
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
@@ -17,7 +18,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
 import org.junit.Test
 
-class ApacheClientTest : Http4kClientContract({ SunHttp(it) }, ApacheClient(),
+class ApacheClientTest : Http4kClientContract<HttpHandler>({ SunHttp(it) }, ApacheClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultSocketConfig(
             SocketConfig.custom()
