@@ -3,7 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.11.0 (uncut)
-- Made `OkHttp` client support Async requests via the `AsyncHttpHandler` interface.
+- Added support for Async HTTP clients and new `AsyncHttpHandler` interface, which is **currently used for HTTP clients only**, and not server-side calls.
+- New client module `http4k-client-apache-async`.
+- Added support for async to `OkHttp` client module.
 
 ### v3.10.0
 - P/R 81 - adding headers and timeout to websocket client.

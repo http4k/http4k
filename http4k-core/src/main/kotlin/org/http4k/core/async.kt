@@ -1,10 +1,13 @@
 package org.http4k.core
 
+import java.io.Closeable
+
 /**
  * For support of both Synchronous and Asynchronous HTTP calls.
  */
-interface AsyncHttpHandler {
+interface AsyncHttpHandler : Closeable {
     operator fun invoke(request: Request, fn: (Response) -> Unit)
+    override fun close() {}
 }
 
 /**
