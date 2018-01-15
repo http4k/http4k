@@ -26,6 +26,17 @@ class SecurityTest {
     }
 
     @Test
+    fun `OPTIONS request is granted access even with no API key if toggled off`() {
+        val param = Query.int().required("name")
+        val next: HttpHandler = { Response(OK).body("hello") }
+
+        val response = ApiKey(param, { true }, false).filter(next)(Request(Method.OPTIONS, "/"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("hello"))
+    }
+
+    @Test
     fun `missing API key is unauthorized`() {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
