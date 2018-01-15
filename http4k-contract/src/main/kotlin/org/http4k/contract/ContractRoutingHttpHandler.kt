@@ -10,6 +10,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.Header
+import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
@@ -29,9 +30,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
 
-    private val routers = routes
-        .map { it.toRouter(contractRoot) to CatchLensFailure.then(security.filter).then(identify(it)).then(filter) }
-        .plus(descriptionRoute.toRouter(contractRoot) to identify(descriptionRoute).then(filter))
+    private val routers: List<Pair<Filter, Router>> = routes
+        .map { CatchLensFailure.then(security.filter).then(identify(it)).then(filter) to it.toRouter(contractRoot) }
+        .plus(identify(descriptionRoute).then(filter) to descriptionRoute.toRouter(contractRoot))
 
     private val noMatch: HttpHandler? = null
 
@@ -39,7 +40,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun match(request: Request): HttpHandler? =
         if (request.isIn(contractRoot)) {
-            routers.fold(noMatch, { memo, (router, routeFilter) ->
+            routers.fold(noMatch, { memo, (routeFilter, router) ->
                 memo ?: router.match(request)?.let { routeFilter.then(it) }
             })
         } else null

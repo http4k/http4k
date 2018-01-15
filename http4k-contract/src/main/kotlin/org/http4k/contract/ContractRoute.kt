@@ -4,7 +4,10 @@ package org.http4k.contract
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.Header.Common.CONTENT_TYPE
@@ -30,12 +33,14 @@ class ContractRoute internal constructor(internal val method: Method,
         override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
         override fun match(request: Request): HttpHandler? =
-            if (request.method == method && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
+            if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
                 try {
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
-                            spec.then(toHandler(it))
+                            if (request.method == OPTIONS) {
+                                { Response(OK) }
+                            } else spec.then(toHandler(it))
                         }
                 } catch (e: LensFailure) {
                     null

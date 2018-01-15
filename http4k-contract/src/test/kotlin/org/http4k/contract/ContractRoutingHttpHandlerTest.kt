@@ -3,10 +3,12 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
@@ -59,6 +61,28 @@ class ContractRoutingHttpHandlerTest {
         assertThat(response.status, equalTo(OK))
         assertThat(X_URI_TEMPLATE(response), equalTo("/root/bar/foo/bar/{world}"))
     }
+
+    @Test
+    fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
+        val root = org.http4k.routing.routes(
+            "/root/bar" bind contract(
+                "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) })
+        )
+        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+
+        assertThat(response.status, equalTo(OK))
+    }
+
+//    @Test
+//    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
+//        val root = org.http4k.routing.routes(
+//            "/root/bar" bind contract(
+//                "/foo/bar" bindContract OPTIONS to { Response(NOT_IMPLEMENTED) })
+//        )
+//        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
+//
+//        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
+//    }
 
     @Test
     fun `identifies called route using identity header on request`() {
@@ -135,7 +159,7 @@ class ContractRoutingHttpHandlerTest {
                 Response(OK)
             })
 
-        val request = Request(OPTIONS, "/test")
+        val request = Request(Method.PUT, "/test")
         (filter.then("/" bind contract))(request)
         (filter.then(contract))(request)
         (org.http4k.routing.routes(filter.then(contract)))(request)
