@@ -186,6 +186,7 @@ dependencies {
     provided project(":http4k-format-jackson")
     provided project(":http4k-format-moshi")
     provided project(":http4k-format-xml")
+    provided project(":http4k-metrics-micrometer")
     provided project(":http4k-multipart")
     provided project(":http4k-resilience4j")
     provided project(":http4k-server-apache")
