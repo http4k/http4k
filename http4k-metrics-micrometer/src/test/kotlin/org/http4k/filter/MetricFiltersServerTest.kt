@@ -5,9 +5,14 @@ import com.natpryce.hamkrest.should.shouldMatch
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Path
@@ -25,16 +30,16 @@ class MetricFiltersServerTest {
     private val server by lazy {
         routes(
                 "/timed" bind routes(
-                        "/one" bind Method.GET to { Response(Status.OK) },
-                        "/two/{name:.*}" bind Method.POST to { Response(Status.OK).body(Path.of("name")(it)) }
+                        "/one" bind GET to { Response(OK) },
+                        "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
                 ).withFilter(requestTimer),
                 "/counted" bind routes(
-                        "/one" bind Method.GET to { Response(Status.OK) },
-                        "/two/{name:.*}" bind Method.POST to { Response(Status.OK).body(Path.of("name")(it)) }
+                        "/one" bind GET to { Response(OK) },
+                        "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
                 ).withFilter(requestCounter),
                 "/unmetered" bind routes(
-                        "one" bind Method.GET to { Response(Status.OK) },
-                        "two" bind Method.DELETE to { Response(Status.INTERNAL_SERVER_ERROR) }
+                        "one" bind GET to { Response(OK) },
+                        "two" bind DELETE to { Response(INTERNAL_SERVER_ERROR) }
                 ),
                 "/otherTimed" bind static().withFilter(requestTimer),
                 "/otherCounted" bind static().withFilter(requestCounter)
@@ -43,40 +48,40 @@ class MetricFiltersServerTest {
 
     @Test
     fun `routes with timer generate request timing metrics tagged with path and method and status`() {
-        server(Request(Method.GET, "/timed/one")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/timed/one")) shouldMatch hasStatus(OK)
         repeat(2) {
-            server(Request(Method.POST, "/timed/two/bob")) shouldMatch (hasStatus(Status.OK) and hasBody("bob"))
+            server(Request(POST, "/timed/two/bob")) shouldMatch (hasStatus(OK) and hasBody("bob"))
         }
 
         assert(registry,
-                hasRequestTimer(Method.GET, "timed_one", Status.OK, 1, 1),
-                hasRequestTimer(Method.POST, "timed_two_name", Status.OK, 2, 2)
+                hasRequestTimer(GET, "timed_one", OK, 1, 1),
+                hasRequestTimer(POST, "timed_two_name", OK, 2, 2)
         )
     }
 
     @Test
     fun `routes with counter generate request count metrics tagged with path and method and status`() {
-        server(Request(Method.GET, "/counted/one")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/counted/one")) shouldMatch hasStatus(OK)
         repeat(2) {
-            server(Request(Method.POST, "/counted/two/bob")) shouldMatch (hasStatus(Status.OK) and hasBody("bob"))
+            server(Request(POST, "/counted/two/bob")) shouldMatch (hasStatus(OK) and hasBody("bob"))
         }
 
         assert(registry,
-                hasRequestCounter(Method.GET, "counted_one", Status.OK, 1),
-                hasRequestCounter(Method.POST, "counted_two_name", Status.OK, 2)
+                hasRequestCounter(GET, "counted_one", OK, 1),
+                hasRequestCounter(POST, "counted_two_name", OK, 2)
         )
     }
 
     @Test
     fun `routes without metrics generate nothing`() {
-        server(Request(Method.GET, "/unmetered/one")) shouldMatch hasStatus(Status.OK)
-        server(Request(Method.DELETE, "/unmetered/two")) shouldMatch hasStatus(Status.INTERNAL_SERVER_ERROR)
+        server(Request(GET, "/unmetered/one")) shouldMatch hasStatus(OK)
+        server(Request(DELETE, "/unmetered/two")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
 
         assert(registry,
-                hasNoRequestTimer(Method.GET, "unmetered_one", Status.OK),
-                hasNoRequestTimer(Method.DELETE, "unmetered_two", Status.INTERNAL_SERVER_ERROR),
-                hasNoRequestCounter(Method.GET, "unmetered_one", Status.OK),
-                hasNoRequestCounter(Method.DELETE, "unmetered_two", Status.INTERNAL_SERVER_ERROR)
+                hasNoRequestTimer(GET, "unmetered_one", OK),
+                hasNoRequestTimer(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR),
+                hasNoRequestCounter(GET, "unmetered_one", OK),
+                hasNoRequestCounter(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR)
         )
     }
 
@@ -86,10 +91,10 @@ class MetricFiltersServerTest {
                 "customMethod", "customStatus", "customPath",
                 { MetricFilters.Server.defaultRequestIdFormatter(it).plus("-custom") }, clock)
 
-        server(Request(Method.GET, "/timed/one")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/timed/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestTimer(Method.GET, "timed_one-custom", Status.OK, 1, 1,
+                hasRequestTimer(GET, "timed_one-custom", OK, 1, 1,
                         "custom.requests", "custom.description", "customMethod",
                         "customStatus", "customPath")
         )
@@ -101,10 +106,10 @@ class MetricFiltersServerTest {
                 "customMethod", "customStatus", "customPath",
                 { MetricFilters.Server.defaultRequestIdFormatter(it).plus("-custom") })
 
-        server(Request(Method.GET, "/counted/one")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/counted/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestCounter(Method.GET, "counted_one-custom", Status.OK, 1,
+                hasRequestCounter(GET, "counted_one-custom", OK, 1,
                         "custom.requests", "custom.description", "customMethod",
                         "customStatus", "customPath")
         )
@@ -112,26 +117,26 @@ class MetricFiltersServerTest {
 
     @Test
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
-        server(Request(Method.GET, "/otherTimed/test.json")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/otherTimed/test.json")) shouldMatch hasStatus(OK)
 
         assert(registry,
                 // The count and time seems wrong - is static handler invoked twice per request ???
-                hasRequestTimer(Method.GET, "UNMAPPED", Status.OK, 2, 2)
+                hasRequestTimer(GET, "UNMAPPED", OK, 2, 2)
         )
     }
 
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
-        server(Request(Method.GET, "/otherCounted/test.json")) shouldMatch hasStatus(Status.OK)
+        server(Request(GET, "/otherCounted/test.json")) shouldMatch hasStatus(OK)
 
         assert(registry,
                 // The count and time seems wrong - is static handler invoked twice per request ???
-                hasRequestCounter(Method.GET, "UNMAPPED", Status.OK, 2)
+                hasRequestCounter(GET, "UNMAPPED", OK, 2)
         )
     }
 
     private fun hasRequestCounter(method: Method, path: String, status: Status, count: Long,
-                                  name: String = "http.server.requests",
+                                  name: String = "http.server.request.count",
                                   description: String = "Total number of server requests",
                                   methodName: String = "method",
                                   statusName: String = "status",
@@ -141,8 +146,8 @@ class MetricFiltersServerTest {
     )
 
     private fun hasRequestTimer(method: Method, path: String, status: Status, count: Long, totalTimeSec: Long,
-                                name: String = "http.server.requests",
-                                description: String = "Timings of server requests",
+                                name: String = "http.server.request.latency",
+                                description: String = "Timing of server requests",
                                 methodName: String = "method",
                                 statusName: String = "status",
                                 requestIdName: String = "path") = hasTimer(name,
@@ -151,12 +156,12 @@ class MetricFiltersServerTest {
     )
 
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
-            hasTimer("http.server.requests",
+            hasTimer("http.server.request.latency",
                     Tags.zip("path", path, "method", method.name, "status", status.code.toString())
             ).not()
 
     private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
-            hasCounter("http.server.requests",
+            hasCounter("http.server.request.count",
                     Tags.zip("path", path, "method", method.name, "status", status.code.toString())
             ).not()
 }
