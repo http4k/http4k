@@ -6,9 +6,13 @@ import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.http4k.util.TickingClock
@@ -22,8 +26,8 @@ class MetricFiltersClientTest {
     private var requestCounter = MetricFilters.Client.RequestCounter(registry)
     private val remoteServerMock: HttpHandler = {
         when (it.uri.path) {
-            "/one" -> Response(Status.OK)
-            else -> Response(Status.NOT_FOUND)
+            "/one" -> Response(OK)
+            else -> Response(NOT_FOUND)
         }
     }
     private val timedClient by lazy { requestTimer.then(remoteServerMock) }
@@ -31,77 +35,77 @@ class MetricFiltersClientTest {
 
     @Test
     fun `timed requests generate timing metrics tagged with method and status and host`() {
-        timedClient(Request(Method.GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(Status.OK)
+        timedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
         repeat(2) {
-            timedClient(Request(Method.POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(Status.NOT_FOUND)
+            timedClient(Request(POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(NOT_FOUND)
         }
 
         assert(registry,
-                hasRequestTimer(Method.GET, Status.OK, "test_server_com", 1, 1),
-                hasRequestTimer(Method.POST, Status.NOT_FOUND, "another_server_com", 2, 2)
+            hasRequestTimer(GET, OK, "test_server_com", 1, 1),
+            hasRequestTimer(POST, NOT_FOUND, "another_server_com", 2, 2)
         )
     }
 
     @Test
     fun `counted requests generate count metrics tagged with method and status and host`() {
-        countedClient(Request(Method.GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(Status.OK)
+        countedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
         repeat(2) {
-            countedClient(Request(Method.POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(Status.NOT_FOUND)
+            countedClient(Request(POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(NOT_FOUND)
         }
 
         assert(registry,
-                hasRequestCounter(Method.GET, Status.OK, "test_server_com", 1),
-                hasRequestCounter(Method.POST, Status.NOT_FOUND, "another_server_com", 2)
+            hasRequestCounter(GET, OK, "test_server_com", 1),
+            hasRequestCounter(POST, NOT_FOUND, "another_server_com", 2)
         )
     }
 
     @Test
     fun `request timer meter names and request id formatter can be configured`() {
-        requestTimer = MetricFilters.Client.RequestTimer(registry,"custom.requests", "custom.description",
-                "customMethod", "customStatus", "customHost",
-                { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") }, clock)
+        requestTimer = MetricFilters.Client.RequestTimer(registry, "custom.requests", "custom.description",
+            "customMethod", "customStatus", "customHost",
+            { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") }, clock)
 
-        timedClient(Request(Method.GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(Status.OK)
+        timedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestTimer(Method.GET, Status.OK, "test_server_com-custom", 1, 1,
-                        "custom.requests", "custom.description", "customMethod",
-                        "customStatus", "customHost")
+            hasRequestTimer(GET, OK, "test_server_com-custom", 1, 1,
+                "custom.requests", "custom.description", "customMethod",
+                "customStatus", "customHost")
         )
     }
 
     @Test
     fun `request counter meter names and request id formatter can be configured`() {
-        requestCounter = MetricFilters.Client.RequestCounter(registry,"custom.requests", "custom.description",
-                "customMethod", "customStatus", "customHost",
-                { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") })
+        requestCounter = MetricFilters.Client.RequestCounter(registry, "custom.requests", "custom.description",
+            "customMethod", "customStatus", "customHost",
+            { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") })
 
-        countedClient(Request(Method.GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(Status.OK)
+        countedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestCounter(Method.GET, Status.OK, "test_server_com-custom", 1,
-                        "custom.requests", "custom.description", "customMethod",
-                        "customStatus", "customHost")
+            hasRequestCounter(GET, OK, "test_server_com-custom", 1,
+                "custom.requests", "custom.description", "customMethod",
+                "customStatus", "customHost")
         )
     }
 
-    private fun hasRequestTimer(method: Method, status: Status, host: String, count: Long, totalTimeSec: Long,
-                                name: String = "http.client.requests",
-                                description: String = "Timings of client requests",
-                                methodName: String = "method",
-                                statusName: String = "status",
-                                requestIdName: String = "host") = hasTimer(name,
-            Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
-            description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)
-    )
-
     private fun hasRequestCounter(method: Method, status: Status, host: String, count: Long,
-                                  name: String = "http.client.requests",
+                                  name: String = "http.client.request.count",
                                   description: String = "Total number of client requests",
                                   methodName: String = "method",
                                   statusName: String = "status",
                                   requestIdName: String = "host") = hasCounter(name,
-            Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
-            description(description) and counterCount(count)
+        Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
+        description(description) and counterCount(count)
+    )
+
+    private fun hasRequestTimer(method: Method, status: Status, host: String, count: Long, totalTimeSec: Long,
+                                name: String = "http.client.request.latency",
+                                description: String = "Timing of client requests",
+                                methodName: String = "method",
+                                statusName: String = "status",
+                                requestIdName: String = "host") = hasTimer(name,
+        Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
+        description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)
     )
 }

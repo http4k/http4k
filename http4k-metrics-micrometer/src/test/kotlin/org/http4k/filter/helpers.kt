@@ -10,7 +10,7 @@ import io.micrometer.core.instrument.Meter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Timer
-import java.util.*
+import java.util.Optional
 import java.util.concurrent.TimeUnit
 
 internal fun assert(registry: MeterRegistry, vararg matcher: Matcher<MeterRegistry>) =
