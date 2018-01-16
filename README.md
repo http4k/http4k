@@ -43,6 +43,7 @@ plugging together of services without HTTP container being required.
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
+    * Metrics gathering for performance analysis.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
@@ -96,6 +97,8 @@ plugging together of services without HTTP container being required.
         * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
 * [Resilience:](https://http4k.org/guide/modules/resilience) 
     * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
+* [Metrics:](https://http4k.org/guide/modules/metrics) 
+    * Support for plugging http4k apps into micrometer
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 

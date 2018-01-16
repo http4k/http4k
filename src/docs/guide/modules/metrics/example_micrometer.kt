@@ -18,22 +18,23 @@ fun main(args: Array<String>) {
 
     val server = routes("/metrics" bind GET to { Response(OK) })
 
+    // apply filters to a server...
     val app = MetricFilters.Server.RequestCounter(registry)
         .then(MetricFilters.Server.RequestTimer(registry))
         .then(server)
 
-    (0..10).forEach {
-        app(Request(GET, "/metrics/one"))
-    }
-
+    // ... or to a client
     val client =
         MetricFilters.Client.RequestCounter(registry)
             .then(MetricFilters.Client.RequestTimer(registry))
             .then(ApacheClient())
 
+    // make some calls
     (0..10).forEach {
+        app(Request(GET, "/metrics"))
         client(Request(GET, "https://http4k.org"))
     }
 
+    // see some results
     registry.forEachMeter { println("${it.id} ${it.type()} ${it.measure().joinToString(",")}") }
 }
