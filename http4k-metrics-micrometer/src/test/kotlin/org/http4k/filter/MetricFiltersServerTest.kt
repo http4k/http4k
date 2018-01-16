@@ -131,8 +131,8 @@ class MetricFiltersServerTest {
     }
 
     private fun hasRequestTimer(method: Method, path: String, status: Status, count: Long, totalTimeSec: Long,
-                                name: String = "http.server.requests",
-                                description: String = "Timings of server requests",
+                                name: String = "http.server.request.latency",
+                                description: String = "Timing of server requests",
                                 methodName: String = "method",
                                 statusName: String = "status",
                                 requestIdName: String = "path") = hasTimer(name,
@@ -141,7 +141,7 @@ class MetricFiltersServerTest {
     )
 
     private fun hasRequestCounter(method: Method, path: String, status: Status, count: Long,
-                                  name: String = "http.server.requests",
+                                  name: String = "http.server.request.count",
                                   description: String = "Total number of server requests",
                                   methodName: String = "method",
                                   statusName: String = "status",
