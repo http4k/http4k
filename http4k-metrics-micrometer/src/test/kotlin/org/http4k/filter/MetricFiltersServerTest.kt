@@ -118,21 +118,13 @@ class MetricFiltersServerTest {
     @Test
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
         server(Request(GET, "/otherTimed/test.json")) shouldMatch hasStatus(OK)
-
-        assert(registry,
-                // The count and time seems wrong - is static handler invoked twice per request ???
-                hasRequestTimer(GET, "UNMAPPED", OK, 2, 2)
-        )
+        assert(registry, hasRequestTimer(GET, "UNMAPPED", OK, 1, 1))
     }
 
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
         server(Request(GET, "/otherCounted/test.json")) shouldMatch hasStatus(OK)
-
-        assert(registry,
-                // The count and time seems wrong - is static handler invoked twice per request ???
-                hasRequestCounter(GET, "UNMAPPED", OK, 2)
-        )
+        assert(registry, hasRequestCounter(GET, "UNMAPPED", OK, 1))
     }
 
     private fun hasRequestCounter(method: Method, path: String, status: Status, count: Long,
