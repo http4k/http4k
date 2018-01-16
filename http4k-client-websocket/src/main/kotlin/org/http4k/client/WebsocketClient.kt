@@ -40,7 +40,7 @@ object WebsocketClient {
 
             override fun onMessage(message: String) = socket.get().triggerMessage(WsMessage(message))
 
-            override fun onError(ex: Exception) = socket.get().triggerError(ex)
+            override fun onError(e: Exception) = socket.get().triggerError(e)
 
         }
         socket.set(object : PushPullAdaptingWebSocket(Request(GET, uri)) {
@@ -82,9 +82,7 @@ object WebsocketClient {
                 queue.add({ WsMessage(Body(bytes.array().inputStream())) })
             }
 
-            override fun onError(ex: Exception) {
-                throw ex
-            }
+            override fun onError(e: Exception): Unit = throw e
         }
 
         client.connectBlocking()

@@ -38,18 +38,18 @@ class ApacheAsyncClient(
 
             override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
 
-            override fun failed(ex: Exception) = fn(when (ex) {
-                is ConnectTimeoutException -> Response(CLIENT_TIMEOUT)
-                is SocketTimeoutException -> Response(CLIENT_TIMEOUT)
-                else -> Response(SERVICE_UNAVAILABLE)
-            })
+            override fun failed(e: Exception) = fn(Response(when (e) {
+                is ConnectTimeoutException -> CLIENT_TIMEOUT
+                is SocketTimeoutException -> CLIENT_TIMEOUT
+                else -> SERVICE_UNAVAILABLE
+            }.describeClientError(e)))
         })
     }
 
-    private fun HttpResponse.toHttp4kResponse(): Response {
-        val baseResponse = Response(statusLine.toTarget()).headers(allHeaders.toTarget())
-        return entity?.let { baseResponse.body(responseBodyMode(it.content)) } ?: baseResponse
-    }
+    private fun HttpResponse.toHttp4kResponse(): Response =
+        Response(statusLine.toTarget()).headers(allHeaders.toTarget()).run {
+            entity?.let { body(responseBodyMode(it.content)) } ?: this
+        }
 
     private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
         init {

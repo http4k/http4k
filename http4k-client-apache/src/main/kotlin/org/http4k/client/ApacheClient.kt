@@ -33,9 +33,9 @@ class ApacheClient(
     override fun invoke(request: Request): Response = try {
         client.execute(request.toApacheRequest()).toHttp4kResponse()
     } catch (e: ConnectTimeoutException) {
-        Response(CLIENT_TIMEOUT)
+        Response(CLIENT_TIMEOUT.describeClientError(e))
     } catch (e: SocketTimeoutException) {
-        Response(CLIENT_TIMEOUT)
+        Response(CLIENT_TIMEOUT.describeClientError(e))
     }
 
     private fun CloseableHttpResponse.toHttp4kResponse(): Response {

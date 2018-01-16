@@ -21,14 +21,14 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         try {
             client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
         } catch (e: SocketTimeoutException) {
-            Response(CLIENT_TIMEOUT)
+            Response(CLIENT_TIMEOUT.describeClientError(e))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
-        override fun onFailure(call: Call, e: IOException) = when (e) {
-            is SocketTimeoutException -> fn(Response(CLIENT_TIMEOUT))
-            else -> fn(Response(SERVICE_UNAVAILABLE.description("Client error: " + (e.message ?: "<unknown>"))))
-        }
+        override fun onFailure(call: Call, e: IOException) = fn(Response(when (e) {
+            is SocketTimeoutException -> CLIENT_TIMEOUT
+            else -> SERVICE_UNAVAILABLE
+        }.describeClientError(e)))
 
         override fun onResponse(call: Call?, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
     }
