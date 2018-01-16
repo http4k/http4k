@@ -62,8 +62,8 @@ plugging together of services without HTTP container being required.
     * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
-        * **Apache** HTTP
-        * **OkHttp** HTTP
+        * **Apache** sync + async HTTP
+        * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:

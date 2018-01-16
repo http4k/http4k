@@ -2,11 +2,12 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.11.0
+### v3.11.0 (uncut)
 - Fix #84. OPTIONS requests are not detected by contract routes.
 - Added option to NOT authorise OPTIONS requests in ApiKey security filter.
 - Added support for Async HTTP clients and added new `AsyncHttpClient` interface, which is obviously used for HTTP clients only**, and not server-side calls. :)
 - New client module `http4k-client-apache-async`.
+- New metrics gathering module `http4k-metrics-micrometer`.
 - Added support for async to `OkHttp` client module.
 
 ### v3.10.0

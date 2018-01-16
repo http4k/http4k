@@ -4,6 +4,8 @@ description: Feature overview of the http4k-client modules
 ### Installation (Gradle)
 **Apache:** ```compile group: "org.http4k", name: "http4k-client-apache", version: "3.10.0"```
 
+**Apache Async:** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.10.0"```
+
 **OkHttp:** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.10.0"```
 
 **Websocket:** ```compile group: "org.http4k", name: "http4k-client-websocket", version: "3.10.0"```
