@@ -5,7 +5,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.11.0
 - Fix #84. OPTIONS requests are not detected by contract routes.
 - Added option to NOT authorise OPTIONS requests in ApiKey security filter.
-- Added support for Async HTTP clients and new `AsyncHttpClient` interface, which is obviously used for HTTP clients only**, and not server-side calls. :)
+- Added support for Async HTTP clients and added new `AsyncHttpClient` interface, which is obviously used for HTTP clients only**, and not server-side calls. :)
 - New client module `http4k-client-apache-async`.
 - Added support for async to `OkHttp` client module.
 
