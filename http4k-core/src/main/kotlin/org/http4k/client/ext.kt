@@ -7,9 +7,6 @@ import org.http4k.core.Status
 import java.io.Closeable
 import java.lang.Exception
 
-/**
- * For support of both Synchronous and Asynchronous HTTP calls.
- */
 interface AsyncHttpClient : Closeable {
     operator fun invoke(request: Request, fn: (Response) -> Unit)
     override fun close() {}
