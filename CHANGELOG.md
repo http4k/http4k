@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.11.0 (uncut)
+### v3.11.0
 - Fix #84. OPTIONS requests are not detected by contract routes.
 - Added option to NOT authorise OPTIONS requests in ApiKey security filter.
 - Added support for Async HTTP clients and new `AsyncHttpClient` interface, which is **currently used for HTTP clients only**, and not server-side calls.
