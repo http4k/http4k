@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 
-class ApacheAsyncClientTest : Http4kAsyncClientContract({ SunHttp(it) }, ApacheAsyncClient(),
+class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsyncClient(),
     ApacheAsyncClient(HttpAsyncClients.custom()
         .setDefaultIOReactorConfig(IOReactorConfig.custom()
             .setSoTimeout(100)

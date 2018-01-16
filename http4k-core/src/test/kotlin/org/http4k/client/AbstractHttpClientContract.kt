@@ -17,7 +17,7 @@ import org.junit.Rule
 import java.util.Arrays
 import java.util.Random
 
-abstract class AbstractHttp4kClientContract(private val serverConfig: (Int) -> ServerConfig) {
+abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
     @Rule
     @JvmField
     var retryRule = RetryRule(5)

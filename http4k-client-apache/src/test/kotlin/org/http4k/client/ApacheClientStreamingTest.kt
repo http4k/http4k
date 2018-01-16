@@ -5,7 +5,7 @@ import org.apache.http.impl.client.HttpClients
 import org.http4k.core.BodyMode.Stream
 import org.http4k.server.SunHttp
 
-class ApacheClientStreamingTest : Http4kClientContract({ SunHttp(it) },
+class ApacheClientStreamingTest : HttpClientContract({ SunHttp(it) },
     ApacheClient(responseBodyMode = Stream),
     ApacheClient(HttpClients.custom()
         .setDefaultSocketConfig(

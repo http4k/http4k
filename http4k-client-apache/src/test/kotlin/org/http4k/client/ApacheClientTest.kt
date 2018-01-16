@@ -17,7 +17,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
 import org.junit.Test
 
-class ApacheClientTest : Http4kClientContract({ SunHttp(it) }, ApacheClient(),
+class ApacheClientTest : HttpClientContract({ SunHttp(it) }, ApacheClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultSocketConfig(
             SocketConfig.custom()

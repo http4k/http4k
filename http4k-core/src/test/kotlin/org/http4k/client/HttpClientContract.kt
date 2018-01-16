@@ -24,9 +24,9 @@ import org.http4k.server.asServer
 import org.junit.Test
 import java.nio.ByteBuffer
 
-abstract class Http4kClientContract(serverConfig: (Int) -> ServerConfig,
-                                    val client: HttpHandler,
-                                    private val timeoutClient: HttpHandler) : AbstractHttp4kClientContract(serverConfig) {
+abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
+                                  val client: HttpHandler,
+                                  private val timeoutClient: HttpHandler) : AbstractHttpClientContract(serverConfig) {
 
     @Test
     fun `can forward response body to another request`() {

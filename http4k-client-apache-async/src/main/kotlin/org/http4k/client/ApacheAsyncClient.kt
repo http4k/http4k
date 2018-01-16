@@ -13,7 +13,6 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient
 import org.apache.http.impl.nio.client.HttpAsyncClients
-import org.http4k.core.AsyncHttpHandler
 import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
@@ -31,7 +30,7 @@ class ApacheAsyncClient(
     private val client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
     private val responseBodyMode: BodyMode = Memory,
     private val requestBodyMode: BodyMode = Memory
-) : AsyncHttpHandler {
+) : AsyncHttpClient {
     override fun invoke(request: Request, fn: (Response) -> Unit) {
         client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
             override fun cancelled() {

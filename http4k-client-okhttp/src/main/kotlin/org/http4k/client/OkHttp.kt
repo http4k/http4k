@@ -5,7 +5,6 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.create
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
-import org.http4k.core.AsyncHttpHandler
 import org.http4k.core.BodyMode
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -16,7 +15,7 @@ import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler, AsyncHttpHandler {
+class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler, AsyncHttpClient {
 
     override fun invoke(request: Request): Response =
         try {

@@ -2,7 +2,6 @@ package org.http4k.client
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.AsyncHttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -12,9 +11,9 @@ import org.http4k.server.ServerConfig
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 
-abstract class Http4kAsyncClientContract(serverConfig: (Int) -> ServerConfig,
-                                         val client: AsyncHttpHandler,
-                                         private val timeoutClient: AsyncHttpHandler) : AbstractHttp4kClientContract(serverConfig) {
+abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
+                                       val client: AsyncHttpClient,
+                                       private val timeoutClient: AsyncHttpClient) : AbstractHttpClientContract(serverConfig) {
     @Test
     fun `can make call`() {
         val latch = CountDownLatch(1)
