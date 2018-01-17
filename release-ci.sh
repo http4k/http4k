@@ -34,6 +34,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-template-pebble:bintrayUpload \
     :http4k-template-thymeleaf:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
+    :http4k-client-apache-async:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
     :http4k-client-websocket:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
@@ -41,6 +42,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-format-jackson:bintrayUpload \
     :http4k-format-moshi:bintrayUpload \
     :http4k-format-xml:bintrayUpload \
+    :http4k-metrics-micrometer:bintrayUpload \
     :http4k-multipart:bintrayUpload \
     :http4k-resilience4j:bintrayUpload \
     :http4k-server-apache:bintrayUpload \
