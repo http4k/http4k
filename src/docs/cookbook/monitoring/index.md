@@ -1,7 +1,7 @@
 title: Monitoring http4k applications
 description: How to monitor http4k endpoints and applications
 
-Measuring performance of application estate is crucial in today's microservice world - it is crucial that dev-ops enabled teams can monitor, react and scale dynamically to changes in the runtime environment. However, because of the plethora of monitoring tools on the market, and because [**http4k**](https://github.com/http4k/http4k) is a toolkit and not a complete "batteries included" framework, it provides a number of integration points to enable monitoring systems to be plugged in as required. Additionally, it is envisaged that users will probably want to provide their own implementations of the [**http4k**](https://github.com/http4k/http4k) `ServerConfig` classes (`Jetty`, `Undertow` etc..) so that tweaking and tuning to their exact requirements is accessible, instead of http4k attempting to provide some generic configuration API to achieve it.
+Measuring performance of application estate is crucial in today's microservice world - it is crucial that dev-ops enabled teams can monitor, react and scale dynamically to changes in the runtime environment. However, because of the plethora of monitoring tools on the market, and because [**http4k**](https://github.com/http4k/http4k) is a toolkit and not a complete "batteries included" framework, it provides a number of integration points to enable monitoring systems to be plugged in as required. Additionally, it is envisaged that users will probably want to provide their own implementations of the [**http4k**](https://github.com/http4k/http4k) `ServerConfig` classes (`Jetty`, `Undertow` etc..) so that tweaking and tuning to their exact requirements is accessible, instead of [**http4k**](https://github.com/http4k/http4k) attempting to provide some generic configuration API to achieve it.
 
 ### Gradle setup
 ```
@@ -9,9 +9,15 @@ Measuring performance of application estate is crucial in today's microservice w
     compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.11.1"
 ```
  
-### Metrics [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_metrics.kt)
+### Metrics (Micrometer) [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_micrometer.kt)
 
-http4k provides module support for monitoring application endpoints using the [**micrometer**](http://micrometer.io/) metrics abstraction library, which currently enables support for libraries such as Graphite, StatsD, Prometheus and Netflix Atlas. This also provides drop-in classes to record stats such as JVM performance, GC and thread usage. Alternatively, it's very easy to use a standard `Filter` to report on stats:
+[**http4k**](https://github.com/http4k/http4k) provides module support for monitoring application endpoints using the [**micrometer**](http://micrometer.io/) metrics abstraction library, which currently enables support for libraries such as Graphite, StatsD, Prometheus and Netflix Atlas. This also provides drop-in classes to record stats such as JVM performance, GC and thread usage.
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_micrometer.kt"></script>
+
+### Metrics (other APIs) [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_metrics.kt)
+
+Alternatively, it's very easy to use a standard `Filter` to report on stats:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_metrics.kt"></script>
 
