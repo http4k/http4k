@@ -25,7 +25,10 @@ fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
     override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(NOT_FOUND.description("Route not found"))
 
-    override fun match(request: Request): HttpHandler? = list.find { it.match(request) != null }
+    override fun match(request: Request): HttpHandler? {
+        list.forEach { next -> next.match(request)?.let { return it } }
+        return null
+    }
 
     override fun withFilter(new: Filter): RoutingHttpHandler = routes(*list.map { it.withFilter(new) }.toTypedArray())
 

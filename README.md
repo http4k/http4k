@@ -43,6 +43,7 @@ plugging together of services without HTTP container being required.
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
+    * Metrics gathering for performance analysis.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
@@ -62,8 +63,8 @@ plugging together of services without HTTP container being required.
     * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
-        * **Apache** HTTP
-        * **OkHttp** HTTP
+        * **Apache** sync + async HTTP
+        * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:
@@ -96,6 +97,8 @@ plugging together of services without HTTP container being required.
         * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes**)
 * [Resilience:](https://http4k.org/guide/modules/resilience) 
     * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
+* [Metrics:](https://http4k.org/guide/modules/metrics) 
+    * Support for plugging http4k apps into micrometer
 * [Multipart:](https://http4k.org/guide/modules/multipart) 
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
@@ -111,9 +114,9 @@ This quick example is designed to convey the simplicity & features of [**http4k*
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "3.10.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.10.0"
-    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.10.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.11.1"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.11.1"
+    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.11.1"
 }
 ```
 
@@ -189,9 +192,9 @@ fun main(args: Array<String>) {
 //    HTTP/1.1 200
 //    cache-control: private, must-revalidate
 //    content-length: 9
-//    date: Thu, 08 Jun 3.10.03:01:13 GMT
+//    date: Thu, 08 Jun 3.11.13:01:13 GMT
 //    expires: 0
-//    server: Jetty(9.3.16.v3.10.020)
+//    server: Jetty(9.3.16.v3.11.120)
 //
 //    hello Bob
 }
