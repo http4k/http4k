@@ -36,7 +36,7 @@ plugging together of services without HTTP container being required.
     * websockets
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
-    * Pluggable HTTP client adapters for Apache, OkHttp and Websockets
+    * Pluggable HTTP client adapters for Apache, Jetty, OkHttp and Websockets
     * Pluggable Server backends: Single LOC Server spinup for Apache, Jetty, Netty, Undertow, Apache (Httpcore) and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
@@ -64,6 +64,7 @@ plugging together of services without HTTP container being required.
 * [Client:](https://http4k.org/guide/modules/clients) 
     * **1LOC** client adapters 
         * **Apache** sync + async HTTP
+        * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)

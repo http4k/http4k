@@ -6,6 +6,8 @@ description: Feature overview of the http4k-client modules
 
 **Apache (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.11.1"```
 
+**Jetty (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-jetty", version: "3.11.1"```
+
 **OkHttp (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.11.1"```
 
 **Websocket:** ```compile group: "org.http4k", name: "http4k-client-websocket", version: "3.11.1"```
