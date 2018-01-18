@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.12.0 (uncut)
+- New client module `http4k-client-jetty`, which supports both sync and async models.
+
 ### v3.11.1
 - Fix #84. OPTIONS requests are not detected by contract routes.
 - Added option to NOT authorise OPTIONS requests in ApiKey security filter.

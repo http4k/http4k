@@ -13,8 +13,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import java.lang.Exception
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeoutException
 import org.eclipse.jetty.client.api.Request as JettyRequest
 import org.eclipse.jetty.client.api.Response as JettyResponse
@@ -23,26 +24,26 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
                   private val bodyMode: BodyMode = BodyMode.Memory,
                   private val requestModifier: (JettyRequest) -> JettyRequest = { it }) : HttpHandler, AsyncHttpClient {
     init {
-        client.start()
+        if(!client.isStarted && !client.isStarting) client.start()
     }
+
+    override fun close() = client.stop()
 
     override fun invoke(request: Request): Response = client.send(request)
 
     override fun invoke(request: Request, fn: (Response) -> Unit) = client.sendAsync(request, fn)
 
-    private fun HttpClient.send(request: Request): Response {
-        return with(newRequest(request)) {
-            try {
-                when (bodyMode) {
-                    BodyMode.Memory -> send().let { it.toHttp4kResponse().body(it.contentAsString) }
-                    BodyMode.Stream -> InputStreamResponseListener().run {
-                        send(this)
-                        get(timeoutOrMax(), TimeUnit.MILLISECONDS).toHttp4kResponse().body(inputStream)
-                    }
+    private fun HttpClient.send(request: Request): Response = with(newRequest(request)) {
+        try {
+            when (bodyMode) {
+                BodyMode.Memory -> send().let { it.toHttp4kResponse().body(it.contentAsString) }
+                BodyMode.Stream -> InputStreamResponseListener().run {
+                    send(this)
+                    get(timeoutOrMax(), MILLISECONDS).toHttp4kResponse().body(inputStream)
                 }
-            } catch (e: TimeoutException) {
-                Response(Status.CLIENT_TIMEOUT.describeClientError(e))
             }
+        } catch (e: TimeoutException) {
+            Response(CLIENT_TIMEOUT.describeClientError(e))
         }
     }
 
@@ -77,14 +78,14 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
     }
 
     private fun HttpClient.newRequest(request: Request): JettyRequest = request.headers.fold(
-            newRequest(request.uri.toString()).method(request.method.name), { memo, (key, value) ->
+        newRequest(request.uri.toString()).method(request.method.name), { memo, (key, value) ->
         memo.header(key, value)
     }).content(InputStreamContentProvider(request.body.stream)).let(requestModifier)
 
     private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
 
     private fun JettyResponse.toHttp4kResponse(): Response =
-            Response(Status(status, reason)).headers(headers.toHttp4kHeaders())
+        Response(Status(status, reason)).headers(headers.toHttp4kHeaders())
 
     private fun HttpFields.toHttp4kHeaders(): Headers = flatMap { it.values.map { hValue -> it.name to hValue } }
 

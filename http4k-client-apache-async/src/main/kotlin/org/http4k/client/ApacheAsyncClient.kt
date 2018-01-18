@@ -31,6 +31,13 @@ class ApacheAsyncClient(
     private val responseBodyMode: BodyMode = Memory,
     private val requestBodyMode: BodyMode = Memory
 ) : AsyncHttpClient {
+
+    init {
+        if (!client.isRunning) client.start()
+    }
+
+    override fun close() = client.close()
+
     override fun invoke(request: Request, fn: (Response) -> Unit) {
         client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
             override fun cancelled() {
@@ -77,6 +84,4 @@ class ApacheAsyncClient(
                 .build()).build().apply { start() }
 
     }
-
-    override fun close() = client.close()
 }
