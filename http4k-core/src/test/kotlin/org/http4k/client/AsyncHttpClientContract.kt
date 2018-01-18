@@ -8,12 +8,19 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.server.ServerConfig
+import org.junit.After
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 
 abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
                                        val client: AsyncHttpClient,
                                        private val timeoutClient: AsyncHttpClient) : AbstractHttpClientContract(serverConfig) {
+
+    @After
+    fun close() {
+        client.close()
+    }
+
     @Test
     fun `can make call`() {
         val latch = CountDownLatch(1)
