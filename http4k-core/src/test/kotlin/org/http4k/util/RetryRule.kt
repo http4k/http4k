@@ -24,7 +24,7 @@ class RetryRule(private val attempts: Int = 5) : TestRule {
                     caughtThrowable = t
                 }
 
-                Thread.sleep(1000.toLong())
+                Thread.sleep(5000.toLong())
             }
             System.err.println(description.displayName + ": giving up after " + attempts + " failures.")
             throw caughtThrowable!!
