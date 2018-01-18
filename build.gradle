@@ -178,6 +178,7 @@ dependencies {
     provided project(":http4k-aws")
     provided project(":http4k-core")
     provided project(":http4k-client-apache")
+    provided project(":http4k-client-jetty")
     provided project(":http4k-client-okhttp")
     provided project(":http4k-client-websocket")
     provided project(":http4k-contract")
