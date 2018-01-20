@@ -10,9 +10,6 @@ typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {
 
-    @Deprecated("use required/optional/defaulted instead", ReplaceWith("RequestContextKey.required(contexts)"))
-    inline fun <reified T : Any> of(contexts: RequestContexts): RequestContextLens<T> = required(contexts)
-
     inline fun <reified T : Any> required(contexts: RequestContexts, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
         val meta = Meta(true, "context", ObjectParam, name)
         return BiDiLens(meta, { target ->

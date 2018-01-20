@@ -35,9 +35,8 @@ class UriTemplate private constructor(private val template: String) {
             if (paramValue.contains("/")) paramValue else URLEncoder.encode(paramValue, "UTF-8")
         })
 
-    private fun Regex.findParameterValues(uri: String): List<String> {
-        return findAll(uri).first().groupValues.drop(1).map { URLDecoder.decode(it, "UTF-8") }
-    }
+    private fun Regex.findParameterValues(uri: String): List<String> =
+        findAll(uri).first().groupValues.drop(1).map { URLDecoder.decode(it, "UTF-8") }
 
     private fun String.replace(regex: Regex, notMatched: (String) -> String, matched: (MatchResult) -> String): String {
         val matches = regex.findAll(this)

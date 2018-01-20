@@ -12,8 +12,6 @@ fun Request.toCurl(): String =
         .append(" \"$uri\"")
         .toString()
 
-private fun String.truncated(): String {
-    return if (length > 256)
-        substring(0..127) + "[truncated]" + substring(length - 128)
-    else this
-}
+private fun String.truncated(): String = if (length > 256)
+    substring(0..127) + "[truncated]" + substring(length - 128)
+else this

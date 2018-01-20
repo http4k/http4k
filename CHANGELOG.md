@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.13.0
 - Support for `operationId` in OpenApi route metadata. H/T @danschultz for the PR.
+- Removed previously deprecated methods.
 
 ### v3.12.0
 - New client module `http4k-client-jetty`, which supports both sync and async models.

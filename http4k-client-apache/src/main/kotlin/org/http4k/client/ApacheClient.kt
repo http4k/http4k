@@ -38,10 +38,10 @@ class ApacheClient(
         Response(CLIENT_TIMEOUT.describeClientError(e))
     }
 
-    private fun CloseableHttpResponse.toHttp4kResponse(): Response {
-        val baseResponse = Response(statusLine.toTarget()).headers(allHeaders.toTarget())
-        return entity?.let { baseResponse.body(responseBodyMode(it.content)) } ?: baseResponse
-    }
+    private fun CloseableHttpResponse.toHttp4kResponse(): Response =
+        with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
+            entity?.let { body(responseBodyMode(it.content)) } ?: this
+        }
 
     private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
         init {

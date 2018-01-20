@@ -4,12 +4,14 @@ open class LensFailure(val failures: List<Failure>, override val cause: Exceptio
 
     constructor(vararg failures: Failure, cause: Exception? = null, target: Any? = null) : this(failures.asList(), cause, target)
 
-    fun overall(): Failure.Type {
-        val all = failures.map { it.type }
-        return if (all.contains(Failure.Type.Unsupported)) Failure.Type.Unsupported
-        else if (all.isEmpty() || all.contains(Failure.Type.Invalid)) Failure.Type.Invalid
-        else Failure.Type.Missing
-    }
+    fun overall(): Failure.Type =
+        with(failures.map { it.type }) {
+            when {
+                contains(Failure.Type.Unsupported) -> Failure.Type.Unsupported
+                isEmpty() || contains(Failure.Type.Invalid) -> Failure.Type.Invalid
+                else -> Failure.Type.Missing
+            }
+        }
 }
 
 sealed class Failure(val type: Type) {

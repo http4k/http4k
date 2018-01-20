@@ -18,10 +18,9 @@ fun Response.Companion.parse(response: String): Response {
         { memo, (first, second) -> memo.header(first, second) })
 }
 
-private fun lines(message: String): List<String> {
-    if (message.isBlank()) throw IllegalArgumentException("Empty message")
-    return message.split("\r\n")
-}
+private fun lines(message: String): List<String> =
+    if (message.isBlank()) throw IllegalArgumentException("Empty message") else
+        message.split("\r\n")
 
 private fun parseStatus(value: String): Status {
     val values = value.split(" ", limit = 3)
@@ -40,13 +39,14 @@ private fun parseHeader(line: String): Pair<String, String?> = line.split(": ").
 
 private fun headerLines(lines: List<String>) = lines.subList(1, lines.indexOf(""))
 
-private fun parseRequestLine(line: String): Pair<Method, Uri> {
-    val tokens = line.split(" ")
-    if (tokens.size < 2) throw IllegalArgumentException("Invalid request line: $line")
-    val method = try {
-        Method.valueOf(tokens[0])
-    } catch (e: Exception) {
-        throw IllegalArgumentException("Invalid method: ${tokens[0]}")
+private fun parseRequestLine(line: String): Pair<Method, Uri> =
+    with(line.split(" ")) {
+        when {
+            size < 2 -> throw IllegalArgumentException("Invalid request line: $line")
+            else -> try {
+                Method.valueOf(this[0]) to Uri.of(this[1])
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Invalid method: ${this[0]}")
+            }
+        }
     }
-    return method to Uri.of(tokens[1])
-}

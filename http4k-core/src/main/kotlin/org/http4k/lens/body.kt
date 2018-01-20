@@ -45,9 +45,8 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
     /**
      * Create a lens for this Spec
      */
-    open fun toLens(): BodyLens<OUT> {
-        val getLens = get("")
-        return BodyLens(metas, contentType, { getLens(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
+    open fun toLens(): BodyLens<OUT> = with(get("")) {
+        BodyLens(metas, contentType, { this(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
     }
 
     /**

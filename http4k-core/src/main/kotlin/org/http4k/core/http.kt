@@ -44,11 +44,12 @@ class StreamBody(override val stream: InputStream, length: Long?) : Body {
 
     override fun toString(): String = "<<stream>>"
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Body?) return false
-        return payload == other?.payload
-    }
+    override fun equals(other: Any?): Boolean =
+        when {
+            this === other -> true
+            other !is Body? -> false
+            else -> payload == other?.payload
+        }
 
     override fun hashCode(): Int = payload.hashCode()
 }

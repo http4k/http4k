@@ -38,14 +38,18 @@ data class Cookie(val name: String, val value: String,
     companion object {
         fun parse(cookieValue: String): Cookie? {
             val pair = cookieValue.split("=", limit = 2)
-            if (pair.size < 2) return null
-            val valueAndAttributes = pair[1].split(";")
-            val attributes = valueAndAttributes.drop(1)
-                .map { it.trimStart() }
-                .map { attrString -> attrString.split("=").let { it[0] to it.getOrNull(1) } }
-            return Cookie(pair[0], valueAndAttributes[0].unquoted(),
-                attributes.maxAge(), attributes.expires(), attributes.domain(),
-                attributes.path(), attributes.secure(), attributes.httpOnly())
+            return when {
+                pair.size < 2 -> null
+                else -> {
+                    val valueAndAttributes = pair[1].split(";")
+                    val attributes = valueAndAttributes.drop(1)
+                        .map { it.trimStart() }
+                        .map { attrString -> attrString.split("=").let { it[0] to it.getOrNull(1) } }
+                    Cookie(pair[0], valueAndAttributes[0].unquoted(),
+                        attributes.maxAge(), attributes.expires(), attributes.domain(),
+                        attributes.path(), attributes.secure(), attributes.httpOnly())
+                }
+            }
         }
 
         private fun List<Pair<String, String?>>.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()

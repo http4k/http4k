@@ -80,9 +80,7 @@ object ClientFilters {
 
         private fun Response.assureBodyIsConsumed() = body.stream.close()
 
-        private fun Response.isRedirection(): Boolean {
-            return status.redirection && header("location")?.let(String::isNotBlank) == true
-        }
+        private fun Response.isRedirection(): Boolean = status.redirection && header("location")?.let(String::isNotBlank) == true
 
         private fun Request.ensureValidMethodForRedirect(): Request =
             if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)

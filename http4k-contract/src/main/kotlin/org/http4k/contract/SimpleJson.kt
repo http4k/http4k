@@ -16,8 +16,7 @@ class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>
     private fun render(pathSegments: PathSegments, route: ContractRoute) =
         route.method.toString() + ":" + route.describeFor(pathSegments) to json.string(route.meta.summary)
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-        return Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response =
+        Response(OK)
             .with(json.body().toLens() of json.obj("resources" to json.obj(routes.map { render(contractRoot, it) })))
-    }
 }

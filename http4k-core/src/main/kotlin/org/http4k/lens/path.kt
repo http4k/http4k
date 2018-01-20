@@ -105,6 +105,7 @@ fun Path.dateTime() = this.map(LocalDateTime::parse, DateTimeFormatter.ISO_LOCAL
 fun Path.zonedDateTime() = this.map(ZonedDateTime::parse, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
 fun Path.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
 fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> = apply {
-    val toRegex = pattern.toRegex()
-    return map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
+    return with(pattern.toRegex()) {
+        map { matchEntire(it)?.groupValues?.get(group)!! }
+    }
 }

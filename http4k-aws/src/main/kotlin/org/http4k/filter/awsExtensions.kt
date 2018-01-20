@@ -14,8 +14,7 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                           credentials: AwsCredentials,
                           clock: Clock = Clock.systemDefaultZone(),
                           payloadMode: Payload.Mode = Payload.Mode.Signed) =
-    Filter {
-        next ->
+    Filter { next ->
         {
             val payload = payloadMode(it)
 
@@ -37,8 +36,8 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
     }
 
 private fun buildAuthHeader(scope: AwsCredentialScope,
-                             credentials: AwsCredentials,
-                             canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
+                            credentials: AwsCredentials,
+                            canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
     String.format("%s Credential=%s/%s, SignedHeaders=%s, Signature=%s",
         "AWS4-HMAC-SHA256",
         credentials.accessKey, scope.datedScope(date),
@@ -50,10 +49,10 @@ data class CanonicalPayload(val hash: String, val length: Long)
 object Payload {
     sealed class Mode : (Request) -> CanonicalPayload {
         object Signed : Mode() {
-            override operator fun invoke(request: Request): CanonicalPayload {
-                val content = request.body.payload.array()
-                return CanonicalPayload(AwsHmacSha256.hash(content), content.size.toLong())
-            }
+            override operator fun invoke(request: Request) =
+                request.body.payload.array().let {
+                    CanonicalPayload(AwsHmacSha256.hash(it), it.size.toLong())
+                }
         }
 
         object Unsigned : Mode() {

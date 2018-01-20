@@ -2,7 +2,6 @@ package org.http4k.contract
 
 import org.http4k.core.ContentType
 import org.http4k.core.Method
-import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -65,27 +64,4 @@ data class RouteMeta(val summary: String = "<unknown>",
 
     operator fun plus(new: Lens<Request, *>): RouteMeta = copy(requestParams = requestParams.plus(listOf(new)))
     operator fun plus(new: BodyLens<*>): RouteMeta = copy(body = new)
-
-    @JvmName("returningResponse")
-    @Deprecated("use meta builder returning() instead")
-    fun returning(new: Pair<String, Response>) =
-        copy(
-            produces = produces.plus(Header.Common.CONTENT_TYPE(new.second)?.let { listOf(it) } ?: emptyList()),
-            responses = responses.plus(new.second.status to new))
-
-    @JvmName("returningStatus")
-    @Deprecated("use meta builder returning() instead")
-    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
-
-    @Deprecated("use meta builder receiving() instead")
-    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>): RouteMeta = copy(request = Request(GET, "").with(new.first of new.second))
-
-    @Deprecated("use meta builder produces +=() instead")
-    fun producing(vararg new: ContentType) = copy(produces = produces.plus(new))
-    @Deprecated("use meta builder consumes +=() instead")
-    fun consuming(vararg new: ContentType) = copy(consumes = consumes.plus(new))
-    @Deprecated("use meta builder tags +=() instead")
-    fun taggedWith(tag: String) = taggedWith(Tag(tag))
-    @Deprecated("use meta builder tags +=() instead")
-    fun taggedWith(vararg new: Tag) = copy(tags = tags.plus(new))
 }

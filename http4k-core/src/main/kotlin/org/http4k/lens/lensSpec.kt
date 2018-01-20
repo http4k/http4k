@@ -207,7 +207,7 @@ fun <IN> BiDiLensSpec<IN, String>.zonedDateTime() = this.map(ZonedDateTime::pars
 fun <IN> BiDiLensSpec<IN, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> {
     val toRegex = pattern.toRegex()
-    return this.map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
+    return map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
 }
 
 internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
