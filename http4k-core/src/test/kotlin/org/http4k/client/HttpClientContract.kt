@@ -30,6 +30,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `can forward response body to another request`() {
+        println("FORWARD")
         val response = client(Request(GET, "http://localhost:$port/stream"))
         val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
         echoResponse.bodyString().shouldMatch(equalTo("stream"))
@@ -37,6 +38,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `supports gzipped content`() {
+        println("GZIPPED")
+
         val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp())
         asServer.start()
         val client = ApacheClient()
@@ -50,6 +53,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `can make call`() {
+        println("CALL")
         val response = client(Request(POST, "http://localhost:$port/someUri")
             .query("query", "123")
             .header("header", "value").body("body"))
@@ -63,6 +67,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `performs simple GET request`() {
+        println("GET")
         val response = client(Request(GET, "http://httpbin.org/get").query("name", "John Doe"))
 
         assertThat(response.status, equalTo(OK))
@@ -71,6 +76,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `performs simple POST request`() {
+        println("POST")
         val response = client(Request(POST, "http://httpbin.org/post"))
 
         assertThat(response.status, equalTo(OK))
@@ -79,6 +85,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `performs simple DELETE request`() {
+        println("DELETE")
+
         val response = client(Request(DELETE, "http://httpbin.org/delete"))
 
         assertThat(response.status, equalTo(OK))
@@ -87,6 +95,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `does not follow redirects`() {
+        println("REDIRECTS")
         val response = client(Request(GET, "http://httpbin.org/redirect-to").query("url", "/destination"))
 
         assertThat(response.status, equalTo(Status.FOUND))
@@ -95,6 +104,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `does not store cookies`() {
+        println("COOKIES")
+
         client(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
 
         val response = client(Request(GET, "http://httpbin.org/cookies"))
@@ -105,6 +116,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `filters enable cookies and redirects`() {
+        println("FILTER COOKIE AND REDIRECT")
+
         val enhancedClient = ClientFilters.FollowRedirects().then(ClientFilters.Cookies()).then(client)
 
         val response = enhancedClient(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
@@ -115,6 +128,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `empty body`() {
+        println("EMPTY BODY")
+
         val response = client(Request(Method.GET, "http://localhost:$port/empty"))
         response.status.successful.shouldMatch(equalTo(true))
         response.bodyString().shouldMatch(equalTo(""))
@@ -122,6 +137,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `redirection response`() {
+        println("REDIRECTION")
         val response = ClientFilters.FollowRedirects()
             .then(client)(Request(Method.GET, "http://httpbin.org/relative-redirect/5"))
         response.status.shouldMatch(equalTo(OK))
@@ -130,12 +146,14 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `send binary data`() {
+        println("BINARY")
         val response = client(Request(Method.POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
         response.status.shouldMatch(equalTo(OK))
     }
 
     @Test
     open fun `socket timeouts are converted into 504`() {
+        println("TIMEOUT")
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
 
         assertThat(response.status, equalTo(Status.CLIENT_TIMEOUT))
