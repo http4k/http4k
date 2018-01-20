@@ -12,9 +12,9 @@ matrix:
       language: java
       jdk: oraclejdk8
       script:
-      - "./gradlew check"
+      - "./gradlew -i check"
       after_success:
-      - "./gradlew -i jacocoRootReport coveralls"
+      - "./gradlew jacocoRootReport coveralls"
       cache:
         directories:
         - "$HOME/.m2"
