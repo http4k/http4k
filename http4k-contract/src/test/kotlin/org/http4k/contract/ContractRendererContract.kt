@@ -60,6 +60,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/echo" / Path.of("message") meta {
                 summary = "summary of this route"
                 description = "some rambling description of what this thing actually does"
+                operationId = "echoMessage"
                 headers += Header.optional("header", "description of the header")
                 produces += APPLICATION_JSON
                 returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))

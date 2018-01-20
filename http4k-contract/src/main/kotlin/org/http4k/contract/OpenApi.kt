@@ -65,10 +65,11 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
         val consumes = route.meta.consumes.plus(route.spec.routeMeta.body?.let { listOf(it.contentType) } ?: emptyList())
 
-        val pathJson = json.obj(
+        val fields = listOf(
             "tags" to json.array(routeTags),
             "summary" to json.string(route.meta.summary),
             "description" to (route.meta.description?.let(json::string) ?: json.nullNode()),
+            route.meta.operationId?.let { "operationId" to json.string(it) },
             "produces" to json.array(route.meta.produces.map { json.string(it.value) }),
             "consumes" to json.array(consumes.map { json.string(it.value) }),
             "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes)),
@@ -79,6 +80,10 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
                 else -> emptyList<NODE>()
             })
         )
+
+        val fieldsAfter = fields.filterNotNull()
+
+        val pathJson = json.obj(*fieldsAfter.toTypedArray())
 
         val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
 

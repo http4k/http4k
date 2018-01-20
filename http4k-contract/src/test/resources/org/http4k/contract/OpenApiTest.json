@@ -27,6 +27,7 @@
         ],
         "summary": "summary of this route",
         "description": "some rambling description of what this thing actually does",
+        "operationId": "echoMessage",
         "produces": [
           "application/json"
         ],

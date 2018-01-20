@@ -24,6 +24,7 @@ class RouteMetaDsl internal constructor() {
     var headers = Appendable<Lens<Request, *>>()
     var queries = Appendable<Lens<Request, *>>()
     var body: BodyLens<*>? = null
+    var operationId: String? = null
 
     @JvmName("returningResponse")
     fun returning(new: Pair<String, Response>) {
@@ -44,7 +45,7 @@ class RouteMetaDsl internal constructor() {
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), body, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all.toMap()
+        summary, description, request, tags.all.toSet(), body, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all.toMap(), operationId
     )
 }
 data class Tag(val name: String, val description: String? = null)
@@ -57,7 +58,8 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val produces: Set<ContentType> = emptySet(),
                      val consumes: Set<ContentType> = emptySet(),
                      val requestParams: List<Lens<Request, *>> = emptyList(),
-                     val responses: Map<Status, Pair<String, Response>> = emptyMap()) {
+                     val responses: Map<Status, Pair<String, Response>> = emptyMap(),
+                     val operationId: String? = null) {
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
 
