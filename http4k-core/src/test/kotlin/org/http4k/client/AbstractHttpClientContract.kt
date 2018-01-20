@@ -18,9 +18,6 @@ import java.util.Arrays
 import java.util.Random
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
-    init {
-        System.err.println(this.javaClass.name)
-    }
     @Rule
     @JvmField
     var retryRule = RetryRule(10)
