@@ -32,16 +32,14 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
         )))
 
-    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> {
-        return routes
-            .groupBy { it.describeFor(contractRoot) }.entries
-            .fold(FieldsAndDefinitions(), { memo, (path, routes) ->
-                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), { memoFields, route ->
-                    memoFields.add(render(contractRoot, security, route))
-                })
-                memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
+    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
+        .groupBy { it.describeFor(contractRoot) }.entries
+        .fold(FieldsAndDefinitions(), { memo, (path, routes) ->
+            val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), { memoFields, route ->
+                memoFields.add(render(contractRoot, security, route))
             })
-    }
+            memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
+        })
 
     private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): ROOT = json.obj(
         "in" to json.string(it.location),
@@ -81,13 +79,10 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             })
         )
 
-        val fieldsAfter = fields.filterNotNull()
-
-        val pathJson = json.obj(*fieldsAfter.toTypedArray())
-
         val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
 
-        return FieldAndDefinitions(route.method.toString().toLowerCase() to pathJson, definitions)
+        return FieldAndDefinitions(route.method.toString().toLowerCase() to
+            json.obj(*fields.filterNotNull().toTypedArray()), definitions)
     }
 
     private fun render(responses: List<Pair<String, Response>>) =
@@ -132,4 +127,4 @@ private data class FieldsAndDefinitions<NODE : Any>(val fields: List<Pair<String
 
 private data class FieldAndDefinitions<out NODE : Any>(val field: Pair<String, NODE>, val definitions: List<Pair<String, NODE>>)
 
-private fun <T> T?.asList() = this?.let { listOf(it) } ?: listOf()
+private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()

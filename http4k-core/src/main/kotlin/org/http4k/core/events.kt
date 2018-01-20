@@ -10,9 +10,7 @@ interface Event {
     }
 }
 
-interface Events {
-    fun raise(event: Event)
-}
+typealias Events = (Event) -> Unit
 
 data class EventCategory(private val name: String) {
     override fun toString(): String = name
