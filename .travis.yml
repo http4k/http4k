@@ -14,7 +14,7 @@ matrix:
       script:
       - "./gradlew check"
       after_success:
-      - "./gradlew jacocoRootReport coveralls"
+      - "./gradlew -i jacocoRootReport coveralls"
       cache:
         directories:
         - "$HOME/.m2"
