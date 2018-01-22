@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.13.1
+- Upgrade to Kotlin 1.2.20
+
 ### v3.13.0
 - Support for `operationId` in OpenApi route metadata. H/T @danschultz for the PR.
 - Removed previously deprecated methods.
