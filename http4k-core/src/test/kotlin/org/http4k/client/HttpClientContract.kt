@@ -29,7 +29,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
                                   private val timeoutClient: HttpHandler) : AbstractHttpClientContract(serverConfig) {
 
     @Test
-    fun `can forward response body to another request`() {
+    open fun `can forward response body to another request`() {
         System.err.println("FORWARD")
         val response = client(Request(GET, "http://localhost:$port/stream"))
         val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
