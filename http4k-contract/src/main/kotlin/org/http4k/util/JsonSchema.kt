@@ -13,31 +13,32 @@ class IllegalSchemaException(message: String) : Exception(message)
 data class JsonSchema<out NODE>(val node: NODE, val definitions: List<Pair<String, NODE>>)
 
 class JsonToJsonSchema<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) {
-    fun toSchema(node: NODE): JsonSchema<NODE> = toSchema(JsonSchema(node, emptyList()))
+    fun toSchema(node: NODE): JsonSchema<NODE> = JsonSchema(node, emptyList()).toSchema()
 
-    private fun toSchema(input: JsonSchema<NODE>): JsonSchema<NODE> =
-        when (json.typeOf(input.node)) {
-            JsonType.Object -> objectSchema(input)
-            JsonType.Array -> arraySchema(input)
-            JsonType.String -> JsonSchema(StringParam.schema(), input.definitions)
-            JsonType.Number -> numberSchema(input)
-            JsonType.Boolean -> JsonSchema(BooleanParam.schema(), input.definitions)
+    private fun JsonSchema<NODE>.toSchema(): JsonSchema<NODE> =
+        when (json.typeOf(node)) {
+            JsonType.Object -> objectSchema()
+            JsonType.Array -> arraySchema()
+            JsonType.String -> JsonSchema(StringParam.schema(), definitions)
+            JsonType.Number -> numberSchema()
+            JsonType.Boolean -> JsonSchema(BooleanParam.schema(), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
             else -> throw IllegalSchemaException("unknown type")
         }
 
-    private fun numberSchema(input: JsonSchema<NODE>): JsonSchema<NODE> =
-        JsonSchema((if (json.text(input.node).contains(".")) NumberParam else IntegerParam).schema(), input.definitions)
+    private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> =
+        JsonSchema((if (json.text(node).contains(".")) NumberParam else IntegerParam).schema(), definitions)
 
-    private fun arraySchema(input: JsonSchema<NODE>): JsonSchema<NODE> {
-        val (node, definitions) = json.elements(input.node).toList().firstOrNull()?.let { toSchema(JsonSchema(it, input.definitions)) } ?: throw IllegalSchemaException("Cannot use an empty list to generate a schema!")
+    private fun JsonSchema<NODE>.arraySchema(): JsonSchema<NODE> {
+        val (node, definitions) = json.elements(node).toList().firstOrNull()?.let {
+            JsonSchema(it, definitions).toSchema()
+        } ?: throw IllegalSchemaException("Cannot use an empty list to generate a schema!")
         return JsonSchema(json.obj("type" to json.string("array"), "items" to node), definitions)
     }
 
-    private fun objectSchema(input: JsonSchema<NODE>): JsonSchema<NODE> {
-        val (fields, subDefinitions) = json.fields(input.node).fold(listOf<Pair<String, NODE>>() to input.definitions, { (memoFields, memoDefinitions), (first, second) ->
-            val next = toSchema(JsonSchema(second, memoDefinitions))
-            memoFields.plus(first to next.node) to next.definitions
+    private fun JsonSchema<NODE>.objectSchema(): JsonSchema<NODE> {
+        val (fields, subDefinitions) = json.fields(node).fold(listOf<Pair<String, NODE>>() to definitions, { (memoFields, memoDefinitions), (first, second) ->
+            JsonSchema(second, memoDefinitions).toSchema().let { memoFields.plus(first to it.node) to it.definitions }
         })
 
         val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
