@@ -34,4 +34,3 @@ class JsonToJsonSchemaTest {
         assertThat(obj(actual.definitions), equalTo(expectedDefs))
     }
 }
-
