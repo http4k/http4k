@@ -33,7 +33,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Rule
     @JvmField
-    var retryRule = RetryRule(5)
+    var retryRule = RetryRule(1)
 
     private val port = Random().nextInt(1000) + 8000
 
@@ -52,6 +52,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                             .header("content-type", "text/plain")
                     },
                     "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
+                    "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
                     "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
                     "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
                     "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
@@ -81,11 +82,19 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
-    open fun `can return a large body`() {
+    open fun `can return a large body - GET`() {
         val response = client(Request(GET, "http://localhost:$port/large").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString().length, equalTo(random.length +1))
+        assertThat(response.bodyString().length, equalTo(random.length + 1))
+    }
+
+    @Test
+    open fun `can return a large body - POST`() {
+        val response = client(Request(POST, "http://localhost:$port/large").body("hello mum"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString().length, equalTo(random.length + 1))
     }
 
     @Test
