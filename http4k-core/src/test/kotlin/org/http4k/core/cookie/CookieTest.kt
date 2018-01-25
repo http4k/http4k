@@ -2,25 +2,34 @@ package org.http4k.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.*
+import org.http4k.core.Method
+import org.http4k.core.Parameters
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.junit.Test
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 class CookieTest {
 
     @Test
     fun `full cookie creation`() {
+        val date = LocalDateTime.of(2017, 3, 11, 12, 15, 21)
         val cookie = Cookie("my-cookie", "my-value")
             .maxAge(37)
-            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+            .expires(date)
             .domain("google.com")
             .path("/")
             .secure()
             .httpOnly()
 
+        val dateStr = ZonedDateTime.of(date, ZoneId.of("GMT")).format(RFC822)
+
         assertThat(cookie.toString(),
-            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly"""))
+            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=$dateStr; Domain=google.com; Path=/; secure; HttpOnly"""))
     }
 
     @Test
