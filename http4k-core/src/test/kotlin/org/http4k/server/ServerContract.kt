@@ -85,7 +85,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         val response = client(Request(GET, "http://localhost:$port/large").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString().length, equalTo(random.length))
+        assertThat(response.bodyString().length, equalTo(random.length +1))
     }
 
     @Test
