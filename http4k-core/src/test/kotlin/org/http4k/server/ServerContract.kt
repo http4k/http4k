@@ -37,8 +37,8 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     private val port = Random().nextInt(1000) + 8000
 
-    private val size = 1000*1024
-    private val random = (0..size).map { '.' }.joinToString("")
+    private val size = 1000 * 1024
+    private val random = (0 until size).map { '.' }.joinToString("")
 
     @Before
     fun before() {
@@ -47,23 +47,23 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             requiredMethods.map {
                 "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
             }.plus(listOf(
-                "/headers" bind GET to { _: Request ->
-                    Response(ACCEPTED)
-                        .header("content-type", "text/plain")
-                },
-                "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-                "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
-                "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
-                "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-                "/length" bind { req: Request ->
-                    when (req.body) {
-                        is StreamBody -> Response(OK).body(req.body.length.toString())
-                        else -> Response(INTERNAL_SERVER_ERROR)
-                    }
-                },
-                "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
-                "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
-            ))
+                    "/headers" bind GET to { _: Request ->
+                        Response(ACCEPTED)
+                            .header("content-type", "text/plain")
+                    },
+                    "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
+                    "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
+                    "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
+                    "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+                    "/length" bind { req: Request ->
+                        when (req.body) {
+                            is StreamBody -> Response(OK).body(req.body.length.toString())
+                            else -> Response(INTERNAL_SERVER_ERROR)
+                        }
+                    },
+                    "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
+                    "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
+                ))
 
         server = routes(*routes.toTypedArray()).asServer(serverConfig(port)).start()
     }
@@ -85,7 +85,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         val response = client(Request(GET, "http://localhost:$port/large").body("hello mum"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo(random))
+        assertThat(response.bodyString().length, equalTo(random.length))
     }
 
     @Test
