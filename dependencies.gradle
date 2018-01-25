@@ -3,7 +3,7 @@ ext {
     ext.jetty_version = '9.4.7.v20170914'
 
     kotlin_lib = [
-            "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     ]
 
     kotlin_reflect = [
