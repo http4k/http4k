@@ -5,6 +5,7 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.ByteBufOutputStream
 import io.netty.channel.ChannelFuture
+import io.netty.channel.ChannelFutureListener.CLOSE
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
@@ -39,9 +40,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
         if (request.decoderResult() == SUCCESS) {
-            ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse()).addListener {
-                ctx.close()
-            }
+            ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse()).addListener(CLOSE)
         } else {
             ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse())
             ctx.close()
