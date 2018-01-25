@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.13.2
+- Fix #91 - large message handling in Netty
+
 ### v3.13.1
 - Upgrade to Kotlin 1.2.20
 
