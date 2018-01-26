@@ -19,12 +19,15 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpObjectAggregator
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.netty.handler.codec.http.HttpServerCodec
+import io.netty.handler.codec.http.HttpUtil
 import io.netty.handler.codec.http.HttpVersion.HTTP_1_1
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.CONTINUE
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
@@ -39,6 +42,8 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
+        if (HttpUtil.is100ContinueExpected(request)) ctx.write(Response(CONTINUE).asNettyResponse())
+
         ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse()).apply {
             if (request.decoderResult() == SUCCESS) addListener(CLOSE) else ctx.close()
         }
@@ -87,4 +92,10 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             }
         }
     }
+}
+
+
+fun main(args: Array<String>) {
+    var a = 1
+    { r: Request -> Response(OK).body("hello" + a++) }.asServer(Netty(8000)).start().block()
 }
