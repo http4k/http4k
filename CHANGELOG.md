@@ -5,6 +5,9 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.14.0 (uncut)
 - Add ability to "name" input and output contract body definitions in an OpenAPI JSON doc. This applies to only the top level entity. If no override is passed, the objects are named according to their hashcode.
 
+### 3.13.4
+- Fix #92 - cookie date should always use US locale
+
 ### v3.13.3
 - Further tweak to Netty. H/T @FredDeschenes
 
