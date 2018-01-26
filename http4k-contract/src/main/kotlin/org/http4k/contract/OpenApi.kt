@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.core.HttpMessage
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Json
@@ -55,7 +54,7 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun renderTags(routes: List<ContractRoute>) = routes.flatMap(ContractRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
     private fun render(pathSegments: PathSegments, security: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
-        val (responses, responseDefinitions) = render(route.meta.responses.values.toList())
+        val (responses, responseDefinitions) = render(route.meta.responses)
 
         val schema = route.jsonRequest?.asSchema()
 
@@ -88,12 +87,12 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             json.obj(*fields.filterNotNull().toTypedArray()), definitions)
     }
 
-    private fun render(responses: List<Pair<String, Response>>) =
+    private fun render(responses: List<ResponseMeta>) =
         responses.fold(FieldsAndDefinitions<NODE>(),
-            { memo, (reason, response) ->
-                val (node, definitions) = response.asSchema()
-                val newField = response.status.code.toString() to json.obj(
-                    "description" to json.string(reason),
+            { memo, meta ->
+                val (node, definitions) = meta.asSchema()
+                val newField = meta.message.status.code.toString() to json.obj(
+                    "description" to json.string(meta.description),
                     "schema" to node)
                 memo.add(newField, definitions)
             })
@@ -108,8 +107,8 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
         else -> json.obj(listOf())
     }
 
-    private fun HttpMessage.asSchema(): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(bodyString()), header(this))
+    private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
+        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
     } catch (e: Exception) {
         JsonSchema(json.nullNode(), emptyList())
     }

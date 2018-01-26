@@ -22,7 +22,7 @@ class ContractRoute internal constructor(internal val method: Method,
 
     internal val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatMap { it }
 
-    internal val jsonRequest: Request? = meta.request?.let { if (CONTENT_TYPE(it) == APPLICATION_JSON) it else null }
+    internal val jsonRequest: RequestMeta? = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
     internal val tags = meta.tags.toSet().sortedBy { it.name }
 

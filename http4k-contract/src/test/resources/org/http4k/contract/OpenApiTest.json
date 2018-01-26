@@ -58,7 +58,7 @@
           "202": {
             "description": "peachy",
             "schema": {
-              "$ref": "#/definitions/peachy"
+              "$ref": "#/definitions/someDefinitionId"
             }
           },
           "403": {
@@ -110,7 +110,7 @@
             "description": "the body of the message",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/object26517582"
+              "$ref": "#/definitions/someOtherDefinitionId"
             }
           }
         ],
@@ -218,7 +218,7 @@
         }
       }
     },
-    "object26517582": {
+    "someOtherDefinitionId": {
       "type": "object",
       "properties": {
         "anObject": {
@@ -242,7 +242,7 @@
         }
       }
     },
-    "peachy": {
+    "someDefinitionId": {
       "type": "object",
       "properties": {
         "anAnotherObject": {

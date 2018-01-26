@@ -64,9 +64,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 headers += Header.optional("header", "description of the header")
                 produces += APPLICATION_JSON
                 returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                returning("peachy" to Response(ACCEPTED)
-                    .header("definitionId", "peachy")
-                    .with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                returning(ResponseMeta("peachy",
+                    Response(ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))), "someDefinitionId"))
                 returning("no way jose" to FORBIDDEN)
                 tags += Tag("tag3")
                 tags += Tag("tag1")
@@ -81,7 +80,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
                 tags += Tag("tag1")
                 tags += listOf(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
-                receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))))
+                receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))), "someOtherDefinitionId")
             }
                 bindContract POST to { msg -> { Response(OK).body(msg) } },
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") meta {
@@ -95,7 +94,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-        println(actual)
+//        println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }
