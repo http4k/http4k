@@ -107,6 +107,19 @@ fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
         assertThat(extracted.getValue("second"), equalTo("3"))
     }
 
+    @Test
+    fun capturingPathVariableWithSlashes(){
+        val template = from("/{anything:.*}")
+        assertThat(template.matches("/foo/bar"), equalTo(true))
+        assertThat(template.extract("/foo/bar").getValue("anything"), equalTo("foo/bar"))
+    }
+
+    @Test
+    fun doesNotMatchPathWithSlashesForUnnamedVariable(){
+        assertThat(from("/{:.*}").matches("/foo/bar"), equalTo(false))
+        assertThat(from("/{something:.*}").matches("/foo/bar"), equalTo(true))
+    }
+
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
 
     private fun pair(v1: String, v2: String) = v1 to v2
