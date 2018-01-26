@@ -58,7 +58,7 @@
           "202": {
             "description": "peachy",
             "schema": {
-              "$ref": "#/definitions/object730441992"
+              "$ref": "#/definitions/peachy"
             }
           },
           "403": {
@@ -239,6 +239,14 @@
       "properties": {
         "aNumberField": {
           "type": "integer"
+        }
+      }
+    },
+    "peachy": {
+      "type": "object",
+      "properties": {
+        "anAnotherObject": {
+          "$ref": "#/definitions/object-945612357"
         }
       }
     },

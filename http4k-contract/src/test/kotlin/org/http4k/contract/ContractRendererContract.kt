@@ -10,7 +10,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -64,7 +64,9 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 headers += Header.optional("header", "description of the header")
                 produces += APPLICATION_JSON
                 returning("peachy" to Response(OK).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
-                returning("peachy" to Response(Status.ACCEPTED).with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
+                returning("peachy" to Response(ACCEPTED)
+                    .header("definitionId", "peachy")
+                    .with(customBody of Argo.obj("anAnotherObject" to Argo.obj("aNumberField" to Argo.number(123)))))
                 returning("no way jose" to FORBIDDEN)
                 tags += Tag("tag3")
                 tags += Tag("tag1")
@@ -93,7 +95,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        println(actual)
+        println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }

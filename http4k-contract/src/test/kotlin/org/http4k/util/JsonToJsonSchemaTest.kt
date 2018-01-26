@@ -29,8 +29,8 @@ class JsonToJsonSchemaTest {
         val actual = JsonToJsonSchema(json).toSchema(model, "bob")
         val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
-        val expectedDefs: JsonNode = "JsonSchema_definitions.json".readResource().asJsonValue()
-        println(json.pretty(obj(actual.definitions)))
+        val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
+//        println(json.pretty(obj(actual.definitions)))
         assertThat(obj(actual.definitions), equalTo(expectedDefs))
     }
 }

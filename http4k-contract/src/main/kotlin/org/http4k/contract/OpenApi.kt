@@ -6,11 +6,14 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
+import org.http4k.lens.Header
 import org.http4k.lens.Meta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
+
+private val header = Header.optional("definitionId")
 
 class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
@@ -106,7 +109,7 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     }
 
     private fun HttpMessage.asSchema(): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(bodyString()))
+        schemaGenerator.toSchema(json.parse(bodyString()), header(this))
     } catch (e: Exception) {
         JsonSchema(json.nullNode(), emptyList())
     }
