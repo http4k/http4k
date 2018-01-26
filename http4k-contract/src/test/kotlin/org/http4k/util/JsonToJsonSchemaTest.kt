@@ -12,8 +12,8 @@ import java.math.BigDecimal
 class JsonToJsonSchemaTest {
     private val json = Argo
 
-    fun String.readResource(): InputStream = JsonToJsonSchemaTest::class.java.getResourceAsStream(this)
-    fun InputStream.asJsonValue() = json.parse(String(this.readBytes()))
+    private fun String.readResource(): InputStream = JsonToJsonSchemaTest::class.java.getResourceAsStream(this)
+    private fun InputStream.asJsonValue() = json.parse(String(readBytes()))
 
     @Test
     fun `renders all different types of json value as expected`() {
@@ -26,11 +26,11 @@ class JsonToJsonSchemaTest {
             "anObject" to json.obj("anInteger" to json.number(1))
         )
 
-        val actual = JsonToJsonSchema(json).toSchema(model)
+        val actual = JsonToJsonSchema(json).toSchema(model, "bob")
         val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
         val expectedDefs: JsonNode = "JsonSchema_definitions.json".readResource().asJsonValue()
-//        println(obj(actual.definitions).asPrettyJsonString())
+        println(json.pretty(obj(actual.definitions)))
         assertThat(obj(actual.definitions), equalTo(expectedDefs))
     }
 }
