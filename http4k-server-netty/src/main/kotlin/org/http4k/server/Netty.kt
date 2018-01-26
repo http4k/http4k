@@ -27,7 +27,6 @@ import org.http4k.core.Method.valueOf
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CONTINUE
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
@@ -92,10 +91,4 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             }
         }
     }
-}
-
-
-fun main(args: Array<String>) {
-    var a = 1
-    { r: Request -> Response(OK).body("hello" + a++) }.asServer(Netty(8000)).start().block()
 }
