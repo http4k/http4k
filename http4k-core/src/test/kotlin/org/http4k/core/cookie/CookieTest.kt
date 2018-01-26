@@ -1,6 +1,7 @@
 package org.http4k.core.cookie
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Parameters
@@ -9,27 +10,36 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.Test
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
+import java.util.*
 
 class CookieTest {
 
     @Test
     fun `full cookie creation`() {
-        val date = LocalDateTime.of(2017, 3, 11, 12, 15, 21)
         val cookie = Cookie("my-cookie", "my-value")
             .maxAge(37)
-            .expires(date)
+            .expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
             .domain("google.com")
             .path("/")
             .secure()
             .httpOnly()
 
-        val dateStr = ZonedDateTime.of(date, ZoneId.of("GMT")).format(RFC822)
-
         assertThat(cookie.toString(),
-            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=$dateStr; Domain=google.com; Path=/; secure; HttpOnly"""))
+            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly"""))
+    }
+
+    @Test
+    fun `cookie expiry date is always in english`() {
+        val currentSystemLocale = Locale.getDefault()
+        try {
+            Locale.setDefault(Locale.TAIWAN)
+            val cookie = Cookie("foo", "bar").expires(LocalDateTime.of(2017, 3, 11, 12, 15, 21))
+
+            assertThat(cookie.toString(), containsSubstring("""Expires=Sat, 11 Mar 2017 12:15:21 GMT"""))
+        } finally {
+            Locale.setDefault(currentSystemLocale)
+        }
     }
 
     @Test
@@ -53,12 +63,12 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies can be extracted from request`(){
+    fun `cookies can be extracted from request`() {
         assertThat(Request(Method.GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
-    fun `cookies with ending semicolon can be extracted from request`(){
+    fun `cookies with ending semicolon can be extracted from request`() {
         assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
@@ -69,7 +79,7 @@ class CookieTest {
     }
 
     @Test
-    fun `cookies with equals signs inside quotes can be extracted from request`(){
+    fun `cookies with equals signs inside quotes can be extracted from request`() {
         assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
         assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
         assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
@@ -164,8 +174,8 @@ class CookieTest {
 
     @Test
     fun `cookie with domain can be invalidated at response level`() {
-        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar", domain="foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
-            equalTo(Cookie("foo", "", domain="foo.com").invalidate()))
+        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
+            equalTo(Cookie("foo", "", domain = "foo.com").invalidate()))
     }
 
     @Test

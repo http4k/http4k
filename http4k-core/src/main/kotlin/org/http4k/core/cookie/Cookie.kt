@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ofPattern
+import java.util.Locale.US
 
 data class Cookie(val name: String, val value: String,
                   val maxAge: Long? = null,
@@ -82,7 +83,7 @@ data class Cookie(val name: String, val value: String,
     fun keyValueCookieString(): String = "$name=${value.quoted()}"
 }
 
-internal val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz")
+private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", US)
 
 private val supportedFormats = listOf(RFC822,
     ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz"),
