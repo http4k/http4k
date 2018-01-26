@@ -39,11 +39,8 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     private val safeHandler = ServerFilters.CatchAll().then(handler)
 
     override fun channelRead0(ctx: ChannelHandlerContext, request: FullHttpRequest) {
-        if (request.decoderResult() == SUCCESS) {
-            ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse()).addListener(CLOSE)
-        } else {
-            ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse())
-            ctx.close()
+        ctx.writeAndFlush(safeHandler(request.asRequest()).asNettyResponse()).apply {
+            if (request.decoderResult() == SUCCESS) addListener(CLOSE) else ctx.close()
         }
     }
 
