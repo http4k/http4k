@@ -40,11 +40,13 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
             }
         }
 
+    private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
+
     private fun Response.into(response: ApacheResponse) {
         with(response) {
             setStatusCode(status.code)
             setReasonPhrase(status.description)
-            headers.forEach { (key, value) -> addHeader(key, value) }
+            headers.filter { !headersThatApacheInterceptorSets.contains(it.first)  }.forEach { (key, value) -> addHeader(key, value) }
             entity = InputStreamEntity(body.stream)
         }
     }

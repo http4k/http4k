@@ -4,7 +4,9 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.asByteBuffer
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -15,8 +17,10 @@ import org.http4k.core.Status.Companion.ACCEPTED
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.StreamBody
+import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.util.RetryRule
@@ -33,7 +37,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Rule
     @JvmField
-    var retryRule = RetryRule(5)
+    var retryRule = RetryRule(1)
 
     private val port = Random().nextInt(1000) + 8000
 
@@ -53,7 +57,8 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     },
                     "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
                     "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-                    "/stream" bind GET to { Response(OK).body("hello".byteInputStream()) },
+                    "/stream" bind GET to { Response(OK).with(Body.binary(ContentType.TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
+                    "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
                     "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
                     "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
                     "/length" bind { req: Request ->
@@ -161,6 +166,13 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
+    }
+
+    @Test
+    fun `ok when length already set`() {
+        val response = client(Request(GET, "http://localhost:$port/presetlength"))
+
+        assertThat(response.status, equalTo(OK))
     }
 
     @After
