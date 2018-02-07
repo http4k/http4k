@@ -54,6 +54,6 @@ infix fun String.bind(httpHandler: RoutingHttpHandler): RoutingHttpHandler = htt
 
 infix fun String.bind(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(null, UriTemplate.from(this), action)
 
-infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplatingRoutingWsHandler(UriTemplate.from(this), consumer)
+infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
 
 infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)

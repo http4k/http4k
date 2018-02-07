@@ -64,18 +64,15 @@ data class StaticRoutingHttpHandler(private val pathSegments: String,
     override fun invoke(req: Request): Response = httpHandler(req)
 }
 
-data class AggregateRoutingHttpHandler(
+internal data class AggregateRoutingHttpHandler(
     private val list: List<RoutingHttpHandler>,
-    private val notFoundHandler: HttpHandler = routeNotFoundHandler
-) : RoutingHttpHandler {
+    private val notFoundHandler: HttpHandler = routeNotFoundHandler) : RoutingHttpHandler {
+
     constructor(vararg list: RoutingHttpHandler) : this(list.toList())
 
-    override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: notFoundHandler(request)
+    override fun invoke(request: Request): Response = (match(request) ?: notFoundHandler)(request)
 
-    override fun match(request: Request): HttpHandler? {
-        list.forEach { next -> next.match(request)?.let { return it } }
-        return null
-    }
+    override fun match(request: Request): HttpHandler? = list.asSequence().mapNotNull { next -> next.match(request) }.firstOrNull()
 
     override fun withFilter(new: Filter): RoutingHttpHandler =
         copy(list = list.map { it.withFilter(new) }, notFoundHandler = new.then(notFoundHandler))
@@ -83,10 +80,9 @@ data class AggregateRoutingHttpHandler(
     override fun withBasePath(new: String): RoutingHttpHandler = copy(list = list.map { it.withBasePath(new) })
 }
 
-internal val routeNotFoundHandler: HttpHandler = {
-    Response(NOT_FOUND.description("Route not found")) }
+internal val routeNotFoundHandler: HttpHandler = { Response(NOT_FOUND.description("Route not found")) }
 
-data class TemplateRoutingHttpHandler(
+internal data class TemplateRoutingHttpHandler(
     private val method: Method?,
     private val template: UriTemplate,
     private val httpHandler: HttpHandler,
@@ -98,7 +94,7 @@ data class TemplateRoutingHttpHandler(
             { r: Request -> httpHandler(r.withUriTemplate(template)) }
         else null
 
-    override fun invoke(request: Request): Response = match(request)?.invoke(request) ?: notFoundHandler(request)
+    override fun invoke(request: Request): Response = (match(request) ?: notFoundHandler)(request)
 
     override fun withFilter(new: Filter): RoutingHttpHandler =
         copy(httpHandler = new.then(httpHandler), notFoundHandler = new.then(notFoundHandler))
@@ -106,15 +102,15 @@ data class TemplateRoutingHttpHandler(
     override fun withBasePath(new: String): RoutingHttpHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
-data class TemplatingRoutingWsHandler(private val template: UriTemplate,
-                                      private val consumer: WsConsumer) : RoutingWsHandler {
-    override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) { websocket ->
-        consumer(object : Websocket by websocket {
-            override val upgradeRequest: Request = websocket.upgradeRequest.withUriTemplate(template)
+internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
+                                             private val consumer: WsConsumer) : RoutingWsHandler {
+    override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) { ws ->
+        consumer(object : Websocket by ws {
+            override val upgradeRequest: Request = ws.upgradeRequest.withUriTemplate(template)
         })
     } else null
 
-    override fun withBasePath(new: String): TemplatingRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
+    override fun withBasePath(new: String): TemplateRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
 private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
