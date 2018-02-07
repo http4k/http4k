@@ -273,6 +273,17 @@ class RoutingTest {
     }
 
     @Test
+    fun `RoutingHttpHandler with filters also applies when route is not found`() {
+        val filter = Filter { next -> { next(it).body("value") } }
+
+        val routingHttpHandler = filter.then(routes(
+            "/a/thing" bind GET to { Response(OK) }
+        ))
+
+        assertThat(routingHttpHandler(Request(GET, "/not-found")).bodyString(), equalTo("value"))
+    }
+
+    @Test
     fun `can apply a filter to a Router`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
             .then(routes(

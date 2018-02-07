@@ -5,8 +5,6 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
@@ -22,18 +20,7 @@ interface RoutingHttpHandler : Router, HttpHandler {
 
 fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(*list.map { "" bind it.first to it.second }.toTypedArray())
 
-fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = object : RoutingHttpHandler {
-    override fun invoke(p1: Request): Response = match(p1)?.invoke(p1) ?: Response(NOT_FOUND.description("Route not found"))
-
-    override fun match(request: Request): HttpHandler? {
-        list.forEach { next -> next.match(request)?.let { return it } }
-        return null
-    }
-
-    override fun withFilter(new: Filter): RoutingHttpHandler = routes(*list.map { it.withFilter(new) }.toTypedArray())
-
-    override fun withBasePath(new: String): RoutingHttpHandler = routes(*list.map { it.withBasePath(new) }.toTypedArray())
-}
+fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRoutingHttpHandler(*list)
 
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): StaticRoutingHttpHandler =
     StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
