@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.14.1
+- Fix #95 - Filters are now applied to "route not found" responses
+
 ### v3.14.0
 - Fix #93 - Apache server doesn't like content-length or transfer-encoding headers present in http4k response.
 - Add ability to "name" input and output contract body definitions in an OpenAPI JSON doc. This applies to only the top level entity. If no override is passed, the objects are named according to their hashcode.
