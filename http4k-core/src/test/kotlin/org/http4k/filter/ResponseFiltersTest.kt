@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.core.with
+import org.http4k.filter.HttpTransaction.Companion.REQUEST_GROUP
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
@@ -105,37 +106,27 @@ class ResponseFiltersTest {
     @Test
     fun `reporting http transaction for unknown route`() {
         var transaction: HttpTransaction? = null
-        var called: String? = null
 
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { tx, identity ->
-            called = identity
-            transaction = tx
-        }
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { transaction = it }
 
         val handler = filter.then { Response(OK) }
 
         handler(Request(Method.GET, ""))
 
-        assertThat(called, equalTo("UNMAPPED"))
         assertThat(transaction, equalTo(HttpTransaction(Request(Method.GET, ""), Response(OK), Duration.ZERO)))
     }
 
     @Test
     fun `reporting http transaction for known route`() {
         var transaction: HttpTransaction? = null
-        var called: String? = null
 
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { tx, txIdentifier ->
-            called = txIdentifier
-            transaction = tx
-        }
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault()))  { transaction = it }
 
         val handler = filter.then { Response(OK) }
 
         val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "/path/dir/someFile.html")
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO)))
-        assertThat(called, equalTo("/path/dir/someFile.html"))
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(REQUEST_GROUP to "/path/dir/someFile.html"))))
     }
 }

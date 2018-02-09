@@ -50,8 +50,8 @@ fun main(args: Array<String>) {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction, txIdentifier: String ->
-        println(txIdentifier + " took " + tx.duration)
+    val filter: Filter = ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction ->
+        println(tx.labels.toString() + " took " + tx.duration)
     }
 
     val security = ApiKey(Query.int().required("apiKey"), {

@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     fun HttpMessage.logHeader(name: String) = "\n\t\t$name=${header(name)}"
     fun HttpMessage.traces() = logHeader("x-b3-traceid") + logHeader("x-b3-spanid") + logHeader("x-b3-parentspanid")
 
-    fun audit(name: String) = ResponseFilters.ReportHttpTransaction { tx, _ ->
+    fun audit(name: String) = ResponseFilters.ReportHttpTransaction { tx ->
         println("$name: ${tx.request.uri}\n\trequest:${tx.request.traces()}\n\tresponse:${tx.response.traces()}")
     }
 

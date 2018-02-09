@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
 
     fun logger(message: String) = println("${Clock.systemUTC().instant()} $message")
 
-    val audit = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction, _: String ->
+    val audit = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction ->
         logger("my call to ${tx.request.uri} returned ${tx.response.status} and took ${tx.duration.toMillis()}")
     }
 

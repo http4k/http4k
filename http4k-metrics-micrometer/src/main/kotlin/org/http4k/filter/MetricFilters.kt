@@ -24,7 +24,7 @@ object MetricFilters {
                          requestIdName: String = defaultRequestIdName,
                          requestIdFormatter: RequestIdFormatter = defaultRequestIdFormatter,
                          clock: Clock = Clock.systemUTC()): Filter =
-            ResponseFilters.ReportHttpTransaction(clock) { tx, _ ->
+            ResponseFilters.ReportHttpTransaction(clock) { tx ->
                 Timer.builder(name).description(description)
                     .tag(methodName, tx.request.method.name)
                     .tag(statusName, tx.response.status.code.toString())

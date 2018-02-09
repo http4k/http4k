@@ -19,8 +19,8 @@ fun main(args: Array<String>) {
     fun metricConsumer(name: String, time: Duration) = println("$name ${time.toMillis()}ms")
 
     // this is a general use filter for reporting on http transactions
-    val standardFilter = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction, txIdentifier: String ->
-        metricConsumer("txIdentifier is: $txIdentifier", tx.duration)
+    val standardFilter = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction ->
+        metricConsumer("txLabels are: ${tx.labels}", tx.duration)
         metricConsumer("uri is: ${tx.request.uri}", tx.duration)
     }
 
