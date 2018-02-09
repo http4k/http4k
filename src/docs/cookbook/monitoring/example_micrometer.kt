@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     // this is a micrometer registry used mostly for testing - substitute the correct implementation.
     val registry = SimpleMeterRegistry()
 
-    val server = routes("/metrics" bind GET to { Response(OK) })
+    val server = routes("/metrics/{name}" bind GET to { Response(OK) })
 
     // apply filters to a server...
     val app = MetricFilters.Server.RequestCounter(registry)
@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
 
     // make some calls
     (0..10).forEach {
-        app(Request(GET, "/metrics"))
+        app(Request(GET, "/metrics/$it"))
         client(Request(GET, "https://http4k.org"))
     }
 
