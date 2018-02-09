@@ -11,6 +11,6 @@ Header.X_URI_TEMPLATE(request)?.let { it -> mapOf(ROUTING_GROUP_LABEL to it) } ?
     val routingGroup by lazy { labels[ROUTING_GROUP_LABEL] ?: "UNMAPPED" }
 
     companion object {
-        const val ROUTING_GROUP_LABEL = "routingGroup"
+        internal const val ROUTING_GROUP_LABEL = "routingGroup"
     }
 }
