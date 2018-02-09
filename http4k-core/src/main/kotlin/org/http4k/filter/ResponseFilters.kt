@@ -29,12 +29,12 @@ object ResponseFilters {
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), httpTransactionIdFormatter: HttpTransactionIdFormatter = { it.requestGroup }, recordFn: (HttpTransaction, String) -> Unit): Filter = Filter { next ->
+        operator fun invoke(clock: Clock = Clock.systemUTC(), httpTransactionGroupFormatter: HttpTransactionGroupFormatter = { it.requestGroup }, recordFn: (HttpTransaction, String) -> Unit): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
                         val transaction = HttpTransaction(it, this, between(start, clock.instant()))
-                        recordFn(transaction, httpTransactionIdFormatter(transaction))
+                        recordFn(transaction, httpTransactionGroupFormatter(transaction))
                     }
                 }
             }
@@ -99,4 +99,4 @@ data class HttpTransaction(val request: Request, val response: Response, val dur
     val requestGroup by lazy { Header.X_URI_TEMPLATE(request) ?: "UNMAPPED" }
 }
 
-typealias HttpTransactionIdFormatter = (HttpTransaction) -> String
+typealias HttpTransactionGroupFormatter = (HttpTransaction) -> String
