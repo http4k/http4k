@@ -1,10 +1,9 @@
 package org.http4k.filter
 
 import org.http4k.core.Filter
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.filter.HttpTransaction.Companion.URI_TEMPLATE
-import org.http4k.lens.Header
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -58,7 +57,7 @@ object ResponseFilters {
     object ReportRouteLatency {
         operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter =
             ReportHttpTransaction(clock) { tx ->
-                recordFn("${tx.request.method}.${(tx.label(URI_TEMPLATE) ?: "UNMAPPED").replace('.', '_').replace(':', '.').replace('/', '_')}" +
+                recordFn("${tx.request.method}.${tx.routingGroup.replace('.', '_').replace(':', '.').replace('/', '_')}" +
                     ".${tx.response.status.code / 100}xx" +
                     ".${tx.response.status.code}", tx.duration)
             }
@@ -93,16 +92,6 @@ object ResponseFilters {
                 }
             }
         }
-    }
-}
-
-data class HttpTransaction(val request: Request, val response: Response, val duration: Duration, val labels: Map<String, String> =
-Header.X_URI_TEMPLATE(request)?.let { it -> mapOf(URI_TEMPLATE to it) } ?: emptyMap()) {
-    fun label(name: String, value: String) = copy(labels = labels + (name to value))
-    fun label(name: String) = labels[name]
-
-    companion object {
-        const val URI_TEMPLATE = "uriTemplate"
     }
 }
 

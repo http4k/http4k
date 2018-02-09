@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import junit.framework.TestCase.assertTrue
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.core.with
-import org.http4k.filter.HttpTransaction.Companion.URI_TEMPLATE
+import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
@@ -127,6 +128,6 @@ class ResponseFiltersTest {
         val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "someValue")
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(URI_TEMPLATE to "someValue"))))
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(ROUTING_GROUP to "someValue"))))
     }
 }
