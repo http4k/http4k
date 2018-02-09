@@ -1,12 +1,12 @@
 package cookbook.monitoring
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.HttpTransaction
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes

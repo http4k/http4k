@@ -25,16 +25,17 @@ object ResponseFilters {
     }
 
     /**
-     * General reporting Filter for an ReportHttpTransaction.
+     * General reporting Filter for an ReportHttpTransaction. Pass an optional HttpTransactionLabeller to
+     * create custom labels.
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), httpTransactionGroupFormatter: HttpTransactionLabeller = { it }, recordFn: (HttpTransaction) -> Unit): Filter = Filter { next ->
+        operator fun invoke(clock: Clock = Clock.systemUTC(), transactionLabeller: HttpTransactionLabeller = { it }, recordFn: (HttpTransaction) -> Unit): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
                         val transaction = HttpTransaction(it, this, between(start, clock.instant()))
-                        recordFn(httpTransactionGroupFormatter(transaction))
+                        recordFn(transactionLabeller(transaction))
                     }
                 }
             }
