@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.core.with
-import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP
+import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
@@ -128,6 +128,6 @@ class ResponseFiltersTest {
         val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "someValue")
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(ROUTING_GROUP to "someValue"))))
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(ROUTING_GROUP_LABEL to "someValue"))))
     }
 }
