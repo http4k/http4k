@@ -107,10 +107,10 @@ class ResponseFiltersTest {
         var transaction: HttpTransaction? = null
         var called: String? = null
 
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault()), { tx, identity ->
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { tx, identity ->
             called = identity
             transaction = tx
-        })
+        }
 
         val handler = filter.then { Response(OK) }
 
@@ -125,10 +125,10 @@ class ResponseFiltersTest {
         var transaction: HttpTransaction? = null
         var called: String? = null
 
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault()), { tx, identity ->
-            called = identity
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { tx, txIdentifier ->
+            called = txIdentifier
             transaction = tx
-        })
+        }
 
         val handler = filter.then { Response(OK) }
 

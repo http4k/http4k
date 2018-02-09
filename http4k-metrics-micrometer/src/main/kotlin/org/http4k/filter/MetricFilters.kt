@@ -24,13 +24,13 @@ object MetricFilters {
                          requestIdName: String = defaultRequestIdName,
                          requestIdFormatter: RequestIdFormatter = defaultRequestIdFormatter,
                          clock: Clock = Clock.systemUTC()): Filter =
-            ResponseFilters.ReportLatency(clock) { request, response, duration ->
+            ResponseFilters.ReportHttpTransaction(clock) { tx, _ ->
                 Timer.builder(name).description(description)
-                    .tag(methodName, request.method.name)
-                    .tag(statusName, response.status.code.toString())
-                    .tag(requestIdName, requestIdFormatter(request))
+                    .tag(methodName, tx.request.method.name)
+                    .tag(statusName, tx.response.status.code.toString())
+                    .tag(requestIdName, requestIdFormatter(tx.request))
                     .register(meterRegistry)
-                    .record(duration)
+                    .record(tx.duration)
             }
 
         fun RequestCounter(meterRegistry: MeterRegistry,

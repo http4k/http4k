@@ -19,6 +19,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.filter.CorsPolicy
+import org.http4k.filter.HttpTransaction
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Argo
@@ -33,7 +34,6 @@ import org.http4k.routing.static
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
-import java.time.Duration
 
 fun main(args: Array<String>) {
 
@@ -50,12 +50,11 @@ fun main(args: Array<String>) {
         )
     }
 
-    val filter: Filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), { name: String, latency: Duration ->
-        println(name + " took " + latency)
-    })
+    val filter: Filter = ResponseFilters.ReportHttpTransaction(Clock.systemUTC()) { tx: HttpTransaction, txIdentifier: String ->
+        println(txIdentifier + " took " + tx.duration)
+    }
 
     val security = ApiKey(Query.int().required("apiKey"), {
-        println("foo" + (it == 42))
         it == 42
     })
 

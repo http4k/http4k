@@ -6,11 +6,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.HttpTransaction
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
-import java.time.Duration
 
 fun main(args: Array<String>) {
 
@@ -18,8 +18,8 @@ fun main(args: Array<String>) {
 
     fun logger(message: String) = println("${Clock.systemUTC().instant()} $message")
 
-    val audit = ResponseFilters.ReportLatency { req: Request, resp: Response, duration: Duration ->
-        logger("my call to ${req.uri} returned ${resp.status} and took ${duration.toMillis()}")
+    val audit = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction, _: String ->
+        logger("my call to ${tx.request.uri} returned ${tx.response.status} and took ${tx.duration.toMillis()}")
     }
 
     val monitoredApp: HttpHandler = audit.then(app)

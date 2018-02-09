@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.15.0 (uncut)
+- Introduce `HttpTransaction` and new `ReportHttpTransaction` filter provide better API for metrics reporting.
+
 ### v3.14.1
 - Fix #95 - Filters are now applied to "route not found" responses
 
@@ -16,7 +19,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Further tweak to Netty. H/T @FredDeschenes
 
 ### v3.13.2
-- Fix #91 - large message handling in Netty
+- Fix #91 - large message handli
+ng in Netty
 
 ### v3.13.1
 - Upgrade to Kotlin 1.2.20

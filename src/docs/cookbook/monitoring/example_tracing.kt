@@ -20,8 +20,8 @@ fun main(args: Array<String>) {
     fun HttpMessage.logHeader(name: String) = "\n\t\t$name=${header(name)}"
     fun HttpMessage.traces() = logHeader("x-b3-traceid") + logHeader("x-b3-spanid") + logHeader("x-b3-parentspanid")
 
-    fun audit(name: String) = ResponseFilters.ReportLatency { req, resp, _ ->
-        println("$name: ${req.uri}\n\trequest:${req.traces()}\n\tresponse:${resp.traces()}")
+    fun audit(name: String) = ResponseFilters.ReportHttpTransaction { tx, _ ->
+        println("$name: ${tx.request.uri}\n\trequest:${tx.request.traces()}\n\tresponse:${tx.response.traces()}")
     }
 
     // a simple proxy to another app

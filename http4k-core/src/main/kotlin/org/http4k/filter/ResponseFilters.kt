@@ -26,11 +26,10 @@ object ResponseFilters {
 
     /**
      * General reporting Filter for an ReportHttpTransaction.
+     * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportHttpTransaction {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (HttpTransaction, String) -> Unit,
-                            httpTransactionIdFormatter: HttpTransactionIdFormatter = { it.requestIdentifier }
-        ): Filter = Filter { next ->
+        operator fun invoke(clock: Clock = Clock.systemUTC(), httpTransactionIdFormatter: HttpTransactionIdFormatter = { it.requestGroup }, recordFn: (HttpTransaction, String) -> Unit): Filter = Filter { next ->
             {
                 clock.instant().let { start ->
                     next(it).apply {
@@ -45,9 +44,10 @@ object ResponseFilters {
     /**
      * Measure and report the latency of a request to the passed function.
      */
+    @Deprecated("Use ReportHttpTransaction instead", ReplaceWith("ReportHttpTransaction(clock, { tx, _ -> recordFn(tx.request, tx.response, tx.latency) })"))
     object ReportLatency {
         operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter =
-            ReportHttpTransaction(clock, { tx, _ -> recordFn(tx.request, tx.response, tx.latency) })
+            ReportHttpTransaction(clock) { tx, _ -> recordFn(tx.request, tx.response, tx.duration) }
     }
 
     /**
@@ -55,11 +55,12 @@ object ResponseFilters {
      * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportRouteLatency {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter = ReportLatency(clock, { req, response, duration ->
-            val identify = req.method.toString() + "." + (Header.X_URI_TEMPLATE(req)?.replace('.', '_')?.replace(':', '.') ?: "UNMAPPED")
-            val identity = listOf(identify.replace('/', '_'), "${response.status.code / 100}xx", response.status.code.toString()).joinToString(".")
-            recordFn(identity, duration)
-        })
+        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter =
+            ReportHttpTransaction(clock) { tx, txIdentifier ->
+                recordFn("${tx.request.method}.${txIdentifier.replace('.', '_').replace(':', '.').replace('/', '_')}" +
+                    ".${tx.response.status.code / 100}xx" +
+                    ".${tx.response.status.code}", tx.duration)
+            }
     }
 
     /**
@@ -94,8 +95,8 @@ object ResponseFilters {
     }
 }
 
-data class HttpTransaction(val request: Request, val response: Response, val latency: Duration) {
-    val requestIdentifier by lazy { Header.X_URI_TEMPLATE(request) ?: "UNMAPPED" }
+data class HttpTransaction(val request: Request, val response: Response, val duration: Duration) {
+    val requestGroup by lazy { Header.X_URI_TEMPLATE(request) ?: "UNMAPPED" }
 }
 
 typealias HttpTransactionIdFormatter = (HttpTransaction) -> String

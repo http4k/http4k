@@ -6,6 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.HttpTransaction
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -17,13 +18,16 @@ fun main(args: Array<String>) {
 
     fun metricConsumer(name: String, time: Duration) = println("$name ${time.toMillis()}ms")
 
-    // this is a general use filter for reporting on call latency
-    val standardFilter = ResponseFilters.ReportLatency { req: Request, _: Response, duration: Duration ->
-        metricConsumer(req.uri.toString(), duration)
+    // this is a general use filter for reporting on http transactions
+    val standardFilter = ResponseFilters.ReportHttpTransaction { tx: HttpTransaction, txIdentifier: String ->
+        metricConsumer("txIdentifier is: $txIdentifier", tx.duration)
+        metricConsumer("uri is: ${tx.request.uri}", tx.duration)
     }
 
     // this filter provides an anonymous identifier of the route
-    val identifiedRouteFilter = ResponseFilters.ReportRouteLatency(recordFn = ::metricConsumer)
+    val identifiedRouteFilter = ResponseFilters.ReportRouteLatency { requestGroup: String, duration: Duration ->
+        metricConsumer("requestGroup is: " + requestGroup, duration)
+    }
 
     val monitoredApp: HttpHandler = standardFilter
         .then(identifiedRouteFilter)
