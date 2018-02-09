@@ -124,9 +124,9 @@ class ResponseFiltersTest {
 
         val handler = filter.then { Response(OK) }
 
-        val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "/path/dir/someFile.html")
+        val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "someValue")
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(URI_TEMPLATE to "/path/dir/someFile.html"))))
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO, mapOf(URI_TEMPLATE to "someValue"))))
     }
 }
