@@ -12,6 +12,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.core.with
+import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -20,7 +21,10 @@ import org.http4k.toHttpHandler
 import org.http4k.util.TickingClock
 import org.junit.Test
 import java.time.Clock
+import java.time.Clock.fixed
 import java.time.Duration
+import java.time.Instant.EPOCH
+import java.time.ZoneId.systemDefault
 
 class ResponseFiltersTest {
 
@@ -95,5 +99,43 @@ class ResponseFiltersTest {
         handler(Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "/path/dir/someFile.html"))
 
         assertThat(called, equalTo("GET._path_dir_someFile_html.2xx.200"))
+    }
+
+
+    @Test
+    fun `reporting http transaction for unknown route`() {
+        var transaction: HttpTransaction? = null
+        var called: String? = null
+
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault()), { tx, identity ->
+            called = identity
+            transaction = tx
+        })
+
+        val handler = filter.then { Response(OK) }
+
+        handler(Request(Method.GET, ""))
+
+        assertThat(called, equalTo("UNMAPPED"))
+        assertThat(transaction, equalTo(HttpTransaction(Request(Method.GET, ""), Response(OK), Duration.ZERO)))
+    }
+
+    @Test
+    fun `reporting http transaction for known route`() {
+        var transaction: HttpTransaction? = null
+        var called: String? = null
+
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault()), { tx, identity ->
+            called = identity
+            transaction = tx
+        })
+
+        val handler = filter.then { Response(OK) }
+
+        val request = Request(Method.GET, "").with(Header.X_URI_TEMPLATE of "/path/dir/someFile.html")
+        handler(request)
+
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), Duration.ZERO)))
+        assertThat(called, equalTo("/path/dir/someFile.html"))
     }
 }

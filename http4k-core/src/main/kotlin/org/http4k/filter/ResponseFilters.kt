@@ -25,28 +25,40 @@ object ResponseFilters {
     }
 
     /**
-     * Measure and report the latency of a request to the passed function.
+     * General reporting Filter for an ReportHttpTransaction.
      */
-    object ReportLatency {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter = Filter { next ->
+    object ReportHttpTransaction {
+        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (HttpTransaction, String) -> Unit,
+                            httpTransactionIdFormatter: HttpTransactionIdFormatter = { it.requestIdentifier }
+        ): Filter = Filter { next ->
             {
-                val start = clock.instant()
-                val response = next(it)
-
-                recordFn(it, response, between(start, clock.instant()))
-                response
+                clock.instant().let { start ->
+                    next(it).apply {
+                        val transaction = HttpTransaction(it, this, between(start, clock.instant()))
+                        recordFn(transaction, httpTransactionIdFormatter(transaction))
+                    }
+                }
             }
         }
     }
 
     /**
-     * Report the latency on a particular route to a callback function, passing the "x-uri-template" header and response status bucket (e.g. 2xx)
-     * for identification. This is useful for logging metrics. Note that the passed function blocks the response from completing.
+     * Measure and report the latency of a request to the passed function.
+     */
+    object ReportLatency {
+        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter =
+            ReportHttpTransaction(clock, { tx, _ -> recordFn(tx.request, tx.response, tx.latency) })
+    }
+
+    /**
+     * Report the latency on a particular route to a callback function.
+     * This is useful for logging metrics. Note that the passed function blocks the response from completing.
      */
     object ReportRouteLatency {
         operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (String, Duration) -> Unit): Filter = ReportLatency(clock, { req, response, duration ->
             val identify = req.method.toString() + "." + (Header.X_URI_TEMPLATE(req)?.replace('.', '_')?.replace(':', '.') ?: "UNMAPPED")
-            recordFn(listOf(identify.replace('/', '_'), "${response.status.code / 100}xx", response.status.code.toString()).joinToString("."), duration)
+            val identity = listOf(identify.replace('/', '_'), "${response.status.code / 100}xx", response.status.code.toString()).joinToString(".")
+            recordFn(identity, duration)
         })
     }
 
@@ -81,3 +93,9 @@ object ResponseFilters {
         }
     }
 }
+
+data class HttpTransaction(val request: Request, val response: Response, val latency: Duration) {
+    val requestIdentifier by lazy { Header.X_URI_TEMPLATE(request) ?: "UNMAPPED" }
+}
+
+typealias HttpTransactionIdFormatter = (HttpTransaction) -> String
