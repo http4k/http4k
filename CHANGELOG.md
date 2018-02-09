@@ -2,8 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.15.0 (uncut)
-- Introduce `HttpTransaction` and new `ReportHttpTransaction` filter provide better API for metrics reporting.
+### v3.15.0
+- Introduce `HttpTransaction` and new `ReportHttpTransaction` filter provide better generic API for reporting, along with the ability to label transactions for this purpose.
+- Breaking: Rework the metrics request counter and timer Filter API. There is now a `HttpTransactionLabeller` for you to add as many labels as required to the transaction. Each of these labels will be used to tag the metric.
 
 ### v3.14.1
 - Fix #95 - Filters are now applied to "route not found" responses

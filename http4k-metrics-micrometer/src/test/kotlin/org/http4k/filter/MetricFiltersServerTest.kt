@@ -2,6 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.should.shouldMatch
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.Method
@@ -29,20 +30,20 @@ class MetricFiltersServerTest {
     private var requestCounter = MetricFilters.Server.RequestCounter(registry)
     private val server by lazy {
         routes(
-                "/timed" bind routes(
-                        "/one" bind GET to { Response(OK) },
-                        "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
-                ).withFilter(requestTimer),
-                "/counted" bind routes(
-                        "/one" bind GET to { Response(OK) },
-                        "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
-                ).withFilter(requestCounter),
-                "/unmetered" bind routes(
-                        "one" bind GET to { Response(OK) },
-                        "two" bind DELETE to { Response(INTERNAL_SERVER_ERROR) }
-                ),
-                "/otherTimed" bind static().withFilter(requestTimer),
-                "/otherCounted" bind static().withFilter(requestCounter)
+            "/timed" bind routes(
+                "/one" bind GET to { Response(OK) },
+                "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
+            ).withFilter(requestTimer),
+            "/counted" bind routes(
+                "/one" bind GET to { Response(OK) },
+                "/two/{name:.*}" bind POST to { Response(OK).body(Path.of("name")(it)) }
+            ).withFilter(requestCounter),
+            "/unmetered" bind routes(
+                "one" bind GET to { Response(OK) },
+                "two" bind DELETE to { Response(INTERNAL_SERVER_ERROR) }
+            ),
+            "/otherTimed" bind static().withFilter(requestTimer),
+            "/otherCounted" bind static().withFilter(requestCounter)
         )
     }
 
@@ -54,8 +55,10 @@ class MetricFiltersServerTest {
         }
 
         assert(registry,
-                hasRequestTimer(GET, "timed_one", OK, 1, 1),
-                hasRequestTimer(POST, "timed_two_name", OK, 2, 2)
+            hasRequestTimer(1, 1, tags = *arrayOf(
+                "path" to "timed_one", "method" to "GET", "status" to "200")),
+            hasRequestTimer(2, 2, tags = *arrayOf(
+                "path" to "timed_two_name", "method" to "POST", "status" to "200"))
         )
     }
 
@@ -67,8 +70,8 @@ class MetricFiltersServerTest {
         }
 
         assert(registry,
-                hasRequestCounter(GET, "counted_one", OK, 1),
-                hasRequestCounter(POST, "counted_two_name", OK, 2)
+            hasRequestCounter(1, tags = *arrayOf("path" to "counted_one", "method" to "GET", "status" to "200")),
+            hasRequestCounter(2, tags = *arrayOf("path" to "counted_two_name", "method" to "POST", "status" to "200"))
         )
     }
 
@@ -78,82 +81,76 @@ class MetricFiltersServerTest {
         server(Request(DELETE, "/unmetered/two")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
 
         assert(registry,
-                hasNoRequestTimer(GET, "unmetered_one", OK),
-                hasNoRequestTimer(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR),
-                hasNoRequestCounter(GET, "unmetered_one", OK),
-                hasNoRequestCounter(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR)
+            hasNoRequestTimer(GET, "unmetered_one", OK),
+            hasNoRequestTimer(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR),
+            hasNoRequestCounter(GET, "unmetered_one", OK),
+            hasNoRequestCounter(DELETE, "unmetered_two", INTERNAL_SERVER_ERROR)
         )
     }
 
     @Test
     fun `request timer meter names and request id formatter can be configured`() {
         requestTimer = MetricFilters.Server.RequestTimer(registry, "custom.requests", "custom.description",
-                "customMethod", "customStatus", "customPath",
-                { MetricFilters.Server.defaultRequestIdFormatter(it).plus("-custom") }, clock)
+            { it.label("foo", "bar") }, clock)
 
         server(Request(GET, "/timed/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestTimer(GET, "timed_one-custom", OK, 1, 1,
-                        "custom.requests", "custom.description", "customMethod",
-                        "customStatus", "customPath")
+            hasRequestTimer(1, 1, "custom.requests", "custom.description", "foo" to "bar")
         )
     }
 
     @Test
     fun `request counter meter names and request id formatter can be configured`() {
         requestCounter = MetricFilters.Server.RequestCounter(registry, "custom.requests", "custom.description",
-                "customMethod", "customStatus", "customPath",
-                { MetricFilters.Server.defaultRequestIdFormatter(it).plus("-custom") })
+            { it.label("foo", "bar") })
 
         server(Request(GET, "/counted/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-                hasRequestCounter(GET, "counted_one-custom", OK, 1,
-                        "custom.requests", "custom.description", "customMethod",
-                        "customStatus", "customPath")
+            hasRequestCounter(1, "custom.requests", "custom.description", "foo" to "bar")
         )
     }
 
     @Test
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
         server(Request(GET, "/otherTimed/test.json")) shouldMatch hasStatus(OK)
-        assert(registry, hasRequestTimer(GET, "UNMAPPED", OK, 1, 1))
+
+        assert(registry, hasRequestTimer(1, 1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
         server(Request(GET, "/otherCounted/test.json")) shouldMatch hasStatus(OK)
-        assert(registry, hasRequestCounter(GET, "UNMAPPED", OK, 1))
+        assert(registry, hasRequestCounter(1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
-    private fun hasRequestCounter(method: Method, path: String, status: Status, count: Long,
+
+    private fun hasRequestCounter(count: Long,
                                   name: String = "http.server.request.count",
                                   description: String = "Total number of server requests",
-                                  methodName: String = "method",
-                                  statusName: String = "status",
-                                  requestIdName: String = "path") = hasCounter(name,
-            Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, path),
-            description(description) and counterCount(count)
+                                  vararg tags: Pair<String, String>) = hasCounter(name,
+        tags.asList()
+            .map { Tag.of(it.first, it.second) },
+        description(description) and counterCount(count)
     )
 
-    private fun hasRequestTimer(method: Method, path: String, status: Status, count: Long, totalTimeSec: Long,
+    private fun hasRequestTimer(count: Long, totalTimeSec: Long,
                                 name: String = "http.server.request.latency",
                                 description: String = "Timing of server requests",
-                                methodName: String = "method",
-                                statusName: String = "status",
-                                requestIdName: String = "path") = hasTimer(name,
-        Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, path),
-        description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000L)
+                                vararg tags: Pair<String, String>) = hasTimer(name,
+        tags.asList()
+            .map { Tag.of(it.first, it.second) },
+        description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)
     )
 
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
-            hasTimer("http.server.request.latency",
-                    Tags.zip("path", path, "method", method.name, "status", status.code.toString())
-            ).not()
+        hasTimer("http.server.request.latency",
+            Tags.zip("path", path, "method", method.name, "status", status.code.toString())
+        ).not()
 
     private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
-            hasCounter("http.server.request.count",
-                    Tags.zip("path", path, "method", method.name, "status", status.code.toString())
-            ).not()
+        hasCounter("http.server.request.count",
+            Tags.zip("path", path, "method", method.name, "status", status.code.toString())
+        ).not()
 }

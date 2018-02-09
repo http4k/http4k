@@ -2,15 +2,13 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.should.shouldMatch
-import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -41,8 +39,8 @@ class MetricFiltersClientTest {
         }
 
         assert(registry,
-            hasRequestTimer(GET, OK, "test_server_com", 1, 1),
-            hasRequestTimer(POST, NOT_FOUND, "another_server_com", 2, 2)
+            hasRequestTimer(1, 1, tags = *arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
+            hasRequestTimer(2, 2, tags = *arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
     }
 
@@ -54,58 +52,52 @@ class MetricFiltersClientTest {
         }
 
         assert(registry,
-            hasRequestCounter(GET, OK, "test_server_com", 1),
-            hasRequestCounter(POST, NOT_FOUND, "another_server_com", 2)
+            hasRequestCounter(1, tags = *arrayOf("host" to "test_server_com", "method" to "GET", "status" to "200")),
+            hasRequestCounter(2, tags = *arrayOf("host" to "another_server_com", "method" to "POST", "status" to "404"))
         )
     }
 
     @Test
-    fun `request timer meter names and request id formatter can be configured`() {
+    fun `request timer meter names and transaction labelling can be configured`() {
         requestTimer = MetricFilters.Client.RequestTimer(registry, "custom.requests", "custom.description",
-            "customMethod", "customStatus", "customHost",
-            { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") }, clock)
+            { it.label("foo", "bar") }, clock)
 
         timedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-            hasRequestTimer(GET, OK, "test_server_com-custom", 1, 1,
-                "custom.requests", "custom.description", "customMethod",
-                "customStatus", "customHost")
+            hasRequestTimer(1, 1, "custom.requests", "custom.description", tags = *arrayOf("foo" to "bar"))
         )
     }
 
     @Test
-    fun `request counter meter names and request id formatter can be configured`() {
+    fun `request counter meter names and transaction labelling can be configured`() {
         requestCounter = MetricFilters.Client.RequestCounter(registry, "custom.requests", "custom.description",
-            "customMethod", "customStatus", "customHost",
-            { MetricFilters.Client.defaultRequestIdFormatter(it).plus("-custom") })
+            { it.label("foo", "bar") })
 
         countedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
 
         assert(registry,
-            hasRequestCounter(GET, OK, "test_server_com-custom", 1,
-                "custom.requests", "custom.description", "customMethod",
-                "customStatus", "customHost")
+            hasRequestCounter(1, "custom.requests", "custom.description",
+                "foo" to "bar"
+            )
         )
     }
 
-    private fun hasRequestCounter(method: Method, status: Status, host: String, count: Long,
+    private fun hasRequestCounter(count: Long,
                                   name: String = "http.client.request.count",
                                   description: String = "Total number of client requests",
-                                  methodName: String = "method",
-                                  statusName: String = "status",
-                                  requestIdName: String = "host") = hasCounter(name,
-        Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
+                                  vararg tags: Pair<String, String>) = hasCounter(name,
+        tags.asList()
+            .map { Tag.of(it.first, it.second) },
         description(description) and counterCount(count)
     )
 
-    private fun hasRequestTimer(method: Method, status: Status, host: String, count: Long, totalTimeSec: Long,
+    private fun hasRequestTimer(count: Long, totalTimeSec: Long,
                                 name: String = "http.client.request.latency",
                                 description: String = "Timing of client requests",
-                                methodName: String = "method",
-                                statusName: String = "status",
-                                requestIdName: String = "host") = hasTimer(name,
-        Tags.zip(methodName, method.name, statusName, status.code.toString(), requestIdName, host),
+                                vararg tags: Pair<String, String>) = hasTimer(name,
+        tags.asList()
+            .map { Tag.of(it.first, it.second) },
         description(description) and timerCount(count) and timerTotalTime(totalTimeSec * 1000)
     )
 }

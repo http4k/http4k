@@ -19,7 +19,6 @@ internal fun assert(registry: MeterRegistry, vararg matcher: Matcher<MeterRegist
 internal fun hasCounter(name: String, tags: List<Tag>, matcher: Matcher<Counter>? = null): Matcher<MeterRegistry> =
     has("a counter named $name with tags ${tags.map { "${it.key}=${it.value}" }}",
         {
-            it.meters.forEach { println(it.id) }
             it.find(name).tags(tags).counter().orNull()
         },
         present(matcher)
