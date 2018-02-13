@@ -46,6 +46,10 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 **A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class fields with `@JsonAlias` to get the deserialisation to work correctly.
 
+**Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
+
+**A.** This happens because http4k uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
+
 **Q. My application uses Lenses, but when they fail I get an HTTP 500 instead of the promised 400.**
 
 **A.** You forgot to add the `ServerFilters.CatchLensFailure` filter to your Server stack.
