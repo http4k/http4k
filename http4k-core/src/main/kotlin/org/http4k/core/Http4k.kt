@@ -7,7 +7,7 @@ typealias HttpHandler = (Request) -> Response
 interface Filter : (HttpHandler) -> HttpHandler {
     companion object {
         operator fun invoke(fn: (HttpHandler) -> HttpHandler): Filter = object : Filter {
-            operator override fun invoke(next: HttpHandler): HttpHandler = fn(next)
+            override operator fun invoke(next: HttpHandler): HttpHandler = fn(next)
         }
     }
 }
