@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.16.0
+- Convert `Security` (from sealed class) and `ApiKey` to be interfaces. This allows users to implement their own security models.
+
 ### v3.15.0
 - Introduce `HttpTransaction` and new `ReportHttpTransaction` filter provide better generic API for reporting, along with the ability to label transactions for this purpose.
 - Breaking: Rework the metrics request counter and timer Filter API. There is now a `HttpTransactionLabeller` for you to add as many labels as required to the transaction. Each of these labels will be used to tag the metric.
