@@ -25,23 +25,34 @@ object NoSecurity : Security {
 
 /**
  * Checks the presence of the named Api Key parameter. Filter returns 401 if Api-Key is not found in request.
- * Includes an option to NOT authorise OPTIONS requests, which is currently not enabled for OpenAPI.
  */
-data class ApiKey<out T>(val param: Lens<Request, T>, private val validateKey: (T) -> Boolean, private val authorizeOptionsRequests: Boolean = true) : Security {
-    override val filter = Filter {
-        next ->
-        {
-            if (!authorizeOptionsRequests && it.method == OPTIONS) {
-                next(it)
-            } else {
-                val keyValid = try {
-                    validateKey(param(it))
-                } catch (e: LensFailure) {
-                    false
+interface ApiKey<out T> : Security {
+    val param: Lens<Request, T>
+
+    companion object {
+        /**
+         * Default implementation of ApiKey. Includes an option to NOT authorise OPTIONS requests, which is
+         * currently not enabled for OpenAPI.
+         */
+        operator fun <T> invoke(param: Lens<Request, T>,
+                                validateKey: (T) -> Boolean,
+                                authorizeOptionsRequests: Boolean = true): ApiKey<T> =
+            object: ApiKey<T> {
+                override val param = param
+                override val filter = Filter { next ->
+                    {
+                        if (!authorizeOptionsRequests && it.method == OPTIONS) {
+                            next(it)
+                        } else {
+                            val keyValid = try {
+                                validateKey(param(it))
+                            } catch (e: LensFailure) {
+                                false
+                            }
+                            if (keyValid) next(it) else Response(UNAUTHORIZED)
+                        }
+                    }
                 }
-                if (keyValid) next(it) else Response(UNAUTHORIZED)
             }
-        }
     }
 }
-
