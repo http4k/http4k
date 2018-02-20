@@ -7,6 +7,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -50,7 +51,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
 data class StaticRoutingHttpHandler(private val pathSegments: String,
                                     private val resourceLoader: ResourceLoader,
                                     private val extraPairs: Map<String, ContentType>,
-                                    private val filter: Filter = Filter { next -> { next(it) } }
+                                    private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = filter.then(new))

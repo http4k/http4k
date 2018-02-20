@@ -107,6 +107,19 @@ class ContractRoutingHttpHandlerTest {
     }
 
     @Test
+    fun `pre-security filter is applied before security`() {
+        val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
+            "/bob" bindContract GET to { Response(OK) }
+        ).withPreSecurityFilter(Filter { next ->
+            {
+                next(it.query("key", "bob"))
+            }
+        })
+
+        assertThat(root(Request(GET, "/root/bob")).status, equalTo(OK))
+    }
+
+    @Test
     fun `applies security and responds with a 200 to authorized requests`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
             "/bob" bindContract GET to { Response(OK) }

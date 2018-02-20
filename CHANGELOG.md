@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.17.0
+- Added a pre-security-filter option to contract creation, so that you can explicitly specify behaviour to occur before security kicks in.
+
 ### v3.16.0
 - Convert `Security` (from sealed class) and `ApiKey` to be interfaces. This allows users to implement their own security models.
 
