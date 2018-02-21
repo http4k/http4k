@@ -1,6 +1,7 @@
 package org.http4k.format
 
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -32,4 +33,4 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asJsonString(it) })
 }
 
-object Moshi : ConfigurableMoshi(Moshi.Builder())
+object Moshi : ConfigurableMoshi(Moshi.Builder().add(KotlinJsonAdapterFactory()))

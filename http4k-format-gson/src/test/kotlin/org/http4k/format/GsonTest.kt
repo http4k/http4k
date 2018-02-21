@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Gson.auto
+import org.junit.Ignore
 import org.junit.Test
 
 class GsonAutoTest : AutoMarshallingContract(Gson) {
@@ -27,6 +28,12 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).asList(), equalTo(arrayOf(obj).asList()))
     }
+
+    @Test
+    @Ignore("GSON does not currently have Kotlin class support")
+    override fun `fails decoding when a required value is null`() {
+    }
+
 }
 
 class GsonTest : JsonContract<JsonElement, JsonElement>(Gson) {

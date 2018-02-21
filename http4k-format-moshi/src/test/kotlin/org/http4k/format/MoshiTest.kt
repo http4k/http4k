@@ -11,10 +11,7 @@ import org.junit.Test
 
 class MoshiAutoTest : AutoMarshallingContract(Moshi) {
 
-    override val expectedAutoMarshallingResult = """{"bool":false,"child":{"bool":true,"numbers":[1],"string":"world"},"numbers":[],"string":"hello"}"""
-
-
-    val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+    override val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","numbers":[1],"bool":true},"numbers":[],"bool":false}"""
 
     @Test
     fun `roundtrip list of arbitary objects to and from body`() {
