@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
@@ -14,6 +15,8 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Argo
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
 import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
@@ -110,13 +113,26 @@ class ContractRoutingHttpHandlerTest {
     fun `pre-security filter is applied before security`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
             "/bob" bindContract GET to { Response(OK) }
-        ).withPreSecurityFilter(Filter { next ->
+        ).withFilter(Filter { next ->
             {
                 next(it.query("key", "bob"))
             }
         })
 
         assertThat(root(Request(GET, "/root/bob")).status, equalTo(OK))
+    }
+
+    @Test
+    fun `post-security filter is applied after security`() {
+        val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
+            "/bob" bindContract GET to { Response(OK).body(it.body) }
+        ).withPostSecurityFilter(Filter { next ->
+            {
+                next(it.body("body"))
+            }
+        })
+
+        assertThat(root(Request(GET, "/root/bob?key=bob")), hasStatus(OK).and(hasBody("body")))
     }
 
     @Test

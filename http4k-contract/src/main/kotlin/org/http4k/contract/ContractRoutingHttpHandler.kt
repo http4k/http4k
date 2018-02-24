@@ -17,20 +17,20 @@ import org.http4k.routing.RoutingHttpHandler
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val security: Security,
                                       private val descriptionPath: String,
-                                      private val rootAsString: String = "",
                                       private val routes: List<ContractRoute> = emptyList(),
+                                      private val rootAsString: String = "",
                                       private val preSecurityFilter: Filter = Filter.NoOp,
                                       private val postSecurityFilter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
     private val contractRoot = PathSegments(rootAsString)
 
-    fun withPreSecurityFilter(new: Filter) = copy(preSecurityFilter = preSecurityFilter.then(new))
+    fun withPostSecurityFilter(new: Filter) = copy(postSecurityFilter = postSecurityFilter.then(new))
 
     /**
      * NOTE: By default, filters for Contracts are applied *after* the Security filter. Use withPreSecurityFilter()
      * to achieve population of filters before security.
      */
-    override fun withFilter(new: Filter) = copy(postSecurityFilter = postSecurityFilter.then(new))
+    override fun withFilter(new: Filter) = copy(preSecurityFilter = preSecurityFilter.then(new))
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
     private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }

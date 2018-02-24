@@ -2,11 +2,14 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.18.0 (uncut)
+- Breaking: converted contract pre-security filter to be a post-security filter. This means that all standard filters are applied before the security later, which allows for logging and monitoring and context setup. The previous filter mechanic applied security first, which didn't allow for this. In the unlikely event that post-security filters still need to be applied, use the `withPostSecurityFilter()` function when building the contract.
+
 ### v3.17.1
 - Fix #97. Moshi does not fail when deserialise non-nullable fields correctly. Note that GSON still suffers from this problem
 
 ### v3.17.0
-- Added a pre-security-filter option to contract creation, so that you can explicitly specify behaviour to occur before security kicks in.
+- Added a pre-security filter option to contract creation, so that you can explicitly specify behaviour to occur before security kicks in.
 
 ### v3.16.0
 - Convert `Security` (from sealed class) and `ApiKey` to be interfaces. This allows users to implement their own security models.
