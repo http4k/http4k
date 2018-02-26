@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.18.0 (uncut)
 - Breaking: converted contract pre-security filter to be a post-security filter. This means that all standard filters are applied before the security later, which allows for logging and monitoring and context setup. The previous filter mechanic applied security first, which didn't allow for this. In the unlikely event that post-security filters still need to be applied, use the `withPostSecurityFilter()` function when building the contract.
+- Docs for contract RouteMeta function parameters, and deprecated some unused functions (missed when we introduced the DSL).
 
 ### v3.17.1
 - Fix #97. Moshi does not fail when deserialise non-nullable fields correctly. Note that GSON still suffers from this problem

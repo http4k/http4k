@@ -31,22 +31,35 @@ class RouteMetaDsl internal constructor() {
     var operationId: String? = null
 
     @JvmName("returningResponse")
-    fun returning(new: Pair<String, Response>) = returning(ResponseMeta(new.first, new.second))
+    fun returning(descriptionToResponse: Pair<String, Response>) = returning(ResponseMeta(descriptionToResponse.first, descriptionToResponse.second))
 
+    /**
+     * Add a possible response metadata to this Route
+     */
     @JvmName("returningResponseMeta")
-    fun returning(new: ResponseMeta) {
-        responses += new
-        produces.plusAssign(Header.Common.CONTENT_TYPE(new.message)?.let { listOf(it) } ?: emptyList())
+    fun returning(responseMeta: ResponseMeta) {
+        responses += responseMeta
+        produces.plusAssign(Header.Common.CONTENT_TYPE(responseMeta.message)?.let { listOf(it) } ?: emptyList())
     }
 
+    /**
+     * Add a possible response description/reason and status to this Route
+     */
     @JvmName("returningStatus")
-    fun returning(new: Pair<String, Status>) = returning(new.first to Response(new.second))
+    fun returning(descriptionToStatus: Pair<String, Status>) = returning(descriptionToStatus.first to Response(descriptionToStatus.second))
 
+    /**
+     * Add a possible response status to this Route
+     */
     @JvmName("returningStatus")
-    fun returning(new: Status) = returning(ResponseMeta("", Response(new)))
+    fun returning(status: Status) = returning(ResponseMeta("", Response(status)))
 
-    fun <T> receiving(new: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
-        request = RequestMeta(Request(GET, "").with(new.first of new.second), definitionId)
+    /**
+     * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId for this request body which
+     * will override the naturally generated one.
+     */
+    fun <T> receiving(bodyToDefinitionId: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
+        request = RequestMeta(Request(GET, "").with(bodyToDefinitionId.first of bodyToDefinitionId.second), definitionId)
     }
 }
 
@@ -71,6 +84,9 @@ data class RouteMeta(val summary: String = "<unknown>",
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
 
+    @Deprecated("Use the routeMeta Dsl instead of this")
     operator fun plus(new: Lens<Request, *>): RouteMeta = copy(requestParams = requestParams.plus(listOf(new)))
+
+    @Deprecated("Use the routeMeta Dsl instead of this")
     operator fun plus(new: BodyLens<*>): RouteMeta = copy(body = new)
 }
