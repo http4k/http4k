@@ -66,11 +66,64 @@ infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.bindContract(method: Metho
     }
 }
 
+infix fun <A, B, C, D, E> ContractRouteSpec5<A, B, C, D, E>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta, { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e]) })
+    }
+}
+
+infix fun <A, B, C, D, E, F> ContractRouteSpec6<A, B, C, D, E, F>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E, F) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E, F) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta,
+                { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f]) })
+    }
+}
+
+infix fun <A, B, C, D, E, F, G> ContractRouteSpec7<A, B, C, D, E, F, G>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E, F, G) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E, F, G) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta,
+                { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g]) })
+    }
+}
+
+infix fun <A, B, C, D, E, F, G, H> ContractRouteSpec8<A, B, C, D, E, F, G, H>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E, F, G, H) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E, F, G, H) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta,
+                { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h]) })
+    }
+}
+
+infix fun <A, B, C, D, E, F, G, H, I> ContractRouteSpec9<A, B, C, D, E, F, G, H, I>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E, F, G, H, I) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E, F, G, H, I) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta,
+                { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h], it[spec.i]) })
+    }
+}
+
+infix fun <A, B, C, D, E, F, G, H, I, J> ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J>.bindContract(method: Method) = let { spec ->
+    object : RouteBinder<(A, B, C, D, E, F, G, H, I, J) -> HttpHandler> {
+        override fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        override fun to(fn: (A, B, C, D, E, F, G, H, I, J) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta,
+                { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h], it[spec.i], it[spec.j]) })
+    }
+}
+
 infix fun String.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(toBaseFn(this), routeMetaDsl(new))
 infix fun ContractRouteSpec0.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(pathFn, routeMetaDsl(new))
 infix fun <A> ContractRouteSpec1<A>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec1(pathFn, routeMetaDsl(new), a)
 infix fun <A, B> ContractRouteSpec2<A, B>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec2(pathFn, routeMetaDsl(new), a, b)
 infix fun <A, B, C> ContractRouteSpec3<A, B, C>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec3(pathFn, routeMetaDsl(new), a, b, c)
 infix fun <A, B, C, D> ContractRouteSpec4<A, B, C, D>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec4(pathFn, routeMetaDsl(new), a, b, c, d)
+infix fun <A, B, C, D, E> ContractRouteSpec5<A, B, C, D, E>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec5(pathFn, routeMetaDsl(new), a, b, c, d, e)
+infix fun <A, B, C, D, E, F> ContractRouteSpec6<A, B, C, D, E, F>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec6(pathFn, routeMetaDsl(new), a, b, c, d, e, f)
+infix fun <A, B, C, D, E, F, G> ContractRouteSpec7<A, B, C, D, E, F, G>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec7(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g)
+infix fun <A, B, C, D, E, F, G, H> ContractRouteSpec8<A, B, C, D, E, F, G, H>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec8(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g, h)
+infix fun <A, B, C, D, E, F, G, H, I> ContractRouteSpec9<A, B, C, D, E, F, G, H, I>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec9(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g, h, i)
+infix fun <A, B, C, D, E, F, G, H, I, J> ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec10(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g, h, i, j)
 
 internal fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
