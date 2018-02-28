@@ -19,7 +19,7 @@ class UriTemplate private constructor(private val template: String) {
     }
 
     companion object {
-        private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?\\}".toRegex()
+        private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?\\}".toRegex() // ignore redundant warning #100
         fun from(template: String) = UriTemplate(template.trimSlashes())
 
         fun String.trimSlashes() = "^(/)?(.*?)(/)?$".toRegex().replace(this, { result -> result.groupValues[2] })
