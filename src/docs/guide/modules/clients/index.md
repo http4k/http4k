@@ -2,15 +2,15 @@ title: http4k Client Modules
 description: Feature overview of the http4k-client modules
 
 ### Installation (Gradle)
-**Apache (Sync):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "3.18.0"```
+**Apache (Sync):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "3.18.1"```
 
-**Apache (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.18.0"```
+**Apache (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.18.1"```
 
-**Jetty (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-jetty", version: "3.18.0"```
+**Jetty (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-jetty", version: "3.18.1"```
 
-**OkHttp (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.18.0"```
+**OkHttp (Sync + Async):** ```compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.18.1"```
 
-**Websocket:** ```compile group: "org.http4k", name: "http4k-client-websocket", version: "3.18.0"```
+**Websocket:** ```compile group: "org.http4k", name: "http4k-client-websocket", version: "3.18.1"```
 
 ### HTTP
 Supported HTTP client adapter APIs are wrapped to provide an `HttpHandler` interface in 1 LOC.
