@@ -1,7 +1,5 @@
 package org.http4k.format
 
-import kotlin.reflect.KClass
-
 import com.jsoniter.JsonIterator
 import com.jsoniter.ValueType
 import com.jsoniter.output.JsonStream
