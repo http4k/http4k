@@ -28,13 +28,13 @@ class JsonIterAutoTest : AutoMarshallingContract(JsonIter) {
     }
 
     @Test
-    @Ignore("JsonIter does not currently have Kotlin class support")
+    @Ignore("JsonIter does not currently have Kotlin class support") // TODO Is that true?
     override fun `fails decoding when a required value is null`() {
     }
 
 }
 
-class JsonIterTest : JsonContract<JsonElement, JsonElement>(JsonIter) {
+class JsonIterTest : JsonContract<JsonAny, JsonAny>(JsonIter) {
     override val prettyString = """{
   "hello": "world"
 }"""
