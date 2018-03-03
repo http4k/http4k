@@ -40,5 +40,5 @@ class JsonIterTest : JsonContract<JsonAny, JsonAny>(JsonIter) {
 }"""
 }
 
-class JsonIterJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement, JsonElement>(JsonIter)
-class JsonIterGenerateDataClassesTest : GenerateDataClassesContract<JsonElement, JsonElement>(JsonIter)
+class JsonIterJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonAny, JsonAny>(JsonIter)
+class JsonIterGenerateDataClassesTest : GenerateDataClassesContract<JsonAny, JsonAny>(JsonIter)
