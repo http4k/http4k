@@ -6,7 +6,7 @@ import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import import org.http4k.format.JsonIter.auto
+import org.http4k.format.JsonIter.auto
 import org.junit.Ignore
 import org.junit.Test
 
