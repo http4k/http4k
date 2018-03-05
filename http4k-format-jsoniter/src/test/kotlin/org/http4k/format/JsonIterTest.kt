@@ -7,30 +7,29 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.JsonIter.auto
-import org.junit.Ignore
 import org.junit.Test
 
 class JsonIterAutoTest : AutoMarshallingContract(JsonIter) {
 
     @Test
-    fun `roundtrip arbitary object to and from JSON element`() {
+    fun `roundtrip arbitrary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = JsonIter.asJsonObject(obj)
-        assertThat(JsonIter.asA(out, ArbObject::class), equalTo(obj))
+
+//        assertThatJson("{\"test\":1}").isEqualTo("{\"test\":2}");
+
+
+        val actual = JsonIter.asA(out, ArbObject::class)
+        assertThat(actual, equalTo(obj))
     }
 
     @Test
-    fun `roundtrip list of arbitary objects to and from body`() {
+    fun `roundtrip list of arbitrary objects to and from body`() {
         val body = Body.auto<Array<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).asList(), equalTo(arrayOf(obj).asList()))
-    }
-
-    @Test
-    @Ignore("JsonIter does not currently have Kotlin class support") // TODO Is that true?
-    override fun `fails decoding when a required value is null`() {
     }
 
 }

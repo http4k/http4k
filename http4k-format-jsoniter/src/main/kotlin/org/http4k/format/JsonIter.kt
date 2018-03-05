@@ -2,11 +2,11 @@ package org.http4k.format
 
 import com.jsoniter.JsonIterator
 import com.jsoniter.ValueType
+import com.jsoniter.output.EncodingMode
 import com.jsoniter.output.JsonStream
 import com.jsoniter.spi.Config
+import com.jsoniter.spi.DecodingMode
 import org.http4k.core.Body
-import org.http4k.format.JsonLibAutoMarshallingJson
-import org.http4k.format.JsonType
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -20,6 +20,12 @@ typealias JsonAny = com.jsoniter.any.Any
 class InvalidJsonException : Exception("Could not convert to a JSON Object or Array")
 
 open class ConfigurableJsonIter(config: Config) : JsonLibAutoMarshallingJson<JsonAny>() {
+
+    init {
+        JsonIterator.setMode(DecodingMode.DYNAMIC_MODE_AND_MATCH_FIELD_WITH_HASH)
+        JsonStream.setMode(EncodingMode.DYNAMIC_MODE)
+    }
+
     override fun typeOf(value: JsonAny): JsonType =
             when (value.valueType()) {
                 ValueType.ARRAY -> JsonType.Array
@@ -41,7 +47,7 @@ open class ConfigurableJsonIter(config: Config) : JsonLibAutoMarshallingJson<Jso
     }
     override fun String?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
     override fun Int?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
-    override fun Double?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(BigDecimal(this)) } ?: JsonAny.wrapNull()
+    override fun Double?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
     override fun Long?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
     override fun BigDecimal?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
     override fun BigInteger?.asJsonValue(): JsonAny = this?.let { JsonAny.wrap(this) } ?: JsonAny.wrapNull()
@@ -77,7 +83,7 @@ open class ConfigurableJsonIter(config: Config) : JsonLibAutoMarshallingJson<Jso
             is Double -> JsonAny.wrap((it as java.lang.Double).toDouble())
             is String -> JsonAny.wrap((it as java.lang.String)) // FIXME it should call wrap(String) but calls wrap(Object)
 // TODO     Collection<T>, List<T>, Map<String, T>
-            else -> JsonAny.wrap(a)
+            else -> JsonIterator.deserialize(JsonStream.serialize(a))//JsonAny.wrap(a)
         } ?: JsonAny.wrapNull()
 
     }

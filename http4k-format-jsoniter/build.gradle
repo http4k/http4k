@@ -5,6 +5,10 @@ dependencies {
 
     provided project(":http4k-core")
     compile 'com.jsoniter:jsoniter:0.9.19'
+    compile 'org.javassist:javassist:3.21.0-GA'
+    testCompile 'net.javacrumbs.json-unit:json-unit:1.28.2'
+    testCompile 'net.javacrumbs.json-unit:json-unit-fluent:1.28.2'
+    testCompile 'org.json:json:20180130'
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile testing
