@@ -1,9 +1,10 @@
 package org.http4k.lens
 
-import org.http4k.lens.ParamMeta.*
+import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NumberParam
 import java.time.format.DateTimeFormatter
-import java.util.*
-
+import java.util.UUID
 
 class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN) -> List<OUT>) {
     operator fun invoke(name: String) = { target: IN -> getFn(name, target) }
