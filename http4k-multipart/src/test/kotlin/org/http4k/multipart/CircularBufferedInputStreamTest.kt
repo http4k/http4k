@@ -174,8 +174,6 @@ class CircularBufferedInputStreamTest {
 
     }
 
-    private fun createInputStream(bytes: ByteArray, bufSize: Int): InputStream {
-        return CircularBufferedInputStream(ByteArrayInputStream(bytes), bufSize)
-        //        return new BufferedInputStream(new ByteArrayInputStream(bytes), bufSize);
-    }
+    private fun createInputStream(bytes: ByteArray, bufSize: Int): InputStream = CircularBufferedInputStream(ByteArrayInputStream(bytes), bufSize)
+    //        return new BufferedInputStream(new ByteArrayInputStream(bytes), bufSize);
 }

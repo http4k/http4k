@@ -11,23 +11,21 @@ import org.http4k.core.safeLong
 import java.net.InetSocketAddress
 
 data class SunHttp(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer {
-        return object : Http4kServer {
-            private val server = HttpServer.create(InetSocketAddress(port), 0)
-            override fun start(): Http4kServer = apply {
-                server.createContext("/") {
-                    try {
-                        it.populate(httpHandler(it.toRequest()))
-                    } catch (e: Exception) {
-                        it.sendResponseHeaders(500, 0)
-                    }
-                    it.close()
+    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+        private val server = HttpServer.create(InetSocketAddress(port), 0)
+        override fun start(): Http4kServer = apply {
+            server.createContext("/") {
+                try {
+                    it.populate(httpHandler(it.toRequest()))
+                } catch (e: Exception) {
+                    it.sendResponseHeaders(500, 0)
                 }
-                server.start()
+                it.close()
             }
-
-            override fun stop() = server.stop(0)
+            server.start()
         }
+
+        override fun stop() = server.stop(0)
     }
 }
 

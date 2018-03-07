@@ -16,11 +16,13 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
             return Uri(scheme, userInfo, host, port, path, query, fragment)
         }
 
-        private fun parseAuthority(authority: String): Triple<String, String, Int?> {
-            if(authority.isBlank()) return Triple("", "", null)
-            val (userInfo, host, portString) = AUTHORITY.matchEntire(authority)?.destructured ?: throw RuntimeException("Invalid authority: $authority")
-            val port = portString.toIntOrNull()
-            return Triple(userInfo, host, port)
+        private fun parseAuthority(authority: String): Triple<String, String, Int?> = when {
+            authority.isBlank() -> Triple("", "", null)
+            else -> {
+                val (userInfo, host, portString) = AUTHORITY.matchEntire(authority)?.destructured ?: throw RuntimeException("Invalid authority: $authority")
+                val port = portString.toIntOrNull()
+                Triple(userInfo, host, port)
+            }
         }
     }
 
@@ -38,10 +40,9 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     fun query(query: String) = copy(query = query)
     fun fragment(fragment: String) = copy(fragment = fragment)
 
-    fun authority(authority: String): Uri {
-        val (userInfo, host, port) = parseAuthority(authority)
-        return copy(userInfo = userInfo, host = host, port = port)
-    }
+    fun authority(authority: String): Uri = parseAuthority(authority).let {
+         (userInfo, host, port) ->  copy(userInfo = userInfo, host = host, port = port)
+     }
 
     override fun toString(): String = StringBuilder()
         .appendIfNotBlank(scheme, scheme, ":")

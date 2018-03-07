@@ -207,10 +207,10 @@ fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_L
 fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)
-fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> {
-    val toRegex = pattern.toRegex()
-    return map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }
-}
+fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> =
+    pattern.toRegex().let { r ->
+        map { r.matchEntire(it)?.groupValues?.get(group)!! }
+    }
 
 internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
 

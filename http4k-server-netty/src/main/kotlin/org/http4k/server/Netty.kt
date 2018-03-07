@@ -61,34 +61,32 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
-    override fun toServer(httpHandler: HttpHandler): Http4kServer {
-        return object : Http4kServer {
-            private val masterGroup = NioEventLoopGroup()
-            private val workerGroup = NioEventLoopGroup()
-            private var closeFuture: ChannelFuture? = null
+    override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
+        private val masterGroup = NioEventLoopGroup()
+        private val workerGroup = NioEventLoopGroup()
+        private var closeFuture: ChannelFuture? = null
 
-            override fun start(): Http4kServer = apply {
-                val bootstrap = ServerBootstrap()
-                bootstrap.group(masterGroup, workerGroup)
-                    .channel(NioServerSocketChannel::class.java)
-                    .childHandler(object : ChannelInitializer<SocketChannel>() {
-                        public override fun initChannel(ch: SocketChannel) {
-                            ch.pipeline().addLast("codec", HttpServerCodec())
-                            ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
-                            ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+        override fun start(): Http4kServer = apply {
+            val bootstrap = ServerBootstrap()
+            bootstrap.group(masterGroup, workerGroup)
+                .channel(NioServerSocketChannel::class.java)
+                .childHandler(object : ChannelInitializer<SocketChannel>() {
+                    public override fun initChannel(ch: SocketChannel) {
+                        ch.pipeline().addLast("codec", HttpServerCodec())
+                        ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
+                        ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-                closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
-            }
+            closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
+        }
 
-            override fun stop() {
-                closeFuture?.cancel(false)
-                workerGroup.shutdownGracefully()
-                masterGroup.shutdownGracefully()
-            }
+        override fun stop() {
+            closeFuture?.cancel(false)
+            workerGroup.shutdownGracefully()
+            masterGroup.shutdownGracefully()
         }
     }
 }

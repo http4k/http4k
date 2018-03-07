@@ -25,11 +25,7 @@ object AwsHmacSha256 {
         throw RuntimeException("Could not run HMAC SHA256", e)
     }
 
-    fun hex(data: ByteArray): String {
-        val result = StringBuilder()
-        for (aByte in data) {
-            result.append(String.format("%02x", aByte))
-        }
-        return result.toString().toLowerCase()
-    }
+    fun hex(data: ByteArray): String = data.fold(StringBuilder()) { acc, next ->
+        acc.append(String.format("%02x", next))
+    }.toString().toLowerCase()
 }

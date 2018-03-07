@@ -19,10 +19,8 @@ interface ReadWriteCache : Sink, Source {
         /**
          * Serialise and retrieve HTTP traffic to/from Memory.
          */
-        fun Memory(cache: MutableMap<Request, Response> = mutableMapOf(), shouldStore: (HttpMessage) -> Boolean = { true }): ReadWriteCache {
-            return object : ReadWriteCache,
-                Source by Source.MemoryMap(cache),
-                Sink by Sink.MemoryMap(cache, shouldStore) {}
-        }
+        fun Memory(cache: MutableMap<Request, Response> = mutableMapOf(), shouldStore: (HttpMessage) -> Boolean = { true }): ReadWriteCache = object : ReadWriteCache,
+            Source by Source.MemoryMap(cache),
+            Sink by Sink.MemoryMap(cache, shouldStore) {}
     }
 }

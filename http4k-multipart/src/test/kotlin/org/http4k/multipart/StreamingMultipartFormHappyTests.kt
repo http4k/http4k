@@ -327,13 +327,11 @@ fun compareOneStreamToAnother(actualStream: InputStream, expectedStream: InputSt
     }
 }
 
-internal fun getMultipartFormParts(boundary: String, multipartFormContents: InputStream): Iterator<StreamingPart> {
-    return getMultipartFormParts(boundary.toByteArray(StandardCharsets.UTF_8), multipartFormContents, StandardCharsets.UTF_8)
-}
+internal fun getMultipartFormParts(boundary: String, multipartFormContents: InputStream): Iterator<StreamingPart> =
+    getMultipartFormParts(boundary.toByteArray(StandardCharsets.UTF_8), multipartFormContents, StandardCharsets.UTF_8)
 
-internal fun getMultipartFormParts(boundary: ByteArray, multipartFormContents: InputStream, encoding: Charset): Iterator<StreamingPart> {
-    return StreamingMultipartFormParts.parse(boundary, multipartFormContents, encoding).iterator()
-}
+internal fun getMultipartFormParts(boundary: ByteArray, multipartFormContents: InputStream, encoding: Charset): Iterator<StreamingPart> =
+    StreamingMultipartFormParts.parse(boundary, multipartFormContents, encoding).iterator()
 
 internal fun assertFilePart(form: Iterator<StreamingPart>, fieldName: String, fileName: String, contentType: String, contents: String, encoding: Charset = StandardCharsets.UTF_8): StreamingPart {
     assertThereAreMoreParts(form)

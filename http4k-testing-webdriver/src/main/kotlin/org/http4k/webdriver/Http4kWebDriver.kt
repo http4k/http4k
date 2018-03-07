@@ -21,8 +21,8 @@ import java.net.URL
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
-import kotlin.NoSuchElementException
+import java.util.Date
+import java.util.UUID
 import org.http4k.core.cookie.Cookie as HCookie
 
 
@@ -90,25 +90,22 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
     override fun getWindowHandle(): String? = windowHandles.firstOrNull()
 
-    override fun switchTo(): WebDriver.TargetLocator {
-        val driver = this
-        return object : WebDriver.TargetLocator {
-            override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet
+    override fun switchTo(): WebDriver.TargetLocator = object : WebDriver.TargetLocator {
+        override fun frame(index: Int): WebDriver = throw FeatureNotImplementedYet
 
-            override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(nameOrId: String?): WebDriver = throw FeatureNotImplementedYet
 
-            override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet
+        override fun frame(frameElement: WebElement?): WebDriver = throw FeatureNotImplementedYet
 
-            override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet
+        override fun parentFrame(): WebDriver = throw FeatureNotImplementedYet
 
-            override fun alert(): Alert = throw FeatureNotImplementedYet
+        override fun alert(): Alert = throw FeatureNotImplementedYet
 
-            override fun activeElement(): WebElement = activeElement ?: current?.firstElement() ?: throw NoSuchElementException("no page loaded!")
+        override fun activeElement(): WebElement = activeElement ?: current?.firstElement() ?: throw NoSuchElementException("no page loaded!")
 
-            override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle" + nameOrHandle) else driver
+        override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle" + nameOrHandle) else this@Http4kWebDriver
 
-            override fun defaultContent(): WebDriver = driver
-        }
+        override fun defaultContent(): WebDriver = this@Http4kWebDriver
     }
 
     override fun navigate(): Navigation = object : Navigation {

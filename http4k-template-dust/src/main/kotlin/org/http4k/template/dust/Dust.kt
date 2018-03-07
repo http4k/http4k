@@ -121,17 +121,13 @@ class Dust(
 
     private val pool = GenericObjectPool<SingleThreadedDust>(
         object : BasePooledObjectFactory<SingleThreadedDust>() {
-            override fun create(): SingleThreadedDust {
-                return SingleThreadedDust(
-                    js = scriptEngineManager.getEngineByName("nashorn"),
-                    cacheTemplates = cacheTemplates,
-                    dustPluginScripts = dustPluginScripts,
-                    notifyOnClosed = { returnDustEngine(it) })
-            }
+            override fun create(): SingleThreadedDust = SingleThreadedDust(
+                js = scriptEngineManager.getEngineByName("nashorn"),
+                cacheTemplates = cacheTemplates,
+                dustPluginScripts = dustPluginScripts,
+                notifyOnClosed = { returnDustEngine(it) })
 
-            override fun wrap(obj: SingleThreadedDust): PooledObject<SingleThreadedDust> {
-                return DefaultPooledObject(obj)
-            }
+            override fun wrap(obj: SingleThreadedDust) = DefaultPooledObject(obj)
         },
         GenericObjectPoolConfig().apply {
             minIdle = precachePoolSize

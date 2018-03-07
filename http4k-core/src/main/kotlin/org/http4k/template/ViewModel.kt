@@ -3,7 +3,6 @@ package org.http4k.template
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLens
-import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.string
 
 interface ViewModel {
@@ -14,7 +13,5 @@ interface ViewModel {
     fun template(): String = javaClass.name.replace('.', '/')
 }
 
-fun Body.Companion.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> {
-    val map: BiDiBodyLensSpec<ViewModel> = string(contentType).map({ object : ViewModel {} }, renderer::invoke)
-    return map.toLens()
-}
+fun Body.Companion.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> =
+    string(contentType).map<ViewModel>({ object : ViewModel {} }, renderer::invoke).toLens()

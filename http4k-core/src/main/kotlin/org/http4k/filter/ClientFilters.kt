@@ -63,16 +63,14 @@ object ClientFilters {
     object FollowRedirects {
         operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
 
-        private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response {
-            val response = next(request)
-            return if (response.isRedirection()) {
-                if (attempt == 10) throw IllegalStateException("Too many redirection")
-                response.assureBodyIsConsumed()
-                makeRequest(next, request.toNewLocation(response.location()), attempt + 1)
-            } else {
-                response
+        private fun makeRequest(next: HttpHandler, request: Request, attempt: Int = 1): Response =
+            next(request).let {
+                if (it.isRedirection()) {
+                    if (attempt == 10) throw IllegalStateException("Too many redirection")
+                    it.assureBodyIsConsumed()
+                    makeRequest(next, request.toNewLocation(it.location()), attempt + 1)
+                } else it
             }
-        }
 
         private fun Request.toNewLocation(location: String) = ensureValidMethodForRedirect().uri(newLocation(location))
 
@@ -85,12 +83,10 @@ object ClientFilters {
         private fun Request.ensureValidMethodForRedirect(): Request =
             if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)
 
-        private fun Request.newLocation(location: String): Uri {
-            val locationUri = Uri.of(location)
-            return if (locationUri.host.isBlank()) {
-                locationUri.authority(uri.authority).scheme(uri.scheme)
-            } else locationUri
-        }
+        private fun Request.newLocation(location: String): Uri =
+            Uri.of(location).run {
+                if (host.isBlank()) authority(uri.authority).scheme(uri.scheme) else this
+            }
     }
 
     object Cookies {
@@ -109,8 +105,7 @@ object ClientFilters {
             .map { it.cookie }
             .fold(this, { r, cookie -> r.cookie(cookie.name, cookie.value) })
 
-        private fun removeExpired(now: LocalDateTime, storage: CookieStorage)
-            = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
+        private fun removeExpired(now: LocalDateTime, storage: CookieStorage) = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
         private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
     }

@@ -53,7 +53,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun JsonElement.asCompactJsonString(): String = compact.toJson(this)
     override fun <LIST : Iterable<Pair<String, JsonElement>>> LIST.asJsonObject(): JsonElement {
         val root = JsonObject()
-        this.forEach { root.add(it.first, it.second) }
+        forEach { root.add(it.first, it.second) }
         return root
     }
 

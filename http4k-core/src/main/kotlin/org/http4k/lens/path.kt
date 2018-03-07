@@ -43,8 +43,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         val meta = Meta(true, "path", paramMeta, name, description)
-        return PathLens(meta,
-            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+        return PathLens(meta, { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
     }
 
     /**

@@ -64,8 +64,6 @@ abstract class AbstractAwsRealS3TestCase {
             Assume.assumeTrue(properties() != null)
         }
 
-        private fun properties(): InputStream? {
-            return AbstractAwsRealS3TestCase::class.java.getResourceAsStream("/aws.properties")
-        }
+        private fun properties(): InputStream? = AbstractAwsRealS3TestCase::class.java.getResourceAsStream("/aws.properties")
     }
 }

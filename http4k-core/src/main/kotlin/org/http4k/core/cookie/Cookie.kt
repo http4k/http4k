@@ -25,16 +25,14 @@ data class Cookie(val name: String, val value: String,
 
     override fun toString(): String = fullCookieString()
 
-    private fun attributes(): String {
-        val builder = mutableListOf<String>()
-        builder.appendIfPresent(maxAge, "Max-Age=$maxAge")
-        builder.appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")
-        builder.appendIfPresent(domain, "Domain=$domain")
-        builder.appendIfPresent(path, "Path=$path")
-        builder.appendIfTrue(secure, "secure")
-        builder.appendIfTrue(httpOnly, "HttpOnly")
-        return builder.joinToString("; ")
-    }
+    private fun attributes(): String = mutableListOf<String>().apply {
+        appendIfPresent(maxAge, "Max-Age=${maxAge}")
+        appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")
+        appendIfPresent(domain, "Domain=${domain}")
+        appendIfPresent(path, "Path=${path}")
+        appendIfTrue(secure, "secure")
+        appendIfTrue(httpOnly, "HttpOnly")
+    }.joinToString("; ")
 
     companion object {
         fun parse(cookieValue: String): Cookie? {
