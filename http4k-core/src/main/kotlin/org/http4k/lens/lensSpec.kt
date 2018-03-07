@@ -3,7 +3,13 @@ package org.http4k.lens
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
 class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN) -> List<OUT>) {
@@ -191,16 +197,16 @@ open class BiDiLensSpec<IN, OUT>(location: String,
 }
 
 fun <IN> BiDiLensSpec<IN, String>.string() = this
-fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = this.map(::nonEmpty, { it })
-fun <IN> BiDiLensSpec<IN, String>.int() = this.mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String>.long() = this.mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String>.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String>.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String>.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE) = this.map(formatter::parse, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME) = this.map(formatter::parse, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME) = this.map(formatter::parse, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
+fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = map(::nonEmpty, { it })
+fun <IN> BiDiLensSpec<IN, String>.int() = mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.long() = mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
+fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
+fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
+fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> {
     val toRegex = pattern.toRegex()
     return map { toRegex.matchEntire(it)?.groupValues?.get(group)!! }

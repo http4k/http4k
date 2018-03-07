@@ -11,6 +11,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
 
@@ -94,16 +97,16 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.nonEmptyString() = this.map(::nonEmpty, { it })
-fun Path.int() = this.mapWithNewMeta(String::toInt, Int::toString, NumberParam)
-fun Path.long() = this.mapWithNewMeta(String::toLong, Long::toString, NumberParam)
-fun Path.double() = this.mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun Path.float() = this.mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun Path.boolean() = this.mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun Path.localDate(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE) = this.map(LocalDate::parse, formatter::format)
-fun Path.dateTime(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME) = this.map(LocalDateTime::parse, formatter::format)
-fun Path.zonedDateTime(formatter: DateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME) = this.map(ZonedDateTime::parse, formatter::format)
-fun Path.uuid() = this.map(UUID::fromString, java.util.UUID::toString)
+fun Path.nonEmptyString() = map(::nonEmpty, { it })
+fun Path.int() = mapWithNewMeta(String::toInt, Int::toString, NumberParam)
+fun Path.long() = mapWithNewMeta(String::toLong, Long::toString, NumberParam)
+fun Path.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
+fun Path.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
+fun Path.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
+fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
+fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
+fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
+fun Path.uuid() = map(UUID::fromString, java.util.UUID::toString)
 fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> = apply {
     return with(pattern.toRegex()) {
         map { matchEntire(it)?.groupValues?.get(group)!! }
