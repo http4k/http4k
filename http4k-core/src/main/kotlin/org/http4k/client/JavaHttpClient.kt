@@ -25,7 +25,7 @@ class JavaHttpClient : HttpHandler {
 
         val status = Status(con.responseCode, con.responseMessage.orEmpty())
 
-        val baseResponse = Response(status).body(if (status.serverError) {
+        val baseResponse = Response(status).body(if (status.serverError || status.clientError) {
             con.errorStream
         } else {
             con.inputStream

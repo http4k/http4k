@@ -14,8 +14,7 @@ import org.http4k.util.RetryRule
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
-import java.util.Arrays
-import java.util.Random
+import java.util.*
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
     @Rule
@@ -47,6 +46,10 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
             "/check-image" bind Method.POST to { request: Request ->
                 if (Arrays.equals(testImageBytes(), request.body.payload.array()))
                     Response(Status.OK) else Response(Status.BAD_REQUEST.description("Image content does not match"))
+            },
+            "/status/{status}" bind Method.GET to  { r: Request ->
+                val status = Status(r.path("status")!!.toInt(), "")
+                Response(status).body("body for status ${status.code}")
             })
             .asServer(serverConfig(port)).start()
     }

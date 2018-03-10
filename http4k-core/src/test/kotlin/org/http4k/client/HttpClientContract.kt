@@ -158,4 +158,13 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         assertThat(response.status, equalTo(Status.CLIENT_TIMEOUT))
     }
+
+    @Test
+    fun `can retrieve body for different statuses`(){
+        listOf(200, 301, 404, 500).forEach { statusCode ->
+            val response = client(Request(Method.GET, "http://localhost:$port/status/$statusCode"))
+            assertThat(response.status, equalTo(Status(statusCode, "")))
+            assertThat(response.bodyString(), equalTo("body for status $statusCode"))
+        }
+    }
 }
