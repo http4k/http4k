@@ -1,7 +1,7 @@
 title: http4k Clients
 description: Recipes for using http4k to consume HTTP services
 
-This example demonstrates using http4k as a client, to consume HTTP clients. A client is just another HttpHandler.
+This example demonstrates using http4k as a client, to consume HTTP services. A client is just another HttpHandler.
 
 ### Gradle setup
 ```
