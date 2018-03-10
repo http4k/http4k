@@ -66,6 +66,7 @@ plugging together of services without HTTP container being required.
         * **Apache** sync + async HTTP
         * **Jetty** HTTP (supports sync and async HTTP)
         * **OkHttp** HTTP (supports sync and async HTTP)
+        * **Java** (bundled with `http4k-core`)
     * **1LOC** WebSocket client, with blocking and non-blocking modes
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:
