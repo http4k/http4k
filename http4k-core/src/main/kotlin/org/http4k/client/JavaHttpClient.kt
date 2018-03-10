@@ -25,7 +25,11 @@ class JavaHttpClient : HttpHandler {
 
         val status = Status(con.responseCode, con.responseMessage.orEmpty())
 
-        val baseResponse = Response(status).body(con.inputStream)
+        val baseResponse = Response(status).body(if (status.successful) {
+            con.inputStream
+        } else {
+            con.errorStream
+        })
 
         return con.headerFields
             .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)

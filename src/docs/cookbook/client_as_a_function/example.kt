@@ -1,15 +1,15 @@
 package cookbook.client_as_a_function
 
-import org.http4k.client.ApacheClient
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 
 fun main(args: Array<String>) {
 
-    val request = Request(Method.GET, "http://pokeapi.co/api/v2/pokemon/")
+    val request = Request(Method.GET, "https://xkcd.com/info.0.json")
 
-    val client: HttpHandler = ApacheClient()
+    val client: HttpHandler = JavaHttpClient()
 
     println(client(request))
 }

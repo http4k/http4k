@@ -2,6 +2,8 @@ title: http4k Client Modules
 description: Feature overview of the http4k-client modules
 
 ### Installation (Gradle)
+**Java (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.19.0"```
+
 **Apache (Sync):** ```compile group: "org.http4k", name: "http4k-client-apache", version: "3.19.0"```
 
 **Apache (Async):** ```compile group: "org.http4k", name: "http4k-client-apache-async", version: "3.19.0"```
