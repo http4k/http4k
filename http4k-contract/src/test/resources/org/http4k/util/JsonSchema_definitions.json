@@ -38,6 +38,9 @@
       },
       "anObject": {
         "$ref": "#/definitions/object-1591149158"
+      },
+      "anotherObject": {
+        "$ref": "#/definitions/object-1591149158"
       }
     }
   }

@@ -81,7 +81,7 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
             })
         )
 
-        val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).distinct()
+        val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).toSet()
 
         return FieldAndDefinitions(route.method.toString().toLowerCase() to
             json.obj(*fields.filterNotNull().toTypedArray()), definitions)
@@ -110,7 +110,7 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
         schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
     } catch (e: Exception) {
-        JsonSchema(json.nullNode(), emptyList())
+        JsonSchema(json.nullNode(), emptySet())
     }
 
     private fun ContractRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
@@ -120,13 +120,13 @@ class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private
     private fun Tag.asJson() = json.obj(listOf("name" to json.string(name)).plus(description?.let { "description" to json.string(it) }.asList()))
 }
 
-private data class FieldsAndDefinitions<NODE : Any>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: List<Pair<String, NODE>> = emptyList()) {
-    fun add(newField: Pair<String, NODE>, newDefinitions: List<Pair<String, NODE>>) = FieldsAndDefinitions(fields.plus(newField), newDefinitions.plus(definitions))
+private data class FieldsAndDefinitions<NODE : Any>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
+    fun add(newField: Pair<String, NODE>, newDefinitions: Set<Pair<String, NODE>>) = FieldsAndDefinitions(fields.plus(newField), newDefinitions.plus(definitions))
 
     fun add(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields.plus(fieldAndDefinitions.field),
         fieldAndDefinitions.definitions.plus(definitions))
 }
 
-private data class FieldAndDefinitions<out NODE : Any>(val field: Pair<String, NODE>, val definitions: List<Pair<String, NODE>>)
+private data class FieldAndDefinitions<out NODE : Any>(val field: Pair<String, NODE>, val definitions: Set<Pair<String, NODE>>)
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()

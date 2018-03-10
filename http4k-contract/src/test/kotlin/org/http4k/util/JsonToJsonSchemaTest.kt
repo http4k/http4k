@@ -23,14 +23,15 @@ class JsonToJsonSchemaTest {
             "aBooleanTrue" to json.boolean(true),
             "aBooleanFalse" to json.boolean(false),
             "anArray" to json.array(listOf(json.obj("anotherString" to json.string("yetAnotherString")))),
-            "anObject" to json.obj("anInteger" to json.number(1))
+            "anObject" to json.obj("anInteger" to json.number(1)),
+            "anotherObject" to json.obj("anInteger" to json.number(1))
         )
 
         val actual = JsonToJsonSchema(json).toSchema(model, "bob")
         val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
         val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
-//        println(json.pretty(obj(actual.definitions)))
+        println(json.pretty(obj(actual.definitions)))
         assertThat(obj(actual.definitions), equalTo(expectedDefs))
     }
 }

@@ -2,8 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.19.0 (uncut)
+### v3.19.0
 - PR #104 - Add optional time/date formatters to LensSpecs so you can choose you serialisation format. H/T @elifarley
+- Fix #105 - Swagger API json file: duplicate key in "definitions".
 
 ### v3.18.1
 - Fixed PR #100 - URI template regex required extra escaping. This only affects Android deployments as IDE shows the regex escaping is redundant. H/T @privatwolke
