@@ -25,10 +25,10 @@ class JavaHttpClient : HttpHandler {
 
         val status = Status(con.responseCode, con.responseMessage.orEmpty())
 
-        val baseResponse = Response(status).body(if (status.successful) {
-            con.inputStream
-        } else {
+        val baseResponse = Response(status).body(if (status.serverError) {
             con.errorStream
+        } else {
+            con.inputStream
         })
 
         return con.headerFields
