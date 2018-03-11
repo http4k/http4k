@@ -1,6 +1,9 @@
 <h2 class="github">Changelog</h2>
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
+### v3.20.0
+
+- Introduce JavaHttpClient to `http4k-core`. It provides a very basic http client without  any other 3rd party dependencies.
 
 ### v3.19.0
 - PR #104 - Add optional time/date formatters to LensSpecs so you can choose you serialisation format. H/T @elifarley
