@@ -115,11 +115,11 @@ Once the lens is declared, you can use it on a target object to either get or se
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/example.kt"></script>
 
 ### Serving static assets
-For serving static assets, just bind a path to a Static block as below, using either a Classpath or HotReload based ResourceLoader instance. Typically, HotReload is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
+For serving static assets, just bind a path to a Static block as below, using either a Classpath or Directory (Hot reloading) based ResourceLoader instance (find these on the `ResourceLoader` companion object). Typically, Directory is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
 ```kotlin
 routes(
     "/static" bind static(Classpath("/org/http4k/some/package/name"))
-    "/hotreload" bind static(HotReload("path/to/static/dir/goes/here"))
+    "/hotreload" bind static(Directory("path/to/static/dir/goes/here"))
 )
 ```
 
