@@ -13,12 +13,10 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
-import org.http4k.core.with
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.http4k.lens.Header
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.toHttpHandler
@@ -99,13 +97,12 @@ class ResponseFiltersTest {
     fun `reporting latency for known route`() {
         var called: String? = null
         val filter = ResponseFilters.ReportRouteLatency(Clock.systemUTC(), { identity, _ -> called = identity })
-        val handler = filter.then { Response(OK) }
+        val handler = filter.then(routes("/bob/{anything:.*}" bind GET to { Response(OK) }))
 
-        handler(Request(GET, "").with(Header.X_URI_TEMPLATE of "/path/dir/someFile.html"))
+        handler(Request(GET, "/bob/dir/someFile.html"))
 
-        assertThat(called, equalTo("GET._path_dir_someFile_html.2xx.200"))
+        assertThat(called, equalTo("GET.bob_{anything._*}.2xx.200"))
     }
-
 
     @Test
     fun `reporting http transaction for unknown route`() {
@@ -115,35 +112,30 @@ class ResponseFiltersTest {
 
         val handler = filter.then { Response(OK) }
 
-        handler(Request(GET, ""))
+        val request = Request(GET, "")
 
-        assertThat(transaction, equalTo(HttpTransaction(Request(GET, ""), Response(OK), ZERO)))
+        handler(request)
+
+        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), ZERO, emptyMap())))
     }
 
     @Test
     fun `reporting http transaction for known route`() {
         var transaction: HttpTransaction? = null
 
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { transaction = it }
+        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) {
+            transaction = it
+        }
 
-        val handler = filter.then { Response(OK) }
+        val handler = filter.then(
+            routes("/sue" bind routes("/bob/{name}" bind GET to { Response(OK) }))
+        )
 
-        val request = Request(GET, "").with(Header.X_URI_TEMPLATE of "someValue")
+        val request = Request(GET, "/sue/bob/rita")
+
         handler(request)
 
-        assertThat(transaction, equalTo(HttpTransaction(request, Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "someValue"))))
-    }
-
-    @Test
-    fun `reporting http transaction for known route inside a routes block`() {
-        var transaction: HttpTransaction? = null
-
-        val filter = ReportHttpTransaction(fixed(EPOCH, systemDefault())) { transaction = it }
-
-        val handler = routes("/bob" bind GET to filter.then( { Response(OK) }))
-
-        handler(Request(GET, "/bob"))
-
-        assertThat(transaction, equalTo(HttpTransaction(Request(GET, "/bob").with(Header.X_URI_TEMPLATE of "bob"), Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "bob"))))
+        assertThat(transaction, equalTo(HttpTransaction(request,
+            Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
     }
 }
