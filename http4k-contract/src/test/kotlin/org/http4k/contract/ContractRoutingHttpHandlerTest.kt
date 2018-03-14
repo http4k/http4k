@@ -12,15 +12,16 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
-import org.http4k.lens.Header.X_URI_TEMPLATE
 import org.http4k.lens.Path
 import org.http4k.lens.Query
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.Test
@@ -55,19 +56,19 @@ class ContractRoutingHttpHandlerTest {
 
     @Test
     fun `traffic goes to the path specified`() {
-        val root = org.http4k.routing.routes(
+        val root = routes(
             "/root/bar" bind contract(
-                "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it)) } })
+                "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK) } })
         )
-        val response = root(Request(GET, "/root/bar/foo/bar/hello"))
+        val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
 
         assertThat(response.status, equalTo(OK))
-        assertThat(X_URI_TEMPLATE(response), equalTo("/root/bar/foo/bar/{world}"))
+        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/bar/foo/bar/{world}")))
     }
 
     @Test
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
-        val root = org.http4k.routing.routes(
+        val root = routes(
             "/root/bar" bind contract(
                 "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) })
         )
@@ -89,14 +90,14 @@ class ContractRoutingHttpHandlerTest {
 
     @Test
     fun `identifies called route using identity header on request`() {
-        val root = org.http4k.routing.routes(
+        val root = routes(
             "/root" bind contract(
-                Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK).with(X_URI_TEMPLATE of X_URI_TEMPLATE(it)) } })
+                Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } })
         )
-        val response = root(Request(GET, "/root/hello/planet"))
+        val response : RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
 
         assertThat(response.status, equalTo(OK))
-        assertThat(X_URI_TEMPLATE(response), equalTo("/root/hello/{world}"))
+        assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/hello/{world}")))
     }
 
     @Test
@@ -191,7 +192,7 @@ class ContractRoutingHttpHandlerTest {
         val request = Request(Method.PUT, "/test")
         (filter.then("/" bind contract))(request)
         (filter.then(contract))(request)
-        (org.http4k.routing.routes(filter.then(contract)))(request)
+        routes(filter.then(contract))(request)
         (filter.then(routes(contract)))(request)
     }
 

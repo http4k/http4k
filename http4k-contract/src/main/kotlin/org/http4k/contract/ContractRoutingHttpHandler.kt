@@ -7,10 +7,11 @@ import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
-import org.http4k.lens.Header
+import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
@@ -31,6 +32,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
      * to achieve population of filters before security.
      */
     override fun withFilter(new: Filter) = copy(preSecurityFilter = preSecurityFilter.then(new))
+
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
     private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
@@ -56,6 +58,11 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private fun identify(route: ContractRoute): Filter =
         route.describeFor(contractRoot).let { routeIdentity ->
-            Filter { next -> { next(it.with(Header.X_URI_TEMPLATE of if (routeIdentity.isEmpty()) "/" else routeIdentity)) } }
+            Filter { next ->
+                {
+                    val xUriTemplate = UriTemplate.from(if (routeIdentity.isEmpty()) "/" else routeIdentity)
+                    RoutedResponse(next(RoutedRequest(it, xUriTemplate)), xUriTemplate)
+                }
+            }
         }
 }

@@ -13,7 +13,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
-import org.http4k.core.findSingle
 import org.http4k.core.then
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
@@ -92,7 +91,7 @@ internal data class TemplateRoutingHttpHandler(
 
     override fun match(request: Request): HttpHandler? =
         if (template.matches(request.uri.path) && (method == null || method == request.method))
-            { r: Request -> httpHandler(r.withUriTemplate(template)) }
+            { r: Request -> RoutedResponse(httpHandler(RoutedRequest(r, template)), template) }
         else null
 
     override fun invoke(request: Request): Response = (match(request) ?: notFoundHandler)(request)
@@ -107,14 +106,9 @@ internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
                                              private val consumer: WsConsumer) : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = if (template.matches(request.uri.path)) { ws ->
         consumer(object : Websocket by ws {
-            override val upgradeRequest: Request = ws.upgradeRequest.withUriTemplate(template)
+            override val upgradeRequest: Request = RoutedRequest(ws.upgradeRequest, template)
         })
     } else null
 
     override fun withBasePath(new: String): TemplateRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
-
-private fun Request.withUriTemplate(uriTemplate: UriTemplate): Request = header("x-uri-template", uriTemplate.toString())
-
-internal fun Request.uriTemplate(): UriTemplate = headers.findSingle("x-uri-template")?.let { UriTemplate.from(it) }
-    ?: throw IllegalStateException("x-uri-template header not present in the request")

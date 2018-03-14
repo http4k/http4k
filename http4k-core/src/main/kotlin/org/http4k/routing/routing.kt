@@ -5,6 +5,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.UriTemplate
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
@@ -34,7 +35,10 @@ fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : Routi
     override fun withBasePath(new: String): RoutingWsHandler = websockets(*list.map { it.withBasePath(new) }.toTypedArray())
 }
 
-fun Request.path(name: String): String? = uriTemplate().extract(uri.path)[name]
+fun Request.path(name: String): String? = when(this) {
+    is RoutedRequest -> xUriTemplate.extract(uri.path)[name]
+    else -> throw IllegalStateException("Request was not routed, so no uri-template not present")
+}
 
 data class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
@@ -57,3 +61,19 @@ infix fun String.bind(action: HttpHandler): RoutingHttpHandler = TemplateRouting
 infix fun String.bind(consumer: WsConsumer): RoutingWsHandler = TemplateRoutingWsHandler(UriTemplate.from(this), consumer)
 
 infix fun String.bind(wsHandler: RoutingWsHandler): RoutingWsHandler = wsHandler.withBasePath(this)
+
+class RoutedRequest(private val delegate: Request, val xUriTemplate: UriTemplate) : Request by delegate {
+    override fun equals(other: Any?): Boolean = delegate == other
+
+    override fun hashCode(): Int = delegate.hashCode()
+
+    override fun toString(): String = delegate.toString()
+}
+
+class RoutedResponse(private val delegate: Response, val xUriTemplate: UriTemplate) : Response by delegate {
+    override fun equals(other: Any?): Boolean = delegate == other
+
+    override fun hashCode(): Int = delegate.hashCode()
+
+    override fun toString(): String = delegate.toString()
+}

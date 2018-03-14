@@ -191,7 +191,7 @@ class RoutingTest {
             Request(GET, "/").path("abc")
             fail("Expected exception")
         } catch (e: IllegalStateException) {
-            assertThat(e.message, equalTo("x-uri-template header not present in the request"))
+            assertThat(e.message, equalTo("Request was not routed, so no uri-template not present"))
         }
     }
 

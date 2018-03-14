@@ -4,18 +4,21 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
-import org.http4k.lens.Header
+import org.http4k.routing.RoutedResponse
 import org.junit.Test
 import java.time.Duration.ZERO
 
 class HttpTransactionTest {
 
     @Test
-    fun `can get the routing group`() {
+    fun `cannot get the routing group from a standard Response`() {
         assertThat(HttpTransaction(Request(GET, Uri.of("/")), Response(OK), ZERO).routingGroup, equalTo("UNMAPPED"))
+    }
 
-        assertThat(HttpTransaction(Request(GET, Uri.of("/"))
-            .with(Header.X_URI_TEMPLATE of "hello"), Response(OK), ZERO).routingGroup, equalTo("hello"))
+    @Test
+    fun `can get the routing group from a RoutedResponse`() {
+        val response = RoutedResponse(Response(OK), UriTemplate.from("hello"))
+        assertThat(HttpTransaction(Request(GET, Uri.of("/")), response, ZERO).routingGroup, equalTo("hello"))
     }
 
 }

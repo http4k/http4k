@@ -22,6 +22,4 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             },
             ContentType::toHeaderValue).optional("content-type")
     }
-
-    val X_URI_TEMPLATE = optional("x-uri-template")
 }
