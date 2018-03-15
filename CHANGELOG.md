@@ -1,8 +1,12 @@
 <h2 class="github">Changelog</h2>
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
-### v3.20.0
 
+### v3.21.0
+- Fix #107 - Killed the x-uri-template header and fixed the ReportHttpTransaction to have access to the `routingGroup`.
+- Altered ordering of filters in `http4k-contract` so that the route is identified before pre-filters and security are applied. This allows knowledge of the path to be accessible at the time of application of those filters.
+
+### v3.20.0
 - Introduce JavaHttpClient to `http4k-core`. It provides a very basic http client without  any other 3rd party dependencies.
 
 ### v3.19.0
