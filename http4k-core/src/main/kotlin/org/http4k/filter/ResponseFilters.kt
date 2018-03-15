@@ -34,8 +34,7 @@ object ResponseFilters {
             {
                 clock.instant().let { start ->
                     next(it).apply {
-                        val transaction = HttpTransaction(it, this, between(start, clock.instant()))
-                        recordFn(transactionLabeller(transaction))
+                        recordFn(transactionLabeller(HttpTransaction(it, this, between(start, clock.instant()))))
                     }
                 }
             }
