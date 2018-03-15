@@ -42,7 +42,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
 
     private val routers: List<Pair<Filter, Router>> = routes
-        .map { CatchLensFailure.then(preSecurityFilter).then(security.filter).then(identify(it)).then(postSecurityFilter) to it.toRouter(contractRoot) }
+        .map { CatchLensFailure.then(identify(it)).then(preSecurityFilter).then(security.filter).then(postSecurityFilter) to it.toRouter(contractRoot) }
         .plus(identify(descriptionRoute).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
     private val noMatch: HttpHandler? = null
@@ -53,7 +53,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         if (request.isIn(contractRoot)) {
             routers.fold(noMatch, { memo, (routeFilter, router) ->
                 memo ?: router.match(request)?.let { routeFilter.then(it) }
-            })
+            })AN
         } else null
 
     private fun identify(route: ContractRoute): Filter =
