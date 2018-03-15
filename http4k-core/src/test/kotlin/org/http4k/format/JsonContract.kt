@@ -32,7 +32,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE
     fun `serializes object to json`() {
         val input = j.obj(
             "string" to j.string("value"),
-            "double" to j.number(1.0),
+            "double" to j.number(1.5),
             "long" to j.number(10L),
             "boolean" to j.boolean(true),
             "bigDec" to j.number(BigDecimal(1.2)),
@@ -45,7 +45,7 @@ abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE
                 j.number(123)
             ))
         )
-        val expected = """{"string":"value","double":1,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123]}"""
+        val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123]}"""
         assertThat(j.compact(input), equalTo(expected))
     }
 

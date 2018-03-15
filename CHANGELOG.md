@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.21.1
+- Fix #109 - Jackson treats integer values inconsistently, leading to matching errors when using hamkrest.
+
 ### v3.21.0
 - Fix #107 - Killed the x-uri-template header and fixed the ReportHttpTransaction to have access to the `routingGroup`.
 - Altered ordering of filters in `http4k-contract` so that the route is identified before pre-filters and security are applied. This allows knowledge of the path to be accessible at the time of application of those filters.

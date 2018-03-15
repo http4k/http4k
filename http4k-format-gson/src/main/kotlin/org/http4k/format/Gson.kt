@@ -44,12 +44,12 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     ) }
     override fun String?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Int?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
-    override fun Double?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(BigDecimal(this)) } ?: JsonNull.INSTANCE
+    override fun Double?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Long?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun BigDecimal?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun BigInteger?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
     override fun Boolean?.asJsonValue(): JsonElement = this?.let { JsonPrimitive(this) } ?: JsonNull.INSTANCE
-    override fun <T : Iterable<JsonElement>> T.asJsonArray(): JsonElement = this.fold(JsonArray()) { memo, o -> memo.add(o); memo }
+    override fun <T : Iterable<JsonElement>> T.asJsonArray(): JsonElement = fold(JsonArray()) { memo, o -> memo.add(o); memo }
 
     override fun JsonElement.asPrettyJsonString(): String = pretty.toJson(this)
     override fun JsonElement.asCompactJsonString(): String = compact.toJson(this)

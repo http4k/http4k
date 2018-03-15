@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.BigIntegerNode
 import com.fasterxml.jackson.databind.node.BooleanNode
 import com.fasterxml.jackson.databind.node.DecimalNode
-import com.fasterxml.jackson.databind.node.IntNode
-import com.fasterxml.jackson.databind.node.LongNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -40,9 +38,9 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
     override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
-    override fun Int?.asJsonValue(): JsonNode = this?.let { IntNode(this) } ?: NullNode.instance
+    override fun Int?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this.toBigInteger()) } ?: NullNode.instance
     override fun Double?.asJsonValue(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
-    override fun Long?.asJsonValue(): JsonNode = this?.let { LongNode(this) } ?: NullNode.instance
+    override fun Long?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this.toBigInteger()) } ?: NullNode.instance
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
