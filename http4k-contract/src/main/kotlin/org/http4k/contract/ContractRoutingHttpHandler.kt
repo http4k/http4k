@@ -53,7 +53,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         if (request.isIn(contractRoot)) {
             routers.fold(noMatch, { memo, (routeFilter, router) ->
                 memo ?: router.match(request)?.let { routeFilter.then(it) }
-            })AN
+            })
         } else null
 
     private fun identify(route: ContractRoute): Filter =
