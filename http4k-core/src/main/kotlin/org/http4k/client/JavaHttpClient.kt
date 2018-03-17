@@ -7,10 +7,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.ByteBuffer
 
 class JavaHttpClient : HttpHandler {
     override fun invoke(request: Request): Response {
-        val con = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
+        val connection = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
             instanceFollowRedirects = false
             requestMethod = request.method.name
             doOutput = true
@@ -23,15 +24,11 @@ class JavaHttpClient : HttpHandler {
             }
         }
 
-        val status = Status(con.responseCode, con.responseMessage.orEmpty())
+        val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
 
-        val baseResponse = Response(status).body(if (status.serverError || status.clientError) {
-            con.errorStream
-        } else {
-            con.inputStream
-        })
+        val baseResponse = Response(status).body(connection.body(status))
 
-        return con.headerFields
+        return connection.headerFields
             .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
             .map { header -> header.value.map { header.key to it } }
             .flatten()
@@ -39,4 +36,14 @@ class JavaHttpClient : HttpHandler {
                 response.header(nextHeader.first, nextHeader.second)
             })
     }
+
+    // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
+    private fun HttpURLConnection.body(status: Status) =
+        resolveStream(status).readBytes().let { ByteBuffer.wrap(it) }.let { Body(it) }
+
+    private fun HttpURLConnection.resolveStream(status: Status) =
+        when {
+            status.serverError || status.clientError -> errorStream
+            else -> inputStream
+        }
 }
