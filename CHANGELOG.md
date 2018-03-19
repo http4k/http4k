@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.21.2
+- PR #110 - Websocket client timeouts are incorrectly translated as seconds instead of millis. HT @anorth
+- Core `JavaHttpClient` does not support streaming due to limitations with `HttpURLConnection` 
+
 ### v3.21.1
 - Fix #109 - Jackson treats integer values inconsistently, leading to matching errors when using hamkrest.
 
