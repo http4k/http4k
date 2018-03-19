@@ -31,7 +31,7 @@ object WebsocketClient {
      */
     fun nonBlocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
-        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.seconds.toInt()) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.toMillis().toInt()) {
             override fun onOpen(handshakedata: ServerHandshake?) {
                 onConnect(socket.get())
             }
@@ -67,7 +67,7 @@ object WebsocketClient {
     fun blocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO): WsClient {
         val queue = LinkedBlockingQueue<() -> WsMessage?>()
 
-        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.seconds.toInt()) {
+        val client = object : WebSocketClient(URI.create(uri.toString()), Draft_6455(), headers.combineToMap(), timeout.toMillis().toInt()) {
             override fun onOpen(sh: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
