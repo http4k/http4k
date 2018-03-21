@@ -1,5 +1,6 @@
 package org.http4k.routing
 
+import org.http4k.MimetypesFileTypeMap
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
@@ -17,7 +18,6 @@ import org.http4k.core.then
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
 import java.nio.ByteBuffer
-import javax.activation.MimetypesFileTypeMap
 
 internal class ResourceLoadingHandler(private val pathSegments: String,
                                       private val resourceLoader: ResourceLoader,
