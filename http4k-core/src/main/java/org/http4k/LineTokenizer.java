@@ -11,55 +11,55 @@ class LineTokenizer {
     private Vector stack = new Vector();
 
     public LineTokenizer(String str) {
-        this.str = str;
-        this.maxPosition = str.length();
+        str = str;
+        maxPosition = str.length();
     }
 
     private void skipWhiteSpace() {
-        while (this.currentPosition < this.maxPosition && Character.isWhitespace(this.str.charAt(this.currentPosition))) {
-            ++this.currentPosition;
+        while (currentPosition < maxPosition && Character.isWhitespace(str.charAt(currentPosition))) {
+            ++currentPosition;
         }
 
     }
 
     public boolean hasMoreTokens() {
-        if (this.stack.size() > 0) {
+        if (stack.size() > 0) {
             return true;
         } else {
-            this.skipWhiteSpace();
-            return this.currentPosition < this.maxPosition;
+            skipWhiteSpace();
+            return currentPosition < maxPosition;
         }
     }
 
     public String nextToken() {
-        int size = this.stack.size();
+        int size = stack.size();
         if (size > 0) {
-            String t = (String) this.stack.elementAt(size - 1);
-            this.stack.removeElementAt(size - 1);
+            String t = (String) stack.elementAt(size - 1);
+            stack.removeElementAt(size - 1);
             return t;
         } else {
-            this.skipWhiteSpace();
-            if (this.currentPosition >= this.maxPosition) {
+            skipWhiteSpace();
+            if (currentPosition >= maxPosition) {
                 throw new NoSuchElementException();
             } else {
-                int start = this.currentPosition;
-                char c = this.str.charAt(start);
+                int start = currentPosition;
+                char c = str.charAt(start);
                 if (c == '"') {
-                    ++this.currentPosition;
+                    ++currentPosition;
                     boolean filter = false;
 
-                    while (this.currentPosition < this.maxPosition) {
-                        c = this.str.charAt(this.currentPosition++);
+                    while (currentPosition < maxPosition) {
+                        c = str.charAt(currentPosition++);
                         if (c == '\\') {
-                            ++this.currentPosition;
+                            ++currentPosition;
                             filter = true;
                         } else if (c == '"') {
                             String s;
                             if (filter) {
                                 StringBuffer sb = new StringBuffer();
 
-                                for (int i = start + 1; i < this.currentPosition - 1; ++i) {
-                                    c = this.str.charAt(i);
+                                for (int i = start + 1; i < currentPosition - 1; ++i) {
+                                    c = str.charAt(i);
                                     if (c != '\\') {
                                         sb.append(c);
                                     }
@@ -67,21 +67,21 @@ class LineTokenizer {
 
                                 s = sb.toString();
                             } else {
-                                s = this.str.substring(start + 1, this.currentPosition - 1);
+                                s = str.substring(start + 1, currentPosition - 1);
                             }
 
                             return s;
                         }
                     }
                 } else if ("=".indexOf(c) >= 0) {
-                    ++this.currentPosition;
+                    ++currentPosition;
                 } else {
-                    while (this.currentPosition < this.maxPosition && "=".indexOf(this.str.charAt(this.currentPosition)) < 0 && !Character.isWhitespace(this.str.charAt(this.currentPosition))) {
-                        ++this.currentPosition;
+                    while (currentPosition < maxPosition && "=".indexOf(str.charAt(currentPosition)) < 0 && !Character.isWhitespace(str.charAt(currentPosition))) {
+                        ++currentPosition;
                     }
                 }
 
-                return this.str.substring(start, this.currentPosition);
+                return str.substring(start, currentPosition);
             }
         }
     }

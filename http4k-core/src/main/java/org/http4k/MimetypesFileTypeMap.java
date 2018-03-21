@@ -13,45 +13,6 @@ public class MimetypesFileTypeMap {
     private MimeTypeFile[] DB;
     private static String defaultType = "application/octet-stream";
 
-    public MimetypesFileTypeMap() {
-        Vector dbv = new Vector(5);
-        MimeTypeFile mf = null;
-        dbv.addElement((Object)null);
-
-        String system_mimetypes;
-        try {
-            system_mimetypes = System.getProperty("user.home");
-            if (system_mimetypes != null) {
-                String path = system_mimetypes + File.separator + ".mime.types";
-                mf = this.loadFile(path);
-                if (mf != null) {
-                    dbv.addElement(mf);
-                }
-            }
-        } catch (SecurityException var6) {
-            ;
-        }
-
-        try {
-            system_mimetypes = System.getProperty("java.home") + File.separator + "lib" + File.separator + "mime.types";
-            mf = this.loadFile(system_mimetypes);
-            if (mf != null) {
-                dbv.addElement(mf);
-            }
-        } catch (SecurityException var5) {
-            ;
-        }
-
-        this.loadAllResources(dbv, "META-INF/mime.types");
-        mf = this.loadResource("/META-INF/mimetypes.default");
-        if (mf != null) {
-            dbv.addElement(mf);
-        }
-
-        this.DB = new MimeTypeFile[dbv.size()];
-        dbv.copyInto(this.DB);
-    }
-
     private MimeTypeFile loadResource(String name) {
         InputStream clis = null;
 
@@ -86,7 +47,7 @@ public class MimetypesFileTypeMap {
         boolean anyLoaded = false;
 
         try {
-            ClassLoader cld = null;
+            ClassLoader cld;
             cld = SecuritySupport.getContextClassLoader();
             if (cld == null) {
                 cld = this.getClass().getClassLoader();
@@ -147,13 +108,43 @@ public class MimetypesFileTypeMap {
         return mtf;
     }
 
-    public MimetypesFileTypeMap(String mimeTypeFileName) throws IOException {
-        this();
-        this.DB[0] = new MimeTypeFile(mimeTypeFileName);
-    }
-
     public MimetypesFileTypeMap(InputStream is) {
-        this();
+        Vector dbv = new Vector(5);
+        MimeTypeFile mf = null;
+        dbv.addElement((Object)null);
+
+        String system_mimetypes;
+        try {
+            system_mimetypes = System.getProperty("user.home");
+            if (system_mimetypes != null) {
+                String path = system_mimetypes + File.separator + ".mime.types";
+                mf = this.loadFile(path);
+                if (mf != null) {
+                    dbv.addElement(mf);
+                }
+            }
+        } catch (SecurityException var6) {
+            ;
+        }
+
+        try {
+            system_mimetypes = System.getProperty("java.home") + File.separator + "lib" + File.separator + "mime.types";
+            mf = this.loadFile(system_mimetypes);
+            if (mf != null) {
+                dbv.addElement(mf);
+            }
+        } catch (SecurityException var5) {
+            ;
+        }
+
+        this.loadAllResources(dbv, "META-INF/mime.types");
+        mf = this.loadResource("/META-INF/mimetypes.default");
+        if (mf != null) {
+            dbv.addElement(mf);
+        }
+
+        this.DB = new MimeTypeFile[dbv.size()];
+        dbv.copyInto(this.DB);
 
         try {
             this.DB[0] = new MimeTypeFile(is);

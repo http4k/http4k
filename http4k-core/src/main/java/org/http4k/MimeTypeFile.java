@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class MimeTypeFile {
     private String fname = null;
-    private Hashtable type_hash = new Hashtable();
+    private HashMap<String, String> type_hash = new HashMap<>();
 
     public MimeTypeFile(String new_fname) throws IOException {
         File mime_file;
@@ -43,13 +43,12 @@ public class MimeTypeFile {
         parse(new BufferedReader(new InputStreamReader(is, "iso-8859-1")));
     }
 
-    public MimeTypeEntry getMimeTypeEntry(String file_ext) {
-        return (MimeTypeEntry)type_hash.get(file_ext);
+    public String getMimeTypeEntry(String file_ext) {
+        return type_hash.get(file_ext);
     }
 
     public String getMIMETypeString(String file_ext) {
-        MimeTypeEntry entry = getMimeTypeEntry(file_ext);
-        return entry != null ? entry.getMIMEType() : null;
+        return getMimeTypeEntry(file_ext);
     }
 
     public void appendToRegistry(String mime_types) {
@@ -100,7 +99,7 @@ public class MimeTypeFile {
                 if (line.indexOf(61) > 0) {
                     LineTokenizer lt = new LineTokenizer(line);
 
-                    do {
+                    while (true) {
                         while (lt.hasMoreTokens()) {
                             String name = lt.nextToken();
                             value = null;
@@ -119,14 +118,13 @@ public class MimeTypeFile {
 
                                 while (st.hasMoreTokens()) {
                                     file_ext = st.nextToken();
-                                    MimeTypeEntry entry = new MimeTypeEntry(mime_type);
-                                    type_hash.put(file_ext, entry);
+                                    type_hash.put(file_ext, mime_type);
                                 }
                             }
                         }
 
                         return;
-                    } while (true);
+                    }
                 } else {
                     StringTokenizer strtok = new StringTokenizer(line);
                     int num_tok = strtok.countTokens();
@@ -135,8 +133,7 @@ public class MimeTypeFile {
 
                         while(strtok.hasMoreTokens()) {
                             file_ext = strtok.nextToken();
-                            MimeTypeEntry entry = new MimeTypeEntry(mime_type);
-                            type_hash.put(file_ext, entry);
+                            type_hash.put(file_ext, mime_type);
                         }
 
                     }

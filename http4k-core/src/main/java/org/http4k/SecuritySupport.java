@@ -33,11 +33,7 @@ class SecuritySupport {
 
     public static InputStream getResourceAsStream(final Class c, final String name) throws IOException {
         try {
-            return (InputStream)AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                public Object run() throws IOException {
-                    return c.getResourceAsStream(name);
-                }
-            });
+            return (InputStream)AccessController.doPrivileged((PrivilegedExceptionAction) () -> c.getResourceAsStream(name));
         } catch (PrivilegedActionException var3) {
             throw (IOException)var3.getException();
         }
