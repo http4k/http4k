@@ -13,7 +13,7 @@ application/cu-seeme				cu
 application/davmount+xml			davmount
 application/docbook+xml				dbk
 application/dssc+der				dssc
-application/dssc+xml				xdssc
+application/dssc+xml				a xdssc
 application/ecmascript				ecma
 application/emma+xml				emma
 application/epub+zip				epub
@@ -49,7 +49,7 @@ application/mp21				m21 mp21
 application/mp4					mp4s
 application/msword				doc dot
 application/mxf					mxf
-application/octet-stream	bin dms lrf mar so dist distz pkg bpk dump elc deploy
+application/octet-stream					bin dms lrf mar so dist distz pkg bpk dump elc deploy
 application/oda					oda
 application/oebps-package+xml			opf
 application/ogg					ogx
@@ -563,7 +563,9 @@ application/x-tcl				tcl
 application/x-tex				tex
 application/x-tex-tfm				tfm
 application/x-texinfo				texinfo texi
+application/x-texinfo	texinfo texi
 application/x-tgif				obj
+application/x-troff	t tr roff
 application/x-ustar				ustar
 application/x-wais-source			src
 application/x-x509-ca-cert			der crt
@@ -607,10 +609,12 @@ audio/vnd.nuera.ecelp9600			ecelp9600
 audio/vnd.rip					rip
 audio/webm					weba
 audio/x-aac					aac
+audio/x-aifc		aifc
 audio/x-aiff					aif aiff aifc
 audio/x-caf					caf
 audio/x-flac					flac
 audio/x-matroska				mka
+audio/x-mpeg	            	mpeg mpg
 audio/x-mpegurl					m3u
 audio/x-ms-wax					wax
 audio/x-ms-wma					wma
@@ -621,9 +625,9 @@ audio/xm					xm
 image/bmp					bmp
 image/cgm					cgm
 image/g3fax					g3
-image/gif					gif
+image/gif					gif GIF
 image/ief					ief
-image/jpeg					jpeg jpg jpe
+image/jpeg					jpeg jpg jpe JPG
 image/ktx					ktx
 image/png					png
 image/prs.btif					btif
@@ -632,8 +636,8 @@ image/svg+xml					svg svgz
 image/tiff					tiff tif
 image/vnd.adobe.photoshop			psd
 image/vnd.dece.graphic				uvi uvvi uvg uvvg
-image/vnd.dvb.subtitle				sub
 image/vnd.djvu					djvu djv
+image/vnd.dvb.subtitle				sub
 image/vnd.dwg					dwg
 image/vnd.dxf					dxf
 image/vnd.fastbidsheet				fbs
@@ -665,14 +669,14 @@ image/x-xbitmap					xbm
 image/x-xpixmap					xpm
 image/x-xwindowdump				xwd
 message/rfc822					eml mime
+text/babel					jsx
 text/cache-manifest				appcache
 text/calendar					ics ifb
 text/css					css
 text/csv					csv
-text/html					html htm
-text/babel					jsx
+text/html					html htm HTML HTM
 text/n3						n3
-text/plain					txt text conf def list log in
+text/plain					txt text conf def list log in TXT TEXT
 text/prs.lines.tag				dsc
 text/richtext					rtx
 text/sgml					sgml sgm
@@ -683,8 +687,8 @@ text/uri-list					uri uris urls
 text/vcard					vcard
 text/vnd.curl					curl
 text/vnd.curl.dcurl				dcurl
-text/vnd.curl.scurl				scurl
 text/vnd.curl.mcurl				mcurl
+text/vnd.curl.scurl				scurl
 text/vnd.dvb.subtitle				sub
 text/vnd.fly					fly
 text/vnd.fmi.flexstor				flx
@@ -698,9 +702,9 @@ text/x-asm					pkg asm
 text/x-c					c cc cxx cpp h hh dic
 text/x-fortran					f for f77 f90
 text/x-java-source				java
+text/x-nfo					nfo
 text/x-opml					opml
 text/x-pascal					p pas
-text/x-nfo					nfo
 text/x-setext					etx
 text/x-sfv					sfv
 text/x-uuencode					uu

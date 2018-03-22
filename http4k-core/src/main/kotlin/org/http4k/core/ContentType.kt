@@ -4,6 +4,8 @@ import java.nio.charset.Charset
 
 data class ContentType(val value: String, val directive: Pair<String, String>? = null) {
 
+    fun withNoDirective() = copy(directive = null)
+
     fun toHeaderValue() = value + (directive?.let { "; ${it.first}=${it.second}" } ?: "")
 
     companion object {
