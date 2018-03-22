@@ -13,7 +13,7 @@ application/cu-seeme				cu
 application/davmount+xml			davmount
 application/docbook+xml				dbk
 application/dssc+der				dssc
-application/dssc+xml			a	xdssc
+application/dssc+xml				a xdssc
 application/ecmascript				ecma
 application/emma+xml				emma
 application/epub+zip				epub
@@ -49,7 +49,7 @@ application/mp21				m21 mp21
 application/mp4					mp4s
 application/msword				doc dot
 application/mxf					mxf
-application/octet-stream	bin dms lrf mar so dist distz pkg bpk dump elc deploy
+application/octet-stream					bin dms lrf mar so dist distz pkg bpk dump elc deploy
 application/oda					oda
 application/oebps-package+xml			opf
 application/ogg					ogx
@@ -625,7 +625,7 @@ audio/xm					xm
 image/bmp					bmp
 image/cgm					cgm
 image/g3fax					g3
-image/gif		            gif GIF
+image/gif					gif GIF
 image/ief					ief
 image/jpeg					jpeg jpg jpe JPG
 image/ktx					ktx
