@@ -1,6 +1,5 @@
 package org.http4k.routing
 
-import org.http4k.MimetypesFileTypeMap
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
@@ -8,6 +7,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.MimeTypes
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -22,16 +22,12 @@ import java.nio.ByteBuffer
 internal class ResourceLoadingHandler(private val pathSegments: String,
                                       private val resourceLoader: ResourceLoader,
                                       extraPairs: Map<String, ContentType>) : HttpHandler {
-    private val extMap = MimetypesFileTypeMap(ContentType::class.java.getResourceAsStream("/META-INF/mime.types"))
-
-    init {
-        extMap.addMimeTypes(extraPairs.map { (first, second) -> second.value + "\t\t\t" + first }.joinToString("\n"))
-    }
+    private val extMap = MimeTypes(extraPairs)
 
     override fun invoke(p1: Request): Response {
         val path = convertPath(p1.uri.path)
         return resourceLoader.load(path)?.let { url ->
-            val lookupType = ContentType(extMap.getContentType(path))
+            val lookupType = extMap.forFile(path)
             if (p1.method == GET && lookupType != OCTET_STREAM) {
                 Response(OK)
                     .header("Content-Type", lookupType.value)
