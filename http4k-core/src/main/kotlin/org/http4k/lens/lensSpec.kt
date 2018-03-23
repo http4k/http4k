@@ -1,5 +1,6 @@
 package org.http4k.lens
 
+import org.http4k.core.Uri
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
@@ -211,6 +212,7 @@ fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSp
     pattern.toRegex().let { r ->
         map { r.matchEntire(it)?.groupValues?.get(group)!! }
     }
+fun <IN> BiDiLensSpec<IN, String>.uri() = map(Uri.Companion::of, Uri::toString)
 
 internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
 

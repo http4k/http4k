@@ -1,0 +1,15 @@
+<html>
+<head>
+    <title>{{serviceName}} Login</title>
+</head>
+<body>
+<h1>{{serviceName}} Login</h1>
+{{#if error}} <h1>{{error}}</h1> {{/if}}
+<form>
+    <label for="user"><input type="text" id="user"/></label>
+    <label for="password"><input type="text" id="password"/></label>
+    <input type="callbackUri" id="callbackUri" value="{{callbackUri}}"/>
+    <button>Submit</button>
+</form>
+</body>
+</html>

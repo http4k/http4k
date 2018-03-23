@@ -2,6 +2,8 @@ package org.http4k.lens
 
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
+import org.http4k.core.Uri
+import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.ParamMeta.StringParam
 
 typealias HeaderLens<T> = Lens<HttpMessage, T>
@@ -16,10 +18,12 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
                 val parts = it.split(";")
                 if (parts.size == 2) {
                     val directive = parts[1].split("=")
-                    if(directive.size == 2) ContentType(parts[0].trim(), directive[0].trim() to directive[1].trim())
+                    if (directive.size == 2) ContentType(parts[0].trim(), directive[0].trim() to directive[1].trim())
                     else ContentType(parts[0].trim())
                 } else ContentType(it.trim())
             },
             ContentType::toHeaderValue).optional("content-type")
+
+        val LOCATION = map({ of(it) }, Uri::toString).required("location")
     }
 }
