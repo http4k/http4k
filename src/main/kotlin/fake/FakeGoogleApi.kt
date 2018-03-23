@@ -5,7 +5,8 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -60,9 +61,9 @@ class FakeGoogleApi : HttpHandler {
     private val api =
         ServerFilters.CatchAll().then(
             routes(
-                "/o/oauth2/v2/auth" bind Method.POST to login,
-                "/fakeLogin" bind Method.POST to submit,
-                "/" bind Method.GET to { Response(OK).with(html of templates(Index("Google"))) }
+                "/o/oauth2/v2/auth" bind POST to login,
+                "/fakeLogin" bind POST to submit,
+                "/" bind GET to { Response(OK).with(html of templates(Index("Google"))) }
             )
         )
 
