@@ -9,7 +9,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.query
@@ -42,7 +41,7 @@ class FakeGoogleApi : HttpHandler {
     private val codes = mutableMapOf<UUID, Credentials>()
 
     private val login: HttpHandler = {
-        Response(Status.OK).with(html of templates(OAuthLogin("Google", GoogleApi.redirectUri(it))))
+        Response(OK).with(html of templates(OAuthLogin("Google", GoogleApi.redirectUri(it))))
     }
 
     private val submit: HttpHandler = {

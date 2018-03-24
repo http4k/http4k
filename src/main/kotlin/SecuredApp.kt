@@ -1,6 +1,7 @@
 import org.http4k.client.ApacheClient
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
@@ -63,17 +64,21 @@ fun TemplateRenderer.page(viewModel: ViewModel,
     Response(status).with(CONTENT_TYPE of contentType).body(invoke(viewModel))
 
 fun main(args: Array<String>) {
-    val templates = HandlebarsTemplates().CachingClasspath()
 
     val home = Uri.of(("http://localhost:9000"))
 
-    val oauth = OAuth(DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
-        OAuthClientConfig.google(callbackUri = home.path("/callback")))
+    val google = OAuth.google(
+        DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
+        Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET")),
+        home.path("/callback")
+    )
+
+    val templates = HandlebarsTemplates().CachingClasspath()
 
     val app: HttpHandler =
         routes(
-            routes("/callback" bind GET to oauth.callback),
-            oauth.authFilter.then(
+            routes("/callback" bind GET to google.callback),
+            google.authFilter.then(
                 routes("/" bind GET to { templates.page(Index("app")) })
             )
         )
