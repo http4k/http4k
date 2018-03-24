@@ -43,7 +43,9 @@ nonce=random&
 
 
 class OAuth(client: HttpHandler,
-            val clientConfig: OAuthClientConfig,
+            private val clientConfig: OAuthClientConfig,
+            private val callbackUri: Uri,
+            private val scopes: List<String>,
             private val generateCrsf: () -> String = { BigInteger(130, SecureRandom()).toString(32) },
             private val generateNonce: () -> String = { UUID.randomUUID().toString() }) {
 
@@ -89,8 +91,8 @@ class OAuth(client: HttpHandler,
         Response(Status.TEMPORARY_REDIRECT).with(Header.Common.LOCATION of clientConfig.authUri
             .query("client_id", clientConfig.credentials.user)
             .query("response_type", "code")
-            .query("scope", clientConfig.scopes.joinToString(" "))
-            .query("redirect_uri", clientConfig.callbackUri.toString())
+            .query("scope", scopes.joinToString(" "))
+            .query("redirect_uri", callbackUri.toString())
             .query("state", originalUri.query(crsfCookieName, it).toString())
             .query("nonce", generateNonce()))
             .cookie(Cookie(crsfCookieName, it))

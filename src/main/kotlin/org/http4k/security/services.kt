@@ -12,8 +12,7 @@ fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callba
             "/o/oauth2/v2/auth",
             Uri.of("https://www.googleapis.com"),
             "/oauth2/v4/token",
-            credentials,
-            callbackUri,
-            scopes)
-
+            credentials),
+        callbackUri,
+        scopes
     )

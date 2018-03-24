@@ -9,8 +9,6 @@ data class OAuthClientConfig(
     val authPath: String,
     val apiBase: Uri,
     val tokenPath: String,
-    val credentials: Credentials,
-    val callbackUri: Uri,
-    val scopes: List<String>) {
+    val credentials: Credentials) {
     val authUri = authBase.path(authPath)
 }
