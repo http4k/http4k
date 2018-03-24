@@ -33,12 +33,6 @@ encode!!    security_token=138r5719ru3e1&url=https://oauth2-login-demo.example.c
 nonce=random&
  */
 
-data class AntiForgeryStateToken(val state: String) {
-    companion object {
-        fun secure() = AntiForgeryStateToken(BigInteger(130, SecureRandom()).toString(32))
-    }
-}
-
 data class OAuthClientConfig(
     val serviceName: String,
     private val authBase: Uri,
