@@ -24,8 +24,6 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.server.SunHttp
-import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -69,8 +67,4 @@ class FakeGoogleApi : HttpHandler {
     )
 
     override fun invoke(p1: Request): Response = api(p1)
-}
-
-fun main(args: Array<String>) {
-    FakeGoogleApi().asServer(SunHttp(8000)).start().block()
 }

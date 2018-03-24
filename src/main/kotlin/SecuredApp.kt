@@ -1,40 +1,26 @@
 
 import org.http4k.client.ApacheClient
-import org.http4k.core.Credentials
+import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
-import org.http4k.core.cookie.Cookie
-import org.http4k.core.cookie.cookie
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
+import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
-import org.http4k.lens.Header.Common.LOCATION
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
+import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
-
-
-val client = ApacheClient()
-
-val credentials = Credentials("c090918276dd3545e779f29f61c86c7a", "ca78037a2fe013aa120b3de628375b4f")
-
-//fun main(args: Array<String>) {
-//
-//    val auth = AuthorizeRequest(credentials, Uri.of("http://localhost:9000"))
-//
-//    val r = client(Request(GET, "https://soundcloud.com/connect").with(auth))
-//
-//    println(r)
-//}
-//
 
 data class Index(val name: String) : ViewModel
 
@@ -73,24 +59,40 @@ Obtain user information from the ID token
 Authenticate the user
  */
 
+fun TemplateRenderer.page(viewModel: ViewModel,
+                          status: Status = OK,
+                          contentType: ContentType = TEXT_HTML): Response =
+    Response(status).with(CONTENT_TYPE of contentType).body(invoke(viewModel))
+
 fun main(args: Array<String>) {
     val templates = HandlebarsTemplates().CachingClasspath()
 
     val home = Uri.of(("http://localhost:9000"))
 
-    val soundcloudHome = Uri.of("https://soundcloud.com")
+    val googleOAuth = OAuthClientConfig.google(callbackUri = home.path("/callback"))
 
-    //https://www.googleapis.com/auth/calendar
-
-    fun getIndex(code: String) = Response(OK).body(templates(Index(code)))
-
-    val index = { r: Request ->
-        r.cookie("full")?.let { getIndex(it.value) }
-            ?: r.query("code")?.let { Response(TEMPORARY_REDIRECT).cookie(Cookie("session", it)).with(LOCATION of home) }
-//            ?: Response(TEMPORARY_REDIRECT).with(LOCATION of soundcloudHome.with(GoogleAuthorizeRequest(credentials, home)))
+    val index: HttpHandler = {
+        templates.page(Index("app"))
+//        r.cookie("full")?.let { getIndex(it.value) }
+//            ?: r.query("code")?.let { Response(TEMPORARY_REDIRECT).cookie(Cookie("session", it)).with(LOCATION of home) }
+////            ?: Response(TEMPORARY_REDIRECT).with(LOCATION of soundcloudHome.with(GoogleAuthorizeRequest(credentials, home)))
     }
 
-    val app: HttpHandler = routes("/" bind GET to { Response(OK) })
+    val googleApi = ClientFilters.SetHostFrom(Uri.of("https://www.googleapis.com"))
+        .then(DebuggingFilters.PrintRequestAndResponse())
+        .then(ApacheClient())
 
-    ServerFilters.CatchAll().then(app).asServer(SunHttp(9000)).start().block()
+    val oauth = OAuth(googleApi, googleOAuth)
+
+    val app: HttpHandler =
+        routes(
+            routes("/callback" bind GET to oauth.callback),
+            oauth.authFilter.then(
+                routes("/" bind GET to index)
+            )
+        )
+
+    ServerFilters.CatchAll()
+        .then(app)
+        .asServer(SunHttp(9000)).start().block()
 }
