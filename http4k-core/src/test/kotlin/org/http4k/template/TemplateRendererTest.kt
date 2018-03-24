@@ -1,8 +1,15 @@
 package org.http4k.template
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
+import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.Status.Companion.OK
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasContentType
+import org.http4k.hamkrest.hasStatus
 import org.junit.Test
 
 object TestViewModel : ViewModel
@@ -21,5 +28,13 @@ class TemplateRendererTest {
     fun `eventually fails with ViewNotFound`() {
         assertThat({noFinds.then(noFinds)(TestViewModel)} , throws<ViewNotFound>())
     }
+
+    @Test
+    fun `can generate response with default code and content type`() {
+        finds.responseFor(TestViewModel) shouldMatch hasStatus(OK).
+            and(hasBody("org/http4k/template/TestViewModel")).
+            and(hasContentType(TEXT_HTML))
+    }
+
 
 }

@@ -1,18 +1,12 @@
+
 import org.http4k.client.ApacheClient
-import org.http4k.core.ContentType
-import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
-import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.OAuth
@@ -20,8 +14,8 @@ import org.http4k.security.google
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
-import org.http4k.template.TemplateRenderer
 import org.http4k.template.ViewModel
+import org.http4k.template.responseFor
 
 data class Index(val name: String) : ViewModel
 
@@ -60,11 +54,6 @@ Obtain user information from the ID token
 Authenticate the user
  */
 
-fun TemplateRenderer.page(viewModel: ViewModel,
-                          status: Status = OK,
-                          contentType: ContentType = TEXT_HTML): Response =
-    Response(status).with(CONTENT_TYPE of contentType).body(invoke(viewModel))
-
 fun main(args: Array<String>) {
 
     val home = Uri.of(("http://localhost:9000"))
@@ -81,7 +70,7 @@ fun main(args: Array<String>) {
         routes(
             routes("/callback" bind GET to google.callback),
             google.authFilter.then(
-                routes("/" bind GET to { templates.page(Index("app")) })
+                routes("/" bind GET to { templates.responseFor(Index("app")) })
             )
         )
 
