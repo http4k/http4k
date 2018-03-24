@@ -30,6 +30,17 @@ import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
+/**
+ * POST www.googleapis.com/oauth2/v4/token
+Content-Type: application/x-www-form-urlencoded
+code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7&
+client_id=8819981768.apps.googleusercontent.com&
+client_secret={client_secret}&
+redirect_uri=https://oauth2-login-demo.example.com/code&
+grant_type=authorization_code
+ */
+
+
 class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()
