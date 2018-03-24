@@ -1,6 +1,5 @@
 package fake
 
-import GoogleApi
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Credentials
@@ -9,6 +8,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.query
@@ -17,17 +17,20 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.FormField
 import org.http4k.lens.Header.Common.LOCATION
+import org.http4k.lens.Query
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.string
 import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.OAuthClientConfig
 import org.http4k.template.HandlebarsTemplates
+import page
 import java.util.UUID
 import java.util.UUID.randomUUID
 
-class FakeGoogleApi : HttpHandler {
+class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()
 
@@ -37,12 +40,12 @@ class FakeGoogleApi : HttpHandler {
     private val loginForm = Body.webForm(Feedback, user, password, callbackUri).toLens()
     private val html = Body.string(TEXT_HTML).toLens()
 
+    private val redirectUri = Query.uri().required("redirect_uri")
     private val users = mapOf("user" to "password")
-    private val codes = mutableMapOf<UUID, Credentials>()
 
-    private val login: HttpHandler = {
-        Response(OK).with(html of templates(OAuthLogin("Google", GoogleApi.redirectUri(it))))
-    }
+    private val generatedCodes = mutableMapOf<UUID, Credentials>()
+
+    private val login: HttpHandler = { templates.page(OAuthLogin(oAuthClientConfig.serviceName, redirectUri(it))) }
 
     private val submit: HttpHandler = {
         val submitted = loginForm(it)
@@ -51,17 +54,20 @@ class FakeGoogleApi : HttpHandler {
             submitted.errors.isNotEmpty() || users[credentials.user] != credentials.password ->
                 Response(OK).with(html of templates(OAuthLogin("Google", callbackUri(submitted), "failed")))
             else -> randomUUID().let {
-                codes[it] = credentials
+                generatedCodes[it] = credentials
                 Response(TEMPORARY_REDIRECT).with(LOCATION of callbackUri(submitted).query("code", it.toString()))
             }
         }
     }
 
+    private val token: (Request) -> Response = { Response(FORBIDDEN) }
+
     private val api = ServerFilters.CatchAll().then(
         routes(
-            "/o/oauth2/v2/auth" bind POST to login,
+            oAuthClientConfig.authPath bind POST to login,
+            oAuthClientConfig.tokenPath bind POST to token,
             "/fakeLogin" bind POST to submit,
-            "/" bind GET to { Response(OK).with(html of templates(Index("Google"))) }
+            "/" bind GET to { Response(OK).with(html of templates(Index(oAuthClientConfig.serviceName))) }
         )
     )
 
