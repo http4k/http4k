@@ -20,7 +20,9 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
 import org.http4k.core.query
+import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
 import org.http4k.lens.FormField
 import org.http4k.lens.Header.Common.LOCATION
 import org.http4k.lens.Query
@@ -125,13 +127,15 @@ fun Uri.with(req: GoogleAuthorizeRequest) =
         .query(state.meta.name, req.originalUri.query("csrf", req.antiForgeryStateToken.state).toString())
         .query(nonce.meta.name, req.nonce)
 
-class OAuth(private val google: HttpHandler,
+class OAuth(client: HttpHandler,
             private val oAuthClientConfig: OAuthClientConfig,
             private val generateToken: () -> AntiForgeryStateToken = AntiForgeryStateToken.Companion::secure,
             private val generateNonce: () -> String = { UUID.randomUUID().toString() }) {
 
+    val apiClient = ClientFilters.SetHostFrom(oAuthClientConfig.apiBase).then(client)
+
     private fun codeToAccessToken(code: String, originalUri: Uri): Response {
-        val accessToken = google(Request(POST, "/oauth2/v4/token").with(CodeToAccessTokenRequest.lens of
+        val accessToken = apiClient(Request(POST, "/oauth2/v4/token").with(CodeToAccessTokenRequest.lens of
             CodeToAccessTokenRequest(originalUri, oAuthClientConfig.client, code)))
 
         println(accessToken.bodyString())

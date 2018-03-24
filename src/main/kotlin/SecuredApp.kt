@@ -1,4 +1,3 @@
-
 import org.http4k.client.ApacheClient
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_HTML
@@ -10,7 +9,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Header.Common.CONTENT_TYPE
@@ -69,26 +67,14 @@ fun main(args: Array<String>) {
 
     val home = Uri.of(("http://localhost:9000"))
 
-    val googleOAuth = OAuthClientConfig.google(callbackUri = home.path("/callback"))
-
-    val index: HttpHandler = {
-        templates.page(Index("app"))
-//        r.cookie("full")?.let { getIndex(it.value) }
-//            ?: r.query("code")?.let { Response(TEMPORARY_REDIRECT).cookie(Cookie("session", it)).with(LOCATION of home) }
-////            ?: Response(TEMPORARY_REDIRECT).with(LOCATION of soundcloudHome.with(GoogleAuthorizeRequest(credentials, home)))
-    }
-
-    val googleApi = ClientFilters.SetHostFrom(Uri.of("https://www.googleapis.com"))
-        .then(DebuggingFilters.PrintRequestAndResponse())
-        .then(ApacheClient())
-
-    val oauth = OAuth(googleApi, googleOAuth)
+    val oauth = OAuth(DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
+        OAuthClientConfig.google(callbackUri = home.path("/callback")))
 
     val app: HttpHandler =
         routes(
             routes("/callback" bind GET to oauth.callback),
             oauth.authFilter.then(
-                routes("/" bind GET to index)
+                routes("/" bind GET to { templates.page(Index("app")) })
             )
         )
 
