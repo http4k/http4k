@@ -30,16 +30,17 @@ import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
-/**
- * POST www.googleapis.com/oauth2/v4/token
-Content-Type: application/x-www-form-urlencoded
-code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7&
-client_id=8819981768.apps.googleusercontent.com&
-client_secret={client_secret}&
-redirect_uri=https://oauth2-login-demo.example.com/code&
-grant_type=authorization_code
- */
 
+/**
+ *     https://accounts.google.com/o/oauth2/v2/auth?
+client_id=424911365001.apps.googleusercontent.com&
+response_type=code&
+scope=openid%20email&
+redirect_uri=http://localhost:9000/callback
+state=below
+encode!!    security_token=138r5719ru3e1&url=https://oauth2-login-demo.example.com/myHome&
+nonce=random&
+ */
 
 class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHandler {
 

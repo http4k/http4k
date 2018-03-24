@@ -21,17 +21,7 @@ import java.math.BigInteger
 import java.security.SecureRandom
 import java.util.UUID
 
-/**
 
- *     https://accounts.google.com/o/oauth2/v2/auth?
-client_id=424911365001.apps.googleusercontent.com&
-response_type=code&
-scope=openid%20email&
-redirect_uri=http://localhost:9000/callback
-state=below
-encode!!    security_token=138r5719ru3e1&url=https://oauth2-login-demo.example.com/myHome&
-nonce=random&
- */
 
 
 class OAuth(client: HttpHandler,
@@ -55,22 +45,31 @@ class OAuth(client: HttpHandler,
     }
 
     val callback: HttpHandler = {
-        //http://localhost:9000/callback?state=/?csrf%3Dehnst6i3n89khhn0v27ks6t8gn&code=4/AABog4Jo0BMKTmTKZR87LnGES1U4Q2deF6MbBMvqs4fiDKhTZr0LT0GPYAZ-mBX2gO8JwJZVlvjQ9k_D50K1MIg&authuser=0&session_state=7c0f1ea0f7dff7252ed75788864337e165d75232..05be&prompt=consent#
         it.query("code")
             ?.let { code -> it.cookie(serviceCsrfName)?.let { code to it } }
             ?.let { (code, csrfCookie) ->
                 println("hit callback$ $code, $csrfCookie")
                 when {
                     csrfCookie.value != it.query(serviceCsrfName) -> Response(FORBIDDEN).invalidateCookie(serviceCsrfName)
-                    else -> codeToAccessToken(code, Uri.of(""))
+                    else -> codeToAccessToken(code)
                 }
             } ?: Response(FORBIDDEN)
     }
 
-    private fun codeToAccessToken(code: String, originalUri: Uri): Response {
+    /**
+     * POST www.googleapis.com/oauth2/v4/token
+//    Content-Type: application/x-www-form-urlencoded
+//    code=4/P7q7W91a-oMsCeLvIaQm6bTrgtp7&
+//    client_id=8819981768.apps.googleusercontent.com&
+//    client_secret={client_secret}&
+//    redirect_uri=https://oauth2-login-demo.example.com/code&
+//    grant_type=authorization_code
+     */
+
+    private fun codeToAccessToken(code: String): Response {
         val accessToken = api(Request(POST, clientConfig.tokenPath)
             .form("grant_type", "authorization_code")
-            .form("redirect_uri", originalUri.toString())
+            .form("redirect_uri", callbackUri.toString())
             .form("client_id", clientConfig.credentials.user)
             .form("client_secret", clientConfig.credentials.password)
             .form("code", code))
