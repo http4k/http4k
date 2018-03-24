@@ -31,7 +31,7 @@ class TemplateRendererTest {
 
     @Test
     fun `can generate response with default code and content type`() {
-        finds.responseFor(TestViewModel) shouldMatch hasStatus(OK).
+        finds.renderToResponse(TestViewModel) shouldMatch hasStatus(OK).
             and(hasBody("org/http4k/template/TestViewModel")).
             and(hasContentType(TEXT_HTML))
     }

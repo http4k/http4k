@@ -15,7 +15,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
-import org.http4k.template.responseFor
+import org.http4k.template.renderToResponse
 
 data class Index(val name: String) : ViewModel
 
@@ -70,7 +70,7 @@ fun main(args: Array<String>) {
         routes(
             routes("/callback" bind GET to google.callback),
             google.authFilter.then(
-                routes("/" bind GET to { templates.responseFor(Index("app")) })
+                routes("/" bind GET to { templates.renderToResponse(Index("app")) })
             )
         )
 

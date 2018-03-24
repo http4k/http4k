@@ -26,7 +26,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.OAuthClientConfig
 import org.http4k.template.HandlebarsTemplates
-import org.http4k.template.responseFor
+import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
@@ -45,7 +45,7 @@ class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHa
 
     private val generatedCodes = mutableMapOf<UUID, Credentials>()
 
-    private val login: HttpHandler = { templates.responseFor(OAuthLogin(oAuthClientConfig.serviceName, redirectUri(it))) }
+    private val login: HttpHandler = { templates.renderToResponse(OAuthLogin(oAuthClientConfig.serviceName, redirectUri(it))) }
 
     private val submit: HttpHandler = {
         val submitted = loginForm(it)
