@@ -1,4 +1,4 @@
-package fake
+package org.http4k.testing
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
@@ -67,7 +67,7 @@ class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHa
             oAuthClientConfig.authPath bind POST to login,
             oAuthClientConfig.tokenPath bind POST to token,
             "/fakeLogin" bind POST to submit,
-            "/" bind GET to { Response(OK).with(html of templates(Index(oAuthClientConfig.serviceName))) }
+            "/" bind GET to { Response(OK).with(html of templates(OAuthIndex(oAuthClientConfig.serviceName))) }
         )
     )
 
