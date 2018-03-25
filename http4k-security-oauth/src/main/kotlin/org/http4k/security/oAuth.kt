@@ -73,6 +73,7 @@ internal class OAuthCallback(
     private val accessTokenName: String,
     private val clock: Clock
 ) : HttpHandler {
+
     private fun codeToAccessToken(code: String): String? {
         val accessTokenResponse = api(Request(POST, clientConfig.tokenPath)
             .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
