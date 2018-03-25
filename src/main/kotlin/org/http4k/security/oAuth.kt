@@ -1,5 +1,6 @@
 package org.http4k.security
 
+import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
@@ -21,11 +22,18 @@ import java.math.BigInteger
 import java.security.SecureRandom
 import java.util.UUID
 
-
-
+data class OAuthConfig(
+    val serviceName: String,
+    private val authBase: Uri,
+    val authPath: String,
+    val apiBase: Uri,
+    val tokenPath: String,
+    val credentials: Credentials) {
+    val authUri = authBase.path(authPath)
+}
 
 class OAuth(client: HttpHandler,
-            private val clientConfig: OAuthClientConfig,
+            private val clientConfig: OAuthConfig,
             private val callbackUri: Uri,
             private val scopes: List<String>,
             private val generateCrsf: () -> String = { BigInteger(130, SecureRandom()).toString(32) },

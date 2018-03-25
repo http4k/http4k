@@ -24,7 +24,7 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.OAuthClientConfig
+import org.http4k.security.OAuthConfig
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.renderToResponse
 import java.util.UUID
@@ -42,7 +42,7 @@ encode!!    security_token=138r5719ru3e1&url=https://oauth2-login-demo.example.c
 nonce=random&
  */
 
-class FakeOAuthServer(private val oAuthClientConfig: OAuthClientConfig) : HttpHandler {
+class FakeOAuthServer(private val oAuthClientConfig: OAuthConfig) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()
 

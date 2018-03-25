@@ -7,7 +7,7 @@ import org.http4k.core.Uri
 fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, scopes: List<String> = listOf("openid", "email")) =
     OAuth(
         client,
-        OAuthClientConfig("Google",
+        OAuthConfig("Google",
             Uri.of("https://accounts.google.com"),
             "/o/oauth2/v2/auth",
             Uri.of("https://www.googleapis.com"),
