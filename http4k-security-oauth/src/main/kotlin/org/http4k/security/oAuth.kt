@@ -99,11 +99,12 @@ internal class OAuthCallback(
             if (crsfInState != null && crsfInState == p1.cookie(clientConfig.csrfName)?.value) {
                 codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
-                    Response(TEMPORARY_REDIRECT)
+                    val redirect = Response(TEMPORARY_REDIRECT)
                         .header("Location", originalUri)
                         .invalidateCookie(clientConfig.csrfName)
-                        .cookie(Cookie(accessTokenName, it, expires = expires))
+
+                    val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
+                    redirect.cookie(Cookie(accessTokenName, it, expires = expires))
                 }
             } else null
         } ?: Response(FORBIDDEN).invalidateCookie(clientConfig.csrfName).invalidateCookie(accessTokenName)
