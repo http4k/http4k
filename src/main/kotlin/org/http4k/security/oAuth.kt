@@ -6,7 +6,6 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
@@ -16,6 +15,7 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
 import org.http4k.core.query
 import org.http4k.core.then
+import org.http4k.core.toParameters
 import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
@@ -36,8 +36,8 @@ data class OAuthConfig(
 
 internal class OAuthRedirectionFilter(
     private val clientConfig: OAuthConfig,
-    private val serviceCsrfName: String,
-    private val serviceAccessTokenName: String,
+    private val csrfName: String,
+    private val accessTokenName: String,
     private val callbackUri: Uri,
     private val scopes: List<String>,
     private val generateCrsf: () -> String,
@@ -48,12 +48,12 @@ internal class OAuthRedirectionFilter(
             .query("response_type", "code")
             .query("scope", scopes.joinToString(" "))
             .query("redirect_uri", callbackUri.toString())
-            .query("state", listOf(serviceCsrfName to csrf, "uri" to originalUri.toString()).toUrlFormEncoded())
+            .query("state", listOf(csrfName to csrf, "uri" to originalUri.toString()).toUrlFormEncoded())
             .query("nonce", generateNonce()))
-            .cookie(Cookie(serviceCsrfName, csrf))
+            .cookie(Cookie(csrfName, csrf))
     }
 
-    override fun invoke(next: HttpHandler): HttpHandler = { it.cookie(serviceAccessTokenName)?.let { _ -> next(it) } ?: redirectToAuth(it.uri) }
+    override fun invoke(next: HttpHandler): HttpHandler = { it.cookie(accessTokenName)?.let { _ -> next(it) } ?: redirectToAuth(it.uri) }
 }
 
 internal class OAuthCallback(
@@ -84,18 +84,19 @@ internal class OAuthCallback(
         // this is wrong!
         println(accessTokenResponse.bodyString())
 
-        return Response(Status.TEMPORARY_REDIRECT).cookie(Cookie(accessTokenName, accessTokenResponse.bodyString()))
+        return Response(TEMPORARY_REDIRECT).cookie(Cookie(accessTokenName, accessTokenResponse.bodyString()))
     }
-
     override fun invoke(p1: Request) = p1.query("code")
-        ?.let { code -> p1.cookie(csrfName)?.let { code to it } }
-        ?.let { (code, csrfCookie) ->
-            println("hit callback$ $code, $csrfCookie")
-            when {
-                csrfCookie.value != p1.query(csrfName) -> Response(FORBIDDEN).invalidateCookie(csrfName)
-                else -> codeToAccessToken(code)
-            }
-        } ?: Response(FORBIDDEN)
+        ?.let { code ->
+            p1.query("state")
+                ?.let { it to code }
+                ?.let { (state, code) -> p1.cookie(csrfName)?.let { Triple(it.value, state.toParameters(), code) } }
+        }
+        ?.let { (csrfCookie, state, code) ->
+            if (csrfCookie == state.find { it.first == csrfName }?.second) codeToAccessToken(code)
+            else null
+        }
+        ?: Response(FORBIDDEN).invalidateCookie(csrfName)
 }
 
 class OAuth(client: HttpHandler,
