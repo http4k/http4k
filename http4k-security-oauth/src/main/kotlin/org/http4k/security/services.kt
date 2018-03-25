@@ -3,7 +3,21 @@ package org.http4k.security
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
+import org.http4k.core.query
 import java.time.Clock
+
+
+fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()) =
+    OAuth(
+        client,
+        OAuthConfig("Dropbox",
+            Uri.of("https://www.dropbox.com"),
+            "/oauth2/authorize",
+            "/oauth2/token",
+            credentials, Uri.of("https://api.dropboxapi.com")),
+        callbackUri,
+        listOf(""),
+        clock)
 
 fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, scopes: List<String> = listOf("openid"), clock: Clock = Clock.systemUTC()) =
     OAuth(
@@ -16,7 +30,8 @@ fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callba
             Uri.of("https://www.googleapis.com")),
         callbackUri,
         scopes,
-        clock
+        clock,
+        modifyAuthRedirect = { it.query("nonce", SECURE_GENERATE_RANDOM()) }
     )
 
 fun OAuth.Companion.soundcloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()) =
@@ -30,5 +45,6 @@ fun OAuth.Companion.soundcloud(client: HttpHandler, credentials: Credentials, ca
             Uri.of("https://api.soundcloud.com")),
         callbackUri,
         listOf(""),
-        clock
+        clock,
+        modifyAuthRedirect = { it.query("nonce", SECURE_GENERATE_RANDOM()) }
     )

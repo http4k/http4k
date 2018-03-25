@@ -14,6 +14,7 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
+import org.http4k.core.query
 import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
 import org.http4k.hamkrest.hasHeader
@@ -41,7 +42,8 @@ class OAuthTest {
         { Response(OK).body("access token goes here") },
         clientConfig, Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"), clock, { "randomCsrf" },
-        { "randomNonce" })
+        { it.query("nonce", "randomNonce") }
+    )
 
     private val filter = oauth.authFilter.then { Response(OK) }
 
