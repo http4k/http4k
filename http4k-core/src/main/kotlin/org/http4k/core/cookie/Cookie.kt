@@ -26,10 +26,10 @@ data class Cookie(val name: String, val value: String,
     override fun toString(): String = fullCookieString()
 
     private fun attributes(): String = mutableListOf<String>().apply {
-        appendIfPresent(maxAge, "Max-Age=${maxAge}")
+        appendIfPresent(maxAge, "Max-Age=$maxAge")
         appendIfPresent(expires, "Expires=${expires?.let { ZonedDateTime.of(it, ZoneId.of("GMT")).format(RFC822) }}")
-        appendIfPresent(domain, "Domain=${domain}")
-        appendIfPresent(path, "Path=${path}")
+        appendIfPresent(domain, "Domain=$domain")
+        appendIfPresent(path, "Path=$path")
         appendIfTrue(secure, "secure")
         appendIfTrue(httpOnly, "HttpOnly")
     }.joinToString("; ")
