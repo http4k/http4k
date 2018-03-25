@@ -33,9 +33,9 @@ data class OAuthConfig(
     val serviceName: String,
     private val authBase: Uri,
     val authPath: String,
-    val apiBase: Uri,
     val tokenPath: String,
-    val credentials: Credentials) {
+    val credentials: Credentials,
+    val apiBase: Uri = authBase) {
     val authUri = authBase.path(authPath)
 }
 

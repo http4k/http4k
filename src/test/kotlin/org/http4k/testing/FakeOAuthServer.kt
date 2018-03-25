@@ -30,18 +30,6 @@ import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
-
-/**
- *     https://accounts.google.com/o/oauth2/v2/auth?
-client_id=424911365001.apps.googleusercontent.com&
-response_type=code&
-scope=openid%20email&
-redirect_uri=http://localhost:9000/callback
-state=below
-encode!!    security_token=138r5719ru3e1&url=https://oauth2-login-demo.example.com/myHome&
-nonce=random&
- */
-
 class FakeOAuthServer(private val oAuthClientConfig: OAuthConfig) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()
@@ -71,8 +59,14 @@ class FakeOAuthServer(private val oAuthClientConfig: OAuthConfig) : HttpHandler 
             }
         }
     }
+/*
+"{ \"access_token\": \"ya29.GluJBWUSr_cvzC2J4hl0kxD8SmyUlspVwkNrf9oKPGEOFgwNxU_JipNPO0NP76MCUsnsvQ9G-YbH3mni6wcPwXoqSpdZdUa5QQQvKtJZNNj2z7WMhw5hX3_RSeZA\", \"token_type\": \"Bearer\", \"expires_in\": 3600, \"id_token\": \"eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3NmVhMWUyZjRjOTM3YzMzM2QxZTI0YjU2NDczOGZjMDRjOTkwMDkifQ.eyJhenAiOiI5MTkwOTMzNzc5NzEtN2M3djBxdDhramZhdm4xcml0M3U1bjluajZ0ajY2b2QuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI5MTkwOTMzNzc5NzEtN2M3djBxdDhramZhdm4xcml0M3U1bjluajZ0ajY2b2QuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDU5MTQ0NDczNzAwNTg0NzUzNTUiLCJlbWFpbCI6ImRlbnRvbi5kYXZpZEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IkFQazBJUGVRS3docU5vMUw3VkFDU0EiLCJub25jZSI6ImhrazFtb2tvaGxvdmxib3Vpdmg4N2JocTMxIiwiZXhwIjoxNTIxOTc5Njk4LCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJpYXQiOjE1MjE5NzYwOTgsIm5hbWUiOiJEYXZpZCBEZW50b24iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDUuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy0zWUpOSWJBSDFpTS9BQUFBQUFBQUFBSS9BQUFBQUFBQUI0Zy9YQlhHNXk3dlRiZy9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiRGF2aWQiLCJmYW1pbHlfbmFtZSI6IkRlbnRvbiIsImxvY2FsZSI6ImVuLUdCIn0.K8r3cFCYm42mZSAeWy5-TkWu5cMKf3V_To_bNVEQZO8q5ymD4Sal0cgen2O68yK2BJgmBfNxej6IKaAuvQ4czRaNQxcjZaZS4HxIa-S1O7Y4TISkuNUxsAt94mfaQzosMqGihCmw2vTUmSo2LyZA9D47EmYrz7fjcP8CwbGzUnm_o3VXgfA_Qel89WpRFfc8BJl8qTgexYHm4VOCvT5QM0FdVGXhlpdlNrZCrppmhZJPiApODLfx5XhvO7-k0oBlv89Tl14GLAfbxKEl6oNeOQjz_JBAVcTPHMzvQk_7nuL5zvbdJsCVSp25xl_q37ALSbFstOPzuNHY9NGEewTW9w\"
+ */
+    private val generateAccessToken: (Request) -> Response = {
 
-    private val generateAccessToken: (Request) -> Response = { Response(FORBIDDEN) }
+
+        Response(FORBIDDEN)
+    }
 
     private val api = ServerFilters.CatchAll().then(
         routes(
