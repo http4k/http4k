@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.cookie.Cookie
@@ -15,6 +16,7 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
 import org.http4k.core.query
 import org.http4k.core.then
+import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
 import org.http4k.filter.ClientFilters
 import org.http4k.lens.Header.Common.LOCATION
@@ -32,7 +34,7 @@ data class OAuthConfig(
     val authUri = authBase.path(authPath)
 }
 
-internal class AuthRedirectionFilter(
+internal class OAuthRedirectionFilter(
     private val clientConfig: OAuthConfig,
     private val serviceCsrfName: String,
     private val serviceAccessTokenName: String,
@@ -40,25 +42,21 @@ internal class AuthRedirectionFilter(
     private val scopes: List<String>,
     private val generateCrsf: () -> String,
     private val generateNonce: () -> String) : Filter {
-    private fun redirectToAuth(originalUri: Uri) = generateCrsf().let {
-        Response(Status.TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
+    private fun redirectToAuth(originalUri: Uri) = generateCrsf().let { csrf ->
+        Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
             .query("client_id", clientConfig.credentials.user)
             .query("response_type", "code")
             .query("scope", scopes.joinToString(" "))
             .query("redirect_uri", callbackUri.toString())
-            .query("state", originalUri.query(serviceCsrfName, it).toString())
+            .query("state", listOf(serviceCsrfName to csrf, "uri" to originalUri.toString()).toUrlFormEncoded())
             .query("nonce", generateNonce()))
-            .cookie(Cookie(serviceCsrfName, it))
+            .cookie(Cookie(serviceCsrfName, csrf))
     }
 
-    override fun invoke(next: HttpHandler): HttpHandler {
-        return { req ->
-            req.cookie(serviceAccessTokenName)?.let { next(req) } ?: redirectToAuth(req.uri)
-        }
-    }
+    override fun invoke(next: HttpHandler): HttpHandler = { it.cookie(serviceAccessTokenName)?.let { _ -> next(it) } ?: redirectToAuth(it.uri) }
 }
 
-internal class AuthCallback(
+internal class OAuthCallback(
     private val api: HttpHandler,
     private val clientConfig: OAuthConfig,
     private val callbackUri: Uri,
@@ -112,9 +110,9 @@ class OAuth(client: HttpHandler,
 
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
-    val authFilter: Filter = AuthRedirectionFilter(clientConfig, csrfName, accessTokenName, callbackUri, scopes, generateCrsf, generateNonce)
+    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, csrfName, accessTokenName, callbackUri, scopes, generateCrsf, generateNonce)
 
-    val callback: HttpHandler = AuthCallback(api, clientConfig, callbackUri, csrfName, accessTokenName)
+    val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, csrfName, accessTokenName)
 
     companion object
 }
