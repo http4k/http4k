@@ -91,9 +91,12 @@ internal class OAuthCallback(
         val state = p1.query("state")?.toParameters() ?: emptyList()
         val crsfInState = state.find { it.first == csrfName }?.second
 
-        return p1.query("code")?.let {
+        println("crsfInState $crsfInState")
+        return p1.query("code")?.let { code ->
+            println("code $code")
+            println("csrfCookie = " + p1.cookie(csrfName)?.value)
             if (crsfInState != null && crsfInState == p1.cookie(csrfName)?.value) {
-                codeToAccessToken(it)?.let {
+                codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
                     val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
                     Response(TEMPORARY_REDIRECT)
