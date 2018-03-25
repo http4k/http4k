@@ -82,8 +82,8 @@ class OAuthTest {
     fun `callback - when valid inputs passed, defaults to root`() {
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
             .header("Location", "/")
-            .cookie(Cookie("serviceAccessToken", "access token goes here", expires = LocalDateTime.ofEpochSecond(3600, 0, ZoneOffset.UTC)))
             .invalidateCookie("serviceCsrf")
+            .cookie(Cookie("serviceAccessToken", "access token goes here", expires = LocalDateTime.ofEpochSecond(3600, 0, ZoneOffset.UTC)))
 
         oauth.callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(validRedirectToRoot)
     }

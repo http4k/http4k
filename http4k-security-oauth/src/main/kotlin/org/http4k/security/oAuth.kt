@@ -102,8 +102,8 @@ internal class OAuthCallback(
                     val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
                     Response(TEMPORARY_REDIRECT)
                         .header("Location", originalUri)
-                        .cookie(Cookie(accessTokenName, it, expires = expires))
                         .invalidateCookie(clientConfig.csrfName)
+                        .cookie(Cookie(accessTokenName, it, expires = expires))
                 }
             } else null
         } ?: Response(FORBIDDEN).invalidateCookie(clientConfig.csrfName).invalidateCookie(accessTokenName)
