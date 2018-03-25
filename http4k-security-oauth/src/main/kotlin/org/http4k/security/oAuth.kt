@@ -48,6 +48,7 @@ internal class OAuthRedirectionFilter(
     private val clock: Clock,
     private val generateCrsf: () -> String = SECURE_GENERATE_RANDOM,
     private val generateNonce: () -> String = SECURE_GENERATE_RANDOM) : Filter {
+
     private fun redirectToAuth(originalUri: Uri) = generateCrsf().let { csrf ->
         val expiry = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
 
