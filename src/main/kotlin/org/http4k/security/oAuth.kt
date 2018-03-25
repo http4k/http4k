@@ -7,6 +7,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.body.form
@@ -73,7 +74,7 @@ internal class OAuthCallback(
     //    grant_type=authorization_code
      */
 
-    private fun codeToAccessToken(code: String): Response {
+    private fun codeToAccessToken(code: String): String? {
         val accessTokenResponse = api(Request(POST, clientConfig.tokenPath)
             .form("grant_type", "authorization_code")
             .form("redirect_uri", callbackUri.toString())
@@ -81,22 +82,35 @@ internal class OAuthCallback(
             .form("client_secret", clientConfig.credentials.password)
             .form("code", code))
 
+
+        println(accessTokenResponse.bodyString())
+
+        if(accessTokenResponse.status != OK) return null
+
         // this is wrong!
         println(accessTokenResponse.bodyString())
 
-        return Response(TEMPORARY_REDIRECT).cookie(Cookie(accessTokenName, accessTokenResponse.bodyString()))
+        return ""
+
+//        return Response(TEMPORARY_REDIRECT).cookie(Cookie(accessTokenName, accessTokenResponse.bodyString()))
     }
-    override fun invoke(p1: Request) = p1.query("code")
-        ?.let { code ->
-            p1.query("state")
-                ?.let { it to code }
-                ?.let { (state, code) -> p1.cookie(csrfName)?.let { Triple(it.value, state.toParameters(), code) } }
-        }
-        ?.let { (csrfCookie, state, code) ->
-            if (csrfCookie == state.find { it.first == csrfName }?.second) codeToAccessToken(code)
-            else null
-        }
-        ?: Response(FORBIDDEN).invalidateCookie(csrfName)
+
+    override fun invoke(p1: Request): Response {
+        val state = p1.query("state")?.toParameters() ?: emptyList()
+        val crsfInState = state.find { it.first == csrfName }?.second
+
+        return p1.query("code")?.let {
+            if (crsfInState != null && crsfInState == p1.cookie(csrfName)?.value) {
+                val accessToken = codeToAccessToken(it)
+                accessToken?.let {
+                    val path = state.find { it.first == "uri" }?.second ?: "/"
+                    Response(TEMPORARY_REDIRECT)
+                        .with(LOCATION of Uri.of("http://localhost:9000").path(path))
+                        .cookie(Cookie(accessTokenName, it))
+                }
+            } else null
+        } ?: Response(FORBIDDEN).invalidateCookie(csrfName).invalidateCookie(accessTokenName)
+    }
 }
 
 class OAuth(client: HttpHandler,
