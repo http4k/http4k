@@ -45,6 +45,5 @@ fun OAuth.Companion.soundcloud(client: HttpHandler, credentials: Credentials, ca
             Uri.of("https://api.soundcloud.com")),
         callbackUri,
         listOf(""),
-        clock,
-        modifyAuthRedirect = { it.query("nonce", SECURE_GENERATE_RANDOM()) }
+        clock
     )
