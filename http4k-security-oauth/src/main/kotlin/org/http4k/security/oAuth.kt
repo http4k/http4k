@@ -50,11 +50,11 @@ internal class OAuthRedirectionFilter(
     private val clock: Clock,
     private val generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM,
     private val modifyAuthRedirect: ModifyAuthRedirectUri = { it },
-    private val validateRequest: (Request) -> Boolean
+    private val isAuthed: (Request) -> Boolean
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = {
-        if (validateRequest(it)) next(it) else {
+        if (isAuthed(it)) next(it) else {
             val csrf = generateCrsf()
             val redirect = Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
                 .query("client_id", clientConfig.credentials.user)
