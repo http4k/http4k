@@ -27,6 +27,7 @@ import java.math.BigInteger
 import java.security.SecureRandom
 import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 data class OAuthConfig(
     val serviceName: String,
@@ -48,7 +49,7 @@ internal class OAuthRedirectionFilter(
     private val generateCrsf: () -> String = SECURE_GENERATE_RANDOM,
     private val generateNonce: () -> String = SECURE_GENERATE_RANDOM) : Filter {
     private fun redirectToAuth(originalUri: Uri) = generateCrsf().let { csrf ->
-        val expiry = clock.instant().plusSeconds(3600)
+        val expiry = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
 
         Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
             .query("client_id", clientConfig.credentials.user)
@@ -57,7 +58,7 @@ internal class OAuthRedirectionFilter(
             .query("redirect_uri", callbackUri.toString())
             .query("state", listOf(csrfName to csrf, "uri" to originalUri.toString()).toUrlFormEncoded())
             .query("nonce", generateNonce()))
-            .cookie(Cookie(csrfName, csrf, expires = LocalDateTime.from(expiry)))
+            .cookie(Cookie(csrfName, csrf, expires = expiry))
     }
 
     override fun invoke(next: HttpHandler): HttpHandler = { it.cookie(accessTokenName)?.let { _ -> next(it) } ?: redirectToAuth(it.uri) }
@@ -79,11 +80,10 @@ internal class OAuthCallback(
             .form("client_id", clientConfig.credentials.user)
             .form("client_secret", clientConfig.credentials.password)
             .form("code", code))
-        println(accessTokenResponse.bodyString())
 
         if (accessTokenResponse.status != OK) return null
 
-        return ""
+        return accessTokenResponse.bodyString()
     }
 
     override fun invoke(p1: Request): Response {
@@ -92,13 +92,12 @@ internal class OAuthCallback(
 
         return p1.query("code")?.let {
             if (crsfInState != null && crsfInState == p1.cookie(csrfName)?.value) {
-                val accessToken = codeToAccessToken(it)
-                accessToken?.let {
-                    val expiry = clock.instant().plusSeconds(3600)
-                    val path = state.find { it.first == "uri" }?.second ?: "/"
+                codeToAccessToken(it)?.let {
+                    val originalUri = state.find { it.first == "uri" }?.second ?: "/"
+                    val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
                     Response(TEMPORARY_REDIRECT)
-                        .with(LOCATION of Uri.of("http://localhost:9000").path(path))
-                        .cookie(Cookie(accessTokenName, it, expires = LocalDateTime.from(expiry)))
+                        .header("Location", originalUri)
+                        .cookie(Cookie(accessTokenName, it, expires = expires))
                         .invalidateCookie(csrfName)
                 }
             } else null

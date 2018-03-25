@@ -1,17 +1,14 @@
-description = 'Http4k Resilience4j support'
+description = 'Http4k Security OAuth support'
 
 ext {
-    ext.pac4j_version = '2.1.0'
 }
 
 dependencies {
     provided kotlin_lib
 
     provided project(":http4k-core")
-    compile "org.pac4j:pac4j-core:$pac4j_version"
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile testing
-    testCompile "org.pac4j:pac4j-oauth:$pac4j_version"
 }
 
