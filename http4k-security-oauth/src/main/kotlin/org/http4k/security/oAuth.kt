@@ -119,7 +119,6 @@ class OAuth(client: HttpHandler,
 
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
-
     val authFilter: Filter = OAuthRedirectionFilter(clientConfig, csrfName, accessTokenName, callbackUri, scopes, clock, generateCrsf, modifyAuthRedirect)
 
     val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, csrfName, accessTokenName, clock)
