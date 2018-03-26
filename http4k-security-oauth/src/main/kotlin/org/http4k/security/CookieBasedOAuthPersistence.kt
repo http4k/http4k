@@ -20,7 +20,7 @@ open class CookieBasedOAuthPersistence(cookieNamePrefix: String, private val clo
 
     override fun redirectAuth(redirect: Response, csrf: String) = redirect.cookie(expiring(csrfName, csrf))
 
-    override fun isAuthed(request: Request) = request.cookie(accessTokenName) != null
+    override fun hasToken(request: Request) = request.cookie(accessTokenName) != null
 
     override fun redirectToken(redirect: Response, accessToken: String) = redirect.cookie(expiring(accessTokenName, accessToken)).invalidateCookie(csrfName)
 

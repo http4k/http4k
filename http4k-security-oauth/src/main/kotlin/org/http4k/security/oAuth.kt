@@ -43,7 +43,7 @@ internal class OAuthRedirectionFilter(
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = {
-        if (oAuthPersistence.isAuthed(it)) next(it) else {
+        if (oAuthPersistence.hasToken(it)) next(it) else {
             val csrf = generateCrsf()
             val redirect = Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
                 .query("client_id", clientConfig.credentials.user)
@@ -51,7 +51,7 @@ internal class OAuthRedirectionFilter(
                 .query("scope", scopes.joinToString(" "))
                 .query("redirect_uri", callbackUri.toString())
                 .query("state", listOf("csrf" to csrf, "uri" to it.uri.toString()).toUrlFormEncoded())
-                .with({ oAuthPersistence.modifyState(it) }))
+                .with(oAuthPersistence::modifyState))
             oAuthPersistence.redirectAuth(redirect, csrf)
         }
     }
@@ -74,12 +74,11 @@ internal class OAuthCallback(
             .form("code", code))
             .let { if (it.status == OK) it.bodyString() else null }
 
-    override fun invoke(p1: Request): Response {
-        val state = p1.query("state")?.toParameters() ?: emptyList()
+    override fun invoke(request: Request): Response {
+        val state = request.query("state")?.toParameters() ?: emptyList()
         val crsfInState = state.find { it.first == "csrf" }?.second
-        return p1.query("code")?.let { code ->
-            val b = crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(p1)
-            if (b) {
+        return request.query("code")?.let { code ->
+            if (crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(request)) {
                 codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
                     oAuthPersistence.redirectToken(Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)

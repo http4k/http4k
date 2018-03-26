@@ -10,7 +10,7 @@ interface OAuthPersistence {
 
     fun redirectAuth(redirect: Response, csrf: String): Response
 
-    fun isAuthed(request: Request): Boolean
+    fun hasToken(request: Request): Boolean
 
     fun redirectToken(redirect: Response, accessToken: String): Response
 

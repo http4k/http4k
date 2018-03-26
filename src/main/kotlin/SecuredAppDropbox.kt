@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     val oauth = OAuth.dropbox(
         DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
         Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET")),
-        home.path("/callback"), clock = clock
+        home.path("/callback"), clock
     )
 
     val templates = HandlebarsTemplates().CachingClasspath()
