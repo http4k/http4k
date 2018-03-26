@@ -22,7 +22,6 @@ import org.http4k.lens.Header.Common.LOCATION
 import java.math.BigInteger
 import java.security.SecureRandom
 
-typealias ModifyAuthRedirectUri = (Uri) -> Uri
 typealias CsrfGenerator = () -> String
 
 data class OAuthConfig(

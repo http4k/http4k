@@ -41,9 +41,7 @@ fun OAuth.Companion.soundCloud(client: HttpHandler, credentials: Credentials, ca
         clientConfig,
         callbackUri,
         listOf(""),
-        object : CookieBasedOAuthPersistence("Soundcloud", clock) {
-            override fun modifyState(uri: Uri) = uri.query("nonce", SECURE_GENERATE_RANDOM())
-        },
+        CookieBasedOAuthPersistence("Soundcloud", clock),
         SECURE_GENERATE_RANDOM
     )
 }
