@@ -29,7 +29,7 @@ internal class OAuthRedirectionFilter(
                 .query("redirect_uri", callbackUri.toString())
                 .query("state", listOf("csrf" to csrf.value, "uri" to it.uri.toString()).toUrlFormEncoded())
                 .with(modifyState))
-            oAuthPersistence.withAssignedCsrf(redirect, csrf)
+            oAuthPersistence.assignCsrf(redirect, csrf)
         }
     }
 }

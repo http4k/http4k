@@ -25,16 +25,16 @@ class FakeOAuthPersistence : OAuthPersistence {
     var csrf: CrossSiteRequestForgeryToken? = null
     var accessToken: AccessToken? = null
 
-    override fun retrieveCsrf(p1: Request): CrossSiteRequestForgeryToken? = csrf
+    override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
-    override fun withAssignedCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response {
+    override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response {
         this.csrf = csrf
         return redirect.header("action", "assignCsrf")
     }
 
-    override fun retrieveToken(p1: Request): AccessToken? = accessToken
+    override fun retrieveToken(request: Request): AccessToken? = accessToken
 
-    override fun withAssignedToken(redirect: Response, accessToken: AccessToken): Response {
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }
@@ -64,7 +64,7 @@ class OAuthTest {
 
     @Test
     fun `filter - when accessToken value is present, request is let through`() {
-        oAuthPersistence.withAssignedToken(Response(OK), AccessToken("randomToken"))
+        oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessToken("randomToken"))
         oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")) shouldMatch
             hasStatus(OK).and(hasBody("i am witorious!"))
     }
@@ -98,7 +98,7 @@ class OAuthTest {
     @Test
     fun `callback - when valid inputs passed, defaults to root`() {
 
-        oAuthPersistence.withAssignedCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
+        oAuthPersistence.assignCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
 
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
             .header("Location", "/")

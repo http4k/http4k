@@ -1,16 +1,17 @@
 package org.http4k.security
 
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.toParameters
 import org.http4k.core.with
-import org.http4k.lens.Header
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 
 internal class OAuthCallback(
     private val api: HttpHandler,
@@ -20,8 +21,8 @@ internal class OAuthCallback(
 ) : HttpHandler {
 
     private fun codeToAccessToken(code: String) =
-        api(Request(Method.POST, clientConfig.tokenPath)
-            .with(Header.Common.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
+        api(Request(POST, clientConfig.tokenPath)
+            .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
             .form("grant_type", "authorization_code")
             .form("redirect_uri", callbackUri.toString())
             .form("client_id", clientConfig.credentials.user)
@@ -36,7 +37,7 @@ internal class OAuthCallback(
             if (crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(request)) {
                 codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    oAuthPersistence.withAssignedToken(Response(Status.TEMPORARY_REDIRECT).header("Location", originalUri), it)
+                    oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)
                 }
             } else null
         } ?: oAuthPersistence.authFailureResponse()

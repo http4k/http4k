@@ -22,13 +22,13 @@ open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     private val accessTokenCookieName = "${cookieNamePrefix}AccessToken"
 
-    override fun retrieveCsrf(p1: Request) = p1.cookie(csrfName)?.value?.let(::CrossSiteRequestForgeryToken)
+    override fun retrieveCsrf(request: Request) = request.cookie(csrfName)?.value?.let(::CrossSiteRequestForgeryToken)
 
-    override fun retrieveToken(p1: Request): AccessToken? = p1.cookie(accessTokenCookieName)?.value?.let(::AccessToken)
+    override fun retrieveToken(request: Request): AccessToken? = request.cookie(accessTokenCookieName)?.value?.let(::AccessToken)
 
-    override fun withAssignedCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) = redirect.cookie(expiring(csrfName, csrf.value))
+    override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) = redirect.cookie(expiring(csrfName, csrf.value))
 
-    override fun withAssignedToken(redirect: Response, accessToken: AccessToken) = redirect.cookie(expiring(accessTokenCookieName, accessToken.value)).invalidateCookie(csrfName)
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken) = redirect.cookie(expiring(accessTokenCookieName, accessToken.value)).invalidateCookie(csrfName)
 
     override fun authFailureResponse() = Response(FORBIDDEN).invalidateCookie(csrfName).invalidateCookie(accessTokenCookieName)
 
