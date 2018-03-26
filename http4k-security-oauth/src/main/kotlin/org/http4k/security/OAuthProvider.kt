@@ -10,13 +10,13 @@ import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 /**
  * Provides a configured set of objects for use with an OAuth2 provider.
  */
-class OAuth(providerConfig: OAuthProviderConfig,
-            client: HttpHandler,
-            callbackUri: Uri,
-            scopes: List<String>,
-            oAuthPersistence: OAuthPersistence,
-            modifyAuthState: (Uri) -> Uri = { it },
-            generateCrsf: CsrfGenerator = SECURE_CSRF) {
+class OAuthProvider(providerConfig: OAuthProviderConfig,
+                    client: HttpHandler,
+                    callbackUri: Uri,
+                    scopes: List<String>,
+                    oAuthPersistence: OAuthPersistence,
+                    modifyAuthState: (Uri) -> Uri = { it },
+                    generateCrsf: CsrfGenerator = SECURE_CSRF) {
 
     // pre-configured API client for this provider
     val api = ClientFilters.SetHostFrom(providerConfig.apiBase).then(client)

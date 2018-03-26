@@ -14,8 +14,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.AccessToken
 import org.http4k.security.CrossSiteRequestForgeryToken
-import org.http4k.security.OAuth
 import org.http4k.security.OAuthPersistence
+import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
     val callbackUri = Uri.of("http://localhost:$port/callback")
 
     // custom OAuth2 provider configuration
-    val oauthProvider = OAuth(
+    val oauthProvider = OAuthProvider(
         OAuthProviderConfig(Uri.of("https://auth.chatroulette.com"),
             "/oauth2/auth", "/oauth2/token",
             Credentials("username", "somepassword"),

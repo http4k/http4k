@@ -40,7 +40,7 @@ class FakeOAuthPersistence : OAuthPersistence {
     }
 }
 
-class OAuthTest {
+class OAuthProviderTest {
     private val providerConfig = OAuthProviderConfig(
         Uri.of("http://authHost"),
         "/auth",
@@ -51,7 +51,7 @@ class OAuthTest {
 
     private val oAuthPersistence = FakeOAuthPersistence()
 
-    private fun oAuth(persistence: OAuthPersistence): OAuth = OAuth(
+    private fun oAuth(persistence: OAuthPersistence): OAuthProvider = OAuthProvider(
         providerConfig,
         { Response(OK).body("access token goes here") }, Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),

@@ -6,16 +6,16 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 
-fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth =
-    OAuth(
+fun OAuthProvider.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
+    OAuthProvider(
         OAuthProviderConfig(Uri.of("https://www.dropbox.com"), "/oauth2/authorize", "/oauth2/token", credentials, Uri.of("https://api.dropboxapi.com")),
         client,
         callbackUri,
         listOf(""),
         oAuthPersistence)
 
-fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuth =
-    OAuth(
+fun OAuthProvider.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuthProvider =
+    OAuthProvider(
         OAuthProviderConfig(Uri.of("https://accounts.google.com"), "/o/oauth2/v2/auth", "/oauth2/v4/token", credentials, Uri.of("https://www.googleapis.com")),
         client,
         callbackUri,
@@ -25,8 +25,8 @@ fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callba
         SECURE_CSRF
     )
 
-fun OAuth.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth =
-    OAuth(
+fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
+    OAuthProvider(
         OAuthProviderConfig(Uri.of("https://soundcloud.com"), "/connect", "/oauth2/token", credentials, Uri.of("https://api.soundcloud.com")),
         client,
         callbackUri,

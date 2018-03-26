@@ -12,7 +12,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
-import org.http4k.security.OAuth
+import org.http4k.security.OAuthProvider
 import org.http4k.security.google
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
     val oAuthPersistence = InsecureCookieBasedOAuthPersistence("Google")
 
     // pre-defined configuration exist for common OAuth providers
-    val oauthProvider = OAuth.google(
+    val oauthProvider = OAuthProvider.google(
         ApacheClient(),
         Credentials(googleClientId, googleClientSecret),
         callbackUri,
