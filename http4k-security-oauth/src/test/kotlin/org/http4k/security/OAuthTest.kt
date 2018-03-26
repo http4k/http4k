@@ -41,8 +41,8 @@ class OAuthTest {
     private val oauth = OAuth(
         { Response(OK).body("access token goes here") },
         clientConfig, Uri.of("http://callbackHost/callback"),
-        listOf("scope1", "scope2"), clock, { "randomCsrf" },
-        { it.query("nonce", "randomNonce") }
+        listOf("scope1", "scope2"), { "randomCsrf" },
+        CookieBasedOAuth(clientConfig, { it.query("nonce", "randomNonce") }, clock)
     )
 
     private val filter = oauth.authFilter.then { Response(OK) }

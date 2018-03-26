@@ -6,44 +6,54 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import java.time.Clock
 
+fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()): OAuth {
+    val config = OAuthConfig("Dropbox",
+        Uri.of("https://www.dropbox.com"),
+        "/oauth2/authorize",
+        "/oauth2/token",
+        credentials, Uri.of("https://api.dropboxapi.com"))
 
-fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()) =
-    OAuth(
+    return OAuth(
         client,
-        OAuthConfig("Dropbox",
-            Uri.of("https://www.dropbox.com"),
-            "/oauth2/authorize",
-            "/oauth2/token",
-            credentials, Uri.of("https://api.dropboxapi.com")),
+        config,
         callbackUri,
         listOf(""),
-        clock)
+        SECURE_GENERATE_RANDOM,
+        CookieBasedOAuth(config, { it.query("nonce", SECURE_GENERATE_RANDOM()) }, clock))
+}
 
-fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, scopes: List<String> = listOf("openid"), clock: Clock = Clock.systemUTC()) =
-    OAuth(
+fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, scopes: List<String> = listOf("openid"), clock: Clock = Clock.systemUTC()): OAuth {
+    val clientConfig = OAuthConfig("Google",
+        Uri.of("https://accounts.google.com"),
+        "/o/oauth2/v2/auth",
+        "/oauth2/v4/token",
+        credentials,
+        Uri.of("https://www.googleapis.com"))
+
+    return OAuth(
         client,
-        OAuthConfig("Google",
-            Uri.of("https://accounts.google.com"),
-            "/o/oauth2/v2/auth",
-            "/oauth2/v4/token",
-            credentials,
-            Uri.of("https://www.googleapis.com")),
+        clientConfig,
         callbackUri,
         scopes,
-        clock,
-        modifyAuthRedirect = { it.query("nonce", SECURE_GENERATE_RANDOM()) }
+        SECURE_GENERATE_RANDOM,
+        CookieBasedOAuth(clientConfig, { it.query("nonce", SECURE_GENERATE_RANDOM()) }, clock)
     )
+}
 
-fun OAuth.Companion.soundcloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()) =
-    OAuth(
+fun OAuth.Companion.soundcloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, clock: Clock = Clock.systemUTC()): OAuth {
+    val clientConfig = OAuthConfig("Soundcloud",
+        Uri.of("https://soundcloud.com"),
+        "/connect",
+        "/oauth2/token",
+        credentials,
+        Uri.of("https://api.soundcloud.com"))
+
+    return OAuth(
         client,
-        OAuthConfig("Soundcloud",
-            Uri.of("https://soundcloud.com"),
-            "/connect",
-            "/oauth2/token",
-            credentials,
-            Uri.of("https://api.soundcloud.com")),
+        clientConfig,
         callbackUri,
         listOf(""),
-        clock
+        SECURE_GENERATE_RANDOM,
+        CookieBasedOAuth(clientConfig, { it.query("nonce", SECURE_GENERATE_RANDOM()) }, clock)
     )
+}

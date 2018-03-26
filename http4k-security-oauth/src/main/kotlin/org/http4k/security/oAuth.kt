@@ -132,11 +132,10 @@ class OAuth(client: HttpHandler,
             clientConfig: OAuthConfig,
             callbackUri: Uri,
             scopes: List<String>,
-            clock: Clock = Clock.systemUTC(),
             generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM,
-            modifyAuthRedirect: ModifyAuthRedirectUri = { it }) {
+            cookieBasedOAuth1: CookieBasedOAuth) {
 
-    private val cookieBasedOAuth = CookieBasedOAuth(clientConfig, modifyAuthRedirect, clock)
+    private val cookieBasedOAuth = cookieBasedOAuth1
 
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
