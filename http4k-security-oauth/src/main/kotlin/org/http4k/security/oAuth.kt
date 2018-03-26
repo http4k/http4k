@@ -38,6 +38,7 @@ internal class OAuthRedirectionFilter(
     private val callbackUri: Uri,
     private val scopes: List<String>,
     private val generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM,
+    private val modifyState: (Uri) -> Uri,
     private val oAuthPersistence: OAuthPersistence
 ) : Filter {
 
@@ -50,7 +51,7 @@ internal class OAuthRedirectionFilter(
                 .query("scope", scopes.joinToString(" "))
                 .query("redirect_uri", callbackUri.toString())
                 .query("state", listOf("csrf" to csrf, "uri" to it.uri.toString()).toUrlFormEncoded())
-                .with(oAuthPersistence::modifyState))
+                .with(modifyState))
             oAuthPersistence.redirectAuth(redirect, csrf)
         }
     }
@@ -93,11 +94,12 @@ class OAuth(client: HttpHandler,
             callbackUri: Uri,
             scopes: List<String>,
             oAuthPersistence: OAuthPersistence,
+            modifyAuthState: (Uri) -> Uri = { it },
             generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM) {
 
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
-    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, generateCrsf, oAuthPersistence)
+    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, generateCrsf, modifyAuthState, oAuthPersistence)
 
     val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, oAuthPersistence)
 

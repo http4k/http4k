@@ -10,7 +10,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-open class CookieBasedOAuthPersistence(cookieNamePrefix: String, private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
+open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String, private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 

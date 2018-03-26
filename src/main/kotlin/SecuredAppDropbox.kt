@@ -9,6 +9,7 @@ import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuth
 import org.http4k.security.dropbox
 import org.http4k.server.SunHttp
@@ -26,7 +27,7 @@ fun main(args: Array<String>) {
     val oauth = OAuth.dropbox(
         DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
         Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET")),
-        home.path("/callback"), clock
+        home.path("/callback"), InsecureCookieBasedOAuthPersistence("Dropbox", clock)
     )
 
     val templates = HandlebarsTemplates().CachingClasspath()
