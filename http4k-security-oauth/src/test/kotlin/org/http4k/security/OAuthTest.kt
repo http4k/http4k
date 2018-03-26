@@ -40,9 +40,10 @@ class OAuthTest {
     private val oauth = OAuth(
         { Response(OK).body("access token goes here") },
         clientConfig, Uri.of("http://callbackHost/callback"),
-        listOf("scope1", "scope2"), object : CookieBasedOAuthPersistence("service", clock) {
-        override fun modifyState(uri: Uri): Uri = uri.query("nonce", "randomNonce")
-    },
+        listOf("scope1", "scope2"),
+        object : CookieBasedOAuthPersistence("service", clock) {
+            override fun modifyState(uri: Uri): Uri = uri.query("nonce", "randomNonce")
+        },
         { "randomCsrf" }
     )
 
