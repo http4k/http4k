@@ -30,7 +30,6 @@ class OAuthTest {
     private val clock = fixed(EPOCH, ZoneId.of("GMT"))
 
     private val clientConfig = OAuthConfig(
-        "service",
         Uri.of("http://authHost"),
         "/auth",
         "/token",
@@ -41,8 +40,10 @@ class OAuthTest {
     private val oauth = OAuth(
         { Response(OK).body("access token goes here") },
         clientConfig, Uri.of("http://callbackHost/callback"),
-        listOf("scope1", "scope2"), { "randomCsrf" },
-        CookieBasedOAuth(clientConfig, { it.query("nonce", "randomNonce") }, clock)
+        listOf("scope1", "scope2"), object : CookieBasedOAuthPersistence("service", clock) {
+        override fun modifyState(uri: Uri): Uri = uri.query("nonce", "randomNonce")
+    },
+        { "randomCsrf" }
     )
 
     private val filter = oauth.authFilter.then { Response(OK) }

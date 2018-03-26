@@ -10,7 +10,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.OAuth
-import org.http4k.security.soundcloud
+import org.http4k.security.soundCloud
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
 
     val clock = Clock.systemUTC()
 
-    val oauth = OAuth.soundcloud(
+    val oauth = OAuth.soundCloud(
         DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
         Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET")),
         home, clock = clock
