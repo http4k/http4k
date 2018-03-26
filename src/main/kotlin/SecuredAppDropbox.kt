@@ -17,6 +17,7 @@ import org.http4k.server.asServer
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.renderToResponse
 import java.time.Clock
+import java.time.Duration
 
 fun main(args: Array<String>) {
 
@@ -27,7 +28,7 @@ fun main(args: Array<String>) {
     val oauth = OAuth.dropbox(
         DebuggingFilters.PrintRequestAndResponse().then(ApacheClient()),
         Credentials(System.getenv("CLIENT_ID"), System.getenv("CLIENT_SECRET")),
-        home.path("/callback"), InsecureCookieBasedOAuthPersistence("Dropbox", clock)
+        home.path("/callback"), InsecureCookieBasedOAuthPersistence("Dropbox", Duration.ofHours(1), clock)
     )
 
     val templates = HandlebarsTemplates().CachingClasspath()

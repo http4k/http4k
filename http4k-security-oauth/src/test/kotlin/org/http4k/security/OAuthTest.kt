@@ -7,28 +7,42 @@ import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
-import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
-import org.http4k.core.cookie.invalidateCookie
 import org.http4k.core.query
 import org.http4k.core.then
 import org.http4k.core.toUrlFormEncoded
+import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.Test
-import java.time.Clock.fixed
-import java.time.Instant.EPOCH
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+
+class FakeOAuthPersistence : OAuthPersistence {
+
+    var csrf: String? = null
+    var accessToken: String? = null
+
+    override fun retrieveCsrf(p1: Request): String? = csrf
+
+    override fun assignCsrf(redirect: Response, csrf: String): Response {
+        this.csrf = csrf
+        return redirect.header("action", "assignCsrf")
+    }
+
+    override fun retrieveToken(p1: Request): String? = accessToken
+
+    override fun assignToken(redirect: Response, accessToken: String): Response {
+        this.accessToken = accessToken
+        return redirect.header("action", "assignToken")
+    }
+
+    override fun authFailureResponse() = Response(I_M_A_TEAPOT)
+}
 
 class OAuthTest {
-    private val clock = fixed(EPOCH, ZoneId.of("GMT"))
-
     private val clientConfig = OAuthConfig(
         Uri.of("http://authHost"),
         "/auth",
@@ -37,26 +51,29 @@ class OAuthTest {
         Uri.of("http://apiHost")
     )
 
-    private val oauth = OAuth(
+    private val oAuthPersistence = FakeOAuthPersistence()
+
+    private fun oAuth(persistence: OAuthPersistence): OAuth = OAuth(
         { Response(OK).body("access token goes here") },
         clientConfig, Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
-        InsecureCookieBasedOAuthPersistence("service", clock),
+        persistence,
         { it.query("nonce", "randomNonce") },
         { "randomCsrf" }
     )
 
-    private val filter = oauth.authFilter.then { Response(OK) }
-
     @Test
-    fun `filter - when accessToken cookie is passed, request is let through`() {
-        filter(Request(GET, "/").cookie("serviceAccessToken", "some value")) shouldMatch hasStatus(OK)
+    fun `filter - when accessToken value is present, request is let through`() {
+        oAuthPersistence.assignToken(Response(OK), "randomToken")
+        oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")) shouldMatch
+            hasStatus(OK).and(hasBody("i am witorious!"))
     }
 
     @Test
-    fun `filter - when no accessToken cookie is passed, request is redirected to expected location`() {
+    fun `filter - when no accessToken value present, request is redirected to expected location`() {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
-        filter(Request(GET, "/")) shouldMatch hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader))
+        Request(GET, "/")
+        oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")) shouldMatch hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader))
     }
 
     private val base = Request(GET, "/")
@@ -67,25 +84,27 @@ class OAuthTest {
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
-        val invalidation = Response(FORBIDDEN).invalidateCookie("serviceCsrf").invalidateCookie("serviceAccessToken")
+        val invalidation = Response(I_M_A_TEAPOT)
 
-        oauth.callback(base) shouldMatch equalTo(invalidation)
+        oAuth(oAuthPersistence).callback(base) shouldMatch equalTo(invalidation)
 
-        oauth.callback(withCookie) shouldMatch equalTo(invalidation)
+        oAuth(oAuthPersistence).callback(withCookie) shouldMatch equalTo(invalidation)
 
-        oauth.callback(withCode) shouldMatch equalTo(invalidation)
+        oAuth(oAuthPersistence).callback(withCode) shouldMatch equalTo(invalidation)
 
-        oauth.callback(withCodeAndInvalidState) shouldMatch equalTo(invalidation)
+        oAuth(oAuthPersistence).callback(withCodeAndInvalidState) shouldMatch equalTo(invalidation)
     }
 
     @Test
     fun `callback - when valid inputs passed, defaults to root`() {
+
+        oAuthPersistence.assignCsrf(Response(OK), "randomCsrf")
+
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
             .header("Location", "/")
-            .cookie(Cookie("serviceAccessToken", "access token goes here", expires = LocalDateTime.ofEpochSecond(3600, 0, ZoneOffset.UTC)))
-            .invalidateCookie("serviceCsrf")
+            .header("action", "assignToken")
 
-        oauth.callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(validRedirectToRoot)
+        oAuth(oAuthPersistence).callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(validRedirectToRoot)
     }
 
 }

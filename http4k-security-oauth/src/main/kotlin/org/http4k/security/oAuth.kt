@@ -43,7 +43,7 @@ internal class OAuthRedirectionFilter(
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = {
-        if (oAuthPersistence.hasToken(it)) next(it) else {
+        if (oAuthPersistence.retrieveToken(it) != null) next(it) else {
             val csrf = generateCrsf()
             val redirect = Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
                 .query("client_id", clientConfig.credentials.user)
@@ -52,7 +52,7 @@ internal class OAuthRedirectionFilter(
                 .query("redirect_uri", callbackUri.toString())
                 .query("state", listOf("csrf" to csrf, "uri" to it.uri.toString()).toUrlFormEncoded())
                 .with(modifyState))
-            oAuthPersistence.redirectAuth(redirect, csrf)
+            oAuthPersistence.assignCsrf(redirect, csrf)
         }
     }
 }
@@ -81,12 +81,11 @@ internal class OAuthCallback(
             if (crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(request)) {
                 codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    oAuthPersistence.redirectToken(Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)
+                    oAuthPersistence.assignToken(Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)
                 }
             } else null
-        } ?: oAuthPersistence.failedResponse()
+        } ?: oAuthPersistence.authFailureResponse()
     }
-
 }
 
 class OAuth(client: HttpHandler,
