@@ -38,12 +38,10 @@ class FakeOAuthPersistence : OAuthPersistence {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }
-
-    override fun authFailureResponse() = Response(I_M_A_TEAPOT)
 }
 
 class OAuthTest {
-    private val clientConfig = OAuthConfig(
+    private val providerConfig = OAuthProviderConfig(
         Uri.of("http://authHost"),
         "/auth",
         "/token",
@@ -54,8 +52,8 @@ class OAuthTest {
     private val oAuthPersistence = FakeOAuthPersistence()
 
     private fun oAuth(persistence: OAuthPersistence): OAuth = OAuth(
-        { Response(OK).body("access token goes here") },
-        clientConfig, Uri.of("http://callbackHost/callback"),
+        providerConfig,
+        { Response(OK).body("access token goes here") }, Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
         persistence,
         { it.query("nonce", "randomNonce") },

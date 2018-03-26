@@ -3,7 +3,7 @@ package org.http4k.security
 import org.http4k.core.Credentials
 import org.http4k.core.Uri
 
-data class OAuthConfig(
+data class OAuthProviderConfig(
     private val authBase: Uri,
     val authPath: String,
     val tokenPath: String,

@@ -6,39 +6,30 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 
-fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth {
-    val config = OAuthConfig(Uri.of("https://www.dropbox.com"), "/oauth2/authorize", "/oauth2/token", credentials, Uri.of("https://api.dropboxapi.com"))
-
-    return OAuth(
+fun OAuth.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth =
+    OAuth(
+        OAuthProviderConfig(Uri.of("https://www.dropbox.com"), "/oauth2/authorize", "/oauth2/token", credentials, Uri.of("https://api.dropboxapi.com")),
         client,
-        config,
         callbackUri,
         listOf(""),
         oAuthPersistence)
-}
 
-fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuth {
-    val clientConfig = OAuthConfig(Uri.of("https://accounts.google.com"), "/o/oauth2/v2/auth", "/oauth2/v4/token", credentials, Uri.of("https://www.googleapis.com"))
-
-    return OAuth(
+fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("openid")): OAuth =
+    OAuth(
+        OAuthProviderConfig(Uri.of("https://accounts.google.com"), "/o/oauth2/v2/auth", "/oauth2/v4/token", credentials, Uri.of("https://www.googleapis.com")),
         client,
-        clientConfig,
         callbackUri,
         scopes,
         oAuthPersistence,
         { it.query("nonce", SECURE_CSRF().value) },
         SECURE_CSRF
     )
-}
 
-fun OAuth.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth {
-    val clientConfig = OAuthConfig(Uri.of("https://soundcloud.com"), "/connect", "/oauth2/token", credentials, Uri.of("https://api.soundcloud.com"))
-
-    return OAuth(
+fun OAuth.Companion.soundCloud(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuth =
+    OAuth(
+        OAuthProviderConfig(Uri.of("https://soundcloud.com"), "/connect", "/oauth2/token", credentials, Uri.of("https://api.soundcloud.com")),
         client,
-        clientConfig,
         callbackUri,
         listOf(""),
         oAuthPersistence
     )
-}

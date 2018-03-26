@@ -24,14 +24,14 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.OAuthConfig
+import org.http4k.security.OAuthProviderConfig
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.renderToResponse
 import java.util.UUID
 import java.util.UUID.randomUUID
 
 
-class FakeOAuthServer(oAuthClientConfig: OAuthConfig, serviceName: String) : HttpHandler {
+class FakeOAuthServer(oAuthClientConfig: OAuthProviderConfig, serviceName: String) : HttpHandler {
 
     private val templates = HandlebarsTemplates().CachingClasspath()
 

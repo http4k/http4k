@@ -1,0 +1,15 @@
+title: http4k Custom OAuth Provider
+description: Recipe for using http4k with custom OAuth provider
+
+It is very easy to configure http4k to integrate with any OAuth2 provider who supports the Authorisation Code Grant.
+
+### Gradle setup
+```
+    compile group: "org.http4k", name: "http4k-core", version: "3.21.2"
+    compile group: "org.http4k", name: "http4k-security-oauth", version: "3.21.2"
+```
+
+For this example, simply reconfigure the `OAuth` instance with the correct details, and provide custom logic for persisting and retrieving the CSRF and AccessToken.
+
+### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/custom_oauth/example.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/custom_oauth/example.kt"></script>

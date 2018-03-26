@@ -14,19 +14,19 @@ import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 
 internal class OAuthCallback(
+    private val providerConfig: OAuthProviderConfig,
     private val api: HttpHandler,
-    private val clientConfig: OAuthConfig,
     private val callbackUri: Uri,
     private val oAuthPersistence: OAuthPersistence
 ) : HttpHandler {
 
     private fun codeToAccessToken(code: String) =
-        api(Request(POST, clientConfig.tokenPath)
+        api(Request(POST, providerConfig.tokenPath)
             .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
             .form("grant_type", "authorization_code")
             .form("redirect_uri", callbackUri.toString())
-            .form("client_id", clientConfig.credentials.user)
-            .form("client_secret", clientConfig.credentials.password)
+            .form("client_id", providerConfig.credentials.user)
+            .form("client_secret", providerConfig.credentials.password)
             .form("code", code))
             .let { if (it.status == Status.OK) AccessToken(it.bodyString()) else null }
 

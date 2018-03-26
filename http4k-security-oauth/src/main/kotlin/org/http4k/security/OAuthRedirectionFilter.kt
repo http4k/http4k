@@ -11,7 +11,7 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 
 internal class OAuthRedirectionFilter(
-    private val clientConfig: OAuthConfig,
+    private val providerConfig: OAuthProviderConfig,
     private val callbackUri: Uri,
     private val scopes: List<String>,
     private val generateCrsf: CsrfGenerator = CrossSiteRequestForgeryToken.SECURE_CSRF,
@@ -22,8 +22,8 @@ internal class OAuthRedirectionFilter(
     override fun invoke(next: HttpHandler): HttpHandler = {
         if (oAuthPersistence.retrieveToken(it) != null) next(it) else {
             val csrf = generateCrsf()
-            val redirect = Response(Status.TEMPORARY_REDIRECT).with(Header.Common.LOCATION of clientConfig.authUri
-                .query("client_id", clientConfig.credentials.user)
+            val redirect = Response(Status.TEMPORARY_REDIRECT).with(Header.Common.LOCATION of providerConfig.authUri
+                .query("client_id", providerConfig.credentials.user)
                 .query("response_type", "code")
                 .query("scope", scopes.joinToString(" "))
                 .query("redirect_uri", callbackUri.toString())
