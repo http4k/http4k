@@ -40,31 +40,55 @@ data class OAuthConfig(
     val credentials: Credentials,
     val apiBase: Uri = authBase) {
     val authUri = authBase.path(authPath)
-    val csrfName = serviceName + "Csrf"
+}
+
+class CookieBasedOAuth(oAuthConfig: OAuthConfig,
+                       private val modifyAuthRedirect: ModifyAuthRedirectUri = { it },
+                       private val clock: Clock) {
+
+    private val csrfName = "${oAuthConfig.serviceName}Csrf"
+
+    private val accessTokenName = "${oAuthConfig.serviceName}AccessToken"
+
+    fun retrieveCsrf(p1: Request) = p1.cookie(csrfName)?.value
+
+    fun redirectAuth(redirect: Response, csrf: String): Response {
+        val expiry = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
+        return redirect.cookie(Cookie(csrfName, csrf, expires = expiry))
+    }
+
+    fun isAuthed(request: Request): Boolean = request.cookie(accessTokenName) != null
+
+    fun redirectToken(redirect: Response, accessToken: String): Response {
+        val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
+        return redirect.cookie(Cookie(accessTokenName, accessToken, expires = expires)).invalidateCookie(csrfName)
+    }
+
+    fun modifyState(uri: Uri): Uri = modifyAuthRedirect(uri)
+
+    fun failedResponse() = Response(FORBIDDEN).invalidateCookie(csrfName).invalidateCookie(accessTokenName)
+
 }
 
 internal class OAuthRedirectionFilter(
     private val clientConfig: OAuthConfig,
     private val callbackUri: Uri,
     private val scopes: List<String>,
-    private val clock: Clock,
     private val generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM,
-    private val modifyAuthRedirect: ModifyAuthRedirectUri = { it },
-    private val isAuthed: (Request) -> Boolean
+    private val cookieBasedOAuth: CookieBasedOAuth
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler = {
-        if (isAuthed(it)) next(it) else {
+        if (cookieBasedOAuth.isAuthed(it)) next(it) else {
             val csrf = generateCrsf()
             val redirect = Response(TEMPORARY_REDIRECT).with(LOCATION of clientConfig.authUri
                 .query("client_id", clientConfig.credentials.user)
                 .query("response_type", "code")
                 .query("scope", scopes.joinToString(" "))
                 .query("redirect_uri", callbackUri.toString())
-                .query("state", listOf(clientConfig.csrfName to csrf, "uri" to it.uri.toString()).toUrlFormEncoded())
-                .with(modifyAuthRedirect))
-            val expiry = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
-            redirect.cookie(Cookie(clientConfig.csrfName, csrf, expires = expiry))
+                .query("state", listOf("csrf" to csrf, "uri" to it.uri.toString()).toUrlFormEncoded())
+                .with({ cookieBasedOAuth.modifyState(it) }))
+            cookieBasedOAuth.redirectAuth(redirect, csrf)
         }
     }
 }
@@ -73,42 +97,35 @@ internal class OAuthCallback(
     private val api: HttpHandler,
     private val clientConfig: OAuthConfig,
     private val callbackUri: Uri,
-    private val accessTokenName: String,
-    private val clock: Clock
+    private val cookieBasedOAuth: CookieBasedOAuth
 ) : HttpHandler {
 
-    private fun codeToAccessToken(code: String): String? {
-        val accessTokenResponse = api(Request(POST, clientConfig.tokenPath)
+    private fun codeToAccessToken(code: String) =
+        api(Request(POST, clientConfig.tokenPath)
             .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
             .form("grant_type", "authorization_code")
             .form("redirect_uri", callbackUri.toString())
             .form("client_id", clientConfig.credentials.user)
             .form("client_secret", clientConfig.credentials.password)
             .form("code", code))
-
-        if (accessTokenResponse.status != OK) return null
-
-        return accessTokenResponse.bodyString()
-    }
+            .let {
+                if (it.status == OK) it.bodyString() else null
+            }
 
     override fun invoke(p1: Request): Response {
         val state = p1.query("state")?.toParameters() ?: emptyList()
-        val crsfInState = state.find { it.first == clientConfig.csrfName }?.second
-
+        val crsfInState = state.find { it.first == "csrf" }?.second
         return p1.query("code")?.let { code ->
-            if (crsfInState != null && crsfInState == p1.cookie(clientConfig.csrfName)?.value) {
+            val b = crsfInState != null && crsfInState == cookieBasedOAuth.retrieveCsrf(p1)
+            if (b) {
                 codeToAccessToken(code)?.let {
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    val redirect = Response(TEMPORARY_REDIRECT)
-                        .header("Location", originalUri)
-                        .invalidateCookie(clientConfig.csrfName)
-
-                    val expires = LocalDateTime.ofInstant(clock.instant().plusSeconds(3600), ZoneId.of("GMT"))
-                    redirect.cookie(Cookie(accessTokenName, it, expires = expires))
+                    cookieBasedOAuth.redirectToken(Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)
                 }
             } else null
-        } ?: Response(FORBIDDEN).invalidateCookie(clientConfig.csrfName).invalidateCookie(accessTokenName)
+        } ?: cookieBasedOAuth.failedResponse()
     }
+
 }
 
 class OAuth(client: HttpHandler,
@@ -119,13 +136,13 @@ class OAuth(client: HttpHandler,
             generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM,
             modifyAuthRedirect: ModifyAuthRedirectUri = { it }) {
 
-    private val accessTokenName = "${clientConfig.serviceName}AccessToken"
+    private val cookieBasedOAuth = CookieBasedOAuth(clientConfig, modifyAuthRedirect, clock)
 
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
-    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, clock, generateCrsf, modifyAuthRedirect) { req: Request -> req.cookie(accessTokenName) != null }
+    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, generateCrsf, cookieBasedOAuth)
 
-    val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, accessTokenName, clock)
+    val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, cookieBasedOAuth)
 
     companion object
 }

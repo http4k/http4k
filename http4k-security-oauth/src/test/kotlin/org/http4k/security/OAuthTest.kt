@@ -54,15 +54,15 @@ class OAuthTest {
 
     @Test
     fun `filter - when no accessToken cookie is passed, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=serviceCsrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
         filter(Request(GET, "/")) shouldMatch hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader))
     }
 
     private val base = Request(GET, "/")
     private val withCookie = Request(GET, "/").cookie("serviceCsrf", "randomCsrf")
     private val withCode = withCookie.query("code", "value")
-    private val withCodeAndInvalidState = withCode.query("state", listOf("serviceCsrf" to "notreal").toUrlFormEncoded())
-    private val withCodeAndValidStateButNoUrl = withCode.query("state", listOf("serviceCsrf" to "randomCsrf").toUrlFormEncoded())
+    private val withCodeAndInvalidState = withCode.query("state", listOf("csrf" to "notreal").toUrlFormEncoded())
+    private val withCodeAndValidStateButNoUrl = withCode.query("state", listOf("csrf" to "randomCsrf").toUrlFormEncoded())
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
@@ -75,15 +75,14 @@ class OAuthTest {
         oauth.callback(withCode) shouldMatch equalTo(invalidation)
 
         oauth.callback(withCodeAndInvalidState) shouldMatch equalTo(invalidation)
-
     }
 
     @Test
     fun `callback - when valid inputs passed, defaults to root`() {
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
             .header("Location", "/")
-            .invalidateCookie("serviceCsrf")
             .cookie(Cookie("serviceAccessToken", "access token goes here", expires = LocalDateTime.ofEpochSecond(3600, 0, ZoneOffset.UTC)))
+            .invalidateCookie("serviceCsrf")
 
         oauth.callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(validRedirectToRoot)
     }
