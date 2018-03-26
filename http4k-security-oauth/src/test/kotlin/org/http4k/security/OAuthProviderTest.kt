@@ -20,27 +20,30 @@ import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.Test
 
-class FakeOAuthPersistence : OAuthPersistence {
-
-    var csrf: CrossSiteRequestForgeryToken? = null
-    var accessToken: AccessToken? = null
-
-    override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
-
-    override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response {
-        this.csrf = csrf
-        return redirect.header("action", "assignCsrf")
-    }
-
-    override fun retrieveToken(request: Request): AccessToken? = accessToken
-
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
-        this.accessToken = accessToken
-        return redirect.header("action", "assignToken")
-    }
-}
-
 class OAuthProviderTest {
+
+    class FakeOAuthPersistence : OAuthPersistence {
+
+        var csrf: CrossSiteRequestForgeryToken? = null
+        var accessToken: AccessToken? = null
+
+        override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
+
+        override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response {
+            this.csrf = csrf
+            return redirect.header("action", "assignCsrf")
+        }
+
+        override fun retrieveToken(request: Request): AccessToken? = accessToken
+
+        override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+            this.accessToken = accessToken
+            return redirect.header("action", "assignToken")
+        }
+
+        override fun authFailureResponse(): Response = Response(I_M_A_TEAPOT)
+    }
+
     private val providerConfig = OAuthProviderConfig(
         Uri.of("http://authHost"),
         "/auth",
