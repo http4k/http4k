@@ -187,7 +187,6 @@ dependencies {
     provided project(":http4k-resilience4j")
     provided project(":http4k-security-oauth")
     provided project(":http4k-server-apache")
-    provided project(":http4k-security-pac4j")
     provided project(":http4k-server-jetty")
     provided project(":http4k-server-netty")
     provided project(":http4k-server-undertow")

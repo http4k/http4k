@@ -46,6 +46,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-metrics-micrometer:bintrayUpload \
     :http4k-multipart:bintrayUpload \
     :http4k-resilience4j:bintrayUpload \
+    :http4k-security-oauth:bintrayUpload \
     :http4k-server-apache:bintrayUpload \
     :http4k-server-jetty:bintrayUpload \
     :http4k-server-netty:bintrayUpload \
