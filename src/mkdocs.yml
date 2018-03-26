@@ -39,6 +39,7 @@ pages:
       - Serverless backend: guide/modules/serverless/index.md
       - Templating: guide/modules/templating/index.md
       - Typesafe contracts: guide/modules/contracts/index.md
+      - OAuth: guide/modules/oauth/index.md
       - WebDriver: guide/modules/webdriver/index.md
     - Application Testing: guide/testing/index.md
     - Worked TDD Example:
@@ -62,6 +63,7 @@ pages:
     - Generating data classes for messages: cookbook/generating_data_classes/index.md
     - Websockets: cookbook/websockets/index.md
     - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
+    - Custom OAuth configuration: cookbook/custom_oauth/index.md
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md
