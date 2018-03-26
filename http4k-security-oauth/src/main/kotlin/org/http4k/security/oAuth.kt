@@ -96,13 +96,11 @@ class OAuth(client: HttpHandler,
             oAuthPersistence: OAuthPersistence,
             generateCrsf: CsrfGenerator = SECURE_GENERATE_RANDOM) {
 
-    private val cookieBasedOAuth = oAuthPersistence
-
     val api = ClientFilters.SetHostFrom(clientConfig.apiBase).then(client)
 
-    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, generateCrsf, cookieBasedOAuth)
+    val authFilter: Filter = OAuthRedirectionFilter(clientConfig, callbackUri, scopes, generateCrsf, oAuthPersistence)
 
-    val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, cookieBasedOAuth)
+    val callback: HttpHandler = OAuthCallback(api, clientConfig, callbackUri, oAuthPersistence)
 
     companion object
 }
