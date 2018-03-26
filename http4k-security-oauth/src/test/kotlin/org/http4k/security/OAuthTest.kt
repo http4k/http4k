@@ -22,19 +22,19 @@ import org.junit.Test
 
 class FakeOAuthPersistence : OAuthPersistence {
 
-    var csrf: String? = null
-    var accessToken: String? = null
+    var csrf: CrossSiteRequestForgeryToken? = null
+    var accessToken: AccessToken? = null
 
-    override fun retrieveCsrf(p1: Request): String? = csrf
+    override fun retrieveCsrf(p1: Request): CrossSiteRequestForgeryToken? = csrf
 
-    override fun assignCsrf(redirect: Response, csrf: String): Response {
+    override fun withAssignedCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response {
         this.csrf = csrf
         return redirect.header("action", "assignCsrf")
     }
 
-    override fun retrieveToken(p1: Request): String? = accessToken
+    override fun retrieveToken(p1: Request): AccessToken? = accessToken
 
-    override fun assignToken(redirect: Response, accessToken: String): Response {
+    override fun withAssignedToken(redirect: Response, accessToken: AccessToken): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }
@@ -59,12 +59,12 @@ class OAuthTest {
         listOf("scope1", "scope2"),
         persistence,
         { it.query("nonce", "randomNonce") },
-        { "randomCsrf" }
+        { CrossSiteRequestForgeryToken("randomCsrf") }
     )
 
     @Test
     fun `filter - when accessToken value is present, request is let through`() {
-        oAuthPersistence.assignToken(Response(OK), "randomToken")
+        oAuthPersistence.withAssignedToken(Response(OK), AccessToken("randomToken"))
         oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")) shouldMatch
             hasStatus(OK).and(hasBody("i am witorious!"))
     }
@@ -98,7 +98,7 @@ class OAuthTest {
     @Test
     fun `callback - when valid inputs passed, defaults to root`() {
 
-        oAuthPersistence.assignCsrf(Response(OK), "randomCsrf")
+        oAuthPersistence.withAssignedCsrf(Response(OK), CrossSiteRequestForgeryToken("randomCsrf"))
 
         val validRedirectToRoot = Response(TEMPORARY_REDIRECT)
             .header("Location", "/")

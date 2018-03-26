@@ -25,8 +25,8 @@ fun OAuth.Companion.google(client: HttpHandler, credentials: Credentials, callba
         callbackUri,
         scopes,
         oAuthPersistence,
-        { it.query("nonce", SECURE_GENERATE_RANDOM()) },
-        SECURE_GENERATE_RANDOM
+        { it.query("nonce", (CrossSiteRequestForgeryToken.SECURE_CSRF)().value) },
+        CrossSiteRequestForgeryToken.SECURE_CSRF
     )
 }
 

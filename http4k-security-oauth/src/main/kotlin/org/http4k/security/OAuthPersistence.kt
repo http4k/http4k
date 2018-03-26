@@ -4,19 +4,15 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 
-data class CrossSiteRequestForgeryToken(val value: String)
-
-data class AccessToken(val value: String)
-
 interface OAuthPersistence {
 
-    fun retrieveCsrf(p1: Request): String?
+    fun retrieveCsrf(p1: Request): CrossSiteRequestForgeryToken?
 
-    fun assignCsrf(redirect: Response, csrf: String): Response
+    fun withAssignedCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken): Response
 
-    fun retrieveToken(p1: Request): String?
+    fun retrieveToken(p1: Request): AccessToken?
 
-    fun assignToken(redirect: Response, accessToken: String): Response
+    fun withAssignedToken(redirect: Response, accessToken: AccessToken): Response
 
     fun authFailureResponse() = Response(FORBIDDEN)
 }
