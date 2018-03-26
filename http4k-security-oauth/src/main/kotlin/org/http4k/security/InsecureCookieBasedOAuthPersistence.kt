@@ -13,6 +13,7 @@ import java.time.ZoneId
 
 /**
  * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
+ * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
                                                private val cookieValidity: Duration = Duration.ofHours(1),
