@@ -56,7 +56,7 @@ class ApacheClient(
         val request = this@toApacheRequest
         val uri = URI(request.uri.toString())
 
-        return when (method) {
+        val apacheRequest = when (method) {
             HEAD -> HttpHead(uri)
             GET -> HttpGet(uri)
             OPTIONS -> HttpOptions(uri)
@@ -66,16 +66,18 @@ class ApacheClient(
                 object : HttpEntityEnclosingRequestBase() {
                     init {
                         this.uri = uri
+                        println(requestBodyMode)
                         entity = when (requestBodyMode) {
                             Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
                             Memory -> ByteArrayEntity(request.body.payload.array())
                         }
-                        request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
                     }
 
                     override fun getMethod() = request.method.name
                 }
         }
+        request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
+        return apacheRequest
     }
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
