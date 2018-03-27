@@ -5,8 +5,13 @@ import org.apache.http.StatusLine
 import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.CloseableHttpResponse
+import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpHead
+import org.apache.http.client.methods.HttpOptions
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.client.methods.HttpTrace
 import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
@@ -17,6 +22,11 @@ import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.HEAD
+import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -43,18 +53,32 @@ class ApacheClient(
             entity?.let { body(responseBodyMode(it.content)) } ?: this
         }
 
-    private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
-        init {
-            val request = this@toApacheRequest
-            uri = URI(request.uri.toString())
-            entity = when (requestBodyMode) {
-                Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-                Memory -> ByteArrayEntity(request.body.payload.array())
-            }
-            request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
-        }
+    private fun Request.toApacheRequest(): HttpRequestBase {
+        val request = this@toApacheRequest
+        val uri = URI(request.uri.toString())
 
-        override fun getMethod(): String = this@toApacheRequest.method.name
+        return when (method) {
+            HEAD -> HttpHead(uri)
+            GET -> HttpGet(uri)
+            OPTIONS -> HttpOptions(uri)
+            TRACE -> HttpTrace(uri)
+            DELETE -> HttpDelete(uri)
+            else ->
+                object : HttpEntityEnclosingRequestBase() {
+                    init {
+                        this.uri = uri
+                        entity = when (requestBodyMode) {
+                            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+                            Memory -> ByteArrayEntity(request.body.payload.array())
+                        }
+                        request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
+                    }
+
+                    override fun getMethod(): String {
+                        return request.method.name
+                    }
+                }
+        }
     }
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
