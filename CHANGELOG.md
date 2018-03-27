@@ -5,6 +5,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.22.0 (uncut)
 - `http4k-security-oauth` module added - with support for OAuth2 Authorization Grant flow
 - Replaced classes reliant on `javax.activation` package, which allows Java 9+ to not require any external dependencies. \o/
+- Fix #112 - `ApacheClient` incorrectly sets headers on GET requests (this breaks F5 load balancers). H/T @simojenki
 
 ### v3.21.2
 - PR #110 - Websocket client timeouts are incorrectly translated as seconds instead of millis. HT @anorth
