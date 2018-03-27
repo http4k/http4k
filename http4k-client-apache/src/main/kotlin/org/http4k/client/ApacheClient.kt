@@ -66,7 +66,6 @@ class ApacheClient(
                 object : HttpEntityEnclosingRequestBase() {
                     init {
                         this.uri = uri
-                        println(requestBodyMode)
                         entity = when (requestBodyMode) {
                             Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
                             Memory -> ByteArrayEntity(request.body.payload.array())
