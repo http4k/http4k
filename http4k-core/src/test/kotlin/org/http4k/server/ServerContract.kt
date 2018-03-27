@@ -26,7 +26,6 @@ import org.http4k.routing.routes
 import org.http4k.util.RetryRule
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import java.util.Random
@@ -130,13 +129,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun `length is ignored on body if it not well formed`() {
         val response = client(Request(POST, "http://localhost:$port/length").header("Content-Length", "nonsense").body("12345"))
         response shouldMatch hasStatus(OK).and(hasBody("5"))
-    }
-
-    @Test
-    @Ignore("at the moment, we don't globally support length in non-body operations")
-    open fun `length is zero on GET body`() {
-        val response = client(Request(GET, "http://localhost:$port/length"))
-        response shouldMatch hasStatus(OK).and(hasBody("0"))
     }
 
     @Test

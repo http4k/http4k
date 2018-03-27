@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.22.0 (uncut)
+### v3.22.0
 - `http4k-security-oauth` module added - with support for OAuth2 Authorization Grant flow
 - Replaced classes reliant on `javax.activation` package, which allows Java 9+ to not require any external dependencies. \o/
 - Fix #112 - `ApacheClient` incorrectly sets headers on GET requests (this breaks F5 load balancers). H/T @simojenki
