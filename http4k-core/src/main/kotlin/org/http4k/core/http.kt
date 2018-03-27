@@ -84,7 +84,7 @@ interface HttpMessage : Closeable {
     fun bodyString(): String = String(body.payload.array())
 
     companion object {
-        val version = "HTTP/1.1"
+        const val version = "HTTP/1.1"
     }
 
     override fun close() = body.close()

@@ -132,7 +132,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
-    fun `length is zero on GET body`() {
+    open fun `length is zero on GET body`() {
         val response = client(Request(GET, "http://localhost:$port/length"))
         response shouldMatch hasStatus(OK).and(hasBody("0"))
     }
