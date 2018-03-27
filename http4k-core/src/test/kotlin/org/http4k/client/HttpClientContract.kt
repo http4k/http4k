@@ -182,10 +182,10 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
             response.close()
         }
         checkNoBannedHeaders(GET, "Transfer-encoding")
+        checkNoBannedHeaders(TRACE, "Transfer-encoding")
+        checkNoBannedHeaders(OPTIONS, "Transfer-encoding")
+        checkNoBannedHeaders(DELETE, "Transfer-encoding")
         checkNoBannedHeaders(POST)
         checkNoBannedHeaders(PUT)
-        checkNoBannedHeaders(TRACE)
-        checkNoBannedHeaders(OPTIONS)
-        checkNoBannedHeaders(DELETE)
     }
 }

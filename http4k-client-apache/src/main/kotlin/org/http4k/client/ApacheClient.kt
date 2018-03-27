@@ -48,10 +48,9 @@ class ApacheClient(
         Response(CLIENT_TIMEOUT.describeClientError(e))
     }
 
-    private fun CloseableHttpResponse.toHttp4kResponse(): Response =
-        with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
-            entity?.let { body(responseBodyMode(it.content)) } ?: this
-        }
+    private fun CloseableHttpResponse.toHttp4kResponse() = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
+        entity?.let { body(responseBodyMode(it.content)) } ?: this
+    }
 
     private fun Request.toApacheRequest(): HttpRequestBase {
         val request = this@toApacheRequest
@@ -74,16 +73,14 @@ class ApacheClient(
                         request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
                     }
 
-                    override fun getMethod(): String {
-                        return request.method.name
-                    }
+                    override fun getMethod() = request.method.name
                 }
         }
     }
 
     private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-    private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
+    private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 
     companion object {
         private fun defaultApacheHttpClient() = HttpClients.custom()
