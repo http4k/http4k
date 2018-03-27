@@ -80,10 +80,10 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `performs simple POST request`() {
         System.err.println("POST")
-        val response = client(Request(POST, "http://httpbin.org/post"))
+        val response = client(Request(POST, "http://localhost:$port/echo").body("foobar"))
 
         assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), containsSubstring(""))
+        assertThat(response.bodyString(), containsSubstring("foobar"))
     }
 
     @Test
