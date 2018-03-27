@@ -46,6 +46,7 @@ plugging together of services without HTTP container being required.
     * Metrics gathering for performance analysis.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
+    * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
     * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
 
@@ -105,6 +106,12 @@ plugging together of services without HTTP container being required.
     * Support for Multipart HTML forms, including Lens extensions for type-safe marshalling of fields.
 * [AWS:](https://http4k.org/guide/modules/aws) 
     * Client filter to allow super-simple interaction with AWS services (via request signing)
+* [OAuth Security](https://http4k.org/guide/modules/oauth) 
+    * Implement OAuth Authorisation Code Grant flow with a single Interface
+    * **Pre-configured** OAuth for following providers:
+        * **Google** 
+        * **Dropbox** 
+        * **Soundcloud**
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
     * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
