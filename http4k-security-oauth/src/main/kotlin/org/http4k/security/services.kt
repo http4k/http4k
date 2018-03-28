@@ -33,3 +33,16 @@ fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credent
         listOf(""),
         oAuthPersistence
     )
+
+fun OAuthProvider.Companion.auth0(
+    auth0Uri: Uri,
+    client: HttpHandler, credentials: Credentials,
+    callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
+
+    OAuthProvider(
+        OAuthProviderConfig(auth0Uri, "/authorize", "/oauth/token", credentials),
+        client,
+        callbackUri,
+        listOf("openid"),
+        oAuthPersistence
+    )
