@@ -50,3 +50,12 @@ fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credent
         listOf(""),
         oAuthPersistence
     )
+
+fun OAuthProvider.Companion.gitHub(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence, scopes: List<String> = listOf("user")): OAuthProvider =
+    OAuthProvider(
+        OAuthProviderConfig(Uri.of("https://github.com"), "/login/oauth/authorize", "/login/oauth/access_token", credentials, Uri.of("https://github.com")),
+        client,
+        callbackUri,
+        scopes,
+        oAuthPersistence
+    )
