@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.22.2 (uncut)
 - OAuth - Rename `AccessToken` to `AccessTokenContainer`, as this better reflects what the entity is.
+- Fix groupId of artifacts which was mistakenly changed to http4k.
 
 ### v3.22.1
 - `http4k-security-oauth` module added - with support for OAuth2 Authorization Grant flow
