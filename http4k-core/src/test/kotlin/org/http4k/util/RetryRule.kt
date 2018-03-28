@@ -6,7 +6,7 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
-class RetryRule(private val attempts: Int = 5) : TestRule {
+class RetryRule private constructor(private val attempts: Int = 5) : TestRule {
 
     override fun apply(base: Statement, description: Description): Statement = statement(base, description)
 
@@ -29,5 +29,10 @@ class RetryRule(private val attempts: Int = 5) : TestRule {
             System.err.println(description.displayName + ": giving up after " + attempts + " failures.")
             throw caughtThrowable!!
         }
+    }
+
+    companion object {
+        val CI = RetryRule(10)
+        val LOCAL = RetryRule(1)
     }
 }

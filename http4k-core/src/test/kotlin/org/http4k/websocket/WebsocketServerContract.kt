@@ -30,7 +30,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
     @Rule
     @JvmField
-    var retryRule = RetryRule(5)
+    var retryRule = RetryRule.CI
 
     private val port = Random().nextInt(1000) + 8000
 

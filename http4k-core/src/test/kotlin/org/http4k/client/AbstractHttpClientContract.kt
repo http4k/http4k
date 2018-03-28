@@ -24,7 +24,7 @@ import java.util.Random
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
     @Rule
     @JvmField
-    var retryRule = RetryRule(10)
+    var retryRule = RetryRule.CI
 
     private var server: Http4kServer? = null
 
