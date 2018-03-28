@@ -109,8 +109,9 @@ plugging together of services without HTTP container being required.
 * [OAuth Security](https://http4k.org/guide/modules/oauth) 
     * Implement OAuth Authorisation Code Grant flow with a single Interface
     * **Pre-configured** OAuth for following providers:
-        * **Google** 
+        * **Auth0** 
         * **Dropbox** 
+        * **Google** 
         * **Soundcloud**
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
     * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.

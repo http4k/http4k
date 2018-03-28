@@ -6,7 +6,7 @@ description: Feature overview of the http4k-security-oauth form module
 
 ### About
 
-Support for using integrating with external OAuth2 providers for authentication purposes and to provide access to external APIs of entities such as Google, Soundcloud, Dropbox etc. 
+Support for using integrating with external OAuth2 providers for authentication purposes and to provide access to external APIs of entities such as Auth0, Google etc. 
 
 
 Specifically, http4k supports the popular `OAuth2 Authorization Code Grant`. This flow provides a callback mechanism that plays out like this:

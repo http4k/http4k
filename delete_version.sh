@@ -14,7 +14,7 @@ function maven_publish {
     echo "Deleting $PACKAGE..."
     RESULT=$(curl -s -X DELETE -u "$BINTRAY_USER:$BINTRAY_KEY"  "https://api.bintray.com/packages/http4k/maven/$PACKAGE/versions/$LOCAL_VERSION")
 
-    if [[ ! "${RESULT}" =~ .*Successful.* ]]; then
+    if [[ ! "${RESULT}" =~ .*success.* ]]; then
        echo "Failed: ${RESULT}"
        exit 1
     fi

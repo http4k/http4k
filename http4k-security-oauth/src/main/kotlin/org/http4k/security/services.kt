@@ -6,6 +6,23 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 
+/**
+ * Preconfigured OAuthProviders go here...
+ */
+
+fun OAuthProvider.Companion.auth0(
+    auth0Uri: Uri,
+    client: HttpHandler, credentials: Credentials,
+    callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
+
+    OAuthProvider(
+        OAuthProviderConfig(auth0Uri, "/authorize", "/oauth/token", credentials),
+        client,
+        callbackUri,
+        listOf("openid"),
+        oAuthPersistence
+    )
+
 fun OAuthProvider.Companion.dropbox(client: HttpHandler, credentials: Credentials, callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
     OAuthProvider(
         OAuthProviderConfig(Uri.of("https://www.dropbox.com"), "/oauth2/authorize", "/oauth2/token", credentials, Uri.of("https://api.dropboxapi.com")),
@@ -31,18 +48,5 @@ fun OAuthProvider.Companion.soundCloud(client: HttpHandler, credentials: Credent
         client,
         callbackUri,
         listOf(""),
-        oAuthPersistence
-    )
-
-fun OAuthProvider.Companion.auth0(
-    auth0Uri: Uri,
-    client: HttpHandler, credentials: Credentials,
-    callbackUri: Uri, oAuthPersistence: OAuthPersistence): OAuthProvider =
-
-    OAuthProvider(
-        OAuthProviderConfig(auth0Uri, "/authorize", "/oauth/token", credentials),
-        client,
-        callbackUri,
-        listOf("openid"),
         oAuthPersistence
     )
