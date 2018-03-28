@@ -51,6 +51,7 @@ allprojects {
     targetCompatibility =JavaVersion.VERSION_1_8
 
     version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
+    group = 'org.http4k'
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
