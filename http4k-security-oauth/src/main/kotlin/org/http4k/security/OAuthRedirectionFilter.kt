@@ -3,14 +3,14 @@ package org.http4k.security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.core.toUrlFormEncoded
 import org.http4k.core.with
-import org.http4k.lens.Header
+import org.http4k.lens.Header.Common.LOCATION
 
-internal class OAuthRedirectionFilter(
+class OAuthRedirectionFilter(
     private val providerConfig: OAuthProviderConfig,
     private val callbackUri: Uri,
     private val scopes: List<String>,
@@ -22,7 +22,7 @@ internal class OAuthRedirectionFilter(
     override fun invoke(next: HttpHandler): HttpHandler = {
         if (oAuthPersistence.retrieveToken(it) != null) next(it) else {
             val csrf = generateCrsf()
-            val redirect = Response(Status.TEMPORARY_REDIRECT).with(Header.Common.LOCATION of providerConfig.authUri
+            val redirect = Response(TEMPORARY_REDIRECT).with(LOCATION of providerConfig.authUri
                 .query("client_id", providerConfig.credentials.user)
                 .query("response_type", "code")
                 .query("scope", scopes.joinToString(" "))

@@ -13,7 +13,7 @@ import org.http4k.core.toParameters
 import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 
-internal class OAuthCallback(
+class OAuthCallback(
     private val providerConfig: OAuthProviderConfig,
     private val api: HttpHandler,
     private val callbackUri: Uri,
@@ -28,7 +28,7 @@ internal class OAuthCallback(
             .form("client_id", providerConfig.credentials.user)
             .form("client_secret", providerConfig.credentials.password)
             .form("code", code))
-            .let { if (it.status == Status.OK) AccessToken(it.bodyString()) else null }
+            .let { if (it.status == Status.OK) AccessTokenContainer(it.bodyString()) else null }
 
     override fun invoke(request: Request): Response {
         val state = request.query("state")?.toParameters() ?: emptyList()

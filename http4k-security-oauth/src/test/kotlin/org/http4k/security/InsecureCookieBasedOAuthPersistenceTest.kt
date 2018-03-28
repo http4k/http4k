@@ -35,7 +35,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     @Test
     fun `token retrieval based on cookie`() {
         persistence.retrieveToken(Request(GET, "")) shouldMatch absent()
-        persistence.retrieveToken(Request(GET, "").cookie(Cookie("prefixAccessToken", "tokenValue"))) shouldMatch equalTo(AccessToken("tokenValue"))
+        persistence.retrieveToken(Request(GET, "").cookie(Cookie("prefixAccessToken", "tokenValue"))) shouldMatch equalTo(AccessTokenContainer("tokenValue"))
     }
 
     @Test
@@ -53,7 +53,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `adds csrf as a cookie to the token redirect`() {
-        persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")) shouldMatch equalTo(
+        persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessTokenContainer("tokenValue")) shouldMatch equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue",
                 expires = LocalDateTime.now(clock).plus(cookieValidity))).invalidateCookie("prefixCsrf")
         )

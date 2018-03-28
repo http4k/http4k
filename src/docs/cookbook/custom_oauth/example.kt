@@ -12,7 +12,7 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.AccessToken
+import org.http4k.security.AccessTokenContainer
 import org.http4k.security.CrossSiteRequestForgeryToken
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
 // to be maximally secuire, never let the end-user see the access token!
 class CustomOAuthPersistence : OAuthPersistence {
     var csrf: CrossSiteRequestForgeryToken? = null
-    var accessToken: AccessToken? = null
+    var accessToken: AccessTokenContainer? = null
 
     override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
@@ -65,9 +65,9 @@ class CustomOAuthPersistence : OAuthPersistence {
         return redirect.header("action", "assignCsrf")
     }
 
-    override fun retrieveToken(request: Request): AccessToken? = accessToken
+    override fun retrieveToken(request: Request): AccessTokenContainer? = accessToken
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessTokenContainer): Response {
         this.accessToken = accessToken
         return redirect.header("action", "assignToken")
     }

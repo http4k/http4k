@@ -25,7 +25,7 @@ class OAuthProviderTest {
     class FakeOAuthPersistence : OAuthPersistence {
 
         var csrf: CrossSiteRequestForgeryToken? = null
-        var accessToken: AccessToken? = null
+        var accessToken: AccessTokenContainer? = null
 
         override fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken? = csrf
 
@@ -34,9 +34,9 @@ class OAuthProviderTest {
             return redirect.header("action", "assignCsrf")
         }
 
-        override fun retrieveToken(request: Request): AccessToken? = accessToken
+        override fun retrieveToken(request: Request): AccessTokenContainer? = accessToken
 
-        override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response {
+        override fun assignToken(request: Request, redirect: Response, accessToken: AccessTokenContainer): Response {
             this.accessToken = accessToken
             return redirect.header("action", "assignToken")
         }
@@ -65,7 +65,7 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when accessToken value is present, request is let through`() {
-        oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessToken("randomToken"))
+        oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessTokenContainer("randomToken"))
         oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")) shouldMatch
             hasStatus(OK).and(hasBody("i am witorious!"))
     }

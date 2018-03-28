@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 /**
- * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
+ * This is an example implementation which stores CSRF and AccessTokenEnvelope values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
@@ -25,11 +25,11 @@ open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun retrieveCsrf(request: Request) = request.cookie(csrfName)?.value?.let(::CrossSiteRequestForgeryToken)
 
-    override fun retrieveToken(request: Request): AccessToken? = request.cookie(accessTokenCookieName)?.value?.let(::AccessToken)
+    override fun retrieveToken(request: Request): AccessTokenContainer? = request.cookie(accessTokenCookieName)?.value?.let(::AccessTokenContainer)
 
     override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) = redirect.cookie(expiring(csrfName, csrf.value))
 
-    override fun assignToken(request: Request, redirect: Response, accessToken: AccessToken) = redirect.cookie(expiring(accessTokenCookieName, accessToken.value)).invalidateCookie(csrfName)
+    override fun assignToken(request: Request, redirect: Response, accessToken: AccessTokenContainer) = redirect.cookie(expiring(accessTokenCookieName, accessToken.value)).invalidateCookie(csrfName)
 
     override fun authFailureResponse() = Response(FORBIDDEN).invalidateCookie(csrfName).invalidateCookie(accessTokenCookieName)
 
