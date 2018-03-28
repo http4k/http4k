@@ -5,10 +5,10 @@ description: List of released changes for the httpk library
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.22.1 (uncut)
+### v3.22.2 (uncut)
 - Upgrade various dependency versions
 
-### v3.22.1
+### v3.22.2
 - Make Route a Router so we can nest them together.
 
 ### v2.2.1
