@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.22.2 (uncut)
+### v3.22.2
 - OAuth - Rename `AccessToken` to `AccessTokenContainer`, as this better reflects what the entity is.
 - Fix groupId of artifacts which was mistakenly changed to http4k.
 
