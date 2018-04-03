@@ -7,7 +7,7 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 
-class SimpleJson<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>) : ContractRenderer {
+class SimpleJson<ROOT : NODE, out NODE>(private val json: Json<ROOT, NODE>) : ContractRenderer {
 
     override fun notFound(): Response = JsonErrorResponseRenderer(json).notFound()
 
