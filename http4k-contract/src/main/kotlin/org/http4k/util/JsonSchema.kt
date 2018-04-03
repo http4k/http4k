@@ -12,7 +12,7 @@ class IllegalSchemaException(message: String) : Exception(message)
 
 data class JsonSchema<out NODE>(val node: NODE, val definitions: Set<Pair<String, NODE>>)
 
-class JsonToJsonSchema<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) {
+class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
     fun toSchema(node: NODE, overrideDefinitionId: String? = null) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
@@ -42,7 +42,7 @@ class JsonToJsonSchema<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NOD
         })
 
         val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
-        val definitionId = overrideDefinitionId ?: "object" + newDefinition.hashCode()
+        val definitionId = overrideDefinitionId ?: "object" + newDefinition!!.hashCode()
         val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
         return JsonSchema(json.obj("\$ref" to json.string("#/definitions/$definitionId")), allDefinitions)
     }

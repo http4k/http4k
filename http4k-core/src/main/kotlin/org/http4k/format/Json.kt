@@ -19,7 +19,7 @@ import java.math.BigInteger
 /**
  * This is the contract for all JSON implementations
  */
-interface Json<ROOT : NODE, NODE : Any> {
+interface Json<ROOT : NODE, NODE> {
     // Contract methods to be implemented
     fun ROOT.asPrettyJsonString(): String
 
