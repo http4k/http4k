@@ -14,7 +14,7 @@ data class ApiInfo(val title: String, val version: String, val description: Stri
 
 private val header = Header.optional("definitionId")
 
-class OpenApi<ROOT : NODE, out NODE : Any>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
+class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
     private val errors = JsonErrorResponseRenderer(json)
