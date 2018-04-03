@@ -28,8 +28,8 @@ fun hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessa
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))
 
-fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: ROOT): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
+fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: ROOT): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
 
-fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: Matcher<ROOT>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: Matcher<ROOT>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
-fun <ROOT : NODE, NODE : Any> Json<ROOT, NODE>.hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))
+fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))
