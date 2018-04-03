@@ -13,7 +13,7 @@ import org.junit.Test
 import java.math.BigDecimal
 import java.math.BigInteger
 
-abstract class JsonContract<ROOT : NODE, NODE : Any>(open val j: Json<ROOT, NODE>) {
+abstract class JsonContract<ROOT : NODE, NODE>(open val j: Json<ROOT, NODE>) {
 
     abstract val prettyString: String
 

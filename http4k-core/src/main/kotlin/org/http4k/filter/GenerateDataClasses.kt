@@ -15,7 +15,7 @@ import java.util.Random
  * the number of class definitions by selecting the definition with the most fields (for cases where lists of items
  * have different fields).
  */
-class GenerateDataClasses<ROOT : NODE, out NODE : Any>(private val json: Json<ROOT, NODE>,
+class GenerateDataClasses<ROOT : NODE, out NODE>(private val json: Json<ROOT, NODE>,
                                                        private val out: PrintStream = System.out,
                                                        private val idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
 

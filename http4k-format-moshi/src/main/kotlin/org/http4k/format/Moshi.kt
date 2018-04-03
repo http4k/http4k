@@ -17,7 +17,7 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
     private val moshi: Moshi = builder.build()
 
-    private fun <T : Any> adapterFor(c: Class<T>): JsonAdapter<T> = moshi.adapter(c).failOnUnknown()
+    private fun <T> adapterFor(c: Class<T>): JsonAdapter<T> = moshi.adapter(c).failOnUnknown()
 
     override fun asJsonString(a: Any): String = adapterFor(a.javaClass).toJson(a)
 

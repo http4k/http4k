@@ -10,7 +10,7 @@ typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {
 
-    inline fun <reified T : Any> required(contexts: RequestContexts, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
+    inline fun <reified T> required(contexts: RequestContexts, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
         val meta = Meta(true, "context", ObjectParam, name)
         return BiDiLens(meta, { target ->
             contexts[target].let {
