@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.22.3
+- Preserve routing information on request/response manipulation  
+
 ### v3.22.2
 - `http4k-security-oauth` module added - with support for OAuth2 Authorization Grant flow
 - Replaced classes reliant on `javax.activation` package, which allows Java 9+ to not require any external dependencies. \o/
