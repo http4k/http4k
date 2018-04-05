@@ -52,6 +52,7 @@ interface Json<ROOT : NODE, NODE> {
     fun number(value: BigDecimal): NODE = value.asJsonValue()
     fun number(value: BigInteger): NODE = value.asJsonValue()
     fun boolean(value: Boolean): NODE = value.asJsonValue()
+    fun <T : NODE> array(value: T): ROOT = array(listOf(value))
     fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
     fun obj(): ROOT = obj(emptyList())
     fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()

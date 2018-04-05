@@ -43,9 +43,10 @@ abstract class JsonContract<ROOT : NODE, NODE>(open val j: Json<ROOT, NODE>) {
             "array" to j.array(listOf(
                 j.string(""),
                 j.number(123)
-            ))
+            )),
+            "singletonArray" to j.array(j.obj("number" to j.number(123)))
         )
-        val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123]}"""
+        val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
         assertThat(j.compact(input), equalTo(expected))
     }
 
