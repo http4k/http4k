@@ -1,12 +1,9 @@
 package org.http4k.filter
 
-import org.http4k.aws.AwsCanonicalRequest
-import org.http4k.aws.AwsCredentialScope
-import org.http4k.aws.AwsCredentials
-import org.http4k.aws.AwsHmacSha256
-import org.http4k.aws.AwsRequestDate
-import org.http4k.aws.AwsSignatureV4Signer
+import org.http4k.aws.*
 import org.http4k.core.Filter
+import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import java.time.Clock
 
@@ -22,8 +19,14 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
 
             val fullRequest = it
                 .header("host", it.uri.host)
-                .header("x-amz-date", date.full)
-                .replaceHeader("content-length", payload.length.toString())
+                .header("x-amz-date", date.full).let {
+                    if (it.method.allowsContent) {
+                        it.replaceHeader("content-length", payload.length.toString())
+                    } else {
+                        it
+                    }
+                }
+
 
             val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
 
@@ -33,6 +36,16 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
 
             next(signedRequest)
         }
+    }
+
+private val Method.allowsContent: Boolean
+    get() = when (this) {
+        HEAD -> false
+        GET -> false
+        OPTIONS -> false
+        TRACE -> false
+        DELETE -> false
+        else -> true
     }
 
 private fun buildAuthHeader(scope: AwsCredentialScope,
