@@ -180,9 +180,20 @@ class ServerFiltersTest {
     }
 
     @Test
+    fun `catch lens failure - custom response`() {
+        val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta))
+        val handler = ServerFilters.CatchLensFailure { Response(OK).body(it.localizedMessage) }
+            .then { throw e }
+
+        val response = handler(Request(GET, "/"))
+
+        response shouldMatch hasStatus(OK).and(hasBody("header 'bob' must be string, header 'bill' is required"))
+    }
+
+    @Test
     fun `catch lens failure - invalid`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta))
-        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then { throw e }
 
         val response = handler(Request(GET, "/"))
 
@@ -193,21 +204,21 @@ class ServerFiltersTest {
     @Test
     fun `catch lens failure - invalid from Response is rethrown`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Response(OK))
-        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then { throw e }
         assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
     }
 
     @Test
     fun `catch lens failure - invalid from RequestContext is rethrown`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = RequestContext())
-        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then { throw e }
         assertThat({ handler(Request(GET, "/")) }, throws(equalTo(e)))
     }
 
     @Test
     fun `catch lens failure - unsupported`() {
         val e = LensFailure(Unsupported(Header.required("bob").meta))
-        val handler = ServerFilters.CatchLensFailure.then { throw e }
+        val handler = ServerFilters.CatchLensFailure().then { throw e }
 
         val response = handler(Request(GET, "/"))
 

@@ -107,7 +107,18 @@ object ServerFilters {
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
      */
-    object CatchLensFailure : Filter {
+    object CatchLensFailure : Filter by CatchLensFailure()
+
+    /**
+     * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
+     * This is required when using lenses to automatically unmarshall inbound requests.
+     * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.
+     *
+     * Pass the failResponseFn param to provide a custom response for the LensFailure case
+     */
+    fun CatchLensFailure(failResponseFn: (LensFailure) -> Response = {
+        Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
+    }) = object : Filter {
         override fun invoke(next: HttpHandler): HttpHandler = {
             try {
                 next(it)
@@ -116,7 +127,7 @@ object ServerFilters {
                     lensFailure.target is Response -> throw lensFailure
                     lensFailure.target is RequestContext -> throw lensFailure
                     lensFailure.overall() == Failure.Type.Unsupported -> Response(UNSUPPORTED_MEDIA_TYPE)
-                    else -> Response(BAD_REQUEST.description(lensFailure.failures.joinToString("; ")))
+                    else -> failResponseFn(lensFailure)
                 }
             }
         }
@@ -196,7 +207,7 @@ object ServerFilters {
     object ReplaceResponseContentsWithStaticFile {
         operator fun invoke(loader: ResourceLoader = Classpath(),
                             toResourceName: (Response) -> String? = { if (it.status.successful) null else it.status.code.toString() }
-                            ): Filter = Filter { next ->
+        ): Filter = Filter { next ->
             {
                 val response = next(it)
                 toResourceName(response)
