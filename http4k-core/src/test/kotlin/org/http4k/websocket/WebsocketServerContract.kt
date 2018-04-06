@@ -83,6 +83,6 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
     fun `errors are propagated to the "on error" handler`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
-        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("websocket 'message' must be object")))
+        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("websocket 'message' must be object (NumberFormatException: For input string: \"hello\")")))
     }
 }
