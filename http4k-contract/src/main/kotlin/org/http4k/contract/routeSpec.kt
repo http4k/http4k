@@ -3,7 +3,6 @@ package org.http4k.contract
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
-import org.http4k.lens.Failure
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
@@ -11,7 +10,6 @@ import org.http4k.lens.PathLens
 abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
                                                       val routeMeta: RouteMeta,
                                                       vararg val pathLenses: PathLens<*>) : Filter {
-
     abstract fun with(new: RouteMeta): ContractRouteSpec
     abstract infix operator fun <T> div(next: PathLens<T>): ContractRouteSpec
 
@@ -20,15 +18,15 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     override fun invoke(nextHandler: HttpHandler): HttpHandler =
         { req ->
             val body = routeMeta.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
-            val errors = body.plus(routeMeta.requestParams).fold(emptyList<Failure>()) { memo, next ->
+            val overallFailure = body.plus(routeMeta.requestParams).fold(null as LensFailure?) { memo, next ->
                 try {
                     next(req)
                     memo
                 } catch (e: LensFailure) {
-                    memo.plus(e.failures)
+                    memo?.let { LensFailure(it.failures + e.failures, e) } ?: e
                 }
             }
-            if (errors.isEmpty()) nextHandler(req) else throw LensFailure(errors)
+            overallFailure?.let { throw it } ?: nextHandler(req)
         }
 
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
