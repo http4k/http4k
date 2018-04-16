@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.24.0
+- Upgrade various dependencies for Java 10 compatibility. H/T @tom
+- Fix bug with repeated params in Websocket upgrade request. H/T @tom
+
 ### v3.23.1
 - Composite LensFailures now capture (at least) the first failing cause (probably the body parameter in the case of an `http4k-contract` module.
 

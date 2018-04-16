@@ -7,7 +7,7 @@ import org.http4k.core.with
 import org.http4k.format.Gson
 import org.http4k.format.Xml.asXmlToJsonElement
 import java.io.PrintStream
-import java.util.*
+import java.util.Random
 
 class GenerateXmlDataClasses(out: PrintStream = System.out,
                              idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {

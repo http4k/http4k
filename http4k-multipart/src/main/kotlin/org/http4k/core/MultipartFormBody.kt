@@ -10,7 +10,7 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 
 sealed class MultipartEntity : Closeable {
     abstract val name: String
@@ -33,11 +33,11 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
     val boundary = CONTENT_TYPE(this)?.directive?.second ?: ""
 
     return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
-        .asSequence()
-        .map {
-            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString)
-            else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream))
-        }.iterator()
+            .asSequence()
+            .map {
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString)
+                else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream))
+            }.iterator()
 }
 
 data class MultipartFormBody private constructor(internal val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {

@@ -11,7 +11,7 @@ ext {
 
 dependencies {
     provided kotlin_lib
-[]
+
     provided project(":http4k-core")
     compile undertow
     compile "commons-io:commons-io:2.5"

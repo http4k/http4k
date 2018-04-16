@@ -4,7 +4,7 @@ import org.http4k.core.Status
 import org.jsoup.Jsoup
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
-import java.util.*
+import java.util.UUID
 
 data class Page(val status: Status, private val navigate: Navigate, val handle: UUID, val url: String, val contents: String, val previous: Page? = null, val next: Page? = null) {
 
