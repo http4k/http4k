@@ -5,16 +5,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import junit.framework.TestCase.assertTrue
-import org.http4k.core.HttpTransaction
+import org.http4k.core.*
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
-import org.http4k.core.toBody
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
-import org.http4k.filter.ResponseFilters.ReportLatency
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.bind
@@ -45,12 +40,12 @@ class ResponseFiltersTest {
         val request = Request(GET, "")
         val response = Response(OK)
 
-        ReportLatency(TickingClock, { req, resp, duration ->
+        ReportHttpTransaction(TickingClock) { (req, resp, duration) ->
             called = true
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
             assertThat(duration, equalTo(ofSeconds(1)))
-        }).then { response }(request)
+        }.then { response }(request)
 
         assertTrue(called)
     }
@@ -128,7 +123,7 @@ class ResponseFiltersTest {
         }
 
         val handler = filter.then(
-            routes("/sue" bind routes("/bob/{name}" bind GET to { Response(OK) }))
+                routes("/sue" bind routes("/bob/{name}" bind GET to { Response(OK) }))
         )
 
         val request = Request(GET, "/sue/bob/rita")
@@ -136,6 +131,6 @@ class ResponseFiltersTest {
         handler(request)
 
         assertThat(transaction, equalTo(HttpTransaction(request,
-            Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
+                Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
     }
 }
