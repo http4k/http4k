@@ -39,25 +39,32 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
     @Before
     fun before() {
         val routes = routes(
-            "/hello/{name}" bind { r: Request -> Response(OK).body(r.path("name")!!) }
+                "/hello/{name}" bind { r: Request -> Response(OK).body(r.path("name")!!) }
         )
         val ws = websockets(
-            "/hello" bind websockets(
-                "/{name}" bind { ws: Websocket ->
-                    val name = ws.upgradeRequest.path("name")!!
-                    ws.send(WsMessage(name))
+                "/hello" bind websockets(
+                        "/{name}" bind { ws: Websocket ->
+                            val name = ws.upgradeRequest.path("name")!!
+                            ws.send(WsMessage(name))
+                            ws.onMessage {
+                                ws.send(WsMessage("goodbye $name".byteInputStream()))
+                            }
+                            ws.onClose { println("bob is closing") }
+                        }
+                ),
+                "/errors" bind { ws: Websocket ->
                     ws.onMessage {
-                        ws.send(WsMessage("goodbye $name".byteInputStream()))
+                        lens.extract(it)
                     }
-                    ws.onClose { println("bob is closing") }
-                }
-            ),
-            "/errors" bind { ws: Websocket ->
-                ws.onMessage {
-                    lens.extract(it)
-                }
-                ws.onError { ws.send(WsMessage(it.localizedMessage)) }
-            })
+                    ws.onError { ws.send(WsMessage(it.localizedMessage)) }
+                },
+                "/queries" bind { ws: Websocket ->
+                    ws.onMessage {
+                        ws.send(WsMessage(ws.upgradeRequest.query("query") ?: "not set"))
+                    }
+                    ws.onError { ws.send(WsMessage(it.localizedMessage)) }
+                })
+
         server = PolyHandler(routes, ws).asServer(serverConfig(port)).start()
     }
 
@@ -84,5 +91,12 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
         client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("websocket 'message' must be object")))
+    }
+
+    @Test
+    fun `should correctly set query parameters on upgrade request passed into the web socket`() {
+        val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
+        client.send(WsMessage("hello"))
+        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("foo")))
     }
 }
