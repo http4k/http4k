@@ -10,7 +10,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:false}
+TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:"false"}
 
 if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
     echo "not master branch, so skipping"
