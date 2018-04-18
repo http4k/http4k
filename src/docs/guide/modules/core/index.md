@@ -52,7 +52,7 @@ val myFilter = Filter {
     next: HttpHandler -> {
         request: Request -> 
             val start = System.currentTimeMillis()
-            val response = next(it)
+            val response = next(request)
             val latency = System.currentTimeMillis() - start
             println("I took $latency ms")
             response
