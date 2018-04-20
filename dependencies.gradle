@@ -1,6 +1,6 @@
 ext {
     ext.kotlin_version = '1.2.31'
-    ext.jetty_version = '9.4.7.v20170914'
+    ext.jetty_version = '9.4.9.v20180320'
 
     kotlin_lib = [
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
