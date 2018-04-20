@@ -1,9 +1,6 @@
 description = 'Http4k HTTP Server built on top of jetty'
 
 ext {
-    alpnApiVersion = '1.1.3.v20160715'
-    alpnBootVersion = '8.1.12.v20180117'
-
     jetty = [
             "org.eclipse.jetty:jetty-server:$jetty_version",
             "org.eclipse.jetty:jetty-servlet:$jetty_version",
@@ -14,13 +11,8 @@ ext {
 dependencies {
     provided kotlin_lib
 
-    jetty
+    compile jetty
     compile "javax.websocket:javax.websocket-api:1.1"
-    compile "org.eclipse.jetty.http2:http2-server:$jetty_version"
-    compile "org.eclipse.jetty:jetty-alpn-conscrypt-server:$jetty_version"
-    compile "org.eclipse.jetty.alpn:alpn-api:$alpnApiVersion"
-
-    runtime "org.mortbay.jetty.alpn:alpn-boot:$alpnBootVersion"
 
     provided project(":http4k-core")
 
