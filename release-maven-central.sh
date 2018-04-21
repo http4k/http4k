@@ -8,12 +8,12 @@ set -o nounset
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 LOCAL_VERSION=`jq -r .http4k.version $DIR/version.json`
-TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:"false"}
+#TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:"false"}
 
-if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-    echo "not master branch, so skipping"
-    exit 0
-fi
+#if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+#    echo "not master branch, so skipping"
+#    exit 0
+#fi
 
 function maven_publish {
     local PACKAGE=$1

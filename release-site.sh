@@ -10,12 +10,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:"false"}
-
-if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-    echo "not master branch, so skipping"
-    exit 0
-fi
+#TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST:"false"}
+#
+#if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+#    echo "not master branch, so skipping"
+#    exit 0
+#fi
 
 pip install -r requirements.txt
 
