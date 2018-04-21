@@ -5,7 +5,7 @@ This example is the simplest possible "server" implementation. Note that we are 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.24.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.25.0"
 ```
 
 ### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/server_as_a_function/example.kt)
