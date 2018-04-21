@@ -1,4 +1,3 @@
-
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -51,8 +50,8 @@ fun main(args: Array<String>) {
     val threads = 250
     val reps = 400
 
-    listOf(::Jetty, ::Undertow, ::SunHttp, ::Netty)
-        .map { testWith(threads, reps, it, 8000) }
-        .sortedBy { it.time }
-        .forEach(::println)
+    listOf<(Int) -> ServerConfig>({ Jetty(it) }, { Undertow(it) }, { SunHttp(it) }, { Netty(it) })
+            .map { testWith(threads, reps, it, 8000) }
+            .sortedBy { it.time }
+            .forEach(::println)
 }
