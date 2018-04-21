@@ -6,6 +6,14 @@ ext {
             "org.eclipse.jetty:jetty-servlet:$jetty_version",
             "org.eclipse.jetty.websocket:javax-websocket-server-impl:$jetty_version"
     ]
+
+    // this list is for reference ("provided") since http2 support is optional
+    jettyHttp2 = [
+            "org.eclipse.jetty.http2:http2-server:$jetty_version",
+            "org.eclipse.jetty:jetty-alpn-conscrypt-server:$jetty_version",
+            "org.eclipse.jetty.alpn:alpn-api:1.1.3.v20160715", // version depends on your version of JDK!
+            "org.mortbay.jetty.alpn:alpn-boot:8.1.12.v20180117" // version depends on your version of JDK!
+    ]
 }
 
 dependencies {
@@ -13,6 +21,8 @@ dependencies {
 
     compile jetty
     compile "javax.websocket:javax.websocket-api:1.1"
+
+    provided jettyHttp2
 
     provided project(":http4k-core")
 

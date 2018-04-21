@@ -4,7 +4,7 @@ package org.http4k.core
 
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
-import org.http4k.core.HttpMessage.Companion.version
+import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -45,11 +45,11 @@ class StreamBody(override val stream: InputStream, length: Long?) : Body {
     override fun toString(): String = "<<stream>>"
 
     override fun equals(other: Any?): Boolean =
-        when {
-            this === other -> true
-            other !is Body? -> false
-            else -> payload == other?.payload
-        }
+            when {
+                this === other -> true
+                other !is Body? -> false
+                else -> payload == other?.payload
+            }
 
     override fun hashCode(): Int = payload.hashCode()
 }
@@ -57,6 +57,7 @@ class StreamBody(override val stream: InputStream, length: Long?) : Body {
 interface HttpMessage : Closeable {
     val headers: Headers
     val body: Body
+    val version: String
 
     fun toMessage(): String
 
@@ -84,7 +85,8 @@ interface HttpMessage : Closeable {
     fun bodyString(): String = String(body.payload.array())
 
     companion object {
-        const val version = "HTTP/1.1"
+        const val HTTP_1_1 = "HTTP/1.1"
+        const val HTTP_2 = "HTTP/2"
     }
 
     override fun close() = body.close()
@@ -123,13 +125,13 @@ interface Request : HttpMessage {
     override fun toMessage() = listOf("$method $uri $version", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(method: Method, uri: Uri): Request = MemoryRequest(method, uri, listOf(), EMPTY)
-        operator fun invoke(method: Method, uri: String): Request = MemoryRequest(method, Uri.of(uri), listOf(), EMPTY)
+        operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request = MemoryRequest(method, uri, listOf(), EMPTY, version)
+        operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = MemoryRequest(method, Uri.of(uri), listOf(), EMPTY, version)
     }
 }
 
 @Suppress("EqualsOrHashCode")
-data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Request {
+data class MemoryRequest(override val method: Method, override val uri: Uri, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Request {
     override fun method(method: Method): Request = copy(method = method)
 
     override fun uri(uri: Uri) = copy(uri = uri)
@@ -157,10 +159,10 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun toString(): String = toMessage()
 
     override fun equals(other: Any?) = (other is Request
-        && headers.areSameHeadersAs(other.headers)
-        && method == other.method
-        && uri == other.uri
-        && body == other.body)
+            && headers.areSameHeadersAs(other.headers)
+            && method == other.method
+            && uri == other.uri
+            && body == other.body)
 }
 
 @Suppress("EqualsOrHashCode")
@@ -184,12 +186,12 @@ interface Response : HttpMessage {
     override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
-        operator fun invoke(status: Status): Response = MemoryResponse(status, listOf(), EMPTY)
+        operator fun invoke(status: Status, version: String = HTTP_1_1): Response = MemoryResponse(status, listOf(), EMPTY, version)
     }
 }
 
 @Suppress("EqualsOrHashCode")
-data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY) : Response {
+data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
     override fun headers(headers: Headers) = copy(headers = this.headers.plus(headers))
@@ -207,9 +209,9 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun toString(): String = toMessage()
 
     override fun equals(other: Any?) = (other is Response
-        && headers.areSameHeadersAs(other.headers)
-        && status == other.status
-        && body == other.body)
+            && headers.areSameHeadersAs(other.headers)
+            && status == other.status
+            && body == other.body)
 }
 
 fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
