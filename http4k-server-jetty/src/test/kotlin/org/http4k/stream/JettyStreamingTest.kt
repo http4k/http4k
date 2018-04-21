@@ -12,5 +12,4 @@ class JettyStreamingTest : StreamingContract() {
 
     override fun createClient(): HttpHandler =
         ApacheClient(requestBodyMode = BodyMode.Stream, responseBodyMode = BodyMode.Stream)
-
 }

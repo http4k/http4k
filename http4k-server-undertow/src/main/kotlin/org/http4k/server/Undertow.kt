@@ -1,6 +1,7 @@
 package org.http4k.server
 
 import io.undertow.Undertow
+import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.util.HttpString
@@ -28,7 +29,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
     }
 
     private fun HttpServerExchange.asRequest(): Request =
-        Request(Method.valueOf(requestMethod.toString()), Uri.of(relativePath + "?" + queryString))
+        Request(Method.valueOf(requestMethod.toString()), Uri.of("$relativePath?$queryString"))
             .headers(requestHeaders
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
             .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
@@ -38,11 +39,12 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
     }
 }
 
-data class Undertow(val port: Int = 8000) : ServerConfig {
+data class Undertow(val port: Int = 8000, val enableHttp2: Boolean = false) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer =
         object : Http4kServer {
             val server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
+                .setServerOption(ENABLE_HTTP2, enableHttp2)
                 .setHandler(BlockingHandler(HttpUndertowHandler(httpHandler))).build()
 
             override fun start(): Http4kServer = apply {
