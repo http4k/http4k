@@ -43,7 +43,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
     }
 }
 
-data class StaticRoutingHttpHandler(private val pathSegments: String,
+data class StaticRoutingHttpHandler internal constructor(private val pathSegments: String,
                                     private val resourceLoader: ResourceLoader,
                                     private val extraPairs: Map<String, ContentType>,
                                     private val filter: Filter = Filter.NoOp

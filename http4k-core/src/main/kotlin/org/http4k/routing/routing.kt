@@ -14,12 +14,25 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
+/**
+ * Provides matching of a Request to an HttpHandler which can service it.
+ */
 interface Router {
     fun match(request: Request): HttpHandler?
 }
 
+/**
+ * Composite HttpHandler which can service many different URL paths.
+ */
 interface RoutingHttpHandler : Router, HttpHandler {
+    /**
+     * Apply the Filter to all received requests before servicing them.
+     */
     fun withFilter(new: Filter): RoutingHttpHandler
+
+    /**
+     * Prepend the existing matching paths with the one passed.
+     */
     fun withBasePath(new: String): RoutingHttpHandler
 }
 
