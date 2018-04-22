@@ -40,8 +40,8 @@ fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(
 
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRoutingHttpHandler(*list)
 
-fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): StaticRoutingHttpHandler =
-    StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
+fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
+        StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
 
 interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
@@ -58,15 +58,18 @@ fun Request.path(name: String): String? = when (this) {
 }
 
 data class PathMethod(val path: String, val method: Method) {
-    infix fun to(action: HttpHandler): RoutingHttpHandler = TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
-    infix fun to(action: StaticRoutingHttpHandler): RoutingHttpHandler = action.withBasePath(path).let {
-        object : RoutingHttpHandler by it {
-            override fun match(request: Request): HttpHandler? = when (method) {
-                request.method -> it.match(request)
-                else -> null
+    infix fun to(action: HttpHandler): RoutingHttpHandler =
+            when (action) {
+                is StaticRoutingHttpHandler -> action.withBasePath(path).let {
+                    object : RoutingHttpHandler by it {
+                        override fun match(request: Request): HttpHandler? = when (method) {
+                            request.method -> it.match(request)
+                            else -> null
+                        }
+                    }
+                }
+                else -> TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
             }
-        }
-    }
 }
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)
