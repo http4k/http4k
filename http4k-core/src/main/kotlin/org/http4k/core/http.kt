@@ -14,6 +14,12 @@ typealias Headers = Parameters
 interface Body : Closeable {
     val stream: InputStream
     val payload: ByteBuffer
+
+    /**
+     * Important: As body's length is not always known (e.g. if streaming is activated in the server or client),
+     * attempting to retrieve this property can result in an IllegalStateException.
+     * @throws IllegalStateException
+     */
     val length: Long
 
     companion object {

@@ -18,20 +18,30 @@ import java.io.InputStream
  * Provides matching of a Request to an HttpHandler which can service it.
  */
 interface Router {
+    /**
+     * Attempt to supply an HttpHandler which can service the passed request.
+     */
     fun match(request: Request): HttpHandler?
 }
 
 /**
- * Composite HttpHandler which can service many different URL paths.
+ * Composite HttpHandler which can potentially service many different URL patterns. Should
+ * return a 404 Response if it cannot service a particular Request.
+ *
+ * Note that generally there should be no reason for the API user to implement this interface over and above the
+ * implementations that already exist. The interface is public only because we have not found a way to hide it from
+ * the API user in an API-consistent manner.
  */
 interface RoutingHttpHandler : Router, HttpHandler {
     /**
-     * Apply the Filter to all received requests before servicing them.
+     * Returns a RoutingHttpHandler which applies the passed Filter to all received requests before servicing them.
+     * To follow the trend of immutability, this will generally be a new instance.
      */
     fun withFilter(new: Filter): RoutingHttpHandler
 
     /**
-     * Prepend the existing matching paths with the one passed.
+     * Returns a RoutingHttpHandler which prepends the passed base path to the logic determining the match()
+     * To follow the trend of immutability, this will generally be a new instance.
      */
     fun withBasePath(new: String): RoutingHttpHandler
 }
