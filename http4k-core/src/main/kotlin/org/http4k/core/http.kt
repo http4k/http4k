@@ -11,6 +11,10 @@ import java.nio.ByteBuffer
 
 typealias Headers = Parameters
 
+/**
+ * If this Body is NOT being returned to the caller (via a Server implementation or otherwise), close() should be
+ * called.
+ */
 interface Body : Closeable {
     val stream: InputStream
     val payload: ByteBuffer
@@ -31,6 +35,9 @@ interface Body : Closeable {
     }
 }
 
+/**
+ * Represents a body that is backed by an in-memory ByteBuffer. Closing this has no effect.
+ **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
 
@@ -40,7 +47,19 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
     override fun toString(): String = payload.asString()
 }
 
+/**
+ * Represents a body that is backed by a (lazy) InputStream. Operating with StreamBody has a number of potential
+ * gotchas:
+ * 1. Attempts to consume the stream will pull all of the contents into memory, and should thus be avoided.
+ * This includes calling `equals()` and `payload`
+ * 2. If this Body is NOT being returned to the caller (via a Server implementation or otherwise), close() should be called.
+ * 3. Depending on the source of the stream, this body may or may not contain a known length. Attempts to get the
+ * length when there is none will cause an IllegalStateException to be thrown.
+ */
 class StreamBody(override val stream: InputStream, length: Long?) : Body {
+    /**
+     * @throws IllegalStateException if there is no supplied body length
+     */
     override val length: Long by lazy { length ?: throw IllegalStateException("Length is not set on StreamBody") }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
 

@@ -40,7 +40,14 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
             }.iterator()
 }
 
+/**
+ * Represents a Multi-part that is backed by a stream, which should be closed after handling the content. The gotchas
+ * which apply to StreamBody also apply here..
+ **/
 data class MultipartFormBody private constructor(internal val formParts: List<MultipartEntity>, val boundary: String = UUID.randomUUID().toString()) : Body, Closeable {
+    /**
+     * @throws IllegalStateException if there is no supplied body length
+     */
     override val length: Long by lazy { throw IllegalStateException("Length is not available in MultipartFormBody") }
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
@@ -54,7 +61,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun fields(name: String): List<String> = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     companion object {
-        val DEFAULT_DISK_THRESHOLD = 1000 * 1024
+        const val DEFAULT_DISK_THRESHOLD = 1000 * 1024
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
