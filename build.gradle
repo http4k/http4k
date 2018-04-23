@@ -12,6 +12,7 @@ buildscript {
         classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.16"
     }
 }
 
@@ -36,6 +37,7 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
     apply plugin: 'provided-base'
+    apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
         toolVersion = '0.8.1'
@@ -213,4 +215,26 @@ sourceSets {
             srcDir 'src/docs'
         }
     }
+}
+
+task dokka (type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
+    moduleName = "$rootProject.name"
+    outputDirectory = "$buildDir/ddoc"
+    outputFormat = "gfm"
+    processConfigurations = []
+
+    sourceDirs = files(subprojects.collect {
+        p ->
+
+            def path = new File(p.projectDir, "/src/main/kotlin")
+
+            def relativePath = rootDir.toPath().relativize(path.toPath()).toString()
+            linkMapping {
+                dir = path
+                url = "https://github.com/http4k/http4k/blob/master/$relativePath"
+                suffix = "#L"
+            }
+
+            return path
+    })
 }
