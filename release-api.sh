@@ -26,7 +26,12 @@ cp -R build/ddoc/http4k/* ${TMP}/
 
 cd ${TMP}
 git add .
-git commit -am "release API docs"
-git push --force
+if [[ -z $(git status -s) ]]
+then
+    echo "tree is clean"
+else
+    git commit -am "release API docs"
+    git push --force
+fi
 
 cd -
