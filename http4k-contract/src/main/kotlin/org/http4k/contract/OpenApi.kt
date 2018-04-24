@@ -74,7 +74,6 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
             "consumes" to json.array(consumes.map { json.string(it.value) }),
             "parameters" to json.array(nonBodyParamNodes.plus(bodyParamNodes)),
             "responses" to json.obj(responses),
-            "supportedContentTypes" to json.array(route.meta.produces.map { json.string(it.value) }),
             "security" to json.array(when (security) {
                 is ApiKey<*> -> listOf(json.obj("api_key" to json.array(emptyList())))
                 else -> emptyList<NODE>()

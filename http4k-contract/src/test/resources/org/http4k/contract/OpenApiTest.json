@@ -66,9 +66,6 @@
             "schema": null
           }
         },
-        "supportedContentTypes": [
-          "application/json"
-        ],
         "security": [
           {
             "api_key": []
@@ -122,9 +119,6 @@
             }
           }
         },
-        "supportedContentTypes": [
-          "application/json"
-        ],
         "security": [
           {
             "api_key": []
@@ -174,7 +168,6 @@
           }
         ],
         "responses": {},
-        "supportedContentTypes": [],
         "security": [
           {
             "api_key": []
@@ -193,7 +186,6 @@
         "consumes": [],
         "parameters": [],
         "responses": {},
-        "supportedContentTypes": [],
         "security": [
           {
             "api_key": []
