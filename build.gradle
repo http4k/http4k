@@ -218,6 +218,7 @@ sourceSets {
 }
 
 task dokka (type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
+    includes = ['src/packages.md']
     moduleName = "$rootProject.name"
     outputDirectory = "$buildDir/ddoc"
     outputFormat = "gfm"
