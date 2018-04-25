@@ -101,4 +101,4 @@ object WebsocketClient {
     }
 }
 
-private fun Headers.combineToMap() = this.groupBy { it.first }.mapValues { it.value.joinToString(", ") }
+private fun Headers.combineToMap() = this.groupBy { it.first }.mapValues { it.value.map { it.second }.joinToString(", ") }

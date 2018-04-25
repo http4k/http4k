@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.26.1
+- Fix #124 - headers in WebSocket upgrade request are incorrectly joined.
+
 ### v3.26.0
 - Removed `supportedContentTypes` field from OpenApi contract JSON, since this is a legacy field.
 
