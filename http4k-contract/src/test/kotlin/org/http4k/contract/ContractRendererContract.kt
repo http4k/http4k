@@ -94,7 +94,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        println(actual)
+        println(actual)
         assertThat(parse(actual), equalTo(parse(expected)))
     }
 }

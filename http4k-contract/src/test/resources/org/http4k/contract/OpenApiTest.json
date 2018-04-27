@@ -26,7 +26,6 @@
           "tag3"
         ],
         "summary": "summary of this route",
-        "description": "some rambling description of what this thing actually does",
         "operationId": "echoMessage",
         "produces": [
           "application/json"
@@ -36,14 +35,13 @@
           {
             "in": "header",
             "name": "header",
-            "description": "description of the header",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "description": "description of the header"
           },
           {
             "in": "path",
             "name": "message",
-            "description": null,
             "required": true,
             "type": "string"
           }
@@ -62,15 +60,15 @@
             }
           },
           "403": {
-            "description": "no way jose",
-            "schema": null
+            "description": "no way jose"
           }
         },
         "security": [
           {
             "api_key": []
           }
-        ]
+        ],
+        "description": "some rambling description of what this thing actually does"
       },
       "post": {
         "tags": [
@@ -78,7 +76,6 @@
           "tag2"
         ],
         "summary": "a post endpoint",
-        "description": null,
         "produces": [
           "application/json"
         ],
@@ -90,25 +87,23 @@
           {
             "in": "query",
             "name": "query",
-            "description": null,
             "required": true,
             "type": "integer"
           },
           {
             "in": "path",
             "name": "message",
-            "description": null,
             "required": true,
             "type": "string"
           },
           {
             "in": "body",
             "name": "body",
-            "description": "the body of the message",
             "required": true,
             "schema": {
               "$ref": "#/definitions/someOtherDefinitionId"
-            }
+            },
+            "description": "the body of the message"
           }
         ],
         "responses": {
@@ -132,7 +127,6 @@
           "/basepath"
         ],
         "summary": "a friendly endpoint",
-        "description": null,
         "produces": [],
         "consumes": [
           "application/x-www-form-urlencoded"
@@ -141,30 +135,28 @@
           {
             "in": "query",
             "name": "query",
-            "description": "description of the query",
             "required": true,
-            "type": "boolean"
+            "type": "boolean",
+            "description": "description of the query"
           },
           {
             "in": "path",
             "name": "firstName",
-            "description": null,
             "required": true,
             "type": "string"
           },
           {
             "in": "path",
             "name": "secondName",
-            "description": null,
             "required": true,
             "type": "string"
           },
           {
             "in": "form",
             "name": "form",
-            "description": "description of the form",
             "required": true,
-            "type": "integer"
+            "type": "integer",
+            "description": "description of the form"
           }
         ],
         "responses": {},
@@ -181,7 +173,6 @@
           "/basepath"
         ],
         "summary": "a simple endpoint",
-        "description": null,
         "produces": [],
         "consumes": [],
         "parameters": [],
