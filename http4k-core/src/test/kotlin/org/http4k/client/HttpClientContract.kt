@@ -71,7 +71,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `performs simple GET request`() {
         System.err.println("GET")
-        val response = client(Request(GET, "http://httpbin.org/get").query("name", "John Doe"))
+        val response = client(Request(GET, "https://httpbin.org/get").query("name", "John Doe"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), containsSubstring("John Doe"))
@@ -90,7 +90,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `performs simple DELETE request`() {
         System.err.println("DELETE")
 
-        val response = client(Request(DELETE, "http://httpbin.org/delete"))
+        val response = client(Request(DELETE, "https://httpbin.org/delete"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), containsSubstring(""))
@@ -99,7 +99,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `does not follow redirects`() {
         System.err.println("REDIRECTS")
-        val response = client(Request(GET, "http://httpbin.org/redirect-to").query("url", "/destination"))
+        val response = client(Request(GET, "https://httpbin.org/redirect-to").query("url", "/destination"))
 
         assertThat(response.status, equalTo(Status.FOUND))
         assertThat(response.header("location"), equalTo("/destination"))
@@ -109,9 +109,9 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `does not store cookies`() {
         System.err.println("COOKIES")
 
-        client(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
+        client(Request(GET, "https://httpbin.org/cookies/set").query("foo", "bar"))
 
-        val response = client(Request(GET, "http://httpbin.org/cookies"))
+        val response = client(Request(GET, "https://httpbin.org/cookies"))
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), !containsSubstring("foo"))
@@ -123,7 +123,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         val enhancedClient = ClientFilters.FollowRedirects().then(ClientFilters.Cookies()).then(client)
 
-        val response = enhancedClient(Request(GET, "http://httpbin.org/cookies/set").query("foo", "bar"))
+        val response = enhancedClient(Request(GET, "https://httpbin.org/cookies/set").query("foo", "bar"))
 
         assertThat(response.status.successful, equalTo(true))
         assertThat(response.bodyString(), containsSubstring("foo"))
@@ -142,7 +142,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `redirection response`() {
         System.err.println("REDIRECTION")
         val response = ClientFilters.FollowRedirects()
-            .then(client)(Request(GET, "http://httpbin.org/relative-redirect/5"))
+            .then(client)(Request(GET, "https://httpbin.org/relative-redirect/5"))
         response.status.shouldMatch(equalTo(OK))
         response.bodyString().shouldMatch(anything)
     }
