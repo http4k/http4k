@@ -2,7 +2,7 @@ package org.http4k.filter
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
-import org.http4k.core.StreamBody
+import org.http4k.core.MemoryBody
 import org.http4k.core.then
 import java.io.PrintStream
 
@@ -38,7 +38,8 @@ object DebuggingFilters {
         }
     }
 
-    private fun HttpMessage.printable(debugStream: Boolean): HttpMessage = if (!debugStream && body is StreamBody) body("<<stream>>") else this
+    private fun HttpMessage.printable(debugStream: Boolean) =
+            if (debugStream || body is MemoryBody) this else body("<<stream>>")
 
     /**
      * Print details of a request and it's response.

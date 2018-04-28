@@ -39,7 +39,7 @@ class DebuggingFiltersTest {
     }
 
     @Test
-    fun `can suppress body`(){
+    fun `can suppress stream body`(){
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
@@ -49,5 +49,4 @@ class DebuggingFiltersTest {
         assertThat(actual, containsSubstring(req.body("<<stream>>").toString()))
         assertThat(actual, containsSubstring(resp.body("<<stream>>").toString()))
     }
-
 }
