@@ -165,8 +165,8 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Test
     fun `ok when length already set`() {
         val response = client(Request(GET, "http://localhost:$port/presetlength"))
-
         assertThat(response.status, equalTo(OK))
+        assertThat(response.header("content-length"), equalTo("0"))
     }
 
     @After

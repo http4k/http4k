@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.26.5
+- Fix #125 - ApacheServer implementation now sets content length if present.
+
 ### v3.26.4
 - Fix #123 - Multipart Body objects blow up when parsed after being debugged. As with all streams, care should be taken to not blow heap when internalising them for debugging purposes.
 
