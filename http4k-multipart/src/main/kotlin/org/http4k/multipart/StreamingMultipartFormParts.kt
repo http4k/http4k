@@ -119,7 +119,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                     if (index < 0) throw ParseError("Header didn't include a colon <<$header>>")
                     else {
                         previousHeaderName = header.substring(0, index).trim { it <= ' ' }
-                        result.put(previousHeaderName, header.substring(index + 1).trim { it <= ' ' })
+                        result[previousHeaderName] = header.substring(index + 1).trim { it <= ' ' }
                     }
                 }
             }
