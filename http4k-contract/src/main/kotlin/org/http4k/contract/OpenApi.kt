@@ -1,11 +1,14 @@
 package org.http4k.contract
 
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
@@ -24,15 +27,17 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
     override fun notFound() = errors.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
-            Response(OK).body(json.pretty(json.obj(
-                    "swagger" to json.string("2.0"),
-                    "info" to apiInfo.asJson(),
-                    "basePath" to json.string("/"),
-                    "tags" to json.array(renderTags(routes)),
-                    "paths" to json.obj(renderPaths(routes, contractRoot, security).fields),
-                    "securityDefinitions" to security.asJson(),
-                    "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
-            )))
+            Response(OK)
+                    .with(CONTENT_TYPE of APPLICATION_JSON)
+                    .body(json.pretty(json.obj(
+                            "swagger" to json.string("2.0"),
+                            "info" to apiInfo.asJson(),
+                            "basePath" to json.string("/"),
+                            "tags" to json.array(renderTags(routes)),
+                            "paths" to json.obj(renderPaths(routes, contractRoot, security).fields),
+                            "securityDefinitions" to security.asJson(),
+                            "definitions" to json.obj(renderPaths(routes, contractRoot, security).definitions)
+                    )))
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
             .groupBy { it.describeFor(contractRoot) }.entries
