@@ -11,7 +11,7 @@ import java.util.NoSuchElementException
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
  */
 internal class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
-    private val iterator = StreamingMulipartFormPartIterator()
+    private val iterator = StreamingMultipartFormPartIterator()
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
     private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
@@ -127,7 +127,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         throw TokenNotFoundException("Didn't find end of Header section within $HEADER_SIZE_MAX bytes")
     }
 
-    inner class StreamingMulipartFormPartIterator : Iterator<StreamingPart> {
+    inner class StreamingMultipartFormPartIterator : Iterator<StreamingPart> {
         private var nextIsKnown = false
         private var currentPart: StreamingPart? = null
 
