@@ -45,10 +45,10 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
         }
         val app = routes("/someUri" bind POST to defaultHandler,
                 "/cookies/set" bind GET to { req: Request ->
-                    Response(OK).cookie(Cookie(req.query("name")!!, req.query("value")!!))
+                    Response(FOUND).header("Location", "/cookies").cookie(Cookie(req.query("name")!!, req.query("value")!!))
                 },
                 "/cookies" bind GET to { req: Request ->
-                    Response(OK).body(req.cookies().map { it.name + "=" + it.value }.joinToString(","))
+                    Response(OK).body(req.cookies().joinToString(",") { it.name + "=" + it.value })
                 },
                 "/empty" bind GET to { _: Request -> Response(OK).body("") },
                 "/relative-redirect/{times}" bind GET to { req: Request ->

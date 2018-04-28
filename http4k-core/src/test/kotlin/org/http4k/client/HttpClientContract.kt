@@ -119,7 +119,6 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    @Ignore
     fun `filters enable cookies and redirects`() {
         System.err.println("FILTER COOKIE AND REDIRECT")
 
