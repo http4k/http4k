@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.26.3
+- Debugging filter now supports ignoring Multipart streams.
+
 ### v3.26.2
 - Tweak: OpenAPI now doesn't return null values in the schema.
 
