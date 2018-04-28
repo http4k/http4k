@@ -26,6 +26,23 @@ class MultipartFormBodyTest {
     }
 
     @Test
+    fun `can handle when body is already pulled into memory`() {
+        val form = MultipartFormBody("bob").plus("field" to "bar")
+            .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+
+        val req = Request(Method.POST, "")
+            .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+            .body(form)
+
+        req.bodyString()
+
+        MultipartFormBody.from(req) shouldMatch equalTo(
+            MultipartFormBody("bob").plus("field" to "bar")
+                .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+        )
+    }
+
+    @Test
     fun `closing streams - manually created multipart`() {
         val streams = (1..3).map { "content $it" }.map { TestInputStream(it) }
 

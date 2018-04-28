@@ -5,6 +5,7 @@ import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormParser
 import org.http4k.multipart.Part
 import org.http4k.multipart.StreamingMultipartFormParts
+import java.io.ByteArrayInputStream
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
@@ -74,7 +75,8 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
             val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
-            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), httpMessage.body.stream, UTF_8)
+            val inputStream = httpMessage.body.run { if (stream.available() > 0) stream else ByteArrayInputStream(payload.array()) }
+            val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
