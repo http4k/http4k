@@ -76,7 +76,7 @@ object ClientFilters {
 
         private fun Response.location() = header("location")?.replace(";\\s*charset=.*$".toRegex(), "").orEmpty()
 
-        private fun Response.assureBodyIsConsumed() = body.stream.close()
+        private fun Response.assureBodyIsConsumed() = body.close()
 
         private fun Response.isRedirection(): Boolean = status.redirection && header("location")?.let(String::isNotBlank) == true
 
