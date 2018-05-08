@@ -24,17 +24,17 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
                                       extraPairs: Map<String, ContentType>) : HttpHandler {
     private val extMap = MimeTypes(extraPairs)
 
-    override fun invoke(p1: Request): Response {
+    override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments)) {
         val path = convertPath(p1.uri.path)
-        return resourceLoader.load(path)?.let { url ->
+        resourceLoader.load(path)?.let { url ->
             val lookupType = extMap.forFile(path)
             if (p1.method == GET && lookupType != OCTET_STREAM) {
                 Response(OK)
-                    .header("Content-Type", lookupType.value)
-                    .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
+                        .header("Content-Type", lookupType.value)
+                        .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
             } else Response(NOT_FOUND)
         } ?: Response(NOT_FOUND)
-    }
+    } else Response(NOT_FOUND)
 
     private fun convertPath(path: String): String {
         val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")

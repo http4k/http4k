@@ -28,6 +28,13 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
+    fun `does not serve contents of existing root file outside the scope`() {
+        val handler = "/svc" bind static()
+        val result = handler(Request(GET, of("/mybob.xml")))
+        assertThat(result.status, equalTo(NOT_FOUND))
+    }
+
+    @Test
     fun `can register custom mime types`() {
         val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
         val result = handler(Request(GET, of("/svc/mybob.myxml")))
