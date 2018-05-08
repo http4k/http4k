@@ -2,15 +2,15 @@ title: http4k Server Modules
 description: Feature overview of the http4k-server modules, covering Server backends
 
 ### Installation (Gradle)
-**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.26.5"```
+**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.26.6"```
 
-**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.26.5"```
+**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.26.6"```
 
-**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.26.5"```
+**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.26.6"```
 
-**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.26.5"```
+**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.26.6"```
 
-**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.26.5"```
+**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.26.6"```
 
 ### About
 Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):

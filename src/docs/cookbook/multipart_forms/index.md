@@ -8,8 +8,8 @@ Multipart form support is provided on 2 levels:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.26.5"
-    compile group: "org.http4k", name: "http4k-multipart", version: "3.26.5"
+    compile group: "org.http4k", name: "http4k-core", version: "3.26.6"
+    compile group: "org.http4k", name: "http4k-multipart", version: "3.26.6"
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/multipart_forms/example_standard.kt)
