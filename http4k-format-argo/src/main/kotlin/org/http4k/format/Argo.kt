@@ -44,6 +44,7 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> = node.fieldList.map { it.name.text to it.value }
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
     override fun text(value: JsonNode): String = value.text
+    override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }

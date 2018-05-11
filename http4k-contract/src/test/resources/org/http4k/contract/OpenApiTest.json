@@ -50,7 +50,7 @@
           "200": {
             "description": "peachy",
             "schema": {
-              "$ref": "#/definitions/object730441992"
+              "$ref": "#/definitions/object-1396932212"
             }
           },
           "202": {
@@ -110,7 +110,7 @@
           "403": {
             "description": "no way jose",
             "schema": {
-              "$ref": "#/definitions/object-610697972"
+              "$ref": "#/definitions/object1283926341"
             }
           }
         },
@@ -193,11 +193,12 @@
     }
   },
   "definitions": {
-    "object-126231440": {
+    "object-546230254": {
       "type": "object",
       "properties": {
         "notAStringField": {
-          "type": "integer"
+          "type": "integer",
+          "example": 123
         }
       }
     },
@@ -205,23 +206,25 @@
       "type": "object",
       "properties": {
         "anObject": {
-          "$ref": "#/definitions/object-126231440"
+          "$ref": "#/definitions/object-546230254"
         }
       }
     },
-    "object-610697972": {
+    "object1283926341": {
       "type": "object",
       "properties": {
         "aString": {
-          "type": "string"
+          "type": "string",
+          "example": "a message of some kind"
         }
       }
     },
-    "object-945612357": {
+    "object-1365611171": {
       "type": "object",
       "properties": {
         "aNumberField": {
-          "type": "integer"
+          "type": "integer",
+          "example": 123
         }
       }
     },
@@ -229,15 +232,15 @@
       "type": "object",
       "properties": {
         "anAnotherObject": {
-          "$ref": "#/definitions/object-945612357"
+          "$ref": "#/definitions/object-1365611171"
         }
       }
     },
-    "object730441992": {
+    "object-1396932212": {
       "type": "object",
       "properties": {
         "anAnotherObject": {
-          "$ref": "#/definitions/object-945612357"
+          "$ref": "#/definitions/object-1365611171"
         }
       }
     }

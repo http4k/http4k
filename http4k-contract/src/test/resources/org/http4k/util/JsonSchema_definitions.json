@@ -1,5 +1,5 @@
 {
-  "object1566645290": {
+  "object1048897856": {
     "type": "object",
     "properties": {
       "anotherString": {
@@ -8,7 +8,7 @@
       }
     }
   },
-  "object-1591149158": {
+  "object-2011196613": {
     "type": "object",
     "properties": {
       "anInteger": {
@@ -30,23 +30,23 @@
       },
       "aBooleanTrue": {
         "type": "boolean",
-        "example": "true"
+        "example": true
       },
       "aBooleanFalse": {
         "type": "boolean",
-        "example": "false"
+        "example": false
       },
       "anArray": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/object1566645290"
+          "$ref": "#/definitions/object1048897856"
         }
       },
       "anObject": {
-        "$ref": "#/definitions/object-1591149158"
+        "$ref": "#/definitions/object-2011196613"
       },
       "anotherObject": {
-        "$ref": "#/definitions/object-1591149158"
+        "$ref": "#/definitions/object-2011196613"
       }
     }
   }

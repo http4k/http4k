@@ -1,12 +1,6 @@
 package org.http4k.format
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonNull
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import com.google.gson.JsonPrimitive
+import com.google.gson.*
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
@@ -69,12 +63,12 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
+    override fun bool(value: JsonElement): Boolean = value.asBoolean
 
     override fun asJsonObject(a: Any): JsonElement = compact.toJsonTree(a)
     override fun <T : Any> asA(s: String, c: KClass<T>): T = compact.fromJson(s, c.java)
     override fun <T : Any> asA(j: JsonElement, c: KClass<T>): T = compact.fromJson(j, c.java)
 
-    inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
     inline fun <reified T : Any> JsonElement.asA(): T = asA(this, T::class)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
