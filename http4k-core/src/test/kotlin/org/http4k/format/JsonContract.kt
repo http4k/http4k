@@ -77,6 +77,11 @@ abstract class JsonContract<ROOT : NODE, NODE>(open val j: Json<ROOT, NODE>) {
     }
 
     @Test
+    fun `get boolean`() {
+        assertThat(j.bool(j.boolean(true)), equalTo(true))
+    }
+
+    @Test
     fun `get elements`() {
         val fields = listOf(j.string("world"), j.string("world2"))
         val elements = j.elements(j.array(fields)).toList()

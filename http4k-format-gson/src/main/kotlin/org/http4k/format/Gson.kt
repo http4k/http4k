@@ -1,6 +1,12 @@
 package org.http4k.format
 
-import com.google.gson.*
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import org.http4k.core.Body
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec

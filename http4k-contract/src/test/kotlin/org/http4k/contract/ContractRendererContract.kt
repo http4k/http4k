@@ -16,7 +16,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.format.Argo.json
-import org.http4k.format.Argo.parse
 import org.http4k.format.Argo.prettify
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
