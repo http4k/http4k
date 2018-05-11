@@ -3,7 +3,8 @@
     "type": "object",
     "properties": {
       "anotherString": {
-        "type": "string"
+        "type": "string",
+        "example": "yetAnotherString"
       }
     }
   },
@@ -11,7 +12,8 @@
     "type": "object",
     "properties": {
       "anInteger": {
-        "type": "integer"
+        "type": "integer",
+        "example": 1
       }
     }
   },
@@ -19,16 +21,20 @@
     "type": "object",
     "properties": {
       "aString": {
-        "type": "string"
+        "type": "string",
+        "example": "aStringValue"
       },
       "aNumber": {
-        "type": "number"
+        "type": "number",
+        "example": 1.9
       },
       "aBooleanTrue": {
-        "type": "boolean"
+        "type": "boolean",
+        "example": "true"
       },
       "aBooleanFalse": {
-        "type": "boolean"
+        "type": "boolean",
+        "example": "false"
       },
       "anArray": {
         "type": "array",
