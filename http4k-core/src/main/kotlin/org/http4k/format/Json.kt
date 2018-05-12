@@ -38,6 +38,7 @@ interface Json<ROOT : NODE, NODE> {
     fun fields(node: NODE): Iterable<Pair<String, NODE>>
     fun elements(value: NODE): Iterable<NODE>
     fun text(value: NODE): String
+    fun bool(value: NODE): Boolean
 
     fun compactify(s: String) = parse(s).asCompactJsonString()
 

@@ -19,15 +19,18 @@ class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
         when (json.typeOf(node)) {
             JsonType.Object -> objectSchema(overrideDefinitionId)
             JsonType.Array -> arraySchema()
-            JsonType.String -> JsonSchema(StringParam.schema(), definitions)
+            JsonType.String -> JsonSchema(StringParam.schema(json.string(json.text(node))), definitions)
             JsonType.Number -> numberSchema()
-            JsonType.Boolean -> JsonSchema(BooleanParam.schema(), definitions)
+            JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
             else -> throw IllegalSchemaException("unknown type")
         }
 
-    private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> =
-        JsonSchema((if (json.text(node).contains(".")) NumberParam else IntegerParam).schema(), definitions)
+    private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> {
+        val text = json.text(node)
+        val schema = if (text.contains(".")) NumberParam.schema(json.number(text.toBigDecimal())) else IntegerParam.schema(json.number(text.toBigInteger()))
+        return JsonSchema(schema, definitions)
+    }
 
     private fun JsonSchema<NODE>.arraySchema(): JsonSchema<NODE> {
         val (node, definitions) = json.elements(node).toList().firstOrNull()?.let {
@@ -47,6 +50,6 @@ class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
         return JsonSchema(json.obj("\$ref" to json.string("#/definitions/$definitionId")), allDefinitions)
     }
 
-    private fun ParamMeta.schema(): NODE = json.obj("type" to json.string(value))
+    private fun ParamMeta.schema(example: NODE): NODE = json.obj("type" to json.string(value), "example" to example)
 }
 

@@ -68,12 +68,12 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
+    override fun bool(value: JsonNode): Boolean = value.asBoolean()
 
     override fun asJsonObject(a: Any): JsonNode = mapper.convertValue(a, JsonNode::class.java)
     override fun <T : Any> asA(s: String, c: KClass<T>): T = mapper.convertValue(s.asJsonObject(), c.java)
     override fun <T : Any> asA(j: JsonNode, c: KClass<T>): T = mapper.convertValue(j, c.java)
 
-    inline fun <reified T : Any> String.asA(): T = asA(this, T::class)
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })

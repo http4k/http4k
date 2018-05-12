@@ -16,7 +16,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.format.Argo.json
-import org.http4k.format.Argo.parse
+import org.http4k.format.Argo.prettify
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
@@ -94,7 +94,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-        println(actual)
-        assertThat(parse(actual), equalTo(parse(expected)))
+        assertThat(prettify(actual), equalTo(prettify(expected)))
     }
 }

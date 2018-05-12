@@ -19,7 +19,7 @@ class JsonToJsonSchemaTest {
     fun `renders all different types of json value as expected`() {
         val model = json.obj(
             "aString" to json.string("aStringValue"),
-            "aNumber" to json.number(BigDecimal(1.9)),
+            "aNumber" to json.number(BigDecimal("1.9")),
             "aBooleanTrue" to json.boolean(true),
             "aBooleanFalse" to json.boolean(false),
             "anArray" to json.array(listOf(json.obj("anotherString" to json.string("yetAnotherString")))),
@@ -32,6 +32,6 @@ class JsonToJsonSchemaTest {
         assertThat(actual.node, equalTo(expected))
         val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
         println(json.pretty(obj(actual.definitions)))
-        assertThat(obj(actual.definitions), equalTo(expectedDefs))
+        assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
     }
 }
