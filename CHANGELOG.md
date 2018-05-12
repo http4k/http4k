@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.27.0
+- OpenAPI now provides example values in the generated schema. H/T @skewwhiffy for the PR.
+
 ### v3.26.6
 - Fix #126 - ResourceLoadingHandler can expose mapped resources into the root. <-- We think this is an important update, so please upgrade!
 
