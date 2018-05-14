@@ -221,7 +221,7 @@ fun main(args: Array<String>) {
 ## Contributors
 
 This project exists thanks to all the people who [contribute](https://www.http4k.org/contributing/).
-<a href="graphs/contributors"><img src="https://opencollective.com/http4k/contributors.svg?width=890" /></a>
+<a href="../../graphs/contributors"><img src="https://opencollective.com/http4k/contributors.svg?width=890" /></a>
 
 ## Backers & Sponsors
 
