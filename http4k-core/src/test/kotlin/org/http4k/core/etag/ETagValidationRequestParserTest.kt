@@ -1,9 +1,9 @@
-package org.http4k
+package org.http4k.core.etag
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ETagValidationRequestParser.Companion.parse
-import org.http4k.FieldValue.ETags
+import org.http4k.core.etag.ETagValidationRequestParser.Companion.parse
+import org.http4k.core.etag.FieldValue.ETags
 import org.junit.Test
 
 

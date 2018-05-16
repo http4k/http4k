@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.core.etag
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
