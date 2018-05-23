@@ -5,9 +5,9 @@ import org.http4k.core.*
 import org.http4k.toHttpHandler
 import org.junit.Test
 
-class LatencyAssaultFilterTest {
+class ChaosFiltersTest {
     @Test
-    fun `latency injected`() {
+    fun `inject latency`() {
         val req = Request(Method.GET, "")
         val resp = Response(Status.OK)
         val injectedResponse = ChaosFilters.LatencyInjectionFilter(100, 1000, 100).then(resp.toHttpHandler())(req)
@@ -15,7 +15,7 @@ class LatencyAssaultFilterTest {
     }
 
     @Test
-    fun `latency not injected`() {
+    fun `doesn't inject latency`() {
         val req = Request(Method.GET, "")
         val resp = Response(Status.OK)
         val injectedResponse = ChaosFilters.LatencyInjectionFilter(100, 1000, 0).then(resp.toHttpHandler())(req)
