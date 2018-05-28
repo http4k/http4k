@@ -199,6 +199,7 @@ dependencies {
     provided project(":http4k-template-pebble")
     provided project(":http4k-template-thymeleaf")
     provided project(":http4k-template-dust")
+    provided project(":http4k-testing-chaos")
     provided project(":http4k-testing-hamkrest")
     provided project(":http4k-testing-webdriver")
 
