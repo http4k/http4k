@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.28.0
+- Added etag parser filter. H/T @dgliosca for the PR
+- Ensured that `disableDefaultTyping` is called in default Jackson implementation. This should be the default anyway, but has been added to ensure that we don't fall foul of [CVE-2017-7525](https://github.com/FasterXML/jackson-databind/issues/1723) and to surface awareness of this issue.
+
 ### v3.27.0
 - OpenAPI now provides example values in the generated schema. H/T @skewwhiffy for the PR.
 
