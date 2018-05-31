@@ -47,7 +47,7 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     override fun toString(): String = StringBuilder()
         .appendIfNotBlank(scheme, scheme, ":")
         .appendIfNotBlank(authority, "//", authority)
-        .append(path)
+        .append(if(path.startsWith("/")) path else "/$path")
         .appendIfNotBlank(query, "?", query)
         .appendIfNotBlank(fragment, "#", fragment).toString()
 

@@ -35,6 +35,17 @@ class UriTest {
     }
 
     @Test
+    fun `handles no prefixed slash in a path`() {
+        val uri = Uri.of("")
+                .scheme("https")
+                .host("example.com")
+                .port(1234)
+                .path("a/b/c")
+
+        assertThat(uri.toString(), equalTo("https://example.com:1234/a/b/c"))
+    }
+
+    @Test
     fun can_parse_minimal_uri() {
         val value = "http://host"
         val uri = Uri.of(value)
