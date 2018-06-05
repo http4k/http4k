@@ -1,14 +1,16 @@
 package org.http4k.chaos
 
-import org.http4k.core.HttpMessage
+import org.http4k.core.Request
+import org.http4k.core.Response
 import java.util.concurrent.ThreadLocalRandom
 
 interface ChaosPolicy {
-    fun shouldInject(httpMessage: HttpMessage): Boolean
+    fun shouldInject(request: Request): Boolean = false
+    fun shouldInject(response: Response): Boolean = false
 }
 
 open class PercentageBasedChaosPolicy(private val injectionFrequency: Int) : ChaosPolicy {
-    override fun shouldInject(httpMessage: HttpMessage): Boolean {
+    override fun shouldInject(response: Response): Boolean {
         return ThreadLocalRandom.current().nextInt(0, 100) < injectionFrequency
     }
 
@@ -18,8 +20,4 @@ open class PercentageBasedChaosPolicy(private val injectionFrequency: Int) : Cha
             return PercentageBasedChaosPolicy(injectionFrequency)
         }
     }
-}
-
-class AlwaysInjectChaosPolicy : ChaosPolicy {
-    override fun shouldInject(httpMessage: HttpMessage) = true
 }

@@ -2,32 +2,22 @@ package org.http4k.chaos
 
 import org.http4k.core.Filter
 
-const val LATENCY_HEADER = "X-Chaos-Behaviour"
+const val CHAOS_HEADER = "X-Http4k-Chaos"
 
-object ChaosFilters {
-    object ChaosPreFilter {
-        operator fun invoke(chaosPolicy: ChaosPolicy, behaviour: ChaosBehaviour): Filter = Filter { next ->
-            { request ->
-                if (chaosPolicy.shouldInject(request)) {
-                    behaviour.inject(request)
-                    next(request).header(LATENCY_HEADER, behaviour.javaClass.name)
-                } else {
-                    next(request)
-                }
+object ChaosFilter {
+    operator fun invoke(chaosPolicy: ChaosPolicy, behaviour: ChaosBehaviour): Filter = Filter { next ->
+        { request ->
+            val response = if (chaosPolicy.shouldInject(request)) {
+                val injectedRequest = behaviour.inject(request)
+                next(injectedRequest).header(CHAOS_HEADER, behaviour.description)
+            } else {
+                next(request)
             }
-        }
-    }
-
-    object ChaosPostFilter {
-        operator fun invoke(chaosPolicy: ChaosPolicy, behaviour: ChaosBehaviour): Filter = Filter { next ->
-            { request ->
-                val response = next(request)
-                if (chaosPolicy.shouldInject(response)) {
-                    behaviour.inject(response)
-                    response.header(LATENCY_HEADER, behaviour.javaClass.name)
-                } else {
-                    response
-                }
+            if (chaosPolicy.shouldInject(response)) {
+                val injectedResponse = behaviour.inject(response)
+                injectedResponse.header(CHAOS_HEADER, behaviour.description)
+            } else {
+                response
             }
         }
     }
