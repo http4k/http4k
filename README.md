@@ -8,18 +8,21 @@
 <a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.2-blue.svg"></a>
 <a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
 <a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
-<a href="https://gitter.im/http4k/http4k"><img alt="Gitter" src="https://img.shields.io/badge/gitter-join%20chat-1dce73.svg"></a>
 <br/>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/backers/badge.svg"></a>
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 </span>
 
- [**http4k**](https://github.com/http4k/http4k) is an HTTP toolkit written in [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way.
+ [**http4k**](https://github.com/http4k/http4k) is an lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [**http4k**](https://github.com/http4k/http4k) applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server - note how i:
+ 
+ ```kotlin
+ val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
+ val server = app.asServer(SunHttp(8000)).start()
+ ```
 
-It consists of a core library `http4k-core` providing a base HTTP implementation + a number of abstractions for various functionalities (such as 
-servers, clients, templating, websockets etc) that are provided as optional add-on libraries.
+[**http4k**](https://github.com/http4k/http4k) consists of a core library, `http4k-core`, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.
 
-The principles of the toolkit are:
+The principles of [**http4k**](https://github.com/http4k/http4k) are:
 
 * **Application as a Function:** Based on the Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), all HTTP services can be composed 
 of 2 types of simple function:
