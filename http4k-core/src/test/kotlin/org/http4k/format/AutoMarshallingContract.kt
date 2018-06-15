@@ -6,16 +6,19 @@ import com.natpryce.hamkrest.throws
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
-data class CommonJdkPrimitives(val localDate: LocalDate, val localDateTime: LocalDateTime, val zonedDateTime: ZonedDateTime, val uuid: UUID)
+data class CommonJdkPrimitives(val localDate: LocalDate, val localTime: LocalTime, val localDateTime: LocalDateTime, val zonedDateTime: ZonedDateTime, val uuid: UUID)
 
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     protected open val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""
+    protected open val expectedAutoMarshallingResultPrimitives = """{"localDate":"2000-01-01","localTime":"01:01:01","localDateTime":"2000-01-01T01:01:01","zonedDateTime":"2000-01-01T01:01:01Z[UTC]","uuid":"1a448854-1687-4f90-9562-7d527d64383c"}"""
 
     val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
@@ -28,6 +31,16 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     @Test
     open fun `fails decoding when a required value is null`() {
-        assertThat({j.asA("{}", ArbObject::class)}, throws<Exception>())
+        assertThat({ j.asA("{}", ArbObject::class) }, throws<Exception>())
+    }
+
+    @Test
+    fun `roundtrip object with common java primitive types`() {
+        val localDate = LocalDate.of(2000, 1, 1)
+        val localTime = LocalTime.of(1, 1, 1)
+        val obj = CommonJdkPrimitives(localDate, localTime, LocalDateTime.of(localDate, localTime), ZonedDateTime.of(localDate, localTime, ZoneId.of("UTC")), UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"))
+        val out = j.asJsonString(obj)
+        assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
+        assertThat(j.asA(out, CommonJdkPrimitives::class), equalTo(obj))
     }
 }

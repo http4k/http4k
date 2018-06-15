@@ -31,15 +31,6 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(arrayOf(obj).toList()))
     }
-
-    @Test
-    fun `roundtrip object with common java primitive types`() {
-        val body = Body.auto<CommonJdkPrimitives>().toLens()
-
-        val obj = CommonJdkPrimitives(LocalDate.now(), LocalDateTime.now(), ZonedDateTime.now(), UUID.randomUUID())
-
-        assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
-    }
 }
 
 class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {

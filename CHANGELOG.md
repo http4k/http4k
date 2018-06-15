@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.29.0
 - Make HTTP clients resilient to unknown host and connectionrefused exceptions
+- Implememted #134 - Added default (de)serialization for common JDK primitives to all Auto-marshalling JSON modules - eg. datetimes and UUIDs
 
 ### v3.28.0
 - Fix #131 - Uri's created with paths that don't contain leading slashes.
