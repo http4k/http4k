@@ -1,11 +1,17 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS
 import com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.BigIntegerNode
 import com.fasterxml.jackson.databind.node.BooleanNode
@@ -22,6 +28,12 @@ import org.http4k.lens.ContentNegotiation
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlin.reflect.KClass
 
 open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
@@ -82,10 +94,26 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 }
 
 object Jackson : ConfigurableJackson(ObjectMapper()
-        .registerModule(KotlinModule())
+        .registerModule(KotlinModule()
+                .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+                .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+                .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+                .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+                .custom(UUID::fromString)
+        )
         .disableDefaultTyping()
         .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
         .configure(FAIL_ON_IGNORED_PROPERTIES, false)
         .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
         .configure(USE_BIG_INTEGER_FOR_INTS, true)
 )
+
+private inline fun <reified T> KotlinModule.custom(crossinline read: (String) -> T, crossinline write: (T) -> String = { it.toString() }) =
+        apply {
+            addDeserializer(T::class.java, object : JsonDeserializer<T>() {
+                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = read(p.text)
+            })
+            addSerializer(T::class.java, object : JsonSerializer<T>() {
+                override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(write(value!!))
+            })
+        }

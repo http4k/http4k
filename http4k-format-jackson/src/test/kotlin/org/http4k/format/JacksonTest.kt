@@ -9,6 +9,10 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.junit.Test
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.UUID
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
@@ -26,6 +30,15 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(arrayOf(obj).toList()))
+    }
+
+    @Test
+    fun `roundtrip object with common java primitive types`() {
+        val body = Body.auto<CommonJdkPrimitives>().toLens()
+
+        val obj = CommonJdkPrimitives(LocalDate.now(), LocalDateTime.now(), ZonedDateTime.now(), UUID.randomUUID())
+
+        assertThat(body(Response(Status.OK).with(body of obj)), equalTo(obj))
     }
 }
 

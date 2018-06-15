@@ -4,6 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.junit.Test
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.UUID
+
+data class CommonJdkPrimitives(val localDate: LocalDate, val localDateTime: LocalDateTime, val zonedDateTime: ZonedDateTime, val uuid: UUID)
 
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 
