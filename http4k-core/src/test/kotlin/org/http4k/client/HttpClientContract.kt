@@ -165,6 +165,22 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    open fun `connection refused are converted into 502`() {
+        System.err.println("CONNECTION REFUSED")
+        val response = client(Request(GET, "http://localhost:1"))
+
+        assertThat(response.status, equalTo(Status.CONNECTION_REFUSED))
+    }
+
+    @Test
+    open fun `unknown host are converted into 502`() {
+        System.err.println("UNKNOWN HOST")
+        val response = client(Request(GET, "http://foobar.bill"))
+
+        assertThat(response.status, equalTo(Status.UNKNOWN_HOST))
+    }
+
+    @Test
     fun `can retrieve body for different statuses`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))

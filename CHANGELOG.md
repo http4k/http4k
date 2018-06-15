@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.29.0
+- Make HTTP clients resilient to unknown host and connectionrefused exceptions
+
 ### v3.28.0
 - Fix #131 - Uri's created with paths that don't contain leading slashes.
 - Added etag parser filter. H/T @dgliosca for the PR

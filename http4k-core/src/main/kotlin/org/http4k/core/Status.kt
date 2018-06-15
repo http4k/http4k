@@ -53,6 +53,7 @@ data class Status(val code: Int, val description: String) {
         val BAD_GATEWAY = Status(502, "Bad Gateway")
         val SERVICE_UNAVAILABLE = Status(503, "Service Unavailable")
         val CONNECTION_REFUSED = SERVICE_UNAVAILABLE.copy(description = "Connection Refused")
+        val UNKNOWN_HOST = SERVICE_UNAVAILABLE.copy(description = "Unknown Host")
         val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
         val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.copy(description = "Client Timeout")
         val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")

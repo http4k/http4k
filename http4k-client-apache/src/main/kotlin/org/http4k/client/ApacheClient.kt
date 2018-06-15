@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpOptions
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.client.methods.HttpTrace
 import org.apache.http.conn.ConnectTimeoutException
+import org.apache.http.conn.HttpHostConnectException
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.CloseableHttpClient
@@ -31,8 +32,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
+import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.net.SocketTimeoutException
 import java.net.URI
+import java.net.UnknownHostException
 
 class ApacheClient(
     private val client: CloseableHttpClient = defaultApacheHttpClient(),
@@ -46,6 +50,10 @@ class ApacheClient(
         Response(CLIENT_TIMEOUT.describeClientError(e))
     } catch (e: SocketTimeoutException) {
         Response(CLIENT_TIMEOUT.describeClientError(e))
+    } catch (e: HttpHostConnectException) {
+        Response(CONNECTION_REFUSED.describeClientError(e))
+    } catch (e: UnknownHostException) {
+        Response(UNKNOWN_HOST.describeClientError(e))
     }
 
     private fun CloseableHttpResponse.toHttp4kResponse() = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {

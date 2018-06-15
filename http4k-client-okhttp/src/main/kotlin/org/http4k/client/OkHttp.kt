@@ -11,15 +11,23 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
+import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.io.IOException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler, AsyncHttpClient {
 
     override fun invoke(request: Request): Response =
         try {
             client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+        } catch (e: ConnectException) {
+            Response(CONNECTION_REFUSED.describeClientError(e))
+        } catch (e: UnknownHostException) {
+            Response(UNKNOWN_HOST.describeClientError(e))
         } catch (e: SocketTimeoutException) {
             Response(CLIENT_TIMEOUT.describeClientError(e))
         }

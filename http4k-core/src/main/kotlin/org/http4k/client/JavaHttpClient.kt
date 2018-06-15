@@ -5,8 +5,12 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
+import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.UnknownHostException
 import java.nio.ByteBuffer
 
 class JavaHttpClient : HttpHandler {
@@ -24,26 +28,30 @@ class JavaHttpClient : HttpHandler {
             }
         }
 
-        val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
-
-        val baseResponse = Response(status).body(connection.body(status))
-
-        return connection.headerFields
-            .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
-            .map { header -> header.value.map { header.key to it } }
-            .flatten()
-            .fold(baseResponse, { response, nextHeader ->
-                response.header(nextHeader.first, nextHeader.second)
-            })
+        return try {
+            val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
+            val baseResponse = Response(status).body(connection.body(status))
+            connection.headerFields
+                    .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
+                    .map { header -> header.value.map { header.key to it } }
+                    .flatten()
+                    .fold(baseResponse, { response, nextHeader ->
+                        response.header(nextHeader.first, nextHeader.second)
+                    })
+        } catch (e: UnknownHostException) {
+            Response(UNKNOWN_HOST)
+        } catch (e: ConnectException) {
+            Response(CONNECTION_REFUSED)
+        }
     }
 
     // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
     private fun HttpURLConnection.body(status: Status) =
-        resolveStream(status).readBytes().let { ByteBuffer.wrap(it) }.let { Body(it) }
+            resolveStream(status).readBytes().let { ByteBuffer.wrap(it) }.let { Body(it) }
 
     private fun HttpURLConnection.resolveStream(status: Status) =
-        when {
-            status.serverError || status.clientError -> errorStream
-            else -> inputStream
-        }
+            when {
+                status.serverError || status.clientError -> errorStream
+                else -> inputStream
+            }
 }
