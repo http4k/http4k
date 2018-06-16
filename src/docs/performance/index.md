@@ -30,23 +30,28 @@ For each of the sections below, the rankings are based only on JVM-based entries
 
 #### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=fortune&l=fjd30b):
 *Top rank: 11/82 - Apache backend*
+
 Database driver used is PostgreSql backed by a Hikari pool.
 Handlebars templating engine is used for rendering.
 
 #### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=query&l=fjd30b):
 *Top rank: 3/76 - Jetty backend*
+
 Database driver used is PostgreSql backed by a Hikari pool.
 
 #### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=db&l=fjd30b):
 *Top rank: 7/78 - Apache backend*
+
 Database driver used is PostgreSql backed by a Hikari pool.
 
 #### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=update&l=fjd30b):
 *Top rank: 11/69 - Jetty backend*
+
 Database driver used is PostgreSql backed by a Hikari pool.
 
 #### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=json&l=fjd30b):
 *Top rank: 23/77 - Apache backend*
+
 The standard Jackson module is used for JSON creation and marshalling.
 
 #### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=plaintext&l=fjd30b):
