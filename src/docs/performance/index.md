@@ -6,20 +6,14 @@ generally performs at a very low overhead compared to the raw server.
 
 ### Tech Empower Benchmarks
 We have entered **http4k** into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
-project, which assesses frameworks over a series of realistic tests, including:
+project, which assesses frameworks over a series of realistic tests. 
 
-* JSON response processing
-* Random data-updates (database)
-* Random data reads (database)
-* Template-rendering (HTML)
-* Plain-text pipelining
-
-For this benchmark, no customisation or performance tuning of the underlying servers was done - the default Server 
-construction mechanic was used, as below:
+For this benchmark, no customisation or performance tuning of the underlying servers was done - the default application 
+HttpHandler was used which is then plugged into each custom backend, as below:
 
 ```kotlin
 fun main(args: Array<String>) {
-    Http4kBenchmarkServer.start(Netty(9000))
+    Http4kBenchmarkServer.start(Undertow(9000))
 }
 ```
 
@@ -27,5 +21,33 @@ Command-line JVM options, however, were tuned for the test to take advantage of 
 
 The full implementation of the benchmark can be found [here](https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Kotlin/http4k).
 
-### Results
-Results and analysis will be posted here when the next round (R15) of the benchmarks is published.
+### Results - Round 16
+Overall, http4k did very well in this round of benchmarking, especially considering that the ethos of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
+
+The big surprise was the high performance of the Apache server backend, which consistently outranked Undertow (which is the the most fully featured of all the supported backends and our default option). The SunHttp backend, which we entered for a baseline comparison, unfortunately didn't produce any results in this round.
+
+For each of the sections below, the rankings are based only on JVM-based entries.
+
+#### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=fortune&l=fjd30b):
+*Top rank: 11/82 - Apache backend*
+Database driver used is PostgreSql backed by a Hikari pool.
+Handlebars templating engine is used for rendering.
+
+#### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=query&l=fjd30b):
+*Top rank: 3/76 - Jetty backend*
+Database driver used is PostgreSql backed by a Hikari pool.
+
+#### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=db&l=fjd30b):
+*Top rank: 7/78 - Apache backend*
+Database driver used is PostgreSql backed by a Hikari pool.
+
+#### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=update&l=fjd30b):
+*Top rank: 11/69 - Jetty backend*
+Database driver used is PostgreSql backed by a Hikari pool.
+
+#### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=json&l=fjd30b):
+*Top rank: 23/77 - Apache backend*
+The standard Jackson module is used for JSON creation and marshalling.
+
+#### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=plaintext&l=fjd30b):
+*Top rank: 23/73 - Apache backend*
