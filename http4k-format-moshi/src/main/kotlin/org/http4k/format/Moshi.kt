@@ -7,12 +7,14 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Uri
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import java.net.URL
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -47,6 +49,8 @@ object Moshi : ConfigurableMoshi(Moshi.Builder()
         .add(custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
         .add(custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .add(custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
+        .add(custom({ Uri.of(it) }))
+        .add(custom({ URL(it) }, { it.toExternalForm() }))
         .add(custom(UUID::fromString))
         .add(KotlinJsonAdapterFactory()))
 
