@@ -13,6 +13,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.http4k.core.Body
 import org.http4k.core.Uri
+import org.http4k.core.Uri.Companion
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -104,8 +105,8 @@ object Gson : ConfigurableGson(GsonBuilder()
         .registerTypeAdapter(LocalDateTime::class.java, custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .registerTypeAdapter(ZonedDateTime::class.java, custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
         .registerTypeAdapter(UUID::class.java, custom(UUID::fromString))
-        .registerTypeAdapter(Uri::class.java, custom({ Uri.of(it) }))
-        .registerTypeAdapter(URL::class.java, custom({ URL(it) }, { it.toExternalForm() }))
+        .registerTypeAdapter(Uri::class.java, custom(Companion::of))
+        .registerTypeAdapter(URL::class.java, custom(::URL, URL::toExternalForm))
         .serializeNulls())
 
 private interface BidiJson<T> : JsonSerializer<T>, JsonDeserializer<T>

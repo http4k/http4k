@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
-import org.http4k.core.Uri
+import org.http4k.core.Uri.Companion
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -102,8 +102,8 @@ object Jackson : ConfigurableJackson(ObjectMapper()
                 .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
                 .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
                 .custom(UUID::fromString)
-                .custom({ Uri.of(it) })
-                .custom({ URL(it) }, { it.toExternalForm() })
+                .custom(Companion::of)
+                .custom(::URL, URL::toExternalForm)
         )
         .disableDefaultTyping()
         .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
