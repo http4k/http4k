@@ -18,9 +18,9 @@ import org.http4k.core.HttpHandler
 import org.http4k.servlet.asServlet
 import org.http4k.websocket.WsHandler
 
-class Jetty(private val server: Server) : WsServerConfig {
-    constructor(port: Int = 8000) : this(http(port))
-    constructor(vararg inConnectors: ConnectorBuilder) : this(Server().apply {
+class Jetty(private val port: Int, private val server: Server) : WsServerConfig {
+    constructor(port: Int = 8000) : this(port, http(port))
+    constructor(port: Int, vararg inConnectors: ConnectorBuilder) : this(port, Server().apply {
         inConnectors.forEach { addConnector(it(this)) }
     })
 
@@ -34,6 +34,8 @@ class Jetty(private val server: Server) : WsServerConfig {
             }
 
             override fun stop() = server.stop()
+
+            override fun port(): Int = if(port > 0) port else server.uri.port
         }
     }
 }

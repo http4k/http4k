@@ -37,40 +37,39 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @Rule
     @JvmField
-    var retryRule = RetryRule.CI
+    var retryRule = RetryRule.LOCAL
 
     private val port = Random().nextInt(1000) + 8000
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
 
-    @Before
-    fun before() {
-
-        val routes =
+    private val routes =
             requiredMethods.map {
                 "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
             }.plus(listOf(
-                "/headers" bind GET to { _: Request ->
-                    Response(ACCEPTED)
-                        .header("content-type", "text/plain")
-                },
-                "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-                "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
-                "/stream" bind GET to { Response(OK).with(Body.binary(ContentType.TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
-                "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
-                "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
-                "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
-                "/length" bind { req: Request ->
-                    when (req.body) {
-                        is StreamBody -> Response(OK).body(req.body.length.toString())
-                        else -> Response(INTERNAL_SERVER_ERROR)
-                    }
-                },
-                "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
-                "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
+                    "/headers" bind GET to { _: Request ->
+                        Response(ACCEPTED)
+                                .header("content-type", "text/plain")
+                    },
+                    "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
+                    "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
+                    "/stream" bind GET to { Response(OK).with(Body.binary(ContentType.TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
+                    "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
+                    "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
+                    "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
+                    "/length" bind { req: Request ->
+                        when (req.body) {
+                            is StreamBody -> Response(OK).body(req.body.length.toString())
+                            else -> Response(INTERNAL_SERVER_ERROR)
+                        }
+                    },
+                    "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
+                    "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
             ))
 
+    @Before
+    fun before() {
         server = routes(*routes.toTypedArray()).asServer(serverConfig(port)).start()
     }
 
@@ -121,7 +120,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     @Test
     fun `length is set on body if it is sent`() {
         val response = client(Request(POST, "http://localhost:$port/length")
-            .body("12345").header("Content-Length", "5"))
+                .body("12345").header("Content-Length", "5"))
         response shouldMatch hasStatus(OK).and(hasBody("5"))
     }
 
@@ -167,6 +166,13 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         val response = client(Request(GET, "http://localhost:$port/presetlength"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("content-length"), equalTo("0"))
+    }
+
+    @Test
+    fun `can start on port zero and then get the port`() {
+        routes(*routes.toTypedArray()).asServer(serverConfig(0)).start().use {
+            assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
+        }
     }
 
     @After

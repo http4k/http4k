@@ -32,13 +32,13 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     }
 
     private fun ApacheRequest.asHttp4kRequest(): Request =
-        Request(Method.valueOf(requestLine.method), requestLine.uri)
-            .headers(allHeaders.toHttp4kHeaders()).let {
-            when (this) {
-                is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
-                else -> it.body(EmptyInputStream.INSTANCE, 0)
-            }
-        }
+            Request(Method.valueOf(requestLine.method), requestLine.uri)
+                    .headers(allHeaders.toHttp4kHeaders()).let {
+                        when (this) {
+                            is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
+                            else -> it.body(EmptyInputStream.INSTANCE, 0)
+                        }
+                    }
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
 
@@ -46,7 +46,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
         with(response) {
             setStatusCode(status.code)
             setReasonPhrase(status.description)
-            headers.filter { !headersThatApacheInterceptorSets.contains(it.first)  }.forEach { (key, value) -> addHeader(key, value) }
+            headers.filter { !headersThatApacheInterceptorSets.contains(it.first) }.forEach { (key, value) -> addHeader(key, value) }
             entity = InputStreamEntity(body.stream, try {
                 body.length
             } catch (e: IllegalStateException) {
@@ -61,22 +61,20 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
 data class ApacheServer(val port: Int = 8000) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val server = ServerBootstrap.bootstrap()
-            .setListenerPort(port)
-            .setSocketConfig(SocketConfig.custom()
-                .setTcpNoDelay(true)
-                .setSoKeepAlive(true)
-                .setSoReuseAddress(true)
-                .setBacklogSize(128)
-                .build())
-            .registerHandler("*", Http4kRequestHandler(httpHandler))
-            .create()
+                .setListenerPort(port)
+                .setSocketConfig(SocketConfig.custom()
+                        .setTcpNoDelay(true)
+                        .setSoKeepAlive(true)
+                        .setSoReuseAddress(true)
+                        .setBacklogSize(128)
+                        .build())
+                .registerHandler("*", Http4kRequestHandler(httpHandler))
+                .create()
 
-        override fun start(): Http4kServer = apply {
-            server.start()
-        }
+        override fun start(): Http4kServer = apply { server.start() }
 
-        override fun stop() {
-            server.shutdown(15, TimeUnit.SECONDS)
-        }
+        override fun stop() = server.shutdown(15, TimeUnit.SECONDS)
+
+        override fun port(): Int = if (port != 0) port else server.localPort
     }
 }

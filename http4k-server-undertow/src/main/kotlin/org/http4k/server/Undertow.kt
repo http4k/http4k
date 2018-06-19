@@ -13,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import java.net.InetSocketAddress
 
 /**
  * Exposed to allow for insertion into a customised Undertow server instance
@@ -47,10 +48,10 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean = false) : Se
                 .setServerOption(ENABLE_HTTP2, enableHttp2)
                 .setHandler(BlockingHandler(HttpUndertowHandler(httpHandler))).build()
 
-            override fun start(): Http4kServer = apply {
-                server.start()
-            }
+            override fun start(): Http4kServer = apply { server.start() }
 
             override fun stop() = server.stop()
+
+            override fun port(): Int = if(port > 0) port else (server.listenerInfo[0].address as InetSocketAddress).port
         }
 }

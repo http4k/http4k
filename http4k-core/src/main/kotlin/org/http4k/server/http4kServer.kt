@@ -10,6 +10,7 @@ interface Http4kServer: Closeable {
     fun stop()
     fun block() = Thread.currentThread().join()
     override fun close() = stop()
+    fun port(): Int
 }
 
 /**

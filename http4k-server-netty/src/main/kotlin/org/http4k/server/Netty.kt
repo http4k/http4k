@@ -31,6 +31,7 @@ import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import java.net.InetSocketAddress
 
 
 /**
@@ -55,7 +56,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
         }
 
     private fun FullHttpRequest.asRequest(): Request =
-        Request(valueOf(method().name()), Uri.Companion.of(uri()))
+        Request(valueOf(method().name()), Uri.of(uri()))
             .headers(headers().map { it.key to it.value })
             .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
 }
@@ -65,6 +66,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
         private val masterGroup = NioEventLoopGroup()
         private val workerGroup = NioEventLoopGroup()
         private var closeFuture: ChannelFuture? = null
+        private lateinit var address: InetSocketAddress
 
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
@@ -80,7 +82,9 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-            closeFuture = bootstrap.bind(port).sync().channel().closeFuture()
+            val channel = bootstrap.bind(port).sync().channel()
+            address = channel.localAddress() as InetSocketAddress
+            closeFuture = channel.closeFuture()
         }
 
         override fun stop() {
@@ -88,5 +92,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             workerGroup.shutdownGracefully()
             masterGroup.shutdownGracefully()
         }
+
+        override fun port(): Int = if(port > 0) 0 else address.port
     }
 }
