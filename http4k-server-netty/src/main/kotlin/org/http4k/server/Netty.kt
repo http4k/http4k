@@ -4,8 +4,14 @@ package org.http4k.server
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.buffer.ByteBufInputStream
 import io.netty.buffer.ByteBufOutputStream
-import io.netty.channel.*
+import io.netty.channel.ChannelFactory
+import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelFutureListener.CLOSE
+import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelInitializer
+import io.netty.channel.ChannelOption
+import io.netty.channel.ServerChannel
+import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
@@ -46,15 +52,15 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse =
-        DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-            headers.forEach { (key, value) -> headers().set(key, value) }
-            body.stream.use { it.copyTo(ByteBufOutputStream(content())) }
-        }
+            DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
+                headers.forEach { (key, value) -> headers().set(key, value) }
+                body.stream.use { it.copyTo(ByteBufOutputStream(content())) }
+            }
 
     private fun FullHttpRequest.asRequest(): Request =
-        Request(valueOf(method().name()), Uri.of(uri()))
-            .headers(headers().map { it.key to it.value })
-            .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
+            Request(valueOf(method().name()), Uri.of(uri()))
+                    .headers(headers().map { it.key to it.value })
+                    .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
@@ -67,16 +73,16 @@ data class Netty(val port: Int = 8000) : ServerConfig {
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
             bootstrap.group(masterGroup, workerGroup)
-                .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
-                .childHandler(object : ChannelInitializer<SocketChannel>() {
-                    public override fun initChannel(ch: SocketChannel) {
-                        ch.pipeline().addLast("codec", HttpServerCodec())
-                        ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
-                        ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
-                    }
-                })
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
+                    .childHandler(object : ChannelInitializer<SocketChannel>() {
+                        public override fun initChannel(ch: SocketChannel) {
+                            ch.pipeline().addLast("codec", HttpServerCodec())
+                            ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
+                            ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
 
             val channel = bootstrap.bind(port).sync().channel()
             address = channel.localAddress() as InetSocketAddress
@@ -89,6 +95,6 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             masterGroup.shutdownGracefully()
         }
 
-        override fun port(): Int = if(port > 0) 0 else address.port
+        override fun port(): Int = if (port > 0) 0 else address.port
     }
 }

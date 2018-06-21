@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.31.0
+- Changes to the Netty factory to enable running http4k on GraalVM. H/T @RichyHBM
+
 ### v3.30.0
 - Allow all server implementations to start on port 0 (ie. find a free port) and then report it back as a part of the `Http4kServer` interface
 
