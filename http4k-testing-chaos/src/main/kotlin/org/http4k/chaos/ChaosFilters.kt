@@ -12,7 +12,10 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 import java.time.Clock
 import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 
@@ -31,17 +34,29 @@ object ChaosFilters {
 
     operator fun invoke(chaosPeriod: ChaosPeriod) = Filter { next ->
         {
+
             chaosPeriod(next(chaosPeriod(it)))
         }
     }
 }
 
 interface ChaosPeriod {
+    fun done(): Boolean = false
     operator fun invoke(request: Request) = request
     operator fun invoke(response: Response) = response
 
     companion object {
-        fun Repeat(period: () -> ChaosPeriod): ChaosPeriod = TODO()
+        fun Repeat(newPeriod: () -> ChaosPeriod): ChaosPeriod = object : ChaosPeriod {
+            private val current by lazy { AtomicReference(newPeriod()) }
+            override fun done(): Boolean {
+                if (current.get().done())
+                    current.set(newPeriod())
+                return current.get().done()
+            }
+
+            override fun invoke(request: Request) = current.get()(request)
+            override fun invoke(response: Response) = current.get()(response)
+        }
 
         object Wait : ChaosPeriod
 
@@ -59,7 +74,7 @@ interface ChaosPeriod {
 
         @Suppress("unused")
         fun EatMemory(): ChaosPeriod = object : ChaosPeriod {
-            override fun invoke(response: Response): Response = response.apply {
+            override fun invoke(response: Response) = response.apply {
                 mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
             }
         }
@@ -80,14 +95,42 @@ interface ChaosPeriod {
     }
 }
 
-fun ChaosPeriod.then(next: ChaosPeriod): ChaosPeriod = TODO()
+fun ChaosPeriod.then(next: ChaosPeriod): ChaosPeriod = object : ChaosPeriod {
+    override fun done() = this@then.done().let { if (it) next.done() else it }
+    override fun invoke(request: Request): Request = if (done()) next(request) else this@then(request)
+    override fun invoke(response: Response): Response = if (done()) next(response) else this@then(response)
+}
 
 @JvmName("untilResponse")
-fun ChaosPeriod.until(trigger: (Response) -> Boolean): ChaosPeriod = TODO()
+fun ChaosPeriod.until(trigger: (Response) -> Boolean) = object : ChaosPeriod {
+    private val isDone = AtomicBoolean(false)
+    override fun done(): Boolean = isDone.get()
+    override fun invoke(response: Response): Response {
+        if (!done()) isDone.set(trigger(response))
+        return this@until(response)
+    }
+}
 
-fun ChaosPeriod.until(trigger: (Request) -> Boolean): ChaosPeriod = TODO()
-fun ChaosPeriod.until(trigger: () -> Boolean): ChaosPeriod = TODO()
-fun ChaosPeriod.until(period: Duration, clock: Clock = Clock.systemUTC()): ChaosPeriod = object : ChaosPeriod {
+fun ChaosPeriod.until(trigger: (Request) -> Boolean) = object : ChaosPeriod {
+    private val isDone = AtomicBoolean(false)
+    override fun done(): Boolean = isDone.get()
+    override fun invoke(request: Request): Request {
+        if (!done()) isDone.set(trigger(request))
+        return this@until(request)
+    }
+}
+
+fun ChaosPeriod.until(trigger: () -> Boolean) = object : ChaosPeriod {
+    private val isDone = AtomicBoolean(false)
+    override fun done(): Boolean {
+        if (!isDone.get()) isDone.set(trigger())
+        return isDone.get()
+    }
+}
+
+fun ChaosPeriod.until(period: Duration, clock: Clock = Clock.systemUTC()) = object : ChaosPeriod {
+    private val endTime by lazy { AtomicReference<Instant>(clock.instant().plus(period)) }
+    override fun done() = clock.instant().isAfter(endTime.get())
 
 }
 
