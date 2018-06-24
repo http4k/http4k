@@ -18,7 +18,7 @@ class ChaosFiltersTest {
     @Test
     fun `filter with request injection policy should apply behaviour on request`() {
         val injectedResponse = ChaosFilters(
-                ChaosPolicy.Always()(
+                ChaosPolicy.Always().inject(
                         object : ChaosBehaviour {
                             override fun invoke(request: Request) = request.also { assertThat(it, equalTo(expecteReq)) }
                             override fun invoke(response: Response) = response.with(Header.Common.CHAOS of "foo")
@@ -31,7 +31,7 @@ class ChaosFiltersTest {
     @Test
     fun `filter with response injection policy should apply behaviour on response`() {
         val injectedResponse = ChaosFilters(
-                ChaosPolicy.Always(injectRequest = false)(
+                ChaosPolicy.Always(injectRequest = false).inject(
                         object : ChaosBehaviour {
                             override fun invoke(response: Response) = response
                                     .also { assertThat(it, equalTo(Response(OK))) }.with(Header.Common.CHAOS of "foo")
