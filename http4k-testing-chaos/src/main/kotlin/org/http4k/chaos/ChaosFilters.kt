@@ -27,9 +27,6 @@ object ChaosFilters {
     }
 }
 
-typealias RequestTrigger = (Request) -> Boolean
-typealias ResponseTrigger = (Response) -> Boolean
-
 interface ChaosPeriod {
     companion object {
         fun Repeat(period: ChaosPeriod): ChaosPeriod = TODO()
