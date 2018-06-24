@@ -10,6 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.with
 import org.http4k.lens.Header
+import java.time.Clock
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
 
@@ -59,8 +60,7 @@ interface ChaosPeriod {
         @Suppress("unused")
         fun EatMemory(): ChaosPeriod = object : ChaosPeriod {
             override fun invoke(response: Response): Response = response.apply {
-                val list = mutableListOf<ByteArray>()
-                while (true) list += ByteArray(1048576)
+                mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
             }
         }
 
@@ -87,7 +87,9 @@ fun ChaosPeriod.until(trigger: (Response) -> Boolean): ChaosPeriod = TODO()
 
 fun ChaosPeriod.until(trigger: (Request) -> Boolean): ChaosPeriod = TODO()
 fun ChaosPeriod.until(trigger: () -> Boolean): ChaosPeriod = TODO()
-fun ChaosPeriod.until(period: Duration): ChaosPeriod = TODO()
+fun ChaosPeriod.until(period: Duration, clock: Clock = Clock.systemUTC()): ChaosPeriod = object : ChaosPeriod {
+
+}
 
 val blockThread = Wait.until(Duration.ofSeconds(100)).then(PercentageBased(100)(BlockThread()))
 val goSlow = Wait.until(Duration.ofSeconds(100)).then(Latency(Duration.ofMillis(1)))
