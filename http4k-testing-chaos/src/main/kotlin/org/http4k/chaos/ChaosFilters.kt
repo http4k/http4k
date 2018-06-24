@@ -1,23 +1,20 @@
 package org.http4k.chaos
 
 import org.http4k.core.Filter
+import org.http4k.core.with
+import org.http4k.lens.Header
 
-const val CHAOS_HEADER = "X-Http4k-Chaos"
+val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 
-object ChaosFilter {
-    operator fun invoke(chaosPolicy: ChaosPolicy, behaviour: ChaosBehaviour): Filter = Filter { next ->
-        { request ->
-            val response = if (chaosPolicy.shouldInject(request)) {
-                val injectedRequest = behaviour.inject(request)
-                next(injectedRequest).header(CHAOS_HEADER, behaviour.description)
-            } else {
-                next(request)
-            }
-            if (chaosPolicy.shouldInject(response)) {
-                val injectedResponse = behaviour.inject(response)
-                injectedResponse.header(CHAOS_HEADER, behaviour.description)
-            } else {
-                response
+object ChaosFilters {
+    operator fun invoke(chaosPolicy: ChaosPolicy, behaviour: ChaosBehaviour) = Filter { next ->
+        {
+            if (chaosPolicy.shouldInject(it)) {
+                next(behaviour.inject(it)).with(Header.Common.CHAOS of behaviour.description)
+            } else next(it).let {
+                if (chaosPolicy.shouldInject(it)) {
+                    behaviour.inject(it).with(Header.Common.CHAOS of behaviour.description)
+                } else it
             }
         }
     }

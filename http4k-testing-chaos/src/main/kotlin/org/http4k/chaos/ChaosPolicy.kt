@@ -9,10 +9,14 @@ interface ChaosPolicy {
     fun shouldInject(response: Response): Boolean = false
 
     companion object {
+        fun Always(injectRequest: Boolean = true, injectResponse: Boolean = true) = object : ChaosPolicy {
+            override fun shouldInject(request: Request): Boolean = injectRequest
+            override fun shouldInject(response: Response): Boolean = injectResponse
+        }
+
         fun PercentageBased(injectionFrequency: Int) = object : ChaosPolicy {
-            override fun shouldInject(response: Response): Boolean {
-                return ThreadLocalRandom.current().nextInt(0, 100) < injectionFrequency
-            }
+            override fun shouldInject(response: Response): Boolean =
+                    ThreadLocalRandom.current().nextInt(0, 100) < injectionFrequency
         }
 
         fun PercentageBasedFromEnv(): ChaosPolicy {
