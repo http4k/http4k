@@ -2,6 +2,7 @@ package org.http4k.chaos
 
 import org.http4k.core.Request
 import org.http4k.core.Response
+import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
 interface ChaosPolicy {
@@ -10,18 +11,14 @@ interface ChaosPolicy {
 
     companion object {
         fun Always(injectRequest: Boolean = true, injectResponse: Boolean = true) = object : ChaosPolicy {
-            override fun shouldInject(request: Request): Boolean = injectRequest
-            override fun shouldInject(response: Response): Boolean = injectResponse
+            override fun shouldInject(request: Request) = injectRequest
+            override fun shouldInject(response: Response) = injectResponse
         }
 
-        fun PercentageBased(injectionFrequency: Int) = object : ChaosPolicy {
-            override fun shouldInject(response: Response): Boolean =
-                    ThreadLocalRandom.current().nextInt(0, 100) < injectionFrequency
+        fun PercentageBased(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
+            override fun shouldInject(response: Response) = selector.nextInt(100) <= injectionFrequency
         }
 
-        fun PercentageBasedFromEnv(): ChaosPolicy {
-            val injectionFrequency = (System.getenv("CHAOS_INJECTION_FREQUENCY") ?: "50").toInt()
-            return PercentageBased(injectionFrequency)
-        }
+        fun PercentageBasedFromEnv() = PercentageBased((System.getenv("CHAOS_INJECTION_FREQUENCY")?.toInt() ?: 50))
     }
 }

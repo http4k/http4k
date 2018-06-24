@@ -33,7 +33,7 @@ class ChaosBehaviourTest {
     @Test
     fun `should return response with internal server error status`() {
         val response = Response(Status.OK)
-        val injectedResponse = ChaosBehaviour.Returns().inject(response)
+        val injectedResponse = ChaosBehaviour.ReturnStatus().inject(response)
         assertEquals(Status.INTERNAL_SERVER_ERROR, injectedResponse.status)
     }
 }

@@ -6,6 +6,8 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import java.lang.Thread.sleep
 import java.time.Duration
+import java.time.Duration.ofMillis
+import java.time.Duration.parse
 import java.util.concurrent.ThreadLocalRandom
 
 interface ChaosBehaviour {
@@ -26,11 +28,9 @@ interface ChaosBehaviour {
             }
         }
 
-        fun ExtraLatencyFromEnv(): ChaosBehaviour {
-            val minDelay = Duration.parse(System.getenv("CHAOS_LATENCY_MS_MIN") ?: "PT0.1S")
-            val maxDelay = Duration.parse(System.getenv("CHAOS_LATENCY_MS_MAX") ?: "PT0.5S")
-            return Latency(minDelay, maxDelay)
-        }
+        fun ExtraLatencyFromEnv(): ChaosBehaviour = Latency(
+                parse(System.getenv("CHAOS_LATENCY_MS_MIN")) ?: ofMillis(100),
+                parse(System.getenv("CHAOS_LATENCY_MS_MAX")) ?: ofMillis(500))
 
         fun ThrowException(e: Exception = ChaosException("Chaos behaviour injected!")) = object : ChaosBehaviour {
             override val description = "Exception"
@@ -46,7 +46,7 @@ interface ChaosBehaviour {
             override fun inject(response: Response) = response.apply { Thread.currentThread().join() }
         }
 
-        fun Returns(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
+        fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
             override val description = status.description
 
             override fun inject(response: Response) = Response(status).headers(response.headers)
