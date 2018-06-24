@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
 class ChaosBehaviourTest {
     @Test(expected = ChaosException::class)
     fun `exception throwing behaviour should throw exception`() {
-        ChaosBehaviour.ThrowException().inject(Response(Status.OK))
+        ChaosBehaviour.ThrowException()(Response(Status.OK))
     }
 
     @Test
@@ -22,9 +22,9 @@ class ChaosBehaviourTest {
         val latch = CountDownLatch(1)
         thread {
             ChaosBehaviour.Latency(
-                Duration.ofMillis(delay),
-                Duration.ofMillis(delay + 1)
-            ).inject(Response(Status.OK))
+                    Duration.ofMillis(delay),
+                    Duration.ofMillis(delay + 1)
+            )(Response(Status.OK))
             latch.countDown()
         }
         assertFalse(latch.await(delay - 1, TimeUnit.MILLISECONDS))
@@ -33,7 +33,7 @@ class ChaosBehaviourTest {
     @Test
     fun `should return response with internal server error status`() {
         val response = Response(Status.OK)
-        val injectedResponse = ChaosBehaviour.ReturnStatus().inject(response)
+        val injectedResponse = ChaosBehaviour.ReturnStatus()(response)
         assertEquals(Status.INTERNAL_SERVER_ERROR, injectedResponse.status)
     }
 }
