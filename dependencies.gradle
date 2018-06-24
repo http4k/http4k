@@ -1,5 +1,5 @@
 ext {
-    ext.kotlin_version = '1.2.31'
+    ext.kotlin_version = '1.2.50'
     ext.jetty_version = '9.4.9.v20180320'
 
     kotlin_lib = [
