@@ -41,7 +41,7 @@ interface ChaosPeriod {
     operator fun invoke(response: Response) = response
 
     companion object {
-        fun Repeat(period: ChaosPeriod): ChaosPeriod = TODO()
+        fun Repeat(period: () -> ChaosPeriod): ChaosPeriod = TODO()
 
         object Wait : ChaosPeriod
 
@@ -93,4 +93,4 @@ fun ChaosPeriod.until(period: Duration, clock: Clock = Clock.systemUTC()): Chaos
 
 val blockThread = Wait.until(Duration.ofSeconds(100)).then(PercentageBased(100)(BlockThread()))
 val goSlow = Wait.until(Duration.ofSeconds(100)).then(Latency(Duration.ofMillis(1)))
-val a = Repeat(blockThread.then(goSlow)).until { _: Response -> true }
+val a = Repeat { blockThread.then(goSlow) }.until { _: Response -> true }
