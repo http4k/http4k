@@ -6,5 +6,5 @@ import org.http4k.lens.Header
 val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 
 object ChaosFilters {
-    operator fun invoke(chaosPeriod: ChaosPeriod) = Filter { next -> { chaosPeriod(next(chaosPeriod(it))) } }
+    operator fun invoke(stage: ChaosStage) = Filter { next -> { stage(next(stage(it))) } }
 }

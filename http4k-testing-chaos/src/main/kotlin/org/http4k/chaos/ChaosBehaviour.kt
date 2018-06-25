@@ -12,6 +12,9 @@ import java.time.Duration.ofMillis
 import java.time.Duration.parse
 import java.util.concurrent.ThreadLocalRandom
 
+/**
+ * Encapsulates the type of bad behaviour to apply to the request/response.
+ */
 interface ChaosBehaviour {
     operator fun invoke(request: Request) = request
     operator fun invoke(response: Response) = response

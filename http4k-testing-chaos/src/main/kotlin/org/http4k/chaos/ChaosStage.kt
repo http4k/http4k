@@ -2,23 +2,23 @@ package org.http4k.chaos
 
 import org.http4k.core.Request
 import org.http4k.core.Response
-import java.time.Clock
-import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-interface ChaosPeriod {
+/**
+ * Defines a period during which a particular ChaosBehaviour to be active.
+ */
+interface ChaosStage {
     fun done(): Boolean = false
     operator fun invoke(request: Request) = request
     operator fun invoke(response: Response) = response
 
     companion object {
-        fun Repeat(newPeriod: () -> ChaosPeriod): ChaosPeriod = object : ChaosPeriod {
-            private val current by lazy { AtomicReference(newPeriod()) }
+        fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
+            private val current by lazy { AtomicReference(stage()) }
             override fun done(): Boolean {
                 if (current.get().done())
-                    current.set(newPeriod())
+                    current.set(stage())
                 return current.get().done()
             }
 
@@ -26,25 +26,18 @@ interface ChaosPeriod {
             override fun invoke(response: Response) = current.get()(response)
         }
 
-        object Wait : ChaosPeriod
+        object Wait : ChaosStage
     }
 }
 
-fun ChaosPeriod.then(next: ChaosPeriod): ChaosPeriod = object : ChaosPeriod {
+fun ChaosStage.then(next: ChaosStage): ChaosStage = object : ChaosStage {
     override fun done() = this@then.done().let { if (it) next.done() else it }
     override fun invoke(request: Request): Request = if (done()) next(request) else this@then(request)
     override fun invoke(response: Response): Response = if (done()) next(response) else this@then(response)
 }
 
-interface RequestPredicate : (Request) -> Boolean {
-    companion object {
-        fun of(): RequestPredicate  = TODO()
-
-    }
-}
-
 @JvmName("untilResponse")
-fun ChaosPeriod.until(trigger: (Response) -> Boolean) = object : ChaosPeriod {
+fun ChaosStage.until(trigger: Trigger<Response>) = object : ChaosStage {
     private val isDone = AtomicBoolean(false)
     override fun done(): Boolean = isDone.get()
     override fun invoke(response: Response): Response {
@@ -53,24 +46,11 @@ fun ChaosPeriod.until(trigger: (Response) -> Boolean) = object : ChaosPeriod {
     }
 }
 
-fun ChaosPeriod.until(trigger: RequestPredicate) = object : ChaosPeriod {
+fun ChaosStage.until(trigger: Trigger<Request>) = object : ChaosStage {
     private val isDone = AtomicBoolean(false)
     override fun done(): Boolean = isDone.get()
     override fun invoke(request: Request): Request {
         if (!done()) isDone.set(trigger(request))
         return this@until(request)
     }
-}
-
-fun ChaosPeriod.until(trigger: () -> Boolean) = object : ChaosPeriod {
-    private val isDone = AtomicBoolean(false)
-    override fun done(): Boolean {
-        if (!isDone.get()) isDone.set(trigger())
-        return isDone.get()
-    }
-}
-
-fun ChaosPeriod.until(period: Duration, clock: Clock = Clock.systemUTC()) = object : ChaosPeriod {
-    private val endTime by lazy { AtomicReference<Instant>(clock.instant().plus(period)) }
-    override fun done() = clock.instant().isAfter(endTime.get())
 }
