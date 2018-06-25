@@ -13,7 +13,7 @@
 <a href="https://opencollective.com/http4k"><img alt="build status" src="https://opencollective.com/http4k/sponsors/badge.svg"></a>
 </span>
 
- [**http4k**](https://github.com/http4k/http4k) is an lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [**http4k**](https://github.com/http4k/http4k) applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
+ [**http4k**](https://github.com/http4k/http4k) is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [**http4k**](https://github.com/http4k/http4k) applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
  
  ```kotlin
  val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
