@@ -33,7 +33,7 @@ val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCust
 
 //To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:
 val handler: RoutingHttpHandler = routes(
-    "/hello/{date:*}" bind GET to { request: Request ->
+    "/hello/{date:.*}" bind GET to { request: Request ->
         val pathDate: LocalDate = pathLocalDate(request)
         // SAME AS:
         // val pathDate: LocalDate = pathLocalDate.extract(request)

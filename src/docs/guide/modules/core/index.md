@@ -78,7 +78,7 @@ Create a Router using routes() to bind a static or dynamic path to either an Htt
 ```kotlin
 routes(
     "/hello" bind routes(
-        "/{name:*}" bind GET to { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") }
+        "/{name:.*}" bind GET to { request: Request -> Response(OK).body("Hello, ${request.path("name")}!") }
     ),
     "/fail" bind POST to { request: Request -> Response(INTERNAL_SERVER_ERROR) }
 ).asServer(Jetty(8000)).start()
