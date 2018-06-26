@@ -1,6 +1,6 @@
 package org.http4k.chaos
 
-import org.http4k.core.Request
+import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -12,11 +12,12 @@ import java.time.Duration.ofMillis
 import java.time.Duration.parse
 import java.util.concurrent.ThreadLocalRandom
 
+val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
+
 /**
  * Encapsulates the type of bad behaviour to apply to the request/response.
  */
 interface ChaosBehaviour {
-    operator fun invoke(request: Request) = request
     operator fun invoke(response: Response) = response
 
     companion object {
@@ -45,9 +46,9 @@ interface ChaosBehaviour {
 
         @Suppress("unused")
         fun StackOverflow() = object : ChaosBehaviour {
-            override fun invoke(request: Request): Request {
+            override fun invoke(response: Response): Response {
                 fun overflow(): Unit = overflow()
-                return request.apply { overflow() }
+                return response.apply { overflow() }
             }
         }
 
@@ -63,6 +64,10 @@ interface ChaosBehaviour {
 
         fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
             override fun invoke(response: Response) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+        }
+
+        fun NoBody() = object : ChaosBehaviour {
+            override fun invoke(response: Response) = response.body(Body.EMPTY).with(Header.Common.CHAOS of "No body")
         }
     }
 }

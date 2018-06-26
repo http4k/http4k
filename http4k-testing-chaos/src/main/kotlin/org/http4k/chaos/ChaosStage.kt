@@ -1,7 +1,10 @@
 package org.http4k.chaos
 
-import org.http4k.core.Request
+import org.http4k.core.Filter
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Response
+import java.time.Clock
+import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -10,8 +13,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 interface ChaosStage {
     fun done(): Boolean = false
-    operator fun invoke(request: Request) = request
-    operator fun invoke(response: Response) = response
+    operator fun invoke(tx: HttpTransaction): Response = tx.response
 
     companion object {
         fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
@@ -22,35 +24,31 @@ interface ChaosStage {
                 return current.get().done()
             }
 
-            override fun invoke(request: Request) = current.get()(request)
-            override fun invoke(response: Response) = current.get()(response)
+            override fun invoke(tx: HttpTransaction) = current.get()(tx)
         }
 
         object Wait : ChaosStage
     }
 }
 
-fun ChaosStage.then(next: ChaosStage): ChaosStage = object : ChaosStage {
-    override fun done() = this@then.done().let { if (it) next.done() else it }
-    override fun invoke(request: Request): Request = if (done()) next(request) else this@then(request)
-    override fun invoke(response: Response): Response = if (done()) next(response) else this@then(response)
-}
-
-@JvmName("untilResponse")
-fun ChaosStage.until(trigger: Trigger<Response>) = object : ChaosStage {
-    private val isDone = AtomicBoolean(false)
-    override fun done(): Boolean = isDone.get()
-    override fun invoke(response: Response): Response {
-        if (!done()) isDone.set(trigger(response))
-        return this@until(response)
+fun ChaosStage.asFilter(clock: Clock = Clock.systemUTC()) = Filter { next ->
+    {
+        clock.instant().let { start ->
+            next(it).apply { this@asFilter(HttpTransaction(it, this, Duration.between(start, clock.instant()))) }
+        }
     }
 }
 
-fun ChaosStage.until(trigger: Trigger<Request>) = object : ChaosStage {
+fun ChaosStage.then(next: ChaosStage): ChaosStage = object : ChaosStage {
+    override fun done() = this@then.done().let { if (it) next.done() else it }
+    override fun invoke(tx: HttpTransaction): Response = if (done()) next(tx) else this@then(tx)
+}
+
+fun ChaosStage.until(trigger: TransactionTrigger) = object : ChaosStage {
     private val isDone = AtomicBoolean(false)
     override fun done(): Boolean = isDone.get()
-    override fun invoke(request: Request): Request {
-        if (!done()) isDone.set(trigger(request))
-        return this@until(request)
+    override fun invoke(tx: HttpTransaction): Response {
+        if (!done()) isDone.set(trigger(tx))
+        return this@until(tx)
     }
 }
