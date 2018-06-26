@@ -11,9 +11,8 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a period during which a particular ChaosBehaviour to be active.
  */
-interface ChaosStage {
+interface ChaosStage: ChaosBehaviour {
     fun done(): Boolean = false
-    operator fun invoke(tx: HttpTransaction): Response = tx.response
 
     companion object {
         fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {

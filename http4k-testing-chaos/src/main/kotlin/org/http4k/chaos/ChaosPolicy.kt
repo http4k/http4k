@@ -7,12 +7,13 @@ import java.util.concurrent.ThreadLocalRandom
 /**
  * Determines whether or not to apply a particular type of ChaosBehaviour to a request/response.
  */
+
 interface ChaosPolicy {
     fun appliesTo(tx: HttpTransaction) = false
 
     fun inject(behaviour: ChaosBehaviour) = let { it ->
         object : ChaosStage {
-            override fun invoke(tx: HttpTransaction) = if (it.appliesTo(tx)) behaviour(tx.response) else tx.response
+            override fun invoke(tx: HttpTransaction) = if (it.appliesTo(tx)) behaviour(tx) else tx.response
         }
     }
 

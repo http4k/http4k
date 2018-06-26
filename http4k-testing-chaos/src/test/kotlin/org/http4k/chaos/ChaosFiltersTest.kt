@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.chaos.ChaosPolicy.Companion.Always
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -20,7 +21,7 @@ class ChaosFiltersTest {
     fun `filter with request injection policy should apply behaviour on request`() {
         val injectedResponse = Always.inject(
                 object : ChaosBehaviour {
-                    override fun invoke(response: Response) = response.with(Header.Common.CHAOS of "foo")
+                    override fun invoke(tx: HttpTransaction) = tx.response.with(Header.Common.CHAOS of "foo")
                 }
         )
                 .asFilter().then { Response(OK) }(expecteReq)

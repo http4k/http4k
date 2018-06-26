@@ -1,5 +1,8 @@
 package org.http4k.chaos
 
+import org.http4k.core.HttpTransaction
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.junit.Assert.assertEquals
@@ -11,9 +14,11 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 class ChaosBehaviourTest {
+    private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), Duration.ZERO)
+
     @Test(expected = ChaosException::class)
     fun `exception throwing behaviour should throw exception`() {
-        ChaosBehaviour.ThrowException()(Response(Status.OK))
+        ChaosBehaviour.ThrowException()(tx)
     }
 
     @Test
@@ -24,7 +29,7 @@ class ChaosBehaviourTest {
             ChaosBehaviour.Latency(
                     Duration.ofMillis(delay),
                     Duration.ofMillis(delay + 1)
-            )(Response(Status.OK))
+            )(tx)
             latch.countDown()
         }
         assertFalse(latch.await(delay - 1, TimeUnit.MILLISECONDS))
@@ -32,8 +37,7 @@ class ChaosBehaviourTest {
 
     @Test
     fun `should return response with internal server error status`() {
-        val response = Response(Status.OK)
-        val injectedResponse = ChaosBehaviour.ReturnStatus()(response)
+        val injectedResponse = ChaosBehaviour.ReturnStatus()(tx)
         assertEquals(Status.INTERNAL_SERVER_ERROR, injectedResponse.status)
     }
 }
