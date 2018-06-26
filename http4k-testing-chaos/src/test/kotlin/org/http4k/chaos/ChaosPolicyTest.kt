@@ -1,19 +1,28 @@
 package org.http4k.chaos
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviour.Companion.BlockThread
 import org.http4k.chaos.ChaosBehaviour.Companion.Latency
 import org.http4k.chaos.ChaosBehaviour.Companion.NoBody
+import org.http4k.chaos.ChaosBehaviour.Companion.ReturnStatus
 import org.http4k.chaos.ChaosPolicy.Companion.Always
 import org.http4k.chaos.ChaosPolicy.Companion.PercentageBased
 import org.http4k.chaos.ChaosStage.Companion.Wait
 import org.http4k.chaos.Triggers.TimePast
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.junit.Test
 import java.time.Duration.ZERO
 import java.time.Duration.ofMillis
@@ -25,7 +34,17 @@ class ChaosPolicyTest {
     fun `Always applies by default`() {
         val tx = HttpTransaction(Request(GET, ""), Response(OK).body("hello"), ZERO)
         assertThat(Always.appliesTo(tx), equalTo(true))
-        assertThat(Always.inject(NoBody())(tx), equalTo(Response(OK)))
+        Always.inject(NoBody())(tx) shouldMatch hasBody("").and(hasStatus(OK))
+    }
+
+    @Test
+    fun `Until stops a behaviour when triggered`() {
+        val http = Always.inject(ReturnStatus(INTERNAL_SERVER_ERROR)).until { it.request.method == POST }.asFilter().then { Response(OK) }
+
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", ""))
+        http(Request(GET, "/bar")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", ""))
+        http(Request(POST, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos", ""))
+        http(Request(GET, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos", ""))
     }
 
     val blockThread = Wait.until(TimePast(ofSeconds(100))).then(PercentageBased(100).inject(BlockThread()))

@@ -1,10 +1,15 @@
 package org.http4k.chaos
 
+import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -37,7 +42,13 @@ class ChaosBehaviourTest {
 
     @Test
     fun `should return response with internal server error status`() {
-        val injectedResponse = ChaosBehaviour.ReturnStatus()(tx)
-        assertEquals(Status.INTERNAL_SERVER_ERROR, injectedResponse.status)
+        val injectedResponse = ChaosBehaviour.ReturnStatus(NOT_FOUND)(tx)
+        assertEquals(NOT_FOUND, injectedResponse.status)
+    }
+
+    @Test
+    fun `should return no body`() {
+        ChaosBehaviour.NoBody()(tx) shouldMatch hasHeader("x-http4k-chaos", "No body")
+                .and(hasBody(""))
     }
 }
