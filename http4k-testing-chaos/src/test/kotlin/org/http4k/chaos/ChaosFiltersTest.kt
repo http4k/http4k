@@ -25,7 +25,6 @@ class ChaosFiltersTest {
                 }
         )
                 .asFilter().then { Response(OK) }(expecteReq)
-        println(injectedResponse)
         assertThat(injectedResponse.header("x-http4k-chaos"), present(equalTo("foo")))
     }
 //
