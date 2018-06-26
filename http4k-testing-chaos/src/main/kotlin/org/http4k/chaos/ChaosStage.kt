@@ -33,7 +33,7 @@ interface ChaosStage: ChaosBehaviour {
 fun ChaosStage.asFilter(clock: Clock = Clock.systemUTC()) = Filter { next ->
     {
         clock.instant().let { start ->
-            next(it).apply { this@asFilter(HttpTransaction(it, this, Duration.between(start, clock.instant()))) }
+            next(it).run { this@asFilter(HttpTransaction(it, this, Duration.between(start, clock.instant()))) }
         }
     }
 }
