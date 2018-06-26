@@ -23,6 +23,9 @@ class HttpMessageMatchersTest {
     fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", listOf("bob", "bob2")), hasHeader("header", listOf("bill")))
 
     @Test
+    fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header"), !hasHeader("header"))
+
+    @Test
     fun `header lens`() =
         Header.required("bob").let {
             assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
