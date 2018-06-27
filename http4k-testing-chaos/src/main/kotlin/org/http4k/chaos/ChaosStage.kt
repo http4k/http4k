@@ -19,12 +19,12 @@ interface ChaosStage {
          * Repeats a stage (or composite stage in repeating pattern). Since ChaosStages are STATEFUL,
          * the stage function will be fired on each iteration and expecting a NEW instance.
          */
-        fun Repeat(stageFn: () -> ChaosStage): ChaosStage = object : ChaosStage {
-            private val current by lazy { AtomicReference(stageFn()) }
+        fun Repeat(newStageFn: () -> ChaosStage): ChaosStage = object : ChaosStage {
+            private val current by lazy { AtomicReference(newStageFn()) }
 
             override fun invoke(tx: HttpTransaction): Response? =
                     current.get()(tx) ?: run {
-                        current.set(stageFn())
+                        current.set(newStageFn())
                         current.get()(tx)
                     }
         }
@@ -40,22 +40,22 @@ interface ChaosStage {
     /**
      * Chain the next ChaosBehaviour to apply when this stage is finished.
      */
-    fun then(next: ChaosStage): ChaosStage = let {
+    fun then(nextStage: ChaosStage): ChaosStage = let {
         object : ChaosStage {
-            override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: next(tx)
+            override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: nextStage(tx)
         }
     }
 
     /**
      * Stop applying the ChaosBehaviour of this stage when the StageTrigger fires.
      */
-    fun until(trigger: StageTrigger): ChaosStage {
+    fun until(stageTrigger: ChaosStageTrigger): ChaosStage {
         val first = this
         val active = AtomicBoolean(true)
 
         return object : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? {
-                if (active.get()) active.set(!trigger(tx))
+                if (active.get()) active.set(!stageTrigger(tx))
                 return if (active.get()) first(tx) else null
             }
         }
