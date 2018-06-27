@@ -7,7 +7,6 @@ import java.util.concurrent.ThreadLocalRandom
 /**
  * Determines whether or not to apply a particular type of ChaosBehaviour to a request/response.
  */
-
 interface ChaosPolicy {
     fun appliesTo(tx: HttpTransaction) = false
 
