@@ -21,7 +21,9 @@ interface ChaosStage {
         fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
             private val current by lazy { AtomicReference(stage()) }
 
-            override fun invoke(tx: HttpTransaction) = current.get()(tx) ?: run {
+            override fun invoke(tx: HttpTransaction) =
+                    current.get()(tx) ?: run {
+                println("current didnt match")
                 current.set(stage())
                 current.get()(tx)
             }

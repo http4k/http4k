@@ -14,6 +14,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.GATEWAY_TIMEOUT
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
@@ -45,11 +46,15 @@ class ChaosStageTest {
         val app = chaosStage(I_M_A_TEAPOT)
                 .until { it.request.method == POST }
                 .then(chaosStage(NOT_FOUND))
+                .until { it.request.method == TRACE }
+                .then(chaosStage(INTERNAL_SERVER_ERROR))
                 .asFilter().then { response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
         app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
         app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(TRACE, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
+        app(Request(GET, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
     }
 
     @Test
