@@ -1,7 +1,6 @@
 package org.http4k.chaos
 
 import java.time.Duration
-import java.time.Duration.parse
 
 /**
  * Handy ways to inject configuration for ChaosBehaviours into your apps.
@@ -17,7 +16,10 @@ object ChaosConfig {
                          defaultMax: Duration = Duration.ofMillis(500),
                          minName: String = "CHAOS_LATENCY_MS_MIN",
                          maxName: String = "CHAOS_LATENCY_MS_MAX"
-        ): ClosedRange<Duration> = (parse(minName) ?: defaultMin)..(parse(env(maxName)) ?: defaultMax)
+        ): ClosedRange<Duration> {
+            return (env(minName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMin)..
+                    (env(maxName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMax)
+        }
 
         /**
          * Get a percentage from the environment.
@@ -26,6 +28,6 @@ object ChaosConfig {
         fun Percentage(env: (String) -> String? = System::getenv,
                        defaultPercentage: Int = 50,
                        name: String = "CHAOS_PERCENTAGE"
-        ) = parse(env(name)) ?: defaultPercentage
+        ): Int = env(name)?.let(Integer::parseInt) ?: defaultPercentage
     }
 }
