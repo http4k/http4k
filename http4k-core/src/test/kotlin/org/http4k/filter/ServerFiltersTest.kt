@@ -28,6 +28,8 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
+import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
@@ -57,17 +59,19 @@ class ServerFiltersTest {
             newThreadLocal!!.traceId shouldMatch present()
             newThreadLocal!!.spanId shouldMatch present()
             newThreadLocal!!.parentSpanId shouldMatch absent()
+            newThreadLocal!!.samplingDecision shouldMatch equalTo(SAMPLE)
 
             val setOnRequest = ZipkinTraces(it)
             setOnRequest.traceId shouldMatch equalTo(newThreadLocal!!.traceId)
             setOnRequest.spanId shouldMatch equalTo(newThreadLocal!!.spanId)
             setOnRequest.parentSpanId shouldMatch absent()
+            setOnRequest.samplingDecision shouldMatch equalTo(newThreadLocal!!.samplingDecision)
             Response(OK)
         }
 
         val received = ZipkinTraces(svc(Request(GET, "")))
 
-        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null))
+        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE))
     }
 
     @Test
@@ -75,7 +79,7 @@ class ServerFiltersTest {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")
         val originalParentSpanId = TraceId("originalParentSpanId")
-        val originalTraces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId)
+        val originalTraces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId, DO_NOT_SAMPLE)
 
         var start: Pair<Request, ZipkinTraces>? = null
         var end: Triple<Request, Response, ZipkinTraces>? = null

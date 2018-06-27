@@ -10,6 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.junit.Before
 import org.junit.Test
 
@@ -25,7 +26,7 @@ class RequestTracingTest {
         val originalTraceId = TraceId("originalTrace")
         val originalSpanId = TraceId("originalSpan")
         val originalParentSpanId = TraceId("originalParentSpanId")
-        val traces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId)
+        val traces = ZipkinTraces(originalTraceId, originalSpanId, originalParentSpanId, DO_NOT_SAMPLE)
 
         val client: HttpHandler = ClientFilters.RequestTracing().then {
             val actual = ZipkinTraces(it)
@@ -33,6 +34,7 @@ class RequestTracingTest {
             actual.traceId shouldMatch equalTo(originalTraceId)
             actual.parentSpanId shouldMatch equalTo(originalSpanId)
             actual.spanId shouldMatch present()
+            actual.samplingDecision shouldMatch equalTo(DO_NOT_SAMPLE)
 
             Response(OK)
         }
