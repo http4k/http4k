@@ -15,7 +15,6 @@ interface ChaosStage {
     operator fun invoke(tx: HttpTransaction): Response?
 
     companion object {
-
         /**
          * Repeats a stage (or composite stage in repeating pattern.
          */
