@@ -10,11 +10,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
-import org.junit.Before
-import org.junit.Test
 
 class RequestTracingTest {
 

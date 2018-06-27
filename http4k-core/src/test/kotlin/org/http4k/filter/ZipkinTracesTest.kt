@@ -10,9 +10,6 @@ import org.http4k.core.Request
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.junit.jupiter.api.Test
-import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
-import org.http4k.filter.SamplingDecision.Companion.SAMPLE
-import org.junit.Test
 import java.util.Random
 
 
@@ -53,9 +50,9 @@ class SamplingDecisionTest {
 class ZipkinTracesTest {
 
     private val requestWithTraces = Request(Method.GET, "")
-        .header("x-b3-traceid", "somevalue1")
-        .header("x-b3-spanid", "somevalue2")
-        .header("x-b3-parentspanid", "somevalue3")
+            .header("x-b3-traceid", "somevalue1")
+            .header("x-b3-spanid", "somevalue2")
+            .header("x-b3-parentspanid", "somevalue3")
 
     private val expectedWithTraces = ZipkinTraces(TraceId("somevalue1"), TraceId("somevalue2"), TraceId("somevalue3"), SAMPLE)
 

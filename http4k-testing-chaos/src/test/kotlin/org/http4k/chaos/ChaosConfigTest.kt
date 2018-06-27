@@ -2,7 +2,7 @@ package org.http4k.chaos
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.util.Properties
 
