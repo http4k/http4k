@@ -16,33 +16,39 @@ interface ChaosStage {
 
     companion object {
         /**
-         * Repeats a stage (or composite stage in repeating pattern.
+         * Repeats a stage (or composite stage in repeating pattern). Since ChaosStages are STATEFUL,
+         * the stage function will be fired on each iteration and expecting a NEW instance.
          */
-        fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
-            private val current by lazy { AtomicReference(stage()) }
+        fun Repeat(stageFn: () -> ChaosStage): ChaosStage = object : ChaosStage {
+            private val current by lazy { AtomicReference(stageFn()) }
 
-            override fun invoke(tx: HttpTransaction) =
+            override fun invoke(tx: HttpTransaction): Response? =
                     current.get()(tx) ?: run {
-                println("current didnt match")
-                current.set(stage())
-                current.get()(tx)
-            }
+                        current.set(stageFn())
+                        current.get()(tx)
+                    }
         }
 
         /**
-         * Does not apply any behaviour.
+         * Does not apply any ChaosBehaviour.
          */
         object Wait : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? = null
         }
     }
 
+    /**
+     * Chain the next ChaosBehaviour to apply when this stage is finished.
+     */
     fun then(next: ChaosStage): ChaosStage = let {
         object : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: next(tx)
         }
     }
 
+    /**
+     * Stop applying the ChaosBehaviour of this stage when the StageTrigger fires.
+     */
     fun until(trigger: StageTrigger): ChaosStage {
         val first = this
         val active = AtomicBoolean(true)
@@ -56,7 +62,7 @@ interface ChaosStage {
     }
 
     /**
-     * Converts the
+     * Converts this chaos behaviour to a standard http4k Filter.
      */
     fun asFilter(clock: Clock = Clock.systemUTC()): Filter {
         val first = this

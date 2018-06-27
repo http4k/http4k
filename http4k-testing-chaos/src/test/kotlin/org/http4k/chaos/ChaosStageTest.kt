@@ -19,7 +19,6 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ChaosStageTest {
@@ -43,10 +42,8 @@ class ChaosStageTest {
 
     @Test
     fun `then moves onto the next stage`() {
-        val app = chaosStage(I_M_A_TEAPOT)
-                .until { it.request.method == POST }
-                .then(chaosStage(NOT_FOUND))
-                .until { it.request.method == TRACE }
+        val app = chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
+                .then(chaosStage(NOT_FOUND).until { it.request.method == TRACE })
                 .then(chaosStage(INTERNAL_SERVER_ERROR))
                 .asFilter().then { response }
 
@@ -58,12 +55,11 @@ class ChaosStageTest {
     }
 
     @Test
-    @Disabled
     fun `repeat starts again at the beginning`() {
         val app = Repeat {
             chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-                    .then(chaosStage(NOT_FOUND)).until { it.request.method == OPTIONS }
-                    .then(chaosStage(GATEWAY_TIMEOUT)).until { it.request.method == TRACE }
+                    .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
+                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
         }.until { it.request.method == DELETE }
                 .asFilter().then { response }
 
@@ -77,6 +73,6 @@ class ChaosStageTest {
     }
 
     private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
-        override fun invoke(tx: HttpTransaction): Response = Response(status)
+        override fun invoke(tx: HttpTransaction) = Response(status)
     }
 }
