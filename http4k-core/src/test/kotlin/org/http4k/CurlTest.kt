@@ -6,7 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.body.toBody
 import org.http4k.core.toCurl
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class CurlTest {
 

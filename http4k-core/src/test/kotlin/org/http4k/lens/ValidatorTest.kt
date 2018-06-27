@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Ignore
 import org.http4k.lens.Validator.Strict
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ValidatorTest {
     private val formFields = FormField.required("bob")

@@ -3,7 +3,7 @@ package org.http4k.filter.cookie
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.cookie.Cookie
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDateTime
 

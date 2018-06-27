@@ -14,7 +14,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.Header
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class FiltersTest {
 

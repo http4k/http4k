@@ -2,7 +2,7 @@ package org.http4k.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class LensFailureTest {
     private val unsupported = Unsupported(Header.Common.CONTENT_TYPE.meta)

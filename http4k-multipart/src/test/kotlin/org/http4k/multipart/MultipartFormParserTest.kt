@@ -1,13 +1,12 @@
 package org.http4k.multipart
 
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.IsEqual.equalTo
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.string
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -15,12 +14,12 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.ISO_8859_1
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.*
+import java.util.Arrays
 
 class MultipartFormParserTest {
 
     @Test
-    @Ignore
+    @Disabled
     fun example() {
 
         val maxStreamLength = 100000 // maximum length of the stream, will throw exception if this is exceeded
@@ -75,8 +74,8 @@ class MultipartFormParserTest {
 
         val parts = MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
 
-        assertThat<String>(parts.parts("file")[0].fileName, equalTo("foo.tab"))
-        assertThat<String>(parts.parts("anotherFile")[0].fileName, equalTo("BAR.tab"))
+        assertThat(parts.parts("file")[0].fileName, equalTo("foo.tab"))
+        assertThat(parts.parts("anotherFile")[0].fileName, equalTo("BAR.tab"))
         compareOneStreamToAnother(parts.parts("field")[0].newInputStream, ByteArrayInputStream(("fieldValue" + CR_LF + "with cr lf").toByteArray()))
         compareOneStreamToAnother(parts.parts("multi")[0].newInputStream, ByteArrayInputStream("value1".toByteArray()))
         compareOneStreamToAnother(parts.parts("multi")[1].newInputStream, ByteArrayInputStream("value2".toByteArray()))
@@ -105,7 +104,7 @@ class MultipartFormParserTest {
             MultipartFormParser(UTF_8, 1024, TEMPORARY_FILE_DIRECTORY).formParts(form)
             fail("should have failed because the form is too big")
         } catch (e: Throwable) {
-            assertThat<String>(e.message, containsString("Form contents was longer than 1024 bytes"))
+            assertThat(e.localizedMessage, containsSubstring("Form contents was longer than 1024 bytes"))
         }
     }
 
@@ -155,7 +154,7 @@ class MultipartFormParserTest {
             MultipartFormParser(UTF_8, 1024 * 4, TEMPORARY_FILE_DIRECTORY).formParts(form)
             fail("Should have thrown an Exception")
         } catch (e: Throwable) {
-            assertThat<String>(e.message, containsString("Boundary must be proceeded by field separator, but didn't find it"))
+            assertThat(e.localizedMessage, containsSubstring("Boundary must be proceeded by field separator, but didn't find it"))
         }
     }
 
@@ -170,7 +169,7 @@ class MultipartFormParserTest {
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[2], "utf8\uD83D\uDCA9.file", file)
 
         val articleType = partMap.filter { it.fieldName == "articleType" }[0]
-        assertTrue("articleType", articleType.isInMemory())
+        assertThat("articleType", articleType.isInMemory(), equalTo(true))
         assertThat(articleType.string(), equalTo("obituary"))
 
         assertFileIsCorrect(partMap.filter { it.fieldName == "uploadManuscript" }[3], "utf8\uD83D\uDCA9.txt", txt)
@@ -179,9 +178,9 @@ class MultipartFormParserTest {
     }
 
     private fun assertPartSaved(fileName: String, files: Array<String>?) {
-        assertTrue(
+        assertThat(
             "couldn't find " + fileName + " in " + Arrays.toString(files),
-            files!![0].contains(fileName) || files[1].contains(fileName))
+            files!![0].contains(fileName) || files[1].contains(fileName), equalTo(true))
     }
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inMemory: Boolean) {
@@ -189,8 +188,8 @@ class MultipartFormParserTest {
     }
 
     private fun assertFileIsCorrect(filePart: Part, expectedFilename: String, inputStream: InputStream, inMemory: Boolean) {
-        assertThat(expectedFilename + " in memory?", filePart.isInMemory(), equalTo(inMemory))
-        assertThat<String>(filePart.fileName, equalTo(expectedFilename))
+        assertThat("$expectedFilename in memory?", filePart.isInMemory(), equalTo(inMemory))
+        assertThat(filePart.fileName, equalTo(expectedFilename))
         compareStreamToFile(inputStream, filePart.fileName)
     }
 

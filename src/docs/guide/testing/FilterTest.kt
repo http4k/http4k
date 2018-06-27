@@ -11,7 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 val AddLatency = Filter { next ->
     {

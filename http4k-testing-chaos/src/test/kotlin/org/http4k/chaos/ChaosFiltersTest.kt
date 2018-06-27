@@ -12,13 +12,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ChaosFiltersTest {
     private val expecteReq = Request(GET, "")
 
     @Test
-    fun `filter with request injection policy should apply behaviour on request`() {
+    fun `filter with injection policy should apply behaviour and set outgoing header`() {
         val injectedResponse = Always.inject(
                 object : ChaosBehaviour {
                     override fun invoke(tx: HttpTransaction) = tx.response.with(Header.Common.CHAOS of "foo")
@@ -27,17 +27,4 @@ class ChaosFiltersTest {
                 .asFilter().then { Response(OK) }(expecteReq)
         assertThat(injectedResponse.header("x-http4k-chaos"), present(equalTo("foo")))
     }
-//
-//    @Test
-//    fun `filter with response injection policy should apply behaviour on response`() {
-//        val injectedResponse = ChaosFilters(
-//                Always(injectRequest = false).inject(
-//                        object : ChaosBehaviour {
-//                            override fun invoke(response: Response) = response
-//                                    .also { assertThat(it, equalTo(Response(OK))) }.with(Header.Common.CHAOS of "foo")
-//                        })
-//        ).then { Response(OK) }(expecteReq)
-//        assertThat(injectedResponse.header("x-http4k-chaos"), present(equalTo("foo")))
-//
-//    }
 }

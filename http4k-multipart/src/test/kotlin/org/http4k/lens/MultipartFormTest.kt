@@ -9,8 +9,8 @@ import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class MultipartFormTest {
 
@@ -26,7 +26,7 @@ class MultipartFormTest {
     private val CONTENT_TYPE_WITH_BOUNDARY = ContentType.MultipartFormWithBoundary(DEFAULT_BOUNDARY)
 
     @Test
-    @Ignore
+    @Disabled
     fun `multipart form serialized into request`() {
         val populatedRequest = emptyRequest.with(
             multipartFormLens(Validator.Strict) of MultipartForm().with(

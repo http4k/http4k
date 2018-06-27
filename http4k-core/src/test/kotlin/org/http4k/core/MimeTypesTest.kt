@@ -6,7 +6,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MimeTypesTest {
 

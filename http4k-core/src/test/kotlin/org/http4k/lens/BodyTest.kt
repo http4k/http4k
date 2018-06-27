@@ -10,7 +10,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Header.Common.CONTENT_TYPE
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BodyTest {
 

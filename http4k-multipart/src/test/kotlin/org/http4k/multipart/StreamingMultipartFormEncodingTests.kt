@@ -1,6 +1,6 @@
 package org.http4k.multipart
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 

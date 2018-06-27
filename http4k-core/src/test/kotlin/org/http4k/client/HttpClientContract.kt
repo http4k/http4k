@@ -24,8 +24,8 @@ import org.http4k.filter.ServerFilters
 import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
 abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
@@ -44,11 +44,11 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `supports gzipped content`() {
         System.err.println("GZIPPED")
 
-        val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp())
+        val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
         asServer.start()
         val client = ApacheClient()
 
-        val request = Request(GET, "http://localhost:8000").header("accept-encoding", "gzip")
+        val request = Request(GET, "http://localhost:${asServer.port()}").header("accept-encoding", "gzip")
         client(request)
         client(request)
         client(request)
@@ -156,7 +156,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    @Ignore
+    @Disabled
     open fun `socket timeouts are converted into 504`() {
         System.err.println("TIMEOUT")
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
@@ -181,7 +181,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `can retrieve body for different statuses`() {
+    fun `can retrieve body for diffMoshierent statuses`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
             assertThat(response.status, equalTo(Status(statusCode, "")))

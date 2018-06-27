@@ -1,17 +1,17 @@
 package org.http4k.core
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import junit.framework.TestCase
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ParametersTest {
     @Test
     fun extract_query_parameters() {
         assertThat("foo=one&bar=two".toParameters().findSingle("foo")!!, equalTo("one"))
         assertThat("foo=&bar=two".toParameters().findSingle("foo")!!, equalTo(""))
-        TestCase.assertNull("foo&bar=two".toParameters().findSingle("foo"))
-        TestCase.assertNull("foo&bar=two".toParameters().findSingle("notthere"))
+        assertThat("foo&bar=two".toParameters().findSingle("foo"), absent())
+        assertThat("foo&bar=two".toParameters().findSingle("notthere"), absent())
     }
 
     @Test

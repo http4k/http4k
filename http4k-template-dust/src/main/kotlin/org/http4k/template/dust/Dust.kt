@@ -2,7 +2,6 @@ package org.http4k.template.dust
 
 import jdk.nashorn.api.scripting.JSObject
 import org.apache.commons.pool2.BasePooledObjectFactory
-import org.apache.commons.pool2.PooledObject
 import org.apache.commons.pool2.impl.DefaultPooledObject
 import org.apache.commons.pool2.impl.GenericObjectPool
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig

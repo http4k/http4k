@@ -21,7 +21,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
 import org.http4k.util.TickingClock
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MetricFiltersServerTest {
     private val registry = SimpleMeterRegistry()

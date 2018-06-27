@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class FormFieldTest {
     private val form = WebForm(mapOf("hello" to listOf("world", "world2")), emptyList())

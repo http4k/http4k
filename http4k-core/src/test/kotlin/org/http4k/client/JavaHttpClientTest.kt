@@ -4,7 +4,7 @@ import org.apache.http.config.SocketConfig
 import org.apache.http.impl.client.HttpClients
 import org.http4k.core.BodyMode
 import org.http4k.server.SunHttp
-import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 
 
 class JavaHttpClientTest : HttpClientContract({ SunHttp(it) }, JavaHttpClient(),
@@ -16,8 +16,7 @@ class JavaHttpClientTest : HttpClientContract({ SunHttp(it) }, JavaHttpClient(),
         ).build()
         , responseBodyMode = BodyMode.Stream)) {
 
-    @Ignore
+    @Disabled
     override fun `can forward response body to another request`() {
-
     }
 }

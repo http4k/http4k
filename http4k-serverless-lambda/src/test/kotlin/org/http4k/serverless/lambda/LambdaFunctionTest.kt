@@ -6,7 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
 import org.http4k.serverless.TestApp
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class LambdaFunctionTest {
 

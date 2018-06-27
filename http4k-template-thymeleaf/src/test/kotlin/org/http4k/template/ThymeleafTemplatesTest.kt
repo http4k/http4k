@@ -2,7 +2,7 @@ package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 data class HtmlFeature(val description: String) : ViewModel {
     override fun template() = super.template() + ".html"

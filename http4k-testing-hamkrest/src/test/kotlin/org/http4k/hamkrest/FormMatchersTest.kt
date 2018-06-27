@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.WebForm
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class FormMatchersTest {
     @Test

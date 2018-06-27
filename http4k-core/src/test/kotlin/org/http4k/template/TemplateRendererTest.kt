@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 object TestViewModel : ViewModel
 

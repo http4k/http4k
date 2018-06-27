@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
 
 class PushPullAdaptingWebSocketTest {

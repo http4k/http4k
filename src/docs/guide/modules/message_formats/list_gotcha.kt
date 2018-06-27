@@ -4,7 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.format.Jackson.auto
-import java.util.*
+import java.util.Arrays
 
 data class MyIntWrapper(val value: Int)
 

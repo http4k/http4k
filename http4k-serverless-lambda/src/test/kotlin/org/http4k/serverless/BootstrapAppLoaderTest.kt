@@ -11,7 +11,7 @@ import org.http4k.core.Status
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BootstrapAppLoaderTest {
 

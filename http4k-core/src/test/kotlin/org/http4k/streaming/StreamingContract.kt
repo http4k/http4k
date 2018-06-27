@@ -13,10 +13,10 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.InputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -47,13 +47,13 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         }
     )
 
-    @Before
+    @BeforeEach
     fun `set up`() {
         runningServer = server.asServer(serverConfig(port)).start()
         countdown = CountDownLatch(config.beeps * 2)
     }
 
-    @After
+    @AfterEach
     fun `tear down`() {
         runningServer?.stop()
     }
@@ -82,7 +82,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private fun waitForCompletion() {
         val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
-        if (!succeeded) Assert.fail("Timed out waiting for server response")
+        if (!succeeded) fail("Timed out waiting for server response")
     }
 
     private fun captureReceivedStream(streamSource: () -> InputStream) {

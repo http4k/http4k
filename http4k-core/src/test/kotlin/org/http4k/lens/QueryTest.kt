@@ -9,7 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class QueryTest {
     private val request = withQueryOf("/?hello=world&hello=world2")

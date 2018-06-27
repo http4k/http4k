@@ -17,7 +17,7 @@ import org.http4k.filter.CachingFilters.Response.MaxAge
 import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.hamkrest.hasHeader
 import org.http4k.util.FixedClock
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import java.time.ZonedDateTime

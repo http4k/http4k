@@ -25,11 +25,11 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import java.util.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import java.util.Random
 
 
 object Matchers {
@@ -73,7 +73,7 @@ class FakeRecorderTest : RecorderCdc() {
     }
 }
 
-@Ignore // this obviously doesn't exist, so we ignore it here
+@Disabled // this obviously doesn't exist, so we ignore it here
 class RealRecorderTest : RecorderCdc() {
     override val client = SetHostFrom(Uri.of("http://realrecorder")).then(OkHttp())
 }
@@ -86,13 +86,13 @@ class EndToEndTest {
     private val server = MyMathServer(port, Uri.of("http://localhost:$recorderPort"))
     private val recorderServer = recorder.asServer(Jetty(recorderPort))
 
-    @Before
+    @BeforeEach
     fun setup(): Unit {
         recorderServer.start()
         server.start()
     }
 
-    @After
+    @AfterEach
     fun teardown(): Unit {
         server.stop()
         recorderServer.stop()

@@ -31,7 +31,7 @@ import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 abstract class ContractRendererContract(private val renderer: ContractRenderer) {
     fun name(): String = this.javaClass.simpleName

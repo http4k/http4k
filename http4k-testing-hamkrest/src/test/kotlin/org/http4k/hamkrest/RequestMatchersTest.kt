@@ -10,7 +10,7 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.with
 import org.http4k.lens.Query
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class RequestMatchersTest {
 

@@ -24,9 +24,9 @@ import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import org.http4k.hamkrest.hasStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration
-import java.util.*
+import java.util.ArrayDeque
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 

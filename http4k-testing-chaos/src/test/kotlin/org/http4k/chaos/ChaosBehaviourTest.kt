@@ -1,7 +1,11 @@
 package org.http4k.chaos
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.throws
+import org.http4k.chaos.ChaosBehaviour.Companion.Latency
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -10,34 +14,35 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Test
-import java.time.Duration
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import java.time.Duration.ZERO
+import java.time.Duration.ofMillis
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
 
 class ChaosBehaviourTest {
-    private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), Duration.ZERO)
+    private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), ZERO)
 
-    @Test(expected = ChaosException::class)
+    @Test
     fun `exception throwing behaviour should throw exception`() {
-        ChaosBehaviour.ThrowException()(tx)
+        val expected = RuntimeException("foo")
+        assertThat({ ChaosBehaviour.ThrowException(expected)(tx)}, throws(equalTo(expected)))
+
     }
 
     @Test
+    @Disabled
     fun `additional latency behaviour should add extra latency`() {
         val delay = 10L
         val latch = CountDownLatch(1)
         thread {
-            ChaosBehaviour.Latency(
-                    Duration.ofMillis(delay),
-                    Duration.ofMillis(delay + 1)
-            )(tx)
+            Latency(ofMillis(delay)..ofMillis(delay + 1))(tx)
             latch.countDown()
         }
-        assertFalse(latch.await(delay - 1, TimeUnit.MILLISECONDS))
+        assertThat(latch.await(delay - 1, MILLISECONDS), equalTo(false))
     }
 
     @Test

@@ -3,17 +3,17 @@ package org.http4k.aws
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
-import org.http4k.core.Method
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.Payload
-import org.junit.After
-import org.junit.Assume
-import org.junit.Before
-import org.junit.BeforeClass
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import java.io.InputStream
 import java.util.Properties
 import java.util.UUID
@@ -27,15 +27,15 @@ abstract class AbstractAwsRealS3TestCase {
     private lateinit var scope: AwsCredentialScope
     private lateinit var credentials: AwsCredentials
 
-    @Before
+    @BeforeEach
     fun setup() {
         val properties = Properties()
         properties.load(properties())
 
         assertThat(
-            "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
-            properties.getProperty("signMyLifeAway"),
-            equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
+                "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
+                properties.getProperty("signMyLifeAway"),
+                equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
 
         scope = AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service"))
         credentials = AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))
@@ -47,21 +47,22 @@ abstract class AbstractAwsRealS3TestCase {
         s3Root = Uri.of("https://s3.amazonaws.com/")
     }
 
-    @After
+    @AfterEach
     fun removeBucket() {
-        aClient()(Request(Method.DELETE, bucketUrl))
+        aClient()(Request(DELETE, bucketUrl))
     }
 
+
     protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
-        .then(ApacheClient())
+            .then(ApacheClient())
 
     protected fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope, credentials, payloadMode = signed)
 
     companion object {
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun checkPropertiesExist() {
-            Assume.assumeTrue(properties() != null)
+            assumeTrue(properties() != null)
         }
 
         private fun properties(): InputStream? = AbstractAwsRealS3TestCase::class.java.getResourceAsStream("/aws.properties")

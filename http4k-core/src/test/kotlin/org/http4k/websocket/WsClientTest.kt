@@ -10,7 +10,7 @@ import org.http4k.core.Request
 import org.http4k.testing.ClosedWebsocket
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.WsStatus.Companion.NEVER_CONNECTED
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
 
 class WsClientTest {

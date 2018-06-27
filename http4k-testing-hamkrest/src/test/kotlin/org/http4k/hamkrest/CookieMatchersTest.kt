@@ -1,7 +1,7 @@
 package org.http4k.hamkrest
 
 import org.http4k.core.cookie.Cookie
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

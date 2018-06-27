@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Argo
 import org.http4k.format.Argo.obj
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.InputStream
 import java.math.BigDecimal
 

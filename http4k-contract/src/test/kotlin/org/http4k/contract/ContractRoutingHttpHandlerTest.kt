@@ -24,7 +24,7 @@ import org.http4k.lens.Query
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ContractRoutingHttpHandlerTest {
 

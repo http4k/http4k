@@ -10,7 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class CookiesTest {
     private val request = Request(GET, of(""))

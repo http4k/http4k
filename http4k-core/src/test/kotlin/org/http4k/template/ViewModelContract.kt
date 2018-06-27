@@ -7,7 +7,7 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Header.Common.CONTENT_TYPE
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 abstract class ViewModelContract(private val templates: Templates) {
 

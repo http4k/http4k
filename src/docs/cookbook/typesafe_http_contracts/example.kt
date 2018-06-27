@@ -12,6 +12,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -19,7 +20,6 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CachingFilters.Response.NoCache
 import org.http4k.filter.CorsPolicy
-import org.http4k.core.HttpTransaction
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Argo

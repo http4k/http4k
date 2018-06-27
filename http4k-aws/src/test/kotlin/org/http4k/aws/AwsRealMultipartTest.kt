@@ -15,7 +15,7 @@ import org.http4k.core.Status
 import org.http4k.core.query
 import org.http4k.core.then
 import org.http4k.filter.Payload
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class AwsRealMultipartTest : AbstractAwsRealS3TestCase() {
 

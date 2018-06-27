@@ -16,8 +16,8 @@ import org.http4k.filter.ChunkKeyContentsIfRequired
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
 
@@ -31,7 +31,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun `streaming usage`() {
         val requestBodyMode = BodyMode.Stream
         bucketLifecycle(ClientFilters.ChunkKeyContentsIfRequired(requestBodyMode = requestBodyMode)

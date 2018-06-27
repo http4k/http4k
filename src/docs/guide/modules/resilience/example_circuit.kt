@@ -9,7 +9,7 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import java.time.Duration
-import java.util.*
+import java.util.ArrayDeque
 
 // Circuit state transition: CLOSED (ok) -> OPEN (dead) -> HALF_OPEN (test) -> CLOSED (ok)
 fun main(args: Array<String>) {

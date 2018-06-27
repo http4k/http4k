@@ -8,15 +8,15 @@ import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.server.ServerConfig
-import org.junit.After
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
 
 abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
                                        val client: AsyncHttpClient,
                                        private val timeoutClient: AsyncHttpClient) : AbstractHttpClientContract(serverConfig) {
 
-    @After
+    @AfterEach
     fun close() {
         client.close()
     }

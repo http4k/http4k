@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.MemoryBody
 import org.http4k.core.StreamBody
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class WsMessageTest {
 

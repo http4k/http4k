@@ -17,9 +17,9 @@ import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class ClientFiltersTest {
     val server = { request: Request ->
@@ -83,7 +83,7 @@ class ClientFiltersTest {
         }
     }
 
-    @Before
+    @BeforeEach
     fun before() {
         ZipkinTraces.THREAD_LOCAL.remove()
     }

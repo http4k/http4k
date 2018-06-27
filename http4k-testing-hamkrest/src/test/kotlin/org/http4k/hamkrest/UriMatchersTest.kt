@@ -1,7 +1,7 @@
 package org.http4k.hamkrest
 
 import org.http4k.core.Uri
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class UriMatchersTest {
 

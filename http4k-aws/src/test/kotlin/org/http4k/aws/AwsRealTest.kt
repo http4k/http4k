@@ -14,8 +14,8 @@ import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.Payload
-import org.junit.Test
-import java.util.*
+import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class AwsRealTest : AbstractAwsRealS3TestCase() {
 

@@ -18,30 +18,28 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
-import org.http4k.util.RetryRule
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import java.util.Arrays
-import java.util.Random
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
-    @Rule
-    @JvmField
-    var retryRule = RetryRule.LOCAL
+//    @Rule
+//    @JvmField
+//    var retryRule = RetryRule.LOCAL
 
-    private var server: Http4kServer? = null
+    private lateinit var server: Http4kServer
 
-    val port = Random().nextInt(1000) + 8000
+    val port: Int
+        get() = server.port()
 
-    @Before
+    @BeforeEach
     fun before() {
         val defaultHandler = { request: Request ->
             Response(OK)
-                .header("uri", request.uri.toString())
-                .header("header", request.header("header"))
-                .header("query", request.query("query"))
-                .body(request.body)
+                    .header("uri", request.uri.toString())
+                    .header("header", request.header("header"))
+                    .header("query", request.query("query"))
+                    .body(request.body)
         }
         val app = routes("/someUri" bind POST to defaultHandler,
                 "/cookies/set" bind GET to { req: Request ->
@@ -76,14 +74,13 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
                     val status = Status(r.path("status")!!.toInt(), "")
                     Response(status).body("body for status ${status.code}")
                 })
-        server = app
-            .asServer(serverConfig(port)).start()
+        server = app.asServer(serverConfig(0)).start()
     }
 
     protected fun testImageBytes() = this::class.java.getResourceAsStream("/test.png").readBytes()
 
-    @After
+    @AfterEach
     fun after() {
-        server?.stop()
+        server.stop()
     }
 }

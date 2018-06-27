@@ -2,8 +2,8 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import junit.framework.TestCase.assertNull
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 
 class UriTest {
     @Test

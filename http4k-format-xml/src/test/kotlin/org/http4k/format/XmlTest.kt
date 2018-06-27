@@ -13,7 +13,7 @@ import org.http4k.format.Xml.asXmlString
 import org.http4k.format.Xml.auto
 import org.http4k.format.Xml.xml
 import org.http4k.lens.Query
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 data class Base(val Xml: XmlNode?)
 

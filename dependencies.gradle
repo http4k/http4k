@@ -15,7 +15,9 @@ ext {
     ]
 
     testing = [
-            "junit:junit:4.12",
+            "org.junit.jupiter:junit-jupiter-api:5.2.0",
+            "org.junit.jupiter:junit-jupiter-engine:5.2.0",
+            "io.github.artsok:rerunner-jupiter:1.1.0",
             kotlin_reflect,
             hamkrest
     ]
