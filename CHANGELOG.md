@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.32.0
+- Add support for propagation of the Zipkin x-b3-sampled header
+
 ### v3.31.0
 - Changes to the Netty factory to enable running http4k on GraalVM. H/T @RichyHBM
 
