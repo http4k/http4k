@@ -19,11 +19,22 @@ class ChaosConfigTest {
     }
 
     @Test
+    fun `default latency range`() {
+        ChaosConfig.env.LatencyRange() shouldMatch
+                equalTo((Duration.ofMillis(100)..Duration.ofMillis(500)))
+    }
+
+    @Test
     fun `create a percentage from an environment`() {
         val props = Properties().apply {
             put("CHAOS_PERCENTAGE", "100")
         }
 
         ChaosConfig.env.Percentage(props::getProperty) shouldMatch equalTo(100)
+    }
+
+    @Test
+    fun `default percentage`() {
+        ChaosConfig.env.Percentage() shouldMatch equalTo((50))
     }
 }
