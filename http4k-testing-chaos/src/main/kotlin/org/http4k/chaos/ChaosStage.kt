@@ -15,6 +15,10 @@ interface ChaosStage {
     operator fun invoke(tx: HttpTransaction): Response?
 
     companion object {
+
+        /**
+         * Repeats a stage (or composite stage in repeating pattern.
+         */
         fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
             private val current by lazy { AtomicReference(stage()) }
 
@@ -25,7 +29,7 @@ interface ChaosStage {
         }
 
         /**
-         * Does not apply any behaviour to
+         * Does not apply any behaviour.
          */
         object Wait : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? = null
@@ -38,7 +42,7 @@ interface ChaosStage {
         }
     }
 
-    fun until(trigger: TransactionTrigger): ChaosStage {
+    fun until(trigger: StageTrigger): ChaosStage {
         val first = this
         val active = AtomicBoolean(true)
 

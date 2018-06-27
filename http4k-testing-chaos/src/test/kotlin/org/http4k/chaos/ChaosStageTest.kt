@@ -14,7 +14,7 @@ import org.http4k.core.with
 import org.http4k.lens.Header
 import org.junit.jupiter.api.Test
 
-class ChaosFiltersTest {
+class ChaosStageTest {
     private val expecteReq = Request(GET, "")
 
     @Test

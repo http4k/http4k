@@ -18,7 +18,7 @@ interface ChaosPolicy {
     }
 
     companion object {
-        fun Only(trigger: TransactionTrigger) = object : ChaosPolicy {
+        fun Only(trigger: StageTrigger) = object : ChaosPolicy {
             override fun appliesTo(tx: HttpTransaction) = trigger(tx)
         }
 
@@ -29,7 +29,5 @@ interface ChaosPolicy {
         fun PercentageBased(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
             override fun appliesTo(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
         }
-
-        fun PercentageBasedFromEnv() = PercentageBased((System.getenv("CHAOS_INJECTION_FREQUENCY")?.toInt() ?: 50))
     }
 }

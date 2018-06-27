@@ -21,6 +21,9 @@ interface ChaosBehaviour {
     operator fun invoke(tx: HttpTransaction): Response
 
     companion object {
+        /**
+         * Blocks the thread for a random amount of time within the allocated range.
+         */
         fun Latency(latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction): Response {
                 val delay = ThreadLocalRandom.current()
@@ -30,14 +33,23 @@ interface ChaosBehaviour {
             }
         }
 
+        /**
+         * Throws the appropriate exception.
+         */
         fun ThrowException(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = throw e
         }
 
+        /**
+         * Returns an empty response with the appropriate status.
+         */
         fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
         }
 
+        /**
+         * Strips the body from a response.
+         */
         fun NoBody() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
         }
