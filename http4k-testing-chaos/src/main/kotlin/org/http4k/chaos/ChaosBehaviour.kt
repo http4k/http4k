@@ -1,6 +1,6 @@
 package org.http4k.chaos
 
-import org.http4k.core.Body
+import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -15,10 +15,10 @@ import java.util.concurrent.ThreadLocalRandom
 val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 
 /**
- * Encapsulates the type of bad behaviour to apply to the request/response.
+ * Encapsulates the type of bad behaviour to apply to the response.
  */
 interface ChaosBehaviour {
-    operator fun invoke(tx: HttpTransaction) = tx.response
+    operator fun invoke(tx: HttpTransaction): Response
 
     companion object {
         fun Latency(latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) = object : ChaosBehaviour {
@@ -39,17 +39,21 @@ interface ChaosBehaviour {
         }
 
         fun NoBody() = object : ChaosBehaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response.body(Body.EMPTY).with(Header.Common.CHAOS of "No body")
+            override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
         }
 
-        @Suppress("unused") // untestable
+        /**
+         * Allocates memory in a busy loop until an OOM occurs.
+         */
         fun EatMemory() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply {
                 mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
             }
         }
 
-        @Suppress("unused") // untestable
+        /**
+         * Allocates memory in a busy loop until an OOM occurs.
+         */
         fun StackOverflow() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction): Response {
                 fun overflow(): Unit = overflow()
@@ -57,12 +61,16 @@ interface ChaosBehaviour {
             }
         }
 
-        @Suppress("unused") // untestable
+        /**
+         * System exits from the process.
+         */
         fun KillProcess() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
         }
 
-        @Suppress("unused") // untestable
+        /**
+         * Blocks the current thread.
+         */
         fun BlockThread() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
         }

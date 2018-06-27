@@ -9,12 +9,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * Defines a period during which a particular ChaosBehaviour to be active.
+ * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-
-typealias HttpTransactionMatcher = (HttpTransaction) -> Response?
-
-interface ChaosStage : HttpTransactionMatcher {
+interface ChaosStage {
+    operator fun invoke(tx: HttpTransaction): Response?
 
     companion object {
         fun Repeat(stage: () -> ChaosStage): ChaosStage = object : ChaosStage {
@@ -26,8 +24,11 @@ interface ChaosStage : HttpTransactionMatcher {
             }
         }
 
+        /**
+         * Does not apply any behaviour to
+         */
         object Wait : ChaosStage {
-            override fun invoke(tx: HttpTransaction): Response = tx.response
+            override fun invoke(tx: HttpTransaction): Response? = null
         }
     }
 
@@ -49,12 +50,19 @@ interface ChaosStage : HttpTransactionMatcher {
         }
     }
 
-}
-
-fun ChaosStage.asFilter(clock: Clock = Clock.systemUTC()) = Filter { next ->
-    {
-        clock.instant().let { start ->
-            next(it).run { this@asFilter(HttpTransaction(it, this, Duration.between(start, clock.instant()))) ?: this }
+    /**
+     * Converts the
+     */
+    fun asFilter(clock: Clock = Clock.systemUTC()): Filter {
+        val first = this
+        return Filter { next ->
+            {
+                clock.instant().let { start ->
+                    next(it).run {
+                        first(HttpTransaction(it, this, Duration.between(start, clock.instant()))) ?: this
+                    }
+                }
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ class ChaosBehaviourTest {
     @Test
     fun `exception throwing behaviour should throw exception`() {
         val expected = RuntimeException("foo")
-        assertThat({ ChaosBehaviour.ThrowException(expected)(tx)}, throws(equalTo(expected)))
+        assertThat({ ChaosBehaviour.ThrowException(expected)(tx) }, throws(equalTo(expected)))
 
     }
 
@@ -55,5 +55,33 @@ class ChaosBehaviourTest {
     fun `should return no body`() {
         ChaosBehaviour.NoBody()(tx) shouldMatch hasHeader("x-http4k-chaos", "No body")
                 .and(hasBody(""))
+    }
+
+    @Test
+    fun `should block thread`() {
+        val latch = CountDownLatch(1)
+        thread {
+            ChaosBehaviour.BlockThread()(tx)
+            latch.countDown()
+        }
+
+        assertThat(latch.await(100, MILLISECONDS), equalTo(false))
+    }
+
+    @Test
+    fun `should eat memory`() {
+        assertThat({ ChaosBehaviour.EatMemory()(tx) }, throws<OutOfMemoryError>())
+    }
+
+    @Test
+    @Disabled // untestable
+    fun `should stack overflow`() {
+        ChaosBehaviour.StackOverflow()(tx)
+    }
+
+    @Test
+    @Disabled // untestable
+    fun `should kill process`() {
+        ChaosBehaviour.KillProcess()(tx)
     }
 }
