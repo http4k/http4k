@@ -16,9 +16,9 @@ import org.http4k.testing.testWsClient
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 val namePath = Path.of("name")
 
@@ -52,11 +52,11 @@ class WebsocketServerTest : WebsocketContract() {
 
     private val server = testApp.asServer(Jetty(8000))
 
-    @Before
+    @BeforeEach
     fun before() {
         server.start()
     }
 
-    @After
+    @AfterEach
     fun after() = server.stop()
 }

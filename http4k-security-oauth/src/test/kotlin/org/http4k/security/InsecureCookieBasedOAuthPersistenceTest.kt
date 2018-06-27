@@ -11,7 +11,7 @@ import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant

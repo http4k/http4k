@@ -13,8 +13,7 @@ import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.toHttpHandler
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class RequestFiltersTest {
 
@@ -23,7 +22,7 @@ class RequestFiltersTest {
         val get = Request(Method.GET, "")
         var called = false
         RequestFilters.Tap { called = true; assertThat(it, equalTo(get)) }.then(Response(OK).toHttpHandler())(get)
-        assertTrue(called)
+        assertThat(called, equalTo(true))
     }
 
     @Test

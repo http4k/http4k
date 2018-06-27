@@ -9,7 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.jsoup.Jsoup
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.WebElement

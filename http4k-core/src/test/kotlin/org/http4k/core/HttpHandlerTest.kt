@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.body.form
 import org.http4k.core.body.toBody
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class HttpHandlerTest {
     @Test

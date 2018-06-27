@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
-import java.util.*
+import java.util.ArrayDeque
 
 fun main(args: Array<String>) {
 

@@ -7,7 +7,7 @@ import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 abstract class JsonErrorResponseRendererContract<ROOT : NODE, NODE: Any>(val j: Json<ROOT, NODE>){
 

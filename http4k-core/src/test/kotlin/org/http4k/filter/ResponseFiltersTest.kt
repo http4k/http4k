@@ -4,11 +4,14 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import junit.framework.TestCase.assertTrue
-import org.http4k.core.*
+import org.http4k.core.HttpTransaction
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
+import org.http4k.core.toBody
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -16,7 +19,8 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.toHttpHandler
 import org.http4k.util.TickingClock
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Clock.fixed
 import java.time.Duration.ZERO

@@ -9,42 +9,40 @@ import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
-import org.http4k.util.RetryRule
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus.Companion.NORMAL
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import java.util.Random
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.concurrent.LinkedBlockingQueue
 
 class WebsocketClientTest {
     private lateinit var server: Http4kServer
 
-    @Rule
-    @JvmField
-    var retryRule = RetryRule.CI
+//    @Rule
+//    @JvmField
+//    var retryRule = RetryRule.CI
 
-    private val port = Random().nextInt(1000) + 8000
+    private val port: Int
+        get() = server.port()
 
-    @Before
+    @BeforeEach
     fun before() {
         val ws = websockets(
-            "/{name}" bind { ws: Websocket ->
-                val name = ws.upgradeRequest.path("name")!!
-                ws.send(WsMessage(name))
-                ws.onMessage {
-                    ws.send(it)
-                    ws.close(NORMAL)
+                "/{name}" bind { ws: Websocket ->
+                    val name = ws.upgradeRequest.path("name")!!
+                    ws.send(WsMessage(name))
+                    ws.onMessage {
+                        ws.send(it)
+                        ws.close(NORMAL)
+                    }
                 }
-            }
         )
-        server = ws.asServer(Jetty(port)).start()
+        server = ws.asServer(Jetty(0)).start()
     }
 
-    @After
+    @AfterEach
     fun after() {
         server.stop()
     }

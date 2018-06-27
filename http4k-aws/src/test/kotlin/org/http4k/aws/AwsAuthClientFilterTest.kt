@@ -1,7 +1,7 @@
 package org.http4k.aws
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -10,7 +10,7 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Clock.fixed
 import java.time.LocalDateTime
 import java.time.ZoneId

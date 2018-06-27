@@ -10,7 +10,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class SecurityTest {
 

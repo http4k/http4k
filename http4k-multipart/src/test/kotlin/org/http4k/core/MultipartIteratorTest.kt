@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.lens.Header
 import org.http4k.multipart.AlreadyClosedException
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.InputStream
 import java.util.concurrent.atomic.AtomicReference
 

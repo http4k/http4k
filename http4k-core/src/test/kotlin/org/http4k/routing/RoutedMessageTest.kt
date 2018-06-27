@@ -11,7 +11,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate.Companion.from
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class RoutedMessageTest {
     private val template = from("an-uri-template")

@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

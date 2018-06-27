@@ -1,10 +1,10 @@
 package org.http4k.multipart
 
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.equalTo
-import org.junit.Assert.assertThat
-import org.junit.Assert.fail
-import org.junit.Test
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.InvalidMarkException
@@ -64,7 +64,7 @@ class CircularBufferedInputStreamTest {
             inputStream.mark(5)
             fail("can't have readlimit larger than buffer")
         } catch (e: ArrayIndexOutOfBoundsException) {
-            assertThat<String>(e.message, containsString("Readlimit (5) cannot be bigger than buffer size (4)"))
+            assertThat(e.localizedMessage, containsSubstring("Readlimit (5) cannot be bigger than buffer size (4)"))
         }
 
     }
@@ -138,7 +138,7 @@ class CircularBufferedInputStreamTest {
             inputStream.reset()
             fail("Have read past readlimit, should fail")
         } catch (e: InvalidMarkException) {
-            assertThat<String>(e.message, equalTo<String>(null))
+            assertThat(e.message, equalTo<String>(null))
         }
 
     }
@@ -169,9 +169,8 @@ class CircularBufferedInputStreamTest {
             inputStream.reset()
             fail("Have read past readlimit, should fail")
         } catch (e: InvalidMarkException) {
-            assertThat<String>(e.message, equalTo<String>(null))
+            assertThat(e.message, equalTo<String>(null))
         }
-
     }
 
     private fun createInputStream(bytes: ByteArray, bufSize: Int): InputStream = CircularBufferedInputStream(ByteArrayInputStream(bytes), bufSize)

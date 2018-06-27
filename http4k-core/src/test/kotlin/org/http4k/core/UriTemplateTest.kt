@@ -3,7 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.UriTemplate.Companion.from
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
 

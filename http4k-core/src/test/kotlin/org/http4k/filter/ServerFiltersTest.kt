@@ -39,14 +39,14 @@ import org.http4k.lens.Invalid
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Missing
 import org.http4k.lens.Unsupported
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.PrintWriter
 import java.io.StringWriter
 
 class ServerFiltersTest {
 
-    @Before
+    @BeforeEach
     fun before() {
         ZipkinTraces.THREAD_LOCAL.remove()
     }

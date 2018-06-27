@@ -8,11 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
-import org.junit.Test
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.util.UUID
+import org.junit.jupiter.api.Test
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 

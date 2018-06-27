@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 val EchoBody : HttpHandler = { r -> Response(OK).body(r.bodyString()) }
 

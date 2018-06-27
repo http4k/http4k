@@ -12,7 +12,7 @@ import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
 import org.http4k.lens.string
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class HttpMessageMatchersTest {
 
@@ -21,6 +21,9 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", listOf("bob", "bob2")), hasHeader("header", listOf("bill")))
+
+    @Test
+    fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header"), !hasHeader("header"))
 
     @Test
     fun `header lens`() =

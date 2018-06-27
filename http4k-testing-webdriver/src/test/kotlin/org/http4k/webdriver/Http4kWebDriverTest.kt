@@ -8,7 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
@@ -16,7 +16,7 @@ import java.io.File
 import java.net.URL
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.Date
 import org.http4k.core.cookie.Cookie as HCookie
 
 class Http4kWebDriverTest {

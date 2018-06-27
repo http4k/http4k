@@ -9,7 +9,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.RequestContexts
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.UUID
 
 

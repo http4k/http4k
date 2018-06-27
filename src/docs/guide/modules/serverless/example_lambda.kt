@@ -1,10 +1,6 @@
 package guide.modules.serverless
 
 
-import org.http4k.serverless.lambda.ApiGatewayProxyRequest
-import org.http4k.serverless.AppLoader
-import org.http4k.serverless.BootstrapAppLoader
-import org.http4k.serverless.lambda.LambdaFunction
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -13,6 +9,10 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.serverless.AppLoader
+import org.http4k.serverless.BootstrapAppLoader
+import org.http4k.serverless.lambda.ApiGatewayProxyRequest
+import org.http4k.serverless.lambda.LambdaFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 // It is the only actual piece of code that needs to be written.

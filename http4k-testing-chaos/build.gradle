@@ -6,4 +6,5 @@ dependencies {
 
     testCompile testing
     testCompile project(":http4k-core")
+    testCompile project(":http4k-testing-hamkrest")
 }

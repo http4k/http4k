@@ -6,7 +6,7 @@ import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.filter.CanonicalPayload
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
 class AwsCanonicalRequestTest {

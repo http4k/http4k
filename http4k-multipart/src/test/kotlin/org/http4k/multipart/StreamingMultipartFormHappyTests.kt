@@ -1,12 +1,9 @@
 package org.http4k.multipart
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.IsNot.not
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
-import org.junit.Test
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -239,7 +236,7 @@ class StreamingMultipartFormHappyTests {
 
         val file2 = form.next()
 
-        assertThat(file1, not(equalTo(file2)))
+        assertThat(file1, !equalTo(file2))
 
         try {
             val ignored = file1.inputStream.read()
@@ -358,17 +355,17 @@ internal fun assertPart(fieldName: String, fieldValue: String, StreamingPart: St
 }
 
 internal fun assertThereAreNoMoreParts(form: Iterator<StreamingPart>) {
-    assertFalse("Too many parts", form.hasNext())
+    assertThat("Too many parts", form.hasNext(), equalTo(false))
 }
 
 internal fun assertThereAreMoreParts(form: Iterator<StreamingPart>) {
-    assertTrue("Not enough parts", form.hasNext())
+    assertThat("Not enough parts", form.hasNext(), equalTo(true))
 }
 
 internal fun assertPartIsFormField(field: StreamingPart) {
-    assertTrue("the StreamingPart is a form field", field.isFormField)
+    assertThat("the StreamingPart is a form field", field.isFormField, equalTo(true))
 }
 
 internal fun assertPartIsNotField(file: StreamingPart) {
-    assertFalse("the StreamingPart is not a form field", file.isFormField)
+    assertThat("the StreamingPart is not a form field", file.isFormField, equalTo(false))
 }

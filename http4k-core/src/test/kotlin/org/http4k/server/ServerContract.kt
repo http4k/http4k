@@ -23,11 +23,9 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.util.RetryRule
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.Random
 
 
@@ -35,9 +33,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                               private val requiredMethods: Array<Method> = Method.values()) {
     private var server: Http4kServer? = null
 
-    @Rule
-    @JvmField
-    var retryRule = RetryRule.LOCAL
+//    @Rule
+//    @JvmField
+//    var retryRule = RetryRule.LOCAL
 
     private val port = Random().nextInt(1000) + 8000
 
@@ -68,7 +66,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
             ))
 
-    @Before
+    @BeforeEach
     fun before() {
         server = routes(*routes.toTypedArray()).asServer(serverConfig(port)).start()
     }
@@ -175,7 +173,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         }
     }
 
-    @After
+    @AfterEach
     fun after() {
         server?.stop()
     }

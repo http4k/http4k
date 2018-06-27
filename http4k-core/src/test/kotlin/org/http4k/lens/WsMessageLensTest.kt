@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.websocket.WsMessage
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
 class WsMessageLensTest {

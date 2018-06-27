@@ -12,7 +12,7 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.openqa.selenium.Cookie
 import org.http4k.core.cookie.Cookie as HCookie
 

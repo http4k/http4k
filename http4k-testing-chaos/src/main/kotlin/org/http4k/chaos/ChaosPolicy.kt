@@ -1,24 +1,32 @@
 package org.http4k.chaos
 
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.HttpTransaction
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
+/**
+ * Determines whether or not to apply a particular type of ChaosBehaviour to a request/response.
+ */
 interface ChaosPolicy {
-    fun shouldInject(request: Request): Boolean = false
-    fun shouldInject(response: Response): Boolean = false
+    fun appliesTo(tx: HttpTransaction) = false
+
+    fun inject(behaviour: ChaosBehaviour) = let { it ->
+        object : ChaosStage {
+            override fun invoke(tx: HttpTransaction) = if (it.appliesTo(tx)) behaviour(tx) else tx.response
+        }
+    }
 
     companion object {
-        fun Always(injectRequest: Boolean = true, injectResponse: Boolean = true) = object : ChaosPolicy {
-            override fun shouldInject(request: Request) = injectRequest
-            override fun shouldInject(response: Response) = injectResponse
+        fun Only(trigger: StageTrigger) = object : ChaosPolicy {
+            override fun appliesTo(tx: HttpTransaction) = trigger(tx)
+        }
+
+        object Always : ChaosPolicy {
+            override fun appliesTo(tx: HttpTransaction) = true
         }
 
         fun PercentageBased(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
-            override fun shouldInject(response: Response) = selector.nextInt(100) <= injectionFrequency
+            override fun appliesTo(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
         }
-
-        fun PercentageBasedFromEnv() = PercentageBased((System.getenv("CHAOS_INJECTION_FREQUENCY")?.toInt() ?: 50))
     }
 }

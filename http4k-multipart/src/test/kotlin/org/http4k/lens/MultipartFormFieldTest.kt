@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MultipartFormFieldTest {
     private val form = MultipartForm(mapOf("hello" to listOf("world", "world2")))

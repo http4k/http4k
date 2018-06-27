@@ -14,7 +14,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.http4k.util.TickingClock
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MetricFiltersClientTest {
 

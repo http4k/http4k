@@ -10,7 +10,7 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.with
 import org.http4k.routing.RoutedRequest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

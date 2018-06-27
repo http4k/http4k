@@ -16,9 +16,9 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
-import org.junit.Assert.fail
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class RoutingTest {
 
@@ -46,7 +46,7 @@ class RoutingTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun `method not allowed`() {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }
@@ -69,7 +69,7 @@ class RoutingTest {
     }
 
     @Test
-    @Ignore("this doesn't have a name so isn't bound...")
+    @Disabled("this doesn't have a name so isn't bound...")
     fun `matches empty uri template and method`() {
         val routes = routes(
             "/{.*}" bind GET to { Response(OK).body("matched") }

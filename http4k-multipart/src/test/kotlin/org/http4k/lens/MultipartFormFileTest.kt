@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType
 import org.http4k.core.FormFile
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MultipartFormFileTest {
     private fun file1() = FormFile("world", ContentType.TEXT_HTML, "world".byteInputStream())

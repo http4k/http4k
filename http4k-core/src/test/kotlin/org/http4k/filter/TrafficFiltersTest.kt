@@ -9,7 +9,7 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.traffic.ReadWriteCache
 import org.http4k.traffic.ReadWriteStream
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class TrafficFiltersTest {
     private val request = Request(Method.GET, "/bob")

@@ -12,7 +12,7 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 val EchoPath = "/echo/{message}" bind GET to { r -> Response(OK).body(r.path("message") ?: "nothing!") }
 

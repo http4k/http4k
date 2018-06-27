@@ -11,10 +11,10 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import java.util.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.util.Random
 
 object Matchers {
 
@@ -28,12 +28,12 @@ class EndToEndTest {
     private val client = OkHttp()
     private val server = MyMathServer(port)
 
-    @Before
+    @BeforeEach
     fun setup(): Unit {
         server.start()
     }
 
-    @After
+    @AfterEach
     fun teardown(): Unit {
         server.stop()
     }

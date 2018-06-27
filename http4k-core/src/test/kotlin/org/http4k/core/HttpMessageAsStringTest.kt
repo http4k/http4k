@@ -2,9 +2,9 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import junit.framework.TestCase.fail
 import org.http4k.core.Status.Companion.OK
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class HttpMessageAsStringTest {
 

@@ -5,10 +5,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.present
-import org.junit.Assert.fail
-import org.junit.Ignore
-import org.junit.Test
-import java.util.*
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
+import java.util.NoSuchElementException
 
 class StreamingMultipartFormSadTests {
 
@@ -68,7 +68,7 @@ class StreamingMultipartFormSadTests {
     }
 
     @Test
-    @Ignore("this is not a valid test case according to the RFC - we should blow up..")
+    @Disabled("this is not a valid test case according to the RFC - we should blow up..")
     fun partHasNoHeaders() {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)

@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.lens.Header
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.InputStream
 
 class MultipartFormBodyTest {

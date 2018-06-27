@@ -23,7 +23,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.lensFailureWith
 import org.http4k.lens.string
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
 
@@ -201,11 +201,13 @@ class ContractRouteTest {
                 "value1value2value3value4value5value6value7value8value9value10")
     }
 
-    @Test(expected = UnsupportedOperationException::class)
+    @Test
     fun `11 parts - unsupported`() {
+        assertThat({
         Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4")/
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
                 Path.of("value9") / Path.of("value10") / Path.of("value11")
+        }, throws<UnsupportedOperationException>())
     }
 
     private fun checkMatching(route: ContractRoute, valid: String, expected: String) {

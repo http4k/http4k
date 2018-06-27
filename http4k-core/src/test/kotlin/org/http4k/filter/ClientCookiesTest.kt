@@ -12,7 +12,7 @@ import org.http4k.core.then
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId

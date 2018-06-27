@@ -18,25 +18,22 @@ import org.http4k.routing.websockets
 import org.http4k.server.Http4kServer
 import org.http4k.server.WsServerConfig
 import org.http4k.server.asServer
-import org.http4k.util.RetryRule
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import java.util.Random
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
 
-    @Rule
-    @JvmField
-    var retryRule = RetryRule.CI
+//    @Rule
+//    @JvmField
+//    var retryRule = RetryRule.CI
 
-    private val port = Random().nextInt(1000) + 8000
+    private val port by lazy { server.port() }
 
     private val lens = WsMessage.string().map(String::toInt).toLens()
 
-    @Before
+    @BeforeEach
     fun before() {
         val routes = routes(
                 "/hello/{name}" bind { r: Request -> Response(OK).body(r.path("name")!!) }
@@ -65,10 +62,10 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
                     ws.onError { ws.send(WsMessage(it.localizedMessage)) }
                 })
 
-        server = PolyHandler(routes, ws).asServer(serverConfig(port)).start()
+        server = PolyHandler(routes, ws).asServer(serverConfig(0)).start()
     }
 
-    @After
+    @AfterEach
     fun after() {
         server.stop()
     }

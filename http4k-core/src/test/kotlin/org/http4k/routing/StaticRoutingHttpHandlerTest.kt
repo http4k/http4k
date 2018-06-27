@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class StaticRoutingHttpHandlerTest {
 

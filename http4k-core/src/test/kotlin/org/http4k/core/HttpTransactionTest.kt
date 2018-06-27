@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.RoutedResponse
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
 
 class HttpTransactionTest {

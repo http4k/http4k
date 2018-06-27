@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicReference
 
 class WsRoutingTest {

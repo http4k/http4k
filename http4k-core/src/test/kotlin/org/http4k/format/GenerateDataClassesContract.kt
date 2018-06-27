@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.GenerateDataClasses
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.math.BigDecimal

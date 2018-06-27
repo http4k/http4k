@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters.PrintRequestAndResponse
 import org.http4k.toHttpHandler
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 

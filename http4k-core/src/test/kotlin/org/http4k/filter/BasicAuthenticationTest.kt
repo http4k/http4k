@@ -10,7 +10,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BasicAuthenticationTest {
     @Test
