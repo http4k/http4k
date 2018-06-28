@@ -17,8 +17,8 @@ interface ChaosPolicy {
     }
 
     companion object {
-        fun Only(stageTrigger: ChaosStageTrigger) = object : ChaosPolicy {
-            override fun appliesTo(tx: HttpTransaction) = stageTrigger(tx)
+        fun Only(trigger: ChaosTrigger) = object : ChaosPolicy {
+            override fun appliesTo(tx: HttpTransaction) = trigger(tx)
         }
 
         object Always : ChaosPolicy {

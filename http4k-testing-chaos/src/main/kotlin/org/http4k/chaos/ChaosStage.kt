@@ -47,15 +47,15 @@ interface ChaosStage {
     }
 
     /**
-     * Stop applying the ChaosBehaviour of this stage when the StageTrigger fires.
+     * Stop applying the ChaosBehaviour of this stage when the ChaosTrigger fires.
      */
-    fun until(stageTrigger: ChaosStageTrigger): ChaosStage {
+    fun until(trigger: ChaosTrigger): ChaosStage {
         val first = this
         val active = AtomicBoolean(true)
 
         return object : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? {
-                if (active.get()) active.set(!stageTrigger(tx))
+                if (active.get()) active.set(!trigger(tx))
                 return if (active.get()) first(tx) else null
             }
         }

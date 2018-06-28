@@ -14,13 +14,13 @@ import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.Instant
 
-class ChaosStageTriggersTest {
+class ChaosTriggersTest {
     private val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
 
     @Test
     fun `deadline trigger`() {
         val clock = Clock.systemDefaultZone()
-        val trigger = ChaosStageTriggers.Deadline(Instant.now().plusMillis(100), clock)
+        val trigger = ChaosTriggers.Deadline(Instant.now().plusMillis(100), clock)
         trigger(tx) shouldMatch equalTo(false)
         sleep(100)
         trigger(tx) shouldMatch equalTo(true)
@@ -29,7 +29,7 @@ class ChaosStageTriggersTest {
     @Test
     fun `delay trigger`() {
         val clock = Clock.systemDefaultZone()
-        val trigger = ChaosStageTriggers.Delay(Duration.ofMillis(100), clock)
+        val trigger = ChaosTriggers.Delay(Duration.ofMillis(100), clock)
         trigger(tx) shouldMatch equalTo(false)
         sleep(100)
         trigger(tx) shouldMatch equalTo(true)
