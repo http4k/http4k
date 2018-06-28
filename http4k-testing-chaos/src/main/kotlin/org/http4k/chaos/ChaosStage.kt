@@ -33,7 +33,7 @@ interface ChaosStage {
          * Does not apply any ChaosBehaviour.
          */
         object Wait : ChaosStage {
-            override fun invoke(tx: HttpTransaction): Response? = null
+            override fun invoke(tx: HttpTransaction) = tx.response
         }
     }
 
