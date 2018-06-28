@@ -27,7 +27,7 @@ matrix:
       if: branch = master
       language: python
       script:
-      - "./release-site.sh"
+      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-site.sh; fi'
     - stage: api
       if: branch = master
       language: java
