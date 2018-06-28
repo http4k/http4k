@@ -4,6 +4,7 @@ import org.http4k.chaos.ChaosBehaviour
 import org.http4k.chaos.ChaosPolicy
 import org.http4k.chaos.ChaosStage.Companion.Wait
 import org.http4k.client.OkHttp
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
@@ -26,7 +27,7 @@ fun main(args: Array<String>) {
     val errorStage = ChaosPolicy.PercentageBased(100).inject(ChaosBehaviour.ReturnStatus(INTERNAL_SERVER_ERROR))
 
     // chain the stages together with then() and finally convert to a standard http4k Filter
-    val chaosFilter = doNothingStage.then(errorStage).asFilter()
+    val chaosFilter: Filter = doNothingStage.then(errorStage).asFilter()
     val svc: HttpHandler = { Response(OK).body("A normal response") }
 
     chaosFilter.then(svc).asServer(SunHttp(9000)).start().use {
