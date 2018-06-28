@@ -24,19 +24,19 @@ fun main(args: Array<String>) {
 
     // chaos is split into "stages", which can be triggered by specific request or time-based criteria
     val doNothingStage = Wait.until { tx: HttpTransaction -> tx.request.method == POST }
-    val errorStage = ChaosPolicy.PercentageBased(100).inject(ChaosBehaviour.ReturnStatus(INTERNAL_SERVER_ERROR))
+    val errorStage = ChaosPolicy.PercentageBased(50).inject(ChaosBehaviour.ReturnStatus(INTERNAL_SERVER_ERROR))
 
     // chain the stages together with then() and finally convert to a standard http4k Filter
     val chaosFilter: Filter = doNothingStage.then(errorStage).asFilter()
     val svc: HttpHandler = { Response(OK).body("A normal response") }
 
     chaosFilter.then(svc).asServer(SunHttp(9000)).start().use {
-        (1..5).forEach { performA(GET) }
+        (1..10).forEach { performA(GET) }
 
         // this triggers the change in behaviour
         performA(POST)
 
-        (1..5).forEach { performA(GET) }
+        (1..10).forEach { performA(GET) }
     }
 }
 
