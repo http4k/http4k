@@ -27,6 +27,7 @@ interface ChaosStage {
                         current.set(newStageFn())
                         current.get()(tx)
                     }
+
             override fun toString() = "Repeat ${current.get()}"
         }
 
@@ -45,37 +46,34 @@ interface ChaosStage {
     fun then(nextStage: ChaosStage): ChaosStage = let {
         object : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: nextStage(tx)
-            override fun toString() = "then $nextStage"
+            override fun toString() = "[$it] then [$nextStage]"
         }
     }
 
     /**
      * Stop applying the ChaosBehaviour of this stage when the ChaosTrigger fires.
      */
-    fun until(trigger: ChaosTrigger): ChaosStage {
-        val first = this
-        val active = AtomicBoolean(true)
-
-        return object : ChaosStage {
+    fun until(trigger: ChaosTrigger): ChaosStage = let {
+        object : ChaosStage {
+            private val active = AtomicBoolean(true)
             override fun invoke(tx: HttpTransaction): Response? {
                 if (active.get()) active.set(!trigger(tx))
-                return if (active.get()) first(tx) else null
+                return if (active.get()) it(tx) else null
             }
 
-            override fun toString(): String = "until $trigger"
+            override fun toString(): String = "$it until $trigger"
         }
     }
 
     /**
      * Converts this chaos behaviour to a standard http4k Filter.
      */
-    fun asFilter(clock: Clock = Clock.systemUTC()): Filter {
-        val first = this
-        return Filter { next ->
-            {
+    fun asFilter(clock: Clock = Clock.systemUTC()): Filter = let {
+        Filter { next ->
+            { req ->
                 clock.instant().let { start ->
-                    next(it).run {
-                        first(HttpTransaction(it, this, Duration.between(start, clock.instant()))) ?: this
+                    next(req).run {
+                        it(HttpTransaction(req, this, Duration.between(start, clock.instant()))) ?: this
                     }
                 }
             }
