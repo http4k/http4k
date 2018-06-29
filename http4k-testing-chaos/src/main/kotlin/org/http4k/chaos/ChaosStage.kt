@@ -27,6 +27,7 @@ interface ChaosStage {
                         current.set(newStageFn())
                         current.get()(tx)
                     }
+            override fun toString() = "Repeat ${current.get()}"
         }
 
         /**
@@ -34,6 +35,7 @@ interface ChaosStage {
          */
         object Wait : ChaosStage {
             override fun invoke(tx: HttpTransaction) = tx.response
+            override fun toString() = "Wait"
         }
     }
 
@@ -43,6 +45,7 @@ interface ChaosStage {
     fun then(nextStage: ChaosStage): ChaosStage = let {
         object : ChaosStage {
             override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: nextStage(tx)
+            override fun toString() = "then $nextStage"
         }
     }
 
@@ -58,6 +61,8 @@ interface ChaosStage {
                 if (active.get()) active.set(!trigger(tx))
                 return if (active.get()) first(tx) else null
             }
+
+            override fun toString(): String = "until $trigger"
         }
     }
 

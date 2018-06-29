@@ -24,13 +24,29 @@ interface ChaosBehaviour {
         /**
          * Blocks the thread for a random amount of time within the allocated range.
          */
-        fun Latency(latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) = object : ChaosBehaviour {
-            override fun invoke(tx: HttpTransaction): Response {
-                val delay = ThreadLocalRandom.current()
-                        .nextInt(latencyRange.start.toMillis().toInt(), latencyRange.endInclusive.toMillis().toInt())
-                sleep(delay.toLong())
-                return tx.response.with(Header.Common.CHAOS of "Latency (${delay}ms)")
+        object Latency {
+            operator fun invoke(latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) = object : ChaosBehaviour {
+                override fun invoke(tx: HttpTransaction): Response {
+                    val delay = ThreadLocalRandom.current()
+                            .nextInt(latencyRange.start.toMillis().toInt(), latencyRange.endInclusive.toMillis().toInt())
+                    sleep(delay.toLong())
+                    return tx.response.with(Header.Common.CHAOS of "Latency (${delay}ms)")
+                }
+
+                override fun toString() = "Latency (range = ${latencyRange.start} to ${latencyRange.start})"
             }
+
+            /**
+             * Get a latency range from the environment.
+             * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
+             */
+            fun fromEnv(env: (String) -> String? = System::getenv,
+                        defaultMin: Duration = Duration.ofMillis(100),
+                        defaultMax: Duration = Duration.ofMillis(500),
+                        minName: String = "CHAOS_LATENCY_MS_MIN",
+                        maxName: String = "CHAOS_LATENCY_MS_MAX"
+            ) = Latency((env(minName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMin)..
+                    (env(maxName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMax))
         }
 
         /**
@@ -38,6 +54,7 @@ interface ChaosBehaviour {
          */
         fun ThrowException(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = throw e
+            override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
         }
 
         /**
@@ -45,6 +62,7 @@ interface ChaosBehaviour {
          */
         fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+            override fun toString() = "ReturnStatus (${status.code})"
         }
 
         /**
@@ -52,6 +70,7 @@ interface ChaosBehaviour {
          */
         fun NoBody() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
+            override fun toString() = "NoBody"
         }
 
         /**
@@ -61,6 +80,7 @@ interface ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply {
                 mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
             }
+            override fun toString() = "EatMemory"
         }
 
         /**
@@ -71,6 +91,7 @@ interface ChaosBehaviour {
                 fun overflow(): Unit = overflow()
                 return tx.response.apply { overflow() }
             }
+            override fun toString() = "StackOverflow"
         }
 
         /**
@@ -78,6 +99,7 @@ interface ChaosBehaviour {
          */
         fun KillProcess() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
+            override fun toString() = "KillProcess"
         }
 
         /**
@@ -85,6 +107,7 @@ interface ChaosBehaviour {
          */
         fun BlockThread() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
+            override fun toString() = "BlockThread"
         }
     }
 }

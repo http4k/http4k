@@ -13,20 +13,35 @@ interface ChaosPolicy {
     fun inject(behaviour: ChaosBehaviour) = let { it ->
         object : ChaosStage {
             override fun invoke(tx: HttpTransaction) = if (it.appliesTo(tx)) behaviour(tx) else tx.response
+            override fun toString() = "$it $behaviour"
         }
     }
 
     companion object {
         fun Only(trigger: ChaosTrigger) = object : ChaosPolicy {
             override fun appliesTo(tx: HttpTransaction) = trigger(tx)
+            override fun toString() = "Only (trigger = $trigger)"
         }
 
         object Always : ChaosPolicy {
             override fun appliesTo(tx: HttpTransaction) = true
+            override fun toString() = "Always"
         }
 
-        fun PercentageBased(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
-            override fun appliesTo(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
+        object PercentageBased {
+            operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
+                override fun appliesTo(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
+                override fun toString() = "PercentageBased ($injectionFrequency%)"
+            }
+
+            /**
+             * Get a percentage from the environment.
+             * Defaults to CHAOS_PERCENTAGE and a value of 50%
+             */
+            fun fromEnvironment(env: (String) -> String? = System::getenv,
+                                defaultPercentage: Int = 50,
+                                name: String = "CHAOS_PERCENTAGE"
+            ) = PercentageBased(env(name)?.let(Integer::parseInt) ?: defaultPercentage)
         }
     }
 }

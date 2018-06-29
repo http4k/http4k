@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration.ZERO
 import java.time.Duration.ofMillis
+import java.util.Properties
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
@@ -29,39 +30,63 @@ class ChaosBehaviourTest {
     @Test
     fun `exception throwing behaviour should throw exception`() {
         val expected = RuntimeException("foo")
-        assertThat({ ChaosBehaviour.ThrowException(expected)(tx) }, throws(equalTo(expected)))
+        val throwException = ChaosBehaviour.ThrowException(expected)
+        throwException.toString() shouldMatch equalTo(("ThrowException RuntimeException foo"))
 
+        assertThat({ throwException(tx) }, throws(equalTo(expected)))
     }
 
     @Test
     @Disabled
     fun `additional latency behaviour should add extra latency`() {
         val delay = 10L
+        val latency = Latency(ofMillis(delay)..ofMillis(delay + 1))
+        latency.toString() shouldMatch equalTo((""))
+
         val latch = CountDownLatch(1)
         thread {
-            Latency(ofMillis(delay)..ofMillis(delay + 1))(tx)
+            latency(tx)
             latch.countDown()
         }
         assertThat(latch.await(delay - 1, MILLISECONDS), equalTo(false))
     }
 
     @Test
+    fun `latency description`() {
+        val props = Properties().apply {
+            put("CHAOS_LATENCY_MS_MIN", "1000")
+            put("CHAOS_LATENCY_MS_MAX", "1000000")
+        }
+
+        Latency.fromEnv(props::getProperty).toString() shouldMatch equalTo(("Latency (range = PT1S to PT1S)"))
+        Latency.fromEnv().toString() shouldMatch equalTo(("Latency (range = PT0.1S to PT0.1S)"))
+    }
+
+    @Test
     fun `should return response with internal server error status`() {
-        val injectedResponse = ChaosBehaviour.ReturnStatus(NOT_FOUND)(tx)
+        val returnStatus = ChaosBehaviour.ReturnStatus(NOT_FOUND)
+        returnStatus.toString() shouldMatch equalTo(("ReturnStatus (404)"))
+
+        val injectedResponse = returnStatus(tx)
         assertEquals(NOT_FOUND, injectedResponse.status)
     }
 
     @Test
     fun `should return no body`() {
-        ChaosBehaviour.NoBody()(tx) shouldMatch hasHeader("x-http4k-chaos", "No body")
+        val noBody = ChaosBehaviour.NoBody()
+        noBody.toString() shouldMatch equalTo(("NoBody"))
+
+        noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body")
                 .and(hasBody(""))
     }
 
     @Test
     fun `should block thread`() {
+        val blockThread = ChaosBehaviour.BlockThread()
+        blockThread.toString() shouldMatch equalTo(("BlockThread"))
         val latch = CountDownLatch(1)
         thread {
-            ChaosBehaviour.BlockThread()(tx)
+            blockThread(tx)
             latch.countDown()
         }
 
@@ -70,18 +95,25 @@ class ChaosBehaviourTest {
 
     @Test
     fun `should eat memory`() {
-        assertThat({ ChaosBehaviour.EatMemory()(tx) }, throws<OutOfMemoryError>())
+        val eatMemory = ChaosBehaviour.EatMemory()
+        eatMemory.toString() shouldMatch equalTo(("EatMemory"))
+
+        assertThat({ eatMemory(tx) }, throws<OutOfMemoryError>())
     }
 
     @Test
     @Disabled // untestable
     fun `should stack overflow`() {
-        ChaosBehaviour.StackOverflow()(tx)
+        val stackOverflow = ChaosBehaviour.StackOverflow()
+        stackOverflow.toString() shouldMatch equalTo(("StackOverflow"))
+        stackOverflow(tx)
     }
 
     @Test
     @Disabled // untestable
     fun `should kill process`() {
-        ChaosBehaviour.KillProcess()(tx)
+        val killProcess = ChaosBehaviour.KillProcess()
+        killProcess.toString() shouldMatch equalTo(("KillProcess"))
+        killProcess(tx)
     }
 }
