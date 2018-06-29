@@ -35,7 +35,7 @@ class ChaosTriggersTest {
         trigger(tx) shouldMatch equalTo(true)
     }
 
-    @org.junit.Test
+    @Test
     fun `switch trigger`() {
         val switch = SwitchTrigger(true)
         switch(tx) shouldMatch equalTo(true)
@@ -46,4 +46,11 @@ class ChaosTriggersTest {
         switch.toggle(true)
         switch(tx) shouldMatch equalTo(true)
     }
+
+    @Test
+    fun `inversion of trigger`() {
+        (!{ _: HttpTransaction -> false })(tx) shouldMatch equalTo(true)
+        (!{ _: HttpTransaction -> true })(tx) shouldMatch equalTo(false)
+    }
+
 }

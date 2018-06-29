@@ -28,7 +28,17 @@ object ChaosTriggers {
 class SwitchTrigger(initialPosition: Boolean = false) : ChaosTrigger {
     private val on = AtomicBoolean(initialPosition)
 
+    fun isActive() = on.get()
+
     fun toggle(newValue: Boolean? = null) = on.set(newValue ?: !on.get())
 
-    override fun invoke(p1: HttpTransaction): Boolean = on.get()
+    override fun invoke(p1: HttpTransaction) = on.get()
+
+    override fun toString() = "SwitchTrigger (active = ${on.get()})"
+
+}
+
+operator fun ChaosTrigger.not() = object : Function1<HttpTransaction, Boolean> {
+    override fun invoke(p1: HttpTransaction): Boolean = !this@not(p1)
+    override fun toString() = "NOT " + this@not.toString()
 }
