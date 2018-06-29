@@ -34,4 +34,17 @@ class ChaosTriggersTest {
         sleep(100)
         trigger(tx) shouldMatch equalTo(true)
     }
+
+    @org.junit.Test
+    fun `switch trigger`() {
+        val switch = SwitchTrigger(true)
+        switch(tx) shouldMatch equalTo(true)
+        switch.toggle()
+        switch(tx) shouldMatch equalTo(false)
+        switch.toggle(false)
+        switch(tx) shouldMatch equalTo(false)
+        switch.toggle(true)
+        switch(tx) shouldMatch equalTo(true)
+    }
+
 }
