@@ -46,5 +46,4 @@ class ChaosTriggersTest {
         switch.toggle(true)
         switch(tx) shouldMatch equalTo(true)
     }
-
 }

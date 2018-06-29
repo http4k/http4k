@@ -9,13 +9,22 @@ import java.util.concurrent.atomic.AtomicBoolean
 typealias ChaosTrigger = (HttpTransaction) -> Boolean
 
 object ChaosTriggers {
+    /**
+     * Activates after a particular instant in time.
+     */
     fun Deadline(endTime: Instant, clock: Clock = Clock.systemUTC()): ChaosTrigger = { clock.instant().isAfter(endTime) }
 
+    /**
+     * Activates after a particular delay (compared to instantiation).
+     */
     fun Delay(period: Duration, clock: Clock = Clock.systemUTC()): ChaosTrigger =
             clock.instant().plus(period).let { endTime -> { clock.instant().isAfter(endTime) } }
 
 }
 
+/**
+ * Simple toggleable trigger to turn ChaosBehaviour on/off
+ */
 class SwitchTrigger(initialPosition: Boolean = false) : ChaosTrigger {
     private val on = AtomicBoolean(initialPosition)
 
