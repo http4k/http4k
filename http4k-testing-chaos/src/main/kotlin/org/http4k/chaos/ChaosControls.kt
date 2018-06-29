@@ -51,8 +51,8 @@ object ChaosControls {
 /**
  * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage
  */
-fun HttpHandler.withChaosControls(behaviour: ChaosStage, clock: Clock = systemUTC()): RoutingHttpHandler {
+fun HttpHandler.withChaosControls(stage: ChaosStage, clock: Clock = systemUTC()): RoutingHttpHandler {
     val trigger = SwitchTrigger()
-    val stage = Repeat { Wait.until(trigger).then(behaviour).until(!trigger) }
-    return routes(ChaosControls(trigger, stage), "/" bind stage.asFilter(clock).then(this))
+    val repeatStage = Repeat { Wait.until(trigger).then(stage).until(!trigger) }
+    return routes(ChaosControls(trigger, repeatStage), "/" bind repeatStage.asFilter(clock).then(this))
 }
