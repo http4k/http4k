@@ -2,7 +2,7 @@ title: http4k Chaos Module
 description: Feature overview of the http4k-testing-chaos module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-chaos", version: "3.32.0"```
+```compile group: "org.http4k", name: "http4k-testing-chaos", version: "3.32.1"```
 
 ### About
 
