@@ -13,25 +13,29 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ChaosControlsTest {
 
+    private val expectedChaos = "chaos active: Repeat [Wait until SwitchTrigger (active = true)] then [Always ReturnStatus (404)] until NOT SwitchTrigger (active = true)"
+    private val noChaos = "chaos active: none"
+
     @Test
-    @Disabled
     fun `can convert a normal app to be chaotic`() {
-        val app = routes("/" bind routes("/" bind GET to { Response(OK) }))
+        val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosControls(Always.inject(ReturnStatus(NOT_FOUND)))
 
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody("chaos active: none")
-        appWithChaos(Request(GET, "/chaos/activate")) shouldMatch hasBody("chaos active: none")
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(expectedChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(expectedChaos)
         appWithChaos(Request(POST, "/")) shouldMatch hasStatus(NOT_FOUND)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
-        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody("chaos active: none")
+        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(GET, "/chaos/activate")) shouldMatch hasBody("chaos active: none")
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(expectedChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(expectedChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
     }
 }
