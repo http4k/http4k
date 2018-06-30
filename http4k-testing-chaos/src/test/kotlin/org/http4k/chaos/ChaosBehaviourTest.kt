@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.chaos.ChaosBehaviour.Companion.Latency
+import org.http4k.chaos.ChaosBehaviour.Companion.NoBody
+import org.http4k.chaos.ChaosBehaviour.Companion.Variable
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -76,8 +78,7 @@ class ChaosBehaviourTest {
         val noBody = ChaosBehaviour.NoBody()
         noBody.toString() shouldMatch equalTo(("NoBody"))
 
-        noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body")
-                .and(hasBody(""))
+        noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
 
     @Test
@@ -99,6 +100,24 @@ class ChaosBehaviourTest {
         eatMemory.toString() shouldMatch equalTo(("EatMemory"))
 
         assertThat({ eatMemory(tx) }, throws<OutOfMemoryError>())
+    }
+
+    @Test
+    fun `should do nothing memory`() {
+        val none = ChaosBehaviour.None
+        none.toString() shouldMatch equalTo(("None"))
+
+        none(tx) shouldMatch equalTo(tx.response)
+    }
+
+    @Test
+    fun `should provide ability to modify behaviour at runtime`() {
+        val variable = Variable()
+        variable.toString() shouldMatch equalTo(("Variable [None]"))
+        variable(tx) shouldMatch equalTo(tx.response)
+        variable.current = NoBody()
+        variable.toString() shouldMatch equalTo(("Variable [NoBody]"))
+        variable(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
 
     @Test

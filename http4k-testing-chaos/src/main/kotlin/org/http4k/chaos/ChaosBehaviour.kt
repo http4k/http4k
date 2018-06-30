@@ -80,6 +80,7 @@ interface ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply {
                 mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
             }
+
             override fun toString() = "EatMemory"
         }
 
@@ -91,6 +92,7 @@ interface ChaosBehaviour {
                 fun overflow(): Unit = overflow()
                 return tx.response.apply { overflow() }
             }
+
             override fun toString() = "StackOverflow"
         }
 
@@ -108,6 +110,22 @@ interface ChaosBehaviour {
         fun BlockThread() = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
             override fun toString() = "BlockThread"
+        }
+
+        /**
+         * Does absolutely nothing.
+         */
+        val None = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response
+            override fun toString() = "None"
+        }
+
+        /**
+         * Provide a means of modifying a ChaosBehaviour at runtime.
+         */
+        class Variable(var current: ChaosBehaviour = None) : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = current(tx)
+            override fun toString() = "Variable [$current]"
         }
     }
 }
