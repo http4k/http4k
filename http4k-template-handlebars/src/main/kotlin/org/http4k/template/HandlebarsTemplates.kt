@@ -19,7 +19,7 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
-                classToTemplate.getOrPut(it.javaClass to it.template(), { handlebars.compile(it.template()) }).apply(it)
+                classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it)
             }(viewModel)
     }
 
@@ -29,7 +29,7 @@ class HandlebarsTemplates(private val configure: (Handlebars) -> Handlebars = { 
 
         override fun invoke(viewModel: ViewModel) =
             safeRender {
-                classToTemplate.getOrPut(it.javaClass to it.template(), { handlebars.compile(it.template()) }).apply(it)
+                classToTemplate.getOrPut(it.javaClass to it.template()) { handlebars.compile(it.template()) }.apply(it)
             }(viewModel)
 
     }
