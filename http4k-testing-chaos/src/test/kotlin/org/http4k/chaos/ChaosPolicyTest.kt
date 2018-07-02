@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviour.Companion.ReturnStatus
 import org.http4k.chaos.ChaosPolicy.Companion.Always
+import org.http4k.chaos.ChaosPolicy.Companion.Once
 import org.http4k.chaos.ChaosPolicy.Companion.Only
 import org.http4k.chaos.ChaosPolicy.Companion.PercentageBased
 import org.http4k.core.Method.GET
@@ -63,5 +64,14 @@ class ChaosPolicyTest {
         http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
         http(Request(POST, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
         http(Request(GET, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
+    }
+
+    @Test
+    fun `Once only fires once`() {
+        val http = Once { it.request.method == GET }.inject(ReturnStatus(INTERNAL_SERVER_ERROR)).asFilter().then { Response(OK) }
+        http(Request(POST, "/foo")) shouldMatch hasStatus(OK)
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
+        http(Request(POST, "/foo")) shouldMatch hasStatus(OK)
+        http(Request(GET, "/foo")) shouldMatch hasStatus(OK)
     }
 }
