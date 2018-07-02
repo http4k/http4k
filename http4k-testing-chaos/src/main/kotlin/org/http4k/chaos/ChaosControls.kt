@@ -2,9 +2,11 @@ package org.http4k.chaos
 
 import org.http4k.chaos.ChaosStage.Companion.Repeat
 import org.http4k.chaos.ChaosStage.Companion.Wait
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.NoOp
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -49,10 +51,14 @@ object ChaosControls {
 }
 
 /**
- * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage
+ * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
+ * Optionally a Filter can be passed to limit access to the chaos controls.
  */
-fun HttpHandler.withChaosControls(stage: ChaosStage, clock: Clock = systemUTC()): RoutingHttpHandler {
+fun HttpHandler.withChaosControls(stage: ChaosStage,
+                                  preChaosFilter: Filter = Filter.NoOp,
+                                  controlsPath: String = "/chaos",
+                                  clock: Clock = systemUTC()): RoutingHttpHandler {
     val trigger = SwitchTrigger()
     val repeatStage = Repeat { Wait.until(trigger).then(stage).until(!trigger) }
-    return routes(ChaosControls(trigger, repeatStage), "/" bind repeatStage.asFilter(clock).then(this))
+    return routes(preChaosFilter.then(ChaosControls(trigger, repeatStage, controlsPath)), "/" bind repeatStage.asFilter(clock).then(this))
 }
