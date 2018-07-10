@@ -12,6 +12,10 @@ fun Parameters.toUrlEncoded(): String = toUrlFormEncoded()
 
 fun Parameters.toUrlFormEncoded(): String = this.joinToString("&") { it.first.toFormEncoded() + it.second?.let { "=" + it.toFormEncoded() }.orEmpty() }
 
+fun Parameters.toParametersMap(): Map<String, List<String?>> = this.groupBy(Pair<String, String?>::first, Pair<String, String?>::second)
+
+fun <K, V> Map<K, List<V>>.getFirst(key: K) = this[key]?.firstOrNull()
+
 fun String.toParameters() = if (isNotEmpty()) split("&").map(String::toParameter) else listOf()
 
 internal fun Parameters.findSingle(name: String): String? = find { it.first == name }?.second
@@ -25,3 +29,4 @@ internal fun String.fromFormEncoded() = URLDecoder.decode(this, "UTF-8")
 internal fun String.toFormEncoded() = URLEncoder.encode(this, "UTF-8")
 
 private typealias Parameter = Pair<String, String?>
+

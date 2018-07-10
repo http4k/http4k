@@ -24,4 +24,18 @@ class ParametersTest {
     fun round_trip() {
         assertThat("a=1&b&c+d=three+four&a=2".toParameters().toUrlFormEncoded(), equalTo("a=1&b&c+d=three+four&a=2"))
     }
+
+    @Test
+    fun `can convert parameters to map`() {
+        val map: Map<String, List<String?>> = listOf("a" to "A", "b" to "B", "a" to null).toParametersMap()
+
+        assertThat(map["a"], equalTo(listOf("A", null)))
+        assertThat(map["b"], equalTo<List<String?>>(listOf("B")))
+        assertThat(map["c"], absent())
+
+        assertThat(map.getFirst("a"), equalTo("A"))
+        assertThat(map.getFirst("b"), equalTo("B"))
+        assertThat(map.getFirst("c"), absent())
+    }
+
 }
