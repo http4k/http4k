@@ -118,7 +118,7 @@ Once the lens is declared, you can use it on a target object to either get or se
 For serving static assets, just bind a path to a Static block as below, using either a Classpath or Directory (Hot reloading) based ResourceLoader instance (find these on the `ResourceLoader` companion object). Typically, Directory is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
 ```kotlin
 routes(
-    "/static" bind static(Classpath("/org/http4k/some/package/name"))
+    "/static" bind static(Classpath("/org/http4k/some/package/name")),
     "/hotreload" bind static(Directory("path/to/static/dir/goes/here"))
 )
 ```
