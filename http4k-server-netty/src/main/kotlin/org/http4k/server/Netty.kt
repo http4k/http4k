@@ -81,7 +81,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
                             ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_BACKLOG, 1000)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
 
             val channel = bootstrap.bind(port).sync().channel()
