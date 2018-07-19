@@ -66,7 +66,7 @@ data class ApacheServer(val port: Int = 8000) : ServerConfig {
                         .setTcpNoDelay(true)
                         .setSoKeepAlive(true)
                         .setSoReuseAddress(true)
-                        .setBacklogSize(128)
+                        .setBacklogSize(1000)
                         .build())
                 .registerHandler("*", Http4kRequestHandler(httpHandler))
                 .create()
