@@ -5,6 +5,9 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.34.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
+### v3.33.2
+- Add PERMANENT_REDIRECT` Status object
+
 ### v3.33.1
 - No change from 3.33.0. Previous version couldn't be made available to maven central.
 

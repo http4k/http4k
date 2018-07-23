@@ -23,6 +23,7 @@ data class Status(val code: Int, val description: String) {
         val NOT_MODIFIED = Status(304, "Not Modified")
         val USE_PROXY = Status(305, "Use Proxy")
         val TEMPORARY_REDIRECT = Status(307, "Temporary Redirect")
+        val PERMANENT_REDIRECT = Status(308, "Permanent Redirect")
 
         private val CLIENT_ERROR = 400..499
         val BAD_REQUEST = Status(400, "Bad Request")
