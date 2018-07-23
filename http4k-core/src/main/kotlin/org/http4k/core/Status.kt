@@ -46,6 +46,7 @@ data class Status(val code: Int, val description: String) {
         val REQUESTED_RANGE_NOT_SATISFIABLE = Status(416, "Requested Range Not Satisfiable")
         val EXPECTATION_FAILED = Status(417, "Expectation Failed")
         val I_M_A_TEAPOT = Status(418, "I'm a teapot") //RFC2324
+        val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
         val TOO_MANY_REQUESTS = Status(429, "Too many requests")
 
         private val SERVER_ERROR = 500..599
