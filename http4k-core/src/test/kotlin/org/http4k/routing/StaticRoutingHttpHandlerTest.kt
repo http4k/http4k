@@ -177,12 +177,17 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can add filter to a RoutingHttpHandler`() {
+        val calls = AtomicInteger(0)
         val changePathFilter = Filter { next ->
-            { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
+            {
+                calls.incrementAndGet()
+                next(it.uri(it.uri.path("/svc/mybob.xml")))
+            }
         }
         val handler = changePathFilter.then("/svc" bind static())
         val req = Request(GET, of("/svc/notmybob.xml"))
         assertThat(handler(req).status, equalTo(OK))
+        assertThat(calls.get(), equalTo(1))
     }
 
     @Test
@@ -229,6 +234,14 @@ class StaticRoutingHttpHandlerTest {
         handler.assertFilterCalledOnce("/first/mybob.xml", OK)
         handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
         handler.assertFilterCalledOnce("/second", NOT_FOUND)
+    }
+
+    @Test
+    fun `does not apply filter on no match of context - raw`() {
+        val handler = static()
+        handler.assertFilterCalledOnce("/mybob.xml", OK)
+        handler.assertFilterCalledOnce("/notmybob.xml", NOT_FOUND)
+        handler.assertFilterCalledOnce("/foo/bob.xml", NOT_FOUND)
     }
 
     private fun RoutingHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
