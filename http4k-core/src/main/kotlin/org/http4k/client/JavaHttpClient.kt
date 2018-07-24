@@ -35,13 +35,13 @@ class JavaHttpClient : HttpHandler {
                     .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
                     .map { header -> header.value.map { header.key to it } }
                     .flatten()
-                    .fold(baseResponse, { response, nextHeader ->
+                    .fold(baseResponse) { response, nextHeader ->
                         response.header(nextHeader.first, nextHeader.second)
-                    })
+                    }
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST)
+            Response(UNKNOWN_HOST.describeClientError(e))
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED)
+            Response(CONNECTION_REFUSED.describeClientError(e))
         }
     }
 
