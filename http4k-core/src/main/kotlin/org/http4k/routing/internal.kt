@@ -56,14 +56,12 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
     private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs)
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
-    override fun match(request: Request): HttpHandler? = if (request.uri.path.startsWith(pathSegments)) {
-        handlerNoFilter(request).let {
-            if (it.status != NOT_FOUND) {
-                val handler = filter.then { _: Request -> it }
-                handler
-            } else null
-        }
-    } else null
+    override fun match(request: Request): HttpHandler? = handlerNoFilter(request).let {
+        if (it.status != NOT_FOUND) {
+            val handler = filter.then { _: Request -> it }
+            handler
+        } else null
+    }
 
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
