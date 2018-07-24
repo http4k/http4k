@@ -53,11 +53,19 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
 
-    override fun match(request: Request): HttpHandler? = invoke(request).let { if (it.status != NOT_FOUND) { _: Request -> it } else null }
+    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs)
+    private val handlerWithFilter = filter.then(handlerNoFilter)
 
-    private val httpHandler = filter.then(ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs))
+    override fun match(request: Request): HttpHandler? = if (request.uri.path.startsWith(pathSegments)) {
+        handlerNoFilter(request).let {
+            if (it.status != NOT_FOUND) {
+                val handler = filter.then { _: Request -> it }
+                handler
+            } else null
+        }
+    } else null
 
-    override fun invoke(req: Request): Response = httpHandler(req)
+    override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
 
 internal data class AggregateRoutingHttpHandler(

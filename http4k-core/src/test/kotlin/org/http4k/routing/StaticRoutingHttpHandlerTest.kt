@@ -8,12 +8,17 @@ import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 class StaticRoutingHttpHandlerTest {
 
@@ -72,8 +77,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can apply filters`() {
-        val rewritePathToRootIndex = Filter {
-            next ->
+        val rewritePathToRootIndex = Filter { next ->
             {
                 next(it.uri(it.uri.path("/index.html")))
             }
@@ -163,8 +167,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can add filter to router`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
@@ -174,8 +177,7 @@ class StaticRoutingHttpHandlerTest {
 
     @Test
     fun `can add filter to a RoutingHttpHandler`() {
-        val changePathFilter = Filter {
-            next ->
+        val changePathFilter = Filter { next ->
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = changePathFilter.then("/svc" bind static())
@@ -183,4 +185,56 @@ class StaticRoutingHttpHandlerTest {
         assertThat(handler(req).status, equalTo(OK))
     }
 
+    @Test
+    fun `does not apply filter on no match of context - nested and first`() {
+        val handler = routes("/first" bind static(), "/second" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) })
+
+        handler.assertFilterCalledOnce("/first/mybob.xml", OK)
+        handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
+        handler.assertFilterCalledOnce("/second", INTERNAL_SERVER_ERROR)
+        handler.assertFilterCalledOnce("/third", NOT_FOUND)
+    }
+
+    @Test
+    fun `does not apply filter on no match of context - nested and middle`() {
+        val handler = routes(
+                "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
+                "/second" bind static(),
+                "/third" bind GET to { _: Request -> Response(I_M_A_TEAPOT) }
+        )
+
+        handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
+        handler.assertFilterCalledOnce("/second/mybob.xml", OK)
+        handler.assertFilterCalledOnce("/second/notmybob.xml", NOT_FOUND)
+        handler.assertFilterCalledOnce("/third", I_M_A_TEAPOT)
+        handler.assertFilterCalledOnce("/fourth", NOT_FOUND)
+    }
+
+    @Test
+    fun `does not apply filter on no match of context - nested and last`() {
+        val handler = routes(
+                "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
+                "/second" bind GET to { _: Request -> Response(I_M_A_TEAPOT) },
+                "/third" bind static()
+        )
+        handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
+        handler.assertFilterCalledOnce("/second", I_M_A_TEAPOT)
+        handler.assertFilterCalledOnce("/third/mybob.xml", OK)
+        handler.assertFilterCalledOnce("/fourth", NOT_FOUND)
+    }
+
+    @Test
+    fun `does not apply filter on no match of context - unnested`() {
+        val handler = "/first" bind static()
+        handler.assertFilterCalledOnce("/first/mybob.xml", OK)
+        handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
+        handler.assertFilterCalledOnce("/second", NOT_FOUND)
+    }
+
+    private fun RoutingHttpHandler.assertFilterCalledOnce(path: String, expected: Status) {
+        val calls = AtomicInteger(0)
+        val handler = Filter { next -> { calls.incrementAndGet(); next(it) } }.then(this)
+        assertThat(handler(Request(GET, of(path))).status, equalTo(expected))
+        assertThat(calls.get(), equalTo(1))
+    }
 }
