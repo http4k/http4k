@@ -191,7 +191,7 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `does not apply filter on no match of context - nested and first`() {
+    fun `application of filter - nested and first`() {
         val handler = routes("/first" bind static(), "/second" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) })
 
         handler.assertFilterCalledOnce("/first/mybob.xml", OK)
@@ -201,7 +201,7 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `does not apply filter on no match of context - nested and middle`() {
+    fun `application of filter - nested and middle`() {
         val handler = routes(
                 "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
                 "/second" bind static(),
@@ -216,7 +216,7 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `does not apply filter on no match of context - nested and last`() {
+    fun `application of filter - nested and last`() {
         val handler = routes(
                 "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
                 "/second" bind GET to { _: Request -> Response(I_M_A_TEAPOT) },
@@ -229,7 +229,7 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `does not apply filter on no match of context - unnested`() {
+    fun `application of filter - unnested`() {
         val handler = "/first" bind static()
         handler.assertFilterCalledOnce("/first/mybob.xml", OK)
         handler.assertFilterCalledOnce("/first/notmybob.xml", NOT_FOUND)
@@ -237,7 +237,7 @@ class StaticRoutingHttpHandlerTest {
     }
 
     @Test
-    fun `does not apply filter on no match of context - raw`() {
+    fun `application of filter - raw`() {
         val handler = static()
         handler.assertFilterCalledOnce("/mybob.xml", OK)
         handler.assertFilterCalledOnce("/notmybob.xml", NOT_FOUND)
