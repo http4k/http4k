@@ -1,6 +1,6 @@
 package org.http4k.core
 
-data class Status(val code: Int, val description: String) {
+data class Status(val code: Int, val description: String, val isGeneratedByClient: Boolean = false) {
     companion object {
         private val INFORMATIONAL = 100..199
         val CONTINUE = Status(100, "Continue")
@@ -27,7 +27,7 @@ data class Status(val code: Int, val description: String) {
 
         private val CLIENT_ERROR = 400..499
         val BAD_REQUEST = Status(400, "Bad Request")
-        val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.copy(description = "Unsatisfiable Parameters")
+        val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.description("Unsatisfiable Parameters")
         val UNAUTHORIZED = Status(401, "Unauthorized")
         val PAYMENT_REQUIRED = Status(402, "Payment Required")
         val FORBIDDEN = Status(403, "Forbidden")
@@ -54,10 +54,10 @@ data class Status(val code: Int, val description: String) {
         val NOT_IMPLEMENTED = Status(501, "Not Implemented")
         val BAD_GATEWAY = Status(502, "Bad Gateway")
         val SERVICE_UNAVAILABLE = Status(503, "Service Unavailable")
-        val CONNECTION_REFUSED = SERVICE_UNAVAILABLE.copy(description = "Connection Refused")
-        val UNKNOWN_HOST = SERVICE_UNAVAILABLE.copy(description = "Unknown Host")
+        val CONNECTION_REFUSED = SERVICE_UNAVAILABLE.description("Connection Refused")
+        val UNKNOWN_HOST = SERVICE_UNAVAILABLE.description("Unknown Host")
         val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
-        val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.copy(description = "Client Timeout")
+        val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.description("Client Timeout")
         val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
     }
 

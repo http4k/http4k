@@ -19,4 +19,4 @@ fun HttpHandler.withAsyncApi(): AsyncHttpClient = object : AsyncHttpClient, Http
     override fun invoke(request: Request, fn: (Response) -> Unit) = fn(invoke(request))
 }
 
-fun Status.describeClientError(e: Exception) = description("Client error, caused by ${e.localizedMessage}")
+fun Status.describeClientError(e: Exception) = description("Client error, caused by ${e.localizedMessage}").copy(isGeneratedByClient = true)

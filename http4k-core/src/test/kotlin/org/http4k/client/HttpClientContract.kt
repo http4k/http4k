@@ -165,7 +165,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `connection refused are converted into 502`() {
+    open fun `connection refused are converted into 503`() {
         System.err.println("CONNECTION REFUSED")
         val response = client(Request(GET, "http://localhost:1"))
 
@@ -173,7 +173,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `unknown host are converted into 502`() {
+    open fun `unknown host are converted into 503`() {
         System.err.println("UNKNOWN HOST")
         val response = client(Request(GET, "http://foobar.bill"))
 
