@@ -60,14 +60,14 @@ class Status internal constructor(val code: Int, val description: String, privat
         val CONNECTION_REFUSED = Status(503, "Connection Refused", true)
         val UNKNOWN_HOST = Status(503, "Unknown Host", true)
         val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
-        val CLIENT_TIMEOUT =  Status(504, "Client Timeout", true)
+        val CLIENT_TIMEOUT = Status(504, "Client Timeout", true)
         val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
     }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
     val informational by lazy { INFORMATIONAL.contains(code) }
     val redirection by lazy { REDIRECTION.contains(code) }
-    val clientError by lazy { CLIENT_ERROR.contains(code) }
+    val clientError by lazy { CLIENT_ERROR.contains(code) || clientGenerated }
     val serverError by lazy { SERVER_ERROR.contains(code) }
 
     fun description(newDescription: String) = Status(code, newDescription, clientGenerated)
