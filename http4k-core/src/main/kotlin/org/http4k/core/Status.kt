@@ -1,10 +1,8 @@
 package org.http4k.core
 
-class Status internal constructor(val code: Int, private val originalDescription: String, overrideDescription: String?) {
+class Status internal constructor(val code: Int, val description: String, private val clientGenerated: Boolean = false) {
 
-    val description = overrideDescription ?: originalDescription
-
-    constructor(code: Int, description: String) : this(code, description, null)
+    constructor(code: Int, description: String) : this(code, description, false)
 
     companion object {
         private val INFORMATIONAL = 100..199
@@ -59,10 +57,10 @@ class Status internal constructor(val code: Int, private val originalDescription
         val NOT_IMPLEMENTED = Status(501, "Not Implemented")
         val BAD_GATEWAY = Status(502, "Bad Gateway")
         val SERVICE_UNAVAILABLE = Status(503, "Service Unavailable")
-        val CONNECTION_REFUSED = SERVICE_UNAVAILABLE.description("Connection Refused")
-        val UNKNOWN_HOST = SERVICE_UNAVAILABLE.description("Unknown Host")
+        val CONNECTION_REFUSED = Status(503, "Connection Refused", true)
+        val UNKNOWN_HOST = Status(503, "Unknown Host", true)
         val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
-        val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.description("Client Timeout")
+        val CLIENT_TIMEOUT =  Status(504, "Client Timeout", true)
         val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
     }
 
@@ -72,7 +70,7 @@ class Status internal constructor(val code: Int, private val originalDescription
     val clientError by lazy { CLIENT_ERROR.contains(code) }
     val serverError by lazy { SERVER_ERROR.contains(code) }
 
-    fun description(overrideDescription: String) = Status(code, originalDescription, overrideDescription)
+    fun description(newDescription: String) = Status(code, newDescription, clientGenerated)
 
     override fun hashCode(): Int = code.hashCode()
     override fun toString(): String = "$code $description"
@@ -84,7 +82,7 @@ class Status internal constructor(val code: Int, private val originalDescription
         other as Status
 
         if (code != other.code) return false
-        if (originalDescription != other.originalDescription) return false
+        if (clientGenerated != other.clientGenerated) return false
 
         return true
     }
