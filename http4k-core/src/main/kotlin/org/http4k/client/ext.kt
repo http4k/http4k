@@ -6,6 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import java.io.Closeable
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 
 interface AsyncHttpClient : Closeable {
     operator fun invoke(request: Request, fn: (Response) -> Unit)
@@ -19,4 +20,4 @@ fun HttpHandler.withAsyncApi(): AsyncHttpClient = object : AsyncHttpClient, Http
     override fun invoke(request: Request, fn: (Response) -> Unit) = fn(invoke(request))
 }
 
-fun Status.describeClientError(e: Exception) = description("Client error, caused by ${e.localizedMessage}").copy(isGeneratedByClient = true)
+fun Status.asClientError(e: Exception) = if (serverError) Status(code, description, "Client Error: caused by ${e.localizedMessage}") else throw IllegalArgumentException("can only reassign a server error")

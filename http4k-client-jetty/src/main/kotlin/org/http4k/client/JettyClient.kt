@@ -49,12 +49,12 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
             }
         } catch (e: ExecutionException) {
             when (e.cause) {
-                is UnknownHostException -> Response(UNKNOWN_HOST.describeClientError(e))
-                is ConnectException -> Response(CONNECTION_REFUSED.describeClientError(e))
+                is UnknownHostException -> Response(UNKNOWN_HOST.asClientError(e))
+                is ConnectException -> Response(CONNECTION_REFUSED.asClientError(e))
                 else -> throw e
             }
         } catch (e: TimeoutException) {
-            Response(CLIENT_TIMEOUT.describeClientError(e))
+            Response(CLIENT_TIMEOUT.asClientError(e))
         }
     }
 
@@ -103,7 +103,7 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
     private fun Throwable.asHttp4kResponse(): Response = Response(when (this) {
         is TimeoutException -> Status.CLIENT_TIMEOUT
         else -> Status.SERVICE_UNAVAILABLE
-    }.describeClientError(this as Exception))
+    }.asClientError(this as Exception))
 
     companion object {
         private fun defaultHttpClient() = HttpClient().apply {

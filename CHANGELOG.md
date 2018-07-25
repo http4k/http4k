@@ -2,12 +2,12 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.34.0 (uncut)
+### v3.35.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
-### v3.33.3
+### v3.34.0
 - Fix #150 - StaticRoutingHandler filters being called twice.
-- Fix #151 - Status objects now indicate that they were generated on the client.
+- Fix #151 - Refactor of Status objects to correctly override a description in a way that does not break equality so comparison against the Status constant `vals` will still work. This involves a very unlikely but potential breaking change as the Status class is no longer a data class to tighten up encapsulation - user calls to copy() will have to be replaced.
 
 ### v3.33.2
 - Raise SO_BACKLOG in Apache and Netty server implementations.

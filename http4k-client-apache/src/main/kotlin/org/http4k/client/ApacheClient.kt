@@ -47,13 +47,13 @@ class ApacheClient(
     override fun invoke(request: Request): Response = try {
         client.execute(request.toApacheRequest()).toHttp4kResponse()
     } catch (e: ConnectTimeoutException) {
-        Response(CLIENT_TIMEOUT.describeClientError(e))
+        Response(CLIENT_TIMEOUT.asClientError(e))
     } catch (e: SocketTimeoutException) {
-        Response(CLIENT_TIMEOUT.describeClientError(e))
+        Response(CLIENT_TIMEOUT.asClientError(e))
     } catch (e: HttpHostConnectException) {
-        Response(CONNECTION_REFUSED.describeClientError(e))
+        Response(CONNECTION_REFUSED.asClientError(e))
     } catch (e: UnknownHostException) {
-        Response(UNKNOWN_HOST.describeClientError(e))
+        Response(UNKNOWN_HOST.asClientError(e))
     }
 
     private fun CloseableHttpResponse.toHttp4kResponse() = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {

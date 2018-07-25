@@ -39,9 +39,9 @@ class JavaHttpClient : HttpHandler {
                         response.header(nextHeader.first, nextHeader.second)
                     }
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.describeClientError(e))
+            Response(UNKNOWN_HOST.asClientError(e))
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.describeClientError(e))
+            Response(CONNECTION_REFUSED.asClientError(e))
         }
     }
 

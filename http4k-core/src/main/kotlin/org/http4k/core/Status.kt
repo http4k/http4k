@@ -1,6 +1,11 @@
 package org.http4k.core
 
-data class Status(val code: Int, val description: String, val isGeneratedByClient: Boolean = false) {
+class Status internal constructor(val code: Int, private val originalDescription: String, overrideDescription: String?) {
+
+    val description = overrideDescription ?: originalDescription
+
+    constructor(code: Int, description: String) : this(code, description, null)
+
     companion object {
         private val INFORMATIONAL = 100..199
         val CONTINUE = Status(100, "Continue")
@@ -67,9 +72,20 @@ data class Status(val code: Int, val description: String, val isGeneratedByClien
     val clientError by lazy { CLIENT_ERROR.contains(code) }
     val serverError by lazy { SERVER_ERROR.contains(code) }
 
-    fun description(description: String) = copy(description = description)
+    fun description(overrideDescription: String) = Status(code, originalDescription, overrideDescription)
 
-    override fun equals(other: Any?): Boolean = other != null && other is Status && other.code == code
     override fun hashCode(): Int = code.hashCode()
     override fun toString(): String = "$code $description"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Status
+
+        if (code != other.code) return false
+        if (originalDescription != other.originalDescription) return false
+
+        return true
+    }
 }
