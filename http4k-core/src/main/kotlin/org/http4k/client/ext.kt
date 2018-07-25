@@ -20,4 +20,4 @@ fun HttpHandler.withAsyncApi(): AsyncHttpClient = object : AsyncHttpClient, Http
     override fun invoke(request: Request, fn: (Response) -> Unit) = fn(invoke(request))
 }
 
-fun Status.asClientError(e: Exception) = if (serverError) Status(code, "Client Error: caused by ${e.localizedMessage}", true) else throw IllegalArgumentException("can only reassign a server error")
+fun Status.asClientError(e: Exception) = if (serverError || clientError) Status(code, "Client Error: caused by ${e.localizedMessage}", true) else throw IllegalArgumentException("can only reassign a server error")
