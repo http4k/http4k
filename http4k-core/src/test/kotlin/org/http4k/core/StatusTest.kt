@@ -2,10 +2,7 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
-import org.http4k.client.asClientError
-import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.junit.jupiter.api.Test
 
 class StatusTest {
@@ -18,12 +15,7 @@ class StatusTest {
     }
 
     @Test
-    fun `equality does not include cause`() {
-        assertThat(SERVICE_UNAVAILABLE.asClientError(RuntimeException("foo")) == SERVICE_UNAVAILABLE.asClientError(RuntimeException("bar")), equalTo(true))
-    }
-
-    @Test
-    fun `asClientError blows up when not reassigning a server error`() {
-        assertThat({OK.asClientError(RuntimeException("foo")) }, throws<IllegalArgumentException>())
+    fun `equality does not include description`() {
+        assertThat(CONNECTION_REFUSED.description("foo") == CONNECTION_REFUSED.description("bar"), equalTo(true))
     }
 }

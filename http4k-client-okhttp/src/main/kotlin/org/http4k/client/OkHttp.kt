@@ -25,18 +25,18 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         try {
             client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.asClientError(e))
+            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.asClientError(e))
+            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
         } catch (e: SocketTimeoutException) {
-            Response(CLIENT_TIMEOUT.asClientError(e))
+            Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
         override fun onFailure(call: Call, e: IOException) = fn(Response(when (e) {
             is SocketTimeoutException -> CLIENT_TIMEOUT
             else -> SERVICE_UNAVAILABLE
-        }.asClientError(e)))
+        }.description("Client Error: caused by ${e.localizedMessage}")))
 
         override fun onResponse(call: Call?, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
     }

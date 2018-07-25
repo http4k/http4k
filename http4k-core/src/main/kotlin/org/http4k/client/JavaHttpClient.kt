@@ -39,9 +39,9 @@ class JavaHttpClient : HttpHandler {
                         response.header(nextHeader.first, nextHeader.second)
                     }
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.asClientError(e))
+            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.asClientError(e))
+            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
         }
     }
 

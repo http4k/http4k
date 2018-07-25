@@ -16,7 +16,6 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
-import java.lang.Exception
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
@@ -49,12 +48,12 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
             }
         } catch (e: ExecutionException) {
             when (e.cause) {
-                is UnknownHostException -> Response(UNKNOWN_HOST.asClientError(e))
-                is ConnectException -> Response(CONNECTION_REFUSED.asClientError(e))
+                is UnknownHostException -> Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
+                is ConnectException -> Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
                 else -> throw e
             }
         } catch (e: TimeoutException) {
-            Response(CLIENT_TIMEOUT.asClientError(e))
+            Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
         }
     }
 
@@ -89,9 +88,9 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
     }
 
     private fun HttpClient.newRequest(request: Request): JettyRequest = request.headers.fold(
-            newRequest(request.uri.toString()).method(request.method.name), { memo, (key, value) ->
+            newRequest(request.uri.toString()).method(request.method.name)) { memo, (key, value) ->
         memo.header(key, value)
-    }).content(InputStreamContentProvider(request.body.stream)).let(requestModifier)
+    }.content(InputStreamContentProvider(request.body.stream)).let(requestModifier)
 
     private fun JettyRequest.timeoutOrMax() = if (timeout <= 0) Long.MAX_VALUE else timeout
 
@@ -103,7 +102,7 @@ class JettyClient(private val client: HttpClient = defaultHttpClient(),
     private fun Throwable.asHttp4kResponse(): Response = Response(when (this) {
         is TimeoutException -> Status.CLIENT_TIMEOUT
         else -> Status.SERVICE_UNAVAILABLE
-    }.asClientError(this as Exception))
+    }.description("Client Error: caused by $localizedMessage"))
 
     companion object {
         private fun defaultHttpClient() = HttpClient().apply {
