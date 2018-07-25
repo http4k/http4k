@@ -6,6 +6,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
 ### v3.34.0
+- Add default SamplingDescision param to ZipkinTraces - defaults to always sample.
 - Fix #150 - StaticRoutingHandler filters being called twice.
 - Fix #151 - POTENTIAL BREAK: Rework of Status objects to fix equality against the Status constant `vals` when a description has been overridden. This involves the following potential breaking change: The Status class is no longer a data class to tighten up encapsulation - user calls to copy() will have to be replaced.
 
