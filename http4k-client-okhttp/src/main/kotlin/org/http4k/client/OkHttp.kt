@@ -25,18 +25,18 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
         try {
             client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.describeClientError(e))
+            Response(CONNECTION_REFUSED.asClientError(e))
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.describeClientError(e))
+            Response(UNKNOWN_HOST.asClientError(e))
         } catch (e: SocketTimeoutException) {
-            Response(CLIENT_TIMEOUT.describeClientError(e))
+            Response(CLIENT_TIMEOUT.asClientError(e))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
         override fun onFailure(call: Call, e: IOException) = fn(Response(when (e) {
             is SocketTimeoutException -> CLIENT_TIMEOUT
             else -> SERVICE_UNAVAILABLE
-        }.describeClientError(e)))
+        }.asClientError(e)))
 
         override fun onResponse(call: Call?, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
     }

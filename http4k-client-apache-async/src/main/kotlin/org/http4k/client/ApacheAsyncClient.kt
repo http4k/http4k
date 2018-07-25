@@ -49,7 +49,7 @@ class ApacheAsyncClient(
                 is ConnectTimeoutException -> CLIENT_TIMEOUT
                 is SocketTimeoutException -> CLIENT_TIMEOUT
                 else -> SERVICE_UNAVAILABLE
-            }.describeClientError(e)))
+            }.asClientError(e)))
         })
     }
 
