@@ -13,7 +13,7 @@ open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>)
     /**
      * Create a lens for this Spec
      */
-    open fun toLens(): WsMessageLens<OUT> = WsMessageLens({ get("message")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+    open fun toLens(): WsMessageLens<OUT> = WsMessageLens { get("message")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) }
 
     /**
      * Create another WsMessageLensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be used to extract the final type from a WsMessage.
@@ -75,7 +75,7 @@ class BiDiWsMessageLens<FINAL>(get: (WsMessage) -> FINAL,
 private val wsRoot =
     BiDiWsMessageLensSpec<Body>(
         LensGet { _, target -> listOf(target.body) },
-        LensSet { _, values, target -> values.fold(target, { m, next -> m.body(next) }) })
+        LensSet { _, values, target -> values.fold(target) { m, next -> m.body(next) } })
 
-fun WsMessage.Companion.binary() = wsRoot.map(Body::payload, { Body(it) })
+fun WsMessage.Companion.binary() = wsRoot.map(Body::payload) { Body(it) }
 fun WsMessage.Companion.string() = wsRoot.map({ it.payload.asString() }, { it: String -> Body(it) })

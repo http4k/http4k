@@ -113,7 +113,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
                     state = MultipartFormStreamState.Contents
                     return result
                 }
-                header.matches("\\s+.*".toRegex()) -> result.put(previousHeaderName!!, result[previousHeaderName] + "; " + header.trim { it <= ' ' })
+                header.matches("\\s+.*".toRegex()) -> result[previousHeaderName!!] = result[previousHeaderName] + "; " + header.trim { it <= ' ' }
                 else -> {
                     val index = header.indexOf(":")
                     if (index < 0) throw ParseError("Header didn't include a colon <<$header>>")
@@ -225,27 +225,27 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
     }
 
     companion object {
-        private val DEFAULT_BUFSIZE = 4096
+        private const val DEFAULT_BUFSIZE = 4096
 
         /**
          * The Carriage Return ASCII character value.
          */
-        private val CR: Byte = 0x0D
+        private const val CR: Byte = 0x0D
 
         /**
          * The Line Feed ASCII character value.
          */
-        private val LF: Byte = 0x0A
+        private const val LF: Byte = 0x0A
 
         /**
          * The dash (-) ASCII character value.
          */
-        private val DASH: Byte = 0x2D
+        private const val DASH: Byte = 0x2D
 
         /**
          * The maximum length of all headers
          */
-        val HEADER_SIZE_MAX = 10 * 1024
+        const val HEADER_SIZE_MAX = 10 * 1024
 
         /**
          * A byte sequence that that follows a delimiter that will be

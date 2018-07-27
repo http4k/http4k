@@ -98,7 +98,7 @@ private class SingleThreadedDust(
             """, bindings)
 
         return when (error) {
-            null -> writer.toString();
+            null -> writer.toString()
             TEMPLATE_NOT_FOUND -> onMissingTemplate(templateName)
             else -> throw IllegalStateException(error.toString())
         }

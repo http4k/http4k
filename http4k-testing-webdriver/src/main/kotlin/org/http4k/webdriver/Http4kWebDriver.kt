@@ -103,7 +103,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
         override fun activeElement(): WebElement = activeElement ?: current?.firstElement() ?: throw NoSuchElementException("no page loaded!")
 
-        override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle" + nameOrHandle) else this@Http4kWebDriver
+        override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver
 
         override fun defaultContent(): WebDriver = this@Http4kWebDriver
     }
@@ -130,7 +130,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
     override fun manage() = object : WebDriver.Options {
         override fun addCookie(cookie: Cookie) {
-            siteCookies.put(cookie.name, StoredCookie(cookie, LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now())))
+            siteCookies[cookie.name] = StoredCookie(cookie, LocalCookie(HCookie(cookie.name, cookie.value), LocalDateTime.now()))
         }
 
         override fun getCookies() = siteCookies.values.map { it.cookie }.toSet()
@@ -160,7 +160,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
     private fun cookieStorage() = object : CookieStorage {
         override fun store(cookies: List<LocalCookie>) {
-            cookies.forEach { siteCookies.put(it.cookie.name, it.toWebDriver()) }
+            cookies.forEach { siteCookies[it.cookie.name] = it.toWebDriver() }
         }
 
         override fun remove(name: String) {

@@ -31,7 +31,7 @@ private fun HttpServletRequest.asHttp4kRequest(): Request =
         .body(inputStream, getHeader("Content-Length").safeLong()).headers(headerParameters())
 
 private fun HttpServletRequest.headerParameters(): Headers =
-    headerNames.asSequence().fold(listOf(), { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) })
+    headerNames.asSequence().fold(listOf()) { a: Parameters, b: String -> a.plus(getHeaders(b).asPairs(b)) }
 
 private fun Enumeration<String>.asPairs(key: String): Parameters = asSequence().map { key to it }.toList()
 

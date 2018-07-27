@@ -13,7 +13,7 @@ internal class JSoupElementFinder(private val navigate: Navigate, private val el
     FindsByCssSelector, FindsByTagName, FindsById, FindsByClassName, SearchContext {
     override fun findElementByClassName(className: String) = findElementsByClassName(className).firstOrNull()
 
-    override fun findElementsByClassName(className: String) = findElementsByCssSelector("."+className)
+    override fun findElementsByClassName(className: String) = findElementsByCssSelector(".$className")
 
     override fun findElementByTagName(tagName: String) = findElementsByTagName(tagName).firstOrNull()
 
@@ -21,7 +21,7 @@ internal class JSoupElementFinder(private val navigate: Navigate, private val el
 
     override fun findElementById(id: String) = findElementsById(id).firstOrNull()
 
-    override fun findElementsById(id: String) = findElementsByCssSelector("#" + id)
+    override fun findElementsById(id: String) = findElementsByCssSelector("#$id")
 
     override fun findElementByCssSelector(selector: String) = findElementsByCssSelector(selector).firstOrNull()
 

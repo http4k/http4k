@@ -19,4 +19,4 @@ internal fun loadFromResourcesIn(baseClasspathPackage: String): TemplateLoader {
 }
 
 private fun resourcePath(resourceRoot: String, templateName: String) =
-    (if (resourceRoot.isEmpty()) "" else resourceRoot + "/") + templateName + ".dust"
+    (if (resourceRoot.isEmpty()) "" else "$resourceRoot/") + templateName + ".dust"

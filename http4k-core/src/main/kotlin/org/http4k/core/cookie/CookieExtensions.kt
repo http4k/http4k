@@ -11,7 +11,7 @@ fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.full
 fun Response.removeCookie(name: String): Response {
     val oldCookies = headerValues("Set-Cookie")
     val next = removeHeader("Set-Cookie")
-    return oldCookies.filter { (it != null && !it.startsWith("$name=")) }.fold(next, { response, value -> response.header("Set-Cookie", value) })
+    return oldCookies.filter { (it != null && !it.startsWith("$name=")) }.fold(next) { response, value -> response.header("Set-Cookie", value) }
 }
 
 fun Response.replaceCookie(cookie: Cookie): Response = removeCookie(cookie.name).cookie(cookie)
@@ -20,7 +20,7 @@ fun Request.cookie(name: String, value: String): Request = replaceHeader("Cookie
 
 fun Request.cookie(new: Cookie): Request = replaceHeader("Cookie", cookies().plus(new).toCookieString())
 
-internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.filter { it.isNotBlank() }.map { it.split("=", limit = 2).let { Cookie(it.elementAt(0), it.elementAtOrElse(1, { "\"\"" }).unquoted()) } }
+internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.filter { it.isNotBlank() }.map { it.split("=", limit = 2).let { Cookie(it.elementAt(0), it.elementAtOrElse(1) { "\"\"" }.unquoted()) } }
 
 fun Request.cookies(): List<Cookie> = header("Cookie")?.toCookieList() ?: listOf()
 

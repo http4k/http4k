@@ -71,15 +71,15 @@ object WebsocketClient {
             override fun onOpen(sh: ServerHandshake) {}
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                queue.add({ null })
+                queue.add { null }
             }
 
             override fun onMessage(message: String) {
-                queue.add({ WsMessage(message) })
+                queue.add { WsMessage(message) }
             }
 
             override fun onMessage(bytes: ByteBuffer) {
-                queue.add({ WsMessage(Body(bytes.array().inputStream())) })
+                queue.add { WsMessage(Body(bytes.array().inputStream())) }
             }
 
             override fun onError(e: Exception): Unit = throw e

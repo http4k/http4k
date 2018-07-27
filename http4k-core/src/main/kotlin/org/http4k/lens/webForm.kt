@@ -11,7 +11,7 @@ import java.net.URLDecoder.decode
 object FormField : BiDiLensSpec<WebForm, String>("form",
     StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-    LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+    LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
 )
 
 data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {

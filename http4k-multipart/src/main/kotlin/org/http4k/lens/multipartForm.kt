@@ -13,7 +13,7 @@ import java.util.UUID
 object MultipartFormField : BiDiLensSpec<MultipartForm, String>("form",
         ParamMeta.StringParam,
         LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-        LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+        LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
 )
 
 object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
@@ -21,7 +21,7 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
         LensGet { name, form ->
             form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList()
         },
-        LensSet { name, values, target -> values.fold(target, { m, next -> m.plus(name to next) }) }
+        LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
 )
 
 data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),

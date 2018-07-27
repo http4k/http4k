@@ -11,7 +11,7 @@ internal object AwsSignatureV4Signer {
     }
 
     private fun getSignatureKey(key: String, dateStamp: String, regionName: String, serviceName: String): ByteArray = try {
-        val kSecret = ("AWS4" + key).toByteArray(charset("UTF8"))
+        val kSecret = ("AWS4$key").toByteArray(charset("UTF8"))
         val kDate = AwsHmacSha256.hmacSHA256(kSecret, dateStamp)
         val kRegion = AwsHmacSha256.hmacSHA256(kDate, regionName)
         val kService = AwsHmacSha256.hmacSHA256(kRegion, serviceName)

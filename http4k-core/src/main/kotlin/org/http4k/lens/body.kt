@@ -46,7 +46,7 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
      * Create a lens for this Spec
      */
     open fun toLens(): BodyLens<OUT> = with(get("")) {
-        BodyLens(metas, contentType, { this(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) })
+        BodyLens(metas, contentType) { this(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) }
     }
 
     /**
@@ -141,7 +141,7 @@ fun Body.Companion.string(contentType: ContentType, description: String? = null,
     .map({ it.payload.asString() }, { it: String -> Body(it) })
 
 fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
-    = string(contentType, description, contentNegotiation).map(::nonEmpty, { it })
+    = string(contentType, description, contentNegotiation).map(::nonEmpty) { it }
 
 fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
     = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)

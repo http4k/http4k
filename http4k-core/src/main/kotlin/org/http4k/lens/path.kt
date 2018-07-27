@@ -43,7 +43,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         val meta = Meta(true, "path", paramMeta, name, description)
-        return PathLens(meta, { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+        return PathLens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) }
     }
 
     /**
@@ -96,7 +96,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.nonEmptyString() = map(::nonEmpty, { it })
+fun Path.nonEmptyString() = map(::nonEmpty) { it }
 fun Path.int() = mapWithNewMeta(String::toInt, Int::toString, NumberParam)
 fun Path.long() = mapWithNewMeta(String::toLong, Long::toString, NumberParam)
 fun Path.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)

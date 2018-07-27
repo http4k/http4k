@@ -8,7 +8,7 @@ internal fun Headers.removeHeader(name: String) = filterNot { it.first.equals(na
 
 internal fun Headers.replaceHeader(name: String, value: String?) = removeHeader(name).plus(name to value)
 
-internal fun Headers.toHeaderMessage() = map { "${it.first}: ${it.second}" }.joinToString("\r\n").plus("\r\n")
+internal fun Headers.toHeaderMessage() = joinToString("\r\n") { "${it.first}: ${it.second}" }.plus("\r\n")
 
 internal fun Headers.areSameHeadersAs(other: Headers) =
     all { header -> other.any { it == header } } &&

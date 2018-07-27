@@ -55,7 +55,7 @@ object ClientFilters {
         }
 
         operator fun invoke(user: String, password: String): Filter = BasicAuth(Credentials(user, password))
-        operator fun invoke(credentials: Credentials): Filter = BasicAuth({ credentials })
+        operator fun invoke(credentials: Credentials): Filter = BasicAuth { credentials }
 
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
@@ -103,7 +103,7 @@ object ClientFilters {
 
         private fun Request.withLocalCookies(storage: CookieStorage) = storage.retrieve()
             .map { it.cookie }
-            .fold(this, { r, cookie -> r.cookie(cookie.name, cookie.value) })
+            .fold(this) { r, cookie -> r.cookie(cookie.name, cookie.value) }
 
         private fun removeExpired(now: LocalDateTime, storage: CookieStorage) = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 

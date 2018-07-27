@@ -3,7 +3,6 @@ package org.http4k.filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
-import org.http4k.filter.SamplingDecision.Companion.from
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Header
 import org.http4k.lens.LensGet
