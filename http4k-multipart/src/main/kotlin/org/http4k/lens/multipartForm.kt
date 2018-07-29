@@ -72,14 +72,14 @@ internal fun MultipartForm.toMultipartFormBody(boundary: String): MultipartFormB
     val withFields = fields.toList()
             .fold(MultipartFormBody(boundary = boundary)) { body, (name, values) ->
                 values.fold(body) { bodyMemo, fieldValue ->
-                    bodyMemo.plus(name to fieldValue)
+                    bodyMemo + (name to fieldValue)
                 }
             }
 
     return files.toList()
             .fold(withFields) { body, (name, values) ->
                 values.fold(body) { bodyMemo, file ->
-                    bodyMemo.plus(name to file)
+                    bodyMemo + (name to file)
                 }
             }
 }

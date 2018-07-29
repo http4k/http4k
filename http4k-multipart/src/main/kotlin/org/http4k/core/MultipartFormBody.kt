@@ -61,10 +61,10 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     @JvmName("plusField")
-    fun plus(field: Pair<String, String>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
+    operator fun plus(field: Pair<String, String>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
 
     @JvmName("plusFile")
-    fun plus(field: Pair<String, FormFile>) = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
+    operator fun plus(field: Pair<String, FormFile>) = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
 
     override val stream by lazy { formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream() }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }

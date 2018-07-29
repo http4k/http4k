@@ -13,9 +13,9 @@ class MultipartIteratorTest {
 
     @Test
     fun `can stream multiparts`() {
-        val form = MultipartFormBody("bob").plus("field" to "bar")
-            .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
-            .plus("field2" to "bar2")
+        val form = MultipartFormBody("bob") + ("field" to "bar") +
+            ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
+            ("field2" to "bar2")
 
         val req = Request(Method.POST, "")
             .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
