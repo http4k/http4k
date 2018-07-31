@@ -60,5 +60,5 @@ fun HttpHandler.withChaosControls(stage: ChaosStage,
                                   clock: Clock = systemUTC()): RoutingHttpHandler {
     val trigger = SwitchTrigger()
     val repeatStage = Repeat { Wait.until(trigger).then(stage).until(!trigger) }
-    return routes(preChaosFilter.then(ChaosControls(trigger, repeatStage, controlsPath)), "/" bind repeatStage.asFilter(clock).then(this))
+    return routes(ChaosControls(trigger, repeatStage, controlsPath).withFilter(preChaosFilter), "/" bind repeatStage.asFilter(clock).then(this))
 }
