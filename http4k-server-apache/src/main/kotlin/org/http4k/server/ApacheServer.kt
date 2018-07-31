@@ -4,6 +4,7 @@ import org.apache.http.Header
 import org.apache.http.HttpEntityEnclosingRequest
 import org.apache.http.config.SocketConfig
 import org.apache.http.entity.InputStreamEntity
+import org.apache.http.impl.bootstrap.HttpServer
 import org.apache.http.impl.bootstrap.ServerBootstrap
 import org.apache.http.impl.io.EmptyInputStream
 import org.apache.http.protocol.HttpContext
@@ -16,6 +17,7 @@ import org.http4k.core.Response
 import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import org.apache.http.HttpRequest as ApacheRequest
 import org.apache.http.HttpResponse as ApacheResponse
@@ -58,18 +60,28 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     private fun Array<Header>.toHttp4kHeaders(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 }
 
-data class ApacheServer(val port: Int = 8000) : ServerConfig {
+data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : ServerConfig {
+    constructor(port: Int = 8000) : this(port, null)
+
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
-        private val server = ServerBootstrap.bootstrap()
-                .setListenerPort(port)
-                .setSocketConfig(SocketConfig.custom()
-                        .setTcpNoDelay(true)
-                        .setSoKeepAlive(true)
-                        .setSoReuseAddress(true)
-                        .setBacklogSize(1000)
-                        .build())
-                .registerHandler("*", Http4kRequestHandler(httpHandler))
-                .create()
+        private val server: HttpServer
+
+        init {
+            val bootstrap = ServerBootstrap.bootstrap()
+                    .setListenerPort(port)
+                    .setSocketConfig(SocketConfig.custom()
+                            .setTcpNoDelay(true)
+                            .setSoKeepAlive(true)
+                            .setSoReuseAddress(true)
+                            .setBacklogSize(1000)
+                            .build())
+                    .registerHandler("*", Http4kRequestHandler(httpHandler))
+
+            if (address != null)
+                bootstrap.setLocalAddress(address)
+
+            server = bootstrap.create()
+        }
 
         override fun start(): Http4kServer = apply { server.start() }
 
