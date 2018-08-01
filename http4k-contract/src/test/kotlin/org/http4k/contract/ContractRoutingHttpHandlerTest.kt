@@ -8,7 +8,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -17,7 +16,6 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.format.Argo
 import org.http4k.hamkrest.hasBody
-import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
 import org.http4k.lens.Path
@@ -27,7 +25,6 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.RoutingHttpHandlerContract
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
@@ -35,13 +32,6 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
             contract(SimpleJson(Argo), "/", validPath bindContract GET to { Response(OK).with(header of header(it)) })
 
     private val header = Header.optional("FILTER")
-
-    @Test
-    @Disabled
-    override fun `with filter - applies in correct order`() {
-        val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        assertThat(filtered(Request(GET, "/not-found")), hasStatus(Status.NOT_FOUND) and hasHeader("res-header", "foobar"))
-    }
 
     @Test
     fun `by default the description lives at the route`() {

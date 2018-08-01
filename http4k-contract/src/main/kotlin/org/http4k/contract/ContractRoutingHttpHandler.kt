@@ -31,7 +31,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
      * NOTE: By default, filters for Contracts are applied *before* the Security filter. Use withPostSecurityFilter()
      * to achieve population of filters after security.
      */
-    override fun withFilter(new: Filter) = copy(preSecurityFilter = preSecurityFilter.then(new))
+    override fun withFilter(new: Filter) = copy(preSecurityFilter = new.then(preSecurityFilter))
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
