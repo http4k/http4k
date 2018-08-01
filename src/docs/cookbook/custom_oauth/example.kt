@@ -41,10 +41,8 @@ fun main(args: Array<String>) {
 
     val app: HttpHandler =
         routes(
-            routes(callbackUri.path bind GET to oauthProvider.callback),
-            oauthProvider.authFilter.then(
-                routes("/" bind GET to { Response(OK).body("hello!") })
-            )
+            callbackUri.path bind GET to oauthProvider.callback,
+            "/" bind GET to oauthProvider.authFilter.then { Response(OK).body("hello!") }
         )
 
     ServerFilters.CatchAll()
