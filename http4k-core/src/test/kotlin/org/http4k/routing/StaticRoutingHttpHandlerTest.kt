@@ -20,7 +20,12 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-class StaticRoutingHttpHandlerTest {
+class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler: RoutingHttpHandler = StaticRoutingHttpHandler(
+        pathSegments = validPath,
+        resourceLoader = ResourceLoader.Classpath(),
+        extraPairs = emptyMap()
+    )
 
     private val pkg = this.javaClass.`package`.name.replace('.', '/')
 
@@ -203,9 +208,9 @@ class StaticRoutingHttpHandlerTest {
     @Test
     fun `application of filter - nested and middle`() {
         val handler = routes(
-                "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
-                "/second" bind static(),
-                "/third" bind GET to { _: Request -> Response(I_M_A_TEAPOT) }
+            "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
+            "/second" bind static(),
+            "/third" bind GET to { _: Request -> Response(I_M_A_TEAPOT) }
         )
 
         handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
@@ -218,9 +223,9 @@ class StaticRoutingHttpHandlerTest {
     @Test
     fun `application of filter - nested and last`() {
         val handler = routes(
-                "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
-                "/second" bind GET to { _: Request -> Response(I_M_A_TEAPOT) },
-                "/third" bind static()
+            "/first" bind GET to { _: Request -> Response(INTERNAL_SERVER_ERROR) },
+            "/second" bind GET to { _: Request -> Response(I_M_A_TEAPOT) },
+            "/third" bind static()
         )
         handler.assertFilterCalledOnce("/first", INTERNAL_SERVER_ERROR)
         handler.assertFilterCalledOnce("/second", I_M_A_TEAPOT)
