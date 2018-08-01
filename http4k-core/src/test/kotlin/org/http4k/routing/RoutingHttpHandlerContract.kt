@@ -37,14 +37,14 @@ abstract class RoutingHttpHandlerContract {
     }
 
     @Test
-    fun `with filter - applies when not found`() {
+    open fun `with filter - applies when not found`() {
         val filter = filterAppending("foo")
         val filtered = handler.withFilter(filter)
         assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
     @Test
-    fun `with filter - applies in correct order`() {
+    open fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
         assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
     }

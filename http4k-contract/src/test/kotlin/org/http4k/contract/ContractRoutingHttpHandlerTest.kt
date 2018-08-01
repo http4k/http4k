@@ -22,13 +22,28 @@ import org.http4k.lens.Header
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.RoutingHttpHandlerContract
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class ContractRoutingHttpHandlerTest {
+class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler: RoutingHttpHandler =
+        contract(SimpleJson(Argo), "/", validPath bindContract GET to { Response(OK).with(header of header(it)) })
 
     private val header = Header.optional("FILTER")
+
+    @Disabled
+    override fun `with filter - applies when not found`() {
+
+    }
+
+    @Disabled
+    override fun `with filter - applies in correct order`() {
+
+    }
 
     @Test
     fun `by default the description lives at the route`() {
@@ -94,7 +109,7 @@ class ContractRoutingHttpHandlerTest {
             "/root" bind contract(
                 Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } })
         )
-        val response : RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
+        val response: RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/hello/{world}")))
