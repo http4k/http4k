@@ -49,7 +49,7 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
                                     private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
-    override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = filter.then(new))
+    override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
 

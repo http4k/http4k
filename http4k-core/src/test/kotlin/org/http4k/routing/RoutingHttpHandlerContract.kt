@@ -9,7 +9,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.junit.Ignore
 import org.junit.Test
 
 abstract class RoutingHttpHandlerContract {
@@ -45,7 +44,6 @@ abstract class RoutingHttpHandlerContract {
     }
 
     @Test
-    @Ignore("does not work for static routing yet")
     fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
         assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
