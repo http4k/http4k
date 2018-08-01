@@ -9,7 +9,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 abstract class RoutingHttpHandlerContract {
 
@@ -31,15 +31,13 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `with filter - applies to matching handler`() {
-        val filter = filterAppending("bar")
-        val filtered = handler.withFilter(filter)
+        val filtered = handler.withFilter(filterAppending("bar"))
         assertThat(filtered(Request(GET, validPath)), hasStatus(OK) and hasHeader("res-header", "bar"))
     }
 
     @Test
     open fun `with filter - applies when not found`() {
-        val filter = filterAppending("foo")
-        val filtered = handler.withFilter(filter)
+        val filtered = handler.withFilter(filterAppending("foo"))
         assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
     }
 
@@ -67,10 +65,9 @@ abstract class RoutingHttpHandlerContract {
         assertThat(withBase(Request(GET, "$prePrefix$prefix$validPath")), hasStatus(OK))
     }
 
-    private fun filterAppending(value: String) = Filter { next ->
-        { it ->
-            val response = next(it)
-            response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
+    protected fun filterAppending(value: String) = Filter { next ->
+        {
+            next(it).replaceHeader("res-header", next(it).header("res-header").orEmpty() + value)
         }
     }
 }
