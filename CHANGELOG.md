@@ -5,6 +5,9 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.35.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
+### v3.34.1 (uncut)
+- Fix #158 - Static routes filters are applied in the wrong order.
+
 ### v3.34.0
 - Add default SamplingDescision param to ZipkinTraces - defaults to always sample.
 - Fix #150 - StaticRoutingHandler filters being called twice.
