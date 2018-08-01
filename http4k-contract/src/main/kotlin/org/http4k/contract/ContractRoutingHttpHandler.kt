@@ -35,15 +35,19 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val handler: HttpHandler = { match(it)?.invoke(it) ?: Response(NOT_FOUND.description("Route not found")) }
+    private val standardFilters = preSecurityFilter.then(security.filter).then(postSecurityFilter)
+
+    private val handler: HttpHandler = {
+        match(it)?.invoke(it) ?: standardFilters.then { Response(NOT_FOUND.description("Route not found")) }(it)
+    }
 
     override fun invoke(request: Request): Response = handler(request)
 
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
 
     private val routers: List<Pair<Filter, Router>> = routes
-        .map { CatchLensFailure.then(identify(it)).then(preSecurityFilter).then(security.filter).then(postSecurityFilter) to it.toRouter(contractRoot) }
-        .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        .map { CatchLensFailure.then(identify(it)).then(standardFilters) to it.toRouter(contractRoot) }
+        .plus(identify(descriptionRoute).then(standardFilters) to descriptionRoute.toRouter(contractRoot))
 
     private val noMatch: HttpHandler? = null
 
