@@ -36,7 +36,7 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `by default the description lives at the route`() {
         Request(GET, "/root")
-        val response = ("/root" bind contract(SimpleJson(Argo))).invoke(Request(GET, "/root"))
+        val response = ("/root" bind contract(SimpleJson(Argo), security = ApiKey(Query.required("goo"), { false }))).invoke(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }

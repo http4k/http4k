@@ -5,6 +5,9 @@ This list is not currently intended to be all-encompassing - it will document ma
 ### v3.35.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
+### v3.34.2
+- Fix #159 - Contracts should not have Security applied to the description route by default.
+
 ### v3.34.1
 - Fix #158 - Static and contract routes filters are applied in the wrong order.
 

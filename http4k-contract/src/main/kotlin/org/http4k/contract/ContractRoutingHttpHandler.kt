@@ -47,7 +47,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val routers: List<Pair<Filter, Router>> = routes
         .map { CatchLensFailure.then(identify(it)).then(standardFilters) to it.toRouter(contractRoot) }
-        .plus(identify(descriptionRoute).then(standardFilters) to descriptionRoute.toRouter(contractRoot))
+        .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
     private val noMatch: HttpHandler? = null
 
