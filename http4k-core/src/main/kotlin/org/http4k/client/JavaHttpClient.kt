@@ -24,7 +24,11 @@ class JavaHttpClient : HttpHandler {
                 addRequestProperty(it.first, it.second)
             }
             if (request.body != Body.EMPTY) {
-                request.body.stream.copyTo(outputStream)
+                if(request.body.stream.available() == 0) {
+                    request.body.payload.array().inputStream().copyTo(outputStream)
+                } else {
+                    request.body.stream.copyTo(outputStream)
+                }
             }
         }
 
