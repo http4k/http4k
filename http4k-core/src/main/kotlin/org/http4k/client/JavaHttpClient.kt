@@ -23,11 +23,10 @@ class JavaHttpClient : HttpHandler {
             request.headers.forEach {
                 addRequestProperty(it.first, it.second)
             }
-            if (request.body != Body.EMPTY) {
-                if(request.body.stream.available() == 0) {
-                    request.body.payload.array().inputStream().copyTo(outputStream)
-                } else {
-                    request.body.stream.copyTo(outputStream)
+            request.body.apply {
+                if (this != Body.EMPTY) {
+                    val content = if (stream.available() == 0) payload.array().inputStream() else stream
+                    content.copyTo(outputStream)
                 }
             }
         }
