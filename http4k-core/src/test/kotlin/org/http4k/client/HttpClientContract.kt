@@ -88,6 +88,15 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    open fun `performs simple POST request - stream`() {
+        System.err.println("POST")
+        val response = client(Request(POST, "http://localhost:$port/echo").body("foobar".byteInputStream(), 6))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), containsSubstring("foobar"))
+    }
+
+    @Test
     fun `performs simple DELETE request`() {
         System.err.println("DELETE")
 

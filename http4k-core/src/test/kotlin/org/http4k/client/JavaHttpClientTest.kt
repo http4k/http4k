@@ -19,4 +19,9 @@ class JavaHttpClientTest : HttpClientContract({ SunHttp(it) }, JavaHttpClient(),
     @Disabled
     override fun `can forward response body to another request`() {
     }
+
+    @Disabled
+    override fun `performs simple POST request - stream`() {
+    }
+
 }
