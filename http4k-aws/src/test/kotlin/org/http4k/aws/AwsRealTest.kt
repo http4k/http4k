@@ -3,9 +3,7 @@ package org.http4k.aws
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.client.ApacheClient
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -14,18 +12,19 @@ import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.Payload
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class AwsRealTest : AbstractAwsRealS3TestCase() {
 
+    init {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true")
+    }
+
     @Test
     fun `default usage`() {
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true")
-
-        val client = DebuggingFilters.PrintRequestAndResponse().then(awsClientFilter(Payload.Mode.Signed))
+        val client = awsClientFilter(Payload.Mode.Signed)
             .then(JavaHttpClient())
         bucketLifecycle((client))
     }
@@ -33,7 +32,7 @@ class AwsRealTest : AbstractAwsRealS3TestCase() {
     @Test
     fun `streaming`() {
         val client = awsClientFilter(Payload.Mode.Unsigned)
-            .then(ApacheClient(requestBodyMode = Stream))
+            .then(JavaHttpClient())
 
         bucketLifecycle((client))
     }
