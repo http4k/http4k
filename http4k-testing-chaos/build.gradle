@@ -3,8 +3,8 @@ description = 'Http4k support for chaos testing'
 dependencies {
     provided kotlin_lib
     provided project(":http4k-core")
+    provided project(":http4k-testing-hamkrest")
 
     testCompile testing
     testCompile project(":http4k-core")
-    testCompile project(":http4k-testing-hamkrest")
 }
