@@ -22,7 +22,7 @@ class ChaosTriggersTest {
         val clock = Clock.systemDefaultZone()
         val trigger = ChaosTriggers.Deadline(Instant.now().plusMillis(100), clock)
         trigger(tx) shouldMatch equalTo(false)
-        sleep(100)
+        sleep(110)
         trigger(tx) shouldMatch equalTo(true)
     }
 

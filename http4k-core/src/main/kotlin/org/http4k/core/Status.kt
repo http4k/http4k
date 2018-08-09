@@ -1,6 +1,9 @@
 package org.http4k.core
 
-data class Status(val code: Int, val description: String) {
+class Status internal constructor(val code: Int, val description: String, private val clientGenerated: Boolean = false) {
+
+    constructor(code: Int, description: String) : this(code, description, false)
+
     companion object {
         private val INFORMATIONAL = 100..199
         val CONTINUE = Status(100, "Continue")
@@ -23,10 +26,11 @@ data class Status(val code: Int, val description: String) {
         val NOT_MODIFIED = Status(304, "Not Modified")
         val USE_PROXY = Status(305, "Use Proxy")
         val TEMPORARY_REDIRECT = Status(307, "Temporary Redirect")
+        val PERMANENT_REDIRECT = Status(308, "Permanent Redirect")
 
         private val CLIENT_ERROR = 400..499
         val BAD_REQUEST = Status(400, "Bad Request")
-        val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.copy(description = "Unsatisfiable Parameters")
+        val UNSATISFIABLE_PARAMETERS = BAD_REQUEST.description("Unsatisfiable Parameters")
         val UNAUTHORIZED = Status(401, "Unauthorized")
         val PAYMENT_REQUIRED = Status(402, "Payment Required")
         val FORBIDDEN = Status(403, "Forbidden")
@@ -45,6 +49,7 @@ data class Status(val code: Int, val description: String) {
         val REQUESTED_RANGE_NOT_SATISFIABLE = Status(416, "Requested Range Not Satisfiable")
         val EXPECTATION_FAILED = Status(417, "Expectation Failed")
         val I_M_A_TEAPOT = Status(418, "I'm a teapot") //RFC2324
+        val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
         val TOO_MANY_REQUESTS = Status(429, "Too many requests")
 
         private val SERVER_ERROR = 500..599
@@ -52,22 +57,33 @@ data class Status(val code: Int, val description: String) {
         val NOT_IMPLEMENTED = Status(501, "Not Implemented")
         val BAD_GATEWAY = Status(502, "Bad Gateway")
         val SERVICE_UNAVAILABLE = Status(503, "Service Unavailable")
-        val CONNECTION_REFUSED = SERVICE_UNAVAILABLE.copy(description = "Connection Refused")
-        val UNKNOWN_HOST = SERVICE_UNAVAILABLE.copy(description = "Unknown Host")
+        val CONNECTION_REFUSED = Status(503, "Connection Refused", true)
+        val UNKNOWN_HOST = Status(503, "Unknown Host", true)
         val GATEWAY_TIMEOUT = Status(504, "Gateway Timeout")
-        val CLIENT_TIMEOUT = GATEWAY_TIMEOUT.copy(description = "Client Timeout")
+        val CLIENT_TIMEOUT = Status(504, "Client Timeout", true)
         val HTTP_VERSION_NOT_SUPPORTED = Status(505, "HTTP Version Not Supported")
     }
 
     val successful by lazy { SUCCESSFUL.contains(code) }
     val informational by lazy { INFORMATIONAL.contains(code) }
     val redirection by lazy { REDIRECTION.contains(code) }
-    val clientError by lazy { CLIENT_ERROR.contains(code) }
+    val clientError by lazy { CLIENT_ERROR.contains(code) || clientGenerated }
     val serverError by lazy { SERVER_ERROR.contains(code) }
 
-    fun description(description: String) = copy(description = description)
+    fun description(newDescription: String) = Status(code, newDescription, clientGenerated)
 
-    override fun equals(other: Any?): Boolean = other != null && other is Status && other.code == code
     override fun hashCode(): Int = code.hashCode()
     override fun toString(): String = "$code $description"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Status
+
+        if (code != other.code) return false
+        if (clientGenerated != other.clientGenerated) return false
+
+        return true
+    }
 }

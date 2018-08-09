@@ -22,7 +22,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
     override fun Caching(baseTemplateDir: String): TemplateRenderer {
         val templateEngine = TemplateEngine()
         val loader = FileTemplateResolver()
-        loader.prefix = baseTemplateDir + "/"
+        loader.prefix = "$baseTemplateDir/"
         templateEngine.setTemplateResolver(loader)
         return ThymeleafTemplateRenderer(configure(templateEngine))
     }
@@ -30,7 +30,7 @@ class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngi
     override fun HotReload(baseTemplateDir: String): TemplateRenderer {
         val templateEngine = TemplateEngine()
         val loader = FileTemplateResolver()
-        loader.prefix = baseTemplateDir + "/"
+        loader.prefix = "$baseTemplateDir/"
         val cache = StandardCacheManager()
         cache.templateCacheMaxSize = 0
         templateEngine.cacheManager = cache

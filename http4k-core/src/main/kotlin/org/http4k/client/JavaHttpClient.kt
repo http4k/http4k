@@ -23,8 +23,11 @@ class JavaHttpClient : HttpHandler {
             request.headers.forEach {
                 addRequestProperty(it.first, it.second)
             }
-            if (request.body != Body.EMPTY) {
-                request.body.stream.copyTo(outputStream)
+            request.body.apply {
+                if (this != Body.EMPTY) {
+                    val content = if (stream.available() == 0) payload.array().inputStream() else stream
+                    content.copyTo(outputStream)
+                }
             }
         }
 
@@ -35,13 +38,13 @@ class JavaHttpClient : HttpHandler {
                     .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
                     .map { header -> header.value.map { header.key to it } }
                     .flatten()
-                    .fold(baseResponse, { response, nextHeader ->
+                    .fold(baseResponse) { response, nextHeader ->
                         response.header(nextHeader.first, nextHeader.second)
-                    })
+                    }
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST)
+            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED)
+            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
         }
     }
 

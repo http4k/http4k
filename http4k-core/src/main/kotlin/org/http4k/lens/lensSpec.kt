@@ -16,7 +16,7 @@ import java.util.UUID
 class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN) -> List<OUT>) {
     operator fun invoke(name: String) = { target: IN -> getFn(name, target) }
 
-    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet({ x, y: IN -> getFn(x, y).map(nextFn) })
+    fun <NEXT> map(nextFn: (OUT) -> NEXT) = LensGet { x, y: IN -> getFn(x, y).map(nextFn) }
 
     companion object {
         operator fun <IN, OUT> invoke(getFn: (String, IN) -> List<OUT>): LensGet<IN, OUT> = LensGet(getFn)
@@ -26,7 +26,7 @@ class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN
 class LensSet<IN, in OUT> private constructor(private val setFn: (String, List<OUT>, IN) -> IN) {
     operator fun invoke(name: String) = { values: List<OUT>, target: IN -> setFn(name, values, target) }
 
-    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet({ a, b: List<NEXT>, c: IN -> setFn(a, b.map(nextFn), c) })
+    fun <NEXT> map(nextFn: (NEXT) -> OUT) = LensSet { a, b: List<NEXT>, c: IN -> setFn(a, b.map(nextFn), c) }
 
     companion object {
         operator fun <IN, OUT> invoke(setFn: (String, List<OUT>, IN) -> IN): LensSet<IN, OUT> = LensSet(setFn)
@@ -60,7 +60,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
     open fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT> {
         val meta = Meta(false, location, paramMeta, name, description)
         val getLens = get(name)
-        return Lens(meta, { getLens(it).let { if (it.isEmpty()) default else it.first() } })
+        return Lens(meta) { getLens(it).let { if (it.isEmpty()) default else it.first() } }
     }
 
     /**
@@ -69,7 +69,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {
         val meta = Meta(false, location, paramMeta, name, description)
         val getLens = get(name)
-        return Lens(meta, { getLens(it).let { if (it.isEmpty()) null else it.first() } })
+        return Lens(meta) { getLens(it).let { if (it.isEmpty()) null else it.first() } }
     }
 
     /**
@@ -78,7 +78,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
     open fun required(name: String, description: String? = null): Lens<IN, OUT> {
         val meta = Meta(true, location, paramMeta, name, description)
         val getLens = get(name)
-        return Lens(meta, { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) })
+        return Lens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) }
     }
 
     open val multi = object : MultiLensSpec<IN, OUT> {
@@ -88,7 +88,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
         override fun defaulted(name: String, default: List<OUT>, description: String?): Lens<IN, List<OUT>> {
             val meta = Meta(false, location, paramMeta, name, description)
             val getLens = get(name)
-            return Lens(meta, { getLens(it).let { if (it.isEmpty()) default else it } })
+            return Lens(meta) { getLens(it).let { if (it.isEmpty()) default else it } }
         }
 
         /**
@@ -97,7 +97,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
         override fun optional(name: String, description: String?): Lens<IN, List<OUT>?> {
             val meta = Meta(false, location, paramMeta, name, description)
             val getLens = get(name)
-            return Lens(meta, { getLens(it).let { if (it.isEmpty()) null else it } })
+            return Lens(meta) { getLens(it).let { if (it.isEmpty()) null else it } }
         }
 
         /**
@@ -106,7 +106,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
             val meta = Meta(true, location, paramMeta, name, description)
             val getLens = get(name)
-            return Lens(meta, { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta)) else it } })
+            return Lens(meta) { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta)) else it } }
         }
     }
 }
@@ -198,7 +198,7 @@ open class BiDiLensSpec<IN, OUT>(location: String,
 }
 
 fun <IN> BiDiLensSpec<IN, String>.string() = this
-fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = map(::nonEmpty, { it })
+fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = map(::nonEmpty) { it }
 fun <IN> BiDiLensSpec<IN, String>.int() = mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
 fun <IN> BiDiLensSpec<IN, String>.long() = mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
 fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)

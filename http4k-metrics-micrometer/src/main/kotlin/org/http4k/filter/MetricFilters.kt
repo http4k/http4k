@@ -10,7 +10,7 @@ object MetricFilters {
 
     open class FiltersTemplate(private val defaultTimer: Pair<String, String>,
                                private val defaultCounter: Pair<String, String>,
-                               internal val defaultLabeller: HttpTransactionLabeller) {
+                               private val defaultLabeller: HttpTransactionLabeller) {
         fun RequestTimer(meterRegistry: MeterRegistry,
                          name: String = defaultTimer.first,
                          description: String? = defaultTimer.second,

@@ -5,7 +5,7 @@ import org.http4k.core.HttpHandler
 data class BootstrapException(val m: String?) : Exception(m)
 
 object BootstrapAppLoader : AppLoader {
-    val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
+    const val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
 
     override fun invoke(environment: Map<String, String>): HttpHandler = try {
         val loadClass = this.javaClass.classLoader.loadClass(environment[HTTP4K_BOOTSTRAP_CLASS])

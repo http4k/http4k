@@ -22,7 +22,7 @@ data class UriTemplate private constructor(private val template: String) {
         private val URI_TEMPLATE_FORMAT = "\\{([^}]+?)(?::([^}]+))?\\}".toRegex() // ignore redundant warning #100
         fun from(template: String) = UriTemplate(template.trimSlashes())
 
-        fun String.trimSlashes() = "^(/)?(.*?)(/)?$".toRegex().replace(this, { result -> result.groupValues[2] })
+        fun String.trimSlashes() = "^(/)?(.*?)(/)?$".toRegex().replace(this) { result -> result.groupValues[2] }
     }
 
     fun matches(uri: String): Boolean = templateRegex.matches(uri.trimSlashes())
@@ -30,10 +30,10 @@ data class UriTemplate private constructor(private val template: String) {
     fun extract(uri: String): Map<String, String> = parameterNames.zip(templateRegex.findParameterValues(uri.trimSlashes())).toMap()
 
     fun generate(parameters: Map<String, String>): String =
-        template.replace(URI_TEMPLATE_FORMAT, { matchResult ->
+        template.replace(URI_TEMPLATE_FORMAT) { matchResult ->
             val paramValue = parameters[matchResult.groupValues[1]] ?: ""
             if (paramValue.contains("/")) paramValue else URLEncoder.encode(paramValue, "UTF-8")
-        })
+        }
 
     private fun Regex.findParameterValues(uri: String): List<String> =
         findAll(uri).first().groupValues.drop(1).map { URLDecoder.decode(it, "UTF-8") }

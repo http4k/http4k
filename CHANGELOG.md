@@ -2,11 +2,32 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.34.0 (uncut)
+### v3.35.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
 
+### v3.34.3
+- Fix #160 - `JavaHttpClient` does not copy body stream correctly onto URL connection.
+
+### v3.34.2
+- Fix #159 - Contracts should not have Security applied to the description route by default.
+
+### v3.34.1
+- Fix #158 - Static and contract routes filters are applied in the wrong order.
+
+### v3.34.0
+- Add default SamplingDecision param to ZipkinTraces - defaults to always sample.
+- Fix #150 - StaticRoutingHandler filters being called twice.
+- Fix #151 - POTENTIAL BREAK: Rework of Status objects to fix equality against the Status constant `vals` when a description has been overridden. This involves the following potential breaking change: The Status class is no longer a data class to tighten up encapsulation - user calls to copy() will have to be replaced.
+
+### v3.33.2
+- Raise SO_BACKLOG in Apache and Netty server implementations.
+- Add PERMANENT_REDIRECT and UNPROCESSABLE_ENTITY Status object.
+
+### v3.33.1
+- No change from 3.33.0. Previous version couldn't be made available to maven central.
+
 ### v3.33.0
-- Add convenient way to extract from as a Map from http message. H/T to @dmcg
+- Add convenient way to extract from as a Map from http message. H/T to @dmcg (this version is available in jcenter only)
 
 ### v3.32.1
 - Fix #142 - Pebble templates don't load from JAR files.

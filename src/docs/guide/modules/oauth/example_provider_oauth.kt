@@ -41,13 +41,11 @@ fun main(args: Array<String>) {
         oAuthPersistence
     )
 
-    // the 2 main points here are the callback handler and the authFilter, which protexts the root resource
+    // the 2 main points here are the callback handler and the authFilter, which protects the root resource
     val app: HttpHandler =
         routes(
-            routes(callbackUri.path bind GET to oauthProvider.callback),
-            oauthProvider.authFilter.then(
-                routes("/" bind GET to { Response(OK).body("hello!") })
-            )
+            callbackUri.path bind GET to oauthProvider.callback,
+            "/" bind GET to oauthProvider.authFilter.then { Response(OK).body("hello!") }
         )
 
     ServerFilters.CatchAll()

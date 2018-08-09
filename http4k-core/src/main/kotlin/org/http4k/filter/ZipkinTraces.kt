@@ -3,7 +3,6 @@ package org.http4k.filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
-import org.http4k.filter.SamplingDecision.Companion.from
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Header
 import org.http4k.lens.LensGet
@@ -44,7 +43,7 @@ data class SamplingDecision(val value: String) {
     }
 }
 
-data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpanId: TraceId?, val samplingDecision: SamplingDecision) {
+data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpanId: TraceId?, val samplingDecision: SamplingDecision = SAMPLE) {
     companion object {
         private val X_B3_TRACEID = Header.map(::TraceId, TraceId::value).optional("x-b3-traceid")
         private val X_B3_SPANID = Header.map(::TraceId, TraceId::value).optional("x-b3-spanid")

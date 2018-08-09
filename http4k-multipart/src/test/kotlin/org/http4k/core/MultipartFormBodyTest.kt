@@ -11,24 +11,24 @@ import java.io.InputStream
 class MultipartFormBodyTest {
 
     @Test
-    fun `roundtrip`() {
-        val form = MultipartFormBody("bob").plus("field" to "bar")
-            .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+    fun roundtrip() {
+        val form = MultipartFormBody("bob") + ("field" to "bar") +
+            ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
             .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
         MultipartFormBody.from(req) shouldMatch equalTo(
-            MultipartFormBody("bob").plus("field" to "bar")
-                .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to "bar") +
+                ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
         )
     }
 
     @Test
     fun `can handle when body is already pulled into memory`() {
-        val form = MultipartFormBody("bob").plus("field" to "bar")
-            .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+        val form = MultipartFormBody("bob") + ("field" to "bar") +
+             ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
             .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
@@ -37,8 +37,8 @@ class MultipartFormBodyTest {
         req.bodyString()
 
         MultipartFormBody.from(req) shouldMatch equalTo(
-            MultipartFormBody("bob").plus("field" to "bar")
-                .plus("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to "bar") +
+                ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream()))
         )
     }
 

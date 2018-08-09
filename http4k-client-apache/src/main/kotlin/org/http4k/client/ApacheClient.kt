@@ -47,13 +47,13 @@ class ApacheClient(
     override fun invoke(request: Request): Response = try {
         client.execute(request.toApacheRequest()).toHttp4kResponse()
     } catch (e: ConnectTimeoutException) {
-        Response(CLIENT_TIMEOUT.describeClientError(e))
+        Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
     } catch (e: SocketTimeoutException) {
-        Response(CLIENT_TIMEOUT.describeClientError(e))
+        Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
     } catch (e: HttpHostConnectException) {
-        Response(CONNECTION_REFUSED.describeClientError(e))
+        Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
     } catch (e: UnknownHostException) {
-        Response(UNKNOWN_HOST.describeClientError(e))
+        Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
     }
 
     private fun CloseableHttpResponse.toHttp4kResponse() = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {

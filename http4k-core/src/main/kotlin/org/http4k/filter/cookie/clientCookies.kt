@@ -23,7 +23,7 @@ interface CookieStorage {
 class BasicCookieStorage : CookieStorage {
     private val storage = ConcurrentHashMap<String, LocalCookie>()
 
-    override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage.put(it.cookie.name, it) }
+    override fun store(cookies: List<LocalCookie>) = cookies.forEach { storage[it.cookie.name] = it }
 
     override fun retrieve(): List<LocalCookie> = storage.values.toList()
 

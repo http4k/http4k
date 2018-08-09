@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Filter
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
@@ -22,18 +21,22 @@ import org.http4k.lens.Header
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.routing.RoutedResponse
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.RoutingHttpHandlerContract
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-class ContractRoutingHttpHandlerTest {
+class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+    override val handler: RoutingHttpHandler =
+            contract(SimpleJson(Argo), "/", validPath bindContract GET to { Response(OK).with(header of header(it)) })
 
     private val header = Header.optional("FILTER")
 
     @Test
     fun `by default the description lives at the route`() {
         Request(GET, "/root")
-        val response = ("/root" bind contract(SimpleJson(Argo))).invoke(Request(GET, "/root"))
+        val response = ("/root" bind contract(SimpleJson(Argo), security = ApiKey(Query.required("goo"), { false }))).invoke(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
@@ -45,7 +48,7 @@ class ContractRoutingHttpHandlerTest {
         }
 
         val root = "/root" bind contract(SimpleJson(Argo), "/docs",
-            "/" bindContract GET to { Response(OK).with(header of header(it)) })
+                "/" bindContract GET to { Response(OK).with(header of header(it)) })
         val withRoute = filter.then(root)
 
         val response = withRoute(Request(GET, "/root"))
@@ -69,8 +72,8 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
         val root = routes(
-            "/root/bar" bind contract(
-                "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) })
+                "/root/bar" bind contract(
+                        "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) })
         )
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
 
@@ -91,10 +94,10 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `identifies called route using identity header on request`() {
         val root = routes(
-            "/root" bind contract(
-                Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } })
+                "/root" bind contract(
+                        Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } })
         )
-        val response : RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
+        val response: RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.xUriTemplate, equalTo(UriTemplate.from("/root/hello/{world}")))
@@ -103,7 +106,7 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
+                "/bob" bindContract GET to { Response(OK) }
         )
 
         val response = root(Request(GET, "/root/bob?key=sue"))
@@ -113,7 +116,7 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `pre-security filter is applied before security`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
+                "/bob" bindContract GET to { Response(OK) }
         ).withFilter(Filter { next ->
             {
                 next(it.query("key", "bob"))
@@ -126,7 +129,7 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `post-security filter is applied after security`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK).body(it.body) }
+                "/bob" bindContract GET to { Response(OK).body(it.body) }
         ).withPostSecurityFilter(Filter { next ->
             {
                 next(it.body("body"))
@@ -139,7 +142,7 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
         val root = "/root" bind contract(SimpleJson(Argo), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
+                "/bob" bindContract GET to { Response(OK) }
         )
 
         val response = root(Request(GET, "/root/bob?key=bob"))
@@ -149,7 +152,7 @@ class ContractRoutingHttpHandlerTest {
     @Test
     fun `can change path to description route`() {
         val response = ("/root/foo" bind contract(SimpleJson(Argo), "/docs/swagger.json"))
-            .invoke(Request(GET, "/root/foo/docs/swagger.json"))
+                .invoke(Request(GET, "/root/foo/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -164,36 +167,9 @@ class ContractRoutingHttpHandlerTest {
             "/test"
                 bindContract GET to
                 { Response(OK).body(it.headerValues("foo").toString()) })
-        val withFilter = filter.then(contract)
-        val response = withFilter(Request(GET, "/test"))
+
+        val response = (filter.then(contract))(Request(GET, "/test"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("[bar]"))
     }
-
-    @Test
-    fun `only calls filters once - in various combos`() {
-        var called = false
-        val filter = Filter {
-            { req: Request ->
-                assertThat(called, equalTo(false))
-                called = true
-                it(req)
-            }
-        }
-
-        var calledHandler = false
-        val contract = contract(
-            "/test" bindContract GET to {
-                assertThat(calledHandler, equalTo(false))
-                calledHandler = true
-                Response(OK)
-            })
-
-        val request = Request(Method.PUT, "/test")
-        (filter.then("/" bind contract))(request)
-        (filter.then(contract))(request)
-        routes(filter.then(contract))(request)
-        (filter.then(routes(contract)))(request)
-    }
-
 }

@@ -7,15 +7,12 @@ import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
-import org.http4k.lens.Header
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
-
-private val header = Header.optional("definitionId")
 
 class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
 
@@ -41,12 +38,12 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
             .groupBy { it.describeFor(contractRoot) }.entries
-            .fold(FieldsAndDefinitions(), { memo, (path, routes) ->
-                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>(), { memoFields, route ->
+            .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
+                val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
                     memoFields.add(render(contractRoot, security, route))
-                })
+                }
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
-            })
+            }
 
     private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): ROOT = json.obj(
             listOf(
@@ -92,14 +89,14 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
     }
 
     private fun render(responses: List<ResponseMeta>) =
-            responses.fold(FieldsAndDefinitions<NODE>(),
-                    { memo, meta ->
-                        val (node, definitions) = meta.asSchema()
-                        val newField = meta.message.status.code.toString() to json.obj(
-                                listOf("description" to json.string(meta.description)) +
-                                        if (node == json.nullNode()) emptyList() else listOf("schema" to node))
-                        memo.add(newField, definitions)
-                    })
+            responses.fold(FieldsAndDefinitions<NODE>()
+            ) { memo, meta ->
+                val (node, definitions) = meta.asSchema()
+                val newField = meta.message.status.code.toString() to json.obj(
+                        listOf("description" to json.string(meta.description)) +
+                                if (node == json.nullNode()) emptyList() else listOf("schema" to node))
+                memo.add(newField, definitions)
+            }
 
     private fun Security.asJson() = when (this) {
         is ApiKey<*> -> json.obj(

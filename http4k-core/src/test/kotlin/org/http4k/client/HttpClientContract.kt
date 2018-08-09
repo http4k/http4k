@@ -88,6 +88,15 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    open fun `performs simple POST request - stream`() {
+        System.err.println("POST")
+        val response = client(Request(POST, "http://localhost:$port/echo").body("foobar".byteInputStream(), 6))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), containsSubstring("foobar"))
+    }
+
+    @Test
     fun `performs simple DELETE request`() {
         System.err.println("DELETE")
 
@@ -165,7 +174,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `connection refused are converted into 502`() {
+    open fun `connection refused are converted into 503`() {
         System.err.println("CONNECTION REFUSED")
         val response = client(Request(GET, "http://localhost:1"))
 
@@ -173,7 +182,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `unknown host are converted into 502`() {
+    open fun `unknown host are converted into 503`() {
         System.err.println("UNKNOWN HOST")
         val response = client(Request(GET, "http://foobar.bill"))
 

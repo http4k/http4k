@@ -31,7 +31,7 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     }
 
     private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) {
-        val headers = headerName + ": " + pairs.joinToString("; ") { (first, second) ->
+        val headers = "$headerName: " + pairs.joinToString("; ") { (first, second) ->
             if (second != null) """$first="$second"""" else first
         }
 

@@ -129,11 +129,11 @@ object CachingFilters {
                     response.header(header, response.header(header) ?: defaultProducer())
 
                 private fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
-                    addDefaultHeaderIfAbsent(response, "Cache-Control", {
+                    addDefaultHeaderIfAbsent(response, "Cache-Control") {
                         listOf("public", defaultCacheTimings.maxAge.toHeaderValue(), defaultCacheTimings.staleWhenRevalidateTtl.toHeaderValue(), defaultCacheTimings.staleIfErrorTtl.toHeaderValue()).joinToString(", ")
-                    })
-                        .let { addDefaultHeaderIfAbsent(it, "Expires", { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) }) }
-                        .let { addDefaultHeaderIfAbsent(it, "Vary", { "Accept-Encoding" }) }
+                    }
+                            .let { addDefaultHeaderIfAbsent(it, "Expires") { RFC_1123_DATE_TIME.format(ZonedDateTime.now(clock).plus(defaultCacheTimings.maxAge.value)) } }
+                        .let { addDefaultHeaderIfAbsent(it, "Vary") { "Accept-Encoding" } }
             }
         }
     }

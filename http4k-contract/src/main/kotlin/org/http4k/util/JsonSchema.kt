@@ -40,9 +40,9 @@ class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
     }
 
     private fun JsonSchema<NODE>.objectSchema(overrideDefinitionId: String?): JsonSchema<NODE> {
-        val (fields, subDefinitions) = json.fields(node).fold(listOf<Pair<String, NODE>>() to definitions, { (memoFields, memoDefinitions), (first, second) ->
+        val (fields, subDefinitions) = json.fields(node).fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
             JsonSchema(second, memoDefinitions).toSchema().let { memoFields.plus(first to it.node) to it.definitions }
-        })
+        }
 
         val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
         val definitionId = overrideDefinitionId ?: "object" + newDefinition!!.hashCode()

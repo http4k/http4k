@@ -7,7 +7,7 @@ import org.http4k.core.then
 import java.io.PrintStream
 
 object DebuggingFilters {
-    private val defaultDebugStream = true
+    private const val defaultDebugStream = true
 
     /**
      * Print details of the request before it is sent to the next service.

@@ -95,11 +95,11 @@ object ServerFilters {
 
 
         operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
-        operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm, { it == credentials })
+        operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm) { it == credentials }
 
         private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
 
-        private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0, { "" }), it.getOrElse(1, { "" })) }
+        private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
 
     /**
@@ -148,7 +148,6 @@ object ServerFilters {
                 }
             }
         }
-
     }
 
     /**
@@ -157,8 +156,8 @@ object ServerFilters {
     object CopyHeaders {
         operator fun invoke(vararg headers: String): Filter = Filter { next ->
             { request ->
-                headers.fold(next(request),
-                    { memo, name -> request.header(name)?.let { memo.header(name, it) } ?: memo })
+                headers.fold(next(request)
+                ) { memo, name -> request.header(name)?.let { memo.header(name, it) } ?: memo }
             }
         }
     }
