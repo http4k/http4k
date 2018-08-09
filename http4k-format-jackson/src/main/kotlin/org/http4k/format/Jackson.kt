@@ -103,6 +103,8 @@ val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
         .custom(UUID::fromString)
         .custom(Companion::of)
         .custom(::URL, URL::toExternalForm)
+        .custom(::Regex, Regex::pattern)
+
 
 object Jackson : ConfigurableJackson(ObjectMapper()
         .registerModule(defaultKotlinModuleWithHttp4kSerialisers)

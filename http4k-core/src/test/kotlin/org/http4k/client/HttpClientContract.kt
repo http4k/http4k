@@ -46,7 +46,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
         val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
         asServer.start()
-        val client = ApacheClient()
+        val client = JavaHttpClient()
 
         val request = Request(GET, "http://localhost:${asServer.port()}").header("accept-encoding", "gzip")
         client(request)

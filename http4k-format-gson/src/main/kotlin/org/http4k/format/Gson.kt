@@ -107,6 +107,7 @@ object Gson : ConfigurableGson(GsonBuilder()
         .registerTypeAdapter(UUID::class.java, custom(UUID::fromString))
         .registerTypeAdapter(Uri::class.java, custom(Companion::of))
         .registerTypeAdapter(URL::class.java, custom(::URL, URL::toExternalForm))
+        .registerTypeAdapter(Regex::class.java, custom(::Regex, Regex::pattern))
         .serializeNulls())
 
 private interface BidiJson<T> : JsonSerializer<T>, JsonDeserializer<T>

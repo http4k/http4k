@@ -17,6 +17,8 @@ data class CommonJdkPrimitives(val localDate: LocalDate, val localTime: LocalTim
 
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 
+data class RegexHolder(val regex: Regex)
+
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     protected open val expectedAutoMarshallingResult = """{"string":"hello","child":{"string":"world","child":null,"numbers":[1],"bool":true},"numbers":[],"bool":false}"""
@@ -44,5 +46,13 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val out = j.asJsonString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))
         assertThat(j.asA(out, CommonJdkPrimitives::class), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip regex special as equals isn't comparable`() {
+        val obj = RegexHolder(".*".toRegex())
+        val out = j.asJsonString(obj)
+        assertThat(out, equalTo("""{"regex":".*"}"""))
+        assertThat(j.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
 }

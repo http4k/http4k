@@ -52,6 +52,7 @@ object Moshi : ConfigurableMoshi(Moshi.Builder()
         .add(custom(Companion::of))
         .add(custom(::URL, URL::toExternalForm))
         .add(custom(UUID::fromString))
+        .add(custom(::Regex, Regex::pattern))
         .add(KotlinJsonAdapterFactory()))
 
 private inline fun <T> custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
