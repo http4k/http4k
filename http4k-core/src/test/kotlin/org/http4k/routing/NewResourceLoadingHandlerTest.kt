@@ -5,38 +5,42 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.apache.http.impl.io.EmptyInputStream
 import org.http4k.core.*
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.Test
-import java.io.ByteArrayInputStream
+import java.time.Instant
 
 
 class NewResourceLoadingHandlerTest {
 
+    private val mimeTypes = MimeTypes()
     private val resources = HashMap<String, Resource>()
     private val handler = NewResourceLoadingHandler("/root", InMemoryResourceLoader(resources), emptyMap())
+    private val now = Instant.parse("2018-08-09T23:06:00Z")
 
     @Test fun `no resource returns NOT_FOUND`() {
         assertThat(handler(Request(Method.GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
     }
 
     @Test fun `response has content type, length and body`() {
-        resources["file.html"] = StringResource("content")
+        resources["file.html"] = InMemoryResource("content", lastModified = now)
         assertThat(
             handler(Request(Method.GET, Uri.of("/root/file.html"))),
             allOf(
                 hasStatus(Status.OK),
-                hasContentType(ContentType.TEXT_HTML.withNoDirective()),
+                hasContentType(mimeTypes.forFile("file.html")),
                 hasHeader("Content-Length", "7"),
+                hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
                 hasBody("content")
             ))
     }
 
-    @Test fun `response has no length if resource doesn't`() {
-        resources["file.html"] = StringResource("content", length = null)
+    @Test fun `response has no length and last modified if resource doesn't`() {
+        resources["file.html"] = IndeterminateLengthResource()
         assertThat(
             handler(Request(Method.GET, Uri.of("/root/file.html"))),
             allOf(
@@ -46,11 +50,8 @@ class NewResourceLoadingHandlerTest {
     }
 }
 
-data class StringResource(
-    val s: String,
-    override val length: Long? = s.length.toLong()
-) : Resource {
-    override fun toStream() = ByteArrayInputStream(s.toByteArray())
+private class IndeterminateLengthResource : Resource {
+    override fun toStream() = EmptyInputStream.INSTANCE
 }
 
 class InMemoryResourceLoader(val resources: Map<String, Resource>) : NewResourceLoader {
