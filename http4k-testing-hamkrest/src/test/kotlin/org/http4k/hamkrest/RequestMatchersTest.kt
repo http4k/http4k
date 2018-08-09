@@ -24,10 +24,19 @@ class RequestMatchersTest {
     fun `uri as uri`() = assertMatchAndNonMatch(Request(GET, "/bob"), hasUri(Uri.of("/bob")), hasUri(Uri.of("/bill")))
 
     @Test
+    fun `uri as regex`() = assertMatchAndNonMatch(Request(GET, "/bob123"), hasUri(Regex(".*123")), hasUri(Regex(".*124")))
+
+    @Test
     fun `form`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", "bob"), hasForm("form", "bill"))
 
     @Test
+    fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", Regex(".*bob")), hasForm("form", Regex(".*bill")))
+
+    @Test
     fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", "bob"), hasQuery("form", "bill"))
+
+    @Test
+    fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", Regex(".*bob")), hasQuery("form", Regex(".*bill")))
 
     @Test
     fun `queries`() = assertMatchAndNonMatch(Request(GET, "/bob?query=bob&query=bob2"), hasQuery("query", listOf("bob", "bob2")), hasQuery("query", listOf("bill")))
@@ -43,6 +52,9 @@ class RequestMatchersTest {
 
     @Test
     fun `cookie matcher`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie("name", equalTo(Cookie("name", "bob"))), hasCookie("name", equalTo(Cookie("name", "bill"))))
+
+    @Test
+    fun `cookie as a regex`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie("name", Regex(".*bob")), hasCookie("name", Regex(".*bill")))
 
     @Test
     fun `cookie value`() = assertMatchAndNonMatch(Request(GET, "").cookie(Cookie("name", "bob")), hasCookie("name", "bob"), hasCookie("name", "bill"))
