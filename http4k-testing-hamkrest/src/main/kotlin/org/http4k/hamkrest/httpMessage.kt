@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.matches
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -15,7 +16,11 @@ import org.http4k.lens.HeaderLens
 
 fun <T> hasHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Header '${lens.meta.name}'", { req: HttpMessage -> lens(req) }, matcher))
 
-fun hasHeader(name: String, expected: String?): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, equalTo(expected))
+fun hasHeader(name: String, matcher: Matcher<CharSequence?>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, matcher)
+
+fun hasHeader(name: String, expected: CharSequence): Matcher<HttpMessage> = hasHeader(name, equalTo(expected))
+
+fun hasHeader(name: String, expected: Regex): Matcher<HttpMessage> = hasHeader(name, present(matches(expected)))
 
 fun hasHeader(name: String): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, present(anything))
 
@@ -26,9 +31,11 @@ fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-T
 fun hasBody(expected: Matcher<Body>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.body }, expected)
 
 @JvmName("hasBodyString")
-fun hasBody(expected: Matcher<String>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, expected)
+fun hasBody(expected: Matcher<String?>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
-fun hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, equalTo(expected))
+fun hasBody(expected: CharSequence): Matcher<HttpMessage> = hasBody(equalTo(expected))
+
+fun hasBody(expected: Regex): Matcher<HttpMessage> = hasBody(present(matches(expected)))
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))
 

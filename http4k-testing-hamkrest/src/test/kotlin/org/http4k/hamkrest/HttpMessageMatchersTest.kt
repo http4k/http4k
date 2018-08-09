@@ -20,6 +20,9 @@ class HttpMessageMatchersTest {
     fun `header`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob"), hasHeader("header", "bob"), hasHeader("header", "bill"))
 
     @Test
+    fun `header regex`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob"), hasHeader("header", Regex(".*bob")), hasHeader("header", Regex(".*bill")))
+
+    @Test
     fun `headers`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", listOf("bob", "bob2")), hasHeader("header", listOf("bill")))
 
     @Test
@@ -36,6 +39,9 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `body string`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody("bob"), hasBody("bill"))
+
+    @Test
+    fun `body regex`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(Regex(".*bob")), hasBody(Regex(".*bill")))
 
     @Test
     fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
