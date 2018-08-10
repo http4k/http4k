@@ -100,10 +100,19 @@ class SwitchTrigger(initialPosition: Boolean = false) : ChaosTrigger {
     override fun invoke(p1: HttpTransaction) = on.get()
 
     override fun toString() = "SwitchTrigger (active = ${on.get()})"
-
 }
 
 operator fun ChaosTrigger.not() = object : Function1<HttpTransaction, Boolean> {
     override fun invoke(p1: HttpTransaction): Boolean = !this@not(p1)
     override fun toString() = "NOT " + this@not.toString()
+}
+
+infix fun ChaosTrigger.and(that: ChaosTrigger): ChaosTrigger = object : ChaosTrigger {
+    override fun invoke(p1: HttpTransaction) = this@and(p1) && that(p1)
+    override fun toString() = this@and.toString() + " AND " + that.toString()
+}
+
+infix fun ChaosTrigger.or(that: ChaosTrigger): ChaosTrigger = object : ChaosTrigger {
+    override fun invoke(p1: HttpTransaction) = this@or(p1) || that(p1)
+    override fun toString() = this@or.toString() + " OR " + that.toString()
 }

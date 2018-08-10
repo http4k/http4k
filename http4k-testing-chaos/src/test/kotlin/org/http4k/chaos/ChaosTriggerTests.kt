@@ -22,14 +22,10 @@ import java.time.Instant.now
 import java.time.ZoneId.of
 import kotlin.reflect.KClass
 
-abstract class ChaosTriggerContract {
-    val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
+private val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
 
-    @Test
-    abstract fun `behaves as expected`()
-}
+abstract class SerializableTriggerContract<T : SerializableTrigger>(private val clazz: KClass<T>) {
 
-abstract class SerializableTriggerContract<T : SerializableTrigger>(private val clazz: KClass<T>) : ChaosTriggerContract() {
     abstract val trigger: T
     abstract val expectedJson: String
     abstract val expectedDescription: String
@@ -46,6 +42,9 @@ abstract class SerializableTriggerContract<T : SerializableTrigger>(private val 
     fun `describes itself`() {
         assertThat(trigger(clock).toString(), equalTo(expectedDescription))
     }
+
+    @Test
+    abstract fun `behaves as expected`()
 }
 
 class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::class) {
@@ -78,10 +77,10 @@ class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
     }
 }
 
-class SwitchTriggerTest : ChaosTriggerContract() {
+class SwitchTriggerTest {
     @Test
-    override fun `behaves as expected`() {
-    val trigger = SwitchTrigger(true)
+    fun `behaves as expected`() {
+        val trigger = SwitchTrigger(true)
         trigger.toString() shouldMatch equalTo("SwitchTrigger (active = true)")
         trigger(tx) shouldMatch equalTo(true)
         trigger.toggle()
@@ -93,12 +92,29 @@ class SwitchTriggerTest : ChaosTriggerContract() {
     }
 }
 
-class NotTriggerTest : ChaosTriggerContract() {
+class ChaosTriggerTest {
+    private val isFalse: ChaosTrigger = { _: HttpTransaction -> false }
+    private val isTrue: ChaosTrigger = { _: HttpTransaction -> true }
+
     @Test
-    override fun `behaves as expected`() {
-        (!{ _: HttpTransaction -> false })(tx) shouldMatch equalTo(true)
-        (!{ _: HttpTransaction -> true })(tx) shouldMatch equalTo(false)
-        (!{ _: HttpTransaction -> true }).toString() shouldMatch equalTo("NOT (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+    fun invert() {
+        (!isFalse)(tx) shouldMatch equalTo(true)
+        (!isTrue)(tx) shouldMatch equalTo(false)
+        (!isTrue).toString() shouldMatch equalTo("NOT (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
     }
 
+    @Test
+    fun and() {
+        (isFalse and isTrue)(tx) shouldMatch equalTo(false)
+        (isTrue and isTrue)(tx) shouldMatch equalTo(true)
+        (isTrue and isTrue).toString() shouldMatch equalTo("(org.http4k.core.HttpTransaction) -> kotlin.Boolean AND (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+    }
+
+    @Test
+    fun or() {
+        (isFalse or isFalse)(tx) shouldMatch equalTo(false)
+        (isFalse or isTrue)(tx) shouldMatch equalTo(true)
+        (isTrue or isTrue)(tx) shouldMatch equalTo(true)
+        (isTrue or isTrue).toString() shouldMatch equalTo("(org.http4k.core.HttpTransaction) -> kotlin.Boolean OR (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+    }
 }
