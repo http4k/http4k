@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.apache.http.impl.io.EmptyInputStream
 import org.http4k.core.*
+import org.http4k.core.etag.ETag
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
@@ -27,7 +28,7 @@ class NewResourceLoadingHandlerTest {
     }
 
     @Test fun `returns content, content type, length and body`() {
-        resources["file.html"] = InMemoryResource("content", lastModified = now)
+        resources["file.html"] = InMemoryResource("content", lastModified = now, etag = ETag("etag-value", weak = true))
         assertThat(
             handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"))),
             allOf(
@@ -35,21 +36,24 @@ class NewResourceLoadingHandlerTest {
                 hasContentType(mimeTypes.forFile("file.html")),
                 hasHeader("Content-Length", "7"),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
+                hasHeader("ETag", """W/"etag-value""""),
                 hasBody("content")
             ))
     }
 
-    @Test fun `returns no length and last modified if resource doesn't`() {
+    @Test fun `returns no length and last modified if null from resource`() {
         resources["file.html"] = IndeterminateLengthResource()
         assertThat(
             handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"))),
             allOf(
                 hasStatus(Status.OK),
-                hasHeader("Content-Length", null)
+                hasHeader("Content-Length", null),
+                hasHeader("Last-Modified", null),
+                hasHeader("ETag", null)
             ))
     }
 
-    @Test fun `returns content if resource is modified`() {
+    @Test fun `returns content if resource is modified by time`() {
         resources["file.html"] = InMemoryResource("content", lastModified = now)
         assertThat(
             handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
@@ -61,7 +65,7 @@ class NewResourceLoadingHandlerTest {
             ))
     }
 
-    @Test fun `returns NOT_MODIFIED if resource is not modified`() {
+    @Test fun `returns NOT_MODIFIED if resource is not modified by time`() {
         resources["file.html"] = InMemoryResource("content", lastModified = now)
         assertThat(
             handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
@@ -100,6 +104,58 @@ class NewResourceLoadingHandlerTest {
                 listOf("If-Modified-Since" to "NOT A DATE"))),
             allOf(
                 hasStatus(Status.OK),
+                hasBody("content")
+            ))
+    }
+
+    @Test fun `returns content if resource does not match etag`() {
+        resources["file.html"] = InMemoryResource("content", etag = ETag("etag-value", weak = true))
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-None-Match" to """"something-else""""))),
+            allOf(
+                hasStatus(Status.OK),
+                hasHeader("ETag", """W/"etag-value""""),
+                hasBody("content")
+            ))
+    }
+
+    @Test fun `returns NOT_MODIFIED if resource does match etag`() {
+        resources["file.html"] = InMemoryResource("content", etag = ETag("etag-value", weak = true))
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-None-Match" to """"something-else", W/"etag-value""""))),
+            allOf(
+                hasStatus(Status.NOT_MODIFIED),
+                hasHeader("ETag", """W/"etag-value""""),
+                hasBody("")
+            ))
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-None-Match" to """*"""))),
+            allOf(
+                hasStatus(Status.NOT_MODIFIED),
+                hasHeader("ETag", """W/"etag-value""""),
+                hasBody("")
+            ))
+        assertThat( // should match strong etag even though resource is weak
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-None-Match" to """"etag-value""""))),
+            allOf(
+                hasStatus(Status.NOT_MODIFIED),
+                hasHeader("ETag", """W/"etag-value""""),
+                hasBody("")
+            ))
+    }
+
+    @Test fun `returns content if no etag property`() {
+        resources["file.html"] = InMemoryResource("content", etag = null)
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-None-Match" to """*"""))),
+            allOf(
+                hasStatus(Status.OK),
+                hasHeader("ETag", null),
                 hasBody("content")
             ))
     }
