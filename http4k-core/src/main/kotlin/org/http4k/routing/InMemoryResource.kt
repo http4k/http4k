@@ -3,7 +3,7 @@ package org.http4k.routing
 import java.io.ByteArrayInputStream
 import java.time.Instant
 
-open class InMemoryResource(
+class InMemoryResource(
     private val content: ByteArray,
     override val lastModified: Instant? = null
 ) : Resource {

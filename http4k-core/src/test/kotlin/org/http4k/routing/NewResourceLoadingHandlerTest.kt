@@ -23,13 +23,13 @@ class NewResourceLoadingHandlerTest {
     private val now = Instant.parse("2018-08-09T23:06:00Z")
 
     @Test fun `no resource returns NOT_FOUND`() {
-        assertThat(handler(Request(Method.GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
+        assertThat(handler(MemoryRequest(Method.GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
     }
 
-    @Test fun `response has content type, length and body`() {
+    @Test fun `returns content, content type, length and body`() {
         resources["file.html"] = InMemoryResource("content", lastModified = now)
         assertThat(
-            handler(Request(Method.GET, Uri.of("/root/file.html"))),
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"))),
             allOf(
                 hasStatus(Status.OK),
                 hasContentType(mimeTypes.forFile("file.html")),
@@ -39,19 +39,74 @@ class NewResourceLoadingHandlerTest {
             ))
     }
 
-    @Test fun `response has no length and last modified if resource doesn't`() {
+    @Test fun `returns no length and last modified if resource doesn't`() {
         resources["file.html"] = IndeterminateLengthResource()
         assertThat(
-            handler(Request(Method.GET, Uri.of("/root/file.html"))),
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"))),
             allOf(
                 hasStatus(Status.OK),
                 hasHeader("Content-Length", null)
             ))
     }
+
+    @Test fun `returns content if resource is modified`() {
+        resources["file.html"] = InMemoryResource("content", lastModified = now)
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
+            allOf(
+                hasStatus(Status.OK),
+                hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
+                hasBody("content")
+            ))
+    }
+
+    @Test fun `returns NOT_MODIFIED if resource is not modified`() {
+        resources["file.html"] = InMemoryResource("content", lastModified = now)
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:00 GMT"))),
+            allOf(
+                hasStatus(Status.NOT_MODIFIED),
+                hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
+                hasBody("")
+            ))
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:01 GMT"))),
+            allOf(
+                hasStatus(Status.NOT_MODIFIED),
+                hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
+                hasBody("")
+            ))
+    }
+
+    @Test fun `returns content if no last modified property`() {
+        resources["file.html"] = InMemoryResource("content", lastModified = null)
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
+            allOf(
+                hasStatus(Status.OK),
+                hasHeader("Last-Modified", null),
+                hasBody("content")
+            ))
+    }
+
+    @Test fun `returns content for incorrect date format`() {
+        resources["file.html"] = InMemoryResource("content")
+        assertThat(
+            handler(MemoryRequest(Method.GET, Uri.of("/root/file.html"),
+                listOf("If-Modified-Since" to "NOT A DATE"))),
+            allOf(
+                hasStatus(Status.OK),
+                hasBody("content")
+            ))
+    }
 }
 
 private class IndeterminateLengthResource : Resource {
-    override fun toStream() = EmptyInputStream.INSTANCE
+    override fun toStream() = EmptyInputStream.INSTANCE!!
 }
 
 class InMemoryResourceLoader(val resources: Map<String, Resource>) : NewResourceLoader {
