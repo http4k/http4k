@@ -55,9 +55,9 @@ class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::clas
     @Test
     override fun `behaves as expected`() {
         val clock = Clock.systemUTC()
-        val trigger = ChaosTriggers.Deadline(now(clock).plusMillis(100))(clock)
+        val trigger = ChaosTriggers.Deadline(now(clock).plusMillis(200))(clock)
         trigger(tx) shouldMatch equalTo(false)
-        sleep(110)
+        sleep(200)
         trigger(tx) shouldMatch equalTo(true)
     }
 }

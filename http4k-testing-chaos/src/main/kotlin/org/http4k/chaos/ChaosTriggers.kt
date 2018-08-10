@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 typealias ChaosTrigger = (HttpTransaction) -> Boolean
 
 abstract class SerializableTrigger(val type: String) {
-    abstract operator fun invoke(clock: Clock): ChaosTrigger
+    abstract operator fun invoke(clock: Clock = Clock.systemUTC()): ChaosTrigger
 }
 
 object ChaosTriggers {
@@ -31,11 +31,9 @@ object ChaosTriggers {
      * Activates after a particular instant in time.
      */
     data class Deadline(val endTime: Instant) : SerializableTrigger("deadline") {
-        override operator fun invoke(clock: Clock) = Instant.now(clock).let {
-            object : ChaosTrigger {
-                override fun invoke(p1: HttpTransaction) = clock.instant().isAfter(it)
-                override fun toString() = "Deadline ($it)"
-            }
+        override operator fun invoke(clock: Clock) = object : ChaosTrigger {
+            override fun invoke(p1: HttpTransaction): Boolean = clock.instant().isAfter(endTime)
+            override fun toString() = "Deadline ($endTime)"
         }
     }
 
