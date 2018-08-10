@@ -3,7 +3,9 @@ package org.http4k.core.etag
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-data class ETag(val value: String, val weak: Boolean = false)
+data class ETag(val value: String, val weak: Boolean = false) {
+    fun toHeaderString(): String = (if (weak) "W/" else "") + """"$value""""
+}
 
 sealed class FieldValue {
     data class ETags(val value: List<ETag>) : FieldValue() {
