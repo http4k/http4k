@@ -30,6 +30,7 @@ import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -100,6 +101,7 @@ val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
         .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
         .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
         .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
         .custom(UUID::fromString)
         .custom(Companion::of)
         .custom(::URL, URL::toExternalForm)
