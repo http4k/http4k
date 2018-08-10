@@ -5,6 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
+import org.http4k.chaos.ChaosTriggers.MatchRequest
+import org.http4k.chaos.ChaosTriggers.MatchResponse
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -35,7 +37,7 @@ abstract class SerializableTriggerContract<T : SerializableTrigger>(private val 
     fun `is roundtrippable to JSON`() {
         val asJson = Jackson.asJsonString(trigger)
         assertThat(asJson, equalTo(expectedJson))
-        assertThat(asJson.asA(clazz), equalTo(trigger))
+        assertThat(asJson.asA(clazz).toString(), equalTo(trigger.toString()))
     }
 
     @Test
@@ -74,6 +76,37 @@ class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
         trigger(tx) shouldMatch equalTo(false)
         sleep(110)
         trigger(tx) shouldMatch equalTo(true)
+    }
+}
+
+class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchRequest::class) {
+    override val trigger = MatchRequest(Regex(".*bob"),
+            mapOf("header" to Regex(".*header")),
+            mapOf("query" to Regex(".*query")),
+            Regex(".*body"))
+
+    override val expectedJson = """{"path":".*bob","headers":{"header":".*header"},"queries":{"query":".*query"},"body":".*body","type":"request"}"""
+
+    override val expectedDescription = "has Request that has Header 'header' that is not null & matches " +
+            ".*header and has Query 'query' that is not null & is not null & matches .*query and has Uri " +
+            "that has Path that is not null & matches .*bob and has Body that is not null & matches .*body"
+
+    @Test
+    override fun `behaves as expected`() {
+    }
+}
+
+class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(MatchResponse::class) {
+    override val trigger = MatchResponse(200,
+            mapOf("header" to Regex(".*header")),
+            Regex(".*body"))
+
+    override val expectedJson = """{"status":200,"headers":{"header":".*header"},"body":".*body","type":"response"}"""
+
+    override val expectedDescription = "has Response that anything and has Header 'header' that is not null & " +
+            "matches .*header and has status that is equal to 200  and has Body that is not null & matches .*body"
+    @Test
+    override fun `behaves as expected`() {
     }
 }
 

@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import org.http4k.core.HttpTransaction
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.hamkrest.hasBody
@@ -49,40 +48,51 @@ object ChaosTriggers {
         }
     }
 
-    abstract class HttpTransactionTrigger(type: String, matcher: Matcher<HttpTransaction>)
-        : SerializableTrigger(type), Matcher<HttpTransaction> by matcher {
-        override operator fun invoke(clock: Clock) = object : ChaosTrigger {
-            override fun invoke(p1: HttpTransaction) = this@HttpTransactionTrigger.asPredicate()(p1)
-            override fun toString() = this@HttpTransactionTrigger.description
+    abstract class HttpTransactionTrigger(type: String) : SerializableTrigger(type) {
+        abstract fun matcher(): Matcher<HttpTransaction>
+
+        override operator fun invoke(clock: Clock) = matcher().let {
+            object : ChaosTrigger {
+                override fun invoke(p1: HttpTransaction) = it.asPredicate()(p1)
+                override fun toString() = it.description
+            }
         }
     }
 
+    /**
+     * Activates when matching attributes of a single received request are met.
+     */
     data class MatchRequest(val path: Regex?,
                             val headers: Map<String, Regex>?,
-                            val queries: Map<String, String>?,
-                            val body: Regex?) : HttpTransactionTrigger("request", {
-        val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
-        val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
-        val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
-        val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
-        hasRequest(
-                (headerMatchers + queriesMatchers + pathMatchers + bodyMatchers)
-                        .fold<Matcher<Request>, Matcher<Request>>(anything) { acc, next -> acc.and(next) }
-        )
-    }())
+                            val queries: Map<String, Regex>?,
+                            val body: Regex?) : HttpTransactionTrigger("request") {
+        override fun matcher() = {
+            val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
+            val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
+            val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
+            val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
+            val all = headerMatchers + queriesMatchers + pathMatchers + bodyMatchers
+            if (all.isEmpty()) hasRequest(anything) else hasRequest(all.reduce { acc, next -> acc and next })
+        }()
+    }
 
+    /**
+     * Activates when matching attributes of a single sent response are met.
+     */
     data class MatchResponse(val status: Int?,
                              val headers: Map<String, Regex>?,
-                             val body: Regex?) : HttpTransactionTrigger("response", {
-        val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
-        val statusMatcher = status?.let { listOf(hasStatus((Status(it, "")))) } ?: emptyList()
-        val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
+                             val body: Regex?) : HttpTransactionTrigger("response") {
+        override fun matcher() = {
+            val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
+            val statusMatcher = status?.let { listOf(hasStatus((Status(it, "")))) } ?: emptyList()
+            val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
 
-        hasResponse(
-                (headerMatchers + statusMatcher + bodyMatchers)
-                        .fold<Matcher<Response>, Matcher<Response>>(anything) { acc, next -> acc.and(next) }
-        )
-    }())
+            hasResponse(
+                    (headerMatchers + statusMatcher + bodyMatchers)
+                            .fold<Matcher<Response>, Matcher<Response>>(anything) { acc, next -> acc and next }
+            )
+        }()
+    }
 }
 
 /**
