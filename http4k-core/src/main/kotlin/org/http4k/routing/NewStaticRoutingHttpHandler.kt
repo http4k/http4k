@@ -16,7 +16,7 @@ internal class NewResourceLoadingHandler(private val pathSegments: String,
             resourceLoader.resourceFor(path)?.let { resource ->
                 val lookupType = extMap.forFile(path)
                 if (request.method == GET && lookupType != OCTET_STREAM) {
-                    resource.response().header("Content-Type", lookupType.value)
+                    resource.response(request).header("Content-Type", lookupType.value)
                 } else Response(NOT_FOUND)
             } ?: Response(NOT_FOUND)
         } else Response(NOT_FOUND)

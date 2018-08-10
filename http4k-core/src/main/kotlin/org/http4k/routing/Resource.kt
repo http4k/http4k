@@ -13,20 +13,35 @@ interface Resource {
     val length: Long? get() = null
     val lastModified: Instant? get() = null
 
+    fun isModifiedSince(instant: Instant): Boolean = lastModified?.isAfter(instant) ?: true
+
     val headers: Headers
         get() = listOf(
             "Content-Length" to length?.toString(),
             "Last-Modified" to lastModified?.formattedWith(dateTimeFormatter)
         )
 
-    fun response(): Response = toStream().use { inputStream ->
-        MemoryResponse(Status.OK, headers, Body(inputStream, length))
+    fun response(request: Request): Response = toStream().use { inputStream ->
+        val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
+        if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
+            MemoryResponse(Status.NOT_MODIFIED, headers)
+        else
+            MemoryResponse(Status.OK, headers, Body(inputStream, length))
     }
 }
 
 private val dateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC)
 
 private fun Instant.formattedWith(formatter: DateTimeFormatter) = formatter.format(this)
+
+private fun String?.parsedWith(formatter: DateTimeFormatter): Instant? =
+    if (this == null)
+        null
+    else try {
+        Instant.from(formatter.parse(this))
+    } catch (x: Exception) {
+        null // "if the passed If-Modified-Since date is invalid, the response is exactly the same as for a normal GET"
+    }
 
 
 data class URLResource(val url: URL) : Resource {
