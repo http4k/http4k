@@ -40,6 +40,10 @@ class NewResourceLoaderTest {
     }
 
     private fun checkContents(loader: NewResourceLoader, path: String, expected: String) {
-        assertThat(loader.resourceFor(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
+        val resource = loader.resourceFor(path)!!
+        val content = resource.openStream().use { it.readBytes() }
+        assertThat(String(content), equalTo(expected))
+        if (resource.length != null)
+            assertThat(content.size.toLong(), equalTo(resource.length))
     }
 }
