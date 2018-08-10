@@ -1,13 +1,13 @@
-package org.http4k.routing
+package org.http4k.routing.experimental
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.routing.ResourceLoader.Companion.Classpath
-import org.http4k.routing.ResourceLoader.Companion.Directory
+import org.http4k.routing.experimental.NewResourceLoader.Companion.Classpath
+import org.http4k.routing.experimental.NewResourceLoader.Companion.Directory
 import org.junit.jupiter.api.Test
 
-class ResourceLoaderTest {
+class NewResourceLoaderTest {
 
     @Test
     fun `classpath loader loads existing file`() {
@@ -21,7 +21,7 @@ class ResourceLoaderTest {
 
     @Test
     fun `classpath loader for missing file`() {
-        assertThat(Classpath("/").load("notAFile"), absent())
+        assertThat(Classpath("/").resourceFor("notAFile"), absent())
     }
 
     @Test
@@ -36,10 +36,10 @@ class ResourceLoaderTest {
 
     @Test
     fun `directory loader for missing file`() {
-        assertThat(Directory("./src/test/resources").load("notAFile"), absent())
+        assertThat(Directory("./src/test/resources").resourceFor("notAFile"), absent())
     }
 
-    private fun checkContents(loader: ResourceLoader, path: String, expected: String) {
-        assertThat(loader.load(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
+    private fun checkContents(loader: NewResourceLoader, path: String, expected: String) {
+        assertThat(loader.resourceFor(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
     }
 }

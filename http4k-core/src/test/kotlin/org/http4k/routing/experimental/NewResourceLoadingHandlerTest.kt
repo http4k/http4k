@@ -106,7 +106,7 @@ class NewResourceLoadingHandlerTest {
 }
 
 private class IndeterminateLengthResource : Resource {
-    override fun toStream() = EmptyInputStream.INSTANCE!!
+    override fun openStream() = EmptyInputStream.INSTANCE!!
 }
 
 class InMemoryResourceLoader(val resources: Map<String, Resource>) : NewResourceLoader {

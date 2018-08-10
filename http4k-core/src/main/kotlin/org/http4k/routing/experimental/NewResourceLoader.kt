@@ -1,7 +1,7 @@
 package org.http4k.routing.experimental
 
 import java.io.File
-
+import java.net.URL
 
 
 interface NewResourceLoader {
@@ -17,12 +17,15 @@ interface NewResourceLoader {
         }
 
         fun Directory(baseDir: String) = object : NewResourceLoader {
+
             override fun resourceFor(path: String) = File(finalBaseDir, path).let { f ->
-                if (f.exists() && f.isFile) f.toURI().toURL() else null
-            }?.toResource()
+                if (!f.exists() || !f.isFile) null else FileResource(f)
+            }
 
             private val finalBaseDir = if (baseDir.endsWith("/")) baseDir else "$baseDir/"
         }
     }
 }
+
+private fun URL.toResource(): Resource = URLResource(this)
 

@@ -13,7 +13,7 @@ class InMemoryResource(
         lastModified: Instant? = null
     ): this(content.toByteArray(Charsets.UTF_8), lastModified)
 
-    override fun toStream() = ByteArrayInputStream(content)
+    override fun openStream() = ByteArrayInputStream(content)
 
     override val length: Long? = content.size.toLong()
 }
