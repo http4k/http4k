@@ -21,14 +21,13 @@ interface Resource : HttpHandler {
             "Last-Modified" to lastModified?.formattedWith(dateTimeFormatter)
         )
 
-    override fun invoke(request: Request): Response =
-        openStream().use { inputStream ->
-            val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
-            if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
-                MemoryResponse(Status.NOT_MODIFIED, headers)
-            else
-                MemoryResponse(Status.OK, headers, Body(inputStream, length))
-        }
+    override fun invoke(request: Request): Response {
+        val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
+        return if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
+            MemoryResponse(Status.NOT_MODIFIED, headers)
+        else
+            MemoryResponse(Status.OK, headers, Body(openStream(), length)) // Pipeline is responsible for closing stream
+    }
 }
 
 private val dateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC)
