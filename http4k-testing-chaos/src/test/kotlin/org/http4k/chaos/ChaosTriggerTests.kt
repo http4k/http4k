@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosTriggers.Deadline
+import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -23,6 +24,9 @@ import kotlin.reflect.KClass
 
 abstract class ChaosTriggerContract {
     val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
+
+    @Test
+    abstract fun `behaves as expected`()
 }
 
 abstract class SerializableTriggerContract<T : SerializableTrigger>(private val clazz: KClass<T>) : ChaosTriggerContract() {
@@ -42,9 +46,6 @@ abstract class SerializableTriggerContract<T : SerializableTrigger>(private val 
     fun `describes itself`() {
         assertThat(trigger(clock).toString(), equalTo(expectedDescription))
     }
-
-    @Test
-    abstract fun `behaves as expected`()
 }
 
 class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::class) {
@@ -60,26 +61,27 @@ class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::clas
         sleep(110)
         trigger(tx) shouldMatch equalTo(true)
     }
-
 }
 
-class ChaosTriggersTest : ChaosTriggerContract() {
-    private val dayDot = Clock.fixed(EPOCH, of("UTC"))
+class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
+    override val trigger = Delay(Duration.ofMillis(100), clock)
+    override val expectedJson = """{"endTime":"1970-01-01T00:00:00.100Z","type":"delay"}"""
+    override val expectedDescription = "Delay (expires 1970-01-01T00:00:00.100Z)"
 
     @Test
-    fun `delay trigger`() {
-        ChaosTriggers.Delay(Duration.ofMillis(100), dayDot)(dayDot).toString() shouldMatch equalTo("Delay (expires 1970-01-01T00:00:00.100Z)")
-
+    override fun `behaves as expected`() {
         val clock = Clock.systemDefaultZone()
         val trigger = ChaosTriggers.Delay(Duration.ofMillis(100), clock)(clock)
         trigger(tx) shouldMatch equalTo(false)
         sleep(110)
         trigger(tx) shouldMatch equalTo(true)
     }
+}
 
+class SwitchTriggerTest : ChaosTriggerContract() {
     @Test
-    fun `switch trigger`() {
-        val trigger = SwitchTrigger(true)
+    override fun `behaves as expected`() {
+    val trigger = SwitchTrigger(true)
         trigger.toString() shouldMatch equalTo("SwitchTrigger (active = true)")
         trigger(tx) shouldMatch equalTo(true)
         trigger.toggle()
@@ -89,9 +91,11 @@ class ChaosTriggersTest : ChaosTriggerContract() {
         trigger.toggle(true)
         trigger(tx) shouldMatch equalTo(true)
     }
+}
 
+class NotTriggerTest : ChaosTriggerContract() {
     @Test
-    fun `inversion of trigger`() {
+    override fun `behaves as expected`() {
         (!{ _: HttpTransaction -> false })(tx) shouldMatch equalTo(true)
         (!{ _: HttpTransaction -> true })(tx) shouldMatch equalTo(false)
         (!{ _: HttpTransaction -> true }).toString() shouldMatch equalTo("NOT (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
