@@ -2,14 +2,13 @@ package org.http4k.routing.experimental
 
 import org.http4k.core.*
 import java.io.InputStream
-import java.net.URL
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 interface Resource : HttpHandler {
 
-    fun toStream(): InputStream
+    fun openStream(): InputStream
 
     val length: Long? get() = null
     val lastModified: Instant? get() = null
@@ -23,7 +22,7 @@ interface Resource : HttpHandler {
         )
 
     override fun invoke(request: Request): Response =
-        toStream().use { inputStream ->
+        openStream().use { inputStream ->
             val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
             if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
                 MemoryResponse(Status.NOT_MODIFIED, headers)
@@ -46,8 +45,3 @@ private fun String?.parsedWith(formatter: DateTimeFormatter): Instant? =
     }
 
 
-data class URLResource(val url: URL) : Resource {
-    override fun toStream(): InputStream = url.openStream()
-}
-
-fun URL.toResource(): Resource = URLResource(this)
