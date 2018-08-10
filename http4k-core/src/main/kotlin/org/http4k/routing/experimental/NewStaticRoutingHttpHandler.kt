@@ -1,9 +1,10 @@
-package org.http4k.routing
+package org.http4k.routing.experimental
 
 import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.routing.RoutingHttpHandler
 
 internal class NewResourceLoadingHandler(private val pathSegments: String,
                                          private val resourceLoader: NewResourceLoader,
@@ -16,7 +17,7 @@ internal class NewResourceLoadingHandler(private val pathSegments: String,
             resourceLoader.resourceFor(path)?.let { resource ->
                 val lookupType = extMap.forFile(path)
                 if (request.method == GET && lookupType != OCTET_STREAM) {
-                    resource.response(request).header("Content-Type", lookupType.value)
+                    resource.invoke(request).header("Content-Type", lookupType.value)
                 } else Response(NOT_FOUND)
             } ?: Response(NOT_FOUND)
         } else Response(NOT_FOUND)

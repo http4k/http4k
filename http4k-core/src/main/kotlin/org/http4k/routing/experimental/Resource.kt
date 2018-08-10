@@ -1,4 +1,4 @@
-package org.http4k.routing
+package org.http4k.routing.experimental
 
 import org.http4k.core.*
 import java.io.InputStream
@@ -7,7 +7,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-interface Resource {
+interface Resource : HttpHandler {
+
     fun toStream(): InputStream
 
     val length: Long? get() = null
@@ -21,13 +22,14 @@ interface Resource {
             "Last-Modified" to lastModified?.formattedWith(dateTimeFormatter)
         )
 
-    fun response(request: Request): Response = toStream().use { inputStream ->
-        val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
-        if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
-            MemoryResponse(Status.NOT_MODIFIED, headers)
-        else
-            MemoryResponse(Status.OK, headers, Body(inputStream, length))
-    }
+    override fun invoke(request: Request): Response =
+        toStream().use { inputStream ->
+            val ifModifiedSince = request.header("If-Modified-Since").parsedWith(dateTimeFormatter)
+            if (ifModifiedSince != null && !isModifiedSince(ifModifiedSince))
+                MemoryResponse(Status.NOT_MODIFIED, headers)
+            else
+                MemoryResponse(Status.OK, headers, Body(inputStream, length))
+        }
 }
 
 private val dateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC)
