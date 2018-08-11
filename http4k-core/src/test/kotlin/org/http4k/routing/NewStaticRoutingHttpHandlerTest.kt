@@ -8,7 +8,6 @@ import org.http4k.routing.experimental.NewStaticRoutingHttpHandler
 class NewStaticRoutingHttpHandlerTest : StaticRoutingHttpHandlerTest() {
     override val handler: RoutingHttpHandler = NewStaticRoutingHttpHandler(
         pathSegments = validPath,
-        resourceLoader = NewResourceLoader.Classpath(),
-        extraPairs = emptyMap()
+        resourceLoader = NewResourceLoader.Classpath()
     )
 }

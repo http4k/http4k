@@ -1,5 +1,6 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.MimeTypes
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -12,6 +13,7 @@ interface NewResourceLoader {
 
         fun Classpath(
             basePackagePath: String = "/",
+            mimeTypes: MimeTypes = MimeTypes(),
             constantLastModified: Instant? = Instant.now().truncatedTo(ChronoUnit.SECONDS), // see * below,
             lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
         ): ClasspathResourceLoader {
@@ -20,7 +22,7 @@ interface NewResourceLoader {
 
             // * Must truncate if we are not always to be ahead of the If-Last-Modified header because it doesn't support
             // fractions of seconds.
-            return ClasspathResourceLoader(basePackagePath, lastModifiedFinder)
+            return ClasspathResourceLoader(basePackagePath, mimeTypes, lastModifiedFinder)
         }
 
         fun Directory(baseDir: String) = DirectoryResourceLoader(baseDir)

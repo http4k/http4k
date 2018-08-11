@@ -17,12 +17,15 @@ interface Resource : HttpHandler {
 
     val lastModified: Instant? get() = null
 
+    val contentType: ContentType get() = ContentType.OCTET_STREAM
+
     val etag: ETag? get() = null
 
     fun isModifiedSince(instant: Instant): Boolean = lastModified?.isAfter(instant) ?: true
 
     val headers: Headers
         get() = listOf(
+            "Content-Type" to contentType.value,
             "Content-Length" to length?.toString(),
             "Last-Modified" to lastModified?.formattedWith(dateTimeFormatter),
             "ETag" to etag?.toHeaderString()
