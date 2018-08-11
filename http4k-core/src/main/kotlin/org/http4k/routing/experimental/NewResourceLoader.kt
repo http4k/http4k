@@ -1,7 +1,5 @@
 package org.http4k.routing.experimental
 
-import java.io.File
-import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -25,30 +23,6 @@ interface NewResourceLoader {
             return ClasspathResourceLoader(basePackagePath, lastModifiedFinder)
         }
 
-        fun Directory(baseDir: String) = object : NewResourceLoader {
-
-            override fun resourceFor(path: String) = File(finalBaseDir, path).let { f ->
-                if (!f.exists() || !f.isFile) null else FileResource(f)
-            }
-
-            private val finalBaseDir = if (baseDir.endsWith("/")) baseDir else "$baseDir/"
-        }
+        fun Directory(baseDir: String) = DirectoryResourceLoader(baseDir)
     }
 }
-
-class ClasspathResourceLoader(
-    basePackagePath: String,
-    private val lastModifiedFinder: (path: String) -> Instant?
-) : NewResourceLoader {
-
-    override fun resourceFor(path: String): Resource? {
-        val resourcePath = finalBasePath + path
-        return javaClass.getResource(resourcePath)?.toResource(lastModifiedFinder(resourcePath))
-    }
-
-    private val withStarting = if (basePackagePath.startsWith("/")) basePackagePath else "/$basePackagePath"
-    private val finalBasePath = if (withStarting.endsWith("/")) withStarting else "$withStarting/"
-}
-
-private fun URL.toResource(lastModified: Instant?): Resource = URLResource(this, lastModified)
-
