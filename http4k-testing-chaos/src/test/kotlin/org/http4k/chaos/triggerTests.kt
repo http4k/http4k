@@ -88,11 +88,12 @@ class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchR
     override val expectedJson = """{"path":".*bob","headers":{"header":".*header"},"queries":{"query":".*query"},"body":".*body","type":"request"}"""
 
     override val expectedDescription = "has Request that has Header 'header' that is not null & matches " +
-            ".*header and has Query 'query' that is not null & is not null & matches .*query and has Uri " +
+            ".*header and has Query 'query' that is not null & matches .*query and has Uri " +
             "that has Path that is not null & matches .*bob and has Body that is not null & matches .*body"
 
     @Test
     override fun `behaves as expected`() {
+
     }
 }
 

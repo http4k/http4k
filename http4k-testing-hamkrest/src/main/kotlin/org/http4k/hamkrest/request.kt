@@ -15,9 +15,9 @@ import org.http4k.lens.QueryLens
 
 fun <T> hasQuery(lens: QueryLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Query '${lens.meta.name}'", { req: Request -> lens(req) }, matcher))
 
-fun hasQuery(name: String, matcher: Matcher<CharSequence>): Matcher<Request> = has("Query '$name'", { req: Request -> req.query(name) }, present(matcher))
+fun hasQuery(name: String, matcher: Matcher<CharSequence?>): Matcher<Request> = has("Query '$name'", { req: Request -> req.query(name) }, matcher)
 
-fun hasQuery(name: String, expected: CharSequence): Matcher<Request> = hasQuery(name, present(equalTo(expected)))
+fun hasQuery(name: String, expected: CharSequence): Matcher<Request> = hasQuery(name, equalTo(expected))
 
 fun hasQuery(name: String, expected: Regex): Matcher<Request> = hasQuery(name, present(matches(expected)))
 
