@@ -20,7 +20,7 @@ class NewResourceLoadingHandlerTest {
 
     private val mimeTypes = MimeTypes()
     private val resources = HashMap<String, Resource>()
-    private val handler = NewResourceLoadingHandler("/root", InMemoryResourceLoader(resources), emptyMap())
+    private val handler = ResourceLoadingHandler("/root", InMemoryResourceLoader(resources), emptyMap())
     private val now = Instant.parse("2018-08-09T23:06:00Z")
 
     @Test fun `no resource returns NOT_FOUND`() {

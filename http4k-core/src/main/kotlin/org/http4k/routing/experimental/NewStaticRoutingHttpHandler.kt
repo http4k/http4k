@@ -6,9 +6,35 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.routing.RoutingHttpHandler
 
-internal class NewResourceLoadingHandler(private val pathSegments: String,
-                                         private val resourceLoader: NewResourceLoader,
-                                         extraPairs: Map<String, ContentType>) : HttpHandler {
+internal data class NewStaticRoutingHttpHandler(
+    private val pathSegments: String,
+    private val resourceLoader: NewResourceLoader,
+    private val extraPairs: Map<String, ContentType>,
+    private val filter: Filter = Filter.NoOp
+) : RoutingHttpHandler {
+
+    override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
+
+    override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
+
+    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs)
+    private val handlerWithFilter = filter.then(handlerNoFilter)
+
+    override fun match(request: Request): HttpHandler? = handlerNoFilter(request).let {
+        if (it.status != NOT_FOUND) filter.then { _: Request -> it } else null
+    }
+
+    override fun invoke(request: Request): Response = handlerWithFilter(request)
+}
+
+fun static(resourceLoader: NewResourceLoader, vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
+    NewStaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
+
+internal class ResourceLoadingHandler(
+    private val pathSegments: String,
+    private val resourceLoader: NewResourceLoader,
+    extraPairs: Map<String, ContentType>
+) : HttpHandler {
     private val extMap = MimeTypes(extraPairs)
 
     override fun invoke(request: Request): Response =
@@ -28,27 +54,3 @@ internal class NewResourceLoadingHandler(private val pathSegments: String,
         return resolved.replaceFirst("/", "")
     }
 }
-
-
-internal data class NewStaticRoutingHttpHandler(private val pathSegments: String,
-                                                private val resourceLoader: NewResourceLoader,
-                                                private val extraPairs: Map<String, ContentType>,
-                                                private val filter: Filter = Filter.NoOp
-) : RoutingHttpHandler {
-
-    override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))
-
-    override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
-
-    private val handlerNoFilter = NewResourceLoadingHandler(pathSegments, resourceLoader, extraPairs)
-    private val handlerWithFilter = filter.then(handlerNoFilter)
-
-    override fun match(request: Request): HttpHandler? = handlerNoFilter(request).let {
-        if (it.status != NOT_FOUND) filter.then { _: Request -> it } else null
-    }
-
-    override fun invoke(request: Request): Response = handlerWithFilter(request)
-}
-
-fun static(resourceLoader: NewResourceLoader, vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
-    NewStaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
