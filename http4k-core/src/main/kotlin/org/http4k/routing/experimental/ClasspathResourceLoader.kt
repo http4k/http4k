@@ -17,4 +17,7 @@ data class ClasspathResourceLoader(
     }
 }
 
+
+private fun String.orIndexFile() = if (isEmpty() || endsWith("/")) pathJoin("index.html") else this
+
 private fun URL.toResource(contentType: ContentType, lastModified: Instant?) = URLResource(this, contentType, lastModified)
