@@ -1,9 +1,9 @@
 package org.http4k.chaos
 
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.chaos.ChaosBehaviour.Companion.ReturnStatus
-import org.http4k.chaos.ChaosPolicy.Companion.Always
-import org.http4k.chaos.ChaosStage.Companion.Wait
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosPolicies.Always
+import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST

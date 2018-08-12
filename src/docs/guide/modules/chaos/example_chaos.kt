@@ -1,12 +1,15 @@
 package guide.modules.chaos
 
-import org.http4k.chaos.ChaosBehaviour.Companion.BlockThread
-import org.http4k.chaos.ChaosBehaviour.Companion.ReturnStatus
-import org.http4k.chaos.ChaosPolicy.Companion.Always
-import org.http4k.chaos.ChaosPolicy.Companion.Only
-import org.http4k.chaos.ChaosPolicy.Companion.PercentageBased
-import org.http4k.chaos.ChaosStage.Companion.Wait
+import org.http4k.chaos.ChaosBehaviours.BlockThread
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosPolicies.Always
+import org.http4k.chaos.ChaosPolicies.Only
+import org.http4k.chaos.ChaosPolicies.PercentageBased
+import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.SwitchTrigger
+import org.http4k.chaos.asFilter
+import org.http4k.chaos.then
+import org.http4k.chaos.until
 import org.http4k.chaos.withChaosControls
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
