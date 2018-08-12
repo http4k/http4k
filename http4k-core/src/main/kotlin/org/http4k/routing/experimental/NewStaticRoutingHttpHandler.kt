@@ -34,10 +34,10 @@ internal class ResourceLoadingHandler(
 
     override fun invoke(request: Request): Response =
         if (request.method == GET && request.uri.path.startsWith(pathSegments)) {
-            val path = convertPath(request.uri.path)
-            resourceLoader(path)?.invoke(request) ?: Response(NOT_FOUND)
+            resourceLoader(convertPath(request.uri.path))?.invoke(request) ?: Response(NOT_FOUND)
         }
-        else Response(NOT_FOUND)
+        else
+            Response(NOT_FOUND)
 
     private fun convertPath(path: String) =
         if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")
