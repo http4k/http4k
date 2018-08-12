@@ -83,9 +83,9 @@ object ChaosTriggers {
     /**
      * Activates when matching attributes of a single sent response are met.
      */
-    data class MatchResponse(val status: Int?,
-                             val headers: Map<String, Regex>?,
-                             val body: Regex?) : HttpTransactionTrigger("response") {
+    data class MatchResponse(val status: Int? = null,
+                             val headers: Map<String, Regex>? = null,
+                             val body: Regex? = null) : HttpTransactionTrigger("response") {
         override fun matcher() = {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val statusMatcher = status?.let { listOf(hasStatus((Status(it, "")))) } ?: emptyList()

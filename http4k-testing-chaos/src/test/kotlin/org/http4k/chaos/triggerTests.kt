@@ -12,6 +12,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asA
@@ -132,6 +133,7 @@ class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchR
 }
 
 class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(MatchResponse::class) {
+
     override val trigger = MatchResponse(200,
             mapOf("header" to Regex(".*header")),
             Regex(".*body"))
@@ -141,11 +143,32 @@ class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(Matc
     override val expectedDescription = "has Response that anything and has Header 'header' that is not null & " +
             "matches .*header and has status that is equal to 200  and has Body that is not null & matches .*body"
 
-    @Test
-    fun `behaves as expected`() {
-
-
+    private fun assertMatchNoMatch(s: SerializableTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+        assertThat(s(clock)(match), equalTo(true))
+        assertThat(s(clock)(noMatch), equalTo(false))
     }
+
+    @Test
+    fun `matches header`() {
+        assertMatchNoMatch(MatchResponse(headers = mapOf("header" to Regex(".*bob"))),
+                tx.copy(response = tx.response.header("header", "abob")),
+                tx.copy(response = tx.response.header("header", "bill")))
+    }
+
+    @Test
+    fun `matches status`() {
+        assertMatchNoMatch(MatchResponse(status = 200),
+                tx.copy(response = Response(OK)),
+                tx.copy(response = Response(NOT_FOUND)))
+    }
+
+    @Test
+    fun `matches body`() {
+        assertMatchNoMatch(MatchResponse(body = Regex(".*bob")),
+                tx.copy(response = tx.response.body("abob")),
+                tx.copy(response = tx.response.body("bill")))
+    }
+
 }
 
 class SwitchTriggerTest {
