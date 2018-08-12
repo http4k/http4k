@@ -12,6 +12,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.experimental.ResourceLoaders.Classpath
 import org.http4k.routing.experimental.ResourceLoaders.Directory
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -73,13 +74,20 @@ class DirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test
     }
 }
 
-class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test/resources", directoryLister = DirectoryListingResource)) {
+class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(
+    Directory("./src/test/resources", directoryLister = directoryListing(::simpleDirectoryRenderer))) {
 
     @Test
     fun `lists directory`() {
-        val expected = """<ol>
-            |<li><a href="/org/http4k/routing/StaticRouter.js">StaticRouter.js</a></li>
-            |</ol>""".trimMargin()
+        @Language("HTML") val expected = """
+        <html>
+            <body>
+                <h1>/org/http4k/routing</h1>
+                <ol>
+                    <li><a href="/org/http4k/routing/StaticRouter.js">StaticRouter.js</a></li>
+                <ol>
+            </body>
+        </html>""".trimIndent()
         checkContents("org/http4k/routing", expected, TEXT_HTML)
     }
 }
