@@ -82,7 +82,7 @@ class ChaosBehavioursTest {
 
     @Test
     fun `should return no body`() {
-        val noBody = NoBody()
+        val noBody = NoBody
         noBody.toString() shouldMatch equalTo(("NoBody"))
 
         noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
@@ -90,7 +90,7 @@ class ChaosBehavioursTest {
 
     @Test
     fun `should block thread`() {
-        val blockThread = BlockThread()
+        val blockThread = BlockThread
         blockThread.toString() shouldMatch equalTo(("BlockThread"))
         val latch = CountDownLatch(1)
         thread {
@@ -103,7 +103,7 @@ class ChaosBehavioursTest {
 
     @Test
     fun `should eat memory`() {
-        val eatMemory = EatMemory()
+        val eatMemory = EatMemory
         eatMemory.toString() shouldMatch equalTo(("EatMemory"))
 
         assertThat({ eatMemory(tx) }, throws<OutOfMemoryError>())
@@ -121,7 +121,7 @@ class ChaosBehavioursTest {
         val variable = Variable()
         variable.toString() shouldMatch equalTo(("Variable [None]"))
         variable(tx) shouldMatch equalTo(tx.response)
-        variable.current = NoBody()
+        variable.current = NoBody
         variable.toString() shouldMatch equalTo(("Variable [NoBody]"))
         variable(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
@@ -129,7 +129,7 @@ class ChaosBehavioursTest {
     @Test
     @Disabled // untestable
     fun `should stack overflow`() {
-        val stackOverflow = StackOverflow()
+        val stackOverflow = StackOverflow
         stackOverflow.toString() shouldMatch equalTo(("StackOverflow"))
         stackOverflow(tx)
     }
@@ -137,7 +137,7 @@ class ChaosBehavioursTest {
     @Test
     @Disabled // untestable
     fun `should kill process`() {
-        val killProcess = KillProcess()
+        val killProcess = KillProcess
         killProcess.toString() shouldMatch equalTo(("KillProcess"))
         killProcess(tx)
     }

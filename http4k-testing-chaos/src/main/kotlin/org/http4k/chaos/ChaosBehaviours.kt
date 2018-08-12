@@ -25,35 +25,35 @@ object ChaosBehaviours {
     /**
      * Blocks the thread for a random amount of time within the allocated range.
      */
-    object Latency {
-        operator fun invoke(latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) = object : ChaosBehaviour {
-            override fun invoke(tx: HttpTransaction): Response {
-                val delay = ThreadLocalRandom.current()
-                        .nextInt(latencyRange.start.toMillis().toInt(), latencyRange.endInclusive.toMillis().toInt())
-                sleep(delay.toLong())
-                return tx.response.with(Header.Common.CHAOS of "Latency (${delay}ms)")
-            }
-
-            override fun toString() = "Latency (range = ${latencyRange.start} to ${latencyRange.start})"
+    data class Latency(private val latencyRange: ClosedRange<Duration> = ofMillis(100)..ofMillis(500)) : ChaosBehaviour {
+        override fun invoke(tx: HttpTransaction): Response {
+            val delay = ThreadLocalRandom.current()
+                    .nextInt(latencyRange.start.toMillis().toInt(), latencyRange.endInclusive.toMillis().toInt())
+            sleep(delay.toLong())
+            return tx.response.with(Header.Common.CHAOS of "Latency (${delay}ms)")
         }
 
-        /**
-         * Get a latency range from the environment.
-         * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
-         */
-        fun fromEnv(env: (String) -> String? = System::getenv,
-                    defaultMin: Duration = Duration.ofMillis(100),
-                    defaultMax: Duration = Duration.ofMillis(500),
-                    minName: String = "CHAOS_LATENCY_MS_MIN",
-                    maxName: String = "CHAOS_LATENCY_MS_MAX"
-        ) = Latency((env(minName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMin)..
-                (env(maxName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMax))
+        override fun toString() = "Latency (range = ${latencyRange.start} to ${latencyRange.start})"
+
+        companion object {
+            /**
+             * Get a latency range from the environment.
+             * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
+             */
+            fun fromEnv(env: (String) -> String? = System::getenv,
+                        defaultMin: Duration = Duration.ofMillis(100),
+                        defaultMax: Duration = Duration.ofMillis(500),
+                        minName: String = "CHAOS_LATENCY_MS_MIN",
+                        maxName: String = "CHAOS_LATENCY_MS_MAX"
+            ) = Latency((env(minName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMin)..
+                    (env(maxName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMax))
+        }
     }
 
     /**
      * Throws the appropriate exception.
      */
-    fun ThrowException(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
+    data class ThrowException(val e: Throwable = Exception("Chaos behaviour injected!")) : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = throw e
         override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
     }
@@ -61,7 +61,7 @@ object ChaosBehaviours {
     /**
      * Returns an empty response with the appropriate status.
      */
-    fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
+    data class ReturnStatus(val status: Status = INTERNAL_SERVER_ERROR) : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
         override fun toString() = "ReturnStatus (${status.code})"
     }
@@ -69,7 +69,7 @@ object ChaosBehaviours {
     /**
      * Strips the body from a response.
      */
-    fun NoBody() = object : ChaosBehaviour {
+    object NoBody : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
         override fun toString() = "NoBody"
     }
@@ -77,7 +77,7 @@ object ChaosBehaviours {
     /**
      * Allocates memory in a busy loop until an OOM occurs.
      */
-    fun EatMemory() = object : ChaosBehaviour {
+    object EatMemory : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = tx.response.apply {
             mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
         }
@@ -88,7 +88,7 @@ object ChaosBehaviours {
     /**
      * Allocates memory in a busy loop until an OOM occurs.
      */
-    fun StackOverflow() = object : ChaosBehaviour {
+    object StackOverflow : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction): Response {
             fun overflow(): Unit = overflow()
             return tx.response.apply { overflow() }
@@ -100,7 +100,7 @@ object ChaosBehaviours {
     /**
      * System exits from the process.
      */
-    fun KillProcess() = object : ChaosBehaviour {
+    object KillProcess : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
         override fun toString() = "KillProcess"
     }
@@ -108,7 +108,7 @@ object ChaosBehaviours {
     /**
      * Blocks the current thread.
      */
-    fun BlockThread() = object : ChaosBehaviour {
+    object BlockThread : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
         override fun toString() = "BlockThread"
     }
@@ -124,7 +124,7 @@ object ChaosBehaviours {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: ChaosBehaviour = None) : ChaosBehaviour {
+    data class Variable(var current: ChaosBehaviour = None) : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = current(tx)
         override fun toString() = "Variable [$current]"
     }
