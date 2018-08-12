@@ -28,9 +28,8 @@ abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
         checkContents("/", "hello from the root index.html", TEXT_HTML)
     }
 
-    @Disabled("Doesn't yet work")
     @Test
-    fun `loads embedded index file`() {
+    open fun `loads embedded index file`() {
         checkContents("org", "hello from the io index.html", TEXT_HTML)
         checkContents("org/", "hello from the io index.html", TEXT_HTML)
     }
@@ -45,12 +44,12 @@ abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
         checkContents("notAFile", null, TEXT_HTML)
     }
 
-    private fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
+    protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         if (expected == null)
             assertThat(loader("notAFile"), absent())
         else {
             val resource = loader(path)!!
-            val response = resource(Request(Method.GET, "dummy"))
+            val response = resource(Request(Method.GET, path))
             assertThat(response, hasBody(expected))
             assertThat(response, hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", null))
             assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirective().toHeaderValue()))
@@ -58,6 +57,29 @@ abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
     }
 }
 
-class ClasspathResourceLoaderTest : ResourceLoaderContract(Classpath("/"))
+class ClasspathResourceLoaderTest : ResourceLoaderContract(Classpath("/")) {
 
-class DirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test/resources"))
+    @Disabled
+    override fun `loads embedded index file`() {
+        super.`loads embedded index file`()
+    }
+}
+
+class DirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test/resources")) {
+
+    @Test
+    fun `does not list directory`() {
+        checkContents("org/http4k/routing", null, TEXT_HTML)
+    }
+}
+
+class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test/resources", directoryLister = DirectoryListingResource)) {
+
+    @Test
+    fun `lists directory`() {
+        val expected = """<ol>
+            |<li><a href="/org/http4k/routing/StaticRouter.js">StaticRouter.js</a></li>
+            |</ol>""".trimMargin()
+        checkContents("org/http4k/routing", expected, TEXT_HTML)
+    }
+}

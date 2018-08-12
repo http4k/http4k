@@ -2,6 +2,7 @@ package org.http4k.routing.experimental
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
+import java.io.File
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -23,6 +24,10 @@ object ResourceLoaders {
         return ClasspathResourceLoader(basePackagePath, mimeTypes, lastModifiedFinder)
     }
 
-    fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()) = DirectoryResourceLoader(baseDir, mimeTypes)
+    fun Directory(
+        baseDir: String,
+        mimeTypes: MimeTypes = MimeTypes(),
+        directoryLister: ((File) -> HttpHandler)? = null
+    ) = DirectoryResourceLoader(baseDir, mimeTypes, directoryLister)
 }
 

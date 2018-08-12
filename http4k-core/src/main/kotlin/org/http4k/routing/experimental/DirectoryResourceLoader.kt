@@ -1,16 +1,22 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
 import java.io.File
 
 data class DirectoryResourceLoader(
-    private val baseDir: String,
-    private val mimeTypes: MimeTypes = MimeTypes()
+    val baseDir: String,
+    val mimeTypes: MimeTypes = MimeTypes(),
+    val directoryLister: ((File) -> HttpHandler)? = null
 ) : NewResourceLoader {
 
-    override fun invoke(path: String): FileResource? {
-        val resolved = baseDir.pathJoin(path.orIndexFile())
+    override fun invoke(path: String): HttpHandler? {
+        val resolved = baseDir.pathJoin(path)
         val f = File(resolved)
-        return if (!f.exists() || !f.isFile) null else FileResource(f, mimeTypes.forFile(resolved))
+        return when {
+            f.isFile -> FileResource(f, mimeTypes.forFile(resolved))
+            f.isDirectory -> invoke(path.pathJoin("index.html")) ?: directoryLister?.invoke(f)
+            else -> null
+        }
     }
 }
