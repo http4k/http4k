@@ -12,3 +12,5 @@ fun String.orIndexFile() =
 fun String.withoutTrailingSlash() = if (this.endsWith("/")) this.dropLast(1) else this
 
 fun String.withoutLeadingSlash() = if (this.startsWith("/")) this.drop(1) else this
+
+fun String.withLeadingSlash() = if (this.startsWith("/")) this else "/$this"

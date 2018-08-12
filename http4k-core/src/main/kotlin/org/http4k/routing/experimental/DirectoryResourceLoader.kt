@@ -3,7 +3,7 @@ package org.http4k.routing.experimental
 import org.http4k.core.MimeTypes
 import java.io.File
 
-class DirectoryResourceLoader(
+data class DirectoryResourceLoader(
     private val baseDir: String,
     private val mimeTypes: MimeTypes = MimeTypes()
 ) : NewResourceLoader {
