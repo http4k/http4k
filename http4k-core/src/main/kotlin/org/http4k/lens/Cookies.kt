@@ -8,5 +8,5 @@ import org.http4k.lens.ParamMeta.StringParam
 
 object Cookies : BiDiLensSpec<Request, Cookie>("cookie", StringParam,
     LensGet { name, target -> target.cookies().filter { it.name == name } },
-    LensSet { _, values, target -> values.fold(target, { m, (name, value) -> m.cookie(name, value) }) }
+    LensSet { _, values, target -> values.fold(target) { m, (name, value) -> m.cookie(name, value) } }
 )
