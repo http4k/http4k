@@ -44,9 +44,6 @@ abstract class SerializableTriggerContract<T : SerializableTrigger>(private val 
     fun `describes itself`() {
         assertThat(trigger(clock).toString(), equalTo(expectedDescription))
     }
-
-    @Test
-    abstract fun `behaves as expected`()
 }
 
 class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::class) {
@@ -55,7 +52,7 @@ class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::clas
     override val expectedDescription = "Deadline (1970-01-01T00:00:00Z)"
 
     @Test
-    override fun `behaves as expected`() {
+    fun `behaves as expected`() {
         val clock = Clock.systemUTC()
         val trigger = ChaosTriggers.Deadline(now(clock).plusMillis(100))(clock)
         trigger(tx) shouldMatch equalTo(false)
@@ -70,7 +67,7 @@ class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
     override val expectedDescription = "Delay (expires 1970-01-01T00:00:00.100Z)"
 
     @Test
-    override fun `behaves as expected`() {
+    fun `behaves as expected`() {
         val clock = Clock.systemDefaultZone()
         val trigger = ChaosTriggers.Delay(Duration.ofMillis(100), clock)(clock)
         trigger(tx) shouldMatch equalTo(false)
@@ -91,9 +88,37 @@ class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchR
             ".*header and has Query 'query' that is not null & matches .*query and has Uri " +
             "that has Path that is not null & matches .*bob and has Body that is not null & matches .*body"
 
-    @Test
-    override fun `behaves as expected`() {
+    private fun assertMatchNoMatch(s: SerializableTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+        assertThat(s(clock)(match), equalTo(true))
+        assertThat(s(clock)(noMatch), equalTo(false))
+    }
 
+    @Test
+    fun `matches path`() {
+        assertMatchNoMatch(MatchRequest(path = Regex(".*bob")),
+                tx.copy(Request(GET, "/abob")),
+                tx.copy(Request(GET, "/bill")))
+    }
+
+    @Test
+    fun `matches header`() {
+        assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
+                tx.copy(tx.request.header("header", "abob")),
+                tx.copy(tx.request.header("header", "bill")))
+    }
+
+    @Test
+    fun `matches query`() {
+        assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
+                tx.copy(tx.request.query("query", "abob")),
+                tx.copy(tx.request.query("query", "bill")))
+    }
+
+    @Test
+    fun `matches body`() {
+        assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
+                tx.copy(tx.request.body("abob")),
+                tx.copy(tx.request.body("bill")))
     }
 }
 
@@ -106,8 +131,11 @@ class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(Matc
 
     override val expectedDescription = "has Response that anything and has Header 'header' that is not null & " +
             "matches .*header and has status that is equal to 200  and has Body that is not null & matches .*body"
+
     @Test
-    override fun `behaves as expected`() {
+    fun `behaves as expected`() {
+
+
     }
 }
 

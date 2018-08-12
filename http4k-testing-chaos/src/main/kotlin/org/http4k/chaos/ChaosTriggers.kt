@@ -62,10 +62,10 @@ object ChaosTriggers {
     /**
      * Activates when matching attributes of a single received request are met.
      */
-    data class MatchRequest(val path: Regex?,
-                            val headers: Map<String, Regex>?,
-                            val queries: Map<String, Regex>?,
-                            val body: Regex?) : HttpTransactionTrigger("request") {
+    data class MatchRequest(val path: Regex? = null,
+                            val headers: Map<String, Regex>? = null,
+                            val queries: Map<String, Regex>? = null,
+                            val body: Regex? = null) : HttpTransactionTrigger("request") {
         override fun matcher() = {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
