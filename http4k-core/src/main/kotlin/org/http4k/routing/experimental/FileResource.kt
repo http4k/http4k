@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.time.Instant
 
 
-data class FileResource(
+open class FileResource(
     val file: File,
     override val contentType: ContentType
 ) : Resource {
