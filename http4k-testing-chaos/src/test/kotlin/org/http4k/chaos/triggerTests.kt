@@ -9,6 +9,7 @@ import org.http4k.chaos.ChaosTriggers.MatchRequest
 import org.http4k.chaos.ChaosTriggers.MatchResponse
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -77,16 +78,17 @@ class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
 }
 
 class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchRequest::class) {
-    override val trigger = MatchRequest(Regex(".*bob"),
-            mapOf("header" to Regex(".*header")),
+    override val trigger = MatchRequest("get", Regex(".*bob"),
             mapOf("query" to Regex(".*query")),
+            mapOf("header" to Regex(".*header")),
             Regex(".*body"))
 
-    override val expectedJson = """{"path":".*bob","headers":{"header":".*header"},"queries":{"query":".*query"},"body":".*body","type":"request"}"""
+    override val expectedJson = """{"method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body","type":"request"}"""
 
-    override val expectedDescription = "has Request that has Header 'header' that is not null & matches " +
-            ".*header and has Query 'query' that is not null & matches .*query and has Uri " +
-            "that has Path that is not null & matches .*bob and has Body that is not null & matches .*body"
+
+    override val expectedDescription = "has Request that has Method that is equal to GET and has Uri that has Path " +
+            "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
+            " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
 
     private fun assertMatchNoMatch(s: SerializableTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
         assertThat(s(clock)(match), equalTo(true))
@@ -119,6 +121,13 @@ class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchR
         assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
                 tx.copy(tx.request.body("abob")),
                 tx.copy(tx.request.body("bill")))
+    }
+
+    @Test
+    fun `matches method`() {
+        assertMatchNoMatch(MatchRequest(method = "put"),
+                tx.copy(Request(PUT, "/abob")),
+                tx.copy(Request(GET, "/abob")))
     }
 }
 

@@ -4,10 +4,12 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
 import org.http4k.core.HttpTransaction
+import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasMethod
 import org.http4k.hamkrest.hasQuery
 import org.http4k.hamkrest.hasRequest
 import org.http4k.hamkrest.hasResponse
@@ -62,16 +64,18 @@ object ChaosTriggers {
     /**
      * Activates when matching attributes of a single received request are met.
      */
-    data class MatchRequest(val path: Regex? = null,
-                            val headers: Map<String, Regex>? = null,
+    data class MatchRequest(val method: String? = null,
+                            val path: Regex? = null,
                             val queries: Map<String, Regex>? = null,
+                            val headers: Map<String, Regex>? = null,
                             val body: Regex? = null) : HttpTransactionTrigger("request") {
         override fun matcher() = {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
             val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
             val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
-            val all = headerMatchers + queriesMatchers + pathMatchers + bodyMatchers
+            val methodMatchers = method?.let { listOf(hasMethod(Method.valueOf(it.toUpperCase()))) } ?: emptyList()
+            val all = methodMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
             if (all.isEmpty()) hasRequest(anything) else hasRequest(all.reduce { acc, next -> acc and next })
         }()
     }
