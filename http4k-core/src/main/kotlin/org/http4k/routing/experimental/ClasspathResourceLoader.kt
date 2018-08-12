@@ -11,7 +11,7 @@ class ClasspathResourceLoader(
     private val lastModifiedFinder: (path: String) -> Instant?
 ) : NewResourceLoader {
 
-    override fun resourceFor(path: String): Resource? {
+    override fun invoke(path: String): Resource? {
         val resourcePath = finalBasePath.pathJoin(path.orIndexFile())
         return javaClass.getResource(resourcePath)?.toResource(mimeTypes.forFile(resourcePath), lastModifiedFinder(resourcePath))
     }
