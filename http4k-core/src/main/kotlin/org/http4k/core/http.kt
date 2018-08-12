@@ -239,7 +239,7 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
             && body == other.body)
 }
 
-fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this, { memo, next -> next(memo) })
+fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
 
 fun String.toBody(): Body = Body(this)
 
