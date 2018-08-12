@@ -67,8 +67,8 @@ class ChaosBehavioursTest {
             put("CHAOS_LATENCY_MS_MAX", "1000000")
         }
 
-        Latency.fromEnv(props::getProperty).toString() shouldMatch equalTo(("Latency (range = PT1S to PT1S)"))
-        Latency.fromEnv().toString() shouldMatch equalTo(("Latency (range = PT0.1S to PT0.1S)"))
+        Latency.fromEnv(props::getProperty).toString() shouldMatch equalTo(("Latency (range = PT1S to PT16M40S)"))
+        Latency.fromEnv().toString() shouldMatch equalTo(("Latency (range = PT0.1S to PT0.5S)"))
     }
 
     @Test
@@ -83,7 +83,7 @@ class ChaosBehavioursTest {
     @Test
     fun `should return no body`() {
         val noBody = NoBody
-        noBody.toString() shouldMatch equalTo(("NoBody"))
+        noBody.toString() shouldMatch equalTo("NoBody")
 
         noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
