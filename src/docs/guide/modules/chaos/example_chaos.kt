@@ -8,6 +8,7 @@ import org.http4k.chaos.ChaosPolicies.PercentageBased
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.SwitchTrigger
 import org.http4k.chaos.asFilter
+import org.http4k.chaos.inject
 import org.http4k.chaos.then
 import org.http4k.chaos.until
 import org.http4k.chaos.withChaosControls

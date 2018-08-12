@@ -11,36 +11,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-interface ChaosStage {
-    operator fun invoke(tx: HttpTransaction): Response?
-}
-
-object ChaosStages {
-    /**
-     * Repeats a stage (or composite stage in repeating pattern). Since ChaosStages are STATEFUL,
-     * the stage function will be fired on each iteration and expecting a NEW instance.
-     */
-    fun Repeat(newStageFn: () -> ChaosStage): ChaosStage = object : ChaosStage {
-        private val current by lazy { AtomicReference(newStageFn()) }
-
-        override fun invoke(tx: HttpTransaction): Response? =
-                current.get()(tx) ?: run {
-                    current.set(newStageFn())
-                    current.get()(tx)
-                }
-
-        override fun toString() = "Repeat ${current.get()}"
-    }
-
-    /**
-     * Does not apply any ChaosBehaviour.
-     */
-    object Wait : ChaosStage {
-        override fun invoke(tx: HttpTransaction) = tx.response
-        override fun toString() = "Wait"
-    }
-}
-
+typealias ChaosStage = (HttpTransaction) -> Response?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
@@ -79,5 +50,31 @@ fun ChaosStage.asFilter(clock: Clock = Clock.systemUTC()): Filter = let {
                 }
             }
         }
+    }
+}
+
+object ChaosStages {
+    /**
+     * Repeats a stage (or composite stage in repeating pattern). Since ChaosStages are STATEFUL,
+     * the stage function will be fired on each iteration and expecting a NEW instance.
+     */
+    fun Repeat(newStageFn: () -> ChaosStage): ChaosStage = object : ChaosStage {
+        private val current by lazy { AtomicReference(newStageFn()) }
+
+        override fun invoke(tx: HttpTransaction): Response? =
+                current.get()(tx) ?: run {
+                    current.set(newStageFn())
+                    current.get()(tx)
+                }
+
+        override fun toString() = "Repeat ${current.get()}"
+    }
+
+    /**
+     * Does not apply any ChaosBehaviour.
+     */
+    object Wait : ChaosStage {
+        override fun invoke(tx: HttpTransaction) = tx.response
+        override fun toString() = "Wait"
     }
 }

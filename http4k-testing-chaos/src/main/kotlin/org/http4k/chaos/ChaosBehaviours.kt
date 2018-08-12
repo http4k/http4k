@@ -17,9 +17,7 @@ val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
  */
-interface ChaosBehaviour {
-    operator fun invoke(tx: HttpTransaction): Response
-}
+typealias ChaosBehaviour = (HttpTransaction) -> Response
 
 object ChaosBehaviours {
     /**
