@@ -22,6 +22,7 @@ import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -101,6 +102,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 }
 
 object Gson : ConfigurableGson(GsonBuilder()
+        .registerTypeAdapter(Duration::class.java, custom(Duration::parse))
         .registerTypeAdapter(LocalTime::class.java, custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
         .registerTypeAdapter(LocalDate::class.java, custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
         .registerTypeAdapter(LocalDateTime::class.java, custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))

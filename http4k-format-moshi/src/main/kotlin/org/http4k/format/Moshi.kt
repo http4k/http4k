@@ -15,6 +15,7 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.net.URL
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,6 +47,7 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 object Moshi : ConfigurableMoshi(Moshi.Builder()
+        .add(custom(Duration::parse))
         .add(custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
         .add(custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
         .add(custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
