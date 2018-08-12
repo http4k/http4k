@@ -17,7 +17,9 @@ val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
  */
-typealias ChaosBehaviour = (HttpTransaction) -> Response
+interface ChaosBehaviour {
+    operator fun invoke(tx: HttpTransaction): Response
+}
 
 abstract class SerializableBehaviour(val type: String) : ChaosBehaviour
 
@@ -25,8 +27,7 @@ object ChaosBehaviours {
     /**
      * Blocks the thread for a random amount of time within the allocated range.
      */
-    data class Latency(private val min: Duration = ofMillis(100), private val max: Duration = ofMillis(500))
-        : SerializableBehaviour("latency") {
+    data class Latency(val min: Duration = ofMillis(100), val max: Duration = ofMillis(500)) : SerializableBehaviour("latency") {
         constructor(latencyRange: ClosedRange<Duration>) : this(latencyRange.start, latencyRange.endInclusive)
 
         override fun invoke(tx: HttpTransaction): Response {
@@ -56,10 +57,15 @@ object ChaosBehaviours {
     /**
      * Throws the appropriate exception.
      */
-    data class ThrowException(private val e: Throwable = Exception("Chaos behaviour injected!")) : SerializableBehaviour("throw") {
-        override fun invoke(tx: HttpTransaction) = throw e
-        override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
+    data class ThrowException private constructor(val message: String, private val e: Throwable?) : SerializableBehaviour("throw") {
+        constructor(e: Throwable = Exception("Chaos behaviour injected!")) : this(e.localizedMessage, e)
+
+        private fun fallback() = e ?: Exception(message)
+
+        override fun invoke(tx: HttpTransaction): Nothing = throw fallback()
+        override fun toString() = "ThrowException ${fallback().javaClass.simpleName} ${fallback().message}"
     }
+
 
     /**
      * Returns an empty response with the appropriate status.

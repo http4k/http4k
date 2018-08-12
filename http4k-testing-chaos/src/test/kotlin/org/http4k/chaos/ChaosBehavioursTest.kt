@@ -21,6 +21,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.asA
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,18 +34,39 @@ import java.util.Properties
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
+import kotlin.reflect.KClass
 
-class ChaosBehavioursTest {
-    private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), ZERO)
+private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), ZERO)
+
+abstract class SerializableBehaviourContract<T : SerializableBehaviour>(private val clazz: KClass<T>) {
+    abstract val behaviour: T
+    abstract val expectedJson: String
+    abstract val expectedDescription: String
 
     @Test
-    fun `exception throwing behaviour should throw exception`() {
-        val expected = RuntimeException("foo")
-        val throwException = ThrowException(expected)
-        throwException.toString() shouldMatch equalTo(("ThrowException RuntimeException foo"))
-
-        assertThat({ throwException(tx) }, throws(equalTo(expected)))
+    fun `is roundtrippable to JSON`() {
+        val asJson = Jackson.asJsonString(behaviour)
+        assertThat(asJson, equalTo(expectedJson))
+        assertThat(asJson.asA(clazz).toString(), equalTo(behaviour.toString()))
     }
+
+    @Test
+    fun `describes itself`() {
+        assertThat(behaviour.toString(), equalTo(expectedDescription))
+    }
+}
+
+class NoBodyBehaviourTest : SerializableBehaviourContract<NoBody>(NoBody::class) {
+    override val behaviour = NoBody
+    override val expectedJson = """{"type":"body"}"""
+    override val expectedDescription = "NoBody"
+}
+
+
+class LatencyBehaviourTest : SerializableBehaviourContract<Latency>(Latency::class) {
+    override val behaviour = Latency(ofMillis(10), ofMillis(1000))
+    override val expectedJson = """{"min":"PT0.01S","max":"PT1S","type":"latency"}"""
+    override val expectedDescription = "Latency (range = PT0.01S to PT1S)"
 
     @Test
     @Disabled
@@ -70,6 +93,25 @@ class ChaosBehavioursTest {
         Latency.fromEnv(props::getProperty).toString() shouldMatch equalTo(("Latency (range = PT1S to PT16M40S)"))
         Latency.fromEnv().toString() shouldMatch equalTo(("Latency (range = PT0.1S to PT0.5S)"))
     }
+}
+
+class ThrowExceptionBehaviourTest : SerializableBehaviourContract<ThrowException>(ThrowException::class) {
+    override val behaviour = ThrowException(Exception("boo"))
+    override val expectedJson = """{"message":"boo","type":"throw"}"""
+    override val expectedDescription = "ThrowException Exception boo"
+
+    @Test
+    fun `exception throwing behaviour should throw exception`() {
+        val expected = RuntimeException("foo")
+        val throwException = ThrowException(expected)
+        throwException.toString() shouldMatch equalTo(("ThrowException RuntimeException foo"))
+
+        assertThat({ throwException(tx) }, throws(equalTo(expected)))
+    }
+
+}
+
+class ChaosBehavioursTest {
 
     @Test
     fun `should return response with internal server error status`() {
