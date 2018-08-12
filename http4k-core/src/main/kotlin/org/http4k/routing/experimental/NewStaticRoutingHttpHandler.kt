@@ -35,7 +35,7 @@ internal class ResourceLoadingHandler(
     override fun invoke(request: Request): Response =
         if (request.method == GET && request.uri.path.startsWith(pathSegments)) {
             val path = convertPath(request.uri.path)
-            resourceLoader.resourceFor(path)?.invoke(request) ?: Response(NOT_FOUND)
+            resourceLoader(path)?.invoke(request) ?: Response(NOT_FOUND)
         }
         else Response(NOT_FOUND)
 

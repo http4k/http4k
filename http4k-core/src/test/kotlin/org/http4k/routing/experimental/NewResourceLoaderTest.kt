@@ -2,16 +2,20 @@ package org.http4k.routing.experimental
 
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.or
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.routing.experimental.NewResourceLoader.Companion.Classpath
-import org.http4k.routing.experimental.NewResourceLoader.Companion.Directory
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
+import org.http4k.routing.experimental.ResourceLoaders.Classpath
+import org.http4k.routing.experimental.ResourceLoaders.Directory
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-abstract class ResourceLoaderContract(protected val loader: NewResourceLoader) {
+abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
 
     @Test
     fun `loads existing file`() {
@@ -41,16 +45,15 @@ abstract class ResourceLoaderContract(protected val loader: NewResourceLoader) {
         checkContents("notAFile", null, TEXT_HTML)
     }
 
-    open fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
+    private fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
         if (expected == null)
-            assertThat(loader.resourceFor("notAFile"), absent())
+            assertThat(loader("notAFile"), absent())
         else {
-            val resource = loader.resourceFor(path)!!
-            val content = resource.openStream().use { it.readBytes() }
-            assertThat(String(content), equalTo(expected))
-            if (resource.length != null)
-                assertThat(content.size.toLong(), equalTo(resource.length))
-            assertThat(resource.contentType, equalTo(expectedContentType.withNoDirective()))
+            val resource = loader(path)!!
+            val response = resource(Request(Method.GET, "dummy"))
+            assertThat(response, hasBody(expected))
+            assertThat(response, hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", null))
+            assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirective().toHeaderValue()))
         }
     }
 }

@@ -165,8 +165,8 @@ private class IndeterminateLengthResource : Resource {
     override fun openStream() = EmptyInputStream.INSTANCE!!
 }
 
-private class InMemoryResourceLoader(val resources: Map<String, Resource>) : NewResourceLoader {
-    override fun resourceFor(path: String): Resource? = resources[path]
+private class InMemoryResourceLoader(val resources: Map<String, Resource>) : NewResourceLoader{
+    override fun invoke(path: String): Resource? = resources[path]
 }
 
 
