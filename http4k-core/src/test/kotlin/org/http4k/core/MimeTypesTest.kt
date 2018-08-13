@@ -6,21 +6,29 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class MimeTypesTest {
 
+    private val standardTypes = MimeTypes()
+
     @Test
     fun `uses known content types from mime types file`() {
-        assertCorrectContentTypeFoundFor(MimeTypes(), "/foo/bob.xml", APPLICATION_XML.withNoDirective())
-        assertCorrectContentTypeFoundFor(MimeTypes(), "/foo/bob.html", TEXT_HTML.withNoDirective())
-        assertCorrectContentTypeFoundFor(MimeTypes(), "/foo/bob.txt", TEXT_PLAIN.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.xml", APPLICATION_XML.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.html", TEXT_HTML.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.txt", TEXT_PLAIN.withNoDirective())
     }
 
     @Test
     fun `defaults back to octet stream for unknown file type`() {
-        assertCorrectContentTypeFoundFor(MimeTypes(), "txt", OCTET_STREAM.withNoDirective())
-        assertCorrectContentTypeFoundFor(MimeTypes(), "/foo/bob.foobar", OCTET_STREAM.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "txt", OCTET_STREAM.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.foobar", OCTET_STREAM.withNoDirective())
+    }
+
+    @Test
+    fun `reuses standard types`() {
+        assertTrue(standardTypes === MimeTypes())
     }
 
     @Test
