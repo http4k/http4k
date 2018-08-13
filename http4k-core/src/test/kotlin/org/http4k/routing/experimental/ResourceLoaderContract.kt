@@ -8,8 +8,10 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.routing.Router
 import org.http4k.routing.experimental.ResourceLoaders.Classpath
 import org.http4k.routing.experimental.ResourceLoaders.Directory
 import org.http4k.routing.experimental.ResourceLoaders.ListingDirectory
@@ -17,7 +19,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
+abstract class ResourceLoaderContract(private val loader: Router) {
 
     @Test
     fun `loads existing file`() {
@@ -47,11 +49,11 @@ abstract class ResourceLoaderContract(private val loader: NewResourceLoader) {
     }
 
     protected fun checkContents(path: String, expected: String?, expectedContentType: ContentType) {
+        val request = Request(Method.GET, of(path))
         if (expected == null)
-            assertThat(loader("notAFile"), absent())
+            assertThat(loader.match(request), absent())
         else {
-            val resource = loader(path)!!
-            val response = resource(Request(Method.GET, path))
+            val response = (loader.match(request)!!).invoke(request)
             assertThat(response, hasBody(expected))
             assertThat(response, hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", null))
             assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirective().toHeaderValue()))

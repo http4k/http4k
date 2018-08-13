@@ -7,8 +7,6 @@ import java.io.File
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-typealias NewResourceLoader = (path: String) -> HttpHandler?
-
 object ResourceLoaders {
 
     fun Classpath(
