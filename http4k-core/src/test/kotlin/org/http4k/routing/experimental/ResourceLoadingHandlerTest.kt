@@ -1,10 +1,7 @@
 package org.http4k.routing.experimental
 
-import com.natpryce.hamkrest.Matcher
-import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.anything
+import com.natpryce.hamkrest.*
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import org.apache.http.impl.io.EmptyInputStream
 import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -48,9 +45,9 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"))),
             allOf(
                 hasStatus(Status.OK),
-                hasHeader("Content-Length", null),
-                hasHeader("Last-Modified", null),
-                hasHeader("ETag", null)
+                hasHeader("Content-Length", absent()),
+                hasHeader("Last-Modified", absent()),
+                hasHeader("ETag", absent())
             ))
     }
 
@@ -93,7 +90,7 @@ class NewResourceLoadingHandlerTest {
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
             allOf(
                 hasStatus(Status.OK),
-                hasHeader("Last-Modified", null),
+                hasHeader("Last-Modified", absent()),
                 hasBody("content")
             ))
     }
@@ -156,7 +153,7 @@ class NewResourceLoadingHandlerTest {
                 listOf("If-None-Match" to """*"""))),
             allOf(
                 hasStatus(Status.OK),
-                hasHeader("ETag", null),
+                hasHeader("ETag", absent()),
                 hasBody("content")
             ))
     }

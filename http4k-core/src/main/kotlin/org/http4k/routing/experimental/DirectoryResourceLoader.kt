@@ -1,32 +1,36 @@
 package org.http4k.routing.experimental
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.HttpHandler
+import org.http4k.core.MimeTypes
+import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.routing.Router
 import java.io.ByteArrayInputStream
 import java.io.File
 
-typealias DirectoryListingRenderer = (base: Uri, filenames: List<String>) -> String
+typealias DirectoryRenderer = (request: Request, filenames: List<String>) -> String
 
 data class DirectoryResourceLoader(
     val baseDir: String,
     val mimeTypes: MimeTypes = MimeTypes(),
-    val directoryListingRenderer: DirectoryListingRenderer? = null
+    val directoryRenderer: DirectoryRenderer? = null
 ) : Router {
 
     override fun match(request: Request): HttpHandler? {
         val path = request.uri.path
-        val resolved = baseDir.pathJoin(path)
-        val f = File(resolved)
+        val f = File(baseDir.pathJoin(path))
         return when {
-            f.isFile -> FileResource(f, mimeTypes.forFile(resolved))
-            f.isDirectory -> match(request.uri(of(path.pathJoin("index.html")))) ?: directoryRenderingHandler(f, request.uri)
+            f.isFile -> FileResource(f, mimeTypes.forFile(path))
+            f.isDirectory -> match(request.uri(indexFileIn(path))) ?: directoryRenderingHandler(f, request)
             else -> null
         }
     }
 
-    private fun directoryRenderingHandler(dir: File, uri: Uri): HttpHandler? =
-        directoryListingRenderer?.invoke(uri, dir.list().asList())?.let {
+    private fun indexFileIn(path: String) = of(path.pathJoin("index.html"))
+
+    private fun directoryRenderingHandler(dir: File, request: Request): HttpHandler? =
+        directoryRenderer?.invoke(request, dir.list().asList())?.let {
             FakeFileContentsResource(dir, it.toByteArray(Charsets.UTF_8), ContentType.TEXT_HTML)
         }
 }
