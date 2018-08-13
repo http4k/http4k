@@ -3,11 +3,15 @@ package org.http4k.routing.experimental
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Uri.Companion.of
+import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
-internal data class NewStaticRoutingHttpHandler(
+fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
+
+internal data class StaticRoutingHttpHandler(
     private val pathSegments: String,
-    private val resourceLoader: NewResourceLoader,
+    private val resourceLoader: Router,
     private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
@@ -25,17 +29,15 @@ internal data class NewStaticRoutingHttpHandler(
     override fun invoke(request: Request): Response = handlerWithFilter(request)
 }
 
-fun static(resourceLoader: NewResourceLoader): RoutingHttpHandler = NewStaticRoutingHttpHandler("", resourceLoader)
 
 internal class ResourceLoadingHandler(
     private val pathSegments: String,
-    private val resourceLoader: NewResourceLoader
+    private val resourceLoader: Router
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response =
-        if (request.method == GET && request.uri.path.startsWith(pathSegments)) {
-            resourceLoader(convertPath(request.uri.path))?.invoke(request) ?: Response(NOT_FOUND)
-        }
+        if (request.method == GET && request.uri.path.startsWith(pathSegments))
+            resourceLoader.match(request.uri(of(convertPath(request.uri.path))))?.invoke(request) ?: Response(NOT_FOUND)
         else
             Response(NOT_FOUND)
 
