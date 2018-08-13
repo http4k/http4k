@@ -1,18 +1,19 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.intellij.lang.annotations.Language
 
 // Proof of concept to show how this could be done
 
 @Language("HTML")
-fun simpleDirectoryRenderer(base: Uri, filenames: List<String>) =
+fun simpleDirectoryRenderer(request: Request, filenames: List<String>) =
     """
     <html>
         <body>
-            <h1>$base</h1>
+            <h1>${request.uri}</h1>
             <ol>
-                ${listOfFiles(base, filenames)}
+                ${listOfFiles(request.uri, filenames)}
             <ol>
         </body>
     </html>

@@ -28,7 +28,7 @@ object ResourceLoaders {
     fun ListingDirectory(
         baseDir: String,
         mimeTypes: MimeTypes = MimeTypes(),
-        directoryRenderer: DirectoryListingRenderer = ::simpleDirectoryRenderer
+        directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
     ) = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
 
