@@ -12,6 +12,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.experimental.ResourceLoaders.Classpath
 import org.http4k.routing.experimental.ResourceLoaders.Directory
+import org.http4k.routing.experimental.ResourceLoaders.ListingDirectory
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -74,8 +75,7 @@ class DirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test
     }
 }
 
-class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(
-    Directory("./src/test/resources", directoryLister = directoryListing(::simpleDirectoryRenderer))) {
+class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ListingDirectory("./src/test/resources")) {
 
     @Test
     fun `lists directory`() {
