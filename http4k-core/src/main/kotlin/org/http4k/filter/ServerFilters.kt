@@ -48,9 +48,9 @@ object ServerFilters {
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
                 response.with(
-                    Header.required("access-control-allow-origin") of policy.origins.joined(),
-                    Header.required("access-control-allow-headers") of policy.headers.joined(),
-                    Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
+                        Header.required("access-control-allow-origin") of policy.origins.joined(),
+                        Header.required("access-control-allow-headers") of policy.headers.joined(),
+                        Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
                 )
             }
         }
@@ -61,8 +61,8 @@ object ServerFilters {
      */
     object RequestTracing {
         operator fun invoke(
-            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+                startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+                endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
@@ -156,8 +156,9 @@ object ServerFilters {
     object CopyHeaders {
         operator fun invoke(vararg headers: String): Filter = Filter { next ->
             { request ->
-                headers.fold(next(request)
-                ) { memo, name -> request.header(name)?.let { memo.header(name, it) } ?: memo }
+                headers.fold(next(request)) { memo, name ->
+                    request.header(name)?.let { memo.header(name, it) } ?: memo
+                }
             }
         }
     }
@@ -210,9 +211,9 @@ object ServerFilters {
             {
                 val response = next(it)
                 toResourceName(response)
-                    ?.let {
-                        response.body(loader.load(it)?.readText() ?: "")
-                    } ?: response
+                        ?.let {
+                            response.body(loader.load(it)?.readText() ?: "")
+                        } ?: response
             }
         }
     }

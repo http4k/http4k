@@ -11,7 +11,6 @@ dependencies {
     compile "org.apache.httpcomponents:httpcore:$apache_http_core_version"
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile project(":http4k-client-apache")
     testCompile testing
 }
 

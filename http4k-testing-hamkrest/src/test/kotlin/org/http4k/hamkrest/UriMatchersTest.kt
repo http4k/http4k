@@ -9,6 +9,9 @@ class UriMatchersTest {
     fun `path`() = assertMatchAndNonMatch(Uri.of("/bob"), hasUriPath("/bob"), hasUriPath("bill"))
 
     @Test
+    fun `path regex`() = assertMatchAndNonMatch(Uri.of("/bob"), hasUriPath(Regex(".*bob")), hasUriPath(Regex(".*bill")))
+
+    @Test
     fun `authority`() = assertMatchAndNonMatch(Uri.of("http://bob:80"), hasAuthority("bob:80"), hasAuthority("bill:80"))
 
     @Test

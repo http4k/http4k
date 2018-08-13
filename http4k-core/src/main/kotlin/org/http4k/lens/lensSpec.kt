@@ -4,10 +4,12 @@ import org.http4k.core.Uri
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_INSTANT
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
@@ -205,6 +207,7 @@ fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(String::toDouble, Do
 fun <IN> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
 fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
 fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
+fun <IN> BiDiLensSpec<IN, String>.instant() = map(Instant::parse, ISO_INSTANT::format)
 fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)

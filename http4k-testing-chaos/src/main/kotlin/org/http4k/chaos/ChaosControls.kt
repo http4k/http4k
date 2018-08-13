@@ -1,7 +1,7 @@
 package org.http4k.chaos
 
-import org.http4k.chaos.ChaosStage.Companion.Repeat
-import org.http4k.chaos.ChaosStage.Companion.Wait
+import org.http4k.chaos.ChaosStages.Repeat
+import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

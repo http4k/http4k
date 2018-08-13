@@ -15,6 +15,8 @@ import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.net.URL
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -45,13 +47,16 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 object Moshi : ConfigurableMoshi(Moshi.Builder()
+        .add(custom(Duration::parse))
         .add(custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
         .add(custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
         .add(custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .add(custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
+        .add(custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
         .add(custom(Companion::of))
         .add(custom(::URL, URL::toExternalForm))
         .add(custom(UUID::fromString))
+        .add(custom(::Regex, Regex::pattern))
         .add(KotlinJsonAdapterFactory()))
 
 private inline fun <T> custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =

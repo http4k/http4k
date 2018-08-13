@@ -25,7 +25,7 @@ internal fun ServletUpgradeRequest.asHttp4kRequest(): Request =
     Request(Method.valueOf(method), Uri.of(requestURI.toString()))
         .headers(headerParameters())
 
-private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequence().fold(listOf(), { memo, next -> memo + next.value.map { next.key to it } })
+private fun ServletUpgradeRequest.headerParameters(): Headers = headers.asSequence().fold(listOf()) { memo, next -> memo + next.value.map { next.key to it } }
 
 internal class Http4kWebSocketListener(private val wSocket: WsConsumer, private val upgradeRequest: Request) : WebSocketListener {
     private lateinit var websocket: Http4kWebSocketAdapter

@@ -11,6 +11,7 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.with
 import org.http4k.routing.RoutedRequest
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -104,6 +105,9 @@ class PathTest {
 
     @Test
     fun `datetime`() = checkContract(Path.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
+
+    @Test
+    fun `instant`() = checkContract(Path.instant(), "1970-01-01T00:00:00Z", Instant.EPOCH)
 
     @Test
     fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))

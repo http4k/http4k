@@ -2,8 +2,8 @@ package org.http4k.chaos
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.chaos.ChaosStage.Companion.Repeat
-import org.http4k.chaos.ChaosStage.Companion.Wait
+import org.http4k.chaos.ChaosStages.Repeat
+import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -21,7 +21,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.junit.jupiter.api.Test
 
-class ChaosStageTest {
+class ChaosStagesTest {
     private val response = Response(OK).body("body")
 
     @Test

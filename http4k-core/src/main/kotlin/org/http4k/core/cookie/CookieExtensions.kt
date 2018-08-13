@@ -11,7 +11,7 @@ fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.full
 fun Response.removeCookie(name: String): Response {
     val oldCookies = headerValues("Set-Cookie")
     val next = removeHeader("Set-Cookie")
-    return oldCookies.filter { (it != null && !it.startsWith("$name=")) }.fold(next) { response, value -> response.header("Set-Cookie", value) }
+    return oldCookies.filter { (it != null && !it.startsWith("$name=")) }.fold(next) { acc, next -> acc.header("Set-Cookie", next) }
 }
 
 fun Response.replaceCookie(cookie: Cookie): Response = removeCookie(cookie.name).cookie(cookie)

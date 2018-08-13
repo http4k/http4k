@@ -38,9 +38,7 @@ class JavaHttpClient : HttpHandler {
                     .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
                     .map { header -> header.value.map { header.key to it } }
                     .flatten()
-                    .fold(baseResponse) { response, nextHeader ->
-                        response.header(nextHeader.first, nextHeader.second)
-                    }
+                    .fold(baseResponse) { acc, next -> acc.header(next.first, next.second) }
         } catch (e: UnknownHostException) {
             Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
         } catch (e: ConnectException) {

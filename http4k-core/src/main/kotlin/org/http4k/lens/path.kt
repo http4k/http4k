@@ -7,6 +7,7 @@ import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.routing.path
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -104,6 +105,7 @@ fun Path.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
 fun Path.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
 fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
+fun Path.instant() =  map(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
 fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
 fun Path.uuid() = map(UUID::fromString, java.util.UUID::toString)
 fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> = apply {

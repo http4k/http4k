@@ -22,6 +22,8 @@ import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -100,13 +102,16 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 }
 
 object Gson : ConfigurableGson(GsonBuilder()
+        .registerTypeAdapter(Duration::class.java, custom(Duration::parse))
         .registerTypeAdapter(LocalTime::class.java, custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
         .registerTypeAdapter(LocalDate::class.java, custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
         .registerTypeAdapter(LocalDateTime::class.java, custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .registerTypeAdapter(ZonedDateTime::class.java, custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
+        .registerTypeAdapter(Instant::class.java, custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
         .registerTypeAdapter(UUID::class.java, custom(UUID::fromString))
         .registerTypeAdapter(Uri::class.java, custom(Companion::of))
         .registerTypeAdapter(URL::class.java, custom(::URL, URL::toExternalForm))
+        .registerTypeAdapter(Regex::class.java, custom(::Regex, Regex::pattern))
         .serializeNulls())
 
 private interface BidiJson<T> : JsonSerializer<T>, JsonDeserializer<T>

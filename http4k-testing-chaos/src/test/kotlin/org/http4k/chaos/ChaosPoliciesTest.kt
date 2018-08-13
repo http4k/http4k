@@ -3,11 +3,11 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.chaos.ChaosBehaviour.Companion.ReturnStatus
-import org.http4k.chaos.ChaosPolicy.Companion.Always
-import org.http4k.chaos.ChaosPolicy.Companion.Once
-import org.http4k.chaos.ChaosPolicy.Companion.Only
-import org.http4k.chaos.ChaosPolicy.Companion.PercentageBased
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosPolicies.Always
+import org.http4k.chaos.ChaosPolicies.Once
+import org.http4k.chaos.ChaosPolicies.Only
+import org.http4k.chaos.ChaosPolicies.PercentageBased
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -21,7 +21,7 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.util.Properties
 
-class ChaosPolicyTest {
+class ChaosPoliciesTest {
 
     @Test
     fun `Always applies by default`() {
