@@ -1,6 +1,9 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
+import org.http4k.core.Request
+import org.http4k.routing.Router
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -32,3 +35,12 @@ object ResourceLoaders {
     ) = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
 
+/**
+ * A little convenience thunk to simplify implementing [Router] for resource loaders.
+ */
+interface ResourceLoading : Router {
+
+    fun match(path: String): HttpHandler?
+
+    override fun match(request: Request): HttpHandler? = match(request.uri.path)
+}

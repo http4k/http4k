@@ -84,9 +84,9 @@ class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ListingDirecto
         @Language("HTML") val expected = """
         <html>
             <body>
-                <h1>/org/http4k/routing</h1>
+                <h1>org/http4k/routing</h1>
                 <ol>
-                    <li><a href="/org/http4k/routing/StaticRouter.js">StaticRouter.js</a></li>
+                    <li><a href="StaticRouter.js">StaticRouter.js</a></li>
                 <ol>
             </body>
         </html>""".trimIndent()
