@@ -1,23 +1,23 @@
 package org.http4k.routing.experimental
 
+import org.http4k.core.Uri
 import org.intellij.lang.annotations.Language
 
-// Proof of concept to show how this could be done
+
+typealias DirectoryRenderer = (uri: Uri, dir: ResourceSummary, resources: List<ResourceSummary>) -> String
 
 @Language("HTML")
-fun simpleDirectoryRenderer(path: String, filenames: List<String>) =
-    """
-    <html>
-        <body>
-            <h1>$path</h1>
-            <ol>
-                ${listOfFiles(filenames)}
-            <ol>
-        </body>
-    </html>
-    """.trimIndent()
+fun simpleDirectoryRenderer(uri: Uri, dir: ResourceSummary, resources: List<ResourceSummary>) = """
+<html>
+<body>
+<h1>${dir.name}</h1>
+<ol>
+${listOfFiles(uri, resources)}
+<ol>
+</body>
+</html>""".trimIndent()
 
-private fun listOfFiles(filenames: List<String>): String =
-    filenames.joinToString(separator = "\n") { name ->
-        """<li><a href="$name">$name</a></li>"""
+private fun listOfFiles(base: Uri, resources: List<ResourceSummary>): String =
+    resources.joinToString(separator = "\n") { resourceInfo ->
+        """<li><a href="${base.path.pathJoin(resourceInfo.name)}">${resourceInfo.name}</a></li>"""
     }

@@ -12,11 +12,6 @@ import org.http4k.core.Uri.Companion.of
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.Router
-import org.http4k.routing.experimental.ResourceLoaders.Classpath
-import org.http4k.routing.experimental.ResourceLoaders.Directory
-import org.http4k.routing.experimental.ResourceLoaders.ListingDirectory
-import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 abstract class ResourceLoaderContract(private val loader: Router) {
@@ -61,35 +56,3 @@ abstract class ResourceLoaderContract(private val loader: Router) {
     }
 }
 
-class ClasspathResourceLoaderTest : ResourceLoaderContract(Classpath("/")) {
-
-    @Disabled
-    override fun `loads embedded index file`() {
-        super.`loads embedded index file`()
-    }
-}
-
-class DirectoryResourceLoaderTest : ResourceLoaderContract(Directory("./src/test/resources")) {
-
-    @Test
-    fun `does not list directory`() {
-        checkContents("org/http4k/routing", null, TEXT_HTML)
-    }
-}
-
-class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ListingDirectory("./src/test/resources")) {
-
-    @Test
-    fun `lists directory`() {
-        @Language("HTML") val expected = """
-        <html>
-            <body>
-                <h1>org/http4k/routing</h1>
-                <ol>
-                    <li><a href="StaticRouter.js">StaticRouter.js</a></li>
-                <ol>
-            </body>
-        </html>""".trimIndent()
-        checkContents("org/http4k/routing", expected, TEXT_HTML)
-    }
-}
