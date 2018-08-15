@@ -45,7 +45,9 @@ object ClientFilters {
      */
     object SetHostFrom {
         operator fun invoke(uri: Uri): Filter = Filter { next ->
-            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port)).replaceHeader("Host", uri.host)) }
+            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port)).replaceHeader("Host", "${uri.host}${
+              uri.port?.let { port -> ":$port" } ?: ""
+            }")) }
         }
     }
 
