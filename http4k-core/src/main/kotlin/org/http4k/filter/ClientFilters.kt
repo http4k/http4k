@@ -60,6 +60,14 @@ object ClientFilters {
         private fun Credentials.base64Encoded(): String = "$user:$password".base64Encode()
     }
 
+    object BearerAuth {
+        operator fun invoke(provider: () -> String): Filter = Filter { next ->
+            { next(it.header("Authorization", "Bearer ${provider()}")) }
+        }
+
+        operator fun invoke(token: String): Filter = BearerAuth { token }
+    }
+
     object FollowRedirects {
         operator fun invoke(): Filter = Filter { next -> { makeRequest(next, it) } }
 

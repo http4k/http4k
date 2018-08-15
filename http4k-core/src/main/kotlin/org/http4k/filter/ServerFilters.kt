@@ -103,6 +103,20 @@ object ServerFilters {
     }
 
     /**
+     * Bearer Auth token checking.
+     */
+    object BearerAuth {
+        operator fun invoke(checkToken: (String) -> Boolean): Filter = Filter { next ->
+            {
+                if (it.bearerToken()?.let(checkToken) == true) next(it) else Response(UNAUTHORIZED)
+            }
+        }
+        operator fun invoke(token: String): Filter = BearerAuth() { it == token }
+
+        private fun Request.bearerToken(): String? = header("Authorization")?.replace("Bearer ", "")
+    }
+
+    /**
      * Converts Lens extraction failures into correct HTTP responses (Bad Requests/UnsupportedMediaType).
      * This is required when using lenses to automatically unmarshall inbound requests.
      * Note that LensFailures from unmarshalling upstream Response objects are NOT caught to avoid incorrect server behaviour.

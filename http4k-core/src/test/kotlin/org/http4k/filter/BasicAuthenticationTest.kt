@@ -37,7 +37,7 @@ class BasicAuthenticationTest {
 
     @Test
     fun allow_injecting_authorize_function() {
-        val handler = ServerFilters.BasicAuth("my realm", { it.user == "user" && it.password == "password" }).then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm") { it.user == "user" && it.password == "password" }.then { _: Request -> Response(Status.OK) }
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(Method.GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
@@ -45,7 +45,7 @@ class BasicAuthenticationTest {
     @Test
     fun allow_injecting_credential_provider() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { _: Request -> Response(Status.OK) }
-        val response = ClientFilters.BasicAuth({ Credentials("user", "password") }).then(handler)(Request(Method.GET, "/"))
+        val response = ClientFilters.BasicAuth { Credentials("user", "password") }.then(handler)(Request(Method.GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
 }
