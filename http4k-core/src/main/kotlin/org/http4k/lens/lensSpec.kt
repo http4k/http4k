@@ -47,7 +47,7 @@ interface MultiLensSpec<IN, OUT> {
     /**
      * Make a concrete Lens for this spec that falls back to another lens if no values are found in the target.
      */
-    fun fallback(name: String, fallback: Lens<IN, List<OUT>>, description: String? = null): Lens<IN, List<OUT>>
+    fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String? = null): Lens<IN, List<OUT>>
 
     /**
      * Make a concrete Lens for this spec that looks for an optional list of values in the target.
@@ -76,14 +76,14 @@ open class LensSpec<IN, OUT>(protected val location: String,
      * Make a concrete Lens for this spec that falls back to the default value if no value is found in the target.
      */
     open fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT> =
-            fallback(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
     /**
      * Make a concrete Lens for this spec that falls back to another lens if no value is found in the target.
      */
-    open fun fallback(name: String, fallback: Lens<IN, OUT>, description: String? = null): Lens<IN, OUT> {
+    open fun defaulted(name: String, default: Lens<IN, OUT>, description: String? = null): Lens<IN, OUT> {
         val getLens = get(name)
-        return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) fallback(it) else first() } }
+        return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) default(it) else first() } }
     }
 
     /**
@@ -91,7 +91,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
      */
     open fun optional(name: String, description: String? = null): Lens<IN, OUT?> {
         val getLens = get(name)
-        return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).let { if (it.isEmpty()) null else it.first() } }
+        return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) null else first() } }
     }
 
     /**
@@ -105,23 +105,23 @@ open class LensSpec<IN, OUT>(protected val location: String,
 
     open val multi = object : MultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): Lens<IN, List<OUT>> =
-                fallback(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+                defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
-        override fun fallback(name: String, fallback: Lens<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
+        override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
-            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) fallback(it) else this } }
+            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) default(it) else this } }
         }
 
         override fun optional(name: String, description: String?): Lens<IN, List<OUT>?> {
             val getLens = get(name)
-            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).let { if (it.isEmpty()) null else it } }
+            return Lens(Meta(false, location, paramMeta, name, description)) { getLens(it).run { if (isEmpty()) null else this } }
         }
 
         override fun required(name: String, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
             return Lens(Meta(true, location, paramMeta, name, description)) {
-                getLens(it).let {
-                    if (it.isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else it
+                getLens(it).run {
+                    if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else this
                 }
             }
         }
@@ -154,13 +154,13 @@ open class BiDiLensSpec<IN, OUT>(location: String,
     internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?) =
-            fallback(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
-    override fun fallback(name: String, fallback: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
+    override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(false, location, paramMeta, name, description),
-                { getLens(it).let { found -> if (found.isEmpty()) fallback(it) else found.first() } },
+                { getLens(it).run { if (isEmpty()) default(it) else first() } },
                 { out: OUT, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
@@ -169,7 +169,7 @@ open class BiDiLensSpec<IN, OUT>(location: String,
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(false, location, paramMeta, name, description),
-                { getLens(it).let { if (it.isEmpty()) null else it.first() } },
+                { getLens(it).run { if (isEmpty()) null else first() } },
                 { out: OUT?, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
@@ -187,13 +187,13 @@ open class BiDiLensSpec<IN, OUT>(location: String,
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>> =
-                fallback(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
+                defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
 
-        override fun fallback(name: String, fallback: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
+        override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, paramMeta, name, description),
-                    { getLens(it).run { if (isEmpty()) fallback(it) else this } },
+                    { getLens(it).run { if (isEmpty()) default(it) else this } },
                     { out: List<OUT>, target: IN -> setLens(out, target) }
             )
         }
@@ -202,7 +202,7 @@ open class BiDiLensSpec<IN, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, paramMeta, name, description),
-                    { getLens(it).let { if (it.isEmpty()) null else it } },
+                    { getLens(it).run { if (isEmpty()) null else this } },
                     { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
         }
@@ -211,7 +211,7 @@ open class BiDiLensSpec<IN, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(true, location, paramMeta, name, description),
-                    { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else it } },
+                    { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else this } },
                     { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }
@@ -230,8 +230,8 @@ fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LO
 fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> =
-        pattern.toRegex().let { r ->
-            map { r.matchEntire(it)?.groupValues?.get(group)!! }
+        pattern.toRegex().run {
+            map { matchEntire(it)?.groupValues?.get(group)!! }
         }
 
 fun <IN> BiDiLensSpec<IN, String>.uri() = map(Uri.Companion::of, Uri::toString)
