@@ -7,6 +7,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.35.0 (uncut)
 - Added some regex matchers to `http4k-testing-hamkrest`.
+- Added `BearerAuth` authentication Server and Client Filters - these work similarly to `BasicAuth`.
+- Added `fallback()` lenses, which are similar to `defaulted()`, but fall back to another supplied lens in the case of failure.
 
 ### v3.34.3
 - Fix #160 - `JavaHttpClient` does not copy body stream correctly onto URL connection.
