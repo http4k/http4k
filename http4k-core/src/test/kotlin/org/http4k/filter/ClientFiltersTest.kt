@@ -123,8 +123,14 @@ class ClientFiltersTest {
 
     @Test
     fun `set host on client`() {
-        val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:8080")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost:8080/loop").and(hasHeader("Host", "localhost"))
+        val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:123")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
+        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost:123/loop").and(hasHeader("Host", "localhost:123"))
+    }
+
+    @Test
+    fun `set host without port on client`() {
+        val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
+        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/loop").and(hasHeader("Host", "localhost"))
     }
 
     @Test
