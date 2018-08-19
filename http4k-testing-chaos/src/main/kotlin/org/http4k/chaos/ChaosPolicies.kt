@@ -1,6 +1,12 @@
 package org.http4k.chaos
 
+import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.chaos.ChaosPolicies.Always
+import org.http4k.chaos.ChaosPolicies.Once
+import org.http4k.chaos.ChaosPolicies.Only
+import org.http4k.chaos.ChaosPolicies.PercentageBased
 import org.http4k.core.HttpTransaction
+import java.time.Clock
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicBoolean
@@ -19,6 +25,14 @@ fun ChaosPolicy.inject(behaviour: ChaosBehaviour) = let { it ->
         override fun invoke(tx: HttpTransaction) = if (it(tx)) behaviour(tx) else tx.response
         override fun toString() = "$it $behaviour"
     }
+}
+
+internal fun JsonNode.asPolicy(clock: Clock = Clock.systemUTC()) = when (nonNullable<String>("type")) {
+    "once" -> Once(this["trigger"].asTrigger(clock))
+    "only" -> Only(this["trigger"].asTrigger(clock))
+    "percentage" -> PercentageBased(this["percentage"].asInt())
+    "always" -> Always
+    else -> throw IllegalArgumentException("unknown policy")
 }
 
 object ChaosPolicies {
