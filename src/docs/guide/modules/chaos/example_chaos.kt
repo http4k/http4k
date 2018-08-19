@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
         (1..10).forEach { performA(GET) }
     }
 
-    Only(SwitchTrigger()).inject(BlockThread)
+    Only(SwitchTrigger()).inject(BlockThread())
 
     // EXAMPLE APP WITH CHAOS CONTROLS
     val app = routes("/" bind routes("/" bind GET to { Response(OK).body("hello!") }))

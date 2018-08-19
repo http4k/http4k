@@ -14,6 +14,7 @@ import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
 import org.http4k.chaos.ChaosTriggers.MatchResponse
+import org.http4k.core.Status
 import org.http4k.format.Jackson.asA
 import java.time.Clock
 
@@ -43,18 +44,21 @@ data class ChaosStageJson(val type: String?,
     }
 }
 
-internal fun JsonNode.asBehaviour() = when (this["type"]!!.asText()) {
-    "latency" -> asA<Latency>()
-    "throw" -> asA<ThrowException>()
-    "status" -> asA<ReturnStatus>()
-    "body" -> asA<NoBody>()
+internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
+    "latency" -> Latency(nonNullable("min"), nonNullable("max"))
+    "throw" -> ThrowException(Exception(nonNullable<String>("message")))
+    "status" -> ReturnStatus(Status(nonNullable("status"), "x-http4k-chaos"))
+    "body" -> NoBody()
     else -> throw IllegalArgumentException("unknown behaviour")
 }
 
-internal fun JsonNode.asTrigger() = when (this["type"]!!.asText()) {
-    "deadline" -> asA<Deadline>()
-    "delay" -> asA<Delay>()
-    "request" -> asA<MatchRequest>()
-    "response" -> asA<MatchResponse>()
+internal fun JsonNode.asTrigger() = when (nonNullable<String>("type")) {
+    "deadline" -> Deadline(nonNullable("endTime"))
+    "delay" -> Delay(nonNullable("period"), Clock.systemUTC())
+    "request" -> MatchRequest(asNullable("method"), asNullable("path"), asNullable("queries"), asNullable("headers"), asNullable("body"))
+    "response" -> MatchResponse(asNullable("status"), asNullable("headers"), asNullable("body"))
     else -> throw IllegalArgumentException("unknown trigger")
 }
+
+private inline fun <reified T : Any> JsonNode.asNullable(name: String): T? = if(hasNonNull(name)) this[name].asA() else null
+private inline fun <reified T : Any> JsonNode.nonNullable(name: String): T = this[name].asA()
