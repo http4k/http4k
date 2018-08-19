@@ -4,6 +4,7 @@ dependencies {
     provided kotlin_lib
     provided project(":http4k-core")
     compile project(":http4k-testing-hamkrest")
+    compile project(":http4k-contract")
     compile project(":http4k-format-jackson")
 
     testCompile testing

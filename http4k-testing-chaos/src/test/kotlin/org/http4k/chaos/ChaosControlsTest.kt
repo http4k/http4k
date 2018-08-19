@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.core.Filter
+import org.http4k.contract.ApiKey
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -15,6 +15,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.lens.Header
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
@@ -63,9 +64,7 @@ class ChaosControlsTest {
 
         val appWithChaos = app.withChaosControls(
                 Wait,
-                Filter { next ->
-                    { it.header("secret")?.run { next(it) } ?: Response(UNAUTHORIZED) }
-                },
+                ApiKey(Header.required("secret"), { true }),
                 "/context"
         )
 
