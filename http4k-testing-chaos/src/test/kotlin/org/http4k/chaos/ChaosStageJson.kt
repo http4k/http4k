@@ -22,8 +22,8 @@ data class ChaosStageJson(val type: String?,
             "repeat" -> ChaosStages.Repeat { stage!!.asA<ChaosStageJson>().toStage(clock) }
             "policy" -> {
                 when (policy) {
-                    "once" -> Once(trigger!!.asTrigger()(clock))
-                    "only" -> Only(trigger!!.asTrigger()(clock))
+                    "once" -> Once(trigger!!.asTrigger(Clock.systemUTC()))
+                    "only" -> Only(trigger!!.asTrigger(Clock.systemUTC()))
                     "percentage" -> PercentageBased(percentage!!.asInt())
                     "always" -> Always
                     else -> throw IllegalArgumentException("unknown policy")
@@ -31,6 +31,6 @@ data class ChaosStageJson(val type: String?,
             }
             else -> throw IllegalArgumentException("unknown stage")
         }
-        return until?.let { baseStage.until(until.asTrigger()(clock)) } ?: baseStage
+        return until?.let { baseStage.until(until.asTrigger(Clock.systemUTC())) } ?: baseStage
     }
 }

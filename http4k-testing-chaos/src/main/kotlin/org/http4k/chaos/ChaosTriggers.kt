@@ -51,8 +51,8 @@ object ChaosTriggers {
     /**
      * Activates after a particular instant in time.
      */
-    data class Deadline(val endTime: Instant) : SerializableTrigger("deadline") {
-        override operator fun invoke(clock: Clock) = object : ChaosTrigger {
+    object Deadline {
+        operator fun invoke(endTime: Instant, clock: Clock) = object : ChaosTrigger {
             override fun invoke(p1: HttpTransaction) = clock.instant().isAfter(endTime)
             override fun toString() = "Deadline ($endTime)"
         }
@@ -61,72 +61,72 @@ object ChaosTriggers {
     /**
      * Activates after a particular delay (compared to instantiation).
      */
-    data class Delay(val endTime: Instant) : SerializableTrigger("delay") {
-        constructor(period: Duration, clock: Clock = Clock.systemUTC()) : this(Instant.now(clock).plus(period))
-
-        override operator fun invoke(clock: Clock): ChaosTrigger = object : ChaosTrigger {
+    object Delay {
+        operator fun invoke(period: Duration, clock: Clock = Clock.systemUTC()) = object : ChaosTrigger {
+            private val endTime = Instant.now(clock).plus(period)
             override fun invoke(p1: HttpTransaction) = clock.instant().isAfter(endTime)
             override fun toString() = "Delay (expires $endTime)"
-        }
-    }
-
-    abstract class HttpTransactionTrigger(type: String) : SerializableTrigger(type) {
-        abstract fun matcher(): Matcher<HttpTransaction>
-
-        override operator fun invoke(clock: Clock) = matcher().let {
-            object : ChaosTrigger {
-                override fun invoke(p1: HttpTransaction) = it.asPredicate()(p1)
-                override fun toString() = it.description
-            }
         }
     }
 
     /**
      * Activates when matching attributes of a single received request are met.
      */
-    data class MatchRequest(val method: String? = null,
-                            val path: Regex? = null,
-                            val queries: Map<String, Regex>? = null,
-                            val headers: Map<String, Regex>? = null,
-                            val body: Regex? = null) : HttpTransactionTrigger("request") {
-        override fun matcher() = {
+    object MatchRequest {
+        operator fun invoke(method: String? = null,
+                            path: Regex? = null,
+                            queries: Map<String, Regex>? = null,
+                            headers: Map<String, Regex>? = null,
+                            body: Regex? = null): ChaosTrigger {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
             val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
             val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
             val methodMatchers = method?.let { listOf(hasMethod(Method.valueOf(it.toUpperCase()))) } ?: emptyList()
             val all = methodMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
-            if (all.isEmpty()) hasRequest(anything) else hasRequest(all.reduce { acc, next -> acc and next })
-        }()
+            val matcher = if (all.isEmpty()) hasRequest(anything) else hasRequest(all.reduce { acc, next -> acc and next })
+
+            return object : ChaosTrigger {
+                override fun invoke(p1: HttpTransaction) = matcher.asPredicate()(p1)
+                override fun toString() = matcher.description
+            }
+        }
     }
 
     /**
      * Activates when matching attributes of a single sent response are met.
      */
-    data class MatchResponse(val status: Int? = null,
-                             val headers: Map<String, Regex>? = null,
-                             val body: Regex? = null) : HttpTransactionTrigger("response") {
-        override fun matcher() = {
+    object MatchResponse {
+        operator fun invoke(status: Int? = null,
+                            headers: Map<String, Regex>? = null,
+                            body: Regex? = null): ChaosTrigger {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val statusMatcher = status?.let { listOf(hasStatus((Status(it, "")))) } ?: emptyList()
             val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
 
-            hasResponse(
+            val matcher = hasResponse(
                     (headerMatchers + statusMatcher + bodyMatchers)
                             .fold<Matcher<Response>, Matcher<Response>>(anything) { acc, next -> acc and next }
             )
-        }()
+
+            return object : ChaosTrigger {
+                override fun invoke(p1: HttpTransaction) = matcher.asPredicate()(p1)
+                override fun toString() = matcher.description
+            }
+        }
     }
 }
 
-internal fun JsonNode.asTrigger() = when (nonNullable<String>("type")) {
-    "deadline" -> Deadline(nonNullable("endTime"))
-    "delay" -> Delay(nonNullable("period"), Clock.systemUTC())
-    "request" -> MatchRequest(asNullable("method"), asNullable("path"), asNullable("queries"), asNullable("headers"), asNullable("body"))
-    "response" -> MatchResponse(asNullable("status"), asNullable("headers"), asNullable("body"))
+internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()) = when (nonNullable<String>("type")) {
+    "deadline" -> Deadline(nonNullable("endTime"), clock)
+    "delay" -> Delay(nonNullable("period"), clock)
+    "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
+    "response" -> MatchResponse(asNullable("status"), toRegexMap("headers"), asNullable("body"))
     else -> throw IllegalArgumentException("unknown trigger")
 }
 
+private fun JsonNode.toRegexMap(name:String) =
+        asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off
  */

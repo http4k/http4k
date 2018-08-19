@@ -116,7 +116,6 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
                 description,
                 hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
-
 }
 
 class NoBodyBehaviourTest : ChaosBehaviourContract() {

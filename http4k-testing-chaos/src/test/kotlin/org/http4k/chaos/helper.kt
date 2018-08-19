@@ -17,3 +17,4 @@ internal fun assertBehaviour(json: String, description: String, matcher: Matcher
     behaviour.toString() shouldMatch equalTo(description)
     behaviour(tx) shouldMatch matcher
 }
+

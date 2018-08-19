@@ -21,10 +21,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.junit.jupiter.api.Test
 
-enum class StageType {
-    wait, repeat, policy
-}
-
 class ChaosStagesTest {
     private val response = Response(OK).body("body")
 
@@ -34,49 +30,49 @@ class ChaosStagesTest {
         app(Request(GET, "")) shouldMatch equalTo(response)
     }
 
-@Test
-fun `until stops when the trigger is hit`() {
-    val app = chaosStage(NOT_FOUND).until { it.request.method == POST }
-            .asFilter().then { response }
+    @Test
+    fun `until stops when the trigger is hit`() {
+        val app = chaosStage(NOT_FOUND).until { it.request.method == POST }
+                .asFilter().then { response }
 
-    app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-    app(Request(POST, "")) shouldMatch equalTo(response)
-    app(Request(GET, "")) shouldMatch equalTo(response)
-}
+        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(POST, "")) shouldMatch equalTo(response)
+        app(Request(GET, "")) shouldMatch equalTo(response)
+    }
 
-@Test
-fun `then moves onto the next stage`() {
-    val app = chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-            .then(chaosStage(NOT_FOUND).until { it.request.method == TRACE })
-            .then(chaosStage(INTERNAL_SERVER_ERROR))
-            .asFilter().then { response }
+    @Test
+    fun `then moves onto the next stage`() {
+        val app = chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
+                .then(chaosStage(NOT_FOUND).until { it.request.method == TRACE })
+                .then(chaosStage(INTERNAL_SERVER_ERROR))
+                .asFilter().then { response }
 
-    app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-    app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
-    app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-    app(Request(TRACE, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
-    app(Request(GET, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
-}
+        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
+        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(TRACE, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
+        app(Request(GET, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
+    }
 
-@Test
-fun `repeat starts again at the beginning`() {
-    val app = Repeat {
-        chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-                .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
-                .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
-    }.until { it.request.method == DELETE }
-            .asFilter().then { response }
+    @Test
+    fun `repeat starts again at the beginning`() {
+        val app = Repeat {
+            chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
+                    .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
+                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
+        }.until { it.request.method == DELETE }
+                .asFilter().then { response }
 
-    app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-    app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
-    app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-    app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-    app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-    app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-    app(Request(DELETE, "")) shouldMatch equalTo(response)
-}
+        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
+        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
+        app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
+        app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
+        app(Request(DELETE, "")) shouldMatch equalTo(response)
+    }
 
-private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
-    override fun invoke(tx: HttpTransaction) = Response(status)
-}
+    private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
+        override fun invoke(tx: HttpTransaction) = Response(status)
+    }
 }

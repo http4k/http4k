@@ -14,86 +14,66 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.format.Jackson
-import org.http4k.format.Jackson.asA
+import org.http4k.format.Jackson.asJsonObject
 import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.Instant.EPOCH
-import java.time.Instant.now
 import java.time.ZoneId.of
-import kotlin.reflect.KClass
 
 private val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
 
-abstract class SerializableTriggerContract<T : SerializableTrigger>(private val clazz: KClass<T>) {
-
-    abstract val trigger: T
-    abstract val expectedJson: String
+abstract class ChaosTriggerContract {
+    abstract val asJson: String
     abstract val expectedDescription: String
-    protected val clock = Clock.fixed(EPOCH, of("UTC"))
 
     @Test
-    fun `is roundtrippable to JSON`() {
-        val asJson = Jackson.asJsonString(trigger)
-        assertThat(asJson, equalTo(expectedJson))
-        assertThat(asJson.asA(clazz).toString(), equalTo(trigger.toString()))
-    }
-
-    @Test
-    fun `describes itself`() {
-        assertThat(trigger(clock).toString(), equalTo(expectedDescription))
+    fun `deserialises from JSON`() {
+        val clock = Clock.fixed(EPOCH, of("UTC"))
+        asJson.asJsonObject().asTrigger(clock).toString() shouldMatch equalTo(expectedDescription)
     }
 }
 
-class DeadlineTriggerTest : SerializableTriggerContract<Deadline>(Deadline::class) {
-    override val trigger = Deadline(EPOCH)
-    override val expectedJson = """{"endTime":"1970-01-01T00:00:00Z","type":"deadline"}"""
+class DeadlineTriggerTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"deadline","endTime":"1970-01-01T00:00:00Z"}"""
     override val expectedDescription = "Deadline (1970-01-01T00:00:00Z)"
 
     @Test
     fun `behaves as expected`() {
         val clock = Clock.systemUTC()
-        val trigger = ChaosTriggers.Deadline(now(clock).plusMillis(100))(clock)
+        val trigger = Deadline(clock.instant().plusMillis(100), clock)
         trigger(tx) shouldMatch equalTo(false)
         sleep(200)
         trigger(tx) shouldMatch equalTo(true)
     }
 }
 
-class DelayTriggerTest : SerializableTriggerContract<Delay>(Delay::class) {
-    override val trigger = Delay(Duration.ofMillis(100), clock)
-    override val expectedJson = """{"endTime":"1970-01-01T00:00:00.100Z","type":"delay"}"""
+class DelayTriggerTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"delay","period":"PT0.1S"}"""
     override val expectedDescription = "Delay (expires 1970-01-01T00:00:00.100Z)"
 
     @Test
     fun `behaves as expected`() {
-        val clock = Clock.systemDefaultZone()
-        val trigger = ChaosTriggers.Delay(Duration.ofMillis(100), clock)(clock)
+        val clock = Clock.systemUTC()
+        val trigger = Delay(Duration.ofMillis(100), clock)
         trigger(tx) shouldMatch equalTo(false)
         sleep(110)
         trigger(tx) shouldMatch equalTo(true)
     }
 }
 
-class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchRequest::class) {
-    override val trigger = MatchRequest("get", Regex(".*bob"),
-            mapOf("query" to Regex(".*query")),
-            mapOf("header" to Regex(".*header")),
-            Regex(".*body"))
-
-    override val expectedJson = """{"method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body","type":"request"}"""
-
+class MatchRequestTriggerTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
 
     override val expectedDescription = "has Request that has Method that is equal to GET and has Uri that has Path " +
             "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
             " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
 
-    private fun assertMatchNoMatch(s: SerializableTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
-        assertThat(s(clock)(match), equalTo(true))
-        assertThat(s(clock)(noMatch), equalTo(false))
+    private fun assertMatchNoMatch(s: ChaosTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+        assertThat(s(match), equalTo(true))
+        assertThat(s(noMatch), equalTo(false))
     }
 
     @Test
@@ -132,20 +112,15 @@ class MatchRequestTriggerTest : SerializableTriggerContract<MatchRequest>(MatchR
     }
 }
 
-class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(MatchResponse::class) {
-
-    override val trigger = MatchResponse(200,
-            mapOf("header" to Regex(".*header")),
-            Regex(".*body"))
-
-    override val expectedJson = """{"status":200,"headers":{"header":".*header"},"body":".*body","type":"response"}"""
+class MatchResponseTriggerTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"response","status":200,"headers":{"header":".*header"},"body":".*body"}"""
 
     override val expectedDescription = "has Response that anything and has Header 'header' that is not null & " +
             "matches .*header and has status that is equal to 200  and has Body that is not null & matches .*body"
 
-    private fun assertMatchNoMatch(s: SerializableTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
-        assertThat(s(clock)(match), equalTo(true))
-        assertThat(s(clock)(noMatch), equalTo(false))
+    private fun assertMatchNoMatch(s: ChaosTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+        assertThat(s(match), equalTo(true))
+        assertThat(s(noMatch), equalTo(false))
     }
 
     @Test
@@ -168,7 +143,6 @@ class MatchResponseTriggerTest : SerializableTriggerContract<MatchResponse>(Matc
                 tx.copy(response = tx.response.body("abob")),
                 tx.copy(response = tx.response.body("bill")))
     }
-
 }
 
 class SwitchTriggerTest {
@@ -186,7 +160,7 @@ class SwitchTriggerTest {
     }
 }
 
-class ChaosTriggerTest {
+class ChaosTriggerLogicalOperatorTest {
     private val isFalse: ChaosTrigger = { _: HttpTransaction -> false }
     private val isTrue: ChaosTrigger = { _: HttpTransaction -> true }
 
