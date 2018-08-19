@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.Test
 
 class ChaosControlsTest {
 
-    private val expectedChaos = "chaos active: Repeat [[Wait until SwitchTrigger (active = true)] then [Always ReturnStatus (404)] until NOT SwitchTrigger (active = true)]"
+    private val expectedChaos = "chaos active: Always ReturnStatus (404)"
     private val noChaos = "chaos active: none"
 
     @Test
@@ -37,9 +38,19 @@ class ChaosControlsTest {
         appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(POST, "/chaos/activate").body("""{"type":"wait"}""")) shouldMatch hasBody("chaos active: Wait")
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody("chaos active: Wait")
-        appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
+        appWithChaos(Request(POST, "/chaos/activate").body("""
+            {
+                "type":"policy",
+                "policy": {
+                    "type":"always"
+                },
+                "behaviour":{
+                    "type":"status",
+                    "status":418
+                }
+            }""".trimIndent())) shouldMatch hasBody("chaos active: Always ReturnStatus (418)")
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody("chaos active: Always ReturnStatus (418)")
+        appWithChaos(Request(GET, "/")) shouldMatch hasStatus(I_M_A_TEAPOT)
     }
 
     @Test
