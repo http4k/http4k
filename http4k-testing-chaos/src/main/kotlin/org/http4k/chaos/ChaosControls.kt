@@ -85,7 +85,8 @@ object ChaosControls {
         }
         val description = ""
 
-        val exampleChaos = obj()
+        val exampleChaos = obj(
+        )
 
         return controlsPath bind
                 Cors(corsPolicy)
@@ -96,9 +97,12 @@ object ChaosControls {
                                         "/status" meta {
                                             summary = "show the current chaos being applied"
                                         } bindContract GET to showCurrentStatus,
+                                        "/activate/new" meta {
+                                            summary = "activate new chaos on all routes"
+                                            receiving(Body.json("New chaos to be applied").toLens() to exampleChaos)
+                                        } bindContract POST to activate.then(showCurrentStatus),
                                         "/activate" meta {
                                             summary = "activate chaos on all routes"
-                                            receiving(Body.json("New chaos to be applied").toLens() to exampleChaos)
                                         } bindContract POST to activate.then(showCurrentStatus),
                                         "/deactivate" meta {
                                             summary = "deactivate the chaos on all routes"

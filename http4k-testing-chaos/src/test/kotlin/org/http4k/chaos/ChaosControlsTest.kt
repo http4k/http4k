@@ -1,5 +1,6 @@
 package org.http4k.chaos
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosPolicies.Always
@@ -33,14 +34,14 @@ class ChaosControlsTest {
         val appWithChaos = app.withChaosControls(Always.inject(ReturnStatus(NOT_FOUND)))
 
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(originalChaos)
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasStatus(OK).and(hasBody(originalChaos))
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(originalChaos)
         appWithChaos(Request(POST, "/")) shouldMatch hasStatus(NOT_FOUND)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
-        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasStatus(OK).and(hasBody(noChaos))
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(POST, "/chaos/activate").body("""
+        appWithChaos(Request(POST, "/chaos/activate/new").body("""
             {
                 "type":"policy",
                 "policy": {
@@ -50,12 +51,12 @@ class ChaosControlsTest {
                     "type":"status",
                     "status":418
                 }
-            }""".trimIndent())) shouldMatch hasBody(customChaos)
+            }""".trimIndent())) shouldMatch hasStatus(OK).and(hasBody(customChaos))
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(customChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(I_M_A_TEAPOT)
-        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasStatus(OK).and(hasBody(noChaos))
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(customChaos)
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasStatus(OK).and(hasBody(customChaos))
     }
 
     @Test
