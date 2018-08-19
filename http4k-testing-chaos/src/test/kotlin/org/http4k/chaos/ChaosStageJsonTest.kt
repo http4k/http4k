@@ -34,11 +34,43 @@ class ChaosStageJsonTest {
   }]"""
 
     /**
-     * internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
-    "throw" -> ThrowException(Exception(nonNullable<String>("message")))
-    else -> throw IllegalArgumentException("unknown behaviour")
+    [
+    {
+    "type": "policy",
+    "policy": "once",
+    "behaviour": {
+    "type": "latency",
+    "min": "500",
+    "max": "500"
+    },
+    "until": {}
+    },
+    {
+    "type": "policy",
+    "policy": "percentage",
+    "percentage": 11,
+    "behaviour": {
+    "type": "latency",
+    "min": "500",
+    "max": "500"
+    },
+    "until": {}
+    },
+    {
+    "type": "repeat",
+    "stage": {
+    "type": "policy",
+    "policy": "once",
+    "trigger": {
+    "type": "latency",
+    "min": "500",
+    "max": "500"
+    },
+    "until": {}
+    },
+    "until": {}
     }
-
+    ]
      */
 
     @Test

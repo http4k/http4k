@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
-import org.http4k.chaos.ChaosBehaviours.BlockThread
-import org.http4k.chaos.ChaosBehaviours.EatMemory
 import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
 import org.http4k.chaos.ChaosBehaviours.NoBody
@@ -33,9 +31,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
 
-class ChaosBehavioursTest {
-    private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), ZERO)
+private val tx = HttpTransaction(Request(GET, ""), Response(Status.OK).body("hello"), ZERO)
 
+class ThrowExceptionBehaviourTest {
     @Test
     fun `exception throwing behaviour should throw exception`() {
         val expected = RuntimeException("foo")
@@ -44,7 +42,9 @@ class ChaosBehavioursTest {
 
         assertThat({ throwException(tx) }, throws(equalTo(expected)))
     }
+}
 
+class LatencyBehaviourTest {
     @Test
     @Disabled
     fun `additional latency behaviour should add extra latency`() {
@@ -70,7 +70,9 @@ class ChaosBehavioursTest {
         Latency.fromEnv(props::getProperty).toString() shouldMatch equalTo(("Latency (range = PT1S to PT16M40S)"))
         Latency.fromEnv().toString() shouldMatch equalTo(("Latency (range = PT0.1S to PT0.5S)"))
     }
+}
 
+class ReturnStatusBehaviourTest {
     @Test
     fun `should return response with internal server error status`() {
         val returnStatus = ReturnStatus(NOT_FOUND)
@@ -79,7 +81,9 @@ class ChaosBehavioursTest {
         val injectedResponse = returnStatus(tx)
         assertEquals(NOT_FOUND, injectedResponse.status)
     }
+}
 
+class NoBodyBehaviourTest {
     @Test
     fun `should return no body`() {
         val noBody = NoBody()
@@ -87,10 +91,12 @@ class ChaosBehavioursTest {
 
         noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
+}
 
+class BlockThreadBehaviourTest {
     @Test
     fun `should block thread`() {
-        val blockThread = BlockThread()
+        val blockThread = ChaosBehaviours.BlockThread()
         blockThread.toString() shouldMatch equalTo(("BlockThread"))
         val latch = CountDownLatch(1)
         thread {
@@ -100,22 +106,28 @@ class ChaosBehavioursTest {
 
         assertThat(latch.await(100, MILLISECONDS), equalTo(false))
     }
+}
 
+class EatMemoryBehaviourTest {
     @Test
     fun `should eat memory`() {
-        val eatMemory = EatMemory()
+        val eatMemory = ChaosBehaviours.EatMemory()
         eatMemory.toString() shouldMatch equalTo(("EatMemory"))
 
         assertThat({ eatMemory(tx) }, throws<OutOfMemoryError>())
     }
+}
 
+class DoNothingBehaviourTest {
     @Test
     fun `should do nothing memory`() {
         None.toString() shouldMatch equalTo(("None"))
 
         None(tx) shouldMatch equalTo(tx.response)
     }
+}
 
+class VariableBehaviourTest {
     @Test
     fun `should provide ability to modify behaviour at runtime`() {
         val variable = Variable()
@@ -125,7 +137,9 @@ class ChaosBehavioursTest {
         variable.toString() shouldMatch equalTo(("Variable [NoBody]"))
         variable(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
+}
 
+class StackOverflowBehaviourTest {
     @Test
     @Disabled // untestable
     fun `should stack overflow`() {
@@ -133,6 +147,9 @@ class ChaosBehavioursTest {
         stackOverflow.toString() shouldMatch equalTo(("StackOverflow"))
         stackOverflow(tx)
     }
+}
+
+class KillProcessBehaviourTest {
 
     @Test
     @Disabled // untestable
