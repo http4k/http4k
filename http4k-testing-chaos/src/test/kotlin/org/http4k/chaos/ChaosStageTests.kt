@@ -82,10 +82,10 @@ class VariableStageTest {
     @Test
     fun `should provide ability to modify stage at runtime`() {
         val variable = Variable()
-        variable.toString() shouldMatch equalTo(("Variable [None]"))
+        variable.toString() shouldMatch equalTo(("None"))
         variable(tx) shouldMatch equalTo(tx.response)
         variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND) }
-        variable.toString() shouldMatch equalTo(("Variable [Repeat [ReturnStatus (404)]]"))
+        variable.toString() shouldMatch equalTo(("Repeat [ReturnStatus (404)]"))
         variable(tx)!! shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
     }
 }

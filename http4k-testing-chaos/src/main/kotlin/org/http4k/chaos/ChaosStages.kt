@@ -87,9 +87,8 @@ object ChaosStages {
      */
     class Variable(var current: ChaosStage = None()) : ChaosStage {
         override fun invoke(tx: HttpTransaction) = current(tx)
-        override fun toString() = "Variable [$current]"
+        override fun toString() = current.toString()
     }
-
 }
 
 fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): ChaosStage {

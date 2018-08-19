@@ -37,8 +37,8 @@ class ChaosControlsTest {
         appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(expectedChaos)
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(expectedChaos)
+        appWithChaos(Request(POST, "/chaos/activate").body("""{"type":"wait"}""")) shouldMatch hasBody("chaos active: Wait")
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody("chaos active: Wait")
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
     }
 
