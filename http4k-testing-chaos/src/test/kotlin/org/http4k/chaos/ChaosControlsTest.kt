@@ -22,9 +22,9 @@ import org.junit.jupiter.api.Test
 
 class ChaosControlsTest {
 
-    private val noChaos = "chaos active: none"
-    private val originalChaos = "chaos active: Always ReturnStatus (404)"
-    private val customChaos = "chaos active: Always ReturnStatus (418)"
+    private val noChaos = """{"chaos":"none"}"""
+    private val originalChaos = """{"chaos":"Always ReturnStatus (404)"}"""
+    private val customChaos = """{"chaos":"Always ReturnStatus (418)"}"""
 
     @Test
     fun `can convert a normal app to be chaotic`() {

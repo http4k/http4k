@@ -9,17 +9,22 @@ import org.http4k.contract.OpenApi
 import org.http4k.contract.Security
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
+import org.http4k.contract.meta
 import org.http4k.core.Body
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ServerFilters.Cors
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.json
+import org.http4k.format.Jackson.obj
+import org.http4k.format.Jackson.string
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -51,28 +56,53 @@ object ChaosControls {
             corsPolicy: CorsPolicy = CorsPolicy.UnsafeGlobalPermissive
 
     ): RoutingHttpHandler {
-        fun response() = Response(OK).body("chaos active: ${if (trigger.isActive()) variable.toString() else "none"}")
+        val showCurrentStatus: HttpHandler = {
+            Response(OK).with(Body.json().toLens() of obj(
+                    "chaos" to string(if (trigger.isActive()) variable.toString() else "none")
+            ))
+        }
+
+        val activate = Filter { next ->
+            {
+                if (it.body.stream.available() != 0) variable.current = setStages(it)
+                trigger.toggle(true)
+                next(it)
+            }
+        }
+
+        val deactivate = Filter { next ->
+            {
+                trigger.toggle(false)
+                next(it)
+            }
+        }
+
+        val toggle = Filter { next ->
+            {
+                trigger.toggle()
+                next(it)
+            }
+        }
+        val description = ""
 
         return controlsPath bind
                 Cors(corsPolicy)
                         .then(
-                                contract(OpenApi(ApiInfo("Http4k chaos controls", "1.0", ""), Jackson),
+                                contract(OpenApi(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson),
                                         openApiPath,
                                         security,
-                                        "/status" bindContract GET to { response() },
-                                        "/activate" bindContract POST to {
-                                            if (it.body.stream.available() != 0) variable.current = setStages(it)
-                                            trigger.toggle(true)
-                                            response()
-                                        },
-                                        "/deactivate" bindContract POST to {
-                                            trigger.toggle(false)
-                                            response()
-                                        },
-                                        "/toggle" bindContract POST to {
-                                            trigger.toggle()
-                                            response()
-                                        }
+                                        "/status" meta {
+                                            summary = "show the current chaos being applied"
+                                        } bindContract GET to showCurrentStatus,
+                                        "/activate" meta {
+                                            summary = "activate chaos on all routes"
+                                        } bindContract POST to activate.then(showCurrentStatus),
+                                        "/deactivate" meta {
+                                            summary = "deactivate the chaos on all routes"
+                                        } bindContract POST to deactivate.then(showCurrentStatus),
+                                        "/toggle" meta {
+                                            summary = "toggle the chaos on all routes"
+                                        } bindContract POST to toggle.then(showCurrentStatus)
                                 )
                         )
     }
