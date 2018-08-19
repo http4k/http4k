@@ -1,8 +1,11 @@
 package org.http4k.chaos
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Repeat
+import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.DELETE
@@ -20,12 +23,15 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
+import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 
-private val response = Response(OK).body("body")
+private val tx = HttpTransaction(Request(GET, ""), Response(OK).body("body"), Duration.ZERO)
 
 abstract class ChaosStageContract {
     abstract val asJson: String
@@ -44,14 +50,14 @@ class WaitTest : ChaosStageContract() {
 
     @Test
     fun `Wait does not match the response`() {
-        val app = Wait.asFilter().then { response }
-        app(Request(GET, "")) shouldMatch equalTo(response)
+        val app = Wait.asFilter().then { tx.response }
+        app(Request(GET, "")) shouldMatch equalTo(tx.response)
     }
 }
 
 class RepeatTest : ChaosStageContract() {
     override val asJson = """{"type":"repeat","stage":{"type":"wait"}}"""
-    override val expectedDescription = "Repeat Wait"
+    override val expectedDescription = "Repeat [Wait]"
 
     @Test
     fun `repeat starts again at the beginning`() {
@@ -60,7 +66,7 @@ class RepeatTest : ChaosStageContract() {
                     .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
                     .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
         }.until { it.request.method == DELETE }
-                .asFilter().then { response }
+                .asFilter().then { tx.response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
         app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
@@ -68,7 +74,19 @@ class RepeatTest : ChaosStageContract() {
         app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
         app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
         app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(DELETE, "")) shouldMatch equalTo(response)
+        app(Request(DELETE, "")) shouldMatch equalTo(tx.response)
+    }
+}
+
+class VariableStageTest {
+    @Test
+    fun `should provide ability to modify stage at runtime`() {
+        val variable = Variable()
+        variable.toString() shouldMatch equalTo(("Variable [None]"))
+        variable(tx) shouldMatch equalTo(tx.response)
+        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND) }
+        variable.toString() shouldMatch equalTo(("Variable [Repeat [ReturnStatus (404)]]"))
+        variable(tx)!! shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
     }
 }
 
@@ -76,11 +94,11 @@ class ChaosStageOperationsTest {
     @Test
     fun `until stops when the trigger is hit`() {
         val app = chaosStage(NOT_FOUND).until { it.request.method == POST }
-                .asFilter().then { response }
+                .asFilter().then { tx.response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(POST, "")) shouldMatch equalTo(response)
-        app(Request(GET, "")) shouldMatch equalTo(response)
+        app(Request(POST, "")) shouldMatch equalTo(tx.response)
+        app(Request(GET, "")) shouldMatch equalTo(tx.response)
     }
 
     @Test
@@ -88,7 +106,7 @@ class ChaosStageOperationsTest {
         val app = chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
                 .then(chaosStage(NOT_FOUND).until { it.request.method == TRACE })
                 .then(chaosStage(INTERNAL_SERVER_ERROR))
-                .asFilter().then { response }
+                .asFilter().then { tx.response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
         app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))

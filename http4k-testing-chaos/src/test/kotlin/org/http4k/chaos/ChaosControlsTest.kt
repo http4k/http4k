@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 
 class ChaosControlsTest {
 
-    private val expectedChaos = "chaos active: Repeat [Wait until SwitchTrigger (active = true)] then [Always ReturnStatus (404)] until NOT SwitchTrigger (active = true)"
+    private val expectedChaos = "chaos active: Repeat [[Wait until SwitchTrigger (active = true)] then [Always ReturnStatus (404)] until NOT SwitchTrigger (active = true)]"
     private val noChaos = "chaos active: none"
 
     @Test
