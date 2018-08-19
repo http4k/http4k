@@ -1,9 +1,14 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.chaos.ChaosBehaviours.BlockThread
+import org.http4k.chaos.ChaosBehaviours.EatMemory
+import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
 import org.http4k.chaos.ChaosBehaviours.NoBody
+import org.http4k.chaos.ChaosBehaviours.None
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosBehaviours.StackOverflow
 import org.http4k.chaos.ChaosBehaviours.ThrowException
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpTransaction
@@ -57,7 +62,7 @@ object ChaosBehaviours {
      * Throws the appropriate exception.
      */
     object ThrowException {
-        operator fun invoke(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
+        operator fun invoke(e: Throwable = RuntimeException("Chaos behaviour injected!")) = object : ChaosBehaviour {
             override fun invoke(tx: HttpTransaction) = throw e
             override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
         }
@@ -151,8 +156,13 @@ object ChaosBehaviours {
 
 internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
     "latency" -> Latency(nonNullable("min"), nonNullable("max"))
-    "throw" -> ThrowException(Exception(nonNullable<String>("message")))
+    "throw" -> ThrowException(RuntimeException(nonNullable<String>("message")))
     "status" -> ReturnStatus(Status(nonNullable("status"), "x-http4k-chaos"))
     "body" -> NoBody()
+    "memory" -> EatMemory()
+    "kill" -> KillProcess()
+    "overflow" -> StackOverflow()
+    "block" -> BlockThread()
+    "none" -> None()
     else -> throw IllegalArgumentException("unknown behaviour")
 }
