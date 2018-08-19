@@ -21,8 +21,9 @@ import org.junit.jupiter.api.Test
 
 class ChaosControlsTest {
 
-    private val expectedChaos = "chaos active: Always ReturnStatus (404)"
     private val noChaos = "chaos active: none"
+    private val originalChaos = "chaos active: Always ReturnStatus (404)"
+    private val customChaos = "chaos active: Always ReturnStatus (418)"
 
     @Test
     fun `can convert a normal app to be chaotic`() {
@@ -31,8 +32,8 @@ class ChaosControlsTest {
         val appWithChaos = app.withChaosControls(Always.inject(ReturnStatus(NOT_FOUND)))
 
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(expectedChaos)
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(expectedChaos)
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(originalChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(originalChaos)
         appWithChaos(Request(POST, "/")) shouldMatch hasStatus(NOT_FOUND)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
         appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
@@ -48,9 +49,12 @@ class ChaosControlsTest {
                     "type":"status",
                     "status":418
                 }
-            }""".trimIndent())) shouldMatch hasBody("chaos active: Always ReturnStatus (418)")
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody("chaos active: Always ReturnStatus (418)")
+            }""".trimIndent())) shouldMatch hasBody(customChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(customChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(I_M_A_TEAPOT)
+        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
+        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasBody(customChaos)
     }
 
     @Test
