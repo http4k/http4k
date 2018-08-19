@@ -59,6 +59,7 @@ class RouteMetaDsl internal constructor() {
      * will override the naturally generated one.
      */
     fun <T> receiving(bodyToDefinitionId: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
+        body = bodyToDefinitionId.first
         request = RequestMeta(Request(GET, "").with(bodyToDefinitionId.first of bodyToDefinitionId.second), definitionId)
     }
 }
