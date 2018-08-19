@@ -42,8 +42,8 @@ import java.time.Clock.systemUTC
  */
 object ChaosControls {
     private val setStages = Body.json().map { json ->
-        (if (json.isArray) json else listOf(json))
-                .map { json.asStage(Clock.systemUTC()) }
+        (if (json.isArray) json.elements().asSequence() else sequenceOf(json))
+                .map { it.asStage(Clock.systemUTC()) }
                 .reduce { acc, next -> acc.then(next) }
     }.toLens()
 

@@ -42,7 +42,7 @@ class ChaosControlsTest {
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
         appWithChaos(Request(POST, "/chaos/activate/new").body("""
-            {
+            [{
                 "type":"policy",
                 "policy": {
                     "type":"always"
@@ -51,7 +51,7 @@ class ChaosControlsTest {
                     "type":"status",
                     "status":418
                 }
-            }""".trimIndent())) shouldMatch hasStatus(OK).and(hasBody(customChaos))
+            }]""".trimIndent())) shouldMatch hasStatus(OK).and(hasBody(customChaos))
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(customChaos)
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(I_M_A_TEAPOT)
         appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasStatus(OK).and(hasBody(noChaos))
