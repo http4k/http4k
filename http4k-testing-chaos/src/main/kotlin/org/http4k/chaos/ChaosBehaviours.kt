@@ -1,5 +1,10 @@
 package org.http4k.chaos
 
+import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.chaos.ChaosBehaviours.Latency
+import org.http4k.chaos.ChaosBehaviours.NoBody
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosBehaviours.ThrowException
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Response
@@ -51,79 +56,103 @@ object ChaosBehaviours {
     /**
      * Throws the appropriate exception.
      */
-    fun ThrowException(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = throw e
-        override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
+    object ThrowException {
+        operator fun invoke(e: Throwable = Exception("Chaos behaviour injected!")) = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = throw e
+            override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
+        }
     }
 
     /**
      * Returns an empty response with the appropriate status.
      */
-    fun ReturnStatus(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
-        override fun toString() = "ReturnStatus (${status.code})"
+    object ReturnStatus {
+        operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+            override fun toString() = "ReturnStatus (${status.code})"
+        }
     }
 
     /**
      * Strips the body from a response.
      */
-    fun NoBody() = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
-        override fun toString() = "NoBody"
+    object NoBody {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
+            override fun toString() = "NoBody"
+        }
     }
 
     /**
      * Allocates memory in a busy loop until an OOM occurs.
      */
-    fun EatMemory() = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = tx.response.apply {
-            mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
-        }
+    object EatMemory {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response.apply {
+                mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
+            }
 
-        override fun toString() = "EatMemory"
+            override fun toString() = "EatMemory"
+        }
     }
 
     /**
      * Allocates memory in a busy loop until an OOM occurs.
      */
-    fun StackOverflow() = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction): Response {
-            fun overflow(): Unit = overflow()
-            return tx.response.apply { overflow() }
-        }
+    object StackOverflow {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction): Response {
+                fun overflow(): Unit = overflow()
+                return tx.response.apply { overflow() }
+            }
 
-        override fun toString() = "StackOverflow"
+            override fun toString() = "StackOverflow"
+        }
     }
 
     /**
      * System exits from the process.
      */
-    fun KillProcess() = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
-        override fun toString() = "KillProcess"
+    object KillProcess {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
+            override fun toString() = "KillProcess"
+        }
     }
 
     /**
      * Blocks the current thread.
      */
-    fun BlockThread() = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
-        override fun toString() = "BlockThread"
+    object BlockThread {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
+            override fun toString() = "BlockThread"
+        }
     }
 
     /**
      * Does absolutely nothing.
      */
-    val None = object : ChaosBehaviour {
-        override fun invoke(tx: HttpTransaction) = tx.response
-        override fun toString() = "None"
+    object None {
+        operator fun invoke() = object : ChaosBehaviour {
+            override fun invoke(tx: HttpTransaction) = tx.response
+            override fun toString() = "None"
+        }
     }
 
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: ChaosBehaviour = None) : ChaosBehaviour {
+    class Variable(var current: ChaosBehaviour = None()) : ChaosBehaviour {
         override fun invoke(tx: HttpTransaction) = current(tx)
         override fun toString() = "Variable [$current]"
     }
+}
+
+internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
+    "latency" -> Latency(nonNullable("min"), nonNullable("max"))
+    "throw" -> ThrowException(Exception(nonNullable<String>("message")))
+    "status" -> ReturnStatus(Status(nonNullable("status"), "x-http4k-chaos"))
+    "body" -> NoBody()
+    else -> throw IllegalArgumentException("unknown behaviour")
 }

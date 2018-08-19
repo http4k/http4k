@@ -121,9 +121,9 @@ class EatMemoryBehaviourTest {
 class DoNothingBehaviourTest {
     @Test
     fun `should do nothing memory`() {
-        None.toString() shouldMatch equalTo(("None"))
+        None().toString() shouldMatch equalTo(("None"))
 
-        None(tx) shouldMatch equalTo(tx.response)
+        None()(tx) shouldMatch equalTo(tx.response)
     }
 }
 

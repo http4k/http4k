@@ -1,8 +1,13 @@
 package org.http4k.chaos
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
+import org.http4k.chaos.ChaosTriggers.Deadline
+import org.http4k.chaos.ChaosTriggers.Delay
+import org.http4k.chaos.ChaosTriggers.MatchRequest
+import org.http4k.chaos.ChaosTriggers.MatchResponse
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Response
@@ -112,6 +117,14 @@ object ChaosTriggers {
             )
         }()
     }
+}
+
+internal fun JsonNode.asTrigger() = when (nonNullable<String>("type")) {
+    "deadline" -> Deadline(nonNullable("endTime"))
+    "delay" -> Delay(nonNullable("period"), Clock.systemUTC())
+    "request" -> MatchRequest(asNullable("method"), asNullable("path"), asNullable("queries"), asNullable("headers"), asNullable("body"))
+    "response" -> MatchResponse(asNullable("status"), asNullable("headers"), asNullable("body"))
+    else -> throw IllegalArgumentException("unknown trigger")
 }
 
 /**
