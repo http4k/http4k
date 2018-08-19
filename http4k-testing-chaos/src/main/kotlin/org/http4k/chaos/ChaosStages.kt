@@ -1,5 +1,8 @@
 package org.http4k.chaos
 
+import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.chaos.ChaosStages.Repeat
+import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Response
@@ -77,4 +80,14 @@ object ChaosStages {
         override fun invoke(tx: HttpTransaction) = tx.response
         override fun toString() = "Wait"
     }
+}
+
+fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): ChaosStage {
+    val baseStage = when (asNullable<String>("type")) {
+        "wait" -> Wait
+        "repeat" -> Repeat { this["stage"]!!.asStage(clock) }
+        "policy" -> this["policy"]!!.asPolicy(clock).inject(this["behaviour"]!!.asBehaviour())
+        else -> throw IllegalArgumentException("unknown stage")
+    }
+    return this["until"]?.let { baseStage.until(it.asTrigger(clock)) } ?: baseStage
 }

@@ -19,17 +19,60 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.format.Jackson.asJsonObject
 import org.junit.jupiter.api.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
-class ChaosStagesTest {
-    private val response = Response(OK).body("body")
+private val response = Response(OK).body("body")
+
+abstract class ChaosStageContract {
+    abstract val asJson: String
+    abstract val expectedDescription: String
+
+    @Test
+    fun `deserialises from JSON`() {
+        val clock = Clock.fixed(Instant.EPOCH, ZoneId.of("UTC"))
+        asJson.asJsonObject().asStage(clock).toString() shouldMatch equalTo(expectedDescription)
+    }
+}
+
+class WaitTest : ChaosStageContract() {
+    override val asJson = """{"type":"wait"}"""
+    override val expectedDescription = "Wait"
 
     @Test
     fun `Wait does not match the response`() {
         val app = Wait.asFilter().then { response }
         app(Request(GET, "")) shouldMatch equalTo(response)
     }
+}
 
+class RepeatTest : ChaosStageContract() {
+    override val asJson = """{"type":"repeat","stage":{"type":"wait"}}"""
+    override val expectedDescription = "Repeat Wait"
+
+    @Test
+    fun `repeat starts again at the beginning`() {
+        val app = Repeat {
+            chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
+                    .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
+                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
+        }.until { it.request.method == DELETE }
+                .asFilter().then { response }
+
+        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
+        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
+        app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
+        app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
+        app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
+        app(Request(DELETE, "")) shouldMatch equalTo(response)
+    }
+}
+
+class ChaosStageOperationsTest {
     @Test
     fun `until stops when the trigger is hit`() {
         val app = chaosStage(NOT_FOUND).until { it.request.method == POST }
@@ -53,26 +96,8 @@ class ChaosStagesTest {
         app(Request(TRACE, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
         app(Request(GET, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
     }
+}
 
-    @Test
-    fun `repeat starts again at the beginning`() {
-        val app = Repeat {
-            chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-                    .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
-                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
-        }.until { it.request.method == DELETE }
-                .asFilter().then { response }
-
-        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-        app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-        app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(DELETE, "")) shouldMatch equalTo(response)
-    }
-
-    private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
-        override fun invoke(tx: HttpTransaction) = Response(status)
-    }
+private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
+    override fun invoke(tx: HttpTransaction) = Response(status)
 }
