@@ -62,10 +62,10 @@ class RepeatTest : ChaosStageContract() {
     @Test
     fun `repeat starts again at the beginning`() {
         val app = Repeat {
-            chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-                    .then(chaosStage(NOT_FOUND).until { it.request.method == OPTIONS })
-                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.request.method == TRACE })
-        }.until { it.request.method == DELETE }
+            chaosStage(I_M_A_TEAPOT).until { it.method == POST }
+                    .then(chaosStage(NOT_FOUND).until { it.method == OPTIONS })
+                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.method == TRACE })
+        }.until { it.method == DELETE }
                 .asFilter().then { tx.response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
@@ -93,7 +93,7 @@ class VariableStageTest {
 class ChaosStageOperationsTest {
     @Test
     fun `until stops when the trigger is hit`() {
-        val app = chaosStage(NOT_FOUND).until { it.request.method == POST }
+        val app = chaosStage(NOT_FOUND).until { it.method == POST }
                 .asFilter().then { tx.response }
 
         app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
@@ -103,8 +103,8 @@ class ChaosStageOperationsTest {
 
     @Test
     fun `then moves onto the next stage`() {
-        val app = chaosStage(I_M_A_TEAPOT).until { it.request.method == POST }
-                .then(chaosStage(NOT_FOUND).until { it.request.method == TRACE })
+        val app = chaosStage(I_M_A_TEAPOT).until { it.method == POST }
+                .then(chaosStage(NOT_FOUND).until { it.method == TRACE })
                 .then(chaosStage(INTERNAL_SERVER_ERROR))
                 .asFilter().then { tx.response }
 

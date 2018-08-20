@@ -34,7 +34,7 @@ fun Stage.until(trigger: Trigger): Stage = let {
     object : Stage {
         private val active = AtomicBoolean(true)
         override fun invoke(tx: HttpTransaction): Response? {
-            if (active.get()) active.set(!trigger(tx))
+            if (active.get()) active.set(!trigger(tx.request))
             return if (active.get()) it(tx) else null
         }
 

@@ -9,7 +9,6 @@ import org.http4k.chaos.then
 import org.http4k.chaos.until
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
-import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -26,7 +25,7 @@ val client = OkHttp()
 fun main(args: Array<String>) {
 
     // chaos is split into "stages", which can be triggered by specific request or time-based criteria
-    val doNothingStage = Wait.until { tx: HttpTransaction -> tx.request.method == POST }
+    val doNothingStage = Wait.until { tx: Request -> tx.method == POST }
     val errorStage = PercentageBased(50).inject(ReturnStatus(INTERNAL_SERVER_ERROR))
 
     // chain the stages together with then() and finally convert to a standard http4k Filter

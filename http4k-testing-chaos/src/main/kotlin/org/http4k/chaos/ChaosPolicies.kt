@@ -43,7 +43,7 @@ object ChaosPolicies {
         operator fun invoke(trigger: Trigger) = object : Policy {
             private val active = AtomicBoolean(true)
             override fun invoke(tx: HttpTransaction) =
-                    if (trigger(tx)) active.get().also { active.set(false) } else false
+                    if (trigger(tx.request)) active.get().also { active.set(false) } else false
 
             override fun toString() = "Once (trigger = $trigger)"
         }
@@ -54,7 +54,7 @@ object ChaosPolicies {
      */
     object Only {
         operator fun invoke(trigger: Trigger) = object : Policy {
-            override fun invoke(tx: HttpTransaction) = trigger(tx)
+            override fun invoke(tx: HttpTransaction) = trigger(tx.request)
             override fun toString() = "Only (trigger = $trigger)"
         }
     }
