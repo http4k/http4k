@@ -119,7 +119,7 @@ object ChaosControls {
  * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun HttpHandler.withChaosControls(stage: ChaosStage = Wait,
+fun HttpHandler.withChaosControls(stage: Stage = Wait,
                                   security: Security = NoSecurity,
                                   controlsPath: String = "/chaos",
                                   clock: Clock = systemUTC(),

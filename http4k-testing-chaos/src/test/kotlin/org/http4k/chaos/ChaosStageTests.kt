@@ -116,6 +116,6 @@ class ChaosStageOperationsTest {
     }
 }
 
-private fun chaosStage(status: Status): ChaosStage = object : ChaosStage {
+private fun chaosStage(status: Status): Stage = object : Stage {
     override fun invoke(tx: HttpTransaction) = Response(status)
 }

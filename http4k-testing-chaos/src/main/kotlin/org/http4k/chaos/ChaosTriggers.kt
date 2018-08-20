@@ -26,25 +26,25 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 
-typealias ChaosTrigger = (HttpTransaction) -> Boolean
+typealias Trigger = (HttpTransaction) -> Boolean
 
-operator fun ChaosTrigger.not() = object : Function1<HttpTransaction, Boolean> {
+operator fun Trigger.not() = object : Function1<HttpTransaction, Boolean> {
     override fun invoke(p1: HttpTransaction) = !this@not(p1)
     override fun toString() = "NOT " + this@not.toString()
 }
 
-infix fun ChaosTrigger.and(that: ChaosTrigger): ChaosTrigger = object : ChaosTrigger {
+infix fun Trigger.and(that: Trigger): Trigger = object : Trigger {
     override fun invoke(p1: HttpTransaction) = this@and(p1) && that(p1)
     override fun toString() = this@and.toString() + " AND " + that.toString()
 }
 
-infix fun ChaosTrigger.or(that: ChaosTrigger): ChaosTrigger = object : ChaosTrigger {
+infix fun Trigger.or(that: Trigger): Trigger = object : Trigger {
     override fun invoke(p1: HttpTransaction) = this@or(p1) || that(p1)
     override fun toString() = this@or.toString() + " OR " + that.toString()
 }
 
 abstract class SerializableTrigger(val type: String) {
-    abstract operator fun invoke(clock: Clock = Clock.systemUTC()): ChaosTrigger
+    abstract operator fun invoke(clock: Clock = Clock.systemUTC()): Trigger
 }
 
 object ChaosTriggers {
@@ -52,7 +52,7 @@ object ChaosTriggers {
      * Activates after a particular instant in time.
      */
     object Deadline {
-        operator fun invoke(endTime: Instant, clock: Clock) = object : ChaosTrigger {
+        operator fun invoke(endTime: Instant, clock: Clock) = object : Trigger {
             override fun invoke(p1: HttpTransaction) = clock.instant().isAfter(endTime)
             override fun toString() = "Deadline ($endTime)"
         }
@@ -62,7 +62,7 @@ object ChaosTriggers {
      * Activates after a particular delay (compared to instantiation).
      */
     object Delay {
-        operator fun invoke(period: Duration, clock: Clock = Clock.systemUTC()) = object : ChaosTrigger {
+        operator fun invoke(period: Duration, clock: Clock = Clock.systemUTC()) = object : Trigger {
             private val endTime = Instant.now(clock).plus(period)
             override fun invoke(p1: HttpTransaction) = clock.instant().isAfter(endTime)
             override fun toString() = "Delay (expires $endTime)"
@@ -77,7 +77,7 @@ object ChaosTriggers {
                             path: Regex? = null,
                             queries: Map<String, Regex>? = null,
                             headers: Map<String, Regex>? = null,
-                            body: Regex? = null): ChaosTrigger {
+                            body: Regex? = null): Trigger {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val queriesMatchers = queries?.map { hasQuery(it.key, it.value) } ?: emptyList()
             val pathMatchers = path?.let { listOf(hasUri(hasUriPath(it))) } ?: emptyList()
@@ -86,7 +86,7 @@ object ChaosTriggers {
             val all = methodMatchers + pathMatchers + queriesMatchers + headerMatchers + bodyMatchers
             val matcher = if (all.isEmpty()) hasRequest(anything) else hasRequest(all.reduce { acc, next -> acc and next })
 
-            return object : ChaosTrigger {
+            return object : Trigger {
                 override fun invoke(p1: HttpTransaction) = matcher.asPredicate()(p1)
                 override fun toString() = matcher.description
             }
@@ -99,7 +99,7 @@ object ChaosTriggers {
     object MatchResponse {
         operator fun invoke(status: Int? = null,
                             headers: Map<String, Regex>? = null,
-                            body: Regex? = null): ChaosTrigger {
+                            body: Regex? = null): Trigger {
             val headerMatchers = headers?.map { hasHeader(it.key, it.value) } ?: emptyList()
             val statusMatcher = status?.let { listOf(hasStatus((Status(it, "")))) } ?: emptyList()
             val bodyMatchers = body?.let { listOf(hasBody(it)) } ?: emptyList()
@@ -109,7 +109,7 @@ object ChaosTriggers {
                             .fold<Matcher<Response>, Matcher<Response>>(anything) { acc, next -> acc and next }
             )
 
-            return object : ChaosTrigger {
+            return object : Trigger {
                 override fun invoke(p1: HttpTransaction) = matcher.asPredicate()(p1)
                 override fun toString() = matcher.description
             }
@@ -130,7 +130,7 @@ private fun JsonNode.toRegexMap(name:String) =
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off
  */
-class SwitchTrigger(initialPosition: Boolean = false) : ChaosTrigger {
+class SwitchTrigger(initialPosition: Boolean = false) : Trigger {
     private val on = AtomicBoolean(initialPosition)
 
     fun isActive() = on.get()

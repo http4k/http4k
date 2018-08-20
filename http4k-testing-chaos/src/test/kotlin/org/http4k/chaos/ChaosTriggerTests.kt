@@ -71,7 +71,7 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
             "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
             " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
 
-    private fun assertMatchNoMatch(s: ChaosTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+    private fun assertMatchNoMatch(s: Trigger, match: HttpTransaction, noMatch: HttpTransaction) {
         assertThat(s(match), equalTo(true))
         assertThat(s(noMatch), equalTo(false))
     }
@@ -118,7 +118,7 @@ class MatchResponseTriggerTest : ChaosTriggerContract() {
     override val expectedDescription = "has Response that anything and has Header 'header' that is not null & " +
             "matches .*header and has status that is equal to 200  and has Body that is not null & matches .*body"
 
-    private fun assertMatchNoMatch(s: ChaosTrigger, match: HttpTransaction, noMatch: HttpTransaction) {
+    private fun assertMatchNoMatch(s: Trigger, match: HttpTransaction, noMatch: HttpTransaction) {
         assertThat(s(match), equalTo(true))
         assertThat(s(noMatch), equalTo(false))
     }
@@ -161,8 +161,8 @@ class SwitchTriggerTest {
 }
 
 class ChaosTriggerLogicalOperatorTest {
-    private val isFalse: ChaosTrigger = { _: HttpTransaction -> false }
-    private val isTrue: ChaosTrigger = { _: HttpTransaction -> true }
+    private val isFalse: Trigger = { _: HttpTransaction -> false }
+    private val isTrue: Trigger = { _: HttpTransaction -> true }
 
     @Test
     fun invert() {

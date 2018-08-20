@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Determines whether or not to apply a particular type of ChaosBehaviour to a request/response.
  */
-typealias ChaosPolicy = (HttpTransaction) -> Boolean
+typealias Policy = (HttpTransaction) -> Boolean
 
 /**
  * Returns a ChaosStage which applies some ChaosBehaviour based upon if the policy applies to the
  * passed transaction.
  */
-fun ChaosPolicy.inject(behaviour: ChaosBehaviour) = let { it ->
-    object : ChaosStage {
+fun Policy.inject(behaviour: Behaviour) = let { it ->
+    object : Stage {
         override fun invoke(tx: HttpTransaction) = if (it(tx)) behaviour(tx) else tx.response
         override fun toString() = "$it $behaviour"
     }
@@ -40,7 +40,7 @@ object ChaosPolicies {
      * Single application predicated on the ChaosTrigger. Further matches don't apply
      */
     object Once {
-        operator fun invoke(trigger: ChaosTrigger) = object : ChaosPolicy {
+        operator fun invoke(trigger: Trigger) = object : Policy {
             private val active = AtomicBoolean(true)
             override fun invoke(tx: HttpTransaction) =
                     if (trigger(tx)) active.get().also { active.set(false) } else false
@@ -53,7 +53,7 @@ object ChaosPolicies {
      * Application predicated on the ChaosTrigger
      */
     object Only {
-        operator fun invoke(trigger: ChaosTrigger) = object : ChaosPolicy {
+        operator fun invoke(trigger: Trigger) = object : Policy {
             override fun invoke(tx: HttpTransaction) = trigger(tx)
             override fun toString() = "Only (trigger = $trigger)"
         }
@@ -62,7 +62,7 @@ object ChaosPolicies {
     /**
      * Applies to every transaction.
      */
-    object Always : ChaosPolicy {
+    object Always : Policy {
         override fun invoke(tx: HttpTransaction) = true
         override fun toString() = "Always"
     }
@@ -71,7 +71,7 @@ object ChaosPolicies {
      * Applies n% of the time, based on result of a Random.
      */
     object PercentageBased {
-        operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : ChaosPolicy {
+        operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : Policy {
             override fun invoke(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
             override fun toString() = "PercentageBased ($injectionFrequency%)"
         }
