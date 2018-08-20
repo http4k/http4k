@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
+import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
@@ -25,6 +26,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 typealias Trigger = (HttpTransaction) -> Boolean
 
@@ -41,10 +43,6 @@ infix fun Trigger.and(that: Trigger): Trigger = object : Trigger {
 infix fun Trigger.or(that: Trigger): Trigger = object : Trigger {
     override fun invoke(p1: HttpTransaction) = this@or(p1) || that(p1)
     override fun toString() = this@or.toString() + " OR " + that.toString()
-}
-
-abstract class SerializableTrigger(val type: String) {
-    abstract operator fun invoke(clock: Clock = Clock.systemUTC()): Trigger
 }
 
 object ChaosTriggers {
@@ -94,6 +92,25 @@ object ChaosTriggers {
     }
 
     /**
+     * Activates for a maximum number of calls.
+     */
+    object Countdown {
+        operator fun invoke(initial: Int): Trigger {
+            return object : Trigger {
+                private val count = AtomicInteger(initial)
+
+                override fun invoke(p1: HttpTransaction) =
+                        if (count.get() > 0) {
+                            count.decrementAndGet()
+                            true
+                        } else false
+
+                override fun toString() = "Countdown (${count.get()} remaining)"
+            }
+        }
+    }
+
+    /**
      * Activates when matching attributes of a single sent response are met.
      */
     object MatchResponse {
@@ -120,13 +137,15 @@ object ChaosTriggers {
 internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()) = when (nonNullable<String>("type")) {
     "deadline" -> Deadline(nonNullable("endTime"), clock)
     "delay" -> Delay(nonNullable("period"), clock)
+    "countdown" -> Countdown(nonNullable("count"))
     "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
     "response" -> MatchResponse(asNullable("status"), toRegexMap("headers"), asNullable("body"))
     else -> throw IllegalArgumentException("unknown trigger")
 }
 
-private fun JsonNode.toRegexMap(name:String) =
+private fun JsonNode.toRegexMap(name: String) =
         asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
+
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off
  */

@@ -3,6 +3,7 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
@@ -47,6 +48,19 @@ class DeadlineTriggerTest : ChaosTriggerContract() {
         trigger(tx) shouldMatch equalTo(false)
         sleep(200)
         trigger(tx) shouldMatch equalTo(true)
+    }
+}
+
+class CounterTriggerTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"countdown","count":"1"}"""
+    override val expectedDescription = "Countdown (1 remaining)"
+
+    @Test
+    fun `behaves as expected`() {
+        val trigger = Countdown(1)
+        trigger(tx) shouldMatch equalTo(true)
+        trigger(tx) shouldMatch equalTo(false)
+        trigger(tx) shouldMatch equalTo(false)
     }
 }
 
