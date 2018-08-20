@@ -2,27 +2,28 @@ package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosBehaviours.None
+import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.core.Filter
-import org.http4k.core.HttpTransaction
-import org.http4k.core.Response
+import org.http4k.core.NoOp
+import org.http4k.core.Request
+import org.http4k.core.then
 import java.time.Clock
-import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-typealias Stage = (HttpTransaction) -> Response?
+typealias Stage = (Request) -> Filter?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
  */
 fun Stage.then(nextStage: Stage): Stage = let {
     object : Stage {
-        override fun invoke(tx: HttpTransaction): Response? = it(tx) ?: nextStage(tx)
+        override fun invoke(request: Request): Filter? = it(request) ?: nextStage(request)
         override fun toString() = "[$it] then [$nextStage]"
     }
 }
@@ -33,9 +34,9 @@ fun Stage.then(nextStage: Stage): Stage = let {
 fun Stage.until(trigger: Trigger): Stage = let {
     object : Stage {
         private val active = AtomicBoolean(true)
-        override fun invoke(tx: HttpTransaction): Response? {
-            if (active.get()) active.set(!trigger(tx.request))
-            return if (active.get()) it(tx) else null
+        override fun invoke(request: Request): Filter? {
+            if (active.get()) active.set(!trigger(request))
+            return if (active.get()) it(request) else null
         }
 
         override fun toString(): String = "$it until $trigger"
@@ -45,15 +46,9 @@ fun Stage.until(trigger: Trigger): Stage = let {
 /**
  * Converts this chaos behaviour to a standard http4k Filter.
  */
-fun Stage.asFilter(clock: Clock = Clock.systemUTC()): Filter = let {
-    Filter { next ->
-        { req ->
-            clock.instant().let { start ->
-                next(req).run {
-                    it(HttpTransaction(req, this, Duration.between(start, clock.instant()))) ?: this
-                }
-            }
-        }
+fun Stage.asFilter(): Filter = Filter { next ->
+    {
+        (this@asFilter(it) ?: Filter.NoOp).then(next)(it)
     }
 }
 
@@ -65,10 +60,10 @@ object ChaosStages {
     fun Repeat(newStageFn: () -> Stage): Stage = object : Stage {
         private val current by lazy { AtomicReference(newStageFn()) }
 
-        override fun invoke(tx: HttpTransaction): Response? =
-                current.get()(tx) ?: run {
+        override fun invoke(request: Request): Filter? =
+                current.get()(request) ?: run {
                     current.set(newStageFn())
-                    current.get()(tx)
+                    current.get()(request)
                 }
 
         override fun toString() = "Repeat [${current.get()}]"
@@ -78,15 +73,15 @@ object ChaosStages {
      * Does not apply any ChaosBehaviour.
      */
     object Wait : Stage {
-        override fun invoke(tx: HttpTransaction) = tx.response
+        override fun invoke(request: Request) = Filter.NoOp
         override fun toString() = "Wait"
     }
 
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: Stage = None()) : Stage {
-        override fun invoke(tx: HttpTransaction) = current(tx)
+    class Variable(var current: Stage = Always.inject(None())) : Stage {
+        override fun invoke(request: Request) = current(request)
         override fun toString() = current.toString()
     }
 }

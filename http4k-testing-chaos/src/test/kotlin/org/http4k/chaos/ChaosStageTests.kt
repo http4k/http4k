@@ -4,9 +4,11 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.core.Filter
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -82,11 +84,11 @@ class VariableStageTest {
     @Test
     fun `should provide ability to modify stage at runtime`() {
         val variable = Variable()
-        variable.toString() shouldMatch equalTo(("None"))
-        variable(tx) shouldMatch equalTo(tx.response)
-        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND) }
-        variable.toString() shouldMatch equalTo(("Repeat [ReturnStatus (404)]"))
-        variable(tx)!! shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
+        variable.toString() shouldMatch equalTo(("Always None"))
+        variable(tx.request)!!.then { tx.response }(tx.request) shouldMatch equalTo(tx.response)
+        variable.current = ChaosStages.Repeat { Always.inject(ReturnStatus(NOT_FOUND)) }
+        variable.toString() shouldMatch equalTo(("Repeat [Always ReturnStatus (404)]"))
+        variable(tx.request)!!.then { tx.response }(tx.request) shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
     }
 }
 
@@ -117,5 +119,5 @@ class ChaosStageOperationsTest {
 }
 
 private fun chaosStage(status: Status): Stage = object : Stage {
-    override fun invoke(tx: HttpTransaction) = Response(status)
+    override fun invoke(tx: Request) = Filter { { Response(status) } }
 }

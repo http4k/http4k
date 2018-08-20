@@ -11,10 +11,12 @@ import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosBehaviours.StackOverflow
 import org.http4k.chaos.ChaosBehaviours.ThrowException
 import org.http4k.core.Body.Companion.EMPTY
-import org.http4k.core.HttpTransaction
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.lens.Header
 import java.lang.Thread.sleep
@@ -27,7 +29,7 @@ val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
  */
-typealias Behaviour = (tx: HttpTransaction) -> Response
+typealias Behaviour = Filter
 
 object ChaosBehaviours {
     /**
@@ -35,11 +37,11 @@ object ChaosBehaviours {
      */
     object Latency {
         operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour {
-            override fun invoke(tx: HttpTransaction): Response {
+            override fun invoke(next: HttpHandler): HttpHandler = {
                 val delay = ThreadLocalRandom.current()
                         .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
                 sleep(delay.toLong())
-                return tx.response.with(Header.Common.CHAOS of "Latency (${delay}ms)")
+                next(it).with(Header.Common.CHAOS of "Latency (${delay}ms)")
             }
 
             override fun toString() = "Latency (range = $min to $max)"
@@ -63,7 +65,7 @@ object ChaosBehaviours {
      */
     object ThrowException {
         operator fun invoke(e: Throwable = RuntimeException("Chaos behaviour injected!")) = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = throw e
+            override fun invoke(next: HttpHandler): HttpHandler = { throw e }
             override fun toString() = "ThrowException ${e.javaClass.simpleName} ${e.localizedMessage}"
         }
     }
@@ -73,7 +75,10 @@ object ChaosBehaviours {
      */
     object ReturnStatus {
         operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+            }
+
             override fun toString() = "ReturnStatus (${status.code})"
         }
     }
@@ -83,7 +88,7 @@ object ChaosBehaviours {
      */
     object NoBody {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response.body(EMPTY).with(Header.Common.CHAOS of "No body")
+            override fun invoke(next: HttpHandler): HttpHandler = { next(it).body(EMPTY).with(Header.Common.CHAOS of "No body") }
             override fun toString() = "NoBody"
         }
     }
@@ -93,8 +98,9 @@ object ChaosBehaviours {
      */
     object EatMemory {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response.apply {
-                mutableListOf<ByteArray>().let { while (true) it += ByteArray(1024 * 1024) }
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                mutableListOf<ByteArray>().run { while (true) this += ByteArray(1024 * 1024) }
+                next(it)
             }
 
             override fun toString() = "EatMemory"
@@ -106,9 +112,11 @@ object ChaosBehaviours {
      */
     object StackOverflow {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction): Response {
-                fun overflow(): Unit = overflow()
-                return tx.response.apply { overflow() }
+            fun overflow(): Unit = overflow()
+
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                overflow()
+                next(it)
             }
 
             override fun toString() = "StackOverflow"
@@ -120,7 +128,11 @@ object ChaosBehaviours {
      */
     object KillProcess {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response.apply { System.exit(1) }
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                System.exit(1)
+                next(it)
+            }
+
             override fun toString() = "KillProcess"
         }
     }
@@ -130,7 +142,10 @@ object ChaosBehaviours {
      */
     object BlockThread {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response.apply { Thread.currentThread().join() }
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                next(it).apply { Thread.currentThread().join() }
+            }
+
             override fun toString() = "BlockThread"
         }
     }
@@ -140,7 +155,7 @@ object ChaosBehaviours {
      */
     object None {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(tx: HttpTransaction) = tx.response
+            override fun invoke(next: HttpHandler): HttpHandler = { next(it) }
             override fun toString() = "None"
         }
     }
@@ -149,7 +164,10 @@ object ChaosBehaviours {
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
     class Variable(var current: Behaviour = None()) : Behaviour {
-        override fun invoke(tx: HttpTransaction) = current(tx)
+        override fun invoke(next: HttpHandler): HttpHandler = {
+            current.then(next)(it)
+        }
+
         override fun toString() = "Variable [$current]"
     }
 }

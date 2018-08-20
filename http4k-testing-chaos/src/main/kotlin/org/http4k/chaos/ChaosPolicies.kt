@@ -5,7 +5,6 @@ import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosPolicies.Once
 import org.http4k.chaos.ChaosPolicies.Only
 import org.http4k.chaos.ChaosPolicies.PercentageBased
-import org.http4k.core.HttpTransaction
 import org.http4k.core.Request
 import java.time.Clock
 import java.util.Random
@@ -23,7 +22,7 @@ typealias Policy = (Request) -> Boolean
  */
 fun Policy.inject(behaviour: Behaviour) = let { it ->
     object : Stage {
-        override fun invoke(tx: HttpTransaction) = if (it(tx.request)) behaviour(tx) else tx.response
+        override fun invoke(tx: Request) = if (it(tx)) behaviour else null
         override fun toString() = "$it $behaviour"
     }
 }

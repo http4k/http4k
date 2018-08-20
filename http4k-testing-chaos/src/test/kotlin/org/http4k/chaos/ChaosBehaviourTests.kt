@@ -20,6 +20,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -50,7 +51,7 @@ class ThrowExceptionBehaviourTest : ChaosBehaviourContract() {
         val throwException = ThrowException(expected)
         throwException.toString() shouldMatch equalTo(description)
 
-        assertThat({ throwException(tx) }, throws(equalTo(expected)))
+        assertThat({ throwException.then { tx.response }(tx.request) }, throws(equalTo(expected)))
     }
 
     @Test
@@ -58,7 +59,7 @@ class ThrowExceptionBehaviourTest : ChaosBehaviourContract() {
         val behaviour = """{"message":"foo","type":"throw"}""".asJsonObject().asBehaviour()
         behaviour.toString() shouldMatch equalTo("ThrowException RuntimeException foo")
 
-        assertThat({ behaviour(tx) }, throws<Exception>())
+        assertThat({ behaviour.then { tx.response }(tx.request) }, throws<Exception>())
     }
 }
 
@@ -85,13 +86,13 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     fun `latency behaviour should add extra latency`() {
-        val delay = 10L
+        val delay = 100L
         val latency = Latency(ofMillis(delay), ofMillis(delay + 1))
-        latency.toString() shouldMatch equalTo("Latency (range = PT0.01S to PT0.011S)")
+        latency.toString() shouldMatch equalTo("Latency (range = PT0.1S to PT0.101S)")
 
         val latch = CountDownLatch(1)
         thread {
-            latency(tx)
+            latency.then { tx.response }(tx.request)
             latch.countDown()
         }
         assertThat(latch.await(delay - 1, MILLISECONDS), equalTo(false))
@@ -103,10 +104,10 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     fun `should return response with internal server error status`() {
-        val returnStatus = ReturnStatus(NOT_FOUND)
+        val returnStatus: Behaviour = ReturnStatus(NOT_FOUND)
         returnStatus.toString() shouldMatch equalTo(description)
 
-        val injectedResponse = returnStatus(tx)
+        val injectedResponse = returnStatus.then { tx.response }(tx.request)
         assertEquals(NOT_FOUND, injectedResponse.status)
     }
 
@@ -126,7 +127,7 @@ class NoBodyBehaviourTest : ChaosBehaviourContract() {
         val noBody = NoBody()
         noBody.toString() shouldMatch equalTo(description)
 
-        noBody(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
+        noBody.then { tx.response }(tx.request) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
 
     @Test
@@ -146,7 +147,7 @@ class BlockThreadBehaviourTest : ChaosBehaviourContract() {
         blockThread.toString() shouldMatch equalTo(description)
         val latch = CountDownLatch(1)
         thread {
-            blockThread(tx)
+            blockThread.then { tx.response }(tx.request)
             latch.countDown()
         }
 
@@ -168,7 +169,7 @@ class EatMemoryBehaviourTest : ChaosBehaviourContract() {
         val eatMemory = ChaosBehaviours.EatMemory()
         eatMemory.toString() shouldMatch equalTo(description)
 
-        assertThat({ eatMemory(tx) }, throws<OutOfMemoryError>())
+        assertThat({ eatMemory.then { tx.response }(tx.request) }, throws<OutOfMemoryError>())
     }
 
     @Test
@@ -185,7 +186,7 @@ class DoNothingBehaviourTest : ChaosBehaviourContract() {
     fun `should do nothing memory`() {
         None().toString() shouldMatch equalTo(description)
 
-        None()(tx) shouldMatch equalTo(tx.response)
+        None().then { tx.response }(tx.request) shouldMatch equalTo(tx.response)
     }
 
     @Test
@@ -203,7 +204,7 @@ class StackOverflowBehaviourTest : ChaosBehaviourContract() {
     fun `should stack overflow`() {
         val stackOverflow = StackOverflow()
         stackOverflow.toString() shouldMatch equalTo(description)
-        stackOverflow(tx)
+        stackOverflow.then { tx.response }(tx.request)
     }
 
     @Test
@@ -222,7 +223,7 @@ class KillProcessBehaviourTest : ChaosBehaviourContract() {
     fun `should kill process`() {
         val killProcess = KillProcess()
         killProcess.toString() shouldMatch equalTo(description)
-        killProcess(tx)
+        killProcess.then { tx.response }(tx.request)
     }
 
     @Test
@@ -237,9 +238,9 @@ class VariableBehaviourTest {
     fun `should provide ability to modify behaviour at runtime`() {
         val variable = Variable()
         variable.toString() shouldMatch equalTo(("Variable [None]"))
-        variable(tx) shouldMatch equalTo(tx.response)
+        variable.then { tx.response }(tx.request) shouldMatch equalTo(tx.response)
         variable.current = NoBody()
         variable.toString() shouldMatch equalTo(("Variable [NoBody]"))
-        variable(tx) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
+        variable.then { tx.response }(tx.request) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
 }
