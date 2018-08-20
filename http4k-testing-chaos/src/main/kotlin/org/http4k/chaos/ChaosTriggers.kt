@@ -21,20 +21,20 @@ import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-typealias Trigger = (Request) -> Boolean
+typealias Trigger = (req: Request) -> Boolean
 
 operator fun Trigger.not() = object : Function1<Request, Boolean> {
-    override fun invoke(p1: Request) = !this@not(p1)
+    override fun invoke(req: Request) = !this@not(req)
     override fun toString() = "NOT " + this@not.toString()
 }
 
 infix fun Trigger.and(that: Trigger): Trigger = object : Trigger {
-    override fun invoke(p1: Request) = this@and(p1) && that(p1)
+    override fun invoke(req: Request) = this@and(req) && that(req)
     override fun toString() = this@and.toString() + " AND " + that.toString()
 }
 
 infix fun Trigger.or(that: Trigger): Trigger = object : Trigger {
-    override fun invoke(p1: Request) = this@or(p1) || that(p1)
+    override fun invoke(req: Request) = this@or(req) || that(req)
     override fun toString() = this@or.toString() + " OR " + that.toString()
 }
 
@@ -44,7 +44,7 @@ object ChaosTriggers {
      */
     object Deadline {
         operator fun invoke(endTime: Instant, clock: Clock) = object : Trigger {
-            override fun invoke(p1: Request) = clock.instant().isAfter(endTime)
+            override fun invoke(req: Request) = clock.instant().isAfter(endTime)
             override fun toString() = "Deadline ($endTime)"
         }
     }
@@ -55,7 +55,7 @@ object ChaosTriggers {
     object Delay {
         operator fun invoke(period: Duration, clock: Clock = Clock.systemUTC()) = object : Trigger {
             private val endTime = Instant.now(clock).plus(period)
-            override fun invoke(p1: Request) = clock.instant().isAfter(endTime)
+            override fun invoke(req: Request) = clock.instant().isAfter(endTime)
             override fun toString() = "Delay (expires $endTime)"
         }
     }
@@ -78,7 +78,7 @@ object ChaosTriggers {
             val matcher = if (all.isEmpty()) anything else all.reduce { acc, next -> acc and next }
 
             return object : Trigger {
-                override fun invoke(p1: Request) = matcher.asPredicate()(p1)
+                override fun invoke(req: Request) = matcher.asPredicate()(req)
                 override fun toString() = matcher.description
             }
         }
@@ -91,7 +91,7 @@ object ChaosTriggers {
         operator fun invoke(initial: Int): Trigger = object : Trigger {
             private val count = AtomicInteger(initial)
 
-            override fun invoke(p1: Request) = if (count.get() > 0) { count.decrementAndGet(); true } else false
+            override fun invoke(req: Request) = if (count.get() > 0) { count.decrementAndGet(); true } else false
 
             override fun toString() = "Countdown (${count.get()} remaining)"
         }
@@ -119,7 +119,7 @@ class SwitchTrigger(initialPosition: Boolean = false) : Trigger {
 
     fun toggle(newValue: Boolean? = null) = on.set(newValue ?: !on.get())
 
-    override fun invoke(p1: Request) = on.get()
+    override fun invoke(req: Request) = on.get()
 
     override fun toString() = "SwitchTrigger (active = ${on.get()})"
 }

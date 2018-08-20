@@ -16,31 +16,27 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-typealias Stage = (Request) -> Filter?
+typealias Stage = (req: Request) -> Filter?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
  */
-fun Stage.then(nextStage: Stage): Stage = let {
-    object : Stage {
-        override fun invoke(request: Request): Filter? = it(request) ?: nextStage(request)
-        override fun toString() = "[$it] then [$nextStage]"
-    }
+fun Stage.then(nextStage: Stage) = object : Stage {
+    override fun invoke(request: Request): Filter? = this@then(request) ?: nextStage(request)
+    override fun toString() = "[${this@then}] then [$nextStage]"
 }
 
 /**
  * Stop applying the ChaosBehaviour of this stage when the ChaosTrigger fires.
  */
-fun Stage.until(trigger: Trigger): Stage = let {
-    object : Stage {
-        private val active = AtomicBoolean(true)
-        override fun invoke(request: Request): Filter? {
-            if (active.get()) active.set(!trigger(request))
-            return if (active.get()) it(request) else null
-        }
-
-        override fun toString(): String = "$it until $trigger"
+fun Stage.until(trigger: Trigger): Stage = object : Stage {
+    private val active = AtomicBoolean(true)
+    override fun invoke(request: Request): Filter? {
+        if (active.get()) active.set(!trigger(request))
+        return if (active.get()) this@until(request) else null
     }
+
+    override fun toString(): String = "${this@until} until $trigger"
 }
 
 /**

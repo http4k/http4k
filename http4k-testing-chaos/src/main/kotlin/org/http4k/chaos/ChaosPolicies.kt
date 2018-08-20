@@ -14,17 +14,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Determines whether or not to apply a particular type of ChaosBehaviour to a request.
  */
-typealias Policy = (Request) -> Boolean
+typealias Policy = (req: Request) -> Boolean
 
 /**
  * Returns a ChaosStage which applies some ChaosBehaviour based upon if the policy applies to the
  * passed transaction.
  */
-fun Policy.inject(behaviour: Behaviour) = let { it ->
-    object : Stage {
-        override fun invoke(tx: Request) = if (it(tx)) behaviour else null
-        override fun toString() = "$it $behaviour"
-    }
+fun Policy.inject(behaviour: Behaviour) = object : Stage {
+    override fun invoke(req: Request) = if (this@inject(req)) behaviour else null
+    override fun toString() = "${this@inject} $behaviour"
 }
 
 internal fun JsonNode.asPolicy(clock: Clock = Clock.systemUTC()) = when (nonNullable<String>("type")) {
