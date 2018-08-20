@@ -236,10 +236,10 @@ class VariableBehaviourTest {
     @Test
     fun `should provide ability to modify behaviour at runtime`() {
         val variable = Variable()
-        variable.toString() shouldMatch equalTo(("Variable [None]"))
+        variable.toString() shouldMatch equalTo(("None"))
         variable.then { response }(request) shouldMatch equalTo(response)
         variable.current = NoBody()
-        variable.toString() shouldMatch equalTo(("Variable [NoBody]"))
+        variable.toString() shouldMatch equalTo(("NoBody"))
         variable.then { response }(request) shouldMatch hasHeader("x-http4k-chaos", "No body").and(hasBody(""))
     }
 }

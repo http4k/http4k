@@ -168,7 +168,7 @@ object ChaosBehaviours {
             current.then(next)(it)
         }
 
-        override fun toString() = "Variable [$current]"
+        override fun toString() = current.toString()
     }
 }
 
