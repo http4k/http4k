@@ -20,6 +20,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CorsPolicy
+import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.ServerFilters.Cors
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.json
@@ -29,7 +30,6 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
-import java.time.Clock.systemUTC
 
 /**
  * Adds a set of endpoints to an application which will control the switching on/off of chaos behaviour. The added endpoints are:
@@ -53,7 +53,7 @@ object ChaosControls {
             controlsPath: String = "/chaos",
             security: Security = NoSecurity,
             openApiPath: String = "",
-            corsPolicy: CorsPolicy = CorsPolicy.UnsafeGlobalPermissive
+            corsPolicy: CorsPolicy = UnsafeGlobalPermissive
 
     ): RoutingHttpHandler {
         val showCurrentStatus: HttpHandler = {
@@ -122,9 +122,8 @@ object ChaosControls {
 fun HttpHandler.withChaosControls(stage: Stage = Wait,
                                   security: Security = NoSecurity,
                                   controlsPath: String = "/chaos",
-                                  clock: Clock = systemUTC(),
                                   openApiPath: String = "",
-                                  corsPolicy: CorsPolicy = CorsPolicy.UnsafeGlobalPermissive
+                                  corsPolicy: CorsPolicy = UnsafeGlobalPermissive
 ): RoutingHttpHandler {
     val trigger = SwitchTrigger()
     val variable = Variable(stage)
