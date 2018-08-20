@@ -95,18 +95,12 @@ object ChaosTriggers {
      * Activates for a maximum number of calls.
      */
     object Countdown {
-        operator fun invoke(initial: Int): Trigger {
-            return object : Trigger {
-                private val count = AtomicInteger(initial)
+        operator fun invoke(initial: Int): Trigger = object : Trigger {
+            private val count = AtomicInteger(initial)
 
-                override fun invoke(p1: HttpTransaction) =
-                        if (count.get() > 0) {
-                            count.decrementAndGet()
-                            true
-                        } else false
+            override fun invoke(p1: HttpTransaction) = if (count.get() > 0) { count.decrementAndGet(); true } else false
 
-                override fun toString() = "Countdown (${count.get()} remaining)"
-            }
+            override fun toString() = "Countdown (${count.get()} remaining)"
         }
     }
 
