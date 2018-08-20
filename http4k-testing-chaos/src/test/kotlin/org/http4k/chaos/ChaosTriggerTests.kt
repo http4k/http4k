@@ -7,22 +7,18 @@ import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
-import org.http4k.core.HttpTransaction
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson.asJsonObject
 import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 import java.time.Clock
 import java.time.Duration
-import java.time.Duration.ZERO
 import java.time.Instant.EPOCH
 import java.time.ZoneId.of
 
-private val tx = HttpTransaction(Request(GET, ""), Response(OK), ZERO)
+private val request = Request(GET, "")
 
 abstract class ChaosTriggerContract {
     abstract val asJson: String
@@ -43,9 +39,9 @@ class DeadlineTriggerTest : ChaosTriggerContract() {
     fun `behaves as expected`() {
         val clock = Clock.systemUTC()
         val trigger = Deadline(clock.instant().plusMillis(100), clock)
-        trigger(tx.request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(false)
         sleep(200)
-        trigger(tx.request) shouldMatch equalTo(true)
+        trigger(request) shouldMatch equalTo(true)
     }
 }
 
@@ -56,9 +52,9 @@ class CounterTriggerTest : ChaosTriggerContract() {
     @Test
     fun `behaves as expected`() {
         val trigger = Countdown(1)
-        trigger(tx.request) shouldMatch equalTo(true)
-        trigger(tx.request) shouldMatch equalTo(false)
-        trigger(tx.request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(true)
+        trigger(request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(false)
     }
 }
 
@@ -70,9 +66,9 @@ class DelayTriggerTest : ChaosTriggerContract() {
     fun `behaves as expected`() {
         val clock = Clock.systemUTC()
         val trigger = Delay(Duration.ofMillis(100), clock)
-        trigger(tx.request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(false)
         sleep(110)
-        trigger(tx.request) shouldMatch equalTo(true)
+        trigger(request) shouldMatch equalTo(true)
     }
 }
 
@@ -98,22 +94,22 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     @Test
     fun `matches header`() {
         assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
-                tx.request.header("header", "abob"),
-                tx.request.header("header", "bill"))
+                request.header("header", "abob"),
+                request.header("header", "bill"))
     }
 
     @Test
     fun `matches query`() {
         assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
-                tx.request.query("query", "abob"),
-                tx.request.query("query", "bill"))
+                request.query("query", "abob"),
+                request.query("query", "bill"))
     }
 
     @Test
     fun `matches body`() {
         assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
-                tx.request.body("abob"),
-                tx.request.body("bill"))
+                request.body("abob"),
+                request.body("bill"))
     }
 
     @Test
@@ -129,13 +125,13 @@ class SwitchTriggerTest {
     fun `behaves as expected`() {
         val trigger = SwitchTrigger(true)
         trigger.toString() shouldMatch equalTo("SwitchTrigger (active = true)")
-        trigger(tx.request) shouldMatch equalTo(true)
+        trigger(request) shouldMatch equalTo(true)
         trigger.toggle()
-        trigger(tx.request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(false)
         trigger.toggle(false)
-        trigger(tx.request) shouldMatch equalTo(false)
+        trigger(request) shouldMatch equalTo(false)
         trigger.toggle(true)
-        trigger(tx.request) shouldMatch equalTo(true)
+        trigger(request) shouldMatch equalTo(true)
     }
 }
 
@@ -145,23 +141,23 @@ class ChaosTriggerLogicalOperatorTest {
 
     @Test
     fun invert() {
-        (!isFalse)(tx.request) shouldMatch equalTo(true)
-        (!isTrue)(tx.request) shouldMatch equalTo(false)
+        (!isFalse)(request) shouldMatch equalTo(true)
+        (!isTrue)(request) shouldMatch equalTo(false)
         (!isTrue).toString() shouldMatch equalTo("NOT (org.http4k.core.Request) -> kotlin.Boolean")
     }
 
     @Test
     fun and() {
-        (isFalse and isTrue)(tx.request) shouldMatch equalTo(false)
-        (isTrue and isTrue)(tx.request) shouldMatch equalTo(true)
+        (isFalse and isTrue)(request) shouldMatch equalTo(false)
+        (isTrue and isTrue)(request) shouldMatch equalTo(true)
         (isTrue and isTrue).toString() shouldMatch equalTo("(org.http4k.core.Request) -> kotlin.Boolean AND (org.http4k.core.Request) -> kotlin.Boolean")
     }
 
     @Test
     fun or() {
-        (isFalse or isFalse)(tx.request) shouldMatch equalTo(false)
-        (isFalse or isTrue)(tx.request) shouldMatch equalTo(true)
-        (isTrue or isTrue)(tx.request) shouldMatch equalTo(true)
+        (isFalse or isFalse)(request) shouldMatch equalTo(false)
+        (isFalse or isTrue)(request) shouldMatch equalTo(true)
+        (isTrue or isTrue)(request) shouldMatch equalTo(true)
         (isTrue or isTrue).toString() shouldMatch equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean")
     }
 }
