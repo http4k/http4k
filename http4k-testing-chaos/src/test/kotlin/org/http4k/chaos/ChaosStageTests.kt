@@ -57,7 +57,7 @@ class WaitTest : ChaosStageContract() {
 }
 
 class RepeatTest : ChaosStageContract() {
-    override val asJson = """{"type":"repeat","stage":{"type":"wait"}}"""
+    override val asJson = """{"type":"repeat","stages":[{"type":"wait"}]}"""
     override val expectedDescription = "Repeat [Wait]"
 
     @Test

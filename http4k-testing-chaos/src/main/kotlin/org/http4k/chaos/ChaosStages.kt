@@ -85,7 +85,12 @@ object ChaosStages {
 fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
     val baseStage = when (asNullable<String>("type")) {
         "wait" -> Wait
-        "repeat" -> Repeat { this["stage"]!!.asStage(clock) }
+        "repeat" -> Repeat {
+            this["stages"]!!
+                    .elements().asSequence()
+                    .map { it.asStage(clock) }
+                    .reduce { acc, next -> acc.then(next) }
+        }
         "policy" -> this["policy"]!!.asPolicy(clock).inject(this["behaviour"]!!.asBehaviour())
         else -> throw IllegalArgumentException("unknown stage")
     }
