@@ -147,14 +147,14 @@ class ChaosTriggerLogicalOperatorTest {
     fun invert() {
         (!isFalse)(tx.request) shouldMatch equalTo(true)
         (!isTrue)(tx.request) shouldMatch equalTo(false)
-        (!isTrue).toString() shouldMatch equalTo("NOT (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+        (!isTrue).toString() shouldMatch equalTo("NOT (org.http4k.core.Request) -> kotlin.Boolean")
     }
 
     @Test
     fun and() {
         (isFalse and isTrue)(tx.request) shouldMatch equalTo(false)
         (isTrue and isTrue)(tx.request) shouldMatch equalTo(true)
-        (isTrue and isTrue).toString() shouldMatch equalTo("(org.http4k.core.HttpTransaction) -> kotlin.Boolean AND (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+        (isTrue and isTrue).toString() shouldMatch equalTo("(org.http4k.core.Request) -> kotlin.Boolean AND (org.http4k.core.Request) -> kotlin.Boolean")
     }
 
     @Test
@@ -162,6 +162,6 @@ class ChaosTriggerLogicalOperatorTest {
         (isFalse or isFalse)(tx.request) shouldMatch equalTo(false)
         (isFalse or isTrue)(tx.request) shouldMatch equalTo(true)
         (isTrue or isTrue)(tx.request) shouldMatch equalTo(true)
-        (isTrue or isTrue).toString() shouldMatch equalTo("(org.http4k.core.HttpTransaction) -> kotlin.Boolean OR (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+        (isTrue or isTrue).toString() shouldMatch equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean")
     }
 }

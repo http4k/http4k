@@ -75,7 +75,7 @@ class OnlyTest : ChaosPolicyContract() {
     @Test
     fun `Only applies a behaviour to matching transactions`() {
         val inject = Only { it.method == GET }.inject(ReturnStatus(INTERNAL_SERVER_ERROR))
-        inject.toString() shouldMatch equalTo("Only (trigger = (org.http4k.core.HttpTransaction) -> kotlin.Boolean) ReturnStatus (500)")
+        inject.toString() shouldMatch equalTo("Only (trigger = (org.http4k.core.Request) -> kotlin.Boolean) ReturnStatus (500)")
         val http = inject.asFilter().then { Response(OK) }
 
         http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
@@ -104,7 +104,7 @@ class ChaosPolicyOperationTest {
     @Test
     fun `Until stops a behaviour when triggered`() {
         val stage = Always.inject(ReturnStatus(INTERNAL_SERVER_ERROR)).until { it.method == POST }
-        stage.toString() shouldMatch equalTo("Always ReturnStatus (500) until (org.http4k.core.HttpTransaction) -> kotlin.Boolean")
+        stage.toString() shouldMatch equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean")
 
         val http = stage.asFilter().then { Response(OK) }
 

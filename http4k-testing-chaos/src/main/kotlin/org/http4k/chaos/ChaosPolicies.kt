@@ -6,15 +6,16 @@ import org.http4k.chaos.ChaosPolicies.Once
 import org.http4k.chaos.ChaosPolicies.Only
 import org.http4k.chaos.ChaosPolicies.PercentageBased
 import org.http4k.core.HttpTransaction
+import org.http4k.core.Request
 import java.time.Clock
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Determines whether or not to apply a particular type of ChaosBehaviour to a request/response.
+ * Determines whether or not to apply a particular type of ChaosBehaviour to a request.
  */
-typealias Policy = (HttpTransaction) -> Boolean
+typealias Policy = (Request) -> Boolean
 
 /**
  * Returns a ChaosStage which applies some ChaosBehaviour based upon if the policy applies to the
@@ -22,7 +23,7 @@ typealias Policy = (HttpTransaction) -> Boolean
  */
 fun Policy.inject(behaviour: Behaviour) = let { it ->
     object : Stage {
-        override fun invoke(tx: HttpTransaction) = if (it(tx)) behaviour(tx) else tx.response
+        override fun invoke(tx: HttpTransaction) = if (it(tx.request)) behaviour(tx) else tx.response
         override fun toString() = "$it $behaviour"
     }
 }
@@ -42,8 +43,8 @@ object ChaosPolicies {
     object Once {
         operator fun invoke(trigger: Trigger) = object : Policy {
             private val active = AtomicBoolean(true)
-            override fun invoke(tx: HttpTransaction) =
-                    if (trigger(tx.request)) active.get().also { active.set(false) } else false
+            override fun invoke(request: Request) =
+                    if (trigger(request)) active.get().also { active.set(false) } else false
 
             override fun toString() = "Once (trigger = $trigger)"
         }
@@ -54,7 +55,7 @@ object ChaosPolicies {
      */
     object Only {
         operator fun invoke(trigger: Trigger) = object : Policy {
-            override fun invoke(tx: HttpTransaction) = trigger(tx.request)
+            override fun invoke(request: Request) = trigger(request)
             override fun toString() = "Only (trigger = $trigger)"
         }
     }
@@ -63,7 +64,7 @@ object ChaosPolicies {
      * Applies to every transaction.
      */
     object Always : Policy {
-        override fun invoke(tx: HttpTransaction) = true
+        override fun invoke(request: Request) = true
         override fun toString() = "Always"
     }
 
@@ -72,7 +73,7 @@ object ChaosPolicies {
      */
     object PercentageBased {
         operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : Policy {
-            override fun invoke(tx: HttpTransaction) = selector.nextInt(100) <= injectionFrequency
+            override fun invoke(request: Request) = selector.nextInt(100) <= injectionFrequency
             override fun toString() = "PercentageBased ($injectionFrequency%)"
         }
 
