@@ -96,7 +96,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     fun `rpc call with invalid parameters returns error`() {
         assertThat(
                 rpcRequest("add", "{\"first\": 5, \"second\": \"a\"}", "1"),
-                hasErrorResponse(-32600, "Invalid Request", "1")
+                hasErrorResponse(-32602, "Invalid params", "1")
         )
     }
 
@@ -104,7 +104,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     fun `rpc call with positional parameters when not supported returns error`() {
         assertThat(
                 rpcRequest("addNoArray", "[5, 3]", "1"),
-                hasErrorResponse(-32600, "Invalid Request", "1")
+                hasErrorResponse(-32602, "Invalid params", "1")
         )
     }
 

@@ -60,7 +60,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
             when (e) {
                 is JsonRpcException -> renderError(e.errorMessage, request.id)
                 is LensFailure -> when (e.overall()) {
-                    Failure.Type.Invalid -> renderError(ErrorMessage.InvalidRequest, request.id)
+                    Failure.Type.Invalid -> renderError(ErrorMessage.InvalidParams, request.id)
                     else -> renderError(ErrorMessage.ServerError, request.id)
                 }
                 else -> renderError(ErrorMessage.ServerError, request.id)
