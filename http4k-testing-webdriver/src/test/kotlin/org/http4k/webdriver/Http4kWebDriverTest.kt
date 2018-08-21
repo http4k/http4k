@@ -70,11 +70,14 @@ class Http4kWebDriverTest {
 
     @Test
     fun `navigation`() {
-        driver.navigate().to("http://localhost/rita")
-        driver.assertOnPage("http://localhost/rita")
+        driver.navigate().to("https://localhost/rita")
+        driver.assertOnPage("https://localhost/rita")
+        assertThat(driver.currentUrl, equalTo("https://localhost/rita"))
 
         driver.navigate().to(URL("http://localhost/bob"))
         driver.assertOnPage("http://localhost/bob")
+        assertThat(driver.currentUrl, equalTo("http://localhost/bob"))
+
         driver.get("/bill")
         driver.assertOnPage("/bill")
         driver.navigate().back()
