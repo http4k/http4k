@@ -11,7 +11,6 @@ import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
 import org.http4k.chaos.ChaosTriggers.Once
-import org.http4k.chaos.ChaosTriggers.Only
 import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -179,23 +178,6 @@ class PercentageBasedTest : ChaosTriggerContract() {
     fun `PercentageBased applied`() {
         val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(100)).asFilter().then { Response(OK) }
         http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500"))
-    }
-}
-
-class OnlyTest : ChaosTriggerContract() {
-    override val asJson = """{"type":"only","trigger":{"type":"deadline","endTime":"1970-01-01T00:00:00Z"}}"""
-
-    override val expectedDescription = "Only (trigger = Deadline (1970-01-01T00:00:00Z))"
-
-    @Test
-    fun `Only applies a behaviour to matching transactions`() {
-        val inject = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Only { it.method == GET })
-        inject.toString() shouldMatch equalTo("Only (trigger = (org.http4k.core.Request) -> kotlin.Boolean) ReturnStatus (500)")
-        val http = inject.asFilter().then { Response(OK) }
-
-        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
-        http(Request(POST, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
-        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
     }
 }
 

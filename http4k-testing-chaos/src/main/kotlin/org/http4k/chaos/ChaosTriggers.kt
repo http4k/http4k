@@ -9,7 +9,6 @@ import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
 import org.http4k.chaos.ChaosTriggers.Once
-import org.http4k.chaos.ChaosTriggers.Only
 import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -55,16 +54,6 @@ object ChaosTriggers {
                     if (trigger(request)) active.get().also { active.set(false) } else false
 
             override fun toString() = "Once (trigger = $trigger)"
-        }
-    }
-
-    /**
-     * Application predicated on the ChaosTrigger
-     */
-    object Only {
-        operator fun invoke(trigger: Trigger) = object : Trigger {
-            override fun invoke(request: Request) = trigger(request)
-            override fun toString() = "Only (trigger = $trigger)"
         }
     }
 
@@ -160,7 +149,6 @@ internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = whe
     "countdown" -> Countdown(nonNullable("count"))
     "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
     "once" -> Once(this["trigger"].asTrigger(clock))
-    "only" -> Only(this["trigger"].asTrigger(clock))
     "percentage" -> PercentageBased(this["percentage"].asInt())
     "always" -> Always
     else -> throw IllegalArgumentException("unknown trigger")
