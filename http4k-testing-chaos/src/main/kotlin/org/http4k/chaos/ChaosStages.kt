@@ -91,11 +91,7 @@ fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
                     .map { it.asStage(clock) }
                     .reduce { acc, next -> acc.then(next) }
         }
-        "trigger" -> {
-            println(this["behaviour"])
-            println(this["trigger"])
-            this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
-        }
+        "trigger" -> this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
         else -> throw IllegalArgumentException("unknown stage")
     }
     return this["until"]?.let { baseStage.until(it.asTrigger(clock)) } ?: baseStage
