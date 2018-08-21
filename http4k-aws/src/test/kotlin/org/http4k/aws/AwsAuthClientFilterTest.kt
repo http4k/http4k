@@ -29,7 +29,7 @@ class AwsClientFilterTest {
 
     @Test
     fun `adds authorization header`() {
-        client(Request(Method.GET, "http://amazon/test").header("content-length", "0"))
+        client(Request(Method.GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("Authorization"),
             equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date, Signature=8afa7ee258c3eaa39b2764cbd52144fd7bbbe401876d4c9f359318963b82244d"))
@@ -37,21 +37,21 @@ class AwsClientFilterTest {
 
     @Test
     fun `adds time header`() {
-        client(Request(Method.GET, "http://amazon/test").header("content-length", "0"))
+        client(Request(Method.GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("x-amz-date"), equalTo("20160127T153250Z"))
     }
 
     @Test
     fun adds_content_sha256() {
-        client(Request(Method.GET, "http://amazon/test").header("content-length", "0"))
+        client(Request(Method.GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
 
         assertThat(audit.captured?.header("x-amz-content-sha256"),
             equalTo("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
     }
 }
 
-class AuditHandler() : HttpHandler {
+class AuditHandler : HttpHandler {
     var captured: Request? = null
 
     override fun invoke(request: Request): Response {
