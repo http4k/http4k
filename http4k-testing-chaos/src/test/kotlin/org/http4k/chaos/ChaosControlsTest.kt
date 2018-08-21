@@ -3,8 +3,8 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.contract.ApiKey
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -31,7 +31,7 @@ class ChaosControlsTest {
     fun `can convert a normal app to be chaotic`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosControls(Always.inject(ReturnStatus(NOT_FOUND)))
+        val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always))
 
         appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
         appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasStatus(OK).and(hasBody(originalChaos))

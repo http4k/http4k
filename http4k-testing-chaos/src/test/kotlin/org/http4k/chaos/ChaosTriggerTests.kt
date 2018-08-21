@@ -1,22 +1,39 @@
 package org.http4k.chaos
 
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
+import org.http4k.chaos.ChaosTriggers.Once
+import org.http4k.chaos.ChaosTriggers.Only
+import org.http4k.chaos.ChaosTriggers.PercentageBased
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant.EPOCH
 import java.time.ZoneId.of
+import java.util.Properties
 
 private val request = Request(GET, "")
 
@@ -132,6 +149,83 @@ class SwitchTriggerTest {
         trigger(request) shouldMatch equalTo(false)
         trigger.toggle(true)
         trigger(request) shouldMatch equalTo(true)
+    }
+}
+
+class AlwaysTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"always"}"""
+
+    override val expectedDescription = "Always"
+
+    @Test
+    fun `Always applies by default`() {
+        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always).asFilter().then { Response(OK) }
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500"))
+    }
+}
+
+class PercentageBasedTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"percentage", "percentage":100}"""
+
+    override val expectedDescription = "PercentageBased (100%)"
+
+    @Test
+    fun `from environment`() {
+        PercentageBased.fromEnvironment({ Properties().apply { put("CHAOS_PERCENTAGE", "75") }.getProperty(it) }).toString() shouldMatch equalTo("PercentageBased (75%)")
+        PercentageBased.fromEnvironment().toString() shouldMatch equalTo("PercentageBased (50%)")
+    }
+
+    @Test
+    fun `PercentageBased applied`() {
+        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(100)).asFilter().then { Response(OK) }
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500"))
+    }
+}
+
+class OnlyTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"only","trigger":{"type":"deadline","endTime":"1970-01-01T00:00:00Z"}}"""
+
+    override val expectedDescription = "Only (trigger = Deadline (1970-01-01T00:00:00Z))"
+
+    @Test
+    fun `Only applies a behaviour to matching transactions`() {
+        val inject = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Only { it.method == GET })
+        inject.toString() shouldMatch equalTo("Only (trigger = (org.http4k.core.Request) -> kotlin.Boolean) ReturnStatus (500)")
+        val http = inject.asFilter().then { Response(OK) }
+
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
+        http(Request(POST, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
+    }
+}
+
+class OnceTest : ChaosTriggerContract() {
+    override val asJson = """{"type":"once","trigger":{"type":"deadline","endTime":"1970-01-01T00:00:00Z"}}"""
+
+    override val expectedDescription = "Once (trigger = Deadline (1970-01-01T00:00:00Z))"
+
+    @Test
+    fun `Once only fires once`() {
+        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(Status.OK) }
+        http(Request(POST, "/foo")) shouldMatch hasStatus(OK)
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
+        http(Request(POST, "/foo")) shouldMatch hasStatus(OK)
+        http(Request(GET, "/foo")) shouldMatch hasStatus(OK)
+    }
+}
+
+class ChaosPolicyOperationTest {
+
+    @Test
+    fun `Until stops a behaviour when triggered`() {
+        val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always).until { it.method == POST }
+        stage.toString() shouldMatch equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean")
+
+        val http: HttpHandler = stage.asFilter().then { Response(Status.OK) }
+
+        http(Request(GET, "/foo")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500"))
+        http(Request(POST, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
+        http(Request(GET, "/bar")) shouldMatch hasStatus(OK).and(!hasHeader("x-http4k-chaos"))
     }
 }
 

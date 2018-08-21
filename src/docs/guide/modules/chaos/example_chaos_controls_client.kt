@@ -1,8 +1,8 @@
 package guide.modules.chaos
 
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosPolicies.Always
-import org.http4k.chaos.inject
+import org.http4k.chaos.ChaosTriggers.Always
+import org.http4k.chaos.appliedWhen
 import org.http4k.chaos.withChaosControls
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -15,7 +15,7 @@ import org.http4k.routing.routes
 fun main(args: Array<String>) {
     val app = routes("/" bind routes("/" bind GET to { Response(Status.OK).body("hello!") }))
 
-    val appWithChaos = app.withChaosControls(Always.inject(ReturnStatus(Status.NOT_FOUND)))
+    val appWithChaos = app.withChaosControls(ReturnStatus(Status.NOT_FOUND).appliedWhen(Always))
 
     println(appWithChaos(Request(GET, "/chaos/status")).bodyString())
     println(appWithChaos(Request(GET, "/")).status)
