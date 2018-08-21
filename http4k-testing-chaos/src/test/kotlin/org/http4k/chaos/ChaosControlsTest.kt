@@ -43,8 +43,8 @@ class ChaosControlsTest {
         appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
         appWithChaos(Request(POST, "/chaos/activate/new").body("""
             [{
-                "type":"policy",
-                "policy": {
+                "type":"trigger",
+                "trigger": {
                     "type":"always"
                 },
                 "behaviour":{
