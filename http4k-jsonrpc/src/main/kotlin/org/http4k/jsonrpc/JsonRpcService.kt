@@ -107,3 +107,36 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
 data class MethodMapping<IN, OUT>(val name: String, val handler: RequestHandler<IN, OUT>)
 
 typealias ErrorHandler = (Throwable) -> ErrorMessage?
+
+private const val jsonRpcVersion: String = "2.0"
+
+private class JsonRpcRequest<ROOT: NODE, NODE>(json: Json<ROOT, NODE>, fields: Map<String, NODE>) {
+    private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
+        json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
+    }
+
+    val method: String = (fields["method"] ?: json.nullNode()).let {
+        if (json.typeOf(it) == JsonType.String) {
+            json.text(it)
+        } else {
+            valid = false
+            ""
+        }
+    }
+    val params: NODE? = fields["params"]?.also {
+        if (!setOf(JsonType.Object, JsonType.Array).contains(json.typeOf(it))) {
+            valid = false
+        }
+    }
+
+    val id: NODE? = fields["id"]?.let {
+        if (!setOf(JsonType.String, JsonType.Number, JsonType.Null).contains(json.typeOf(it))) {
+            valid = false
+            json.nullNode()
+        } else {
+            it
+        }
+    }
+
+    fun valid() = valid
+}
