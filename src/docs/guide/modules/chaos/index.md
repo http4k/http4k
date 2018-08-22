@@ -63,7 +63,7 @@ For use in deployed environments or when experimenting with the reaction of syst
 
 The module contains a simple extension method `HttpHandler.withChaosControls()` that decorates an existing http4k application with the ability to dynamically inject Chaos behaviour using a set of REST-style endpoints. This API is presented via an OpenAPI specification, which allows it to be controlled by a simple Swagger client. 
 
-Apart from being able to turn the Chaos on/off and check the status, the most powerful endpoint in ChaosControls lives at `/activate/new`. By POSTing a JSON definition of the required behaviour, this JSON is deserialised into actual Chaos behaviours which are then activated in the application. The supported JSON formats of the various Chaos concepts are defined above, but by way of an example, POSTing this piece of JSON would:
+Apart from being able to turn the Chaos on/off and check the status, the most powerful endpoint in ChaosControls lives at `/activate/new`. By POSTing a JSON definition of the required behaviour, this JSON is deserialised into actual Chaos behaviours which can be then activated in the application. The supported JSON formats of the various Chaos concepts are defined above, but by way of an example, POSTing this piece of JSON would:
 
 1. Wait for 100 seconds
 1. Always return an HTTP 404 (Not Found) status for 10 requests
