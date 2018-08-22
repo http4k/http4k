@@ -40,16 +40,32 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
         method("addNoArray", handler(addParams, addResult, Calculator::add))
         method("fails", handler(Result { json.nullNode() }, Calculator::fails))
     }
-})
+}) {
+    @Test
+    fun `rpc call with positional parameters when fields not defined returns error`() {
+        assertThat(
+                rpcRequest("addNoArray", "[5, 3]", "1"),
+                hasErrorResponse(-32602, "Invalid params", "1")
+        )
+    }
+}
 
 class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
 
     jsonRpc(auto(json)) {
-        method("add", handler(setOf("first", "second"), Calculator::add))
-        method("addNoArray", handler(Calculator::add))
+        method("add", handler(Calculator::add))
+        method("addDefinedFields", handler(setOf("first", "second", "ignored"), Calculator::add))
         method("fails", handler(Calculator::fails))
     }
-})
+}) {
+    @Test
+    fun `rpc call with positional parameters when fields defined returns result`() {
+        assertThat(
+                rpcRequest("addDefinedFields", "[5, 3]", "1"),
+                hasSuccessResponse("8", "1")
+        )
+    }
+}
 
 abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJson<ROOT>,
                                                         builder: (JsonLibAutoMarshallingJson<ROOT>) -> JsonRpcService<ROOT, ROOT>) {
@@ -96,14 +112,6 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     fun `rpc call with invalid parameters returns error`() {
         assertThat(
                 rpcRequest("add", "{\"first\": 5, \"second\": \"a\"}", "1"),
-                hasErrorResponse(-32602, "Invalid params", "1")
-        )
-    }
-
-    @Test
-    fun `rpc call with positional parameters when not supported returns error`() {
-        assertThat(
-                rpcRequest("addNoArray", "[5, 3]", "1"),
                 hasErrorResponse(-32602, "Invalid params", "1")
         )
     }
@@ -279,7 +287,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
         )
     }
 
-    private fun rpcRequest(method: String, params: String? = null, id: String? = null): Response =
+    protected fun rpcRequest(method: String, params: String? = null, id: String? = null): Response =
             rpcRequestWithBody(rpcJson(method, params, id))
 
     private fun rpcJson(method: String, params: String? = null, id: String? = null): String =
@@ -291,7 +299,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     private fun rpcRequestWithBody(body: String): Response = rpc(Request(Method.POST, "/rpc")
             .with(Body.string(ContentType.APPLICATION_JSON).toLens() of body))
 
-    private fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
+    protected fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
             hasResponse(Success(result, id))
 
     private fun hasNoContentResponse(): Matcher<Response> =
@@ -299,7 +307,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
                     hasContentType(ContentType.APPLICATION_JSON) and
                     hasBody("")
 
-    private fun hasErrorResponse(code: Int, message: String, id: String?): Matcher<Response> =
+    protected fun hasErrorResponse(code: Int, message: String, id: String?): Matcher<Response> =
             hasResponse(Error(code, message, id))
 
     private fun hasResponse(response: ExpectedResponse): Matcher<Response> =

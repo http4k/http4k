@@ -17,7 +17,7 @@ class AutoMethodMappingsBuilder<ROOT: Any>(override val json: JsonLibAutoMarshal
     }
 
     inline fun <reified IN: Any, OUT: Any> handler(noinline block: (IN) -> OUT): RequestHandler<ROOT, ROOT> =
-            handler(emptySet(), block)
+            handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), block)
 
     fun <OUT: Any> handler(block: () -> OUT): RequestHandler<ROOT, ROOT> {
         val resultLens = Result<OUT, ROOT> {
