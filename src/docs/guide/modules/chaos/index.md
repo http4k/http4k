@@ -10,7 +10,7 @@ The http4k Chaos module provides the facility to dynamically inject failure mode
 The [Principles of Chaos Engineering](http://principlesofchaos.org/) approach was made prominent by Netflix open-sourcing the [Simian Army](https://github.com/Netflix/SimianArmy) libraries. 
 
 ### API concepts
-To understand the API, these domain-language concepts are important, all modelled as simple Kotlin:
+To understand the API, these domain-language concepts are important, all modelled as simple Kotlin typealiases and interfaces in order that API users can create their own:
 
 #### Behaviours - `typealias Behaviour = Filter` 
 A **Behaviour** applies the failure mode to the HTTP call. This could involve blocking a thread permanently, introducing extra latency into an HTTP service, or even causing a Stack Overflow or Killing the running process.
@@ -52,11 +52,63 @@ A **Stage** provides the lifecycle for applying a behaviour, and applies until a
 |Repeat|Loops through the stages and then repeats|`{"type":"repeat","stages":[<insert stage json elements>],"until":<insert trigger json>}`|
 |(Triggered)|Combines a Trigger and a Behaviour |`{"type":"trigger","behaviour":{"type":"body"},"trigger":<insert trigger json>,"until":<insert trigger json>}}`|
 
+### Manually injecting Chaos
+For use in automated test suites, it is simple to define the Chaos behaviour programmatically using the API and then apply it as a Filter onto an existing application.
+
 #### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt"></script>
 
+### Dynamic behaviour injection using Chaos Controls
+For use in deployed environments or when experimenting with the reaction of systems to failure, there is the need to vary (and otherwise control) the Chaos behaviour that an application or downstream fake exhibits, in order to simulate periods of failures and then observe the after-effects.
+
+The module contains a simple extension method `HttpHandler.withChaosControls()` that decorates an existing http4k application with the ability to dynamically inject Chaos behaviour using a set of REST-style endpoints. This API is presented via an OpenAPI specification, which allows it to be controlled by a simple Swagger client. 
+
+Apart from being able to turn the Chaos on/off and check the status, the most powerful endpoint in ChaosControls lives at `/activate/new`. By POSTing a JSON definition of the required behaviour, this JSON is deserialised into actual Chaos behaviours which are then activated in the application. The supported JSON formats of the various Chaos concepts are defined above, but by way of an example, POSTing this piece of JSON would:
+
+1. Wait for 100 seconds
+1. Always return an HTTP 404 (Not Found) status for 10 requests
+1. Repeat the above until Big Ben strikes in the New Year 2020.
+
+```json
+[
+  {
+    "type": "repeat",
+    "stages": [
+      {
+        "type": "wait",
+        "until": {
+          "type": "delay",
+          "period": "PT100S"
+        }
+      },
+      {
+        "type": "trigger",
+        "behaviour": {
+          "type": "status",
+          "status": 404
+        },
+        "trigger": {
+          "type": "always",
+        },
+        "until": {
+          "type": "countdown",
+          "count": "10"
+        }
+      }
+    ],
+    "until": {
+      "type": "deadline",
+      "endTime": "2020-01-01T00:00:00Z"
+    }
+  }
+]
+```
+
+
 #### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_openapi.kt"></script>
+
+### Interacting with ChaosControls using an HTTP client
 
 #### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_client.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos_controls_client.kt"></script>
