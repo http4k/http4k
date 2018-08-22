@@ -15,11 +15,10 @@
 
  [**http4k**](https://github.com/http4k/http4k) is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [**http4k**](https://github.com/http4k/http4k) applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
  
- ```kotlin
- 
+```kotlin
  val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
  val server = app.asServer(SunHttp(8000)).start()
- ```
+```
 
 [**http4k**](https://github.com/http4k/http4k) consists of a core library, `http4k-core`, providing a base HTTP implementation + a number of capability abstractions (such as servers, clients, templating, websockets etc). These capabilities are then implemented in add-on modules.
 
@@ -53,6 +52,7 @@ plugging together of services without HTTP container being required.
     * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
     * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
+    * Testing: Chaos Injection mechanism, allowing simple, dynamic injection of failure modes into  [**http4k**](https://github.com/http4k/http4k) applications.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
@@ -121,6 +121,8 @@ plugging together of services without HTTP container being required.
     * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
     * A set of Hamkrest matchers for testing [**http4k**](https://github.com/http4k/http4k)  Request and Response messages.
+* [Chaos:](https://http4k.org/guide/modules/chaos) 
+    * API for declaring and injecting failure modes into [**http4k**](https://github.com/http4k/http4k) applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
     
 ## Example
 This quick example is designed to convey the simplicity & features of [**http4k**](https://github.com/http4k/http4k) . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.

@@ -5,7 +5,7 @@ description: Feature overview of the http4k-testing-chaos module
 ```compile group: "org.http4k", name: "http4k-testing-chaos", version: "3.35.1"```
 
 ### About
-The http4k Chaos module provides the facility to dynamically inject failure modes into http4k applications, such as random HTTP failures, killing of processes, and extra latency injection. By modelling these modes, it is possible to plan for mitigation of particular scenarios on a wider scale, resulting either from failures within your system boundary, or those caused by dependent remote HTTP services.
+The http4k Chaos module provides the facility to statically or dynamically inject failure modes into http4k applications, such as random HTTP failures, killing of processes, and extra latency injection. By modelling these modes, it is possible to plan for mitigation of particular scenarios on a wider scale, resulting either from failures within your system boundary, or those caused by dependent remote HTTP services.
 
 The [Principles of Chaos Engineering](http://principlesofchaos.org/) approach was made prominent by Netflix open-sourcing the [Simian Army](https://github.com/Netflix/SimianArmy) libraries. 
 
