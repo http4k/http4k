@@ -17,6 +17,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 
 data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
+                                             private val errorHandler: ErrorHandler,
                                              private val methodMappings: List<MethodMapping<NODE, NODE>>): HttpHandler {
 
     private val jsonLens = json.body("JSON-RPC request", ContentNegotiation.StrictNoDirective).toLens()
@@ -48,23 +49,28 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
     private fun handleSingle(fields: Map<String, NODE>): ROOT? {
         val request = JsonRpcRequest(json, fields)
         return try {
-            val result: NODE = if (request.valid()) {
-                methods[request.method]?.invoke(request.params ?: json.nullNode())
-                        ?: throw JsonRpcException(ErrorMessage.MethodNotFound)
-            } else {
-                throw JsonRpcException(ErrorMessage.InvalidRequest)
-            }
-
-            request.id?.let { renderResult(result, it) }
-        } catch (e: Throwable) {
-            when (e) {
-                is JsonRpcException -> renderError(e.errorMessage, request.id)
-                is LensFailure -> when (e.overall()) {
-                    Failure.Type.Invalid -> renderError(ErrorMessage.InvalidParams, request.id)
-                    else -> renderError(ErrorMessage.ServerError, request.id)
+            if (request.valid()) {
+                val method = methods[request.method]
+                if (method == null) {
+                    renderError(ErrorMessage.MethodNotFound, request.id)
+                } else {
+                    val result = method(request.params ?: json.nullNode())
+                    request.id?.let { renderResult(result, it) }
                 }
-                else -> renderError(ErrorMessage.ServerError, request.id)
+            } else {
+                renderError(ErrorMessage.InvalidRequest, request.id)
             }
+        } catch (e: Throwable) {
+            val defaultErrorMessage = if (e is LensFailure && e.overall() == Failure.Type.Invalid) {
+                ErrorMessage.InvalidParams
+            } else {
+                ErrorMessage.ServerError
+            }
+            val error = when (e) {
+                is LensFailure -> e.cause ?: e
+                else -> e
+            }
+            renderError(errorHandler(error) ?: defaultErrorMessage, request.id)
         }
     }
 
@@ -99,3 +105,5 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
 }
 
 data class MethodMapping<IN, OUT>(val name: String, val handler: RequestHandler<IN, OUT>)
+
+typealias ErrorHandler = (Throwable) -> ErrorMessage?

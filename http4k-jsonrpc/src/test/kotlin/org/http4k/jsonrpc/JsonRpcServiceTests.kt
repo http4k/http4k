@@ -21,11 +21,27 @@ import org.http4k.routing.bind
 import org.junit.Test
 
 data class Add(val first: Int, val second: Int)
+data class Div(val dividend: Double, val divisor: Double)
+
+class DivideByZeroException : RuntimeException("divide by zero")
 
 private object Calculator {
     fun add(it: Add): Int = it.first + it.second
 
+    fun divide(it: Div): Double = if (it.divisor == 0.0 ) {
+        throw DivideByZeroException()
+    } else {
+        it.dividend / it.divisor
+    }
+
     fun fails(): Void = throw RuntimeException("Boom!")
+}
+
+private object CalculatorErrorHandler : ErrorHandler {
+    override fun invoke(error: Throwable): ErrorMessage? = when (error) {
+        is DivideByZeroException -> ErrorMessage(1, "Divide by zero")
+        else -> null
+    }
 }
 
 class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
@@ -35,9 +51,15 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
     }
     val addResult: Result<Int, JsonNode> = Result { json.number(it) }
 
-    jsonRpc(json) {
+    val divParams = Params<JsonNode, Div> {
+        Div(it["dividend"].asDouble(), it["divisor"].asDouble())
+    }
+    val divResult: Result<Double, JsonNode> = Result { json.number(it) }
+
+    jsonRpc(json, CalculatorErrorHandler) {
         method("add", handler(setOf("first", "second"), addParams, addResult, Calculator::add))
         method("addNoArray", handler(addParams, addResult, Calculator::add))
+        method("divide", handler(divParams, divResult, Calculator::divide))
         method("fails", handler(Result { json.nullNode() }, Calculator::fails))
     }
 }) {
@@ -52,9 +74,10 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
 
 class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
 
-    jsonRpc(auto(json)) {
+    jsonRpc(auto(json), CalculatorErrorHandler) {
         method("add", handler(Calculator::add))
         method("addDefinedFields", handler(setOf("first", "second", "ignored"), Calculator::add))
+        method("divide", handler(Calculator::divide))
         method("fails", handler(Calculator::fails))
     }
 }) {
@@ -284,6 +307,14 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
                         rpcJson("add", "[5, 3]")
                 ).joinToString(",", "[", "]")),
                 hasNoContentResponse()
+        )
+    }
+
+    @Test
+    fun `rpc call that throws user exception returns failure`() {
+        assertThat(
+                rpcRequest("divide", "{\"dividend\": 4, \"divisor\": 0}", "1"),
+                hasErrorResponse(1, "Divide by zero", "1")
         )
     }
 

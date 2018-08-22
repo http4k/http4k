@@ -46,5 +46,3 @@ data class ErrorMessage(val code: Int, val message: String) {
         val ParseError = ErrorMessage(-32700, "Parse error")
     }
 }
-
-open class JsonRpcException(val errorMessage: ErrorMessage) : RuntimeException(errorMessage.toString())

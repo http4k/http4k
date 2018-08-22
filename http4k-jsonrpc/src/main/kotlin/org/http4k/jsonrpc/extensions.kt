@@ -5,12 +5,23 @@ import org.http4k.format.JsonLibAutoMarshallingJson
 
 fun <ROOT : NODE, NODE> jsonRpc(json: Json<ROOT, NODE>,
                                 definitions: ManualMethodMappingsBuilder<ROOT, NODE>.() -> Unit): JsonRpcService<ROOT, NODE> =
-        jsonRpc(manual(json), definitions)
+        jsonRpc(json, { null }, definitions)
+
+fun <ROOT : NODE, NODE> jsonRpc(json: Json<ROOT, NODE>,
+                                errorHandler: ErrorHandler,
+                                definitions: ManualMethodMappingsBuilder<ROOT, NODE>.() -> Unit): JsonRpcService<ROOT, NODE> =
+        jsonRpc(manual(json), errorHandler, definitions)
+
+fun <ROOT : NODE, NODE, M: MethodMappingsBuilder<ROOT, NODE>> jsonRpc(
+        methodMappingsBuilder: M,
+        definitions: M.() -> Unit): JsonRpcService<ROOT, NODE> =
+        jsonRpc(methodMappingsBuilder, { null }, definitions)
 
 fun <ROOT : NODE, NODE, M: MethodMappingsBuilder<ROOT, NODE>> jsonRpc(
                                 methodMappingsBuilder: M,
+                                errorHandler: ErrorHandler,
                                 definitions: M.() -> Unit): JsonRpcService<ROOT, NODE> =
-        JsonRpcService(methodMappingsBuilder.json, methodMappingsBuilder.apply(definitions).mappings())
+        JsonRpcService(methodMappingsBuilder.json, errorHandler, methodMappingsBuilder.apply(definitions).mappings())
 
 fun <ROOT: NODE, NODE> manual(json: Json<ROOT, NODE>) = ManualMethodMappingsBuilder(json)
 
