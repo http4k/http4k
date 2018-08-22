@@ -9,10 +9,11 @@ The http4k Chaos module provides the facility to dynamically inject failure mode
 
 The [Principles of Chaos Engineering](http://principlesofchaos.org/) approach was made prominent by Netflix open-sourcing the [Simian Army](https://github.com/Netflix/SimianArmy) libraries. 
 
-#### API concepts
-To understand the API, these domain-language names are important, all modelled as simple Kotlin `typealiases`:
+### API concepts
+To understand the API, these domain-language concepts are important, all modelled as simple Kotlin:
 
-- A **Behaviour** (`typealias Behaviour = Filter) applies the failure mode to the HTTP call. This could involve blocking a thread permanently, introducing extra latency into an HTTP service, or even causing a Stack Overflow or Killing the running process.
+#### Behaviours - `typealias Behaviour = Filter` 
+A **Behaviour** applies the failure mode to the HTTP call. This could involve blocking a thread permanently, introducing extra latency into an HTTP service, or even causing a Stack Overflow or Killing the running process.
 
 -----------------------------------
 |Behaviour function|Effect|as JSON|
@@ -27,8 +28,8 @@ To understand the API, these domain-language names are important, all modelled a
 |BlockThread|Permanently blocks the request thread|`{"type":"block"}`|
 |None|Requests complete normally|`{"type":"none"}`|
 
-
-- A **Trigger** (`typealias Trigger = (req: Request) -> Boolean`) is just a predicate which determines if an HTTP call should have an `Behaviour` applied to it. `Triggers` can be stateless, based on the request content, or stateful - deadlines or countdowns.
+#### Triggers `typealias Trigger = (req: Request) -> Boolean`
+A **Trigger** is just a predicate which determines if an HTTP call should have an `Behaviour` applied to it. `Triggers` can be stateless, based on the request content, or stateful - deadlines or countdowns.
 
 -----------------------------------------------
 |Trigger function|Activation condition|as JSON|
@@ -41,7 +42,8 @@ To understand the API, these domain-language names are important, all modelled a
 |PercentageBased|Applies to a certain (randomly decided) percentage of requests|`{"type":"percentage", "percentage":100}`|
 |Always|For all requests|`{"type":"always"}`|
 
-- A **Stage** (`typealias Stage = (req: Request) -> Filter?`) provides the lifecycle for applying a behaviour, and applies until a `Trigger` indicates that the stage is complete. `Stages` can be chained with `then()`, or can be produced by combining a `Behaviour` and a `Trigger` using `appliedWhen()`.
+#### Stages `interface Stage: (Request) -> Filter?`
+A **Stage** provides the lifecycle for applying a behaviour, and applies until a `Trigger` indicates that the stage is complete. `Stages` can be chained with `then()`, or can be produced by combining a `Behaviour` and a `Trigger` using `appliedWhen()`.
 
 ----------------------------------------
 |Stage function|Lifecycle notes|as JSON|
