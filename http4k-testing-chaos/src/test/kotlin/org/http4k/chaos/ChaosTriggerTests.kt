@@ -61,7 +61,7 @@ class DeadlineTriggerTest : ChaosTriggerContract() {
     }
 }
 
-class CounterTriggerTest : ChaosTriggerContract() {
+class CountdownTriggerTest : ChaosTriggerContract() {
     override val asJson = """{"type":"countdown","count":"1"}"""
     override val expectedDescription = "Countdown (1 remaining)"
 

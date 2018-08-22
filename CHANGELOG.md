@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.36.0 (uncut)
 - Added first cut of `http4-testing-chaos` module. Massive H/T to @IgorPerikov for the PR which drove this module's creation. API might change a bit as we experiment/expand it.
+- Remove deprecations.
 
 ### v3.35.1
 - Fix #165 - AWS auth filter does not replace headers - it sets them (which breaks for request signing)

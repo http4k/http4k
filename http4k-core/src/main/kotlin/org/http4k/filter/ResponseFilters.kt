@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpTransaction
-import org.http4k.core.Request
 import org.http4k.core.Response
 import java.time.Clock
 import java.time.Duration
@@ -39,15 +38,6 @@ object ResponseFilters {
                 }
             }
         }
-    }
-
-    /**
-     * Measure and report the latency of a request to the passed function.
-     */
-    @Deprecated("Use ReportHttpTransaction instead", ReplaceWith("ReportHttpTransaction(clock, { tx, _ -> recordFn(tx.request, tx.response, tx.latency) })"))
-    object ReportLatency {
-        operator fun invoke(clock: Clock = Clock.systemUTC(), recordFn: (Request, Response, Duration) -> Unit): Filter =
-            ReportHttpTransaction(clock) { tx -> recordFn(tx.request, tx.response, tx.duration) }
     }
 
     /**
