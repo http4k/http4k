@@ -12,6 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Jackson
+import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
@@ -23,13 +24,13 @@ import org.junit.Test
 data class Add(val first: Int, val second: Int)
 data class Div(val dividend: Double, val divisor: Double)
 
-class DivideByZeroException : RuntimeException("divide by zero")
+class DivideByZeroException(val dividend: Double) : RuntimeException("divide by zero")
 
 private object Calculator {
     fun add(it: Add): Int = it.first + it.second
 
     fun divide(it: Div): Double = if (it.divisor == 0.0 ) {
-        throw DivideByZeroException()
+        throw DivideByZeroException(it.dividend)
     } else {
         it.dividend / it.divisor
     }
@@ -39,8 +40,13 @@ private object Calculator {
 
 private object CalculatorErrorHandler : ErrorHandler {
     override fun invoke(error: Throwable): ErrorMessage? = when (error) {
-        is DivideByZeroException -> ErrorMessage(1, "Divide by zero")
+        is DivideByZeroException -> DivideByZeroErrorMessage(error.dividend)
         else -> null
+    }
+
+    private class DivideByZeroErrorMessage(private val dividend: Double) : ErrorMessage(1, "Divide by zero") {
+        override fun <ROOT : NODE, NODE> data(json: Json<ROOT, NODE>): NODE? =
+                json.string("cannot divide $dividend by zero")
     }
 }
 
@@ -314,7 +320,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     fun `rpc call that throws user exception returns failure`() {
         assertThat(
                 rpcRequest("divide", "{\"dividend\": 4, \"divisor\": 0}", "1"),
-                hasErrorResponse(1, "Divide by zero", "1")
+                hasErrorResponse(1, "Divide by zero", "\"cannot divide 4.0 by zero\"", "1")
         )
     }
 
@@ -341,6 +347,9 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     protected fun hasErrorResponse(code: Int, message: String, id: String?): Matcher<Response> =
             hasResponse(Error(code, message, id))
 
+    protected fun hasErrorResponse(code: Int, message: String, data: String?, id: String?): Matcher<Response> =
+            hasResponse(Error(code, message, data, id))
+
     private fun hasResponse(response: ExpectedResponse): Matcher<Response> =
             hasStatus(Status.OK) and
                     hasContentType(ContentType.APPLICATION_JSON) and
@@ -357,8 +366,12 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
         override fun toString() = "{\"jsonrpc\":\"2.0\",\"result\":$result,\"id\":$id}"
     }
 
-    private data class Error(private val code: Int, private val message: String, private val id: String?): ExpectedResponse() {
+    private data class Error(private val code: Int, private val message: String,
+                             private val data: String?, private val id: String?): ExpectedResponse() {
+        constructor(code: Int, message: String, id: String?) : this(code, message, null, id)
         override fun toString() =
-                "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":$code,\"message\":\"$message\"},\"id\":$id}"
+                "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":$code,\"message\":\"$message\"" +
+                        (data?.let { ",\"data\":$it" } ?: "") +
+                        "},\"id\":$id}"
     }
 }

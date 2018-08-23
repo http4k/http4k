@@ -27,7 +27,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
         Response(Status.OK).with(jsonLens of renderError(ErrorMessage.ParseError))
     }.then { request ->
         if (request.method == Method.POST) {
-            val responseJson = processRequest(jsonLens(request))
+            val responseJson = process(jsonLens(request))
             if (responseJson == null) {
                 Response(Status.NO_CONTENT).with(Header.Common.CONTENT_TYPE of ContentType.APPLICATION_JSON)
             } else {
@@ -40,13 +40,13 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
 
     override fun invoke(request: Request): Response = handler(request)
 
-    private fun processRequest(requestJson: ROOT): ROOT? = when (json.typeOf(requestJson)) {
-        JsonType.Object -> handleSingle(json.fields(requestJson).toMap())
-        JsonType.Array -> handleBatch(json.elements(requestJson).toList())
+    private fun process(requestJson: ROOT): ROOT? = when (json.typeOf(requestJson)) {
+        JsonType.Object -> processSingleRequest(json.fields(requestJson).toMap())
+        JsonType.Array -> handleBatchRequest(json.elements(requestJson).toList())
         else -> renderError(ErrorMessage.InvalidRequest)
     }
 
-    private fun handleSingle(fields: Map<String, NODE>): ROOT? {
+    private fun processSingleRequest(fields: Map<String, NODE>): ROOT? {
         val request = JsonRpcRequest(json, fields)
         return try {
             if (request.valid()) {
@@ -74,11 +74,11 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
         }
     }
 
-    private fun handleBatch(elements: List<NODE>): ROOT? {
+    private fun handleBatchRequest(elements: List<NODE>): ROOT? {
         return if (elements.isNotEmpty()) {
             val batchResults = mutableListOf<ROOT>()
             elements.forEach {
-                handleSingle(json.fields(it).toMap())?.also {
+                processSingleRequest(json.fields(it).toMap())?.also {
                     batchResults.add(it)
                 }
             }
@@ -96,10 +96,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
 
     private fun renderError(errorMessage: ErrorMessage, id: NODE? = null): ROOT = json.obj(
             "jsonrpc" to json.string(jsonRpcVersion),
-            "error" to json.obj(
-                    "code" to json.number(errorMessage.code),
-                    "message" to json.string(errorMessage.message)
-            ),
+            "error" to errorMessage(json),
             "id" to (id ?: json.nullNode())
     )
 }

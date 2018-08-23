@@ -5,7 +5,7 @@ import org.http4k.format.JsonLibAutoMarshallingJson
 
 fun <ROOT : NODE, NODE> jsonRpc(json: Json<ROOT, NODE>,
                                 definitions: ManualMethodMappingsBuilder<ROOT, NODE>.() -> Unit): JsonRpcService<ROOT, NODE> =
-        jsonRpc(json, { null }, definitions)
+        jsonRpc(json, defaultErrorHandler, definitions)
 
 fun <ROOT : NODE, NODE> jsonRpc(json: Json<ROOT, NODE>,
                                 errorHandler: ErrorHandler,
@@ -15,7 +15,7 @@ fun <ROOT : NODE, NODE> jsonRpc(json: Json<ROOT, NODE>,
 fun <ROOT : NODE, NODE, M: MethodMappingsBuilder<ROOT, NODE>> jsonRpc(
         methodMappingsBuilder: M,
         definitions: M.() -> Unit): JsonRpcService<ROOT, NODE> =
-        jsonRpc(methodMappingsBuilder, { null }, definitions)
+        jsonRpc(methodMappingsBuilder, defaultErrorHandler, definitions)
 
 fun <ROOT : NODE, NODE, M: MethodMappingsBuilder<ROOT, NODE>> jsonRpc(
                                 methodMappingsBuilder: M,
@@ -27,3 +27,4 @@ fun <ROOT: NODE, NODE> manual(json: Json<ROOT, NODE>) = ManualMethodMappingsBuil
 
 fun <ROOT: Any> auto(json: JsonLibAutoMarshallingJson<ROOT>) = AutoMethodMappingsBuilder(json)
 
+private val defaultErrorHandler: ErrorHandler = { null }
