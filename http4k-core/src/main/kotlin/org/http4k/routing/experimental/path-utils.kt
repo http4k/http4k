@@ -1,7 +1,11 @@
 package org.http4k.routing.experimental
 
 
-fun String.pathJoin(suffix: String) = "${this.withoutTrailingSlash()}/${suffix.withoutLeadingSlash()}"
+fun String.pathJoin(suffix: String) = when {
+    this.isEmpty() -> suffix
+    suffix.isEmpty() -> this
+    else -> "${this.withoutTrailingSlash()}/${suffix.withoutLeadingSlash()}"
+}
 
 fun String.withoutTrailingSlash() = if (this.endsWith("/")) this.dropLast(1) else this
 
