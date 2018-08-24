@@ -16,5 +16,4 @@ class FileResource(
     override val length: Long get() = file.length()
 
     override val lastModified: Instant get() = Instant.ofEpochMilli(file.lastModified())
-
 }

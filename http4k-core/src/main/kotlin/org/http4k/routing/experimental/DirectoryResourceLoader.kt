@@ -12,11 +12,10 @@ data class DirectoryResourceLoader(
     val directoryRenderer: DirectoryRenderer? = null
 ) : Router, ResourceLoading {
 
-    override fun match(path: String): HttpHandler? {
-        val f = File(baseDir.pathJoin(path))
-        return when {
-            f.isFile -> FileResource(f, mimeTypes.forFile(path))
-            f.isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(f, it) }
+    override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
+         when {
+            isFile -> FileResource(this, mimeTypes.forFile(path))
+            isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(this, it) }
             else -> null
         }
     }
