@@ -21,9 +21,9 @@ class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ResourceLoader
         <body>
         <h1>dir</h1>
         <ol>
-        <li><a href="/dir/subdir">subdir</a></li>
         <li><a href="/dir/file.html">file.html</a></li>
-        <ol>
+        <li><a href="/dir/subdir">subdir</a></li>
+        </ol>
         </body>
         </html>""".trimIndent()
         checkContents("/dir/", expected, ContentType.TEXT_HTML)
@@ -34,7 +34,7 @@ class ListingDirectoryResourceLoaderTest : ResourceLoaderContract(ResourceLoader
         <h1>subdir</h1>
         <ol>
         <li><a href="/dir/subdir/file.html">file.html</a></li>
-        <ol>
+        </ol>
         </body>
         </html>""".trimIndent()
         checkContents("/dir/subdir/", expected2, ContentType.TEXT_HTML)

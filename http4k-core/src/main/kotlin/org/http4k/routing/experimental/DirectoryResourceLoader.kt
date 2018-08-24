@@ -13,7 +13,7 @@ data class DirectoryResourceLoader(
 ) : Router, ResourceLoading {
 
     override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
-         when {
+        when {
             isFile -> FileResource(this, mimeTypes.forFile(path))
             isDirectory -> match(indexFileIn(path)) ?: directoryRenderer?.let { directoryRenderingHandler(this, it) }
             else -> null
@@ -26,6 +26,6 @@ data class DirectoryResourceLoader(
 
 private fun directoryRenderingHandler(dir: File, renderer: DirectoryRenderer) =
     ResourceListingHandler(
-        ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
-        dir.listFiles().map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
-        renderer)
+            ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
+            dir.listFiles().sortedBy { it.name }.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
+            renderer)

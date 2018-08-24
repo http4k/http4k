@@ -13,7 +13,7 @@ fun simpleDirectoryRenderer(uri: Uri, dir: ResourceSummary, resources: List<Reso
 <h1>${dir.name}</h1>
 <ol>
 ${listOfFiles(uri, resources)}
-<ol>
+</ol>
 </body>
 </html>""".trimIndent()
 
