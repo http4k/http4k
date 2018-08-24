@@ -10,13 +10,18 @@ data class MimeTypes private constructor(private val map: Map<String, ContentTyp
 
     companion object {
         operator fun invoke(overrides: Map<String, ContentType> = emptyMap()): MimeTypes =
-            MimeTypes(MimeTypes::class.java.getResourceAsStream("/META-INF/mime.types").reader().readLines().flatMap {
+            if (overrides.isEmpty()) standardTypes else MimeTypes(standardTypes.map + overrides)
+
+        private val standardTypes : MimeTypes by lazy { MimeTypes(loadStandard()) }
+
+        private fun loadStandard(): Map<String, ContentType> =
+            MimeTypes::class.java.getResourceAsStream("/META-INF/mime.types").reader().readLines().flatMap {
                 it.split('\t')
                     .filter { it.trim().isNotBlank() }
                     .run {
                         if (size != 2) throw RuntimeException("mime.types file is malformed [$it]")
                         this[1].split(" ").map(String::trim).map { it.toLowerCase() to ContentType(this[0]) }
                     }
-            }.toMap() + overrides)
+            }.toMap()
     }
 }

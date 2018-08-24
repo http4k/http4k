@@ -1,41 +1,45 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.routing.ResourceLoader.Companion.Classpath
+import org.http4k.routing.ResourceLoader.Companion.Directory
+import org.junit.jupiter.api.Test
 
 class ResourceLoaderTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `classpath loader loads existing file`() {
-        checkContents(org.http4k.routing.ResourceLoader.Companion.Classpath("/"), "mybob.xml", "<xml>content</xml>")
+        checkContents(Classpath("/"), "mybob.xml", "<xml>content</xml>")
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `classpath loader loads existing child file`() {
-        checkContents(org.http4k.routing.ResourceLoader.Companion.Classpath("/"), "org/index.html", "hello from the io index.html")
+        checkContents(Classpath("/"), "org/index.html", "hello from the io index.html")
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `classpath loader for missing file`() {
-        com.natpryce.hamkrest.assertion.assertThat(ResourceLoader.Classpath("/").load("notAFile"), absent())
+        assertThat(Classpath("/").load("notAFile"), absent())
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `directory loader loads existing file`() {
-        checkContents(org.http4k.routing.ResourceLoader.Companion.Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
+        checkContents(Directory("./src/test/resources"), "mybob.xml", "<xml>content</xml>")
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `directory loader loads existing child file`() {
-        checkContents(org.http4k.routing.ResourceLoader.Companion.Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
+        checkContents(Directory("./src/test/resources"), "org/index.html", "hello from the io index.html")
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `directory loader for missing file`() {
-        com.natpryce.hamkrest.assertion.assertThat(ResourceLoader.Directory("./src/test/resources").load("notAFile"), absent())
+        assertThat(Directory("./src/test/resources").load("notAFile"), absent())
     }
 
-    private fun checkContents(loader: org.http4k.routing.ResourceLoader, path: String, expected: String) {
-        com.natpryce.hamkrest.assertion.assertThat(loader.load(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
+    private fun checkContents(loader: ResourceLoader, path: String, expected: String) {
+        assertThat(loader.load(path)!!.openStream().bufferedReader().use { it.readText() }, equalTo(expected))
     }
 }
