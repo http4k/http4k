@@ -64,7 +64,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
             val defaultErrorMessage = if (e is LensFailure && e.overall() == Failure.Type.Invalid) {
                 ErrorMessage.InvalidParams
             } else {
-                ErrorMessage.ServerError
+                ErrorMessage.InternalError
             }
             val error = when (e) {
                 is LensFailure -> e.cause ?: e

@@ -237,7 +237,7 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
     fun `rpc call to method that throws exception returns error`() {
         assertThat(
                 rpcRequest("fails", id = "1"),
-                hasErrorResponse(-32000, "Server error", "1")
+                hasErrorResponse(-32603, "Internal error", "1")
         )
     }
 
