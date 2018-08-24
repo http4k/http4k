@@ -55,7 +55,7 @@ class ThrowExceptionBehaviourTest : ChaosBehaviourContract() {
 
     @Test
     override fun `deserialises from JSON`() {
-        val behaviour = """{"message":"foo","type":"throw"}""".asJsonObject().asBehaviour()
+        val behaviour = """{"type":"throw","message":"foo"}""".asJsonObject().asBehaviour()
         behaviour.toString() shouldMatch equalTo("ThrowException RuntimeException foo")
 
         assertThat({ behaviour.then { response }(request) }, throws<Exception>())

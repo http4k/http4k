@@ -4,10 +4,10 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.core.Filter
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -56,6 +56,11 @@ class WaitTest : ChaosStageContract() {
     }
 }
 
+class TriggeredTest : ChaosStageContract() {
+    override val asJson = """{"type":"trigger","trigger":{"type":"always"},"behaviour":{"type":"body"}}"""
+    override val expectedDescription = "Always NoBody"
+}
+
 class RepeatTest : ChaosStageContract() {
     override val asJson = """{"type":"repeat","stages":[{"type":"wait"}]}"""
     override val expectedDescription = "Repeat [Wait]"
@@ -85,7 +90,7 @@ class VariableStageTest {
         val variable = Variable()
         variable.toString() shouldMatch equalTo(("Always None"))
         variable(request)!!.then { response }(request) shouldMatch equalTo(response)
-        variable.current = ChaosStages.Repeat { Always.inject(ReturnStatus(NOT_FOUND)) }
+        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always) }
         variable.toString() shouldMatch equalTo(("Repeat [Always ReturnStatus (404)]"))
         variable(request)!!.then { response }(request) shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
     }

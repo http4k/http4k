@@ -84,10 +84,4 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val operationId: String? = null) {
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
-
-    @Deprecated("Use the routeMeta Dsl instead of this")
-    operator fun plus(new: Lens<Request, *>): RouteMeta = copy(requestParams = requestParams.plus(listOf(new)))
-
-    @Deprecated("Use the routeMeta Dsl instead of this")
-    operator fun plus(new: BodyLens<*>): RouteMeta = copy(body = new)
 }

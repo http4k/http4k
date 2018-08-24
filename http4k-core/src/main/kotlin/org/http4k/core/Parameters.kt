@@ -7,9 +7,6 @@ typealias Parameters = List<Parameter>
 
 fun Uri.queries(): Parameters = query.toParameters()
 
-@Deprecated("rename for clarity", ReplaceWith("this.toUrlFormEncoded()"))
-fun Parameters.toUrlEncoded(): String = toUrlFormEncoded()
-
 fun Parameters.toUrlFormEncoded(): String = this.joinToString("&") { it.first.toFormEncoded() + it.second?.let { "=" + it.toFormEncoded() }.orEmpty() }
 
 fun Parameters.toParametersMap(): Map<String, List<String?>> = this.groupBy(Pair<String, String?>::first, Pair<String, String?>::second)

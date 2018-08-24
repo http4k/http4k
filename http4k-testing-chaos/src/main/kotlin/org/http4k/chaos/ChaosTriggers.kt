@@ -3,10 +3,13 @@ package org.http4k.chaos
 import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.anything
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
 import org.http4k.chaos.ChaosTriggers.Deadline
 import org.http4k.chaos.ChaosTriggers.Delay
 import org.http4k.chaos.ChaosTriggers.MatchRequest
+import org.http4k.chaos.ChaosTriggers.Once
+import org.http4k.chaos.ChaosTriggers.PercentageBased
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.hamkrest.hasBody
@@ -18,6 +21,8 @@ import org.http4k.hamkrest.hasUriPath
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.util.Random
+import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -39,6 +44,46 @@ infix fun Trigger.or(that: Trigger): Trigger = object : Trigger {
 }
 
 object ChaosTriggers {
+    /**
+     * Single application predicated on the ChaosTrigger. Further matches don't apply
+     */
+    object Once {
+        operator fun invoke(trigger: Trigger) = object : Trigger {
+            private val active = AtomicBoolean(true)
+            override fun invoke(request: Request) =
+                    if (trigger(request)) active.get().also { active.set(false) } else false
+
+            override fun toString() = "Once (trigger = $trigger)"
+        }
+    }
+
+    /**
+     * Applies to every transaction.
+     */
+    object Always : Trigger {
+        override fun invoke(request: Request) = true
+        override fun toString() = "Always"
+    }
+
+    /**
+     * Applies n% of the time, based on result of a Random.
+     */
+    object PercentageBased {
+        operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : Trigger {
+            override fun invoke(request: Request) = selector.nextInt(100) <= injectionFrequency
+            override fun toString() = "PercentageBased ($injectionFrequency%)"
+        }
+
+        /**
+         * Get a percentage from the environment.
+         * Defaults to CHAOS_PERCENTAGE and a value of 50%
+         */
+        fun fromEnvironment(env: (String) -> String? = System::getenv,
+                            defaultPercentage: Int = 50,
+                            name: String = "CHAOS_PERCENTAGE"
+        ) = PercentageBased(env(name)?.let(Integer::parseInt) ?: defaultPercentage)
+    }
+
     /**
      * Activates after a particular instant in time.
      */
@@ -98,11 +143,14 @@ object ChaosTriggers {
     }
 }
 
-internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()) = when (nonNullable<String>("type")) {
+internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = when (nonNullable<String>("type")) {
     "deadline" -> Deadline(nonNullable("endTime"), clock)
     "delay" -> Delay(nonNullable("period"), clock)
     "countdown" -> Countdown(nonNullable("count"))
     "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
+    "once" -> Once(this["trigger"].asTrigger(clock))
+    "percentage" -> PercentageBased(this["percentage"].asInt())
+    "always" -> Always
     else -> throw IllegalArgumentException("unknown trigger")
 }
 

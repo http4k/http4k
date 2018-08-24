@@ -2,9 +2,9 @@ package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.chaos.ChaosBehaviours.None
-import org.http4k.chaos.ChaosPolicies.Always
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Request
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-typealias Stage = (req: Request) -> Filter?
+interface Stage: (Request) -> Filter?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
@@ -76,7 +76,7 @@ object ChaosStages {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: Stage = Always.inject(None())) : Stage {
+    class Variable(var current: Stage = None().appliedWhen(Always)) : Stage {
         override fun invoke(request: Request) = current(request)
         override fun toString() = current.toString()
     }
@@ -91,7 +91,7 @@ fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
                     .map { it.asStage(clock) }
                     .reduce { acc, next -> acc.then(next) }
         }
-        "policy" -> this["policy"]!!.asPolicy(clock).inject(this["behaviour"]!!.asBehaviour())
+        "trigger" -> this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
         else -> throw IllegalArgumentException("unknown stage")
     }
     return this["until"]?.let { baseStage.until(it.asTrigger(clock)) } ?: baseStage

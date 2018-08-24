@@ -41,6 +41,7 @@ pages:
       - Typesafe contracts: guide/modules/contracts/index.md
       - OAuth: guide/modules/oauth/index.md
       - WebDriver: guide/modules/webdriver/index.md
+      - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
     - Worked TDD Example:
       - Introduction: guide/example/index.md

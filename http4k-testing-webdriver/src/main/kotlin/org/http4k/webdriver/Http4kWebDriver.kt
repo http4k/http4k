@@ -30,9 +30,9 @@ typealias Navigate = (Request) -> Unit
 
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private val handler = ClientFilters.FollowRedirects()
-        .then(ClientFilters.Cookies(storage = cookieStorage()))
-        .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
-        .then(initialHandler)
+            .then(ClientFilters.Cookies(storage = cookieStorage()))
+            .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })
+            .then(initialHandler)
 
     private var current: Page? = null
     private var activeElement: WebElement? = null
@@ -45,20 +45,24 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         current = Page(response.status, this::navigateTo, UUID.randomUUID(), normalized(latestUri), response.bodyString(), current)
     }
 
-    private fun normalized(path: String): String {
-        val newPath = if (path.startsWith("/")) Paths.get(path)
-        else {
-            val currentPath = currentUrl?.let {
-                Uri.of(it).path.let { if (it.isEmpty()) "/" else it }
-            } ?: "/"
-            Paths.get(currentPath, path)
+    private fun normalized(path: String) = when {
+        Regex("http[s]?://.*").matches(path) -> path
+        else -> {
+            val newPath = when {
+                path.startsWith("/") -> Paths.get(path)
+                else -> {
+                    val currentPath = currentUrl?.let {
+                        Uri.of(it).path.let { if (it.isEmpty()) "/" else it }
+                    } ?: "/"
+                    Paths.get(currentPath, path)
+                }
+            }
+            newPath.normalize().toString()
         }
-        return newPath.normalize().toString()
     }
 
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
-        expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
-
+            expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
     private fun LocalCookie.toWebDriver(): Http4kWebDriver.StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
     override fun get(url: String) {
@@ -101,7 +105,8 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
 
         override fun alert(): Alert = throw FeatureNotImplementedYet
 
-        override fun activeElement(): WebElement = activeElement ?: current?.firstElement() ?: throw NoSuchElementException("no page loaded!")
+        override fun activeElement(): WebElement = activeElement ?: current?.firstElement()
+        ?: throw NoSuchElementException("no page loaded!")
 
         override fun window(nameOrHandle: String?): WebDriver = if (current?.handle?.toString() != nameOrHandle) throw NoSuchElementException("window with handle$nameOrHandle") else this@Http4kWebDriver
 

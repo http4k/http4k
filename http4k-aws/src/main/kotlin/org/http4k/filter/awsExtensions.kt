@@ -27,8 +27,8 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                 val date = AwsRequestDate.of(clock.instant())
 
                 val fullRequest = it
-                        .header("host", it.uri.host)
-                        .header("x-amz-date", date.full).let {
+                        .replaceHeader("host", it.uri.host)
+                        .replaceHeader("x-amz-date", date.full).let {
                             if (it.method.allowsContent) {
                                 it.replaceHeader("content-length", payload.length.toString())
                             } else {
@@ -40,8 +40,8 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                 val canonicalRequest = AwsCanonicalRequest.of(fullRequest, payload)
 
                 val signedRequest = fullRequest
-                        .header("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
-                        .header("x-amz-content-sha256", payload.hash)
+                        .replaceHeader("Authorization", buildAuthHeader(scope, credentials, canonicalRequest, date))
+                        .replaceHeader("x-amz-content-sha256", payload.hash)
 
                 next(signedRequest)
             }

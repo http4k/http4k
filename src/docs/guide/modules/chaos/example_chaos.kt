@@ -1,10 +1,10 @@
 package guide.modules.chaos
 
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosPolicies.PercentageBased
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.chaos.ChaosTriggers.PercentageBased
+import org.http4k.chaos.appliedWhen
 import org.http4k.chaos.asFilter
-import org.http4k.chaos.inject
 import org.http4k.chaos.then
 import org.http4k.chaos.until
 import org.http4k.client.OkHttp
@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
     // chaos is split into "stages", which can be triggered by specific request or time-based criteria
     val doNothingStage = Wait.until { tx: Request -> tx.method == POST }
-    val errorStage = PercentageBased(50).inject(ReturnStatus(INTERNAL_SERVER_ERROR))
+    val errorStage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(50))
 
     // chain the stages together with then() and finally convert to a standard http4k Filter
     val filter = doNothingStage.then(errorStage).asFilter()

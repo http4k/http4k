@@ -13,6 +13,7 @@ import org.http4k.chaos.ChaosBehaviours.ThrowException
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -30,6 +31,11 @@ val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
  * Encapsulates the type of bad behaviour to apply to the response.
  */
 typealias Behaviour = Filter
+
+fun Behaviour.appliedWhen(trigger: Trigger) = object : Stage {
+    override fun invoke(req: Request) = if (trigger(req)) this@appliedWhen else null
+    override fun toString() = "$trigger ${this@appliedWhen}"
+}
 
 object ChaosBehaviours {
     /**
