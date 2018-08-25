@@ -63,22 +63,19 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
                 }
                 else -> renderError(ErrorMessage.InvalidRequest, request.id)
             }
+        } catch (e: LensFailure) {
+            renderError(errorHandler(e.cause ?: e) ?: run {
+                if (e.overall() == Failure.Type.Invalid) InvalidParams else InternalError
+            }, request.id)
         } catch (e: Throwable) {
-            val defaultErrorMessage = when {
-                e is LensFailure && e.overall() == Failure.Type.Invalid -> InvalidParams
-                else -> InternalError
-            }
-            val error = if (e is LensFailure) e.cause ?: e else e
-            renderError(errorHandler(error) ?: defaultErrorMessage, request.id)
+            renderError(errorHandler(e) ?: InternalError, request.id)
         }
     }
 
     private fun handleBatchRequest(elements: List<NODE>) = if (elements.isNotEmpty()) {
         val batchResults = mutableListOf<ROOT>()
         elements.forEach {
-            processSingleRequest(json.fields(it).toMap())?.also {
-                batchResults.add(it)
-            }
+            processSingleRequest(json.fields(it).toMap())?.also { batchResults.add(it) }
         }
         batchResults.takeIf { it.isNotEmpty() }?.let { json.array(it) }
     } else {

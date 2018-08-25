@@ -29,7 +29,7 @@ class DivideByZeroException(val dividend: Double) : RuntimeException("divide by 
 private object Calculator {
     fun add(it: Add): Int = it.first + it.second
 
-    fun divide(it: Div): Double = if (it.divisor == 0.0 ) {
+    fun divide(it: Div): Double = if (it.divisor == 0.0) {
         throw DivideByZeroException(it.dividend)
     } else {
         it.dividend / it.divisor
@@ -96,8 +96,8 @@ class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, 
     }
 }
 
-abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJson<ROOT>,
-                                                        builder: (JsonLibAutoMarshallingJson<ROOT>) -> JsonRpcService<ROOT, ROOT>) {
+abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>,
+                                                  builder: (JsonLibAutoMarshallingJson<ROOT>) -> JsonRpcService<ROOT, ROOT>) {
 
     private val rpc = "/rpc" bind builder(json)
 
@@ -362,13 +362,14 @@ abstract class JsonRpcServiceContract<ROOT: Any>(json: JsonLibAutoMarshallingJso
 
     private abstract class ExpectedResponse
 
-    private data class Success(private val result: String, private val id: String): ExpectedResponse() {
+    private data class Success(private val result: String, private val id: String) : ExpectedResponse() {
         override fun toString() = "{\"jsonrpc\":\"2.0\",\"result\":$result,\"id\":$id}"
     }
 
     private data class Error(private val code: Int, private val message: String,
-                             private val data: String?, private val id: String?): ExpectedResponse() {
+                             private val data: String?, private val id: String?) : ExpectedResponse() {
         constructor(code: Int, message: String, id: String?) : this(code, message, null, id)
+
         override fun toString() =
                 "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":$code,\"message\":\"$message\"" +
                         (data?.let { ",\"data\":$it" } ?: "") +
