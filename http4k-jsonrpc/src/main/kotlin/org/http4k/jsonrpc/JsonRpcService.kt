@@ -14,10 +14,14 @@ import org.http4k.core.with
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Json
 import org.http4k.format.JsonType
+import org.http4k.format.JsonType.Array
+import org.http4k.format.JsonType.Object
 import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
+import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
+import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.Failure
+import org.http4k.lens.Failure.Type.Invalid
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 
@@ -45,9 +49,9 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
     override fun invoke(request: Request): Response = handler(request)
 
     private fun process(requestJson: ROOT): ROOT? = when (json.typeOf(requestJson)) {
-        JsonType.Object -> processSingleRequest(json.fields(requestJson).toMap())
-        JsonType.Array -> handleBatchRequest(json.elements(requestJson).toList())
-        else -> renderError(ErrorMessage.InvalidRequest)
+        Object -> processSingleRequest(json.fields(requestJson).toMap())
+        Array -> handleBatchRequest(json.elements(requestJson).toList())
+        else -> renderError(InvalidRequest)
     }
 
     private fun processSingleRequest(fields: Map<String, NODE>): ROOT? {
@@ -57,15 +61,15 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
                 request.valid() -> {
                     val method = methods[request.method]
                     when (method) {
-                        null -> renderError(ErrorMessage.MethodNotFound, request.id)
+                        null -> renderError(MethodNotFound, request.id)
                         else -> request.id?.let { renderResult(method(request.params ?: json.nullNode()), it) }
                     }
                 }
-                else -> renderError(ErrorMessage.InvalidRequest, request.id)
+                else -> renderError(InvalidRequest, request.id)
             }
         } catch (e: LensFailure) {
             renderError(errorHandler(e.cause ?: e) ?: run {
-                if (e.overall() == Failure.Type.Invalid) InvalidParams else InternalError
+                if (e.overall() == Invalid) InvalidParams else InternalError
             }, request.id)
         } catch (e: Throwable) {
             renderError(errorHandler(e) ?: InternalError, request.id)
@@ -79,7 +83,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
         }
         batchResults.takeIf { it.isNotEmpty() }?.let { json.array(it) }
     } else {
-        renderError(ErrorMessage.InvalidRequest)
+        renderError(InvalidRequest)
     }
 
     private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(
@@ -115,7 +119,7 @@ private class JsonRpcRequest<ROOT : NODE, NODE>(json: Json<ROOT, NODE>, fields: 
         }
     }
     val params: NODE? = fields["params"]?.also {
-        if (!setOf(JsonType.Object, JsonType.Array).contains(json.typeOf(it))) valid = false
+        if (!setOf(Object, Array).contains(json.typeOf(it))) valid = false
     }
 
     val id: NODE? = fields["id"]?.let {
