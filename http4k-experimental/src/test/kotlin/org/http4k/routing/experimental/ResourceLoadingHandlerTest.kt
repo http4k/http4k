@@ -1,10 +1,19 @@
 package org.http4k.routing.experimental
 
-import com.natpryce.hamkrest.*
+import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.apache.http.impl.io.EmptyInputStream
-import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.MemoryRequest
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.Uri
 import org.http4k.core.etag.ETag
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasContentType
@@ -22,13 +31,13 @@ class NewResourceLoadingHandlerTest {
     private val now = Instant.parse("2018-08-09T23:06:00Z")
 
     @Test fun `no resource returns NOT_FOUND`() {
-        assertThat(handler(MemoryRequest(Method.GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
+        assertThat(handler(MemoryRequest(GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
     }
 
     @Test fun `returns content, content type, length and body`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, lastModified = now, etag = ETag("etag-value", weak = true))
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"))),
+            handler(Request(GET, Uri.of("/root/file.txt"))),
             allOf(
                 hasStatus(Status.OK),
                 hasContentType(TEXT_PLAIN.withNoDirective()),
@@ -42,7 +51,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns no length and last modified if null from resource`() {
         resources["/file.txt"] = IndeterminateLengthResource()
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"))),
+            handler(Request(GET, Uri.of("/root/file.txt"))),
             allOf(
                 hasStatus(Status.OK),
                 hasHeader("Content-Length", absent()),
@@ -54,7 +63,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns content if resource is modified by time`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, lastModified = now)
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
             allOf(
                 hasStatus(Status.OK),
@@ -66,7 +75,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns NOT_MODIFIED if resource is not modified by time`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, lastModified = now)
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:00 GMT"))),
             allOf(
                 hasStatus(Status.NOT_MODIFIED),
@@ -74,7 +83,7 @@ class NewResourceLoadingHandlerTest {
                 hasBody("")
             ))
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:01 GMT"))),
             allOf(
                 hasStatus(Status.NOT_MODIFIED),
@@ -86,7 +95,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns content if no last modified property`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, lastModified = null)
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
             allOf(
                 hasStatus(Status.OK),
@@ -98,7 +107,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns content for incorrect date format`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN)
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "NOT A DATE"))),
             allOf(
                 hasStatus(Status.OK),
@@ -109,7 +118,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns content if resource does not match etag`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, etag = ETag("etag-value", weak = true))
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"something-else""""))),
             allOf(
                 hasStatus(Status.OK),
@@ -121,7 +130,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns NOT_MODIFIED if resource does match etag`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, etag = ETag("etag-value", weak = true))
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"something-else", W/"etag-value""""))),
             allOf(
                 hasStatus(Status.NOT_MODIFIED),
@@ -129,7 +138,7 @@ class NewResourceLoadingHandlerTest {
                 hasBody("")
             ))
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """*"""))),
             allOf(
                 hasStatus(Status.NOT_MODIFIED),
@@ -137,7 +146,7 @@ class NewResourceLoadingHandlerTest {
                 hasBody("")
             ))
         assertThat( // should match strong etag even though resource is weak
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"etag-value""""))),
             allOf(
                 hasStatus(Status.NOT_MODIFIED),
@@ -149,7 +158,7 @@ class NewResourceLoadingHandlerTest {
     @Test fun `returns content if no etag property`() {
         resources["/file.txt"] = InMemoryResource("content", TEXT_PLAIN, etag = null)
         assertThat(
-            handler(MemoryRequest(Method.GET, Uri.of("/root/file.txt"),
+            handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """*"""))),
             allOf(
                 hasStatus(Status.OK),

@@ -7,10 +7,7 @@ import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
 
-internal class ResourceListingHandler(
-    private val dir: ResourceSummary,
-    private val contents: Iterable<ResourceSummary>,
-    private val renderer: DirectoryRenderer
+internal class ResourceListingHandler(private val dir: ResourceSummary, private val contents: Iterable<ResourceSummary>, private val renderer: DirectoryRenderer
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response =
@@ -20,11 +17,7 @@ internal class ResourceListingHandler(
 /**
  * Used so that the If-Modified-Since handling works
  */
-private class ResourceInfoResource(
-    resourceSummary: ResourceSummary,
-    val content: ByteArray,
-    override val contentType: ContentType
-) : Resource {
+private class ResourceInfoResource(resourceSummary: ResourceSummary, val content: ByteArray, override val contentType: ContentType) : Resource {
 
     override fun openStream() = ByteArrayInputStream(content)
 

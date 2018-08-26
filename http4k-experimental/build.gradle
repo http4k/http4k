@@ -1,0 +1,10 @@
+description = 'Typesafe HTTP contracts for Reekwest'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+    testCompile testing
+}
+
+
