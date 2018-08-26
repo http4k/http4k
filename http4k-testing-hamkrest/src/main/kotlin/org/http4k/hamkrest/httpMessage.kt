@@ -30,8 +30,11 @@ fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-T
 
 fun hasBody(expected: Matcher<Body>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.body }, expected)
 
-@JvmName("hasBodyString")
+@JvmName("hasBodyNullableString")
 fun hasBody(expected: Matcher<String?>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, expected)
+
+@JvmName("hasBodyString")
+fun hasBody(expected: Matcher<String>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.bodyString() }, expected)
 
 fun hasBody(expected: CharSequence): Matcher<HttpMessage> = hasBody(equalTo(expected))
 

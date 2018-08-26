@@ -1,5 +1,6 @@
 package org.http4k.hamkrest
 
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
@@ -45,6 +46,9 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
+
+    @Test
+    fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(containsSubstring("bo")), hasBody(containsSubstring("foo")))
 
     @Test
     fun `body matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob")), hasBody(equalTo("bill")))
