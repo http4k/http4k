@@ -15,7 +15,7 @@ If there are any message format library or templating engine bindings that you'd
 ### general guidelines
 - At the moment, PRs should be sent to the master branch - this might change in future so check back everytime!
 - Source/binary compatibility always must be kept as far as possible - this is a must for minor and patch versions
-- PR changes should have test coverage
+- PR changes should have test coverage. Note that we use Junit 5 as a test engine - which uses new `@Test` annotations.
 - All the PRs must pass the Travis CI jobs before merging them
 
 https://travis-ci.org/http4k/http4k
