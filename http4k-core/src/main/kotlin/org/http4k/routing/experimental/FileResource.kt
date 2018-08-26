@@ -5,8 +5,7 @@ import java.io.File
 import java.io.InputStream
 import java.time.Instant
 
-
-class FileResource(
+internal class FileResource(
     val file: File,
     override val contentType: ContentType
 ) : Resource {

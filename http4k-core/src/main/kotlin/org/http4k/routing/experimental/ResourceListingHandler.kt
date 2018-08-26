@@ -7,9 +7,9 @@ import org.http4k.core.Response
 import java.io.ByteArrayInputStream
 
 
-class ResourceListingHandler(
+internal class ResourceListingHandler(
     private val dir: ResourceSummary,
-    private val contents: List<ResourceSummary>,
+    private val contents: Iterable<ResourceSummary>,
     private val renderer: DirectoryRenderer
 ) : HttpHandler {
 

@@ -4,10 +4,10 @@ import org.http4k.core.Uri
 import org.intellij.lang.annotations.Language
 
 
-typealias DirectoryRenderer = (uri: Uri, dir: ResourceSummary, resources: List<ResourceSummary>) -> String
+typealias DirectoryRenderer = (uri: Uri, dir: ResourceSummary, resources: Iterable<ResourceSummary>) -> String
 
 @Language("HTML")
-fun simpleDirectoryRenderer(uri: Uri, dir: ResourceSummary, resources: List<ResourceSummary>) = """
+fun simpleDirectoryRenderer(uri: Uri, dir: ResourceSummary, resources: Iterable<ResourceSummary>) = """
 <html>
 <body>
 <h1>${dir.name}</h1>
@@ -17,7 +17,7 @@ ${listOfFiles(uri, resources)}
 </body>
 </html>""".trimIndent()
 
-private fun listOfFiles(base: Uri, resources: List<ResourceSummary>): String =
+private fun listOfFiles(base: Uri, resources: Iterable<ResourceSummary>): String =
     resources.joinToString(separator = "\n") { resourceInfo ->
         """<li><a href="${base.path.pathJoin(resourceInfo.name)}">${resourceInfo.name}</a></li>"""
     }

@@ -1,13 +1,18 @@
 package org.http4k.routing.experimental
 
-import org.http4k.core.*
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.NoOp
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.then
 import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
-fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
+fun static(resourceLoader: ResourceLoading): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
 
 internal data class StaticRoutingHttpHandler(
     private val pathSegments: String,

@@ -5,16 +5,16 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.Request
 import org.http4k.routing.Router
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.SECONDS
 
 object ResourceLoaders {
 
     fun Classpath(
-        basePackagePath: String = "/",
-        mimeTypes: MimeTypes = MimeTypes(),
-        constantLastModified: Instant? = Instant.now().truncatedTo(ChronoUnit.SECONDS), // see * below,
-        lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
-    ): ClasspathResourceLoader {
+            basePackagePath: String = "/",
+            mimeTypes: MimeTypes = MimeTypes(),
+            constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS), // see * below,
+            lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
+    ): Router {
         // We don't want to be grubbing about in jar files for last modified dates, so we default to the creation
         // time of the loader, which make everything out of date every time an app is started, but in date after that.
 
@@ -24,15 +24,15 @@ object ResourceLoaders {
     }
 
     fun Directory(
-        baseDir: String,
-        mimeTypes: MimeTypes = MimeTypes()
-    ) = DirectoryResourceLoader(baseDir, mimeTypes, null)
+            baseDir: String,
+            mimeTypes: MimeTypes = MimeTypes()
+    ): Router = DirectoryResourceLoader(baseDir, mimeTypes, null)
 
     fun ListingDirectory(
-        baseDir: String,
-        mimeTypes: MimeTypes = MimeTypes(),
-        directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
-    ) = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
+            baseDir: String,
+            mimeTypes: MimeTypes = MimeTypes(),
+            directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
+    ): Router = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
 
 /**

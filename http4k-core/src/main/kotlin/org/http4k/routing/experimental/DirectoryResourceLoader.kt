@@ -2,15 +2,14 @@ package org.http4k.routing.experimental
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.MimeTypes
-import org.http4k.routing.Router
 import java.io.File
 import java.time.Instant
 
-data class DirectoryResourceLoader(
+internal data class DirectoryResourceLoader(
     val baseDir: String,
     val mimeTypes: MimeTypes = MimeTypes(),
     val directoryRenderer: DirectoryRenderer? = null
-) : Router, ResourceLoading {
+) : ResourceLoading {
 
     override fun match(path: String): HttpHandler? = with(File(baseDir.pathJoin(path))) {
         when {
@@ -21,7 +20,6 @@ data class DirectoryResourceLoader(
     }
 
     private fun indexFileIn(path: String) = path.pathJoin("index.html")
-
 }
 
 private fun directoryRenderingHandler(dir: File, renderer: DirectoryRenderer) =
