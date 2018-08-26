@@ -1,4 +1,4 @@
-description = 'Typesafe HTTP contracts for Reekwest'
+description = 'http4k typesafe HTTP contracts and OpenApi support'
 
 dependencies {
     provided kotlin_lib

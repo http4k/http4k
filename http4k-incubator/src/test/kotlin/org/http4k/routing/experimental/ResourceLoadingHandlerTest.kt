@@ -23,7 +23,6 @@ import org.http4k.routing.Router
 import org.junit.Test
 import java.time.Instant
 
-
 class NewResourceLoadingHandlerTest {
 
     private val resources = HashMap<String, Resource>()

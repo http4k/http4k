@@ -26,18 +26,15 @@ fi
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
 ./gradlew -PreleaseVersion=$LOCAL_VERSION clean assemble \
-    :http4k-aws:bintrayUpload \
     :http4k-core:bintrayUpload \
+    :http4k-aws:bintrayUpload \
     :http4k-contract:bintrayUpload \
-    :http4k-template-dust:bintrayUpload \
-    :http4k-template-handlebars:bintrayUpload \
-    :http4k-template-pebble:bintrayUpload \
-    :http4k-template-thymeleaf:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
     :http4k-client-apache-async:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
     :http4k-client-jetty:bintrayUpload \
     :http4k-client-websocket:bintrayUpload \
+    :http4k-incubator:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
     :http4k-format-gson:bintrayUpload \
     :http4k-format-jackson:bintrayUpload \
@@ -52,6 +49,10 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-server-netty:bintrayUpload \
     :http4k-server-undertow:bintrayUpload \
     :http4k-serverless-lambda:bintrayUpload \
+    :http4k-template-dust:bintrayUpload \
+    :http4k-template-handlebars:bintrayUpload \
+    :http4k-template-pebble:bintrayUpload \
+    :http4k-template-thymeleaf:bintrayUpload \
     :http4k-testing-chaos:bintrayUpload \
     :http4k-testing-hamkrest:bintrayUpload \
     :http4k-testing-webdriver:bintrayUpload

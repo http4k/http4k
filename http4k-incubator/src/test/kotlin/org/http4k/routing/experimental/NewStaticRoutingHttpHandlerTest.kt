@@ -1,7 +1,7 @@
-package org.http4k.routing
+package org.http4k.routing.experimental
 
-import org.http4k.routing.experimental.ResourceLoaders
-import org.http4k.routing.experimental.StaticRoutingHttpHandler
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.StaticRoutingHttpHandlerTest
 
 // I can't move this into experimental for some reason
 

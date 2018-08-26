@@ -1,0 +1,12 @@
+description = 'http4k incubator module'
+
+dependencies {
+    provided kotlin_lib
+
+    provided project(":http4k-core")
+    testCompile testing
+    testCompile project(":http4k-client-apache")
+    testCompile project(":http4k-testing-hamkrest")
+}
+
+
