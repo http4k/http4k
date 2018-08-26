@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.36.0 (uncut)
+### v3.36.0
 - Added `http4k-testing-chaos` module, designed to enhance failure-mode testing for http4k apps. Massive H/T to @IgorPerikov for the PR which drove this module's creation.
 - Added `http4k-incubator` module, for hosting developing projects and other code which might be promoted to top-level modules in the future.
 
