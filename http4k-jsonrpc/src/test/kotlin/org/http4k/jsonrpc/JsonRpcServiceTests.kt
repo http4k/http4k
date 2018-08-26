@@ -19,7 +19,7 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.string
 import org.http4k.routing.bind
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 data class Add(val first: Int, val second: Int)
 data class Div(val dividend: Double, val divisor: Double)
