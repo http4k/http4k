@@ -14,7 +14,7 @@ import java.net.UnknownHostException
 import java.nio.ByteBuffer
 
 class JavaHttpClient : HttpHandler {
-    override fun invoke(request: Request): Response {
+    override fun invoke(request: Request): Response = try {
         val connection = (URL(request.uri.toString()).openConnection() as HttpURLConnection).apply {
             instanceFollowRedirects = false
             requestMethod = request.method.name
@@ -31,19 +31,17 @@ class JavaHttpClient : HttpHandler {
             }
         }
 
-        return try {
-            val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
-            val baseResponse = Response(status).body(connection.body(status))
-            connection.headerFields
-                    .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
-                    .map { header -> header.value.map { header.key to it } }
-                    .flatten()
-                    .fold(baseResponse) { acc, next -> acc.header(next.first, next.second) }
-        } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
-        } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
-        }
+        val status = Status(connection.responseCode, connection.responseMessage.orEmpty())
+        val baseResponse = Response(status).body(connection.body(status))
+        connection.headerFields
+                .filterKeys { it != null } // because response status line comes as a header with null key (*facepalm*)
+                .map { header -> header.value.map { header.key to it } }
+                .flatten()
+                .fold(baseResponse) { acc, next -> acc.header(next.first, next.second) }
+    } catch (e: UnknownHostException) {
+        Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
+    } catch (e: ConnectException) {
+        Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
     }
 
     // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
