@@ -7,7 +7,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.I_M_A_TEAPOT
+import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
@@ -40,8 +40,6 @@ class OAuthProviderTest {
             this.accessToken = accessToken
             return redirect.header("action", "assignToken")
         }
-
-        override fun authFailureResponse(): Response = Response(I_M_A_TEAPOT)
     }
 
     private val providerConfig = OAuthProviderConfig(
@@ -85,7 +83,7 @@ class OAuthProviderTest {
 
     @Test
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
-        val invalidation = Response(I_M_A_TEAPOT)
+        val invalidation = Response(FORBIDDEN)
 
         oAuth(oAuthPersistence).callback(base) shouldMatch equalTo(invalidation)
 
