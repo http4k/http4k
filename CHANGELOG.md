@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.36.1
 - Fix #168 - Fix rest of hamkrest matchers caused by generics mishap.
+- Upgrade HTTP client dependency versions.
 
 ### v3.36.0
 - Added `http4k-testing-chaos` module, designed to enhance failure-mode testing for http4k apps. Massive H/T to @IgorPerikov for the PR which drove this module's creation.
