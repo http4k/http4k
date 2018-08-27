@@ -1,5 +1,6 @@
 package org.http4k.hamkrest
 
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.with
 import org.http4k.lens.FormField
@@ -10,6 +11,6 @@ class FormMatchersTest {
     @Test
     fun `formField`() =
         FormField.required("name").let {
-            assertMatchAndNonMatch(WebForm().with(it of "bob"), hasFormField(it, equalTo("bob")), hasFormField(it, equalTo("bill")))
+            assertMatchAndNonMatch(WebForm().with(it of "bob"), hasFormField(it, containsSubstring("bob")), hasFormField(it, equalTo("bill")))
         }
 }

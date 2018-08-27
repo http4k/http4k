@@ -30,10 +30,13 @@ class HttpMessageMatchersTest {
     fun `header no value`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header"), !hasHeader("header"))
 
     @Test
+    fun `header - non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").header("header", "bob").header("header", "bob2"), hasHeader("header", containsSubstring("bob")), hasHeader("header", equalTo("bill")))
+
+    @Test
     fun `header lens`() =
-        Header.required("bob").let {
-            assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
-        }
+            Header.required("bob").let {
+                assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasHeader(it, equalTo("bob")), hasHeader(it, equalTo("bill")))
+            }
 
     @Test
     fun `content type`() = assertMatchAndNonMatch(Request(GET, "/").header("Content-Type", "application/json; charset=utf-8"), hasContentType(APPLICATION_JSON), hasContentType(APPLICATION_FORM_URLENCODED))
@@ -64,17 +67,17 @@ class HttpMessageMatchersTest {
 
     @Test
     fun `json node body equal matcher - with numbers`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":2}"""),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2))),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42))))
+            Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2))),
+            Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42))))
 
     @Test
     fun `json node body equal matcher - with longs`() = assertMatchAndNonMatch(Request(GET, "/").body("""{"hello":2}"""),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2L))),
-        Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42L))))
+            Jackson.hasBody(Jackson.obj("hello" to Jackson.number(2L))),
+            Jackson.hasBody(Jackson.obj("hello" to Jackson.number(42L))))
 
     @Test
     fun `body lens`() =
-        Body.string(TEXT_PLAIN).toLens().let {
-            assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasBody(it, equalTo("bob")), hasBody(it, equalTo("bill")))
-        }
+            Body.string(TEXT_PLAIN).toLens().let {
+                assertMatchAndNonMatch(Request(GET, "/").with(it of "bob"), hasBody(it, equalTo("bob")), hasBody(it, equalTo("bill")))
+            }
 }

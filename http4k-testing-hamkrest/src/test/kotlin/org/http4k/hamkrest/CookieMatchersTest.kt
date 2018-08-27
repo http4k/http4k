@@ -1,5 +1,7 @@
 package org.http4k.hamkrest
 
+import com.natpryce.hamkrest.containsSubstring
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.cookie.Cookie
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -11,6 +13,11 @@ class CookieMatchersTest {
 
     @Test
     fun `value`() = assertMatchAndNonMatch(Cookie("name", "bob"), hasCookieValue("bob"), hasCookieValue("bill"))
+
+    @Test
+    fun `value with matcher`() {
+        assertMatchAndNonMatch(Cookie("name", "bob"), hasCookieValue(equalTo("bob")), hasCookieValue(containsSubstring("bill")))
+    }
 
     @Test
     fun `domain`() = assertMatchAndNonMatch(Cookie("name", "value", domain = "bob"), hasCookieDomain("bob"), hasCookieDomain("bill"))

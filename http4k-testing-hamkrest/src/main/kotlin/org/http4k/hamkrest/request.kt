@@ -15,7 +15,10 @@ import org.http4k.lens.QueryLens
 
 fun <T> hasQuery(lens: QueryLens<T>, matcher: Matcher<T>): Matcher<Request> = LensMatcher(has("Query '${lens.meta.name}'", { req: Request -> lens(req) }, matcher))
 
-fun hasQuery(name: String, matcher: Matcher<CharSequence?>): Matcher<Request> = has("Query '$name'", { req: Request -> req.query(name) }, matcher)
+@JvmName("hasQueryNullableString")
+fun hasQuery(name: String, matcher: Matcher<String?>): Matcher<Request> = has("Query '$name'", { req: Request -> req.query(name) }, matcher)
+
+fun hasQuery(name: String, matcher: Matcher<String>): Matcher<Request> = has("Query '$name'", { req: Request -> req.query(name) }, present(matcher))
 
 fun hasQuery(name: String, expected: CharSequence): Matcher<Request> = hasQuery(name, equalTo(expected))
 
@@ -23,7 +26,10 @@ fun hasQuery(name: String, expected: Regex): Matcher<Request> = hasQuery(name, p
 
 fun hasQuery(name: String, expected: List<String?>): Matcher<Request> = has("Queries '$name'", { req: Request -> req.queries(name) }, equalTo(expected))
 
-fun hasForm(name: String, matcher: Matcher<CharSequence>): Matcher<Request> = has("Form '$name'", { req: Request -> req.form(name) }, present(matcher))
+@JvmName("hasFormNullableString")
+fun hasForm(name: String, matcher: Matcher<String?>): Matcher<Request> = has("Form '$name'", { req: Request -> req.form(name) }, present(matcher))
+
+fun hasForm(name: String, matcher: Matcher<String>): Matcher<Request> = has("Form '$name'", { req: Request -> req.form(name) }, present(matcher))
 
 fun hasForm(name: String, expected: Regex): Matcher<Request> = hasForm(name, matches(expected))
 

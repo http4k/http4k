@@ -3,12 +3,16 @@ package org.http4k.hamkrest
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.present
 import org.http4k.core.cookie.Cookie
 import java.time.LocalDateTime
 
 fun hasCookieName(expected: CharSequence): Matcher<Cookie> = has(Cookie::name, equalTo(expected))
 
-fun hasCookieValue(matcher: Matcher<CharSequence>): Matcher<Cookie> = has(Cookie::value, matcher)
+@JvmName("hasCookieValueNullableString")
+fun hasCookieValue(matcher: Matcher<String?>): Matcher<Cookie> = has(Cookie::value, matcher)
+
+fun hasCookieValue(matcher: Matcher<String>): Matcher<Cookie> = has(Cookie::value, present(matcher))
 
 fun hasCookieValue(expected: CharSequence): Matcher<Cookie> = has(Cookie::value, equalTo(expected))
 

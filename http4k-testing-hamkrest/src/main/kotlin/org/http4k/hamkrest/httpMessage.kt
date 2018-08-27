@@ -16,7 +16,10 @@ import org.http4k.lens.HeaderLens
 
 fun <T> hasHeader(lens: HeaderLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Header '${lens.meta.name}'", { req: HttpMessage -> lens(req) }, matcher))
 
-fun hasHeader(name: String, matcher: Matcher<CharSequence?>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, matcher)
+@JvmName("hasBodyNullableString")
+fun hasHeader(name: String, matcher: Matcher<String?>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, matcher)
+
+fun hasHeader(name: String, matcher: Matcher<String>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.header(name) }, present(matcher))
 
 fun hasHeader(name: String, expected: CharSequence): Matcher<HttpMessage> = hasHeader(name, equalTo(expected))
 

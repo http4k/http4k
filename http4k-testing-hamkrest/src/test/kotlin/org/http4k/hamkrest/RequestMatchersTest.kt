@@ -1,5 +1,6 @@
 package org.http4k.hamkrest
 
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -30,10 +31,16 @@ class RequestMatchersTest {
     fun `form`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", "bob"), hasForm("form", "bill"))
 
     @Test
+    fun `form as matcher`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", containsSubstring("bob")), hasForm("form", equalTo("bill")))
+
+    @Test
     fun `form as regex`() = assertMatchAndNonMatch(Request(GET, "/").form("form", "bob"), hasForm("form", Regex(".*bob")), hasForm("form", Regex(".*bill")))
 
     @Test
     fun `query`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", "bob"), hasQuery("form", "bill"))
+
+    @Test
+    fun `query - matcher`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", equalTo("bob")), hasQuery("form", containsSubstring("bill")))
 
     @Test
     fun `query as regex`() = assertMatchAndNonMatch(Request(GET, "/bob?form=bob"), hasQuery("form", Regex(".*bob")), hasQuery("form", Regex(".*bill")))
