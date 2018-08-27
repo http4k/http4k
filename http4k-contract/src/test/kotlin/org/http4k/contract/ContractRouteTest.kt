@@ -8,6 +8,7 @@ import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -56,7 +57,7 @@ class ContractRouteTest {
         val actual = route.toRouter(Root).match(invalidRequest)
         assertThat(actual, present())
         assertThat({ actual?.invoke(invalidRequest) },
-            throws(lensFailureWith(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
+                throws(lensFailureWith(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
@@ -101,6 +102,24 @@ class ContractRouteTest {
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
         assertThat(router.match(Request(GET, "/bob")), absent())
+    }
+
+    @Test
+    fun `new requests`() {
+        fun assertRequest(contractRoute: ContractRoute, expected: String) {
+            assertThat(contractRoute.newRequest(Uri.of("http://foo.com")), equalTo(Request(GET, expected)))
+        }
+
+        val handler: HttpHandler = { Response(OK) }
+
+        assertRequest("/" bindContract GET to handler, "http://foo.com")
+        assertRequest(Path.of("value") bindContract GET to { _ -> handler }, "http://foo.com/{value}")
+        assertRequest(Path.of("value") / Path.of("value2") bindContract GET to { _, _ -> handler }, "http://foo.com/{value}/{value2}")
+        assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") bindContract GET to { _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}")
+        assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") bindContract GET to { _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}")
+        assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") bindContract GET to { _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}")
+        assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") bindContract GET to { _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}")
+        assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") / Path.of("value7") bindContract GET to { _, _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}/{value7}")
     }
 
     @Test
@@ -154,8 +173,10 @@ class ContractRouteTest {
     @Test
     fun `7 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
-                    value7: String) = { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 +
-                value5 + value6 + value7) }
+                    value7: String) = { _: Request ->
+            Response(OK).body(value1 + value2 + value3 + value4 +
+                    value5 + value6 + value7)
+        }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
                 Path.of("value5") / Path.of("value6") / Path.of("value7")
@@ -166,8 +187,10 @@ class ContractRouteTest {
     @Test
     fun `8 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
-                    value7: String, value8: String) = { _: Request -> Response(OK).body(value1 + value2 +
-                value3 + value4 + value5 + value6 + value7 + value8) }
+                    value7: String, value8: String) = { _: Request ->
+            Response(OK).body(value1 + value2 +
+                    value3 + value4 + value5 + value6 + value7 + value8)
+        }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8")
@@ -178,8 +201,10 @@ class ContractRouteTest {
     @Test
     fun `9 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
-                    value7: String, value8: String, value9: String) = { _: Request -> Response(OK).body(value1 +
-                value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9) }
+                    value7: String, value8: String, value9: String) = { _: Request ->
+            Response(OK).body(value1 +
+                    value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9)
+        }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
@@ -191,8 +216,10 @@ class ContractRouteTest {
     @Test
     fun `10 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
-                    value7: String, value8: String, value9: String, value10: String) = { _: Request -> Response(OK)
-                .body(value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9 + value10) }
+                    value7: String, value8: String, value9: String, value10: String) = { _: Request ->
+            Response(OK)
+                    .body(value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9 + value10)
+        }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
                 Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
@@ -204,9 +231,9 @@ class ContractRouteTest {
     @Test
     fun `11 parts - unsupported`() {
         assertThat({
-        Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4")/
-                Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
-                Path.of("value9") / Path.of("value10") / Path.of("value11")
+            Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
+                    Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
+                    Path.of("value9") / Path.of("value10") / Path.of("value11")
         }, throws<UnsupportedOperationException>())
     }
 
