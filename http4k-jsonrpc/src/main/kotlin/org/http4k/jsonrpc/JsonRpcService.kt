@@ -1,11 +1,10 @@
 package org.http4k.jsonrpc
 
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
@@ -20,25 +19,26 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.InternalError
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidParams
 import org.http4k.jsonrpc.ErrorMessage.Companion.InvalidRequest
 import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
-import org.http4k.lens.ContentNegotiation
+import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
+import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.Failure.Type.Invalid
-import org.http4k.lens.Header
+import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
 data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
                                              private val errorHandler: ErrorHandler,
                                              private val methodMappings: List<MethodMapping<NODE, NODE>>) : HttpHandler {
 
-    private val jsonLens = json.body("JSON-RPC request", ContentNegotiation.StrictNoDirective).toLens()
+    private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = methodMappings.map { it.name to it.handler }.toMap()
 
     private val handler: HttpHandler = ServerFilters.CatchLensFailure {
-        Response(Status.OK).with(jsonLens of renderError(ErrorMessage.ParseError))
+        Response(OK).with(jsonLens of renderError(ParseError))
     }.then { request ->
         if (request.method == POST) {
             val responseJson = process(jsonLens(request))
             when (responseJson) {
-                null -> Response(NO_CONTENT).with(Header.Common.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+                null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
                 else -> Response(OK).with(jsonLens of responseJson)
             }
         } else {
