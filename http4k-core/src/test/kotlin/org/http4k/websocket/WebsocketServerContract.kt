@@ -21,6 +21,7 @@ import org.http4k.server.asServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CountDownLatch
 
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
@@ -95,5 +96,16 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
         client.send(WsMessage("hello"))
         client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("foo")))
+    }
+
+    @Test
+    fun `can connect with non-blocking client`() {
+        val client = WebsocketClient.nonBlocking(Uri.of("ws://localhost:$port/hello/bob"))
+        val latch = CountDownLatch(1)
+        client.onMessage {
+            latch.countDown()
+        }
+
+        latch.await()
     }
 }
