@@ -5,11 +5,14 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Body
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Json
@@ -333,31 +336,31 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
                     id?.let { ", \"id\": $id" }.orEmpty() +
                     "}"
 
-    private fun rpcRequestWithBody(body: String): Response = rpc(Request(Method.POST, "/rpc")
-            .with(Body.string(ContentType.APPLICATION_JSON).toLens() of body))
+    private fun rpcRequestWithBody(body: String): Response = rpc(Request(POST, "/rpc")
+            .with(Body.string(APPLICATION_JSON).toLens() of body))
 
     protected fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
             hasResponse(Success(result, id))
 
     private fun hasNoContentResponse(): Matcher<Response> =
-            hasStatus(Status.NO_CONTENT) and
-                    hasContentType(ContentType.APPLICATION_JSON) and
+            hasStatus(NO_CONTENT) and
+                    hasContentType(APPLICATION_JSON) and
                     hasBody("")
 
     protected fun hasErrorResponse(code: Int, message: String, id: String?): Matcher<Response> =
             hasResponse(Error(code, message, id))
 
-    protected fun hasErrorResponse(code: Int, message: String, data: String?, id: String?): Matcher<Response> =
+    private fun hasErrorResponse(code: Int, message: String, data: String?, id: String?): Matcher<Response> =
             hasResponse(Error(code, message, data, id))
 
     private fun hasResponse(response: ExpectedResponse): Matcher<Response> =
-            hasStatus(Status.OK) and
-                    hasContentType(ContentType.APPLICATION_JSON) and
+            hasStatus(OK) and
+                    hasContentType(APPLICATION_JSON) and
                     hasBody(response.toString())
 
     private fun hasBatchResponse(vararg responses: ExpectedResponse): Matcher<Response> =
-            hasStatus(Status.OK) and
-                    hasContentType(ContentType.APPLICATION_JSON) and
+            hasStatus(OK) and
+                    hasContentType(APPLICATION_JSON) and
                     hasBody(responses.joinToString(",", "[", "]"))
 
     private abstract class ExpectedResponse
