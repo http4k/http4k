@@ -16,8 +16,9 @@ import org.http4k.server.asServer
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Sink.Companion.DiskTree
 
-fun `static file server`() {
-    static(Directory())
+fun `simple proxy`() {
+    ProxyHost()
+            .then(JavaHttpClient())
             .asServer(SunHttp(8000))
             .start()
             .block()
@@ -45,6 +46,13 @@ fun `recording traffic to disk proxy`() {
     RecordTo(DiskTree())
             .then(ProxyHost())
             .then(JavaHttpClient())
+            .asServer(SunHttp(8000))
+            .start()
+            .block()
+}
+
+fun `static file server`() {
+    static(Directory())
             .asServer(SunHttp(8000))
             .start()
             .block()
