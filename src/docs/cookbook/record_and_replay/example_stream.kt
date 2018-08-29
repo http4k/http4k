@@ -27,7 +27,5 @@ fun main(args: Array<String>) {
 
     // we can also replay a series of requests through a real HTTP client
     val client = ApacheClient()
-    for (request in storage.requests()) {
-        println(client(request))
-    }
+    storage.requests().forEach { println(client(it)) }
 }
