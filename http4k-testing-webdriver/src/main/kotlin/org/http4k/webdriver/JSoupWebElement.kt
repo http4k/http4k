@@ -52,8 +52,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                         .filter { it.isSelected }
                         .map { it.getAttribute("value") }
                 }
-
-            val form = WebForm(inputs.plus(textareas).plus(selects)
+            val buttons = it.findElements(By.tagName("button"))
+                    .filter { it.getAttribute("name") != "" && it == this}
+                    .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+            val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
                 .groupBy { it.first }
                 .mapValues { it.value.map { it.second }.flatMap { it } })
 
