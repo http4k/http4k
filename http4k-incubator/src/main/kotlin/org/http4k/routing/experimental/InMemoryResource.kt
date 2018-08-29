@@ -5,7 +5,7 @@ import org.http4k.core.etag.ETag
 import java.io.ByteArrayInputStream
 import java.time.Instant
 
-internal class InMemoryResource(
+class InMemoryResource(
     private val content: ByteArray,
     override val contentType: ContentType,
     override val lastModified: Instant? = null,
