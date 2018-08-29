@@ -88,8 +88,10 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
             if (oldValue && !currentSelectIsMultiple) clear()
             else element.attr("selected", "selected")
-        } else if (isA("button") && element.attr("type")?:"submit".toLowerCase() == "submit") {
-            submit()
+        } else if (isA("button")) {
+            val t = element.attr("type")
+            if (t == "" || t.toLowerCase() == "submit")
+                submit()
         }
     }
 

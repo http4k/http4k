@@ -52,6 +52,8 @@ class Http4kWebDriverTest {
     @Test
     fun `POST form via button click`() {
         driver.get("/bob")
+        driver.findElement(By.id("resetbutton"))!!.click()
+        driver.assertOnPage("/bob")
         driver.findElement(By.id("button"))!!.click()
         driver.assertOnPage("/form")
         assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
