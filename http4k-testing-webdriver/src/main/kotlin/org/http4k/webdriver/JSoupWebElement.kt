@@ -17,7 +17,7 @@ import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class JSoupWebElement(private val navigate: Navigate, private val element: Element) : WebElement {
+data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) : WebElement {
 
     override fun getTagName(): String = element.tagName()
 
@@ -60,7 +60,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
             val body = Body.webForm(Validator.Strict,
                 *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
 
-            val uri = it.element.attr("action") ?: "<unknown>"
+            val uri = (it.element.attr("action") ?: getURL()) ?: "<unknown>"
             val postRequest = Request(method, uri).with(body of form)
 
             if (method == Method.POST) navigate(postRequest)
@@ -120,13 +120,13 @@ data class JSoupWebElement(private val navigate: Navigate, private val element: 
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, element).findElement(by)
+    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: By) = JSoupElementFinder(navigate, element).findElements(by)
+    override fun findElements(by: By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else this.parent()?.current(tag)
 
-    private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, it) }
+    private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
     private fun isA(tag: String) = tagName.toLowerCase() == tag.toLowerCase()
 }

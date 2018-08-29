@@ -27,6 +27,7 @@ import org.http4k.core.cookie.Cookie as HCookie
 
 
 typealias Navigate = (Request) -> Unit
+typealias GetURL = () -> String?
 
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private val handler = ClientFilters.FollowRedirects()
@@ -42,7 +43,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private fun navigateTo(request: Request) {
         val normalizedPath = request.uri(request.uri.path(normalized(request.uri.path)))
         val response = handler(normalizedPath)
-        current = Page(response.status, this::navigateTo, UUID.randomUUID(), normalized(latestUri), response.bodyString(), current)
+        current = Page(response.status, this::navigateTo, { getCurrentUrl()}, UUID.randomUUID(), normalized(latestUri), response.bodyString(), current)
     }
 
     private fun normalized(path: String) = when {

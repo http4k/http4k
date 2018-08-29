@@ -10,7 +10,7 @@ import java.io.File
 class JSoupElementFinderTest {
     private val contents = File("src/test/resources/test.html").readText()
 
-    private val state = JSoupElementFinder({}, Jsoup.parse(contents))
+    private val state = JSoupElementFinder({}, {null}, Jsoup.parse(contents))
 
     @Test
     fun `find element`() = assertThat(state.findElement(By.tagName("span"))!!.text, equalTo("this is a span"))

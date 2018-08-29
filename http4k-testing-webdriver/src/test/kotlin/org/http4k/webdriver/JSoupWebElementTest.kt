@@ -18,23 +18,23 @@ class JSoupWebElementTest {
 
     private var newLocation: Pair<Method, String>? = null
     private val navigate: (Request) -> Unit = { it -> newLocation = it.method to it.uri.toString() }
-
-    private fun input(type: String): WebElement = JSoupWebElement(navigate, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
+    private val getURL: () -> String? = { null }
+    private fun input(type: String): WebElement = JSoupWebElement(navigate, getURL, Jsoup.parse("""<input id="bob" value="someValue" type="$type">""")).findElement(By.tagName("input"))!!
 
     private fun select(multiple: Boolean): WebElement =
-        JSoupWebElement(navigate, Jsoup.parse("""<select name="bob" ${if (multiple) "multiple" else ""}>
+        JSoupWebElement(navigate, getURL, Jsoup.parse("""<select name="bob" ${if (multiple) "multiple" else ""}>
             <option>foo1</option>
             <option>foo2</option>
             </select>"""
         )).findElement(By.tagName("select"))!!
 
     private fun element(tag: String = "a"): WebElement =
-        JSoupWebElement(navigate, Jsoup.parse("""<$tag id="bob" href="/link">
+        JSoupWebElement(navigate, getURL, Jsoup.parse("""<$tag id="bob" href="/link">
         |<span>hello</span>
         |<disabled disabled>disabled</disabled>
         |</$tag>""".trimMargin())).findElement(By.tagName(tag))!!
 
-    private fun form(method: Method = POST) = JSoupWebElement(navigate, Jsoup.parse("""
+    private fun form(method: Method = POST) = JSoupWebElement(navigate, getURL, Jsoup.parse("""
         <form method="${method.name}" action="/posted">
             <input id="text" type="text"/>
             <textarea id="textarea"/>
