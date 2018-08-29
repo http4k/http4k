@@ -14,7 +14,7 @@ interface ResourceLoader {
             override fun load(path: String): URL? = javaClass.getResource(finalBasePath + path)
         }
 
-        fun Directory(baseDir: String) = object : ResourceLoader {
+        fun Directory(baseDir: String = ".") = object : ResourceLoader {
             private val finalBaseDir = if (baseDir.endsWith("/")) baseDir else "$baseDir/"
 
             override fun load(path: String): URL? =
