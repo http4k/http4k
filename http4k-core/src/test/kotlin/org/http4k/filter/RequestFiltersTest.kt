@@ -5,17 +5,39 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.http4k.toHttpHandler
 import org.junit.jupiter.api.Test
 
 class RequestFiltersTest {
+    @Test
+    fun `proxy host on client`() {
+        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:9000/loop")
+                .header("host", "bob.com:443")) shouldMatch hasBody("http://bob.com:443/loop")
+    }
+
+    @Test
+    fun `proxy host without port on client`() {
+        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:9000/loop")
+                .header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
+    }
+
+    @Test
+    fun `proxy host without header returns 400`() {
+        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
+    }
 
     @Test
     fun `tap passes request through to function`() {

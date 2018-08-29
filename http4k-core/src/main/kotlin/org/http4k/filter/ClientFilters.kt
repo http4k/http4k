@@ -25,8 +25,8 @@ object ClientFilters {
      */
     object RequestTracing {
         operator fun invoke(
-            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+                startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+                endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
                 THREAD_LOCAL.get().run {
                     val updated = copy(parentSpanId = spanId, spanId = TraceId.new())
@@ -45,9 +45,10 @@ object ClientFilters {
      */
     object SetHostFrom {
         operator fun invoke(uri: Uri): Filter = Filter { next ->
-            { next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port)).replaceHeader("Host", "${uri.host}${
-              uri.port?.let { port -> ":$port" } ?: ""
-            }")) }
+            {
+                next(it.uri(it.uri.scheme(uri.scheme).host(uri.host).port(uri.port))
+                        .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
+            }
         }
     }
 
