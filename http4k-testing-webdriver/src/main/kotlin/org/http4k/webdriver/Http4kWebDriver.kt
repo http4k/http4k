@@ -28,6 +28,10 @@ import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
 
+interface Http4KNavigation : Navigation {
+    fun to(uri: Uri)
+}
+
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private val handler = ClientFilters.FollowRedirects()
             .then(ClientFilters.Cookies(storage = cookieStorage()))
@@ -68,6 +72,8 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     override fun get(url: String) {
         navigateTo(Request(GET, url).body(""))
     }
+
+    fun get(uri: Uri) = this.get(uri.toString())
 
     override fun getCurrentUrl(): String? = current?.url
 
@@ -113,7 +119,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         override fun defaultContent(): WebDriver = this@Http4kWebDriver
     }
 
-    override fun navigate(): Navigation = object : Navigation {
+    override fun navigate():Http4KNavigation = object : Http4KNavigation {
         override fun to(url: String) = get(url)
 
         override fun to(url: URL) = get(url.toString())
@@ -131,6 +137,8 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         override fun back() {
             current?.previous?.let { current = it.copy(next = current) }
         }
+
+        override fun to(uri: Uri) = get(uri.toString())
     }
 
     override fun manage() = object : WebDriver.Options {
