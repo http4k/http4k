@@ -53,7 +53,7 @@ private object CalculatorErrorHandler : ErrorHandler {
     }
 }
 
-class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
+class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json: JsonLibAutoMarshallingJson<JsonNode> ->
 
     val addParams = Params<JsonNode, Add> {
         Add(it["first"].asText().toInt(), it["second"].asText().toInt())
@@ -65,7 +65,7 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
     }
     val divResult: Result<Double, JsonNode> = Result { json.number(it) }
 
-    jsonRpc(json, CalculatorErrorHandler) {
+    JsonRpc.auto(json, CalculatorErrorHandler) {
         method("add", handler(setOf("first", "second"), addParams, addResult, Calculator::add))
         method("addNoArray", handler(addParams, addResult, Calculator::add))
         method("divide", handler(divParams, divResult, Calculator::divide))
@@ -82,8 +82,7 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
 }
 
 class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
-
-    jsonRpc(auto(json), CalculatorErrorHandler) {
+    JsonRpc.auto(json, CalculatorErrorHandler) {
         method("add", handler(Calculator::add))
         method("addDefinedFields", handler(setOf("first", "second", "ignored"), Calculator::add))
         method("divide", handler(Calculator::divide))

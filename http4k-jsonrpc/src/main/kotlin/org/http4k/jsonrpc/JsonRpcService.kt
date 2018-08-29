@@ -99,7 +99,7 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
     )
 }
 
-data class MethodMapping<IN, OUT>(val name: String, val handler: RequestHandler<IN, OUT>)
+data class MethodMapping<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
 
 typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
