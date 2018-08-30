@@ -12,6 +12,9 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.toBody
+import org.http4k.filter.RequestFilters.ProxyProtocolMode.Http
+import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
+import org.http4k.filter.RequestFilters.ProxyProtocolMode.Port
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -20,22 +23,28 @@ import org.junit.jupiter.api.Test
 
 class RequestFiltersTest {
     @Test
-    fun `proxy host on client`() {
-        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
-        handler(Request(GET, "http://localhost:9000/loop")
-                .header("host", "bob.com:443")) shouldMatch hasBody("http://bob.com:443/loop")
+    fun `proxy host - http`() {
+        val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")) shouldMatch hasBody("http://bob.com:443/loop")
+        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
+        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
     }
 
     @Test
-    fun `proxy host without port on client`() {
-        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
-        handler(Request(GET, "http://localhost:9000/loop")
-                .header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
+    fun `proxy host - https`() {
+        val handler = RequestFilters.ProxyHost(Https).then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")) shouldMatch hasBody("https://bob.com:443/loop")
+        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("https://bob.com/loop")
+        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
     }
 
     @Test
-    fun `proxy host without header returns 400`() {
-        val handler = RequestFilters.ProxyHost().then { Response(OK).body(it.uri.toString()) }
+    fun `proxy host - port`() {
+        val handler = RequestFilters.ProxyHost(Port).then { Response(OK).body(it.uri.toString()) }
+        handler(Request(GET, "http://localhost:443/loop").header("host", "bob.com")) shouldMatch hasBody("https://bob.com/loop")
+        handler(Request(GET, "http://localhost:81/loop").header("host", "bob.com:81")) shouldMatch hasBody("http://bob.com:81/loop")
+        handler(Request(GET, "http://localhost:80/loop").header("host", "bob.com:80")) shouldMatch hasBody("http://bob.com:80/loop")
+        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
         handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
     }
 

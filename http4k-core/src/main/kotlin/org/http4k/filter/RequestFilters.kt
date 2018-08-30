@@ -45,9 +45,7 @@ object RequestFilters {
     }
 
     enum class ProxyProtocolMode(private val fn: (Uri) -> Uri) {
-        Http({
-            it.scheme("http")
-        }),
+        Http({ it.scheme("http") }),
         Https({ it.scheme("https") }),
         Port({
             when (it.port) {
