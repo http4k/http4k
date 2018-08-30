@@ -1,7 +1,7 @@
 title: http4k Nanoservices
 description: Recipes useful http4k applications you can fit in a tweet
 
-http4k is a small library with minimal dependencies, but what you can accomplish with just a single line of code is quite remarkable due to a combination of the available modules and the`Server as a Function` concept. 
+http4k is a small library with minimal dependencies, but what you can accomplish with just a single line of code is quite remarkable due to a combination of the available modules and the `Server as a Function` concept. 
 
 The following applications all fit in a tweet (140 characters)... exports excluded ;)
 
