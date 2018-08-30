@@ -6,6 +6,7 @@ import org.http4k.chaos.appliedWhen
 import org.http4k.chaos.withChaosControls
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.filter.RequestFilters.ProxyHost
@@ -26,7 +27,7 @@ fun main(args: Array<String>) {
     System.setProperty("http.nonProxyHosts", "localhost")
 
     `latency injection proxy (between 100ms-500ms)`().use {
-        println(JavaHttpClient()(Request(GET, "http://localhost:8000/chaos/activate")))
-        println(JavaHttpClient()(Request(GET, "http://github.com/")).headers)
+        println(JavaHttpClient()(Request(POST, "http://localhost:8000/chaos/activate")))
+        println(JavaHttpClient()(Request(GET, "http://github.com/")).header("X-http4k-chaos"))
     }
 }
