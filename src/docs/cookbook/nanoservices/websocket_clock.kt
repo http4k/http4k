@@ -9,7 +9,7 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import java.time.Instant
 
-fun `ticking websocket_clock`() =
+fun `ticking websocket clock`() =
         websockets { ws: Websocket ->
             while (true) {
                 ws.send(WsMessage(Instant.now().toString()))
@@ -18,6 +18,6 @@ fun `ticking websocket_clock`() =
         }.asServer(Jetty()).start()
 
 fun main(args: Array<String>) {
-    `ticking websocket_clock`()
+    `ticking websocket clock`()
     WebsocketClient.nonBlocking(Uri.of("http://localhost:8000")).onMessage { println(it) }
 }
