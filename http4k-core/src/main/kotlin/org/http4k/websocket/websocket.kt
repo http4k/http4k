@@ -30,7 +30,6 @@ typealias WsHandler = (Request) -> WsConsumer?
 class PolyHandler(val http: HttpHandler, internal val ws: WsHandler)
 
 data class WsMessage(val body: Body) {
-
     constructor(value: String) : this(Body(value))
     constructor(value: InputStream) : this(Body(value))
 

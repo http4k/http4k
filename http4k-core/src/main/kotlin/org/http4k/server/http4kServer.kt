@@ -1,7 +1,9 @@
 package org.http4k.server
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 import org.http4k.websocket.PolyHandler
+import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import java.io.Closeable
 
@@ -29,6 +31,8 @@ interface WsServerConfig : ServerConfig {
     fun toServer(httpHandler: HttpHandler? = null, wsHandler: WsHandler? = null): Http4kServer
 }
 
-fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
+@JvmName("consumerAsServer")
+fun WsConsumer.asServer(config: WsServerConfig): Http4kServer = { _: Request -> this@asServer }.asServer(config)
 fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
+fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 fun PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(http, ws)

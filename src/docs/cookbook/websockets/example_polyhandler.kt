@@ -27,6 +27,6 @@ fun main(args: Array<String>) {
     )
     val http = { _: Request -> Response(OK).body("hiya world") }
 
-    PolyHandler(http, ws).asServer(Jetty(9000)).start().block()
+    PolyHandler(http, ws).asServer(Jetty(9000)).start()
 }
 
