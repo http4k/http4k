@@ -29,6 +29,7 @@ class Http4kWebDriverTest {
             .replace("THEBODY", req.bodyString())
             .replace("THEURL", req.uri.toString())
             .replace("THETIME", System.currentTimeMillis().toString())
+            .replace("ACTION", "action=\"/form\"")
         )
     }
 
@@ -45,9 +46,46 @@ class Http4kWebDriverTest {
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("/form")
-        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2"))
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
+
+    @Test
+    fun `POST form via button click`() {
+        driver.get("/bob")
+        driver.findElement(By.id("resetbutton"))!!.click()
+        driver.assertOnPage("/bob")
+        driver.findElement(By.id("button"))!!.click()
+        driver.assertOnPage("/form")
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+    }
+
+    @Test
+    fun `POST form with empty action`() {
+        var loadCount = 0
+        val driver = Http4kWebDriver {
+            req ->
+                loadCount++
+                val body = File("src/test/resources/test.html").readText()
+                Response(OK).body(body
+                        .replace("FORMMETHOD", Method.POST.name)
+                        .replace("THEMETHOD", req.method.name)
+                        .replace("THEBODY", req.bodyString())
+                        .replace("THEURL", req.uri.toString())
+                        .replace("THETIME", System.currentTimeMillis().toString())
+                        .replace("ACTION", "action")
+                )
+        }
+        val n0 = loadCount
+        driver.get("/bob")
+        driver.findElement(By.id("button"))!!.submit()
+        driver.assertOnPage("/bob")
+        assertThat(loadCount, equalTo(n0+2))
+        assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
+        assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
+    }
+
 
     @Test
     fun `GET form`() {
@@ -59,12 +97,13 @@ class Http4kWebDriverTest {
                 .replace("THEBODY", req.bodyString())
                 .replace("THEURL", req.uri.toString())
                 .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action=\"/form\"")
             )
         }
 
         driver.get("/bob")
         driver.findElement(By.id("button"))!!.submit()
-        driver.assertOnPage("/form?text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2")
+        driver.assertOnPage("/form?text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes")
         assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo(""))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("GET"))
     }
