@@ -50,12 +50,18 @@ fun routes(vararg list: Pair<Method, HttpHandler>): RoutingHttpHandler = routes(
 
 fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRoutingHttpHandler(*list)
 
+/**
+ * Serve static content using the passed ResourceLoader. Note that for security, by default ONLY mime-types registered in
+ * mime.types (resource file) will be served. All other types are registered as application/octet-stream and are not served.
+ */
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraPairs: Pair<String, ContentType>): RoutingHttpHandler =
         StaticRoutingHttpHandler("", resourceLoader, extraPairs.asList().toMap())
 
 interface RoutingWsHandler : WsHandler {
     fun withBasePath(new: String): RoutingWsHandler
 }
+
+fun websockets(ws: WsConsumer): RoutingWsHandler = websockets("/" bind ws)
 
 fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : RoutingWsHandler {
     override operator fun invoke(request: Request): WsConsumer? = list.firstOrNull { it.invoke(request) != null }?.invoke(request)
