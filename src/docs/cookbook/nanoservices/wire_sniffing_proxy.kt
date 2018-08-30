@@ -10,7 +10,7 @@ import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
-fun `traffic sniffing proxy`() =
+fun `wire sniffing proxy`() =
     ProxyHost(Https)
             .then(PrintRequestAndResponse())
             .then(JavaHttpClient())
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
     System.setProperty("http.proxyPort", "8000")
     System.setProperty("http.nonProxyHosts", "localhost")
 
-    `traffic sniffing proxy`().use {
+    `wire sniffing proxy`().use {
         JavaHttpClient()(Request(GET, "http://github.com/http4k"))
     }
 }

@@ -64,8 +64,8 @@ object ResilienceFilters {
     }
 
     /**
-     * Provide simple Bulkhead functionality.
-     * By default, handles 25 parallel requests, with zero wait time.
+     * Provide simple Rate Limiter functionality.
+     * By default, handles maximum of 50 requests per 5 seconds.
      */
     object RateLimit {
         operator fun invoke(rateLimit: RateLimiter = RateLimiter.ofDefaults("RateLimit"),
