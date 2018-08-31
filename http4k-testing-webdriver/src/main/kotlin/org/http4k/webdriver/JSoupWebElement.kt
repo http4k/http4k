@@ -118,7 +118,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         }
     }
 
-    override fun equals(other: Any?) = if (other is JSoupWebElement) other.element.toString() == element.toString() else false
+    override fun equals(other: Any?) = (other as? JSoupWebElement)?.element?.hasSameValue(element) ?: false
 
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet
 
