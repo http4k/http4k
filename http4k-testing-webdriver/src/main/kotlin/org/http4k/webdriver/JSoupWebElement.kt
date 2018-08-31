@@ -118,11 +118,11 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         }
     }
 
+    override fun equals(other: Any?) = if (other is JSoupWebElement) other.element.toString() == element.toString() else false
+
     override fun getRect(): Rectangle = throw FeatureNotImplementedYet
 
     override fun getCssValue(propertyName: String?): String = throw FeatureNotImplementedYet
-
-    override fun equals(other: Any?): Boolean = element == element
 
     override fun hashCode(): Int = element.hashCode()
 
