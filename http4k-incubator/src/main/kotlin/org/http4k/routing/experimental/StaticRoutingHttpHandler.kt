@@ -12,7 +12,7 @@ import org.http4k.core.then
 import org.http4k.routing.Router
 import org.http4k.routing.RoutingHttpHandler
 
-fun static(resourceLoader: ResourceLoading): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
+fun static(resourceLoader: Router): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader)
 
 internal data class StaticRoutingHttpHandler(
     private val pathSegments: String,
