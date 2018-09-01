@@ -8,6 +8,7 @@ import org.http4k.filter.RequestFilters.ProxyHost
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import java.lang.System.setProperty
 
 fun `simple proxy`() =
     ProxyHost(Https)
@@ -16,9 +17,9 @@ fun `simple proxy`() =
             .start()
 
 fun main(args: Array<String>) {
-    System.setProperty("http.proxyHost", "localhost")
-    System.setProperty("http.proxyPort", "8000")
-    System.setProperty("http.nonProxyHosts", "localhost")
+    setProperty("http.proxyHost", "localhost")
+    setProperty("http.proxyPort", "8000")
+    setProperty("http.nonProxyHosts", "localhost")
 
     `simple proxy`().use {
         println(JavaHttpClient()(Request(GET, "http://github.com/")))

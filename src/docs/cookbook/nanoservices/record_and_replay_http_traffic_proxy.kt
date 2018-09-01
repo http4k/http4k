@@ -10,6 +10,7 @@ import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.traffic.ReadWriteStream.Companion.Disk
+import java.lang.System.setProperty
 
 fun `recording traffic to disk proxy`() =
         ProxyHost(Https)
@@ -28,9 +29,9 @@ fun `replay previously recorded traffic from a disk store`() =
         }
 
 fun main(args: Array<String>) {
-    System.setProperty("http.proxyHost", "localhost")
-    System.setProperty("http.proxyPort", "8000")
-    System.setProperty("http.nonProxyHosts", "localhost")
+    setProperty("http.proxyHost", "localhost")
+    setProperty("http.proxyPort", "8000")
+    setProperty("http.nonProxyHosts", "localhost")
 
     `recording traffic to disk proxy`().use {
         JavaHttpClient()(Request(GET, "http://github.com/"))
