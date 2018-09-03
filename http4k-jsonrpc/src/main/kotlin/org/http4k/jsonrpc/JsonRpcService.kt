@@ -25,9 +25,10 @@ import org.http4k.lens.Failure.Type.Invalid
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
-data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
-                                             private val errorHandler: ErrorHandler,
-                                             private val methodMappings: List<MethodMapping<NODE, NODE>>) : HttpHandler {
+data class JsonRpcService<ROOT : NODE, NODE : Any>(
+        private val json: Json<ROOT, NODE>,
+        private val errorHandler: ErrorHandler,
+        private val methodMappings: List<MethodMapping<NODE, NODE>>) : HttpHandler {
 
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = methodMappings.map { it.name to it.handler }.toMap()
@@ -35,14 +36,15 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
     private val handler: HttpHandler = ServerFilters.CatchLensFailure {
         Response(OK).with(jsonLens of renderError(ParseError))
     }.then { request ->
-        if (request.method == POST) {
-            val responseJson = process(jsonLens(request))
-            when (responseJson) {
-                null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
-                else -> Response(OK).with(jsonLens of responseJson)
+        when (request.method) {
+            POST -> {
+                val responseJson = process(jsonLens(request))
+                when (responseJson) {
+                    null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
+                    else -> Response(OK).with(jsonLens of responseJson)
+                }
             }
-        } else {
-            Response(METHOD_NOT_ALLOWED)
+            else -> Response(METHOD_NOT_ALLOWED)
         }
     }
 
@@ -50,41 +52,48 @@ data class JsonRpcService<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>,
 
     private fun process(requestJson: ROOT): ROOT? = when (json.typeOf(requestJson)) {
         Object -> processSingleRequest(json.fields(requestJson).toMap())
-        Array -> handleBatchRequest(json.elements(requestJson).toList())
+        Array -> processBatchRequest(json.elements(requestJson).toList())
         else -> renderError(InvalidRequest)
     }
 
-    private fun processSingleRequest(fields: Map<String, NODE>): ROOT? {
-        val request = JsonRpcRequest(json, fields)
-        return try {
-            when {
-                request.valid() -> {
+    private fun processSingleRequest(fields: Map<String, NODE>): ROOT? =
+            JsonRpcRequest(json, fields).mapIfValid { request ->
+                try {
                     val method = methods[request.method]
-                    when (method) {
-                        null -> renderError(MethodNotFound, request.id)
-                        else -> request.id?.let { renderResult(method(request.params ?: json.nullNode()), it) }
+                    if (method == null) {
+                        renderError(MethodNotFound, request.id)
+                    } else {
+                        val result = method(request.params ?: json.nullNode())
+                        request.id?.let { renderResult(result, it) }
                     }
+                } catch (e: Throwable) {
+                    val error = when (e) {
+                        is LensFailure -> e.cause ?: e
+                        else -> e
+                    }
+                    renderError(errorHandler(error) ?: e.defaultErrorMessage(), request.id)
                 }
-                else -> renderError(InvalidRequest, request.id)
             }
-        } catch (e: LensFailure) {
-            renderError(errorHandler(e.cause ?: e) ?: run {
-                if (e.overall() == Invalid) InvalidParams else InternalError
-            }, request.id)
-        } catch (e: Throwable) {
-            renderError(errorHandler(e) ?: InternalError, request.id)
-        }
+
+    private fun JsonRpcRequest<ROOT, NODE>.mapIfValid(block: (JsonRpcRequest<ROOT, NODE>) -> ROOT?): ROOT? = when {
+        valid() -> block(this)
+        else -> renderError(InvalidRequest, id)
     }
 
-    private fun handleBatchRequest(elements: List<NODE>) = if (elements.isNotEmpty()) {
-        val batchResults = mutableListOf<ROOT>()
-        elements.forEach {
-            processSingleRequest(json.fields(it).toMap())?.also { batchResults.add(it) }
-        }
-        batchResults.takeIf { it.isNotEmpty() }?.let { json.array(it) }
-    } else {
-        renderError(InvalidRequest)
+    private fun Throwable.defaultErrorMessage(): ErrorMessage = when {
+        this is LensFailure && overall() == Invalid -> InvalidParams
+        else -> InternalError
     }
+
+    private fun processBatchRequest(elements: List<NODE>): ROOT? = when {
+        elements.isNotEmpty() -> elements.processEachAsSingleRequest()
+        else -> renderError(InvalidRequest)
+    }
+
+    private fun List<NODE>.processEachAsSingleRequest(): ROOT? =
+            mapNotNull { element ->
+                processSingleRequest(json.fields(element).toMap())
+            }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
     private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(
             "jsonrpc" to json.string(jsonRpcVersion),
