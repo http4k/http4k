@@ -65,7 +65,7 @@ class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson
     }
     val divResult: Result<Double, JsonNode> = Result { json.number(it) }
 
-    JsonRpc.auto(json, CalculatorErrorHandler) {
+    JsonRpc.manual(json, CalculatorErrorHandler) {
         method("add", handler(setOf("first", "second"), addParams, addResult, Calculator::add))
         method("addNoArray", handler(addParams, addResult, Calculator::add))
         method("divide", handler(divParams, divResult, Calculator::divide))
