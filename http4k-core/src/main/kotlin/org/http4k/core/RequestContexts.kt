@@ -1,6 +1,7 @@
 package org.http4k.core
 
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -8,7 +9,7 @@ import java.util.UUID
  */
 class RequestContexts : Store<RequestContext> {
 
-    private val requests = mutableMapOf<UUID, RequestContext>()
+    private val requests = ConcurrentHashMap<UUID, RequestContext>()
 
     override fun invoke(target: Request): RequestContext =
         requests[RequestContext(target)] ?: throw IllegalStateException("No RequestContext initialised")
