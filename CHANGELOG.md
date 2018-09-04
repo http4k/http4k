@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.37.1
+- Fix #177 - Make RequestContexts thread-safe.
+
 ### v3.37.0
 - Upgrades to `http4k-testing-webdriver`. H/T @dickon for the PRs
 - Added `ProxyHost` request filter which is useful for writing proxy-type apps.
