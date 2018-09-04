@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import java.util.*
 
 
 class RequestContextsTest {
@@ -21,7 +21,21 @@ class RequestContextsTest {
 
         requestContexts.remove(value)
 
-        assertThat({requestContexts.extract(updated)}, throws<IllegalStateException>())
+        assertThat({ requestContexts.extract(updated) }, throws<IllegalStateException>())
     }
 
+    @Test
+    fun `you can roll your own`() {
+        @Suppress("unused")
+        class MyVeryOwnContextStore : Store<RequestContext> {
+            override fun invoke(target: Request): RequestContext = TODO()
+            override fun <R : Request> invoke(value: RequestContext, target: R): R {
+                @Suppress("UNUSED_VARIABLE")
+                val id = value.id
+                TODO()
+            }
+
+            override fun remove(value: RequestContext): RequestContext? = TODO()
+        }
+    }
 }
