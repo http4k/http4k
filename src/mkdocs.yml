@@ -66,6 +66,7 @@ pages:
     - Websockets: cookbook/websockets/index.md
     - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
     - Custom OAuth configuration: cookbook/custom_oauth/index.md
+    - Principal lookup: cookbook/principal_lookup/index.md
     - Monitoring http4k: cookbook/monitoring/index.md
     - Recording/replaying HTTP traffic: cookbook/record_and_replay/index.md
     - Test driven apps: cookbook/test_driven_apps/index.md

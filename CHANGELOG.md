@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.37.2 (uncut)
+- Added `BearerAuth` and `BasicAuth` implementations which populate `RequestContexts`. Plus cookbook example :)
+
 ### v3.37.1
 - Fix #177 - Make RequestContexts thread-safe.
 
