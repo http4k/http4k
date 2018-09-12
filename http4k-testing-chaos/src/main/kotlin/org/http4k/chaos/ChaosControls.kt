@@ -128,5 +128,5 @@ fun HttpHandler.withChaosControls(stage: Stage = Wait,
     val trigger = SwitchTrigger()
     val variable = Variable(stage)
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
-    return routes(ChaosControls(trigger, variable, controlsPath, security, openApiPath, corsPolicy), "/" bind repeatStage.asFilter().then(this))
+    return routes(ChaosControls(trigger, variable, controlsPath, security, openApiPath, corsPolicy), "/{x-chaos:.*}" bind repeatStage.asFilter().then(this))
 }

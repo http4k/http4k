@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.38.1
+- Fix `withChaosControls` URL pattern so that it matches sub-routes ok on original handler
+
 ### v3.38.0
 - Added `BearerAuth` and `BasicAuth` implementations which populate `RequestContexts`. Plus cookbook example :)
 
