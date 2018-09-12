@@ -1,6 +1,7 @@
 package org.http4k.jsonrpc
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -10,7 +11,7 @@ import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.ServerFilters
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
@@ -28,25 +29,20 @@ import org.http4k.lens.LensFailure
 data class JsonRpcService<ROOT : NODE, NODE : Any>(
         private val json: Json<ROOT, NODE>,
         private val errorHandler: ErrorHandler,
-        private val methodMappings: List<MethodMapping<NODE, NODE>>) : HttpHandler {
+        private val bindings: Iterable<JsonRpcMethodBinding<NODE, NODE>>) : HttpHandler {
 
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
-    private val methods = methodMappings.map { it.name to it.handler }.toMap()
+    private val methods = bindings.map { it.name to it.handler }.toMap()
 
-    private val handler: HttpHandler = ServerFilters.CatchLensFailure {
-        Response(OK).with(jsonLens of renderError(ParseError))
-    }.then { request ->
-        when (request.method) {
-            POST -> {
-                val responseJson = process(jsonLens(request))
+    private val handler = CatchLensFailure { Response(OK).with(jsonLens of renderError(ParseError)) }
+            .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
+            .then {
+                val responseJson = process(jsonLens(it))
                 when (responseJson) {
                     null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
                     else -> Response(OK).with(jsonLens of responseJson)
                 }
             }
-            else -> Response(METHOD_NOT_ALLOWED)
-        }
-    }
 
     override fun invoke(request: Request): Response = handler(request)
 
@@ -60,39 +56,31 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
             JsonRpcRequest(json, fields).mapIfValid { request ->
                 try {
                     val method = methods[request.method]
-                    if (method == null) {
-                        renderError(MethodNotFound, request.id)
-                    } else {
-                        val result = method(request.params ?: json.nullNode())
-                        request.id?.let { renderResult(result, it) }
+                    when (method) {
+                        null -> renderError(MethodNotFound, request.id)
+                        else -> request.id?.let { renderResult(method(request.params ?: json.nullNode()), it) }
                     }
+                } catch (e: LensFailure) {
+                    val errorMessage = errorHandler(e.cause ?: e)
+                            ?: if (e.overall() == Invalid) InvalidParams else InternalError
+                    renderError(errorMessage, request.id)
                 } catch (e: Throwable) {
-                    val error = when (e) {
-                        is LensFailure -> e.cause ?: e
-                        else -> e
-                    }
-                    renderError(errorHandler(error) ?: e.defaultErrorMessage(), request.id)
+                    renderError(errorHandler(e) ?: InternalError, request.id)
                 }
             }
 
-    private fun JsonRpcRequest<ROOT, NODE>.mapIfValid(block: (JsonRpcRequest<ROOT, NODE>) -> ROOT?): ROOT? = when {
+    private fun JsonRpcRequest<ROOT, NODE>.mapIfValid(block: (JsonRpcRequest<ROOT, NODE>) -> ROOT?) = when {
         valid() -> block(this)
         else -> renderError(InvalidRequest, id)
     }
 
-    private fun Throwable.defaultErrorMessage(): ErrorMessage = when {
-        this is LensFailure && overall() == Invalid -> InvalidParams
-        else -> InternalError
-    }
-
-    private fun processBatchRequest(elements: List<NODE>): ROOT? = when {
-        elements.isNotEmpty() -> elements.processEachAsSingleRequest()
-        else -> renderError(InvalidRequest)
+    private fun processBatchRequest(elements: List<NODE>) = with(elements) {
+        if (isNotEmpty()) processEachAsSingleRequest() else renderError(InvalidRequest)
     }
 
     private fun List<NODE>.processEachAsSingleRequest(): ROOT? =
-            mapNotNull { element ->
-                processSingleRequest(json.fields(element).toMap())
+            mapNotNull {
+                processSingleRequest(json.fields(it).toMap())
             }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
     private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(
@@ -108,7 +96,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
     )
 }
 
-data class MethodMapping<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
+data class JsonRpcMethodBinding<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
 
 typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
