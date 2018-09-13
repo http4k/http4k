@@ -57,11 +57,12 @@ private object CounterErrorHandler : ErrorHandler {
 class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json, counter ->
 
     val incrementParams = Params<JsonNode, Counter.Increment> { Counter.Increment(it["value"].asText().toInt()) }
-    val incrementResult: Result<Int, JsonNode> = Result { json.number(it) }
+    val intResult: Result<Int, JsonNode> = Result { json.number(it) }
 
     JsonRpc.manual(json, CounterErrorHandler) {
-        method("increment", handler(setOf("value"), incrementParams, incrementResult, counter::increment))
-        method("incrementNoArray", handler(incrementParams, incrementResult, counter::increment))
+        method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
+        method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
+        method("current", handler(intResult, counter::currentValue))
     }
 }) {
     @Test
@@ -77,6 +78,7 @@ class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, 
     JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
+        method("current", handler(counter::currentValue))
     }
 }) {
     @Test
@@ -126,6 +128,15 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
                 hasNoContentResponse()
         )
         assertThat(counter.currentValue(), equalTo(4))
+    }
+
+    @Test
+    fun `rpc call with no parameters returns result`() {
+        rpcRequest("increment", "{\"value\": 2}")
+        assertThat(
+                rpcRequest("current", id = "1"),
+                hasSuccessResponse("2", "1")
+        )
     }
 
     @Test
