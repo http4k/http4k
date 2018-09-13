@@ -58,7 +58,9 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
                     val method = methods[request.method]
                     when (method) {
                         null -> renderError(MethodNotFound, request.id)
-                        else -> request.id?.let { renderResult(method(request.params ?: json.nullNode()), it) }
+                        else -> method(request.params ?: json.nullNode()).let { result ->
+                            request.id?.let { renderResult(result, it) }
+                        }
                     }
                 } catch (e: LensFailure) {
                     val errorMessage = errorHandler(e.cause ?: e)

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method
@@ -23,126 +24,114 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.string
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
+import java.util.concurrent.atomic.AtomicInteger
 
-data class Add(val first: Int, val second: Int)
-data class Div(val dividend: Double, val divisor: Double)
+class Counter {
+    private val value: AtomicInteger = AtomicInteger()
 
-class DivideByZeroException(val dividend: Double) : RuntimeException("divide by zero")
-
-private object Calculator {
-    fun add(it: Add): Int = it.first + it.second
-
-    fun divide(it: Div): Double = if (it.divisor == 0.0) {
-        throw DivideByZeroException(it.dividend)
-    } else {
-        it.dividend / it.divisor
+    fun increment(amount: Increment): Int = when {
+        amount.value == 10 -> throw RuntimeException("Boom!")
+        amount.value < 0 -> throw NegativeIncrementException()
+        else -> value.addAndGet(amount.value)
     }
 
-    fun fails(): Void = throw RuntimeException("Boom!")
+    fun currentValue(): Int = value.get()
+
+    data class Increment(val value: Int)
+
+    class NegativeIncrementException : RuntimeException("negative increment not allowed")
 }
 
-private object CalculatorErrorHandler : ErrorHandler {
+private object CounterErrorHandler : ErrorHandler {
     override fun invoke(error: Throwable): ErrorMessage? = when (error) {
-        is DivideByZeroException -> DivideByZeroErrorMessage(error.dividend)
+        is Counter.NegativeIncrementException -> NegativeIncrementExceptionMessage()
         else -> null
     }
 
-    private class DivideByZeroErrorMessage(private val dividend: Double) : ErrorMessage(1, "Divide by zero") {
+    private class NegativeIncrementExceptionMessage : ErrorMessage(1, "Increment by negative") {
         override fun <ROOT : NODE, NODE> data(json: Json<ROOT, NODE>): NODE? =
-                json.string("cannot divide $dividend by zero")
+                json.string("cannot increment counter by negative")
     }
 }
 
-class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json: JsonLibAutoMarshallingJson<JsonNode> ->
+class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json, counter ->
 
-    val addParams = Params<JsonNode, Add> {
-        Add(it["first"].asText().toInt(), it["second"].asText().toInt())
-    }
-    val addResult: Result<Int, JsonNode> = Result { json.number(it) }
+    val incrementParams = Params<JsonNode, Counter.Increment> { Counter.Increment(it["value"].asText().toInt()) }
+    val incrementResult: Result<Int, JsonNode> = Result { json.number(it) }
 
-    val divParams = Params<JsonNode, Div> {
-        Div(it["dividend"].asDouble(), it["divisor"].asDouble())
-    }
-    val divResult: Result<Double, JsonNode> = Result { json.number(it) }
-
-    JsonRpc.manual(json, CalculatorErrorHandler) {
-        method("add", handler(setOf("first", "second"), addParams, addResult, Calculator::add))
-        method("addNoArray", handler(addParams, addResult, Calculator::add))
-        method("divide", handler(divParams, divResult, Calculator::divide))
-        method("fails", handler(Result { json.nullNode() }, Calculator::fails))
+    JsonRpc.manual(json, CounterErrorHandler) {
+        method("increment", handler(setOf("value"), incrementParams, incrementResult, counter::increment))
+        method("incrementNoArray", handler(incrementParams, incrementResult, counter::increment))
     }
 }) {
     @Test
     fun `rpc call with positional parameters when fields not defined returns error`() {
         assertThat(
-                rpcRequest("addNoArray", "[5, 3]", "1"),
+                rpcRequest("incrementNoArray", "[3]", "1"),
                 hasErrorResponse(-32602, "Invalid params", "1")
         )
     }
 }
 
-class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json ->
-    JsonRpc.auto(json, CalculatorErrorHandler) {
-        method("add", handler(Calculator::add))
-        method("addDefinedFields", handler(setOf("first", "second", "ignored"), Calculator::add))
-        method("divide", handler(Calculator::divide))
-        method("fails", handler(Calculator::fails))
+class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json, counter ->
+    JsonRpc.auto(json, CounterErrorHandler) {
+        method("increment", handler(counter::increment))
+        method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
     }
 }) {
     @Test
     fun `rpc call with positional parameters when fields defined returns result`() {
         assertThat(
-                rpcRequest("addDefinedFields", "[5, 3]", "1"),
-                hasSuccessResponse("8", "1")
+                rpcRequest("incrementDefinedFields", "[3]", "1"),
+                hasSuccessResponse("3", "1")
         )
     }
 }
 
 abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>,
-                                                  builder: (JsonLibAutoMarshallingJson<ROOT>) -> JsonRpcService<ROOT, ROOT>) {
+                                                  builder: (JsonLibAutoMarshallingJson<ROOT>, Counter) -> JsonRpcService<ROOT, ROOT>) {
 
-    private val rpc = "/rpc" bind builder(json)
+    private val counter = Counter()
+    private val rpc = "/rpc" bind builder(json, counter)
 
     @Test
     fun `rpc call with named parameters returns result`() {
         assertThat(
-                rpcRequest("add", "{\"first\": 5, \"second\": 3}", "1"),
-                hasSuccessResponse("8", "1")
-        )
-        assertThat(
-                rpcRequest("add", "{\"second\": 4, \"first\": 7}", "2"),
-                hasSuccessResponse("11", "2")
+                rpcRequest("increment", "{\"value\": 2}", "1"),
+                hasSuccessResponse("2", "1")
         )
     }
 
     @Test
     fun `rpc call with positional parameters returns result`() {
         assertThat(
-                rpcRequest("add", "[5, 3]", "1"),
-                hasSuccessResponse("8", "1")
+                rpcRequest("increment", "[3]", "1"),
+                hasSuccessResponse("3", "1")
         )
     }
 
     @Test
     fun `rpc call as notification with named parameters returns no content`() {
         assertThat(
-                rpcRequest("add", "{\"first\": 5, \"second\": 3}"),
+                rpcRequest("increment", "{\"value\": 5}"),
                 hasNoContentResponse()
         )
+        assertThat(counter.currentValue(), equalTo(5))
     }
 
     @Test
     fun `rpc call as notification with positional parameters returns no content`() {
         assertThat(
-                rpcRequest("add", "[5, 3]"),
+                rpcRequest("increment", "[4]"),
                 hasNoContentResponse()
         )
+        assertThat(counter.currentValue(), equalTo(4))
     }
 
     @Test
     fun `rpc call with invalid parameters returns error`() {
         assertThat(
-                rpcRequest("add", "{\"first\": 5, \"second\": \"a\"}", "1"),
+                rpcRequest("increment", "{\"value\": \"a\"}", "1"),
                 hasErrorResponse(-32602, "Invalid params", "1")
         )
     }
@@ -182,7 +171,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call with invalid version value returns error`() {
         assertThat(
-                rpcRequestWithBody("{\"jsonrpc\": \"2.1\", \"method\": \"a\", \"id\" : 1}"),
+                rpcRequestWithBody("{\"jsonrpc\": \"2.1\", \"method\": \"increment\", \"params\": [4], \"id\" : 1}"),
                 hasErrorResponse(-32600, "Invalid Request", "1")
         )
     }
@@ -198,7 +187,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call with invalid params type returns error`() {
         assertThat(
-                rpcRequest("add", "3", "1"),
+                rpcRequest("increment", "3", "1"),
                 hasErrorResponse(-32600, "Invalid Request", "1")
         )
     }
@@ -206,7 +195,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call with invalid id type returns error`() {
         assertThat(
-                rpcRequest("add", "3", "[1]"),
+                rpcRequest("increment", "3", "[1]"),
                 hasErrorResponse(-32600, "Invalid Request", null)
         )
     }
@@ -214,16 +203,16 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call with id type as string returns result`() {
         assertThat(
-                rpcRequest("add", "{\"first\": 5, \"second\": 3}", "\"1\""),
-                hasSuccessResponse("8", "\"1\"")
+                rpcRequest("increment", "{\"value\": 5}", "\"1\""),
+                hasSuccessResponse("5", "\"1\"")
         )
     }
 
     @Test
     fun `rpc call with id type as null returns result`() {
         assertThat(
-                rpcRequest("add", "{\"first\": 5, \"second\": 3}", "null"),
-                hasSuccessResponse("8", "null")
+                rpcRequest("increment", "{\"value\": 3}", "null"),
+                hasSuccessResponse("3", "null")
         )
     }
 
@@ -236,9 +225,9 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     }
 
     @Test
-    fun `rpc call to method that throws exception returns error`() {
+    fun `rpc call to method that throws unhandled exception returns error`() {
         assertThat(
-                rpcRequest("fails", id = "1"),
+                rpcRequest("increment", "{\"value\": 10}", "1"),
                 hasErrorResponse(-32603, "Internal error", "1")
         )
     }
@@ -291,15 +280,15 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     fun `rpc batch call with mixed invalid and valid normal and notifications returns result`() {
         assertThat(
                 rpcRequestWithBody(listOf(
-                        rpcJson("add", "{\"first\": 5, \"second\": 3}", "1"),
-                        rpcJson("add", "[5, 3]", "2"),
-                        rpcJson("add", "3", "[1]"),
-                        rpcJson("add", "{\"first\": 5, \"second\": 3}"),
-                        rpcJson("add", "[5, 3]"),
+                        rpcJson("increment", "{\"value\": 5}", "1"),
+                        rpcJson("increment", "[3]", "2"),
+                        rpcJson("increment", "3", "[1]"),
+                        rpcJson("increment", "{\"value\": 2}"),
+                        rpcJson("increment", "[2]"),
                         "1"
                 ).joinToString(",", "[", "]")),
                 hasBatchResponse(
-                        Success("8", "1"),
+                        Success("5", "1"),
                         Success("8", "2"),
                         Error(-32600, "Invalid Request", null),
                         Error(-32600, "Invalid Request", null)
@@ -311,8 +300,8 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     fun `rpc batch call with only notifications returns no content`() {
         assertThat(
                 rpcRequestWithBody(listOf(
-                        rpcJson("add", "{\"first\": 5, \"second\": 3}"),
-                        rpcJson("add", "[5, 3]")
+                        rpcJson("increment", "{\"value\": 5}"),
+                        rpcJson("increment", "[3]")
                 ).joinToString(",", "[", "]")),
                 hasNoContentResponse()
         )
@@ -321,8 +310,9 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call that throws user exception returns failure`() {
         assertThat(
-                rpcRequest("divide", "{\"dividend\": 4, \"divisor\": 0}", "1"),
-                hasErrorResponse(1, "Divide by zero", "\"cannot divide 4.0 by zero\"", "1")
+                rpcRequest("increment", "{\"value\": -1}", "1"),
+                hasErrorResponse(1, "Increment by negative",
+                        "\"cannot increment counter by negative\"", "1")
         )
     }
 
