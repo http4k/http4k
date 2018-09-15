@@ -51,7 +51,7 @@ object CounterErrorHandler : ErrorHandler {
     }
 }
 
-abstract class JsonRpcServiceContract<ROOT : Any>(builder: (Counter) -> JsonRpcService<ROOT, ROOT>) {
+abstract class JsonRpcServiceContract<ROOT : NODE, NODE : Any>(builder: (Counter) -> JsonRpcService<ROOT, NODE>) {
 
     private val counter = Counter()
     private val rpc = "/rpc" bind builder(counter)
@@ -340,7 +340,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(builder: (Counter) -> JsonRpcS
     }
 }
 
-abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE, NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json: Json<ROOT, NODE>) : JsonRpcServiceContract<ROOT, NODE>({ counter ->
     val incrementParams = Params<NODE, Counter.Increment> { Counter.Increment(json.stringFrom(it, "value")!!.toInt()) }
     val intResult: Result<Int, NODE> = Result { json.number(it) }
 
@@ -359,7 +359,7 @@ abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE, 
     }
 }
 
-abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: JsonLibAutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+abstract class AutoMappingJsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>) : JsonRpcServiceContract<ROOT, ROOT>({ counter ->
     JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
