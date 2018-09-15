@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
+import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
 import org.junit.jupiter.api.Test
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
@@ -36,3 +37,4 @@ class JacksonTest : JsonContract<JsonNode, JsonNode>(Jackson) {
 }
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Jackson)
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Jackson)
+class JacksonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(Jackson)

@@ -7,12 +7,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
@@ -42,7 +41,7 @@ class Counter {
     class NegativeIncrementException : RuntimeException("negative increment not allowed")
 }
 
-private object CounterErrorHandler : ErrorHandler {
+object CounterErrorHandler : ErrorHandler {
     override fun invoke(error: Throwable): ErrorMessage? = when (error) {
         is Counter.NegativeIncrementException -> NegativeIncrementExceptionMessage()
         else -> null
@@ -54,47 +53,10 @@ private object CounterErrorHandler : ErrorHandler {
     }
 }
 
-class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json, counter ->
-
-    val incrementParams = Params<JsonNode, Counter.Increment> { Counter.Increment(it["value"].asText().toInt()) }
-    val intResult: Result<Int, JsonNode> = Result { json.number(it) }
-
-    JsonRpc.manual(json, CounterErrorHandler) {
-        method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
-        method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
-        method("current", handler(intResult, counter::currentValue))
-    }
-}) {
-    @Test
-    fun `rpc call with positional parameters when fields not defined returns error`() {
-        assertThat(
-                rpcRequest("incrementNoArray", "[3]", "1"),
-                hasErrorResponse(-32602, "Invalid params", "1")
-        )
-    }
-}
-
-class AutoMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>(Jackson, { json, counter ->
-    JsonRpc.auto(json, CounterErrorHandler) {
-        method("increment", handler(counter::increment))
-        method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
-        method("current", handler(counter::currentValue))
-    }
-}) {
-    @Test
-    fun `rpc call with positional parameters when fields defined returns result`() {
-        assertThat(
-                rpcRequest("incrementDefinedFields", "[3]", "1"),
-                hasSuccessResponse("3", "1")
-        )
-    }
-}
-
-abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>,
-                                                  builder: (JsonLibAutoMarshallingJson<ROOT>, Counter) -> JsonRpcService<ROOT, ROOT>) {
+abstract class JsonRpcServiceContract<ROOT : Any>(builder: (Counter) -> JsonRpcService<ROOT, ROOT>) {
 
     private val counter = Counter()
-    private val rpc = "/rpc" bind builder(json, counter)
+    private val rpc = "/rpc" bind builder(counter)
 
     @Test
     fun `rpc call with named parameters returns result`() {
@@ -246,7 +208,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call using GET http method returns method not allowed`() {
         assertThat(
-                rpc(Request(Method.GET, "/rpc")),
+                rpc(Request(GET, "/rpc")),
                 hasStatus(Status.METHOD_NOT_ALLOWED) and hasBody("")
         )
     }
@@ -254,7 +216,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
     @Test
     fun `rpc call using wrong content type returns unsupported media type`() {
         assertThat(
-                rpc(Request(Method.POST, "/rpc")),
+                rpc(Request(POST, "/rpc")),
                 hasStatus(Status.UNSUPPORTED_MEDIA_TYPE) and hasBody("")
         )
     }
@@ -343,7 +305,7 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
             hasResponse(Success(result, id))
 
     private fun hasNoContentResponse(): Matcher<Response> =
-            hasStatus(NO_CONTENT) and
+            hasStatus(Status.NO_CONTENT) and
                     hasContentType(APPLICATION_JSON) and
                     hasBody("")
 
@@ -377,5 +339,40 @@ abstract class JsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJs
                 "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":$code,\"message\":\"$message\"" +
                         (data?.let { ",\"data\":$it" } ?: "") +
                         "},\"id\":$id}"
+    }
+}
+
+class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>({counter ->
+    val incrementParams = Params<JsonNode, Counter.Increment> { Counter.Increment(it["value"].asText().toInt()) }
+    val intResult: Result<Int, JsonNode> = Result { Jackson.number(it) }
+
+    JsonRpc.manual(Jackson, CounterErrorHandler) {
+        method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
+        method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
+        method("current", handler(intResult, counter::currentValue))
+    }
+}) {
+    @Test
+    fun `rpc call with positional parameters when fields not defined returns error`() {
+        assertThat(
+                rpcRequest("incrementNoArray", "[3]", "1"),
+                hasErrorResponse(-32602, "Invalid params", "1")
+        )
+    }
+}
+
+abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: JsonLibAutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+    JsonRpc.auto(json, CounterErrorHandler) {
+        method("increment", handler(counter::increment))
+        method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
+        method("current", handler(counter::currentValue))
+    }
+}) {
+    @Test
+    fun `rpc call with positional parameters when fields defined returns result`() {
+        assertThat(
+                rpcRequest("incrementDefinedFields", "[3]", "1"),
+                hasSuccessResponse("3", "1")
+        )
     }
 }
