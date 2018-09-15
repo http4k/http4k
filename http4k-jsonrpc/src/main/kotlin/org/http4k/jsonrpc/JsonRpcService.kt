@@ -82,7 +82,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
 
     private fun List<NODE>.processEachAsSingleRequest(): ROOT? =
             mapNotNull {
-                processSingleRequest(json.fields(it).toMap())
+                processSingleRequest(if(json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
             }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
     private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(

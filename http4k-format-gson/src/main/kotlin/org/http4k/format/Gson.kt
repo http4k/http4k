@@ -80,7 +80,6 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     }
 
     override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> {
-        if(!node.isJsonObject) return emptyList()
         val fieldList = mutableListOf<Pair<String, JsonElement>>()
         for ((key, value) in node.asJsonObject.entrySet()) {
             fieldList += key to value
