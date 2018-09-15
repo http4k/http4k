@@ -96,7 +96,7 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    override fun stringFrom(node: JsonNode, name: String): String? = node[name].asText()
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 }
 
 val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()

@@ -77,6 +77,13 @@ abstract class JsonContract<ROOT : NODE, NODE>(open val j: Json<ROOT, NODE>) {
     }
 
     @Test
+    fun `get string value`() {
+        assertThat(j.textValueOf(j.obj("value" to j.string("world")), "value"), equalTo("world"))
+        assertThat(j.textValueOf(j.obj("value" to j.number(1)), "value"), equalTo("1"))
+        assertThat(j.textValueOf(j.obj("value" to j.boolean(true)), "value"), equalTo("true"))
+    }
+
+    @Test
     fun `get boolean`() {
         assertThat(j.bool(j.boolean(true)), equalTo(true))
     }

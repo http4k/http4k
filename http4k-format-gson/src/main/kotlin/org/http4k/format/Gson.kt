@@ -101,7 +101,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    override fun stringFrom(node: JsonElement, name: String): String? = when(node) {
+    override fun textValueOf(node: JsonElement, name: String) = when(node) {
         is JsonObject -> node[name].asString
         else -> throw IllegalArgumentException("node is not an object")
     }

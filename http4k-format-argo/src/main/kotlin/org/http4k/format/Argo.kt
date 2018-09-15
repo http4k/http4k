@@ -45,7 +45,15 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun text(value: JsonNode): String = value.text
     override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
 
-    override fun stringFrom(node: JsonNode, name: String): String? = node.getNullableStringValue(name)
+    override fun textValueOf(node: JsonNode, name: String) = with(node.getNode(name)) {
+         when (type) {
+            JsonNodeType.STRING -> text
+            JsonNodeType.TRUE -> "true"
+            JsonNodeType.FALSE -> "false"
+            JsonNodeType.NUMBER -> text
+            else -> throw IllegalArgumentException("Don't know now to translate $node")
+        }
+    }
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }

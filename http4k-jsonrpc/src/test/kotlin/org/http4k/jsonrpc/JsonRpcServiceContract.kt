@@ -341,7 +341,7 @@ abstract class JsonRpcServiceContract<ROOT : NODE, NODE : Any>(builder: (Counter
 }
 
 abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json: Json<ROOT, NODE>) : JsonRpcServiceContract<ROOT, NODE>({ counter ->
-    val incrementParams = Params<NODE, Counter.Increment> { Counter.Increment(json.stringFrom(it, "value")!!.toInt()) }
+    val incrementParams = Params<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
     val intResult: Result<Int, NODE> = Result { json.number(it) }
 
     JsonRpc.manual(json, CounterErrorHandler) {

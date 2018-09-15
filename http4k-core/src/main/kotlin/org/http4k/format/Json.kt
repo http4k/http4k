@@ -77,7 +77,7 @@ interface Json<ROOT : NODE, NODE> {
 
     fun WsMessage.Companion.json(): BiDiWsMessageLensSpec<ROOT> = WsMessage.string().map({ parse(it) }, { compact(it) })
 
-    fun stringFrom(node: NODE, name: String): String?
+    fun textValueOf(node: NODE, name: String): String?
 }
 
 enum class JsonType {
