@@ -60,18 +60,6 @@ class ApacheClient(
         entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
 
-    private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
-        init {
-            uri = URI(request.uri.toString())
-            entity = when (requestBodyMode) {
-                Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-                Memory -> ByteArrayEntity(request.body.payload.array())
-            }
-        }
-
-        override fun getMethod() = request.method.name
-    }
-
     private fun Request.toApacheRequest(): HttpRequestBase {
         val request = this@toApacheRequest
         val uri = URI(request.uri.toString())
@@ -100,4 +88,16 @@ class ApacheClient(
                         .build()).build()
 
     }
+}
+
+private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+    init {
+        uri = URI(request.uri.toString())
+        entity = when (requestBodyMode) {
+            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+            Memory -> ByteArrayEntity(request.body.payload.array())
+        }
+    }
+
+    override fun getMethod() = request.method.name
 }
