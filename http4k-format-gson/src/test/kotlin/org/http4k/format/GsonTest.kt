@@ -45,4 +45,4 @@ class GsonTest : JsonContract<JsonElement, JsonElement>(Gson) {
 class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement, JsonElement>(Gson)
 class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement, JsonElement>(Gson)
 //class GsonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonElement>(Gson)
-//class GsonManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonElement>(Gson)
+//class GsonManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonElement ,JsonElement>(Gson)
