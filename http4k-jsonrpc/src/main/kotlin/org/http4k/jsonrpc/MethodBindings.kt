@@ -3,13 +3,12 @@ package org.http4k.jsonrpc
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 
-interface MethodBindings<ROOT : NODE, NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
+interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
     fun method(name: String, handler: JsonRpcHandler<NODE, NODE>)
-    val json: Json<ROOT, NODE>
 
     companion object {
-        open class Manual<ROOT : NODE, NODE : Any>(override val json: Json<ROOT, NODE>) :
-                MethodBindings<ROOT, NODE> {
+        open class Manual<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) :
+                MethodBindings<NODE> {
             override fun iterator(): Iterator<JsonRpcMethodBinding<NODE, NODE>> = methodMappings
                     .map { JsonRpcMethodBinding(it.key, it.value) }.iterator()
 
@@ -34,7 +33,7 @@ interface MethodBindings<ROOT : NODE, NODE> : Iterable<JsonRpcMethodBinding<NODE
                     NoParamsJsonRequestHandler(block, resultLens)
         }
 
-        class Auto<ROOT : Any>(override val json: JsonLibAutoMarshallingJson<ROOT>) :
+        class Auto<ROOT : Any>(val json: JsonLibAutoMarshallingJson<ROOT>) :
                 Manual<ROOT, ROOT>(json) {
 
             inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
