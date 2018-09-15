@@ -39,9 +39,9 @@ import java.net.URI
 import java.net.UnknownHostException
 
 class ApacheClient(
-    private val client: CloseableHttpClient = defaultApacheHttpClient(),
-    private val responseBodyMode: BodyMode = Memory,
-    private val requestBodyMode: BodyMode = Memory
+        private val client: CloseableHttpClient = defaultApacheHttpClient(),
+        private val responseBodyMode: BodyMode = Memory,
+        private val requestBodyMode: BodyMode = Memory
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response = try {
@@ -60,6 +60,18 @@ class ApacheClient(
         entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
 
+    private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+        init {
+            uri = URI(request.uri.toString())
+            entity = when (requestBodyMode) {
+                Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+                Memory -> ByteArrayEntity(request.body.payload.array())
+            }
+        }
+
+        override fun getMethod() = request.method.name
+    }
+
     private fun Request.toApacheRequest(): HttpRequestBase {
         val request = this@toApacheRequest
         val uri = URI(request.uri.toString())
@@ -70,18 +82,7 @@ class ApacheClient(
             OPTIONS -> HttpOptions(uri)
             TRACE -> HttpTrace(uri)
             DELETE -> HttpDelete(uri)
-            else ->
-                object : HttpEntityEnclosingRequestBase() {
-                    init {
-                        this.uri = uri
-                        entity = when (requestBodyMode) {
-                            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-                            Memory -> ByteArrayEntity(request.body.payload.array())
-                        }
-                    }
-
-                    override fun getMethod() = request.method.name
-                }
+            else -> ApacheRequest(requestBodyMode, request)
         }
         request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
         return apacheRequest
@@ -93,10 +94,10 @@ class ApacheClient(
 
     companion object {
         private fun defaultApacheHttpClient() = HttpClients.custom()
-            .setDefaultRequestConfig(RequestConfig.custom()
-                .setRedirectsEnabled(false)
-                .setCookieSpec(IGNORE_COOKIES)
-                .build()).build()
+                .setDefaultRequestConfig(RequestConfig.custom()
+                        .setRedirectsEnabled(false)
+                        .setCookieSpec(IGNORE_COOKIES)
+                        .build()).build()
 
     }
 }
