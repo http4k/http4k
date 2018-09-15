@@ -12,7 +12,6 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 object Argo : Json<JsonRootNode, JsonNode> {
-
     override fun typeOf(value: JsonNode): JsonType =
         when (value.type) {
             JsonNodeType.STRING -> JsonType.String
@@ -45,6 +44,8 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
     override fun text(value: JsonNode): String = value.text
     override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
+
+    override fun stringFrom(node: JsonNode, name: String): String? = node.getNullableStringValue(name)
 
     private fun field(name: String, value: JsonNode) = JsonNodeFactories.field(name, value)
 }

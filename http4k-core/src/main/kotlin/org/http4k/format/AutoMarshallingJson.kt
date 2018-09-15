@@ -24,5 +24,4 @@ abstract class JsonLibAutoMarshallingJson<ROOT : Any> : AutoMarshallingJson(), J
 
     @JvmName("nodeAsA")
     fun <T : Any> ROOT.asA(c: KClass<T>): T = asA(this, c)
-
 }

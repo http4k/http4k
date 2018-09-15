@@ -1,6 +1,5 @@
 package org.http4k.jsonrpc
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
@@ -14,7 +13,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.format.Jackson
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.hamkrest.hasBody
@@ -342,11 +340,11 @@ abstract class JsonRpcServiceContract<ROOT : Any>(builder: (Counter) -> JsonRpcS
     }
 }
 
-class ManualMappingJsonRpcServiceTest : JsonRpcServiceContract<JsonNode>({counter ->
-    val incrementParams = Params<JsonNode, Counter.Increment> { Counter.Increment(it["value"].asText().toInt()) }
-    val intResult: Result<Int, JsonNode> = Result { Jackson.number(it) }
+abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE, NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+    val incrementParams = Params<NODE, Counter.Increment> { Counter.Increment(json.stringFrom(it, "value")!!.toInt()) }
+    val intResult: Result<Int, NODE> = Result { json.number(it) }
 
-    JsonRpc.manual(Jackson, CounterErrorHandler) {
+    JsonRpc.manual(json, CounterErrorHandler) {
         method("increment", handler(setOf("value"), incrementParams, intResult, counter::increment))
         method("incrementNoArray", handler(incrementParams, intResult, counter::increment))
         method("current", handler(intResult, counter::currentValue))

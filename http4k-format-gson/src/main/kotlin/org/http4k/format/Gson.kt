@@ -35,6 +35,7 @@ import kotlin.reflect.KClass
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
 
 open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
+
     override fun typeOf(value: JsonElement): JsonType =
             when {
                 value.isJsonArray -> JsonType.Array
@@ -99,6 +100,11 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    override fun stringFrom(node: JsonElement, name: String): String? = when(node) {
+        is JsonObject -> node[name].asString
+        else -> throw IllegalArgumentException("node is not an object")
+    }
 }
 
 object Gson : ConfigurableGson(GsonBuilder()
