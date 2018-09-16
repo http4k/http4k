@@ -3,7 +3,6 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.should.shouldMatch
 import io.micrometer.core.instrument.Tag
-import io.micrometer.core.instrument.Tags
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -146,11 +145,11 @@ class MetricFiltersServerTest {
 
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
         hasTimer("http.server.request.latency",
-            Tags.zip("path", path, "method", method.name, "status", status.code.toString())
+            listOf(Tag.of("path", path), Tag.of("method", method.name), Tag.of("status", status.code.toString()))
         ).not()
 
     private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
         hasCounter("http.server.request.count",
-            Tags.zip("path", path, "method", method.name, "status", status.code.toString())
+            listOf(Tag.of("path", path),Tag.of( "method", method.name), Tag.of("status", status.code.toString()))
         ).not()
 }

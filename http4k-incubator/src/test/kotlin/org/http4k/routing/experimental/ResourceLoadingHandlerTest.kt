@@ -199,6 +199,6 @@ fun <T> allOf(vararg matchers: Matcher<T>): Matcher<T> = allOf(matchers.asList()
 
 @Suppress("UNCHECKED_CAST")
 private fun <T> List<Matcher<T>>.reducedWith(op: (Matcher<T>, Matcher<T>) -> Matcher<T>): Matcher<T> = when {
-    isEmpty() -> anything as Matcher<T>
+    isEmpty() -> anything
     else -> reduce(op)
 }
