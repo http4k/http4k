@@ -1,7 +1,7 @@
 description = 'Http4k metrics support, integrating with micrometer.io'
 
 ext {
-    ext.micrometer_version = '1.0.6'
+    ext.micrometer_version = '1.0.0-rc.6'
 }
 
 dependencies {
