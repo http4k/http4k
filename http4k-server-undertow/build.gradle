@@ -1,7 +1,7 @@
 description = 'Http4k HTTP Server built on top of Undertow'
 
 ext {
-    ext.undertow_version = '2.0.4.Final'
+    ext.undertow_version = '2.0.13.Final'
 
     undertow = [
             "io.undertow:undertow-core:$undertow_version",

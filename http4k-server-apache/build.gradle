@@ -1,7 +1,7 @@
 description = 'Http4k HTTP Server built on top of Apache httpcore'
 
 ext {
-    ext.apache_http_core_version = '4.4.6'
+    ext.apache_http_core_version = '4.4.10'
 }
 
 dependencies {
