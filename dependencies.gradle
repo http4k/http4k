@@ -1,6 +1,7 @@
 ext {
-    ext.kotlin_version = '1.2.60'
-    ext.jetty_version = '9.4.11.v20180605'
+    ext.kotlin_version = '1.2.70'
+    ext.jetty_version = '9.4.12.v20180830'
+    ext.junit_version = '5.3.1'
 
     kotlin_lib = [
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -11,12 +12,12 @@ ext {
     ]
 
     hamkrest = [
-            "com.natpryce:hamkrest:1.4.2.0"
+            "com.natpryce:hamkrest:1.6.0.0"
     ]
 
     testing = [
-            "org.junit.jupiter:junit-jupiter-api:5.2.0",
-            "org.junit.jupiter:junit-jupiter-engine:5.2.0",
+            "org.junit.jupiter:junit-jupiter-api:$junit_version",
+            "org.junit.jupiter:junit-jupiter-engine:$junit_version",
             "io.github.artsok:rerunner-jupiter:1.1.0",
             kotlin_reflect,
             hamkrest
