@@ -22,7 +22,7 @@ matrix:
     - stage: bintray
       if: branch = master
       language: bash
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-ci.sh'
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-ci.sh; fi'
     - stage: docs
       if: branch = master
       language: python
@@ -33,8 +33,8 @@ matrix:
       language: java
       jdk: oraclejdk8
       script:
-      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh'
+      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
     - stage: maven central
       if: branch = master
-      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central.sh'
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central.sh; fi'
       language: bash
