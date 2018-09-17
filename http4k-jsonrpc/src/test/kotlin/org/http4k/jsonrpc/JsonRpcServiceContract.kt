@@ -126,7 +126,7 @@ abstract class JsonRpcServiceContract<ROOT : NODE, NODE : Any>(builder: (Counter
     @Test
     fun `rpc call with invalid request returns error`() {
         assertThat(
-                rpcRequestWithBody("5"),
+                rpcRequestWithBody("""{"value": 5}"""),
                 hasErrorResponse(-32600, "Invalid Request", null)
         )
     }
