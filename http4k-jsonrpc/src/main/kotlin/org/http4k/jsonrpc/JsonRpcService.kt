@@ -52,22 +52,25 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
         else -> renderError(InvalidRequest)
     }
 
-    private fun processSingleRequest(fields: Map<String, NODE>): ROOT? =
+    private fun processSingleRequest(fields: Map<String, NODE>) =
             JsonRpcRequest(json, fields).mapIfValid { request ->
                 try {
                     val method = methods[request.method]
                     when (method) {
                         null -> renderError(MethodNotFound, request.id)
-                        else -> method(request.params ?: json.nullNode()).let { result ->
-                            request.id?.let { renderResult(result, it) }
+                        else -> with(method(request.params ?: json.nullNode())) {
+                            request.id?.let { renderResult(this, it) }
                         }
                     }
-                } catch (e: LensFailure) {
-                    val errorMessage = errorHandler(e.cause ?: e)
-                            ?: if (e.overall() == Invalid) InvalidParams else InternalError
-                    renderError(errorMessage, request.id)
-                } catch (e: Throwable) {
-                    renderError(errorHandler(e) ?: InternalError, request.id)
+                } catch (e: Exception) {
+                    when (e) {
+                        is LensFailure -> {
+                            val errorMessage = errorHandler(e.cause ?: e)
+                                    ?: if (e.overall() == Invalid) InvalidParams else InternalError
+                            renderError(errorMessage, request.id)
+                        }
+                        else -> renderError(errorHandler(e) ?: InternalError, request.id)
+                    }
                 }
             }
 
@@ -80,9 +83,9 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
         if (isNotEmpty()) processEachAsSingleRequest() else renderError(InvalidRequest)
     }
 
-    private fun List<NODE>.processEachAsSingleRequest(): ROOT? =
+    private fun List<NODE>.processEachAsSingleRequest() =
             mapNotNull {
-                processSingleRequest(if(json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
+                processSingleRequest(if (json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
             }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
     private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(
@@ -91,7 +94,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
             "id" to id
     )
 
-    private fun renderError(errorMessage: ErrorMessage, id: NODE? = null): ROOT = json.obj(
+    private fun renderError(errorMessage: ErrorMessage, id: NODE? = null) = json.obj(
             "jsonrpc" to json.string(jsonRpcVersion),
             "error" to errorMessage(json),
             "id" to (id ?: json.nullNode())
