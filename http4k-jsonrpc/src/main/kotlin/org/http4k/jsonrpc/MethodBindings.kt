@@ -9,7 +9,7 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
     companion object {
         open class Manual<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) :
                 MethodBindings<NODE> {
-            override fun iterator(): Iterator<JsonRpcMethodBinding<NODE, NODE>> = methodMappings
+            override fun iterator() = methodMappings
                     .map { JsonRpcMethodBinding(it.key, it.value) }.iterator()
 
             private val methodMappings = mutableMapOf<String, JsonRpcHandler<NODE, NODE>>()
