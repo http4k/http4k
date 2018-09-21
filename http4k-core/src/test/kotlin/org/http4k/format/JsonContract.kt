@@ -108,12 +108,20 @@ abstract class JsonContract<ROOT : NODE, NODE>(open val j: Json<ROOT, NODE>) {
     }
 
     @Test
-    fun `compactify`() {
+    fun `get no fields`() {
+        assertThat(j.fields(j.string("foo")).toList(), equalTo(emptyList()))
+        assertThat(j.fields(j.boolean(true)).toList(), equalTo(emptyList()))
+        assertThat(j.fields(j.number(123)).toList(), equalTo(emptyList()))
+        assertThat(j.fields(j.nullNode()).toList(), equalTo(emptyList()))
+    }
+
+    @Test
+    fun compactify() {
         assertThat(j.compactify("""{   "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
     }
 
     @Test
-    fun `prettify`() {
+    fun prettify() {
         assertThat(j.prettify("""{"hello":"world"}"""), equalTo(prettyString))
     }
 }

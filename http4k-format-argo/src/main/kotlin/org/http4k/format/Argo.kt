@@ -8,6 +8,7 @@ import argo.jdom.JsonNodeFactories
 import argo.jdom.JsonNodeFactories.`object`
 import argo.jdom.JsonNodeType
 import argo.jdom.JsonRootNode
+import org.http4k.format.JsonType.Object
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -40,7 +41,8 @@ object Argo : Json<JsonRootNode, JsonNode> {
     override fun JsonRootNode.asPrettyJsonString(): String = pretty.format(this)
     override fun JsonRootNode.asCompactJsonString(): String = compact.format(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonRootNode = `object`(this.map { field(it.first, it.second) })
-    override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> = node.fieldList.map { it.name.text to it.value }
+    override fun fields(node: JsonNode) =
+            if(typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
     override fun text(value: JsonNode): String = value.text
     override fun bool(value: JsonNode): Boolean = value.getBooleanValue()

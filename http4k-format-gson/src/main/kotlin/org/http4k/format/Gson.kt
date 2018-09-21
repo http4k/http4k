@@ -14,6 +14,7 @@ import com.google.gson.JsonSerializer
 import org.http4k.core.Body
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion
+import org.http4k.format.JsonType.Object
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -79,13 +80,14 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
         return root
     }
 
-    override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> {
-        val fieldList = mutableListOf<Pair<String, JsonElement>>()
-        for ((key, value) in node.asJsonObject.entrySet()) {
-            fieldList += key to value
-        }
-        return fieldList
-    }
+    override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
+            if (typeOf(node) != Object) emptyList() else {
+                val fieldList = mutableListOf<Pair<String, JsonElement>>()
+                for ((key, value) in node.asJsonObject.entrySet()) {
+                    fieldList += key to value
+                }
+                fieldList
+            }
 
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
@@ -101,7 +103,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    override fun textValueOf(node: JsonElement, name: String) = when(node) {
+    override fun textValueOf(node: JsonElement, name: String) = when (node) {
         is JsonObject -> node[name].asString
         else -> throw IllegalArgumentException("node is not an object")
     }
