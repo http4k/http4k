@@ -31,7 +31,6 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
         private val errorHandler: ErrorHandler,
         private val bindings: Iterable<JsonRpcMethodBinding<NODE, NODE>>) : HttpHandler {
 
-    private val correctRpcVersion = json.string(jsonRpcVersion)
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = bindings.map { it.name to it.handler }.toMap()
 
@@ -53,29 +52,27 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
         else -> renderError(InvalidRequest)
     }
 
-    private fun processSingleRequest(fields: Map<String, NODE>): ROOT? {
-        if(fields["jsonrpc"] != correctRpcVersion) return renderError(InvalidRequest, fields["id"])
-        return JsonRpcRequest(json, fields).mapIfValid { request ->
-            try {
-                val method = methods[request.method]
-                when (method) {
-                    null -> renderError(MethodNotFound, request.id)
-                    else -> with(method(request.params ?: json.nullNode())) {
-                        request.id?.let { renderResult(this, it) }
+    private fun processSingleRequest(fields: Map<String, NODE>) =
+            JsonRpcRequest(json, fields).mapIfValid { request ->
+                try {
+                    val method = methods[request.method]
+                    when (method) {
+                        null -> renderError(MethodNotFound, request.id)
+                        else -> with(method(request.params ?: json.nullNode())) {
+                            request.id?.let { renderResult(this, it) }
+                        }
                     }
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is LensFailure -> {
-                        val errorMessage = errorHandler(e.cause ?: e)
-                                ?: if (e.overall() == Invalid) InvalidParams else InternalError
-                        renderError(errorMessage, request.id)
+                } catch (e: Exception) {
+                    when (e) {
+                        is LensFailure -> {
+                            val errorMessage = errorHandler(e.cause ?: e)
+                                    ?: if (e.overall() == Invalid) InvalidParams else InternalError
+                            renderError(errorMessage, request.id)
+                        }
+                        else -> renderError(errorHandler(e) ?: InternalError, request.id)
                     }
-                    else -> renderError(errorHandler(e) ?: InternalError, request.id)
                 }
             }
-        }
-    }
 
     private fun JsonRpcRequest<ROOT, NODE>.mapIfValid(block: (JsonRpcRequest<ROOT, NODE>) -> ROOT?) = when {
         valid() -> block(this)
@@ -111,7 +108,9 @@ typealias ErrorHandler = (Throwable) -> ErrorMessage?
 private const val jsonRpcVersion: String = "2.0"
 
 private class JsonRpcRequest<ROOT : NODE, NODE>(json: Json<ROOT, NODE>, fields: Map<String, NODE>) {
-    private var valid = true
+    private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
+        json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
+    }
 
     val method: String = (fields["method"] ?: json.nullNode()).let {
         if (json.typeOf(it) == JsonType.String) {
