@@ -63,7 +63,7 @@ class CurlTest {
     @Test
     fun `limits the entity if it's too large`() {
         val largeBody = (0..500).joinToString(" ")
-        val curl = org.http4k.core.Request(Method.GET, "http://httpbin.org").body(largeBody).toCurl()
+        val curl = Request(Method.GET, "http://httpbin.org").body(largeBody).toCurl(256)
         val data = "data \"([^\"]+)\"".toRegex().find(curl)?.groupValues?.get(1)!!
         assertThat(data.length, equalTo(256 + "[truncated]".length))
     }
