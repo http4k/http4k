@@ -20,6 +20,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -53,6 +55,8 @@ object Moshi : ConfigurableMoshi(Moshi.Builder()
         .add(custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .add(custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
         .add(custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
+        .add(custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format))
+        .add(custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format))
         .add(custom(Companion::of))
         .add(custom(::URL, URL::toExternalForm))
         .add(custom(UUID::fromString))

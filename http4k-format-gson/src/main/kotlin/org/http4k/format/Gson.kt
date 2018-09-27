@@ -28,6 +28,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -116,6 +118,8 @@ object Gson : ConfigurableGson(GsonBuilder()
         .registerTypeAdapter(LocalDateTime::class.java, custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
         .registerTypeAdapter(ZonedDateTime::class.java, custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
         .registerTypeAdapter(Instant::class.java, custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
+        .registerTypeAdapter(OffsetTime::class.java, custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format))
+        .registerTypeAdapter(OffsetDateTime::class.java, custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format))
         .registerTypeAdapter(UUID::class.java, custom(UUID::fromString))
         .registerTypeAdapter(Uri::class.java, custom(Companion::of))
         .registerTypeAdapter(URL::class.java, custom(::URL, URL::toExternalForm))
