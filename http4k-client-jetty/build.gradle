@@ -1,12 +1,12 @@
 description = 'HTTP Client built on top of jetty'
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
-    compile "org.eclipse.jetty:jetty-client:$jetty_version"
+    compile Libs.jetty_client
     provided project(":http4k-core")
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 

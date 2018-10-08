@@ -1,6 +1,8 @@
 buildscript {
-    apply from: project.file('dependencies.gradle')
-
+    ext {
+        ext.kotlin_version = '1.2.70'
+    }
+    
     repositories {
         mavenCentral()
         jcenter()
@@ -19,6 +21,7 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
     id 'net.saliman.cobertura' version '2.4.0'
     id 'com.github.kt3k.coveralls' version '2.8.1'
+    id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.2"
 }
 
 allprojects {
@@ -173,7 +176,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 }
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
     provided project(":http4k-core")
     provided project(":http4k-aws")
@@ -208,7 +211,7 @@ dependencies {
     provided project(":http4k-testing-hamkrest")
     provided project(":http4k-testing-webdriver")
 
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
 sourceSets {
