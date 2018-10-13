@@ -12,7 +12,7 @@ matrix:
       language: java
       jdk: oraclejdk8
       script:
-      - "./gradlew -i check"
+      - "./gradlew -w check"
       after_success:
       - "./gradlew jacocoRootReport coveralls"
       cache:
