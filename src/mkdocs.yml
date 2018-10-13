@@ -2,11 +2,15 @@ site_name: http4k
 site_url: https://www.http4k.org
 site_description: http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.
 site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
-copyright: 'Copyright &copy; 2017 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
+copyright: 'Copyright &copy; 2018 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
 remote_branch: master
 repo_url: https://github.com/http4k/http4k/
-theme: 'material'
-theme_dir: ./docs/theme
+theme:
+  name: 'material'
+  custom_dir: ./docs/theme
+  palette:
+    primary: 'indigo'
+    accent: 'blue'
 google_analytics: ['UA-125143867-1', 'auto']
 markdown_extensions:
   - meta
@@ -14,13 +18,10 @@ markdown_extensions:
 extra_css:
   - ./css/site.css
 extra:
-  palette:
-    primary: 'indigo'
-    accent: 'blue'
   logo: img/logo_1100x200_white_on_blue_trans.png
 edit_uri: edit/master/src/docs/
 strict: true
-pages:
+nav:
   - Introduction: index.md
   - Rationale & Concepts: rationale/index.md
   - Installation:  installation/index.md
