@@ -43,11 +43,6 @@ object Libs {
             "net.saliman:gradle-cobertura-plugin:" + Versions.gradle_cobertura_plugin
 
     /**
-     * [gradle-extra-configurations-plugin website](https://github.com/nebula-plugins/gradle-extra-configurations-plugin) */
-    const val gradle_extra_configurations_plugin: String =
-            "com.netflix.nebula:gradle-extra-configurations-plugin:" + Versions.gradle_extra_configurations_plugin
-
-    /**
      * [gson website](https://github.com/google/gson) */
     const val gson: String = "com.google.code.gson:gson:" + Versions.gson
 
@@ -165,6 +160,9 @@ object Libs {
     /**
      * [moshi-kotlin website](https://github.com/square/moshi) */
     const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:" + Versions.moshi_kotlin
+
+    const val nebula_provided_base_gradle_plugin: String =
+            "nebula.provided-base:nebula.provided-base.gradle.plugin:" + Versions.nebula_provided_base_gradle_plugin
 
     const val net_saliman_cobertura_gradle_plugin: String =
             "net.saliman.cobertura:net.saliman.cobertura.gradle.plugin:" + Versions.net_saliman_cobertura_gradle_plugin
