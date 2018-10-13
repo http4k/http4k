@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
-    id 'net.saliman.cobertura' version '2.4.0'
+    id 'net.saliman.cobertura' version '2.5.4'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.3"
 }
