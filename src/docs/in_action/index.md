@@ -2,13 +2,19 @@ title: http4k in Action
 description: Example applications and usages of http4k, including TDD approach 
 
 # Rationale & design
-[Presentation about the development of http4k given at the Kotlin London meetup](https://www.http4k.org/server_as_a_function_in_kotlin)
+
+### KotlinConf presentations: Server as a Function. In Kotlin. __________________
+[Slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)
+[Video](http://bit.ly/serverasafunction)
 
 # See http4k in action in these example projects:
-* [Super quick start "Hello World" Github/Travis/Heroku CD pipeline)](https://start.http4k.org)
-* [Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)
-* [Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)
-* [S3-backed Dropbox clone in <100 lines of code](https://github.com/daviddenton/http4k-demo-s3box)
-* [Simple websocket driven chat-server in 30 lines of code](https://github.com/daviddenton/http4k-demo-irc)
-* [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
-* [Stage-by-stage example of development process (London TDD style)](/guide/example)
+
+| Description | Server | Templates | Testing | Auto-marshalling | Database | HttpClient | Websockets | AWS | CD pipeline | Serverless | Graal |
+|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+|["Hello World"](https://start.http4k.org)|o| | | | | | | |o| | | |
+|[Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)|o| | |o| | | | | | | |
+|[Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)|o| | |o| | | | | | | |
+|[Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)|o| | | | | |o| |o| | |
+|[Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)|o|o|o|o| | | |o|o|o|o|
+|[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|o|o|o|o| |o| | | | | |
+|[Stage-by-stage example of development process (London TDD style)](/guide/example)|o| | | | | | | | | | |
