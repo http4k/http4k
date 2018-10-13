@@ -1,12 +1,12 @@
 description = 'http4k typesafe HTTP contracts and OpenApi support'
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
     provided project(":http4k-core")
     testCompile project(":http4k-format-argo")
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
 

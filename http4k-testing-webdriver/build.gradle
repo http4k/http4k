@@ -1,13 +1,13 @@
 description = 'Ultra-lightweight Selenium WebDriver implementation for http4k apps'
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
     provided project(":http4k-core")
 
-    compile "org.seleniumhq.selenium:selenium-api:3.5.1"
-    compile "org.jsoup:jsoup:1.10.3"
+    compile Libs.selenium_api
+    compile Libs.jsoup
 
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 

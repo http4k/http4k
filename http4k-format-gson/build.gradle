@@ -1,14 +1,14 @@
 description = 'Http4k GSON JSON support'
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
     provided project(":http4k-core")
-    compile 'com.google.code.gson:gson:2.8.5'
+    compile Libs.gson
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
 
