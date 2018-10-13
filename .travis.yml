@@ -10,7 +10,7 @@ matrix:
   include:
     - stage: build
       language: java
-      jdk: oraclejdk11
+      jdk: oraclejdk8
       script:
       - "./gradlew -w check"
       after_success:
