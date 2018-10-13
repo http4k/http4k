@@ -39,7 +39,7 @@ allprojects {
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
-        toolVersion = '0.8.1'
+        toolVersion = '0.8.2'
     }
 
     cobertura.coverageFormats = ['html', 'xml']
