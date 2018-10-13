@@ -12,9 +12,9 @@ description: Example applications and usages of http4k, including TDD approach
 | Description | Templates | Testing | JSON | HttpClient | WS | AWS | CD pipeline | Contracts | Lambda/Graal |
 |-----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |["Hello World"](https://start.http4k.org)| | | | | | |✔| | | | | |
+|[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|✔|✔|✔| | | | | |✔| |
 |[Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)|✔|✔|✔| | |✔|✔| |✔|
 |[Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)| | | | |✔| |✔| | |
-|[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|✔|✔|✔| |✔| | | | | |
 |[Stage-by-stage example of development process (London TDD style)](/guide/example)| | | | | | | | | |
 |[Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)| | |✔| | | | | | |
 |[Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)| | |✔| | | | |✔| |
