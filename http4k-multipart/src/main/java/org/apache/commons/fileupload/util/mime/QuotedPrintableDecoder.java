@@ -22,7 +22,7 @@ import java.io.OutputStream;
 /**
  * @since 1.3
  */
-final class QuotedPrintableDecoder {
+public final class QuotedPrintableDecoder {
 
     /**
      * The shift value required to create the upper nibble
@@ -45,7 +45,7 @@ final class QuotedPrintableDecoder {
      * @return the number of bytes produced.
      * @throws IOException
      */
-    static void decode(byte[] data, OutputStream out) throws IOException {
+    public static void decode(byte[] data, OutputStream out) throws IOException {
         int off = 0;
         int length = data.length;
         int endOffset = off + length;

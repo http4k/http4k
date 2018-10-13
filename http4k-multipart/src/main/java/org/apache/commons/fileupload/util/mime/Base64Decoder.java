@@ -22,7 +22,7 @@ import java.io.OutputStream;
 /**
  * @since 1.3
  */
-final class Base64Decoder {
+public final class Base64Decoder {
 
     /**
      * Decoding table value for invalid bytes.
@@ -102,7 +102,7 @@ final class Base64Decoder {
      * @return the number of bytes produced.
      * @throws IOException thrown when the padding is incorrect or the input is truncated.
      */
-    static void decode(byte[] data, OutputStream out) throws IOException {
+    public static void decode(byte[] data, OutputStream out) throws IOException {
         byte[] cache = new byte[INPUT_BYTES_PER_CHUNK];
         int cachedBytes = 0;
 
