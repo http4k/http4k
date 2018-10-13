@@ -81,9 +81,9 @@ class DelayTriggerTest : ChaosTriggerContract() {
     @Test
     fun `behaves as expected`() {
         val clock = Clock.systemUTC()
-        val trigger = Delay(Duration.ofMillis(100), clock)
+        val trigger = Delay(Duration.ofMillis(500), clock)
         trigger(request) shouldMatch equalTo(false)
-        sleep(200)
+        sleep(1000)
         trigger(request) shouldMatch equalTo(true)
     }
 }
