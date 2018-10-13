@@ -9,7 +9,7 @@ description: Example applications and usages of http4k, including TDD approach
 
 # See http4k in action in these example projects:
 
-| Description | Templates | Testing | JSON | HttpClient | WS | AWS | CD pipeline | Contracts | Lambda/Graal |
+| Description | Templates | Testing | JSON / Lenses | HttpClient | WS | AWS | CD pipeline | Contracts | Lambda/Graal |
 |-----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |["Hello World"](https://start.http4k.org)| | | | | | |✔| | | | | |
 |[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|✔|✔|✔| | | | |✔| |
