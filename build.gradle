@@ -156,7 +156,7 @@ allprojects {
 
 coveralls {
     sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
-    jacocoReportPath = "${buildDir}/reports/jacoco/test/jacocoRootReport.xml"
+    jacocoReportPath = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
@@ -168,7 +168,7 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
         html.enabled = true
         xml.enabled = true
         csv.enabled = false
-        xml.destination = "${buildDir}/reports/jacoco/test/jacocoRootReport.xml"
+        xml.destination = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
     }
 }
 
