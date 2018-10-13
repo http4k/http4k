@@ -119,7 +119,7 @@ class Dust(
     }
 
     private val pool = GenericObjectPool<SingleThreadedDust>(
-        object : BasePooledObjectFactory<SingleTJSoupElementFinderhreadedDust>() {
+        object : BasePooledObjectFactory<SingleThreadedDust>() {
             override fun create(): SingleThreadedDust = SingleThreadedDust(
                 js = scriptEngineManager.getEngineByName("nashorn"),
                 cacheTemplates = cacheTemplates,
