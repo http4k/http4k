@@ -12,19 +12,19 @@ object Versions {
     const val cobertura: String = "2.1.1" // up-to-date
 
     const val com_github_kt3k_coveralls_gradle_plugin: String =
-            "2.8.1" // available: milestone=2.8.2
+            "2.8.2" // available: milestone=2.8.2
 
-    const val com_jfrog_bintray_gradle_plugin: String = "1.7.3" // available: milestone=1.8.4
+    const val com_jfrog_bintray_gradle_plugin: String = "1.8.4" // available: milestone=1.8.4
 
     const val commons_pool2: String = "2.6.0" // up-to-date
 
-    const val coveralls_gradle_plugin: String = "2.3.1" // available: milestone=2.8.2
+    const val coveralls_gradle_plugin: String = "2.8.2" // available: milestone=2.8.2
 
     const val dokka_gradle_plugin: String = "0.9.17" // up-to-date
 
-    const val gradle_cobertura_plugin: String = "2.0.0" // available: milestone=2.5.4
+    const val gradle_cobertura_plugin: String = "2.5.4" // available: milestone=2.5.4
 
-    const val gradle_extra_configurations_plugin: String = "2.2.2" // available: milestone=4.0.1
+    const val gradle_extra_configurations_plugin: String = "4.0.1" // available: milestone=4.0.1
 
     const val gson: String = "2.8.5" // up-to-date
 
@@ -57,7 +57,7 @@ object Versions {
     const val jetty_servlet: String = "9.4.12.RC2" // up-to-date
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "0.2.2" // available: milestone=0.2.3
+            "0.2.3" // available: milestone=0.2.3
 
     const val json: String = "20180813" // up-to-date
 
@@ -67,11 +67,11 @@ object Versions {
 
     const val junit_jupiter_engine: String = "5.3.1" // up-to-date
 
-    const val kotlin_gradle_plugin: String = "1.2.70" // available: milestone=1.2.71
+    const val kotlin_gradle_plugin: String = "1.2.71" // available: milestone=1.2.71
 
     const val kotlin_reflect: String = "1.2.71" // up-to-date
 
-    const val kotlin_scripting_compiler_embeddable: String = "1.2.70" // available: milestone=1.2.71
+    const val kotlin_scripting_compiler_embeddable: String = "1.2.71" // available: milestone=1.2.71
 
     const val kotlin_stdlib_jdk8: String = "1.2.71" // up-to-date
 
@@ -81,7 +81,7 @@ object Versions {
 
     const val moshi_kotlin: String = "1.7.0" // up-to-date
 
-    const val net_saliman_cobertura_gradle_plugin: String = "2.4.0" // available: milestone=2.5.4
+    const val net_saliman_cobertura_gradle_plugin: String = "2.5.4" // available: milestone=2.5.4
 
     const val netty_codec_http2: String = "4.1.23.Final" // available: milestone=5.0.0.Alpha2
 
