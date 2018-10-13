@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.39.0
 - (Possible breaking change): `Json` is now only generified by a single type parameter instead of 2. For most usages, this would have been identical anyway, but the upgrade of Argo has finally allowed the removal of this dead generic. Simply replace ``Json<Node, Node>` with ``Json<Node>`.
-- Added Offset date times to JSON auto-marshalling
+- Added Offset datetime types to all JSON auto-marshalling libraries
 - Build logic for versioning is now in Kotlin. H/T @jmfayard for the PR
 - Upgrade Java version to 11 (we still target 8), Kotlin, and various other dependencies
 
