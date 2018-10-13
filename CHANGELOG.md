@@ -4,6 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.39.0
 - Added Offset date times to JSON auto-marshalling
+- Build logic for versioning is now in Kotlin. H/T @jmfayard for the PR
+- Upgrade Java version to 11 (we still target 8), Kotlin, and various other dependencies
 
 ### v3.38.1
 - Fix `withChaosControls` URL pattern so that it matches sub-routes ok on original handler
