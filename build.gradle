@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        ext.kotlin_version = '1.2.70'
+        ext.kotlin_version = '1.2.71'
     }
-    
+
     repositories {
         mavenCentral()
         jcenter()
@@ -10,18 +10,18 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.5.4'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
     }
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.4"
     id 'net.saliman.cobertura' version '2.4.0'
-    id 'com.github.kt3k.coveralls' version '2.8.1'
-    id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.2"
+    id 'com.github.kt3k.coveralls' version '2.8.2'
+    id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.3"
 }
 
 allprojects {
