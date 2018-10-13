@@ -10,9 +10,9 @@ matrix:
   include:
     - stage: build
       language: java
-      jdk: oraclejdk8
+      jdk: openjdk11
       script:
-      - "./gradlew -w check"
+      - "./gradlew -i check"
       after_success:
       - "./gradlew jacocoRootReport coveralls"
       cache:
@@ -31,7 +31,7 @@ matrix:
     - stage: api
       if: branch = master
       language: java
-      jdk: oraclejdk8
+      jdk: openjdk11
       script:
       - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
     - stage: maven central
