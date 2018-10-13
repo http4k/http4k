@@ -7,7 +7,7 @@
 object Versions {
     const val alpn_boot: String = "8.1.12.v20180117" // up-to-date
 
-    const val argo: String = "3.40" // available: milestone=5.4
+    const val argo: String = "5.4" // available: milestone=5.4
 
     const val cobertura: String = "2.1.1" // up-to-date
 

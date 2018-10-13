@@ -1,14 +1,14 @@
 package org.http4k.format
 
 import argo.jdom.JsonNode
-import argo.jdom.JsonRootNode
 import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 
-class ArgoTest : JsonContract<JsonRootNode, JsonNode>(Argo) {
+class ArgoTest : JsonContract<JsonNode, JsonNode>(Argo) {
     override val prettyString = """{
 	"hello": "world"
 }"""
 }
-class ArgoJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonRootNode, JsonNode>(Argo)
-class ArgoGenerateDataClassesTest : GenerateDataClassesContract<JsonRootNode, JsonNode>(Argo)
-class ArgoManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonRootNode, JsonNode>(Argo)
+
+class ArgoJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonNode, JsonNode>(Argo)
+class ArgoGenerateDataClassesTest : GenerateDataClassesContract<JsonNode, JsonNode>(Argo)
+class ArgoManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonNode, JsonNode>(Argo)
