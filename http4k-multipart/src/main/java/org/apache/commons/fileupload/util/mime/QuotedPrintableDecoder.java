@@ -41,9 +41,8 @@ public final class QuotedPrintableDecoder {
      * Decode the encoded byte data writing it to the given output stream.
      *
      * @param data The array of byte data to decode.
-     * @param out  The output stream used to return the decoded data.
-     * @return the number of bytes produced.
-     * @throws IOException
+     * @param out The output stream used to return the decoded data.
+     * @throws IOException if an error occurs
      */
     public static void decode(byte[] data, OutputStream out) throws IOException {
         int off = 0;
