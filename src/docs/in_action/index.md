@@ -10,7 +10,7 @@ description: Example applications and usages of http4k, including TDD approach
 # See http4k in action in these example projects:
 
 | Description | Server | Templates | Testing | JSON | HttpClient | WS | AWS | CD pipeline | Contracts | Lambda/Graal |
-|-----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|-----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |["Hello World"](https://start.http4k.org)|✔| | | | | | | |✔| | | |
 |[Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)|✔| | |✔| | | | | | |
 |[Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)|✔| | |✔| | | | |✔| |
