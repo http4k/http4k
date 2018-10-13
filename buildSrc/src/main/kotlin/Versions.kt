@@ -25,7 +25,7 @@ object Versions {
 
     const val gradle_cobertura_plugin: String = "2.5.4" // up-to-date
 
-    const val gradle_extra_configurations_plugin: String = "2.2.2" // available: milestone=4.0.1
+    const val gradle_extra_configurations_plugin: String = "3.0.3" // available: milestone=4.0.1
 
     const val gson: String = "2.8.5" // up-to-date
 

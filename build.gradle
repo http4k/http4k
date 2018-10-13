@@ -1,5 +1,5 @@
 buildscript {
-        repositories {
+    repositories {
         mavenCentral()
         jcenter()
     }
@@ -8,7 +8,7 @@ buildscript {
         classpath Libs.kotlin_gradle_plugin
         classpath Libs.gradle_cobertura_plugin
         classpath Libs.coveralls_gradle_plugin
-        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
+        classpath Libs.gradle_extra_configurations_plugin
         classpath Libs.dokka_gradle_plugin
     }
 }
@@ -17,7 +17,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
     id 'net.saliman.cobertura' version '2.5.4'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id("jmfayard.github.io.gradle-kotlin-dsl-libs") version "0.2.3"
+    id 'jmfayard.github.io.gradle-kotlin-dsl-libs' version "0.2.3"
 }
 
 allprojects {
@@ -34,7 +34,7 @@ allprojects {
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'provided-base'
+    apply plugin: 'nebula.provided-base'
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
