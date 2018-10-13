@@ -11,7 +11,7 @@ import org.http4k.format.JsonType.Object
 import java.math.BigDecimal
 import java.math.BigInteger
 
-object Argo : Json<JsonNode, JsonNode> {
+object Argo : Json<JsonNode> {
     override fun typeOf(value: JsonNode): JsonType =
         when (value.type) {
             JsonNodeType.STRING -> JsonType.String

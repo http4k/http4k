@@ -8,7 +8,7 @@ import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 
-class JsonErrorResponseRenderer<ROOT : NODE, out NODE>(private val json: Json<ROOT, NODE>) {
+class JsonErrorResponseRenderer<ROOT : NODE, out NODE>(private val json: Json<NODE>) {
     fun badRequest(failures: List<Failure>) =
         Response(BAD_REQUEST)
                 .with(CONTENT_TYPE of APPLICATION_JSON)

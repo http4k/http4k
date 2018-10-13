@@ -19,12 +19,12 @@ import java.math.BigInteger
 /**
  * This is the contract for all JSON implementations
  */
-interface Json<ROOT : NODE, NODE> {
+interface Json<NODE> {
     // Contract methods to be implemented
-    fun ROOT.asPrettyJsonString(): String
+    fun NODE.asPrettyJsonString(): String
 
-    fun ROOT.asCompactJsonString(): String
-    fun String.asJsonObject(): ROOT
+    fun NODE.asCompactJsonString(): String
+    fun String.asJsonObject(): NODE
     fun String?.asJsonValue(): NODE
     fun Int?.asJsonValue(): NODE
     fun Double?.asJsonValue(): NODE
@@ -32,8 +32,8 @@ interface Json<ROOT : NODE, NODE> {
     fun BigDecimal?.asJsonValue(): NODE
     fun BigInteger?.asJsonValue(): NODE
     fun Boolean?.asJsonValue(): NODE
-    fun <T : Iterable<NODE>> T.asJsonArray(): ROOT
-    fun <LIST : Iterable<Pair<String, NODE>>> LIST.asJsonObject(): ROOT
+    fun <T : Iterable<NODE>> T.asJsonArray(): NODE
+    fun <LIST : Iterable<Pair<String, NODE>>> LIST.asJsonObject(): NODE
     fun typeOf(value: NODE): JsonType
     fun fields(node: NODE): Iterable<Pair<String, NODE>>
     fun elements(value: NODE): Iterable<NODE>
@@ -53,29 +53,29 @@ interface Json<ROOT : NODE, NODE> {
     fun number(value: BigDecimal): NODE = value.asJsonValue()
     fun number(value: BigInteger): NODE = value.asJsonValue()
     fun boolean(value: Boolean): NODE = value.asJsonValue()
-    fun <T : NODE> array(value: T): ROOT = array(listOf(value))
-    fun <T : NODE> array(value: Iterable<T>): ROOT = value.asJsonArray()
-    fun obj(): ROOT = obj(emptyList())
-    fun <T : NODE> obj(value: Iterable<Pair<String, T>>): ROOT = value.asJsonObject()
-    fun <T : NODE> obj(vararg fields: Pair<String, T>): ROOT = obj(fields.asIterable())
+    fun <T : NODE> array(value: T): NODE = array(listOf(value))
+    fun <T : NODE> array(value: Iterable<T>): NODE = value.asJsonArray()
+    fun obj(): NODE = obj(emptyList())
+    fun <T : NODE> obj(value: Iterable<Pair<String, T>>): NODE = value.asJsonObject()
+    fun <T : NODE> obj(vararg fields: Pair<String, T>): NODE = obj(fields.asIterable())
     fun nullNode(): NODE {
         val i: Int? = null
         return i.asJsonValue()
     }
 
-    fun parse(s: String): ROOT = s.asJsonObject()
-    fun pretty(node: ROOT): String = node.asPrettyJsonString()
-    fun compact(node: ROOT): String = node.asCompactJsonString()
+    fun parse(s: String): NODE = s.asJsonObject()
+    fun pretty(node: NODE): String = node.asPrettyJsonString()
+    fun compact(node: NODE): String = node.asCompactJsonString()
     fun <IN> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })
     fun <IN> BiDiLensSpec<IN, String>.json() = lens(this)
-    fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> =
+    fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
         httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
             .map({ it.payload.asString() }, { it: String -> Body(it) })
             .map({ parse(it) }, { compact(it) })
 
-    fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<ROOT> = body(description, contentNegotiation)
+    fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation)
 
-    fun WsMessage.Companion.json(): BiDiWsMessageLensSpec<ROOT> = WsMessage.string().map({ parse(it) }, { compact(it) })
+    fun WsMessage.Companion.json(): BiDiWsMessageLensSpec<NODE> = WsMessage.string().map({ parse(it) }, { compact(it) })
 
     fun textValueOf(node: NODE, name: String): String?
 }

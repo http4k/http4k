@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.math.BigDecimal
 
-abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<ROOT, NODE>) {
+abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<NODE>) {
 
     @Test
     fun `generates data classes correctly`() {
