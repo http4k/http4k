@@ -10,11 +10,11 @@ description: Example applications and usages of http4k, including TDD approach
 # See http4k in action in these example projects:
 
 | Description | Server | Templates | Testing | Auto-marshalling | Database | HttpClient | Websockets | AWS | CD pipeline | Serverless | Graal |
-|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
-|["Hello World"](https://start.http4k.org)|o| | | | | | | |o| | | |
-|[Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)|o| | |o| | | | | | | |
-|[Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)|o| | |o| | | | | | | |
-|[Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)|o| | | | | |o| |o| | |
-|[Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)|o|o|o|o| | | |o|o|o|o|
-|[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|o|o|o|o| |o| | | | | |
-|[Stage-by-stage example of development process (London TDD style)](/guide/example)|o| | | | | | | | | | |
+|-----|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|["Hello World"](https://start.http4k.org)|✔| | | | | | | |✔| | | |
+|[Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)|✔| | |✔| | | | | | | |
+|[Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)|✔| | |✔| | | | | | | |
+|[Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)|✔| | | | | |✔| |✔| | |
+|[Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)|✔|o|✔|o| | | |✔|o|✔|o|
+|[TDD'd example application](https://github.com/http4k/http4k-contract-example-app)|✔|o|✔|o| |✔| | | | | |
+|[Stage-by-stage example of development process (London TDD style)](/guide/example)|✔| | | | | | | | | | |
