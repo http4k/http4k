@@ -1,19 +1,15 @@
 buildscript {
-    ext {
-        ext.kotlin_version = '1.2.71'
-    }
-
-    repositories {
+        repositories {
         mavenCentral()
         jcenter()
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'net.saliman:gradle-cobertura-plugin:2.5.4'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2'
+        classpath Libs.kotlin_gradle_plugin
+        classpath Libs.gradle_cobertura_plugin
+        classpath Libs.coveralls_gradle_plugin
         classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
+        classpath Libs.dokka_gradle_plugin
     }
 }
 
