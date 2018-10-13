@@ -12,19 +12,19 @@ object Versions {
     const val cobertura: String = "2.1.1" // up-to-date
 
     const val com_github_kt3k_coveralls_gradle_plugin: String =
-            "2.8.1" // available: milestone=2.8.2
+            "2.8.2" // up-to-date
 
-    const val com_jfrog_bintray_gradle_plugin: String = "1.7.3" // available: milestone=1.8.4
+    const val com_jfrog_bintray_gradle_plugin: String = "1.8.4" // up-to-date
 
     const val commons_pool2: String = "2.6.0" // up-to-date
 
-    const val coveralls_gradle_plugin: String = "2.3.1" // available: milestone=2.8.2
+    const val coveralls_gradle_plugin: String = "2.8.2" // up-to-date
 
     const val dokka_gradle_plugin: String = "0.9.17" // up-to-date
 
-    const val gradle_cobertura_plugin: String = "2.0.0" // available: milestone=2.5.4
+    const val gradle_cobertura_plugin: String = "2.5.4" // up-to-date
 
-    const val gradle_extra_configurations_plugin: String = "2.2.2" // available: milestone=4.0.1
+    const val gradle_extra_configurations_plugin: String = "4.0.1" // up-to-date
 
     const val gson: String = "2.8.5" // up-to-date
 
