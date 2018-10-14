@@ -11,6 +11,7 @@ theme:
   palette:
     primary: 'indigo'
     accent: 'blue'
+  logo: img/logo_1100x200_white_on_blue_trans.png
 google_analytics: ['UA-125143867-1', 'auto']
 markdown_extensions:
   - meta
