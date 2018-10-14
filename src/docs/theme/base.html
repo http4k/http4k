@@ -12,9 +12,9 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     {% if page and page.meta.title %}
-    <meta itemprop="name" content="{{ page.meta.title | first }}">
-    <meta name="twitter:title" content="{{ page.meta.title | first }}">
-    <meta property="og:title" content="{{ page.meta.title | first }}" />
+    <meta itemprop="name" content="{{ page.meta.title }}">
+    <meta name="twitter:title" content="{{ page.meta.title }}">
+    <meta property="og:title" content="{{ page.meta.title }}" />
     {% else %}
     <meta itemprop="name" content="http4k - a functional Kotlin HTTP toolkit">
     <meta name="twitter:title" content="http4k - a functional Kotlin HTTP toolkit">
@@ -22,9 +22,9 @@
     {% endif %}
 
     {% if page and page.meta and page.meta.description %}
-    <meta name="description" content="{{ page.meta.description | first }}">
-    <meta property="og:description" content="{{ page.meta.description | first }}" />
-    <meta name="twitter:description" content="{{ page.meta.description | first }}">
+    <meta name="description" content="{{ page.meta.description }}">
+    <meta property="og:description" content="{{ page.meta.description }}" />
+    <meta name="twitter:description" content="{{ page.meta.description }}">
     {% elif config.site_description %}
     <meta name="description" content="{{ config.site_description }}">
     <meta property="og:description" content="{{ config.site_description }}" />
@@ -36,8 +36,8 @@
     {% endif %}
 
     {% if page and page.meta and page.meta.author %}
-    <meta name="author" content="{{ page.meta.author | first }}">
-    <meta name="twitter:creator" content="{{ page.meta.author | first }}">
+    <meta name="author" content="{{ page.meta.author }}">
+    <meta name="twitter:creator" content="{{ page.meta.author }}">
     {% elif config.site_author %}
     <meta name="author" content="{{ config.site_author }}">
     <meta name="twitter:creator" content="{{ config.site_author }}">
