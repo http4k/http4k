@@ -39,3 +39,15 @@ ul.statusLink li {
     top: 1px;
     width: 16px ;
 }
+
+.pill {
+    background-color: #2e7bf4;
+    border: none;
+    padding: 5px 10px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
