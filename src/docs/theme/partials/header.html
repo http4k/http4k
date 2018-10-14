@@ -2,7 +2,8 @@
     <nav class="md-header-nav md-grid">
         <div class="md-flex">
             <div class="md-flex__cell md-flex__cell--shrink">
-                <a href="{{ config.site_url | default(nav.homepage.url, true) | url }}" title="{{ config.site_name }}" class="md-header-nav__button md-logo">
+                <a href="{{ config.site_url | default(nav.homepage.url, true) | url }}" title="{{ config.site_name }}"
+                   class="md-header-nav__button md-logo">
                     {% if config.theme.logo.icon %}
                     <i class="md-icon">{{ config.theme.logo.icon }}</i>
                     {% else %}
@@ -16,16 +17,14 @@
             <div class="md-flex__cell md-flex__cell--stretch">
                 <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
                     {% block site_name %}
-                    {% if config.site_name == page.title %}
-                    {{ config.site_name }}
-                    {% else %}
-                    <span class="md-header-nav__topic">
-                {{ config.site_name }}
-              </span>
-                    <span class="md-header-nav__topic">
-                {{ page.title }}
-              </span>
+                    {% if page %}
+                    {% for parent in page.ancestors %}
+                        <span class="md-header-nav__parent">
+                          {{ parent.title }} >
+                        </span>
+                    {% endfor %}
                     {% endif %}
+                    {{ page.title | default(config.site_name, true) }}
                     {% endblock %}
                 </div>
             </div>
