@@ -58,3 +58,7 @@ fun Uri.query(name: String, value: String?): Uri = copy(query = query.toParamete
 fun String.toPathEncoded(): String = URI("http", null, "/$this", null).toURL().path.drop(1).replace("/", "%2F")
 
 fun String.fromPathEncoded(): String = URLDecoder.decode(this, "UTF-8")
+
+fun Uri.appendToPath(path: String): Uri =
+    if (path == "") this
+    else copy(path = (this.path.removeSuffix("/") + "/" + path.removePrefix("/")))

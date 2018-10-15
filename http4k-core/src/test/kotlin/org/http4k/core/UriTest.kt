@@ -83,4 +83,12 @@ class UriTest {
         assertThat(encoded.fromPathEncoded(), equalTo(original))
     }
 
+    @Test
+    fun `can append to existing uri path`() {
+        assertThat(Uri.of("http://ignore").appendToPath("/"), equalTo(Uri.of("http://ignore/")))
+        assertThat(Uri.of("http://ignore/a").appendToPath(""), equalTo(Uri.of("http://ignore/a")))
+        assertThat(Uri.of("http://ignore/a").appendToPath("/b"), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").appendToPath("b"), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").appendToPath("b/"), equalTo(Uri.of("http://ignore/a/b/")))
+    }
 }

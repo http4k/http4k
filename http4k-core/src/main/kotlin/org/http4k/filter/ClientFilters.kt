@@ -8,6 +8,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.core.appendToPath
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.then
@@ -50,6 +51,16 @@ object ClientFilters {
                         .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
             }
         }
+    }
+
+    /**
+     * Sets the base uri (host + base path) on an outbound request. This is useful to separate configuration of remote endpoints
+     * from the logic required to construct the rest of the request.
+     */
+    object SetBaseUriFrom {
+        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
+            { next(it.uri(uri.appendToPath(it.uri.path))) }
+        })
     }
 
     object BasicAuth {
