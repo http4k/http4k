@@ -7,7 +7,7 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
     fun method(name: String, handler: JsonRpcHandler<NODE, NODE>)
 
     companion object {
-        open class Manual<ROOT : NODE, NODE : Any>(private val json: Json<ROOT, NODE>) :
+        open class Manual<NODE : Any>(private val json: Json<NODE>) :
                 MethodBindings<NODE> {
             override fun iterator() = methodMappings
                     .map { JsonRpcMethodBinding(it.key, it.value) }.iterator()
@@ -34,7 +34,7 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
         }
 
         class Auto<ROOT : Any>(val json: JsonLibAutoMarshallingJson<ROOT>) :
-                Manual<ROOT, ROOT>(json) {
+                Manual<ROOT>(json) {
 
             inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
                                                              noinline fn: (IN) -> OUT): JsonRpcHandler<ROOT, ROOT> =

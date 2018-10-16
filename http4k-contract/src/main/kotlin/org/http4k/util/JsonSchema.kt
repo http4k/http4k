@@ -12,7 +12,7 @@ class IllegalSchemaException(message: String) : Exception(message)
 
 data class JsonSchema<out NODE>(val node: NODE, val definitions: Set<Pair<String, NODE>>)
 
-class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
+class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<NODE>) {
     fun toSchema(node: NODE, overrideDefinitionId: String? = null) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =

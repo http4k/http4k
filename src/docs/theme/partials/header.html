@@ -2,36 +2,38 @@
     <nav class="md-header-nav md-grid">
         <div class="md-flex">
             <div class="md-flex__cell md-flex__cell--shrink">
-                {% if config.extra.logo %}
-                <a href="{{ config.site_url | default(nav.homepage.url, true) }}" title="{{ config.site_name }}" class="md-logo md-header-nav__button">
-                    <img src="{{ base_url }}/{{ config.extra.logo }}" height="24">
+                <a href="{{ config.site_url | default(nav.homepage.url, true) | url }}" title="{{ config.site_name }}"
+                   class="md-header-nav__button md-logo">
+                    {% if config.theme.logo.icon %}
+                    <i class="md-icon">{{ config.theme.logo.icon }}</i>
+                    {% else %}
+                    <img src="{{ config.theme.logo | url }}" height="24">
+                    {% endif %}
                 </a>
-                {% else %}
-                <a href="{{ config.site_url | default(nav.homepage.url, true) }}" title="{{ config.site_name }}" class="md-icon md-icon--home md-header-nav__button">
-                </a>
-                {% endif %}
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
-                <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+                <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
             </div>
             <div class="md-flex__cell md-flex__cell--stretch">
-        <span class="md-flex__ellipsis md-header-nav__title">
-          {% block site_name %}
-            {% if page %}
-              {% for parent in page.ancestors %}
-                <span class="md-header-nav__parent">
-                  {{ parent.title }}
-                </span>
-              {% endfor %}
-            {% endif %}
-            {{ page.title | default(config.site_name, true) }}
-          {% endblock %}
-        </span>
+                <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+                    {% block site_name %}
+                    {% if page %}
+                    {% for parent in page.ancestors|reverse %}
+                        <span class="md-header-nav__parent">
+                          {{ parent.title }} >
+                        </span>
+                    {% endfor %}
+                    {% endif %}
+                    {{ page.title | default(config.site_name, true) }}
+                    {% endblock %}
+                </div>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
                 {% block search_box %}
-                <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+                {% if "search" in config["plugins"] %}
+                <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
                 {% include "partials/search.html" %}
+                {% endif %}
                 {% endblock %}
             </div>
             {% if config.repo_url %}

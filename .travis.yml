@@ -10,7 +10,7 @@ matrix:
   include:
     - stage: build
       language: java
-      jdk: oraclejdk8
+      jdk: openjdk11
       script:
       - "./gradlew -i check"
       after_success:
@@ -21,7 +21,8 @@ matrix:
         - "$HOME/.gradle"
     - stage: bintray
       if: branch = master
-      language: bash
+      language: java
+      jdk: openjdk11
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-ci.sh; fi'
     - stage: docs
       if: branch = master
@@ -31,10 +32,11 @@ matrix:
     - stage: api
       if: branch = master
       language: java
-      jdk: oraclejdk8
+      jdk: openjdk11
       script:
       - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
     - stage: maven central
       if: branch = master
+      language: java
+      jdk: openjdk11
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central.sh; fi'
-      language: bash

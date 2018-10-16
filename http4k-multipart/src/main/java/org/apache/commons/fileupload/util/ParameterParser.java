@@ -30,7 +30,7 @@ import java.util.Map;
  * Parameter values are expected to be enclosed in quotes if they
  * contain unsafe characters, such as '=' characters or separators.
  * Parameter values are optional and can be omitted.
- * <p>
+ * </p>
  * <p>
  * <code>param1 = value; param2 = "anything goes; really"; param3</code>
  * </p>
@@ -97,9 +97,9 @@ public class ParameterParser {
         }
         // Strip away quotation marks if necessary
         if (quoted
-            && ((i2 - i1) >= 2)
-            && (chars[i1] == '"')
-            && (chars[i2 - 1] == '"')) {
+                && ((i2 - i1) >= 2)
+                && (chars[i1] == '"')
+                && (chars[i2 - 1] == '"')) {
             i1++;
             i2--;
         }
@@ -186,9 +186,8 @@ public class ParameterParser {
     /**
      * Sets the flag if parameter names are to be converted to lower case when
      * name/value pairs are parsed.
-     *
      */
-    void setLowerCaseNames() {
+    public void setLowerCaseNames() {
         this.lowerCaseNames = true;
     }
 
@@ -255,9 +254,9 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     private Map<String, String> parse(
-        final char[] charArray,
-        int length,
-        char separator) {
+            final char[] charArray,
+            int length,
+            char separator) {
 
         if (charArray == null) {
             return new HashMap<>();

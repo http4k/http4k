@@ -24,6 +24,8 @@ git reset --hard
 git pull --rebase
 sed s/\>\</\>`date '+%Y-%m-%d'`\</g sitemap.xml > new ; mv new sitemap.xml
 git add sitemap.xml
+
+set +e
 git commit -m "sitemap update"
 git push
 

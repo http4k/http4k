@@ -134,6 +134,18 @@ class ClientFiltersTest {
     }
 
     @Test
+    fun `set host without port on client does not set path`() {
+        val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
+        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/loop").and(hasHeader("Host", "localhost"))
+    }
+
+    @Test
+    fun `set base uri appends path`() {
+        val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
+        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "localhost"))
+    }
+
+    @Test
     fun `gzip request and gunzip response`() {
         val handler = ClientFilters.GZip().then {
             it shouldMatch hasHeader("content-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))

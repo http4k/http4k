@@ -46,12 +46,12 @@ object CounterErrorHandler : ErrorHandler {
     }
 
     private class NegativeIncrementExceptionMessage : ErrorMessage(1, "Increment by negative") {
-        override fun <ROOT : NODE, NODE> data(json: Json<ROOT, NODE>): NODE? =
+        override fun <NODE> data(json: Json<NODE>): NODE? =
                 json.string("cannot increment counter by negative")
     }
 }
 
-abstract class JsonRpcServiceContract<ROOT : NODE, NODE : Any>(builder: (Counter) -> JsonRpcService<ROOT, NODE>) {
+abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcService<NODE>) {
 
     private val counter = Counter()
     private val rpc = "/rpc" bind builder(counter)
@@ -340,7 +340,7 @@ abstract class JsonRpcServiceContract<ROOT : NODE, NODE : Any>(builder: (Counter
     }
 }
 
-abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json: Json<ROOT, NODE>) : JsonRpcServiceContract<ROOT, NODE>({ counter ->
+abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json: Json<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
     val incrementParams = Mapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
     val intResult: Mapping<Int, NODE> = Mapping { json.number(it) }
 
@@ -359,7 +359,7 @@ abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json
     }
 }
 
-abstract class AutoMappingJsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>) : JsonRpcServiceContract<ROOT, ROOT>({ counter ->
+abstract class AutoMappingJsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>) : JsonRpcServiceContract<ROOT>({ counter ->
     JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))

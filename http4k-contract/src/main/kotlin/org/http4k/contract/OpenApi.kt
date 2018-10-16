@@ -14,7 +14,7 @@ import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
-class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val json: Json<ROOT, NODE>) : ContractRenderer {
+class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
     private val errors = JsonErrorResponseRenderer(json)
@@ -45,7 +45,7 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
                 memo.add(path to json.obj(routeFieldsAndDefinitions.fields), routeFieldsAndDefinitions.definitions)
             }
 
-    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): ROOT = json.obj(
+    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): NODE = json.obj(
             listOf(
                     "in" to json.string(it.location),
                     "name" to json.string(it.name),
@@ -79,7 +79,7 @@ class OpenApi<ROOT : NODE, out NODE>(private val apiInfo: ApiInfo, private val j
                 "responses" to json.obj(responses),
                 "security" to json.array(when (security) {
                     is ApiKey<*> -> listOf(json.obj("api_key" to json.array(emptyList())))
-                    else -> emptyList<NODE>()
+                    else -> emptyList()
                 })
         ) + (route.meta.description?.let { listOf("description" to json.string(it)) } ?: emptyList())
         val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).toSet()

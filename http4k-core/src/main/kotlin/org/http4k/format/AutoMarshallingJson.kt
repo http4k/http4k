@@ -12,7 +12,7 @@ abstract class AutoMarshallingJson {
     fun <T : Any> String.asA(c: KClass<T>): T = asA(this, c)
 }
 
-abstract class JsonLibAutoMarshallingJson<ROOT : Any> : AutoMarshallingJson(), Json<ROOT, ROOT> {
+abstract class JsonLibAutoMarshallingJson<ROOT : Any> : AutoMarshallingJson(), Json<ROOT> {
     override fun asJsonString(a: Any): String = compact(asJsonObject(a))
 
     abstract fun asJsonObject(a: Any): ROOT

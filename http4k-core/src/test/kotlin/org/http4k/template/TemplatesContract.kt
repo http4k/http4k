@@ -42,16 +42,16 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
         checkNonExistent(renderer)
     }
 
-    protected fun checkOnClasspath(renderer: TemplateRenderer) {
+    private fun checkOnClasspath(renderer: TemplateRenderer) {
         assertThat(renderer(OnClasspath(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
     }
 
-    protected fun checkAtRoot(renderer: TemplateRenderer) {
+    private fun checkAtRoot(renderer: TemplateRenderer) {
         assertThat(renderer(AtRoot(items)), equalTo("<ul><li>AtRootName:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>AtRootName:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty" +
             "</span></li></ul></li></ul>"))
     }
 
-    protected fun checkNonExistent(renderer: TemplateRenderer) {
+    private fun checkNonExistent(renderer: TemplateRenderer) {
         assertThat({ renderer(NonExistent) } , throws(equalTo(ViewNotFound(NonExistent))))
     }
 }

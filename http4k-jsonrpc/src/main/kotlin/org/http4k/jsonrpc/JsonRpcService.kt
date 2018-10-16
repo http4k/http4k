@@ -26,8 +26,8 @@ import org.http4k.lens.Failure.Type.Invalid
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
-data class JsonRpcService<ROOT : NODE, NODE : Any>(
-        private val json: Json<ROOT, NODE>,
+data class JsonRpcService<NODE : Any>(
+        private val json: Json<NODE>,
         private val errorHandler: ErrorHandler,
         private val bindings: Iterable<JsonRpcMethodBinding<NODE, NODE>>) : HttpHandler {
 
@@ -46,7 +46,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
 
     override fun invoke(request: Request): Response = handler(request)
 
-    private fun process(requestJson: ROOT): ROOT? = when (json.typeOf(requestJson)) {
+    private fun process(requestJson: NODE): NODE? = when (json.typeOf(requestJson)) {
         Object -> processSingleRequest(json.fields(requestJson).toMap())
         Array -> processBatchRequest(json.elements(requestJson).toList())
         else -> renderError(InvalidRequest)
@@ -74,7 +74,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
                 }
             }
 
-    private fun JsonRpcRequest<ROOT, NODE>.mapIfValid(block: (JsonRpcRequest<ROOT, NODE>) -> ROOT?) = when {
+    private fun JsonRpcRequest<NODE>.mapIfValid(block: (JsonRpcRequest<NODE>) -> NODE?) = when {
         valid() -> block(this)
         else -> renderError(InvalidRequest, id)
     }
@@ -88,7 +88,7 @@ data class JsonRpcService<ROOT : NODE, NODE : Any>(
                 processSingleRequest(if (json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
             }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
-    private fun renderResult(result: NODE, id: NODE): ROOT = json.obj(
+    private fun renderResult(result: NODE, id: NODE): NODE = json.obj(
             "jsonrpc" to json.string(jsonRpcVersion),
             "result" to result,
             "id" to id
@@ -107,7 +107,7 @@ typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
 private const val jsonRpcVersion: String = "2.0"
 
-private class JsonRpcRequest<ROOT : NODE, NODE>(json: Json<ROOT, NODE>, fields: Map<String, NODE>) {
+private class JsonRpcRequest<NODE>(json: Json<NODE>, fields: Map<String, NODE>) {
     private var valid = (fields["jsonrpc"] ?: json.nullNode()).let {
         json.typeOf(it) == JsonType.String && jsonRpcVersion == json.text(it)
     }
