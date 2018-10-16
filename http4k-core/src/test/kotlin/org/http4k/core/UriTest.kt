@@ -84,11 +84,16 @@ class UriTest {
     }
 
     @Test
-    fun `can append to existing uri path`() {
-        assertThat(Uri.of("http://ignore").appendToPath("/"), equalTo(Uri.of("http://ignore/")))
-        assertThat(Uri.of("http://ignore/a").appendToPath(""), equalTo(Uri.of("http://ignore/a")))
-        assertThat(Uri.of("http://ignore/a").appendToPath("/b"), equalTo(Uri.of("http://ignore/a/b")))
-        assertThat(Uri.of("http://ignore/a").appendToPath("b"), equalTo(Uri.of("http://ignore/a/b")))
-        assertThat(Uri.of("http://ignore/a").appendToPath("b/"), equalTo(Uri.of("http://ignore/a/b/")))
+    fun `can extend existing uri path`() {
+        assertThat(Uri.of("http://ignore").extend(Uri.of("/")), equalTo(Uri.of("http://ignore/")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("")), equalTo(Uri.of("http://ignore/a")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("/b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b/")), equalTo(Uri.of("http://ignore/a/b/")))
+    }
+
+    @Test
+    fun `can extend existing uri`(){
+        assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
     }
 }

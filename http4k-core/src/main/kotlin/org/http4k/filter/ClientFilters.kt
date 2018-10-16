@@ -8,9 +8,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
-import org.http4k.core.appendToPath
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
@@ -59,7 +59,7 @@ object ClientFilters {
      */
     object SetBaseUriFrom {
         operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
-            { next(it.uri(uri.appendToPath(it.uri.path))) }
+            { request -> next(request.uri(uri.extend(request.uri))) }
         })
     }
 

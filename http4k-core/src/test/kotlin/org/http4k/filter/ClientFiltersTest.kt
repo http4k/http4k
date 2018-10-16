@@ -13,6 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
@@ -143,6 +144,16 @@ class ClientFiltersTest {
     fun `set base uri appends path`() {
         val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
         handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "localhost"))
+    }
+
+    @Test
+    fun `set base uri appends path and copy other uri details`() {
+        val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path?a=b")).then { Response(OK).header("Host", it.header("Host")).body(it.toString()) }
+
+        val response = handler(Request(GET, "/loop").query("foo", "bar"))
+
+        val reconstructedRequest = Request.parse(response.bodyString())
+        reconstructedRequest shouldMatch equalTo(Request(GET, "http://localhost/a-path/loop").query("a", "b").query("foo", "bar").header("Host", "localhost"))
     }
 
     @Test

@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.39.2
+- Extend `SetBaseUriFrom` to support query parameters 
+ 
 ### v3.39.1
 - Added `SetBaseUriFrom` filter
 

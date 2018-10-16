@@ -59,6 +59,9 @@ fun String.toPathEncoded(): String = URI("http", null, "/$this", null).toURL().p
 
 fun String.fromPathEncoded(): String = URLDecoder.decode(this, "UTF-8")
 
-fun Uri.appendToPath(path: String): Uri =
+fun Uri.extend(uri: Uri): Uri =
+    appendToPath(uri.path).copy(query = (query.toParameters() + uri.query.toParameters()).toUrlFormEncoded())
+
+private fun Uri.appendToPath(path: String): Uri =
     if (path == "") this
     else copy(path = (this.path.removeSuffix("/") + "/" + path.removePrefix("/")))
