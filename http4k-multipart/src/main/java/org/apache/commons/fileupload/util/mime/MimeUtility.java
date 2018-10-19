@@ -19,7 +19,6 @@ package org.apache.commons.fileupload.util.mime;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -154,7 +153,7 @@ public final class MimeUtility {
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
                         if (!previousTokenEncoded && startWhiteSpace != -1) {
-                            decodedText.append(text, startWhiteSpace, endWhiteSpace);
+                            decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
                             startWhiteSpace = -1;
                         }
                         // this is definitely a decoded token.
@@ -172,7 +171,7 @@ public final class MimeUtility {
                 // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
                 // if we have it.
                 if (startWhiteSpace != -1) {
-                    decodedText.append(text, startWhiteSpace, endWhiteSpace);
+                    decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
                     startWhiteSpace = -1;
                 }
                 // this is not a decoded token.
@@ -236,7 +235,7 @@ public final class MimeUtility {
             // the decoder writes directly to an output stream.
             ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
-            byte[] encodedData = encodedText.getBytes(StandardCharsets.US_ASCII);
+            byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
 
             // Base64 encoded?
             switch (encoding) {
