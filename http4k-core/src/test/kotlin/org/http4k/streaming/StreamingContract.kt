@@ -25,6 +25,7 @@ import java.util.Random
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 
 abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
@@ -102,7 +103,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
         val line = "b".repeat(config.beepSize) + "\n"
 
-        Thread {
+        thread {
             (1..5).forEach {
                 if (runningInIdea) println("sent")
 
@@ -113,7 +114,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
                 Thread.sleep(config.sleepTimeBetweenBeepsInMillis)
             }
             output.close()
-        }.start()
+        }
 
         return input
     }
