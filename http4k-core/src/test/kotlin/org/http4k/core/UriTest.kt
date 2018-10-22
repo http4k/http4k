@@ -46,6 +46,11 @@ class UriTest {
     }
 
     @Test
+    fun `equality for round tripping`() {
+        assertThat(Uri.of("path"), equalTo(Uri.of(Uri.of("path").toString())))
+    }
+
+    @Test
     fun can_parse_minimal_uri() {
         val value = "http://host"
         val uri = Uri.of(value)

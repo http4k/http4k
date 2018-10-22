@@ -44,12 +44,16 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
          (userInfo, host, port) ->  copy(userInfo = userInfo, host = host, port = port)
      }
 
-    override fun toString(): String = StringBuilder()
-        .appendIfNotBlank(scheme, scheme, ":")
-        .appendIfNotBlank(authority, "//", authority)
-        .append(if(path.isBlank() || path.startsWith("/")) path else "/$path")
-        .appendIfNotBlank(query, "?", query)
-        .appendIfNotBlank(fragment, "#", fragment).toString()
+    override fun toString() = StringBuilder()
+            .appendIfNotBlank(scheme, scheme, ":")
+            .appendIfNotBlank(authority, "//", authority)
+            .append(when {
+                authority.isBlank() -> path
+                path.isBlank() || path.startsWith("/") -> path
+                else -> "/$path"
+            })
+            .appendIfNotBlank(query, "?", query)
+            .appendIfNotBlank(fragment, "#", fragment).toString()
 
 }
 

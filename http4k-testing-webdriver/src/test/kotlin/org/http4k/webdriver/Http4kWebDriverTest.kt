@@ -201,7 +201,6 @@ class Http4kWebDriverTest {
         assertLinkGoesTo("/", By.id("rootBackPath"), "/bob/link")
     }
 
-
     private fun assertLinkGoesTo(initial: String, by: By, expected: String) {
         driver.get(initial)
         driver.findElement(by)!!.click()
@@ -272,5 +271,4 @@ class Http4kWebDriverTest {
     private fun WebDriver.assertOnPage(expected: String) {
         assertThat(this.findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
-
 }
