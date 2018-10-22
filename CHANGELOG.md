@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.39.3
+### v3.39.4
 - Fix #189 - Uri toString now omits leading slash if the authority of a Uri is blank. This *could* be a potential break, but is actually more consistent as a Uri can currently be relative or absolute.
  
 ### v3.39.2
