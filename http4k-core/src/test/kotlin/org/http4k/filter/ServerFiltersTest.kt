@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Filter
 import org.http4k.core.Headers
@@ -26,7 +27,6 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
-import org.http4k.core.toBody
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -169,8 +169,8 @@ class ServerFiltersTest {
             Response(OK).body(it.body)
         }
 
-        handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body("hello".toBody().gzipped())) shouldMatch
-            hasHeader("content-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
+        handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
+            hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
     }
 
     @Test

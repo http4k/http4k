@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -15,7 +16,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.parse
 import org.http4k.core.then
-import org.http4k.core.toBody
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.BeforeEach
@@ -159,7 +159,7 @@ class ClientFiltersTest {
     @Test
     fun `gzip request and gunzip response`() {
         val handler = ClientFilters.GZip().then {
-            it shouldMatch hasHeader("content-encoding", "gzip").and(hasBody(equalTo("hello".toBody().gzipped())))
+            it shouldMatch hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
             Response(OK).header("content-encoding", "gzip").body(it.body)
         }
 

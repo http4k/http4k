@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
+import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -11,7 +12,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
-import org.http4k.core.toBody
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Http
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Https
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Port
@@ -60,7 +60,7 @@ class RequestFiltersTest {
     fun `gzip request and add content encoding`() {
         fun assertSupportsZipping(body: String) {
             val handler = RequestFilters.GZip().then {
-                it shouldMatch hasBody(equalTo(body.toBody().gzipped())).and(hasHeader("content-encoding", "gzip"))
+                it shouldMatch hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
                 Response(OK)
             }
             handler(Request(Method.GET, "").body(body))
@@ -76,7 +76,7 @@ class RequestFiltersTest {
                 it shouldMatch hasBody(body)
                 Response(OK)
             }
-            handler(Request(Method.GET, "").body(body.toBody().gzipped()).header("content-encoding", "gzip"))
+            handler(Request(Method.GET, "").body(Body(body).gzipped()).header("content-encoding", "gzip"))
         }
         assertSupportsUnzipping("foobar")
         assertSupportsUnzipping("")

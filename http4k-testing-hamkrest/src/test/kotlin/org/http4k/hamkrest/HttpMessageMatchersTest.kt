@@ -8,7 +8,6 @@ import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
-import org.http4k.core.toBody
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
@@ -48,7 +47,7 @@ class HttpMessageMatchersTest {
     fun `body regex`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(Regex(".*bob")), hasBody(Regex(".*bill")))
 
     @Test
-    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo("bob".toBody())), hasBody(equalTo("bill".toBody())))
+    fun `body string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(equalTo(Body("bob"))), hasBody(equalTo(Body("bill"))))
 
     @Test
     fun `body non-nullable string matcher`() = assertMatchAndNonMatch(Request(GET, "/").body("bob"), hasBody(containsSubstring("bo")), hasBody(containsSubstring("foo")))
