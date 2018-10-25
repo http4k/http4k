@@ -1,21 +1,12 @@
 package org.http4k.webdriver
 
-import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.core.with
+import org.http4k.core.*
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
-import org.openqa.selenium.By
-import org.openqa.selenium.Dimension
-import org.openqa.selenium.OutputType
-import org.openqa.selenium.Point
-import org.openqa.selenium.Rectangle
-import org.openqa.selenium.WebElement
+import org.openqa.selenium.*
 
 data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) : WebElement {
 
@@ -39,28 +30,29 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         current("form")?.let {
             val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
             val inputs = it
-                    .findElements(By.tagName("input"))
-                    .filter { it.getAttribute("name") != "" }
-                    .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .findElements(By.tagName("input"))
+                .filter { it.getAttribute("name") != "" }
+                .filterNot(::isUncheckedInput)
+                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val textareas = it.findElements(By.tagName("textarea"))
-                    .filter { it.getAttribute("name") != "" }
-                    .map { it.getAttribute("name") to listOf(it.text) }
+                .filter { it.getAttribute("name") != "" }
+                .map { it.getAttribute("name") to listOf(it.text) }
             val selects = it.findElements(By.tagName("select"))
-                    .filter { it.getAttribute("name") != "" }
-                    .map {
-                        it.getAttribute("name") to it.findElements(By.tagName("option"))
-                                .filter { it.isSelected }
-                                .map { it.getAttribute("value") }
-                    }
+                .filter { it.getAttribute("name") != "" }
+                .map {
+                    it.getAttribute("name") to it.findElements(By.tagName("option"))
+                        .filter { it.isSelected }
+                        .map { it.getAttribute("value") }
+                }
             val buttons = it.findElements(By.tagName("button"))
-                    .filter { it.getAttribute("name") != "" && it == this }
-                    .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                .filter { it.getAttribute("name") != "" && it == this }
+                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
-                    .groupBy { it.first }
-                    .mapValues { it.value.map { it.second }.flatMap { it } })
+                .groupBy { it.first }
+                .mapValues { it.value.map { it.second }.flatMap { it } })
 
             val body = Body.webForm(Validator.Strict,
-                    *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
+                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
 
             val formtarget = Uri.of(it.element.attr("action") ?: "")
             val current = getURL()
@@ -69,11 +61,17 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
                 formtarget.host == "" && current != null -> Uri.of(current).path(formtarget.path)
                 else -> formtarget
             }
-            val postRequest= Request(method, action.toString()).with(body of form)
+            val postRequest = Request(method, action.toString()).with(body of form)
 
             if (method == Method.POST) navigate(postRequest)
             else navigate(Request(method, action.query(postRequest.bodyString())).body(""))
         }
+    }
+
+    private fun isUncheckedInput(input: WebElement): Boolean = if (input.getAttribute("type") == "checkbox") {
+        input.getAttribute("checked") != "checked"
+    } else {
+        false
     }
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
