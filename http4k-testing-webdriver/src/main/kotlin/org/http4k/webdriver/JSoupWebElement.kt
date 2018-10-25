@@ -68,11 +68,8 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         }
     }
 
-    private fun isUncheckedInput(input: WebElement): Boolean = if (input.getAttribute("type") == "checkbox") {
-        input.getAttribute("checked") != "checked"
-    } else {
-        false
-    }
+    private fun isUncheckedInput(input: WebElement): Boolean =
+        (input.getAttribute("type") == "checkbox") && input.getAttribute("checked") != "checked"
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
