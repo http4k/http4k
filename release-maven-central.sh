@@ -35,7 +35,7 @@ function ensure_release_commit {
     fi
 }
 
-#ensure_release_commit
+ensure_release_commit
 
 echo "Making $LOCAL_VERSION available in Maven central..."
 
