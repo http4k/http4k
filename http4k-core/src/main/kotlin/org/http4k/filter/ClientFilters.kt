@@ -18,6 +18,7 @@ import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 object ClientFilters {
 
@@ -129,7 +130,7 @@ object ClientFilters {
 
         private fun removeExpired(now: LocalDateTime, storage: CookieStorage) = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
-        private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
+        private fun Clock.now() = LocalDateTime.ofInstant(instant(), ZoneOffset.UTC)
     }
 
     /**

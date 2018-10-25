@@ -13,9 +13,12 @@ import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset.UTC
 
 class ClientCookiesTest {
 
@@ -62,6 +65,47 @@ class ClientCookiesTest {
 
         clock.add(10)
 
+        client(Request(Method.GET, "/get")) shouldMatch hasBody("gone")
+    }
+
+    @Test
+    fun `cookie expiry uses the same timezone as cookie parsing`() {
+        val zoneId = ZoneId.of("Europe/London")
+
+        val cookie = Cookie.parse("foo=bar;Path=/;Expires=Thu, 25-Oct-2018 10:00:00 GMT;HttpOnly") ?: fail("Couldn't parse cookie")
+        // this was 11:00:00 in Europe/London due to daylight savings
+
+        val server = { request: Request ->
+            when (request.uri.path) {
+                "/set" -> Response(Status.OK).cookie(cookie)
+                else -> Response(Status.OK).body(request.cookie("foo")?.value ?: "gone")
+            }
+        }
+
+        val cookieStorage = BasicCookieStorage()
+
+        val clock = object : Clock() {
+            var instant = cookie.expires!!.atZone(UTC).toInstant() - Duration.ofMinutes(50)
+            override fun withZone(zone: ZoneId?): Clock = TODO()
+            override fun getZone(): ZoneId = zoneId
+            override fun instant(): Instant = instant
+            fun add(hours: Long) {
+                instant += Duration.ofHours(hours)
+            }
+        }
+
+        val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
+
+        client(Request(Method.GET, "/set"))
+
+        cookieStorage.retrieve().size shouldMatch equalTo(1)
+
+        // if the parser uses UTC and the expiry checker uses local time then this will be 'gone'
+        client(Request(Method.GET, "/get")) shouldMatch hasBody("bar")
+
+        clock.add(1)
+
+        // if the parser uses local time and the expiry checker uses UTC then this will be 'bar'
         client(Request(Method.GET, "/get")) shouldMatch hasBody("gone")
     }
 
