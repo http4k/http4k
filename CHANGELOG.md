@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-	### v3.93.4
+### v3.93.4
 - Use Jetty latest release version (rather than RC one) 
 - Deprecate String.toBody()
 
