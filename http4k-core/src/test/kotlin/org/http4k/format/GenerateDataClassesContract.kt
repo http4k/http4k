@@ -19,7 +19,7 @@ abstract class GenerateDataClassesContract<NODE : Any>(val j: Json<NODE>) {
     @Test
     fun `generates data classes correctly`() {
         val input = j {
-            j.obj(
+            obj(
                 "string" to string("value"),
                 "double" to number(1.0),
                 "long" to number(10L),
