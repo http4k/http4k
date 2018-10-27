@@ -78,22 +78,27 @@ data class JsonRpcService<NODE : Any>(
         if (isNotEmpty()) processEachAsSingleRequest() else renderError(InvalidRequest)
     }
 
-    private fun List<NODE>.processEachAsSingleRequest() =
+    private fun List<NODE>.processEachAsSingleRequest() = json {
         mapNotNull {
-            processSingleRequest(if (json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
-        }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
+            processSingleRequest(if (typeOf(it) == Object) fields(it).toMap() else emptyMap())
+        }.takeIf { it.isNotEmpty() }?.let { array(it) }
+    }
 
-    private fun renderResult(result: NODE, id: NODE): NODE = json.obj(
-        "jsonrpc" to json.string(jsonRpcVersion),
-        "result" to result,
-        "id" to id
-    )
+    private fun renderResult(result: NODE, id: NODE): NODE = json {
+        obj(
+            "jsonrpc" to string(jsonRpcVersion),
+            "result" to result,
+            "id" to id
+        )
+    }
 
-    private fun renderError(errorMessage: ErrorMessage, id: NODE? = null) = json.obj(
-        "jsonrpc" to json.string(jsonRpcVersion),
-        "error" to errorMessage(json),
-        "id" to (id ?: json.nullNode())
-    )
+    private fun renderError(errorMessage: ErrorMessage, id: NODE? = null) = json {
+        obj(
+            "jsonrpc" to string(jsonRpcVersion),
+            "error" to errorMessage(this),
+            "id" to (id ?: nullNode())
+        )
+    }
 }
 
 data class JsonRpcMethodBinding<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
