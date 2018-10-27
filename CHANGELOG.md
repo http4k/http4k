@@ -3,6 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.95.0 (uncut)
+- Deprecation: Moved `Header.Common` fields to main `Header` object. Extension properties should go there now.
 - (Unlikely break): Change `Http4kServer` interface to return `Unit` from `stop()`. This affects all server implementations.
 - Added DSL function for working with JSON objects (scopes JSON as `this`). `fun <T> Json<NODE>.invoke(Json<NODE>.() -> T)`
 - New module `http4k-k8s` contains tools to help run http4k services inside K8S.

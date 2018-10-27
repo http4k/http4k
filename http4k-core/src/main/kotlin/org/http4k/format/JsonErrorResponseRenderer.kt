@@ -6,7 +6,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
 import org.http4k.lens.Failure
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 
 class JsonErrorResponseRenderer<out NODE>(private val json: Json<NODE>) {
     fun badRequest(failures: List<Failure>) =

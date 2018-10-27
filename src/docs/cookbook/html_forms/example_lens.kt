@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     val feedbackFormBody = Body.webForm(Validator.Feedback, nameField, ageField).toLens()
 
     val invalidRequest = Request(Method.GET, "/")
-        .with(Header.Common.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
+        .with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
 
     // the "strict" form rejects (throws a LensFailure) because "age" is required
     try {

@@ -1,12 +1,7 @@
 package org.http4k.contract
 
-import org.http4k.core.ContentType
-import org.http4k.core.HttpMessage
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
@@ -39,7 +34,7 @@ class RouteMetaDsl internal constructor() {
     @JvmName("returningResponseMeta")
     fun returning(responseMeta: ResponseMeta) {
         responses += responseMeta
-        produces.plusAssign(Header.Common.CONTENT_TYPE(responseMeta.message)?.let { listOf(it) } ?: emptyList())
+        produces.plusAssign(Header.CONTENT_TYPE(responseMeta.message)?.let { listOf(it) } ?: emptyList())
     }
 
     /**

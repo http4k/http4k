@@ -90,7 +90,7 @@ class HeaderTest {
 
     @Test
     fun `content type serialises and deserialises correctly to message - with directive`() {
-        val lens = Header.Common.CONTENT_TYPE
+        val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType.TEXT_HTML)
         reqWithHeader.header("Content-Type") shouldMatch equalTo("text/html; charset=utf-8")
         lens(reqWithHeader) shouldMatch equalTo(ContentType.TEXT_HTML)
@@ -98,14 +98,14 @@ class HeaderTest {
 
     @Test
     fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
-        val lens = Header.Common.CONTENT_TYPE
+        val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").header("Content-Type", "bob ; foomanchu")
         lens(reqWithHeader) shouldMatch equalTo(ContentType("bob"))
     }
 
     @Test
     fun `content type serialises and deserialises correctly to message - no directive`() {
-        val lens = Header.Common.CONTENT_TYPE
+        val lens = Header.CONTENT_TYPE
         val reqWithHeader = Request(GET, "").with(lens of ContentType("value"))
         reqWithHeader.header("Content-Type") shouldMatch equalTo("value")
         lens(reqWithHeader) shouldMatch equalTo(ContentType("value"))

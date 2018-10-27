@@ -35,7 +35,7 @@ class MultipartFormBodyTest {
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
-                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
                 .body(form)
 
         MultipartFormBody.from(req) shouldMatch equalTo(
@@ -50,7 +50,7 @@ class MultipartFormBodyTest {
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
-                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
                 .body(form)
 
         req.bodyString()
@@ -94,7 +94,7 @@ class MultipartFormBodyTest {
         val original = streams.toMultipartForm()
 
         MultipartFormBody.from(Request(Method.POST, "/")
-                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
+                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
                 .body(original))
 
         streams shouldMatch closed //original stream are automatically closed during parsing

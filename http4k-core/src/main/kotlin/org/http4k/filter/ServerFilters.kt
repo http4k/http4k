@@ -1,26 +1,16 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
-import org.http4k.core.ContentType
-import org.http4k.core.Credentials
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.*
 import org.http4k.core.Method.OPTIONS
-import org.http4k.core.Request
-import org.http4k.core.RequestContext
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
-import org.http4k.core.Store
-import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.RequestContextLens
 import org.http4k.routing.ResourceLoader
@@ -249,7 +239,7 @@ object ServerFilters {
     object SetContentType {
         operator fun invoke(contentType: ContentType): Filter = Filter { next ->
             {
-                next(it).with(Header.Common.CONTENT_TYPE of contentType)
+                next(it).with(CONTENT_TYPE of contentType)
             }
         }
     }

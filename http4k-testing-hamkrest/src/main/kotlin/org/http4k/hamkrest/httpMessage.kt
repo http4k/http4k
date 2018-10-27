@@ -29,7 +29,7 @@ fun hasHeader(name: String): Matcher<HttpMessage> = has("Header '$name'", { m: H
 
 fun hasHeader(name: String, expected: List<String?>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.headerValues(name) }, equalTo(expected))
 
-fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-Type", { m: HttpMessage -> Header.Common.CONTENT_TYPE(m) }, equalTo(expected))
+fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-Type", { m: HttpMessage -> Header.CONTENT_TYPE(m) }, equalTo(expected))
 
 fun hasBody(expected: Matcher<Body>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.body }, expected)
 

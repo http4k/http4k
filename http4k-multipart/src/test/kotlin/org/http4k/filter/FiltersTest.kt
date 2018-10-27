@@ -25,7 +25,7 @@ class FiltersTest {
             ("field" to "bar")
 
         val req = Request(Method.POST, "")
-            .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
         val files = mutableListOf<String>()

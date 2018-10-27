@@ -8,7 +8,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
 import org.junit.jupiter.api.Test
@@ -28,7 +28,7 @@ class WebFormTest {
             webForm of WebForm().with(stringField of "world", intField of 123)
         )
 
-        assertThat(Header.Common.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
+        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
         assertThat(populatedRequest.bodyString(), equalTo("hello=world&another=123"))
     }
 

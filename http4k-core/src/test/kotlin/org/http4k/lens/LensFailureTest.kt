@@ -2,10 +2,11 @@ package org.http4k.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.junit.jupiter.api.Test
 
 class LensFailureTest {
-    private val unsupported = Unsupported(Header.Common.CONTENT_TYPE.meta)
+    private val unsupported = Unsupported(CONTENT_TYPE.meta)
     private val invalid = Invalid(Meta(true, "query", ParamMeta.BooleanParam, "name"))
     private val missing = Missing(Meta(true, "header", ParamMeta.BooleanParam, "name"))
 

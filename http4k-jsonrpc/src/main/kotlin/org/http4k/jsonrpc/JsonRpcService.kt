@@ -18,7 +18,7 @@ import org.http4k.jsonrpc.ErrorMessage.Companion.MethodNotFound
 import org.http4k.jsonrpc.ErrorMessage.Companion.ParseError
 import org.http4k.lens.ContentNegotiation.Companion.StrictNoDirective
 import org.http4k.lens.Failure.Type.Invalid
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
 data class JsonRpcService<NODE : Any>(

@@ -6,7 +6,7 @@ import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.with
 import org.http4k.lens.ContentNegotiation.Companion.None
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.StringParam
 

@@ -1,33 +1,22 @@
 package org.http4k.testing
 
-import org.http4k.core.Body
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.TEXT_HTML
-import org.http4k.core.Credentials
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
-import org.http4k.core.query
-import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.ServerFilters
-import org.http4k.lens.FormField
-import org.http4k.lens.Header.Common.LOCATION
-import org.http4k.lens.Query
+import org.http4k.lens.*
+import org.http4k.lens.Header.LOCATION
 import org.http4k.lens.Validator.Feedback
-import org.http4k.lens.string
-import org.http4k.lens.uri
-import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.renderToResponse
-import java.util.UUID
+import java.util.*
 import java.util.UUID.randomUUID
 
 
