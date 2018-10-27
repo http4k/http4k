@@ -25,10 +25,10 @@ val namePath = Path.of("name")
 
 // here is our websocket app - it uses dynamic path binding and lenses
 val testApp: WsHandler = websockets(
-        "/{name}" bind { ws: Websocket ->
-            val name = namePath(ws.upgradeRequest)
-            ws.send(WsMessage("hello $name"))
-        }
+    "/{name}" bind { ws: Websocket ->
+        val name = namePath(ws.upgradeRequest)
+        ws.send(WsMessage("hello $name"))
+    }
 )
 
 // this is the abstract contract that defines the behaviour to be tested
@@ -59,5 +59,7 @@ class WebsocketServerTest : WebsocketContract() {
     }
 
     @AfterEach
-    fun after() = server.stop()
+    fun after() {
+        server.stop()
+    }
 }
