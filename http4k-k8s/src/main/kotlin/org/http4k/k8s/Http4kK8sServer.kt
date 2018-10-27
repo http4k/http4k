@@ -1,14 +1,11 @@
 package org.http4k.k8s
 
 import org.http4k.core.HttpHandler
+import org.http4k.k8s.K8sEnvKey.HEALTH_PORT
+import org.http4k.k8s.K8sEnvKey.SERVICE_PORT
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
-
-fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
-                            port: Int = 8000,
-                            healthApp: HttpHandler = Health(),
-                            healthPort: Int = 8001) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
 
 /**
  * A K8S server consists of a main application and a health application, running on 2 different ports.
@@ -27,3 +24,13 @@ class Http4kK8sServer(private val main: Http4kServer, private val health: Http4k
         main.stop()
     }
 }
+
+fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
+                            port: Int = 8000,
+                            healthApp: HttpHandler = org.http4k.k8s.Health(),
+                            healthPort: Int = 8001) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
+
+fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
+                            k8sEnv: K8sEnvironment = org.http4k.k8s.K8sEnvironment.ENV,
+                            healthApp: HttpHandler = org.http4k.k8s.Health()) =
+    asK8sServer(serverConfig, SERVICE_PORT(k8sEnv), healthApp, HEALTH_PORT(k8sEnv))
