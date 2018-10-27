@@ -1,16 +1,11 @@
 package org.http4k.jsonrpc
 
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.format.Json
 import org.http4k.format.JsonType
@@ -27,22 +22,22 @@ import org.http4k.lens.Header.Common.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
 data class JsonRpcService<NODE : Any>(
-        private val json: Json<NODE>,
-        private val errorHandler: ErrorHandler,
-        private val bindings: Iterable<JsonRpcMethodBinding<NODE, NODE>>) : HttpHandler {
+    private val json: Json<NODE>,
+    private val errorHandler: ErrorHandler,
+    private val bindings: Iterable<JsonRpcMethodBinding<NODE, NODE>>) : HttpHandler {
 
     private val jsonLens = json.body("JSON-RPC request", StrictNoDirective).toLens()
     private val methods = bindings.map { it.name to it.handler }.toMap()
 
     private val handler = CatchLensFailure { Response(OK).with(jsonLens of renderError(ParseError)) }
-            .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
-            .then {
-                val responseJson = process(jsonLens(it))
-                when (responseJson) {
-                    null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
-                    else -> Response(OK).with(jsonLens of responseJson)
-                }
+        .then(Filter { next -> { if (it.method == POST) next(it) else Response(METHOD_NOT_ALLOWED) } })
+        .then {
+            val responseJson = process(jsonLens(it))
+            when (responseJson) {
+                null -> Response(NO_CONTENT).with(CONTENT_TYPE of APPLICATION_JSON)
+                else -> Response(OK).with(jsonLens of responseJson)
             }
+        }
 
     override fun invoke(request: Request): Response = handler(request)
 
@@ -53,26 +48,26 @@ data class JsonRpcService<NODE : Any>(
     }
 
     private fun processSingleRequest(fields: Map<String, NODE>) =
-            JsonRpcRequest(json, fields).mapIfValid { request ->
-                try {
-                    val method = methods[request.method]
-                    when (method) {
-                        null -> renderError(MethodNotFound, request.id)
-                        else -> with(method(request.params ?: json.nullNode())) {
-                            request.id?.let { renderResult(this, it) }
-                        }
-                    }
-                } catch (e: Exception) {
-                    when (e) {
-                        is LensFailure -> {
-                            val errorMessage = errorHandler(e.cause ?: e)
-                                    ?: if (e.overall() == Invalid) InvalidParams else InternalError
-                            renderError(errorMessage, request.id)
-                        }
-                        else -> renderError(errorHandler(e) ?: InternalError, request.id)
+        JsonRpcRequest(json, fields).mapIfValid { request ->
+            try {
+                val method = methods[request.method]
+                when (method) {
+                    null -> renderError(MethodNotFound, request.id)
+                    else -> with(method(request.params ?: json.nullNode())) {
+                        request.id?.let { renderResult(this, it) }
                     }
                 }
+            } catch (e: Exception) {
+                when (e) {
+                    is LensFailure -> {
+                        val errorMessage = errorHandler(e.cause ?: e)
+                            ?: if (e.overall() == Invalid) InvalidParams else InternalError
+                        renderError(errorMessage, request.id)
+                    }
+                    else -> renderError(errorHandler(e) ?: InternalError, request.id)
+                }
             }
+        }
 
     private fun JsonRpcRequest<NODE>.mapIfValid(block: (JsonRpcRequest<NODE>) -> NODE?) = when {
         valid() -> block(this)
@@ -84,20 +79,20 @@ data class JsonRpcService<NODE : Any>(
     }
 
     private fun List<NODE>.processEachAsSingleRequest() =
-            mapNotNull {
-                processSingleRequest(if (json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
-            }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
+        mapNotNull {
+            processSingleRequest(if (json.typeOf(it) == Object) json.fields(it).toMap() else emptyMap())
+        }.takeIf { it.isNotEmpty() }?.let { json.array(it) }
 
     private fun renderResult(result: NODE, id: NODE): NODE = json.obj(
-            "jsonrpc" to json.string(jsonRpcVersion),
-            "result" to result,
-            "id" to id
+        "jsonrpc" to json.string(jsonRpcVersion),
+        "result" to result,
+        "id" to id
     )
 
     private fun renderError(errorMessage: ErrorMessage, id: NODE? = null) = json.obj(
-            "jsonrpc" to json.string(jsonRpcVersion),
-            "error" to errorMessage(json),
-            "id" to (id ?: json.nullNode())
+        "jsonrpc" to json.string(jsonRpcVersion),
+        "error" to errorMessage(json),
+        "id" to (id ?: json.nullNode())
     )
 }
 

@@ -7,7 +7,7 @@ import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 
-class SimpleJson<ROOT : NODE, out NODE>(private val json: Json<NODE>) : ContractRenderer {
+class SimpleJson<out NODE>(private val json: Json<NODE>) : ContractRenderer {
 
     override fun notFound(): Response = JsonErrorResponseRenderer(json).notFound()
 
@@ -18,5 +18,5 @@ class SimpleJson<ROOT : NODE, out NODE>(private val json: Json<NODE>) : Contract
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response =
         Response(OK)
-            .with(json.body().toLens() of json.obj("resources" to json.obj(routes.map { render(contractRoot, it) })))
+            .with(json { body().toLens().of<Response>(obj("resources" to obj(routes.map { render(contractRoot, it) }))) })
 }
