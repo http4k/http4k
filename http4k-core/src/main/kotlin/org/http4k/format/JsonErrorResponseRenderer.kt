@@ -8,24 +8,27 @@ import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.Common.CONTENT_TYPE
 
-class JsonErrorResponseRenderer<ROOT : NODE, out NODE>(private val json: Json<NODE>) {
+class JsonErrorResponseRenderer<out NODE>(private val json: Json<NODE>) {
     fun badRequest(failures: List<Failure>) =
         Response(BAD_REQUEST)
-                .with(CONTENT_TYPE of APPLICATION_JSON)
-                .body(
-            json.compact(
-                json.obj("message" to json.string("Missing/invalid parameters"),
-                    "params" to json.array(failures.map {
-                        json.obj(
-                            "name" to json.string(it.meta.name),
-                            "type" to json.string(it.meta.location),
-                            "datatype" to json.string(it.meta.paramMeta.value),
-                            "required" to json.boolean(it.meta.required),
-                            "reason" to json.string(it.javaClass.simpleName))
-                    }))))
+            .with(CONTENT_TYPE of APPLICATION_JSON)
+            .body(
+                json {
+                    compact(
+                        obj("message" to string("Missing/invalid parameters"),
+                            "params" to array(failures.map {
+                                obj(
+                                    "name" to string(it.meta.name),
+                                    "type" to string(it.meta.location),
+                                    "datatype" to string(it.meta.paramMeta.value),
+                                    "required" to boolean(it.meta.required),
+                                    "reason" to string(it.javaClass.simpleName))
+                            })))
+                })
 
     fun notFound(): Response = Response(NOT_FOUND)
-        .body(
-            json.compact(
-                json.obj("message" to json.string("No route found on this path. Have you used the correct HTTP verb?"))))
+        .body(json {
+            compact(
+                obj("message" to string("No route found on this path. Have you used the correct HTTP verb?")))
+        })
 }

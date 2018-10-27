@@ -10,6 +10,9 @@ fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
                             healthApp: HttpHandler = Health(),
                             healthPort: Int = 8001) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
 
+/**
+ * A K8S server consists of a main application and a health application, running on 2 different ports.
+ */
 class Http4kK8sServer(private val main: Http4kServer, private val health: Http4kServer) : Http4kServer {
     override fun port() = main.port()
     fun healthPort() = health.port()

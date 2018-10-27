@@ -3,15 +3,9 @@ package org.http4k.format
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.lens.BiDiBodyLensSpec
-import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.BiDiWsMessageLensSpec
-import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.*
 import org.http4k.lens.ContentNegotiation.Companion.None
-import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.httpBodyRoot
-import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -78,6 +72,8 @@ interface Json<NODE> {
     fun WsMessage.Companion.json(): BiDiWsMessageLensSpec<NODE> = WsMessage.string().map({ parse(it) }, { compact(it) })
 
     fun textValueOf(node: NODE, name: String): String?
+
+    operator fun <T> invoke(fn:Json<NODE>.() -> T): T = run(fn)
 }
 
 enum class JsonType {

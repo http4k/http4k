@@ -2,7 +2,6 @@ package org.http4k.k8s
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.k8s.ReadinessCheckResult.Companion.Composite
 import org.junit.jupiter.api.Test
 
 class ReadinessCheckResultTest {
@@ -19,7 +18,7 @@ class ReadinessCheckResultTest {
 
     @Test
     fun `composite result collects results`() {
-        assertThat((Composite() + success + success).pass, equalTo(true))
-        assertThat((Composite() + failure + success).pass, equalTo(false))
+        assertThat((ReadinessCheckResult() + success + success).pass, equalTo(true))
+        assertThat((ReadinessCheckResult() + failure + success).pass, equalTo(false))
     }
 }

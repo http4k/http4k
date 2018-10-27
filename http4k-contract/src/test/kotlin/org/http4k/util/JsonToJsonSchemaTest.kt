@@ -17,21 +17,23 @@ class JsonToJsonSchemaTest {
 
     @Test
     fun `renders all different types of json value as expected`() {
-        val model = json.obj(
-            "aString" to json.string("aStringValue"),
-            "aNumber" to json.number(BigDecimal("1.9")),
-            "aBooleanTrue" to json.boolean(true),
-            "aBooleanFalse" to json.boolean(false),
-            "anArray" to json.array(listOf(json.obj("anotherString" to json.string("yetAnotherString")))),
-            "anObject" to json.obj("anInteger" to json.number(1)),
-            "anotherObject" to json.obj("anInteger" to json.number(1))
-        )
+        val model = json {
+            obj(
+                "aString" to string("aStringValue"),
+                "aNumber" to number(BigDecimal("1.9")),
+                "aBooleanTrue" to boolean(true),
+                "aBooleanFalse" to boolean(false),
+                "anArray" to array(listOf(obj("anotherString" to string("yetAnotherString")))),
+                "anObject" to obj("anInteger" to number(1)),
+                "anotherObject" to obj("anInteger" to number(1))
+            )
+        }
 
         val actual = JsonToJsonSchema(json).toSchema(model, "bob")
         val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
         val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
-        println(json.pretty(obj(actual.definitions)))
+//        println(json.pretty(obj(actual.definitions)))
         assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
     }
 }
