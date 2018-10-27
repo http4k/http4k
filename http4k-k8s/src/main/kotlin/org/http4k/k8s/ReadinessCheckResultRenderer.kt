@@ -9,7 +9,7 @@ interface ReadinessCheckResultRenderer : (ReadinessCheckResult) -> String {
 }
 
 object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
-    override fun invoke(p1: ReadinessCheckResult) = p1.toString()
+    override fun invoke(p1: ReadinessCheckResult) = (listOf(p1) + p1).joinToString("\n") { it.name + "=" + it.pass }
 
     override val contentType = TEXT_PLAIN
 }

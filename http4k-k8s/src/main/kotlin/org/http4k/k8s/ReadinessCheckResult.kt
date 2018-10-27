@@ -23,9 +23,7 @@ interface ReadinessCheckResult : Iterable<ReadinessCheckResult> {
 
         internal operator fun invoke(parts: Iterable<ReadinessCheckResult> = emptyList()): ReadinessCheckResult = Composite(parts)
 
-        private data class Simple(override val name: String, override val pass: Boolean) : ReadinessCheckResult {
-            override fun toString(): String = "$name=$pass"
-        }
+        private data class Simple(override val name: String, override val pass: Boolean) : ReadinessCheckResult
 
         private data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult {
             override val name = "success"

@@ -15,18 +15,21 @@ import org.http4k.routing.routes
  */
 object Health {
     operator fun invoke(
-            renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer,
-            vararg checks: ReadinessCheck) = routes(
-            "/liveness" bind GET to liveness(),
-            "/readiness" bind GET to readiness(checks, renderer)
+        renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer,
+        checks: List<ReadinessCheck> = emptyList()) = routes(
+        "/liveness" bind GET to liveness(),
+        "/readiness" bind GET to readiness(checks, renderer)
     )
 
     /**
      * The Readiness check is used by K8S to determine if an app is prepared to receive live traffic.
      */
-    private fun readiness(checks: Array<out ReadinessCheck>, renderer: ReadinessCheckResultRenderer): (Request) -> Response =
+    private fun readiness(checks: List<ReadinessCheck>, renderer: ReadinessCheckResultRenderer): (Request) -> Response =
         {
-            val overall = checks.fold(ReadinessCheckResult(true)) { acc, next -> acc + next() }
+            val overall = when {
+                checks.isEmpty() -> ReadinessCheckResult(true)
+                else -> checks.drop(1).fold(checks.first()()) { acc, function -> acc + function() }
+            }
             Response(if (overall.pass) OK else SERVICE_UNAVAILABLE)
                 .with(CONTENT_TYPE of renderer.contentType)
                 .body(renderer(overall))
