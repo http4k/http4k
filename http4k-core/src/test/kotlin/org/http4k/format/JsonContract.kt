@@ -19,109 +19,135 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
 
     @Test
     fun `looks up types`() {
-        assertThat(j.typeOf(j.string("")), equalTo(JsonType.String))
-        assertThat(j.typeOf(j.number(1)), equalTo(JsonType.Number))
-        assertThat(j.typeOf(j.number(1.0)), equalTo(JsonType.Number))
-        assertThat(j.typeOf(j.boolean(true)), equalTo(JsonType.Boolean))
-        assertThat(j.typeOf(j.nullNode()), equalTo(JsonType.Null))
-        assertThat(j.typeOf(j.obj("name" to j.string(""))), equalTo(JsonType.Object))
-        assertThat(j.typeOf(j.array(listOf(j.string("")))), equalTo(JsonType.Array))
+        j {
+            assertThat(typeOf(string("")), equalTo(JsonType.String))
+            assertThat(typeOf(number(1)), equalTo(JsonType.Number))
+            assertThat(typeOf(number(1.0)), equalTo(JsonType.Number))
+            assertThat(typeOf(boolean(true)), equalTo(JsonType.Boolean))
+            assertThat(typeOf(nullNode()), equalTo(JsonType.Null))
+            assertThat(typeOf(obj("name" to string(""))), equalTo(JsonType.Object))
+            assertThat(typeOf(array(listOf(string("")))), equalTo(JsonType.Array))
+        }
     }
 
     @Test
     fun `serializes object to json`() {
-        val input = j.obj(
-            "string" to j.string("value"),
-            "double" to j.number(1.5),
-            "long" to j.number(10L),
-            "boolean" to j.boolean(true),
-            "bigDec" to j.number(BigDecimal(1.2)),
-            "bigInt" to j.number(BigInteger("12344")),
-            "null" to j.nullNode(),
-            "int" to j.number(2),
-            "empty" to j.obj(),
-            "array" to j.array(listOf(
-                j.string(""),
-                j.number(123)
-            )),
-            "singletonArray" to j.array(j.obj("number" to j.number(123)))
-        )
-        val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
-        assertThat(j.compact(input), equalTo(expected))
+        j {
+            val input = obj(
+                "string" to string("value"),
+                "double" to number(1.5),
+                "long" to number(10L),
+                "boolean" to boolean(true),
+                "bigDec" to number(BigDecimal(1.2)),
+                "bigInt" to number(BigInteger("12344")),
+                "null" to nullNode(),
+                "int" to number(2),
+                "empty" to obj(),
+                "array" to array(listOf(
+                    string(""),
+                    number(123)
+                )),
+                "singletonArray" to array(obj("number" to number(123)))
+            )
+            val expected = """{"string":"value","double":1.5,"long":10,"boolean":true,"bigDec":1.1999999999999999555910790149937383830547332763671875,"bigInt":12344,"null":null,"int":2,"empty":{},"array":["",123],"singletonArray":[{"number":123}]}"""
+            assertThat(compact(input), equalTo(expected))
+        }
     }
 
     @Test
     fun `can write and read body as json`() {
-        val body = j.body().toLens()
+        j {
+            val body = body().toLens()
 
-        val obj = j.obj("hello" to j.string("world"))
+            val obj = obj("hello" to string("world"))
 
-        val request = Request(Method.GET, "/bob")
+            val request = Request(Method.GET, "/bob")
 
-        val requestWithBody = request.with(body of obj)
+            val requestWithBody = request.with(body of obj)
 
-        assertThat(requestWithBody.bodyString(), equalTo("""{"hello":"world"}"""))
+            assertThat(requestWithBody.bodyString(), equalTo("""{"hello":"world"}"""))
 
-        assertThat(body(requestWithBody), equalTo(obj))
+            assertThat(body(requestWithBody), equalTo(obj))
+        }
     }
 
     @Test
     fun `get fields`() {
-        val fields = listOf("hello" to j.string("world"), "hello2" to j.string("world2"))
-        assertThat(j.fields(j.obj(*fields.toTypedArray())).toList(), equalTo(fields))
+        j {
+            val fields = listOf("hello" to string("world"), "hello2" to string("world2"))
+            assertThat(fields(obj(*fields.toTypedArray())).toList(), equalTo(fields))
+        }
     }
 
     @Test
     fun `get text`() {
-        assertThat(j.text(j.string("world")), equalTo("world"))
+        j {
+            assertThat(text(string("world")), equalTo("world"))
+        }
     }
 
     @Test
     fun `get string value`() {
-        assertThat(j.textValueOf(j.obj("value" to j.string("world")), "value"), equalTo("world"))
-        assertThat(j.textValueOf(j.obj("value" to j.number(1)), "value"), equalTo("1"))
-        assertThat(j.textValueOf(j.obj("value" to j.boolean(true)), "value"), equalTo("true"))
+        j {
+            assertThat(textValueOf(obj("value" to string("world")), "value"), equalTo("world"))
+            assertThat(textValueOf(obj("value" to number(1)), "value"), equalTo("1"))
+            assertThat(textValueOf(obj("value" to boolean(true)), "value"), equalTo("true"))
+        }
     }
 
     @Test
     fun `get boolean`() {
-        assertThat(j.bool(j.boolean(true)), equalTo(true))
+        j {
+            assertThat(bool(boolean(true)), equalTo(true))
+        }
     }
 
     @Test
     fun `get elements`() {
-        val fields = listOf(j.string("world"), j.string("world2"))
-        val elements = j.elements(j.array(fields)).toList()
-        assertThat(elements, equalTo(fields))
+        j {
+            val fields = listOf(string("world"), string("world2"))
+            val elements = elements(array(fields)).toList()
+            assertThat(elements, equalTo(fields))
+        }
     }
 
     @Test
     fun `can write and read spec as json`() {
-        val validValue = """{"hello":"world"}"""
-        checkContract(j.lens(spec), j.obj("hello" to j.string("world")), validValue, "", "hello", "o", "o$validValue", "o$validValue$validValue")
+        j {
+            val validValue = """{"hello":"world"}"""
+            checkContract(lens(spec), obj("hello" to string("world")), validValue, "", "hello", "o", "o$validValue", "o$validValue$validValue")
+        }
     }
 
     @Test
     fun `invalid json blows up parse`() {
-        assertThat({ j.parse("") }, throws(anything))
-        assertThat({ j.parse("somevalue") }, throws(anything))
+        j {
+            assertThat({ parse("") }, throws(anything))
+            assertThat({ parse("somevalue") }, throws(anything))
+        }
     }
 
     @Test
     fun `get no fields`() {
-        assertThat(j.fields(j.string("foo")).toList(), equalTo(emptyList()))
-        assertThat(j.fields(j.boolean(true)).toList(), equalTo(emptyList()))
-        assertThat(j.fields(j.number(123)).toList(), equalTo(emptyList()))
-        assertThat(j.fields(j.nullNode()).toList(), equalTo(emptyList()))
+        j {
+            assertThat(fields(string("foo")).toList(), equalTo(emptyList()))
+            assertThat(fields(boolean(true)).toList(), equalTo(emptyList()))
+            assertThat(fields(number(123)).toList(), equalTo(emptyList()))
+            assertThat(fields(nullNode()).toList(), equalTo(emptyList()))
+        }
     }
 
     @Test
     fun compactify() {
-        assertThat(j.compactify("""{   "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
+        j {
+            assertThat(compactify("""{   "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
+        }
     }
 
     @Test
     fun prettify() {
-        assertThat(j.prettify("""{"hello":"world"}"""), equalTo(prettyString))
+        j {
+            assertThat(prettify("""{"hello":"world"}"""), equalTo(prettyString))
+        }
     }
 }
