@@ -107,7 +107,7 @@ class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NOD
     }
 
     private fun Security.asJson() = json {
-        when (this) {
+        when (this@asJson) {
             is ApiKey<*> -> obj(
                 "api_key" to obj(
                     "type" to string("apiKey"),
