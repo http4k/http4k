@@ -33,17 +33,17 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                     NoParamsJsonRequestHandler(block, resultLens)
         }
 
-        class Auto<ROOT : Any>(val json: JsonLibAutoMarshallingJson<ROOT>) :
-                Manual<ROOT>(json) {
+        class Auto<NODE : Any>(val json: JsonLibAutoMarshallingJson<NODE>) :
+                Manual<NODE>(json) {
 
             inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
-                                                             noinline fn: (IN) -> OUT): JsonRpcHandler<ROOT, ROOT> =
+                                                             noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                     handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
 
-            inline fun <reified IN : Any, OUT : Any> handler(noinline block: (IN) -> OUT): JsonRpcHandler<ROOT, ROOT> =
+            inline fun <reified IN : Any, OUT : Any> handler(noinline block: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                     handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), block)
 
-            fun <OUT : Any> handler(block: () -> OUT): JsonRpcHandler<ROOT, ROOT> =
+            fun <OUT : Any> handler(block: () -> OUT): JsonRpcHandler<NODE, NODE> =
                     handler(Mapping { json.asJsonObject(it) }, block)
         }
     }

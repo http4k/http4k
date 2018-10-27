@@ -3,11 +3,11 @@ package org.http4k.jsonrpc
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 
-internal class ParamMappingJsonRequestHandler<ROOT : NODE, NODE, IN, OUT>(json: Json<NODE>,
-                                                                          paramsFieldNames: Iterable<String>,
-                                                                          paramsLens: Mapping<NODE, IN>,
-                                                                          function: (IN) -> OUT,
-                                                                          resultLens: Mapping<OUT, NODE>) : JsonRpcHandler<NODE, NODE> {
+internal class ParamMappingJsonRequestHandler<NODE, IN, OUT>(json: Json<NODE>,
+                                                             paramsFieldNames: Iterable<String>,
+                                                             paramsLens: Mapping<NODE, IN>,
+                                                             function: (IN) -> OUT,
+                                                             resultLens: Mapping<OUT, NODE>) : JsonRpcHandler<NODE, NODE> {
     private val handler: (NODE) -> NODE = {
         val input = when (json.typeOf(it)) {
             JsonType.Array -> {

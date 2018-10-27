@@ -4,15 +4,11 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Body
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.hamkrest.hasBody
@@ -340,7 +336,7 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     }
 }
 
-abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json: Json<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
+abstract class ManualMappingJsonRpcServiceContract<NODE : Any>(json: Json<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
     val incrementParams = Mapping<NODE, Counter.Increment> { Counter.Increment(json.textValueOf(it, "value")!!.toInt()) }
     val intResult: Mapping<Int, NODE> = Mapping { json.number(it) }
 
@@ -359,7 +355,7 @@ abstract class ManualMappingJsonRpcServiceContract<ROOT : NODE, NODE : Any>(json
     }
 }
 
-abstract class AutoMappingJsonRpcServiceContract<ROOT : Any>(json: JsonLibAutoMarshallingJson<ROOT>) : JsonRpcServiceContract<ROOT>({ counter ->
+abstract class AutoMappingJsonRpcServiceContract<NODE : Any>(json: JsonLibAutoMarshallingJson<NODE>) : JsonRpcServiceContract<NODE>({ counter ->
     JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))

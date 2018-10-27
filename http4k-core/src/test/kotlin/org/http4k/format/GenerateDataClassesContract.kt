@@ -14,42 +14,43 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.math.BigDecimal
 
-abstract class GenerateDataClassesContract<ROOT : NODE, NODE : Any>(val j: Json<NODE>) {
+abstract class GenerateDataClassesContract<NODE : Any>(val j: Json<NODE>) {
 
     @Test
     fun `generates data classes correctly`() {
-        val input = j.obj(
-            "string" to j.string("value"),
-            "double" to j.number(1.0),
-            "long" to j.number(10L),
-            "boolean" to j.boolean(true),
-            "bigDec" to j.number(BigDecimal(1.2)),
-            "nullNode" to j.nullNode(),
-            "int" to j.number(2),
-            "empty" to j.obj(),
-            "nonEmpty" to j.obj(
-                "double" to j.number(1.0),
-                "long" to j.number(10L)
-            ),
-            "array" to j.array(listOf(
-                j.string(""),
-                j.number(123),
-                j.obj(
-                    "nullNode" to j.nullNode(),
-                    "long" to j.number(10L)
-                )
-            )),
-            "singleTypeArray" to j.array(
-                listOf(j.obj(
-                    "string" to j.string("someString"),
-                    "list" to j.array(listOf(j.obj("id" to j.string("someValue"))))
-                )
+        val input = j {
+            j.obj(
+                "string" to string("value"),
+                "double" to number(1.0),
+                "long" to number(10L),
+                "boolean" to boolean(true),
+                "bigDec" to number(BigDecimal(1.2)),
+                "nullNode" to nullNode(),
+                "int" to number(2),
+                "empty" to obj(),
+                "nonEmpty" to obj(
+                    "double" to number(1.0),
+                    "long" to number(10L)
+                ),
+                "array" to array(listOf(
+                    string(""),
+                    number(123),
+                    obj(
+                        "nullNode" to nullNode(),
+                        "long" to number(10L)
+                    )
+                )),
+                "singleTypeArray" to array(
+                    listOf(obj(
+                        "string" to string("someString"),
+                        "list" to array(listOf(obj("id" to string("someValue"))))
+                    ))
                 )
             )
-        )
+        }
         val os = ByteArrayOutputStream()
 
-        val handler = GenerateDataClasses(j, PrintStream(os), { 1 }).then { Response(OK).with(j.body().toLens() of input) }
+        val handler = GenerateDataClasses(j, PrintStream(os)) { 1 }.then { Response(OK).with(j.body().toLens() of input) }
 
         handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
