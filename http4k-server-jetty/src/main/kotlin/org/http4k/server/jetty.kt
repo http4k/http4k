@@ -33,7 +33,7 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
                 server.start()
             }
 
-            override fun stop() = server.stop()
+            override fun stop(): Http4kServer = apply { server.stop() }
 
             override fun port(): Int = if(port > 0) port else server.uri.port
         }

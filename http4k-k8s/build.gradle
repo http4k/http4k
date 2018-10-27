@@ -1,0 +1,10 @@
+description = 'Http4k K8S machinery'
+
+dependencies {
+    provided Libs.kotlin_stdlib_jdk8
+    provided project(":http4k-core")
+
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile project(":http4k-testing-hamkrest")
+    testCompile Config.TestDependencies
+}

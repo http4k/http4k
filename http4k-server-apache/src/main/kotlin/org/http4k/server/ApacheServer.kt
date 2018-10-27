@@ -83,9 +83,9 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : Serve
             server = bootstrap.create()
         }
 
-        override fun start(): Http4kServer = apply { server.start() }
+        override fun start() = apply { server.start() }
 
-        override fun stop() = server.shutdown(15, TimeUnit.SECONDS)
+        override fun stop() = apply { server.shutdown(15, TimeUnit.SECONDS) }
 
         override fun port(): Int = if (port != 0) port else server.localPort
     }
