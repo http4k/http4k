@@ -50,6 +50,7 @@ plugging together of services without HTTP container being required.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
+    * Cloud-native tooling: support for 12-factor-based style apps.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
     * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
     * Testing: Chaos Injection mechanism, allowing simple, dynamic injection of failure modes into  [**http4k**](https://github.com/http4k/http4k) applications.
@@ -117,6 +118,8 @@ plugging together of services without HTTP container being required.
         * **Dropbox** 
         * **Google** 
         * **Soundcloud**
+* [Cloud Native:](https://http4k.org/guide/modules/cloud_native)
+    * Tooling to support operating [http4k](https://github.com/http4k/http4k) applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
     * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
