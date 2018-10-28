@@ -6,7 +6,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Deprecation: Moved `Header.Common` fields to main `Header` object. Extension properties should go there now.
 - (Unlikely break): Change `Http4kServer` interface to return `Unit` from `stop()`. This affects all server implementations.
 - Added DSL function for working with JSON objects (scopes JSON as `this`). `fun <T> Json<NODE>.invoke(Json<NODE>.() -> T)`
-- New module `http4k-cloud` contains tools to help run http4k services inside cloud-native environments, including K8S.
+- New module `http4k-cloudnative` contains classes to help run http4k services inside cloud-native environments, including K8S.
 
 ### v3.94.1
 - Use UTC when checking cookie expiry
