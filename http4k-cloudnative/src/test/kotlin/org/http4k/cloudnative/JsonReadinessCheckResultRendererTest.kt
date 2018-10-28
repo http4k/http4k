@@ -12,11 +12,7 @@ class JsonReadinessCheckResultRendererTest {
     @Test
     fun `calls toString() on successful result`() {
         assertThat(renderer(Completed("name")), equalTo(Argo {
-            pretty(
-                obj(
-                    "name" to boolean(true)
-                )
-            )
+            pretty(obj("name" to boolean(true)))
         }))
     }
 
