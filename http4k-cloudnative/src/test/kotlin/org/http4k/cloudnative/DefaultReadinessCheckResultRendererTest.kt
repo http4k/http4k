@@ -11,6 +11,6 @@ class DefaultReadinessCheckResultRendererTest {
         assertThat(DefaultReadinessCheckResultRenderer(
                 Failed("first", "failed")
                 + Completed("second")
-        ), equalTo("success=false\nfirst=false [failed]\nsecond=true"))
+        ), equalTo("overall=false\nfirst=false [failed]\nsecond=true"))
     }
 }

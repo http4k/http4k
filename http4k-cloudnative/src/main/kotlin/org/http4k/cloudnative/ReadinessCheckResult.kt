@@ -36,7 +36,7 @@ data class Failed(override val name: String, val cause: Exception) : ReadinessCh
  * Result of multiple checks which calculates the overall result
  */
 data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult() {
-    override val name = "success"
+    override val name = "overall"
     override val pass by lazy { parts.fold(true) { acc, next -> acc && next.pass } }
     override fun iterator() = parts.iterator()
 }

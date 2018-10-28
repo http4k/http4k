@@ -22,13 +22,22 @@ object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
 
 object JsonReadinessCheckResultRenderer {
     operator fun <NODE> invoke(json: Json<NODE>): (ReadinessCheckResult) -> String {
-        fun render(result: ReadinessCheckResult) = result.name to json.boolean(result.pass)
+        fun render(result: ReadinessCheckResult) = json {
+            val core = listOf(
+                "name" to string(result.name),
+                "success" to boolean(result.pass)
+            )
+            when (result) {
+                is Failed -> core + ("message" to string("${result.cause.message}"))
+                else -> core
+            }
+        }
         return {
-            val core: List<Pair<String, NODE>> = listOf(it.asJson(json))
-            val children = it.map(::render)
-            json { pretty(obj(if (children.isEmpty()) core else core + ("children" to obj(children)))) }
+            json {
+                val children = it.map(::render).map { obj(it) }
+                val root = render(it)
+                pretty(obj(if (children.isEmpty()) root else root + ("children" to array(children))))
+            }
         }
     }
-
-    private fun <NODE> ReadinessCheckResult.asJson(json: Json<NODE>) = name to json.boolean(pass)
 }
