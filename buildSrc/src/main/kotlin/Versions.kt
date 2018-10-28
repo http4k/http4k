@@ -5,7 +5,7 @@
  *   `$ ./gradlew syncLibs`
  * to update this file */
 object Versions {
-    const val alpn_boot: String = "8.1.12.v20181017" // available milestone: "8.1.13.v20181017"
+    const val alpn_boot: String = "8.1.13.v20181017"
 
     const val argo: String = "5.4"
 
@@ -79,7 +79,7 @@ object Versions {
 
     const val moshi_kotlin: String = "1.7.0"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3" // available milestone: "4.0.1"
+    const val nebula_provided_base_gradle_plugin: String = "4.0.1"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.5.4"
 
