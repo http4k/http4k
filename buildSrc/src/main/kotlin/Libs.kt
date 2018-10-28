@@ -154,6 +154,11 @@ object Libs {
     const val micrometer_core: String = "io.micrometer:micrometer-core:" + Versions.micrometer_core
 
     /**
+     * [micrometer-registry-prometheus website](https://github.com/micrometer-metrics/micrometer) */
+    const val micrometer_registry_prometheus: String =
+            "io.micrometer:micrometer-registry-prometheus:" + Versions.micrometer_registry_prometheus
+
+    /**
      * [moshi website](https://github.com/square/moshi) */
     const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
 

@@ -5,7 +5,7 @@
  *   `$ ./gradlew syncLibs`
  * to update this file */
 object Versions {
-    const val alpn_boot: String = "8.1.12.v20180117"
+    const val alpn_boot: String = "8.1.12.v20181017" // available milestone: "8.1.13.v20181017"
 
     const val argo: String = "5.4"
 
@@ -29,7 +29,7 @@ object Versions {
 
     const val handlebars: String = "4.1.0"
 
-    const val http2_server: String = "9.4.12.v20180830"
+    const val http2_server: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -43,18 +43,17 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val javax_websocket_server_impl: String = "9.4.12.v20180830"
+    const val javax_websocket_server_impl: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jetty_alpn_conscrypt_server: String = "9.4.12.v20180830"
+    const val jetty_alpn_conscrypt_server: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jetty_client: String = "9.4.12.v20180830"
+    const val jetty_client: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jetty_server: String = "9.4.12.v20180830"
+    const val jetty_server: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jetty_servlet: String = "9.4.12.v20180830"
+    const val jetty_servlet: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "0.2.4" // exceed the version found: 0.2.3
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.5"
 
     const val json: String = "20180813"
 
@@ -64,15 +63,17 @@ object Versions {
 
     const val junit_jupiter_engine: String = "5.3.1"
 
-    const val kotlin_gradle_plugin: String = "1.2.71"
+    const val kotlin_gradle_plugin: String = "1.2.71" // available milestone: "1.3.0-rc-198"
 
-    const val kotlin_reflect: String = "1.2.71"
+    const val kotlin_reflect: String = "1.2.71" // available milestone: "1.3.0-rc-198"
 
-    const val kotlin_scripting_compiler_embeddable: String = "1.2.71"
+    const val kotlin_scripting_compiler_embeddable: String = "1.2.71" // available milestone: "1.3.0-rc-198"
 
-    const val kotlin_stdlib_jdk8: String = "1.2.71"
+    const val kotlin_stdlib_jdk8: String = "1.2.71" // available milestone: "1.3.0-rc-198"
 
-    const val micrometer_core: String = "1.0.6" // available milestone: "1.0.7"
+    const val micrometer_core: String = "1.0.7"
+
+    const val micrometer_registry_prometheus: String = "1.0.7"
 
     const val moshi: String = "1.7.0"
 
@@ -102,9 +103,9 @@ object Versions {
 
     const val thymeleaf: String = "3.0.10.RELEASE"
 
-    const val undertow_core: String = "2.0.13.Final"
+    const val undertow_core: String = "2.0.14.Final"
 
-    const val undertow_servlet: String = "2.0.13.Final"
+    const val undertow_servlet: String = "2.0.14.Final"
 
     /**
      *
@@ -116,7 +117,7 @@ object Versions {
 
         const val currentVersion: String = "4.10.2"
 
-        const val nightlyVersion: String = "5.1-20181015235836+0000"
+        const val nightlyVersion: String = "5.1-20181028101406+0000"
 
         const val releaseCandidate: String = ""
     }
