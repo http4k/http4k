@@ -7,12 +7,10 @@ import org.http4k.lens.*
  * This models the runtime environment of the shell where the app is running
  */
 data class Environment private constructor(private val env: Map<String, String>) {
-    internal operator fun get(key: String) = env[key.convertToKey()]
+    internal operator fun get(key: String) = env[key] ?: env[key.convertToKey()]
     internal operator fun set(key: String, value: String): Environment = Environment(env + (key.convertToKey() to value))
 
     infix fun overrides(that: Environment): Environment = Environment(that.env + env)
-
-    private fun String.convertToKey() = toUpperCase().replace("-", "_")
 
     companion object {
         /**
@@ -44,6 +42,13 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
                     .scheme(if (https) "https" else "http")
                     .authority(if (it == 80 || it == 443) serviceName else "$serviceName:$it")
             }
-            .required("${serviceName.replace("-", "_").toUpperCase()}_SERVICE_PORT")
+            .required("${serviceName.convertToKey()}_SERVICE_PORT")
     }
 }
+
+internal fun String.convertToKey() =
+    flatMap { if (it.isLetter() && it.isUpperCase()) listOf('_', it) else listOf(it) }
+        .joinToString("")
+        .replace("-", "_")
+        .replace(".", "_")
+        .toUpperCase()
