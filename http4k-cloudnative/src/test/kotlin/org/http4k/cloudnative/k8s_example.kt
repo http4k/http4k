@@ -15,7 +15,7 @@ import org.http4k.server.asServer
 object ProxyApp {
 
     operator fun invoke(env: Environment): Http4kK8sServer {
-        val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.baseServiceUriFor("otherservice")
+        val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
 
         val proxyApp = ClientFilters.SetHostFrom(otherServiceUri(env))
             .then(rewriteUriToLocalhostAsWeDoNotHaveDns)
