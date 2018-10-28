@@ -2,8 +2,9 @@ package org.http4k.cloudnative
 
 import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.client.JavaHttpClient
-import org.http4k.cloudnative.EnvironmentKey.k8s.HEALTH_PORT
-import org.http4k.cloudnative.EnvironmentKey.k8s.SERVICE_PORT
+import org.http4k.cloudnative.env.Environment
+import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
+import org.http4k.cloudnative.env.EnvironmentKey.k8s.SERVICE_PORT
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

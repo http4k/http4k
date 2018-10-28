@@ -1,4 +1,4 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.health
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat

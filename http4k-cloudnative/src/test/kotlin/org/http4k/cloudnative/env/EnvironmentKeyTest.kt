@@ -1,12 +1,12 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.env
 
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.cloudnative.Environment.Companion.from
-import org.http4k.cloudnative.EnvironmentKey.k8s.HEALTH_PORT
-import org.http4k.cloudnative.EnvironmentKey.k8s.SERVICE_PORT
-import org.http4k.cloudnative.EnvironmentKey.k8s.serviceUriFor
+import org.http4k.cloudnative.env.Environment.Companion.from
+import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
+import org.http4k.cloudnative.env.EnvironmentKey.k8s.SERVICE_PORT
+import org.http4k.cloudnative.env.EnvironmentKey.k8s.serviceUriFor
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.LensFailure

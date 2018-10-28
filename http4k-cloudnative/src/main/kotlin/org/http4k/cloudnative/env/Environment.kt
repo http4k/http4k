@@ -1,4 +1,4 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.*

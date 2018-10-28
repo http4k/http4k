@@ -1,9 +1,12 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.health
 
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.format.Json
 
+/**
+ * Renders the results of a readiness check into
+ */
 interface ReadinessCheckResultRenderer : (ReadinessCheckResult) -> String {
     val contentType: ContentType
 }

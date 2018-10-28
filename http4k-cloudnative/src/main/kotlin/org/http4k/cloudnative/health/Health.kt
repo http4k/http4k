@@ -1,7 +1,7 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.health
 
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -11,20 +11,30 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 /**
- * Represents the set of operational endpoints called by K8S to ensure that a particular pod is working ok.
+ * Represents the set of operational endpoints to ensure that a particular pod is working ok.
  */
 object Health {
     operator fun invoke(
         renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer,
         checks: List<ReadinessCheck> = emptyList()) = routes(
-        "/liveness" bind GET to liveness(),
-        "/readiness" bind GET to readiness(checks, renderer)
+        "/liveness" bind GET to Liveness,
+        "/readiness" bind GET to Readiness(checks, renderer)
     )
+}
 
-    /**
-     * The Readiness check is used by K8S to determine if an app is prepared to receive live traffic.
-     */
-    private fun readiness(checks: List<ReadinessCheck>, renderer: ReadinessCheckResultRenderer): (Request) -> Response =
+/**
+ * The Liveness check is used to determine if an app is alive.
+ */
+object Liveness : HttpHandler by { Response(OK)  }
+
+/**
+ * The Readiness check is used to determine if an app is prepared to receive live traffic.
+ */
+object Readiness {
+    operator fun invoke(
+        checks: List<ReadinessCheck> = emptyList(),
+        renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer
+    ): HttpHandler =
         {
             val overall = when {
                 checks.isNotEmpty() -> checks.map { check ->
@@ -41,8 +51,4 @@ object Health {
                 .body(renderer(overall))
         }
 
-    /**
-     * The Liveness check is used by K8S to determine if an app is alive.
-     */
-    private fun liveness(): (Request) -> Response = { Response(OK) }
 }

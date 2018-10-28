@@ -1,6 +1,8 @@
 package org.http4k.cloudnative
 
 import org.http4k.client.JavaHttpClient
+import org.http4k.cloudnative.env.Environment
+import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK

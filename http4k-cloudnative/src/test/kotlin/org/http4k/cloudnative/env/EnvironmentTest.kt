@@ -1,4 +1,4 @@
-package org.http4k.cloudnative
+package org.http4k.cloudnative.env
 
 
 import com.natpryce.hamkrest.assertion.assertThat
