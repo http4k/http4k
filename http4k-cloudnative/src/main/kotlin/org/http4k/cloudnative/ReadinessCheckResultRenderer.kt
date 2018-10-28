@@ -9,7 +9,13 @@ interface ReadinessCheckResultRenderer : (ReadinessCheckResult) -> String {
 }
 
 object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
-    override fun invoke(p1: ReadinessCheckResult) = (listOf(p1) + p1).joinToString("\n") { it.name + "=" + it.pass }
+    override fun invoke(p1: ReadinessCheckResult) = (listOf(p1) + p1).joinToString("\n") {
+        val base = it.name + "=" + it.pass
+        when (it) {
+            is Failed -> base + " [${it.cause.message}]"
+            else -> base
+        }
+    }
 
     override val contentType = TEXT_PLAIN
 }

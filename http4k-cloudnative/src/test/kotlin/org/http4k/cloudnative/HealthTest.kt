@@ -26,13 +26,13 @@ class HealthTest {
     @Test
     fun `readiness with extra checks`() {
         assertThat(Health(checks = listOf(check(true, "first"), check(false, "second")))(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nfirst=true\nsecond=false")))
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nfirst=true\nsecond=false [foobar]")))
     }
 
     @Test
     fun `readiness continues to run when check fails`() {
         assertThat(Health(checks = listOf(throws("boom"), check(true, "second")))(Request(GET, "/readiness")),
-            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nboom=false\nsecond=true")))
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nboom=false [foobar]\nsecond=true")))
     }
 
     private fun check(result: Boolean, name: String): ReadinessCheck = object : ReadinessCheck {
