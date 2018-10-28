@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test
 
 class ReadinessCheckResultTest {
 
-    private val success = ReadinessCheckResult(true)
-    private val failure = ReadinessCheckResult(false)
+    private val success = Completed("name")
+    private val failure = Failed("name2", "foobar")
 
     @Test
     fun `simple result`() {
         assertThat(success.pass, equalTo(true))
         assertThat(failure.pass, equalTo(false))
-        assertThat(success, equalTo(ReadinessCheckResult(true)))
+        assertThat(success, equalTo(Completed("name")))
     }
 
     @Test
     fun `composite result collects results`() {
-        assertThat((ReadinessCheckResult() + success + success).pass, equalTo(true))
-        assertThat((ReadinessCheckResult() + failure + success).pass, equalTo(false))
+        assertThat((success + success).pass, equalTo(true))
+        assertThat((failure + success).pass, equalTo(false))
     }
 }

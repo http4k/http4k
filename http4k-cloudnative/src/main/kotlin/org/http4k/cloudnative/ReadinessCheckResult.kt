@@ -1,34 +1,44 @@
 package org.http4k.cloudnative
 
 /**
- * A Readiness check is used by K8S to determine if the pod is ready to receive traffic. An example is to test
+ * A Readiness check is used to determine if the pod is ready to receive traffic. An example is to test
  * if the app can talk to it's database.
  */
-typealias ReadinessCheck = () -> ReadinessCheckResult
+interface ReadinessCheck : () -> ReadinessCheckResult {
+    val name: String
+}
 
 /**
  * The result of a Readiness check. Checks can be combined together with `+()` to provide an overall result.
  */
-interface ReadinessCheckResult : Iterable<ReadinessCheckResult> {
-    val name: String
-    val pass: Boolean
-    operator fun plus(that: ReadinessCheckResult): ReadinessCheckResult = Composite(listOf(this, that))
+sealed class ReadinessCheckResult : Iterable<ReadinessCheckResult> {
+    abstract val name: String
+    abstract val pass: Boolean
     override fun iterator() = emptyList<ReadinessCheckResult>().iterator()
-
-    companion object {
-        /**
-         * a Default implementation of a result.
-         */
-        operator fun invoke(pass: Boolean, name: String = "success"): ReadinessCheckResult = Simple(name, pass)
-
-        internal operator fun invoke(parts: Iterable<ReadinessCheckResult> = emptyList()): ReadinessCheckResult = Composite(parts)
-
-        private data class Simple(override val name: String, override val pass: Boolean) : ReadinessCheckResult
-
-        private data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult {
-            override val name = "success"
-            override val pass by lazy { parts.fold(true) { acc, next -> acc && next.pass } }
-            override fun iterator() = parts.iterator()
-        }
-    }
 }
+
+/**
+ * The check completed successfully
+ */
+data class Completed(override val name: String) : ReadinessCheckResult() {
+    override val pass = true
+}
+
+/**
+ * The check failed
+ */
+data class Failed(override val name: String, val cause: Exception) : ReadinessCheckResult() {
+    constructor(name: String, message: String): this(name, Exception(message))
+    override val pass = false
+}
+
+/**
+ * Result of multiple checks which calculates the overall result
+ */
+data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult() {
+    override val name = "success"
+    override val pass by lazy { parts.fold(true) { acc, next -> acc && next.pass } }
+    override fun iterator() = parts.iterator()
+}
+
+operator fun ReadinessCheckResult.plus(that: ReadinessCheckResult) = Composite(listOf(this, that))

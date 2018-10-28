@@ -27,13 +27,18 @@ object Health {
     private fun readiness(checks: List<ReadinessCheck>, renderer: ReadinessCheckResultRenderer): (Request) -> Response =
         {
             val overall = when {
-                checks.isEmpty() -> ReadinessCheckResult(true)
-                else -> checks.drop(1).fold(checks.first()()) { acc, function -> acc + function() }
+                checks.isNotEmpty() -> checks.map { check ->
+                    try {
+                        check()
+                    } catch (e: Exception) {
+                        Failed(check.name, e)
+                    }
+                }.reduce { acc, result -> acc + result }
+                else -> Completed("success")
             }
             Response(if (overall.pass) OK else SERVICE_UNAVAILABLE)
                 .with(CONTENT_TYPE of renderer.contentType)
                 .body(renderer(overall))
-
         }
 
     /**

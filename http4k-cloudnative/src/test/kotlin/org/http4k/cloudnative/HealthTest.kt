@@ -29,5 +29,22 @@ class HealthTest {
             hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nfirst=true\nsecond=false")))
     }
 
-    private fun check(result: Boolean, name: String): ReadinessCheck = { ReadinessCheckResult(result, name) }
+    @Test
+    fun `readiness continues to run when check fails`() {
+        assertThat(Health(checks = listOf(throws("boom"), check(true, "second")))(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("success=false\nboom=false\nsecond=true")))
+    }
+
+    private fun check(result: Boolean, name: String): ReadinessCheck = object : ReadinessCheck {
+        override fun invoke(): ReadinessCheckResult =
+            if (result) Completed(name) else Failed(name, "foobar")
+
+        override val name: String = name
+    }
+
+    private fun throws(name: String): ReadinessCheck = object : ReadinessCheck {
+        override fun invoke(): ReadinessCheckResult = throw Exception("foobar")
+
+        override val name: String = name
+    }
 }

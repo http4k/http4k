@@ -11,10 +11,10 @@ class JsonReadinessCheckResultRendererTest {
 
     @Test
     fun `calls toString() on successful result`() {
-        assertThat(renderer(ReadinessCheckResult(true)), equalTo(Argo {
+        assertThat(renderer(Completed("name")), equalTo(Argo {
             pretty(
                 obj(
-                    "success" to boolean(true)
+                    "name" to boolean(true)
                 )
             )
         }))
@@ -22,7 +22,7 @@ class JsonReadinessCheckResultRendererTest {
 
     @Test
     fun `calls toString() on composite result`() {
-        val composite = ReadinessCheckResult(listOf(ReadinessCheckResult(true, "first"), ReadinessCheckResult(false, "second")))
+        val composite = Composite(listOf(Completed("first"), Failed("second", "foobar")))
         assertThat(renderer(composite),
             equalTo(Argo {
                 pretty(
