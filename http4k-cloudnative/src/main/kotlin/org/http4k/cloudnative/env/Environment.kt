@@ -36,7 +36,7 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
 
         val SERVICE_PORT = int().required("HEALTH_PORT")
 
-        fun serviceUriFor(serviceName: String, https: Boolean = false) = int()
+        fun baseServiceUriFor(serviceName: String, https: Boolean = false) = int()
             .map {
                 Uri.of("/")
                     .scheme(if (https) "https" else "http")
