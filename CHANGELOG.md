@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.95.0 (uncut)
+### v3.95.0
 - (Unlikely break): Change `Http4kServer` interface to return `Unit` from `stop()`. This affects all server implementations.
 - Added DSL function for working with JSON objects (scopes JSON as `this`). `fun <T> Json<NODE>.invoke(Json<NODE>.() -> T)`
 - New module `http4k-cloudnative` contains classes to help run http4k services inside cloud-native environments, including K8S.

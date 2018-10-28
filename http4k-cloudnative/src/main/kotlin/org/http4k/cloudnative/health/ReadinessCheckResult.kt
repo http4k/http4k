@@ -11,33 +11,28 @@ interface ReadinessCheck : () -> ReadinessCheckResult {
 /**
  * The result of a Readiness check. Checks can be combined together with `+()` to provide an overall result.
  */
-sealed class ReadinessCheckResult : Iterable<ReadinessCheckResult> {
+sealed class ReadinessCheckResult(val pass: Boolean = true) : Iterable<ReadinessCheckResult> {
     abstract val name: String
-    abstract val pass: Boolean
     override fun iterator() = emptyList<ReadinessCheckResult>().iterator()
 }
 
 /**
  * The check completed successfully
  */
-data class Completed(override val name: String) : ReadinessCheckResult() {
-    override val pass = true
-}
+data class Completed(override val name: String) : ReadinessCheckResult(true)
 
 /**
  * The check failed
  */
-data class Failed(override val name: String, val cause: Exception) : ReadinessCheckResult() {
-    constructor(name: String, message: String): this(name, Exception(message))
-    override val pass = false
+data class Failed(override val name: String, val cause: Exception) : ReadinessCheckResult(false) {
+    constructor(name: String, message: String) : this(name, Exception(message))
 }
 
 /**
  * Result of multiple checks which calculates the overall result
  */
-data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult() {
+data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult(parts.fold(true) { acc, next -> acc && next.pass }) {
     override val name = "overall"
-    override val pass by lazy { parts.fold(true) { acc, next -> acc && next.pass } }
     override fun iterator() = parts.iterator()
 }
 
