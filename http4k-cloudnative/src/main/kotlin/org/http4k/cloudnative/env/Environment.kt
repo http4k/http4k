@@ -32,9 +32,8 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
     LensSet { name, values, target -> values.fold(target) { acc, next -> acc.set(name, next) } }
 ) {
     object k8s {
-        val HEALTH_PORT = int().required("SERVICE_PORT")
-
-        val SERVICE_PORT = int().required("HEALTH_PORT")
+        val SERVICE_PORT = int().required("SERVICE_PORT")
+        val HEALTH_PORT = int().required("HEALTH_PORT")
 
         fun serviceUriFor(serviceName: String, https: Boolean = false) = int()
             .map {

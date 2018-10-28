@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.95.1
+- Tweak to K8S port variables.
+
 ### v3.95.0
 - (Unlikely break): Change `Http4kServer` interface to return `Unit` from `stop()`. This affects all server implementations.
 - Added DSL function for working with JSON objects (scopes JSON as `this`). `fun <T> Json<NODE>.invoke(Json<NODE>.() -> T)`

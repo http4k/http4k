@@ -5,6 +5,9 @@ import org.http4k.cloudnative.Http4kK8sServer
 import org.http4k.cloudnative.asK8sServer
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey
+import org.http4k.cloudnative.health.Completed
+import org.http4k.cloudnative.health.Health
+import org.http4k.cloudnative.health.ReadinessCheck
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
@@ -23,7 +26,12 @@ object ProxyApp {
             .then(rewriteUriToLocalhostAsWeDoNotHaveDns)
             .then(JavaHttpClient())
 
-        return proxyApp.asK8sServer(::SunHttp, env)
+        val customReadinessCheck = object : ReadinessCheck {
+            override fun invoke() = Completed(name)
+
+            override val name = "database"
+        }
+        return proxyApp.asK8sServer(::SunHttp, env, Health(checks = listOf(customReadinessCheck)))
     }
 
     private val rewriteUriToLocalhostAsWeDoNotHaveDns = Filter { next ->
