@@ -42,6 +42,7 @@ nav:
       - Templating: guide/modules/templating/index.md
       - Typesafe contracts: guide/modules/contracts/index.md
       - OAuth: guide/modules/oauth/index.md
+      - Cloud native: guide/modules/cloud_native/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
