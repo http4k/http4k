@@ -1,4 +1,4 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.*
@@ -12,8 +12,8 @@ import org.http4k.server.asServer
 
 object ProxyApp {
 
-    operator fun invoke(env: K8sEnvironment): Http4kK8sServer {
-        val otherServiceUri: Lens<K8sEnvironment, Uri> = K8sEnvKey.serviceUriFor("otherservice")
+    operator fun invoke(env: Environment): Http4kK8sServer {
+        val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
 
         val proxyApp = ClientFilters.SetHostFrom(otherServiceUri(env))
             .then(rewriteUriToLocalhostAsWeDoNotHaveDns)
@@ -30,14 +30,13 @@ object ProxyApp {
     }
 }
 
-val environmentSetByK8s =
-    K8sEnvironment.from(
-        mapOf(
-            "SERVICE_PORT" to "8000",
-            "HEALTH_PORT" to "8001",
-            "OTHERSERVICE_SERVICE_PORT" to "9000"
-        )
-    )
+val enviromnentToUseInReality = Environment.JVM_PROPERTIES overrides Environment.ENV
+
+val environmentSetByK8s = Environment.from(
+    "SERVICE_PORT" to "8000",
+    "HEALTH_PORT" to "8001",
+    "OTHERSERVICE_SERVICE_PORT" to "9000"
+)
 
 fun main(args: Array<String>) {
 

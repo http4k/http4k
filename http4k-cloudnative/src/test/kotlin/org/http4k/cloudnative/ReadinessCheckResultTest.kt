@@ -1,4 +1,4 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

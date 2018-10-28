@@ -1,4 +1,4 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN

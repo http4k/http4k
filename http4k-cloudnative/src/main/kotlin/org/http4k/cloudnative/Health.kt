@@ -1,4 +1,4 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
 import org.http4k.core.Method.GET
 import org.http4k.core.Request

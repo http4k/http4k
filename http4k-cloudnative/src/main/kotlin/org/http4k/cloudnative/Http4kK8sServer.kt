@@ -1,9 +1,9 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
+import org.http4k.cloudnative.Environment.Companion.ENV
+import org.http4k.cloudnative.EnvironmentKey.k8s.HEALTH_PORT
+import org.http4k.cloudnative.EnvironmentKey.k8s.SERVICE_PORT
 import org.http4k.core.HttpHandler
-import org.http4k.k8s.K8sEnvKey.HEALTH_PORT
-import org.http4k.k8s.K8sEnvKey.SERVICE_PORT
-import org.http4k.k8s.K8sEnvironment.Companion.ENV
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
@@ -32,6 +32,6 @@ fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
                             healthPort: Int = 8001) = Http4kK8sServer(asServer(serverConfig(port)), healthApp.asServer(serverConfig(healthPort)))
 
 fun HttpHandler.asK8sServer(serverConfig: (port: Int) -> ServerConfig,
-                            k8sEnv: K8sEnvironment = ENV,
+                            env: Environment = ENV,
                             healthApp: HttpHandler = Health()) =
-    asK8sServer(serverConfig, SERVICE_PORT(k8sEnv), healthApp, HEALTH_PORT(k8sEnv))
+    asK8sServer(serverConfig, SERVICE_PORT(env), healthApp, HEALTH_PORT(env))

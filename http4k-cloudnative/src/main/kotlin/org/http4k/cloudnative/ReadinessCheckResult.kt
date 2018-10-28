@@ -1,4 +1,4 @@
-package org.http4k.k8s
+package org.http4k.cloudnative
 
 /**
  * A Readiness check is used by K8S to determine if the pod is ready to receive traffic. An example is to test
