@@ -14,7 +14,13 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun getText(): String = element.text()
 
-    override fun getAttribute(name: String): String? = element.attr(name)
+    override fun getAttribute(name: String): String? {
+        return when {
+            booleanAttributes.contains(name) && element.hasAttr(name) -> "true"
+            booleanAttributes.contains(name) && !element.hasAttr(name) -> null
+            else -> element.attr(name)
+        }
+    }
 
     override fun isDisplayed(): Boolean = throw FeatureNotImplementedYet
 
@@ -69,7 +75,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     }
 
     private fun isUncheckedInput(input: WebElement): Boolean =
-        (input.getAttribute("type") == "checkbox") && input.getAttribute("checked") != "checked"
+        (input.getAttribute("type") == "checkbox") && input.getAttribute("checked") == null
 
     override fun getLocation(): Point = throw FeatureNotImplementedYet
 
@@ -136,4 +142,49 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 
     private fun isA(tag: String) = tagName.toLowerCase() == tag.toLowerCase()
+
+    companion object {
+        private val booleanAttributes = listOf(
+            "async",
+            "autofocus",
+            "autoplay",
+            "checked",
+            "compact",
+            "complete",
+            "controls",
+            "declare",
+            "defaultchecked",
+            "defaultselected",
+            "defer",
+            "disabled",
+            "draggable",
+            "ended",
+            "formnovalidate",
+            "hidden",
+            "indeterminate",
+            "iscontenteditable",
+            "ismap",
+            "itemscope",
+            "loop",
+            "multiple",
+            "muted",
+            "nohref",
+            "noresize",
+            "noshade",
+            "novalidate",
+            "nowrap",
+            "open",
+            "paused",
+            "pubdate",
+            "readonly",
+            "required",
+            "reversed",
+            "scoped",
+            "seamless",
+            "seeking",
+            "selected",
+            "truespeed",
+            "willvalidate"
+        )
+    }
 }
