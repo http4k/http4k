@@ -15,6 +15,7 @@ buildscript {
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
     id 'net.saliman.cobertura' version '2.5.4'
+    id 'nebula.provided-base' version '3.0.3'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'jmfayard.github.io.gradle-kotlin-dsl-libs' version "0.2.6"
 }
@@ -33,6 +34,7 @@ allprojects {
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
+    apply plugin: 'nebula.provided-base'
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
@@ -170,41 +172,41 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 }
 
 dependencies {
-    compileOnly Libs.kotlin_stdlib_jdk8
+    provided Libs.kotlin_stdlib_jdk8
 
-    compileOnly project(":http4k-core")
-    compileOnly project(":http4k-aws")
-    compileOnly project(":http4k-client-apache")
-    compileOnly project(":http4k-client-apache-async")
-    compileOnly project(":http4k-client-jetty")
-    compileOnly project(":http4k-client-okhttp")
-    compileOnly project(":http4k-client-websocket")
-    compileOnly project(":http4k-cloudnative")
-    compileOnly project(":http4k-contract")
-    compileOnly project(":http4k-format-argo")
-    compileOnly project(":http4k-format-gson")
-    compileOnly project(":http4k-format-jackson")
-    compileOnly project(":http4k-format-moshi")
-    compileOnly project(":http4k-format-xml")
-    compileOnly project(":http4k-incubator")
-    compileOnly project(":http4k-jsonrpc")
-    compileOnly project(":http4k-metrics-micrometer")
-    compileOnly project(":http4k-multipart")
-    compileOnly project(":http4k-resilience4j")
-    compileOnly project(":http4k-security-oauth")
-    compileOnly project(":http4k-server-apache")
-    compileOnly project(":http4k-server-jetty")
-    compileOnly project(":http4k-server-netty")
-    compileOnly project(":http4k-server-undertow")
-    compileOnly project(":http4k-serverless-lambda")
-    compileOnly project(":http4k-template-dust")
-    compileOnly project(":http4k-template-handlebars")
-    compileOnly project(":http4k-template-pebble")
-    compileOnly project(":http4k-template-thymeleaf")
-    compileOnly project(":http4k-template-dust")
-    compileOnly project(":http4k-testing-chaos")
-    compileOnly project(":http4k-testing-hamkrest")
-    compileOnly project(":http4k-testing-webdriver")
+    provided project(":http4k-core")
+    provided project(":http4k-aws")
+    provided project(":http4k-client-apache")
+    provided project(":http4k-client-apache-async")
+    provided project(":http4k-client-jetty")
+    provided project(":http4k-client-okhttp")
+    provided project(":http4k-client-websocket")
+    provided project(":http4k-cloudnative")
+    provided project(":http4k-contract")
+    provided project(":http4k-format-argo")
+    provided project(":http4k-format-gson")
+    provided project(":http4k-format-jackson")
+    provided project(":http4k-format-moshi")
+    provided project(":http4k-format-xml")
+    provided project(":http4k-incubator")
+    provided project(":http4k-jsonrpc")
+    provided project(":http4k-metrics-micrometer")
+    provided project(":http4k-multipart")
+    provided project(":http4k-resilience4j")
+    provided project(":http4k-security-oauth")
+    provided project(":http4k-server-apache")
+    provided project(":http4k-server-jetty")
+    provided project(":http4k-server-netty")
+    provided project(":http4k-server-undertow")
+    provided project(":http4k-serverless-lambda")
+    provided project(":http4k-template-dust")
+    provided project(":http4k-template-handlebars")
+    provided project(":http4k-template-pebble")
+    provided project(":http4k-template-thymeleaf")
+    provided project(":http4k-template-dust")
+    provided project(":http4k-testing-chaos")
+    provided project(":http4k-testing-hamkrest")
+    provided project(":http4k-testing-webdriver")
 
     testCompile Config.TestDependencies
 }

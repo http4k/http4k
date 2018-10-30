@@ -1,10 +1,10 @@
 description = 'Http4k Jackson JSON support'
 
 dependencies {
-    compileOnly Libs.kotlin_stdlib_jdk8
-    compileOnly project(":http4k-core")
+    provided Libs.kotlin_stdlib_jdk8
+    provided project(":http4k-core")
 
-    compile  Libs.jackson_module_kotlin
+    compile Libs.jackson_module_kotlin
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')

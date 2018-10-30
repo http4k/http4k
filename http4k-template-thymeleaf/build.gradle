@@ -1,8 +1,8 @@
 description = 'Http4k Thymeleaf templating support'
 
 dependencies {
-    compileOnly Libs.kotlin_stdlib_jdk8
-    compileOnly project(":http4k-core")
+    provided Libs.kotlin_stdlib_jdk8
+    provided project(":http4k-core")
 
     compile Libs.thymeleaf
 
