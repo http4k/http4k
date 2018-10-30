@@ -2,7 +2,8 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.97.0 (uncut)
+### v3.97.0
+- Webdriver checkbox handling improved. H/T @gypsydave5
 - upgrade to various versions
 
 ### v3.96.0
