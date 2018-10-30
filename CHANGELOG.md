@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.96.0 (uncut)
+- upgrade to Kotlin 1.3.0
+
 ### v3.95.1
 - Tweak to K8S port variables.
 

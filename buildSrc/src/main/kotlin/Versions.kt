@@ -63,17 +63,15 @@ object Versions {
 
     const val junit_jupiter_engine: String = "5.3.1"
 
-    const val kotlin_gradle_plugin: String = "1.2.71" // available milestone: "1.3.0-rc-198"
+    const val kotlin_gradle_plugin: String = "1.3.0"
 
-    const val kotlin_reflect: String = "1.2.71" // available milestone: "1.3.0-rc-198"
+    const val kotlin_reflect: String = "1.3.0"
 
-    const val kotlin_scripting_compiler_embeddable: String = "1.2.71" // available milestone: "1.3.0-rc-198"
+    const val kotlin_scripting_compiler_embeddable: String = "1.3.0"
 
-    const val kotlin_stdlib_jdk8: String = "1.2.71" // available milestone: "1.3.0-rc-198"
+    const val kotlin_stdlib_jdk8: String = "1.3.0"
 
     const val micrometer_core: String = "1.0.7"
-
-    const val micrometer_registry_prometheus: String = "1.0.7"
 
     const val moshi: String = "1.7.0"
 
