@@ -1,9 +1,5 @@
 description = 'Http4k HTTP Client built on top of apache-httpclient'
 
-ext{
-    ext.apache_http_version = '4.5.6'
-}
-
 dependencies {
     compileOnly Libs.kotlin_stdlib_jdk8
     compileOnly project(":http4k-core")
