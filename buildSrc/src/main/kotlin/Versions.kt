@@ -53,7 +53,7 @@ object Versions {
 
     const val jetty_servlet: String = "9.4.12.v20180830" // available milestone: "9.4.12.RC2"
 
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.5"
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
 
     const val json: String = "20180813"
 
