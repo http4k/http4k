@@ -7,9 +7,9 @@ Alternatively, any http4k application can be mounted into any Servlet container 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.95.1"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "3.95.1"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.95.1"
+    compile group: "org.http4k", name: "http4k-core", version: "3.96.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "3.96.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.96.0"
 ```
 
 ### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/container_integration/example.kt)
