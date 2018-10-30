@@ -6,8 +6,101 @@
  * to update this file */
 object Libs {
     /**
-     * [alpn-boot website](http://www.eclipse.org/jetty) */
-    const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:" + Versions.alpn_boot
+     * [jackson-module-kotlin website](https://github.com/FasterXML/jackson-module-kotlin) */
+    const val jackson_module_kotlin: String =
+            "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
+
+    /**
+     * [handlebars website](https://github.com/jknack/handlebars.java) */
+    const val handlebars: String = "com.github.jknack:handlebars:" + Versions.handlebars
+
+    const val com_github_kt3k_coveralls_gradle_plugin: String =
+            "com.github.kt3k.coveralls:com.github.kt3k.coveralls.gradle.plugin:" + Versions.com_github_kt3k_coveralls_gradle_plugin
+
+    /**
+     * [gson website](https://github.com/google/gson) */
+    const val gson: String = "com.google.code.gson:gson:" + Versions.gson
+
+    const val com_jfrog_bintray_gradle_plugin: String =
+            "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" + Versions.com_jfrog_bintray_gradle_plugin
+
+    /**
+     * [hamkrest website](https://github.com/npryce/hamkrest) */
+    const val hamkrest: String = "com.natpryce:hamkrest:" + Versions.hamkrest
+
+    /**
+     * [moshi-kotlin website](https://github.com/square/moshi) */
+    const val moshi_kotlin: String =
+            "com.squareup.moshi:moshi-kotlin:" + Versions.com_squareup_moshi
+
+    /**
+     * [moshi website](https://github.com/square/moshi) */
+    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.com_squareup_moshi
+
+    /**
+     * [okhttp website](https://github.com/square/okhttp) */
+    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
+
+    /**
+     * [rerunner-jupiter website](https://github.com/artsok/rerunner-jupiter) */
+    const val rerunner_jupiter: String =
+            "io.github.artsok:rerunner-jupiter:" + Versions.rerunner_jupiter
+
+    /**
+     * [resilience4j-bulkhead website](https://github.com/resilience4j/resilience4j) */
+    const val resilience4j_bulkhead: String =
+            "io.github.resilience4j:resilience4j-bulkhead:" + Versions.io_github_resilience4j
+
+    /**
+     * [resilience4j-circuitbreaker website](https://github.com/resilience4j/resilience4j) */
+    const val resilience4j_circuitbreaker: String =
+            "io.github.resilience4j:resilience4j-circuitbreaker:" + Versions.io_github_resilience4j
+
+    /**
+     * [resilience4j-ratelimiter website](https://github.com/resilience4j/resilience4j) */
+    const val resilience4j_ratelimiter: String =
+            "io.github.resilience4j:resilience4j-ratelimiter:" + Versions.io_github_resilience4j
+
+    /**
+     * [resilience4j-retry website](https://github.com/resilience4j/resilience4j) */
+    const val resilience4j_retry: String =
+            "io.github.resilience4j:resilience4j-retry:" + Versions.io_github_resilience4j
+
+    /**
+     * [micrometer-core website](https://github.com/micrometer-metrics/micrometer) */
+    const val micrometer_core: String = "io.micrometer:micrometer-core:" + Versions.micrometer_core
+
+    /**
+     * [netty-codec-http2 website](http://netty.io/) */
+    const val netty_codec_http2: String = "io.netty:netty-codec-http2:" + Versions.netty_codec_http2
+
+    /**
+     * [pebble website](http://pebbletemplates.io) */
+    const val pebble: String = "io.pebbletemplates:pebble:" + Versions.pebble
+
+    /**
+     * [undertow-core website](http://www.jboss.org) */
+    const val undertow_core: String = "io.undertow:undertow-core:" + Versions.io_undertow
+
+    /**
+     * [undertow-servlet website](http://www.jboss.org) */
+    const val undertow_servlet: String = "io.undertow:undertow-servlet:" + Versions.io_undertow
+
+    /**
+     * [javax.servlet-api website](https://javaee.github.io/servlet-spec/) */
+    const val javax_servlet_api: String =
+            "javax.servlet:javax.servlet-api:" + Versions.javax_servlet_api
+
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
+            "jmfayard.github.io.gradle-kotlin-dsl-libs:jmfayard.github.io.gradle-kotlin-dsl-libs.gradle.plugin:" + Versions.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
+
+    const val net_saliman_cobertura_gradle_plugin: String =
+            "net.saliman.cobertura:net.saliman.cobertura.gradle.plugin:" + Versions.net_saliman_cobertura_gradle_plugin
+
+    /**
+     * [gradle-cobertura-plugin website](https://github.com/stevesaliman/gradle-cobertura-plugin) */
+    const val gradle_cobertura_plugin: String =
+            "net.saliman:gradle-cobertura-plugin:" + Versions.gradle_cobertura_plugin
 
     /**
      * [argo website](http://argo.sourceforge.net) */
@@ -17,44 +110,9 @@ object Libs {
      * [cobertura website](http://cobertura.sourceforge.net) */
     const val cobertura: String = "net.sourceforge.cobertura:cobertura:" + Versions.cobertura
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String =
-            "com.github.kt3k.coveralls:com.github.kt3k.coveralls.gradle.plugin:" + Versions.com_github_kt3k_coveralls_gradle_plugin
-
-    const val com_jfrog_bintray_gradle_plugin: String =
-            "com.jfrog.bintray:com.jfrog.bintray.gradle.plugin:" + Versions.com_jfrog_bintray_gradle_plugin
-
     /**
      * [commons-pool2 website](http://commons.apache.org/proper/commons-pool/) */
     const val commons_pool2: String = "org.apache.commons:commons-pool2:" + Versions.commons_pool2
-
-    /**
-     * [coveralls-gradle-plugin website](https://github.com/kt3k/coveralls-gradle-plugin) */
-    const val coveralls_gradle_plugin: String =
-            "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" + Versions.coveralls_gradle_plugin
-
-    const val dokka_gradle_plugin: String =
-            "org.jetbrains.dokka:dokka-gradle-plugin:" + Versions.dokka_gradle_plugin
-
-    /**
-     * [gradle-cobertura-plugin website](https://github.com/stevesaliman/gradle-cobertura-plugin) */
-    const val gradle_cobertura_plugin: String =
-            "net.saliman:gradle-cobertura-plugin:" + Versions.gradle_cobertura_plugin
-
-    /**
-     * [gson website](https://github.com/google/gson) */
-    const val gson: String = "com.google.code.gson:gson:" + Versions.gson
-
-    /**
-     * [hamkrest website](https://github.com/npryce/hamkrest) */
-    const val hamkrest: String = "com.natpryce:hamkrest:" + Versions.hamkrest
-
-    /**
-     * [handlebars website](https://github.com/jknack/handlebars.java) */
-    const val handlebars: String = "com.github.jknack:handlebars:" + Versions.handlebars
-
-    /**
-     * [http2-server website](https://eclipse.org/jetty) */
-    const val http2_server: String = "org.eclipse.jetty.http2:http2-server:" + Versions.http2_server
 
     /**
      * [httpasyncclient website](http://hc.apache.org/httpcomponents-asyncclient) */
@@ -70,19 +128,8 @@ object Libs {
     const val httpcore: String = "org.apache.httpcomponents:httpcore:" + Versions.httpcore
 
     /**
-     * [jackson-module-kotlin website](https://github.com/FasterXML/jackson-module-kotlin) */
-    const val jackson_module_kotlin: String =
-            "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
-
-    /**
-     * [Java-WebSocket website](https://github.com/TooTallNate/Java-WebSocket) */
-    const val java_websocket: String =
-            "org.java-websocket:Java-WebSocket:" + Versions.java_websocket
-
-    /**
-     * [javax.servlet-api website](https://javaee.github.io/servlet-spec/) */
-    const val javax_servlet_api: String =
-            "javax.servlet:javax.servlet-api:" + Versions.javax_servlet_api
+     * [http2-server website](https://eclipse.org/jetty) */
+    const val http2_server: String = "org.eclipse.jetty.http2:http2-server:" + Versions.http2_server
 
     /**
      * [javax-websocket-server-impl website](http://www.eclipse.org/jetty) */
@@ -92,22 +139,48 @@ object Libs {
     /**
      * [jetty-alpn-conscrypt-server website](https://eclipse.org/jetty) */
     const val jetty_alpn_conscrypt_server: String =
-            "org.eclipse.jetty:jetty-alpn-conscrypt-server:" + Versions.jetty_alpn_conscrypt_server
+            "org.eclipse.jetty:jetty-alpn-conscrypt-server:" + Versions.org_eclipse_jetty
 
     /**
      * [jetty-client website](http://www.eclipse.org/jetty) */
-    const val jetty_client: String = "org.eclipse.jetty:jetty-client:" + Versions.jetty_client
+    const val jetty_client: String = "org.eclipse.jetty:jetty-client:" + Versions.org_eclipse_jetty
 
     /**
      * [jetty-server website](http://www.eclipse.org/jetty) */
-    const val jetty_server: String = "org.eclipse.jetty:jetty-server:" + Versions.jetty_server
+    const val jetty_server: String = "org.eclipse.jetty:jetty-server:" + Versions.org_eclipse_jetty
 
     /**
      * [jetty-servlet website](http://www.eclipse.org/jetty) */
-    const val jetty_servlet: String = "org.eclipse.jetty:jetty-servlet:" + Versions.jetty_servlet
+    const val jetty_servlet: String =
+            "org.eclipse.jetty:jetty-servlet:" + Versions.org_eclipse_jetty
 
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "jmfayard.github.io.gradle-kotlin-dsl-libs:jmfayard.github.io.gradle-kotlin-dsl-libs.gradle.plugin:" + Versions.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
+    /**
+     * [Java-WebSocket website](https://github.com/TooTallNate/Java-WebSocket) */
+    const val java_websocket: String =
+            "org.java-websocket:Java-WebSocket:" + Versions.java_websocket
+
+    const val dokka_gradle_plugin: String =
+            "org.jetbrains.dokka:dokka-gradle-plugin:" + Versions.dokka_gradle_plugin
+
+    /**
+     * [kotlin-gradle-plugin website](https://kotlinlang.org/) */
+    const val kotlin_gradle_plugin: String =
+            "org.jetbrains.kotlin:kotlin-gradle-plugin:" + Versions.org_jetbrains_kotlin
+
+    /**
+     * [kotlin-reflect website](https://kotlinlang.org/) */
+    const val kotlin_reflect: String =
+            "org.jetbrains.kotlin:kotlin-reflect:" + Versions.org_jetbrains_kotlin
+
+    /**
+     * [kotlin-scripting-compiler-embeddable website](https://kotlinlang.org/) */
+    const val kotlin_scripting_compiler_embeddable: String =
+            "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" + Versions.org_jetbrains_kotlin
+
+    /**
+     * [kotlin-stdlib-jdk8 website](https://kotlinlang.org/) */
+    const val kotlin_stdlib_jdk8: String =
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + Versions.org_jetbrains_kotlin
 
     /**
      * [json website](https://github.com/douglascrockford/JSON-java) */
@@ -120,87 +193,21 @@ object Libs {
     /**
      * [junit-jupiter-api website](http://junit.org/junit5/) */
     const val junit_jupiter_api: String =
-            "org.junit.jupiter:junit-jupiter-api:" + Versions.junit_jupiter_api
+            "org.junit.jupiter:junit-jupiter-api:" + Versions.org_junit_jupiter
 
     /**
      * [junit-jupiter-engine website](http://junit.org/junit5/) */
     const val junit_jupiter_engine: String =
-            "org.junit.jupiter:junit-jupiter-engine:" + Versions.junit_jupiter_engine
+            "org.junit.jupiter:junit-jupiter-engine:" + Versions.org_junit_jupiter
 
     /**
-     * [kotlin-gradle-plugin website](https://kotlinlang.org/) */
-    const val kotlin_gradle_plugin: String =
-            "org.jetbrains.kotlin:kotlin-gradle-plugin:" + Versions.kotlin_gradle_plugin
+     * [coveralls-gradle-plugin website](https://github.com/kt3k/coveralls-gradle-plugin) */
+    const val coveralls_gradle_plugin: String =
+            "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" + Versions.coveralls_gradle_plugin
 
     /**
-     * [kotlin-reflect website](https://kotlinlang.org/) */
-    const val kotlin_reflect: String =
-            "org.jetbrains.kotlin:kotlin-reflect:" + Versions.kotlin_reflect
-
-    /**
-     * [kotlin-scripting-compiler-embeddable website](https://kotlinlang.org/) */
-    const val kotlin_scripting_compiler_embeddable: String =
-            "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" + Versions.kotlin_scripting_compiler_embeddable
-
-    /**
-     * [kotlin-stdlib-jdk8 website](https://kotlinlang.org/) */
-    const val kotlin_stdlib_jdk8: String =
-            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:" + Versions.kotlin_stdlib_jdk8
-
-    /**
-     * [micrometer-core website](https://github.com/micrometer-metrics/micrometer) */
-    const val micrometer_core: String = "io.micrometer:micrometer-core:" + Versions.micrometer_core
-
-    /**
-     * [moshi website](https://github.com/square/moshi) */
-    const val moshi: String = "com.squareup.moshi:moshi:" + Versions.moshi
-
-    /**
-     * [moshi-kotlin website](https://github.com/square/moshi) */
-    const val moshi_kotlin: String = "com.squareup.moshi:moshi-kotlin:" + Versions.moshi_kotlin
-
-    const val nebula_provided_base_gradle_plugin: String =
-            "nebula.provided-base:nebula.provided-base.gradle.plugin:" + Versions.nebula_provided_base_gradle_plugin
-
-    const val net_saliman_cobertura_gradle_plugin: String =
-            "net.saliman.cobertura:net.saliman.cobertura.gradle.plugin:" + Versions.net_saliman_cobertura_gradle_plugin
-
-    /**
-     * [netty-codec-http2 website](http://netty.io/) */
-    const val netty_codec_http2: String = "io.netty:netty-codec-http2:" + Versions.netty_codec_http2
-
-    /**
-     * [okhttp website](https://github.com/square/okhttp) */
-    const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
-
-    /**
-     * [pebble website](http://pebbletemplates.io) */
-    const val pebble: String = "io.pebbletemplates:pebble:" + Versions.pebble
-
-    /**
-     * [rerunner-jupiter website](https://github.com/artsok/rerunner-jupiter) */
-    const val rerunner_jupiter: String =
-            "io.github.artsok:rerunner-jupiter:" + Versions.rerunner_jupiter
-
-    /**
-     * [resilience4j-bulkhead website](https://github.com/resilience4j/resilience4j) */
-    const val resilience4j_bulkhead: String =
-            "io.github.resilience4j:resilience4j-bulkhead:" + Versions.resilience4j_bulkhead
-
-    /**
-     * [resilience4j-circuitbreaker website](https://github.com/resilience4j/resilience4j) */
-    const val resilience4j_circuitbreaker: String =
-            "io.github.resilience4j:resilience4j-circuitbreaker:" + Versions.resilience4j_circuitbreaker
-
-    /**
-     * [resilience4j-ratelimiter website](https://github.com/resilience4j/resilience4j) */
-    const val resilience4j_ratelimiter: String =
-            "io.github.resilience4j:resilience4j-ratelimiter:" + Versions.resilience4j_ratelimiter
-
-    /**
-     * [resilience4j-retry website](https://github.com/resilience4j/resilience4j) */
-    const val resilience4j_retry: String =
-            "io.github.resilience4j:resilience4j-retry:" + Versions.resilience4j_retry
+     * [alpn-boot website](http://www.eclipse.org/jetty) */
+    const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:" + Versions.alpn_boot
 
     /**
      * [selenium-api website](http://www.seleniumhq.org/) */
@@ -209,12 +216,4 @@ object Libs {
     /**
      * [thymeleaf website](http://www.thymeleaf.org) */
     const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
-
-    /**
-     * [undertow-core website](http://www.jboss.org) */
-    const val undertow_core: String = "io.undertow:undertow-core:" + Versions.undertow_core
-
-    /**
-     * [undertow-servlet website](http://www.jboss.org) */
-    const val undertow_servlet: String = "io.undertow:undertow-servlet:" + Versions.undertow_servlet
 }

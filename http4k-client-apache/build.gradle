@@ -5,9 +5,10 @@ ext{
 }
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly project(":http4k-core")
+
     compile Libs.httpclient // apache
-    provided project(":http4k-core")
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
     testCompile Config.TestDependencies

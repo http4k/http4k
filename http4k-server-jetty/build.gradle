@@ -1,19 +1,18 @@
 description = 'Http4k HTTP Server built on top of jetty'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly project(":http4k-core")
 
     compile Libs.jetty_server
     compile Libs.jetty_servlet
     compile Libs.javax_websocket_server_impl
     compile Libs.javax_servlet_api
 
-    // this list is for reference ("provided") since http2 support is optional
-    provided Libs.http2_server
-    provided Libs.jetty_alpn_conscrypt_server
-    provided Libs.alpn_boot
-
-    provided project(":http4k-core")
+    // this list is for reference since http2 support is optional
+    compileOnly Libs.http2_server
+    compileOnly Libs.jetty_alpn_conscrypt_server
+    compileOnly Libs.alpn_boot
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

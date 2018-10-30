@@ -1,8 +1,9 @@
 description = 'sane HTTP request API for Kotlin'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided Libs.javax_servlet_api
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly Libs.javax_servlet_api
+
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")
     testCompile project(":http4k-client-websocket")

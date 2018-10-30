@@ -1,9 +1,9 @@
 description = 'Http4k XML support'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly project(":http4k-core")
 
-    provided project(":http4k-core")
     compile project(":http4k-format-gson")
     compile Libs.json
 

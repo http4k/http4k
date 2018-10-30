@@ -1,9 +1,9 @@
 description = 'Http4k HTTP Server built on top of Undertow'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly project(":http4k-core")
 
-    provided project(":http4k-core")
     compile Libs.undertow_core
     compile Libs.undertow_servlet
 

@@ -1,8 +1,8 @@
 description = 'Http4k JSON-RPC support'
 
 dependencies {
-    provided Libs.kotlin_stdlib_jdk8
-    provided project(":http4k-core")
+    compileOnly Libs.kotlin_stdlib_jdk8
+    compileOnly project(":http4k-core")
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
