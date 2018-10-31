@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.98.0 (uncut)
+- Change HttpHandler extending HttpClients to use `object invoke()` mechanism, as the individual clients have no visible API surface of their own. Introduced `DualSyncAsyncHttpHandler` interface.
+
 ### v3.97.0
 - Webdriver checkbox handling improved. H/T @gypsydave5
 - upgrade to various versions
