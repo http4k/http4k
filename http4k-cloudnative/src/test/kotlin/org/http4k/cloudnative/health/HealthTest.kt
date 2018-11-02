@@ -4,14 +4,17 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 
 class HealthTest {
-    private val health = Health()
+    private val health = Health(extraRoutes = *arrayOf("/other" bind GET to { Response(I_M_A_TEAPOT)}))
 
     @Test
     fun liveness() {
@@ -21,6 +24,11 @@ class HealthTest {
     @Test
     fun readiness() {
         assertThat(health(Request(GET, "/readiness")), hasStatus(OK).and(hasBody("success=true")))
+    }
+
+    @Test
+    fun `extra routes are callable`() {
+        assertThat(health(Request(GET, "/other")), hasStatus(I_M_A_TEAPOT))
     }
 
     @Test

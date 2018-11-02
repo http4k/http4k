@@ -3,18 +3,13 @@ package org.http4k.routing
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.Filter
-import org.http4k.core.Method
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.CREATED
 import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -264,7 +259,7 @@ class RoutingTest {
     @Test
     fun `can apply a filter to a RoutingHttpHandler`() {
         val routes = Filter { next -> { next(it.header("name", "value")) } }
-            .then({ Response(OK).body(it.header("name")!!) })
+            .then { Response(OK).body(it.header("name")!!) }
 
         val routingHttpHandler = routes(
             "/a/thing" bind GET to routes
@@ -292,5 +287,4 @@ class RoutingTest {
 
         assertThat(routes(Request(GET, "/a/thing")).bodyString(), equalTo("value"))
     }
-
 }

@@ -7,6 +7,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
@@ -16,9 +17,11 @@ import org.http4k.routing.routes
 object Health {
     operator fun invoke(
         renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer,
-        checks: List<ReadinessCheck> = emptyList()) = routes(
+        checks: List<ReadinessCheck> = emptyList(),
+        vararg extraRoutes: RoutingHttpHandler) = routes(
         "/liveness" bind GET to Liveness,
-        "/readiness" bind GET to Readiness(checks, renderer)
+        "/readiness" bind GET to Readiness(checks, renderer),
+        *extraRoutes
     )
 }
 
