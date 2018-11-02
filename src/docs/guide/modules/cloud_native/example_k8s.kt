@@ -1,5 +1,7 @@
 package guide.modules.cloud_native
 
+import guide.modules.cloud_native.ProxyApp.Settings.dbRole
+import guide.modules.cloud_native.ProxyApp.Settings.otherServiceUri
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.Http4kK8sServer
 import org.http4k.cloudnative.asK8sServer
@@ -17,11 +19,10 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import kotlin.random.Random
 
-
 // this is a database client that we are going to health check
-class RandomlyFailingDatabase {
+class RandomlyFailingDatabase(private val user: String) {
     fun insertARecord() {
-        if (Random(1).nextBoolean()) throw Exception("oh no!")
+        if (Random(1).nextBoolean()) throw Exception("oh no! $user has no access")
     }
 }
 
@@ -35,15 +36,19 @@ class DatabaseCheck(private val db: RandomlyFailingDatabase) : ReadinessCheck {
 }
 
 object ProxyApp {
-    operator fun invoke(env: Environment): Http4kK8sServer {
-        val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
 
+    object Settings {
+        val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
+        val dbRole = EnvironmentKey.required("database.user.role")
+    }
+
+    operator fun invoke(env: Environment): Http4kK8sServer {
         val proxyApp = ClientFilters.SetHostFrom(otherServiceUri(env))
             .then(rewriteUriToLocalhostAsWeDoNotHaveDns)
             .then(JavaHttpClient())
 
         return proxyApp.asK8sServer(::SunHttp, env, Health(checks = listOf(
-            DatabaseCheck(RandomlyFailingDatabase()))
+            DatabaseCheck(RandomlyFailingDatabase(dbRole(env))))
         ))
     }
 
@@ -67,7 +72,7 @@ private fun performHealthChecks() {
 }
 
 /** file app.properties contains
-user.role=admin
+database.user.role=admin
  */
 
 fun main(args: Array<String>) {
@@ -77,10 +82,8 @@ fun main(args: Array<String>) {
         EnvironmentKey.k8s.serviceUriFor("otherservice") of Uri.of("https://localhost:8000")
     )
 
-    val message = Environment.fromResource("app.properties")
-
     // standard chaining order for properties is local file -> JVM -> Environment -> defaults -> boom!
-    val k8sPodEnv = Environment.JVM_PROPERTIES overrides Environment.ENV overrides defaultConfig
+    val k8sPodEnv = Environment.fromResource("app.properties") overrides Environment.JVM_PROPERTIES overrides Environment.ENV overrides defaultConfig
 
     val upstream = { _: Request -> Response(Status.OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
 
