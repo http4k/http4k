@@ -54,7 +54,7 @@ object ResponseFilters {
     }
 
     /**
-     * Basic UnGZipping of Response. Does not currently support GZipping streams
+     * Basic GZipping of Response. Does not currently support GZipping streams
      */
     object GZip {
         operator fun invoke() = Filter { next ->
