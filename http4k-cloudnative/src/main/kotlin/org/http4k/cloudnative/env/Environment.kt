@@ -29,8 +29,8 @@ data class Environment private constructor(private val env: Map<String, String>)
 
         val EMPTY = from()
 
-        fun fromFile(file: File) = file.reader().toProperties()
         fun fromResource(resource: String) = Environment.Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader().toProperties()
+        fun from(file: File) = file.reader().toProperties()
         fun from(vararg pairs: Pair<String, String>) = Environment(pairs.toMap())
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
         private fun Reader.toProperties() = Properties().apply { load(this@toProperties) }.toEnvironment()

@@ -18,7 +18,7 @@ class EnvironmentTest {
     @Test
     fun `load from file`() {
         val file = File("src/test/resources/local.properties")
-        val finalEnv = Environment.fromFile(file) overrides Environment.from("FOO" to "bill")
+        val finalEnv = Environment.from(file) overrides Environment.from("FOO" to "bill")
 
         assertThat(finalEnv["first"], equalTo("bob"))
     }
