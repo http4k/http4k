@@ -20,12 +20,10 @@ data class Environment private constructor(private val env: Map<String, String>)
         val JVM_PROPERTIES = System.getProperties().toEnvironment()
         val SYSTEM = JVM_PROPERTIES overrides ENV
 
-        private fun Properties.toEnvironment(): Environment {
-            return Environment(entries
-                .fold(emptyMap()) { acc, (k, v) ->
-                    acc.plus(k.toString() to v.toString())
-                })
-        }
+        private fun Properties.toEnvironment() = Environment(entries
+            .fold(emptyMap()) { acc, (k, v) ->
+                acc.plus(k.toString() to v.toString())
+            })
 
         val EMPTY = from()
 
