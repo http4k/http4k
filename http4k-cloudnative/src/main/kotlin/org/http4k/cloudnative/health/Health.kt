@@ -16,9 +16,10 @@ import org.http4k.routing.routes
  */
 object Health {
     operator fun invoke(
-        renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer,
+        vararg extraRoutes: RoutingHttpHandler,
         checks: List<ReadinessCheck> = emptyList(),
-        vararg extraRoutes: RoutingHttpHandler) = routes(
+        renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer
+    ) = routes(
         "/liveness" bind GET to Liveness,
         "/readiness" bind GET to Readiness(checks, renderer),
         *extraRoutes
@@ -28,7 +29,7 @@ object Health {
 /**
  * The Liveness check is used to determine if an app is alive.
  */
-object Liveness : HttpHandler by { Response(OK)  }
+object Liveness : HttpHandler by { Response(OK) }
 
 /**
  * The Readiness check is used to determine if an app is prepared to receive live traffic.
