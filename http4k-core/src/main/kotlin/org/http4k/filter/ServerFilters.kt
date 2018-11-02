@@ -218,6 +218,19 @@ object ServerFilters {
     }
 
     /**
+     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list. Does not currently support GZipping streams.
+     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
+     */
+    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>): Filter {
+        override fun invoke(next: HttpHandler): HttpHandler {
+            return RequestFilters.GunZip()
+                    .then(ResponseFilters.GZipContentTypes(compressibleContentTypes))
+                    .invoke(next)
+        }
+    }
+
+    /**
      * Initialise a RequestContext for each request which passes through the Filter stack,
      */
     object InitialiseRequestContext {
