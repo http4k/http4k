@@ -7,26 +7,19 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Body
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
-import org.http4k.core.Filter
-import org.http4k.core.Headers
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.RequestContext
-import org.http4k.core.RequestContexts
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
-import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
@@ -176,6 +169,38 @@ class ServerFiltersTest {
     @Test
     fun `passes through non-gzipped request`() {
         val handler = ServerFilters.GZip().then {
+            it shouldMatch hasBody("hello")
+            Response(OK).body("hello")
+        }
+
+        handler(Request(GET, "/").body("hello"))
+    }
+
+    @Test
+    fun `gunzip request and gzip response with matching content type`() {
+        val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
+            it shouldMatch hasBody(equalTo("hello"))
+            Response(OK).header("content-type", "text/plain").body(it.body)
+        }
+
+        handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
+                hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
+    }
+
+    @Test
+    fun `gunzip request and do not gzip response with unmatched content type`() {
+        val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then {
+            it shouldMatch hasBody(equalTo("hello"))
+            Response(OK).header("content-type", "text/plain").body(it.body)
+        }
+
+        handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
+                !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello"))))
+    }
+
+    @Test
+    fun `passes through non-gzipped request despite content type`() {
+        val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
             it shouldMatch hasBody("hello")
             Response(OK).body("hello")
         }
