@@ -41,12 +41,13 @@ class EnvironmentTest {
 
     @Test
     fun `convert keys`() {
-        infix fun String.shouldConvertTo(expected: String) = assertThat(convertToKey(), equalTo(expected))
+        infix fun String.shouldConvertTo(expected: String) = assertThat(this, convertFromKey(), equalTo(expected))
 
         "" shouldConvertTo ""
-        "first" shouldConvertTo "FIRST"
-        "firstName" shouldConvertTo "FIRST_NAME"
-        "first-name" shouldConvertTo "FIRST_NAME"
-        "first.name" shouldConvertTo "FIRST_NAME"
+        "first" shouldConvertTo "first"
+        "FIRST" shouldConvertTo "first"
+        "firstName" shouldConvertTo "firstname"
+        "FIRST-NAME" shouldConvertTo "first-name"
+        "FIRST.NAME" shouldConvertTo "first-name"
     }
 }

@@ -66,14 +66,18 @@ private fun performHealthChecks() {
     client(Request(Method.GET, "http://localhost:8000"))
 }
 
+/** file app.properties contains
+user.role=admin
+ */
 
 fun main(args: Array<String>) {
-
     val defaultConfig = Environment.defaults(
         EnvironmentKey.k8s.SERVICE_PORT of 8000,
         EnvironmentKey.k8s.HEALTH_PORT of 8001,
         EnvironmentKey.k8s.serviceUriFor("otherservice") of Uri.of("https://localhost:8000")
     )
+
+    val message = Environment.fromResource("app.properties")
 
     // standard chaining order for properties is local file -> JVM -> Environment -> defaults -> boom!
     val k8sPodEnv = Environment.JVM_PROPERTIES overrides Environment.ENV overrides defaultConfig
