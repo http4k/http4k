@@ -8,17 +8,33 @@ import org.http4k.cloudnative.env.EnvironmentKey
 import org.http4k.cloudnative.health.Completed
 import org.http4k.cloudnative.health.Health
 import org.http4k.cloudnative.health.ReadinessCheck
+import org.http4k.cloudnative.health.ReadinessCheckResult
 import org.http4k.core.*
-import org.http4k.core.Method.GET
-import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.lens.Lens
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import kotlin.random.Random
+
+
+// this is a database client that we are going to health check
+class RandomlyFailingDatabase {
+    fun insertARecord() {
+        if (Random(1).nextBoolean()) throw Exception("oh no!")
+    }
+}
+
+// implements the check which will determine if this service is ready to go
+class DatabaseCheck(private val db: RandomlyFailingDatabase) : ReadinessCheck {
+    override val name = "database"
+    override fun invoke(): ReadinessCheckResult {
+        db.insertARecord()
+        return Completed(name)
+    }
+}
 
 object ProxyApp {
-
     operator fun invoke(env: Environment): Http4kK8sServer {
         val otherServiceUri: Lens<Environment, Uri> = EnvironmentKey.k8s.serviceUriFor("otherservice")
 
@@ -26,12 +42,9 @@ object ProxyApp {
             .then(rewriteUriToLocalhostAsWeDoNotHaveDns)
             .then(JavaHttpClient())
 
-        val customReadinessCheck = object : ReadinessCheck {
-            override fun invoke() = Completed(name)
-
-            override val name = "database"
-        }
-        return proxyApp.asK8sServer(::SunHttp, env, Health(checks = listOf(customReadinessCheck)))
+        return proxyApp.asK8sServer(::SunHttp, env, Health(checks = listOf(
+            DatabaseCheck(RandomlyFailingDatabase()))
+        ))
     }
 
     private val rewriteUriToLocalhostAsWeDoNotHaveDns = Filter { next ->
@@ -42,31 +55,36 @@ object ProxyApp {
     }
 }
 
-val enviromnentToUseInReality = Environment.JVM_PROPERTIES overrides Environment.ENV
+private fun performHealthChecks() {
+    val client = DebuggingFilters.PrintResponse().then(JavaHttpClient())
 
-val environmentSetByK8s = Environment.from(
-    "SERVICE_PORT" to "8000",
-    "HEALTH_PORT" to "8001",
-    "OTHERSERVICE_SERVICE_PORT" to "9000"
-)
+    // health checks
+    client(Request(Method.GET, "http://localhost:8001/liveness"))
+    client(Request(Method.GET, "http://localhost:8001/readiness"))
+
+    // proxied call
+    client(Request(Method.GET, "http://localhost:8000"))
+}
+
 
 fun main(args: Array<String>) {
 
-    // start the other service
-    { _: Request -> Response(OK).body("HELLO!") }.asServer(SunHttp(9000)).start().use {
+    val defaultConfig = Environment.defaults(
+        EnvironmentKey.k8s.SERVICE_PORT of 8000,
+        EnvironmentKey.k8s.HEALTH_PORT of 8001,
+        EnvironmentKey.k8s.serviceUriFor("otherservice") of Uri.of("https://localhost:8000")
+    )
 
-        // start our service with the environment set by K8S
-        ProxyApp(environmentSetByK8s).start().use {
-            val client = DebuggingFilters.PrintResponse().then(JavaHttpClient())
+    // standard chaining order for properties is local file -> JVM -> Environment -> defaults -> boom!
+    val k8sPodEnv = Environment.JVM_PROPERTIES overrides Environment.ENV overrides defaultConfig
 
-            // health checks
-            client(Request(GET, "http://localhost:8001/liveness"))
-            client(Request(GET, "http://localhost:8001/readiness"))
+    val upstream = { _: Request -> Response(Status.OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
 
-            // proxied call
-            client(Request(GET, "http://localhost:8000"))
-        }
-    }
+    val server = ProxyApp(k8sPodEnv).start()
 
+    performHealthChecks()
 
+    server.stop()
+    upstream.stop()
 }
+
