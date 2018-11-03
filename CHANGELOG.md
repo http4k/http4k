@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.99.0 
+- Enhancement of `http4k-cloudnative` - now supports extra-health check routes, and provide way to load app configuration via Properties files.
+
 ### v3.98.0 
 - Add filter allowing Gzipping based on an allowed set of content types. H/T @jshiell
 - Change HttpHandler extending HttpClients to use `object invoke()` mechanism, as the individual clients have no visible API surface of their own. Introduced `DualSyncAsyncHttpHandler` interface.
