@@ -5,12 +5,15 @@ import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.format.Json
 
 /**
- * Renders the results of a readiness check into
+ * Renders the results of a readiness check
  */
 interface ReadinessCheckResultRenderer : (ReadinessCheckResult) -> String {
     val contentType: ContentType
 }
 
+/**
+ * Basic reporting of ReadinessCheckResults
+ */
 object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
     override fun invoke(p1: ReadinessCheckResult) = (listOf(p1) + p1).joinToString("\n") {
         val base = it.name + "=" + it.pass
@@ -23,6 +26,9 @@ object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
     override val contentType = TEXT_PLAIN
 }
 
+/**
+ * Reporting of ReadinessCheckResults in a JSON tree
+ */
 object JsonReadinessCheckResultRenderer {
     operator fun <NODE> invoke(json: Json<NODE>): (ReadinessCheckResult) -> String {
         fun render(result: ReadinessCheckResult) = json {

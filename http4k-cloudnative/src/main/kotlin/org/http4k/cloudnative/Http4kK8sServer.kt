@@ -12,6 +12,7 @@ import org.http4k.server.asServer
 
 /**
  * A K8S server consists of a main application and a health application, running on 2 different ports.
+ * This class provides unified start/stop control.
  */
 class Http4kK8sServer(private val main: Http4kServer, private val health: Http4kServer) : Http4kServer {
     override fun port() = main.port()

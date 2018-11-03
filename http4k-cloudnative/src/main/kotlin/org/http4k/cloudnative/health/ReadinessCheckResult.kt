@@ -16,20 +16,14 @@ sealed class ReadinessCheckResult(val pass: Boolean = true) : Iterable<Readiness
     override fun iterator() = emptyList<ReadinessCheckResult>().iterator()
 }
 
-/**
- * The check completed successfully
- */
 data class Completed(override val name: String) : ReadinessCheckResult(true)
 
-/**
- * The check failed
- */
 data class Failed(override val name: String, val cause: Exception) : ReadinessCheckResult(false) {
     constructor(name: String, message: String) : this(name, Exception(message))
 }
 
 /**
- * Result of multiple checks which calculates the overall result
+ * Result of multiple checks, for which it reports an overall result (ie. any failure is fatal).
  */
 data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult(parts.fold(true) { acc, next -> acc && next.pass }) {
     override val name = "overall"

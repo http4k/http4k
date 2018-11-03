@@ -12,7 +12,9 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 /**
- * Represents the set of operational endpoints to ensure that a particular pod is working ok.
+ * Represents the set of operational endpoints to ensure that a particular app is working ok.
+ * By default provides Readiness and Liveness endpoints, but extra routes can be passed, as
+ * can a different renderer implementation for the ReadinessCheck results.
  */
 object Health {
     operator fun invoke(

@@ -12,9 +12,12 @@ import java.util.*
 data class Environment private constructor(private val env: Map<String, String>) {
     internal operator fun <T> get(key: Lens<Environment, T>) = key(this)
     internal operator fun get(key: String): String? = env[key] ?: env[key.convertFromKey()]
-
     internal operator fun set(key: String, value: String) = Environment(env + (key.convertFromKey() to value))
 
+    /**
+     * Overlays the configuration set in this Environment on top of the values in the passed Environment.
+     * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
+     */
     infix fun overrides(that: Environment) = Environment(that.env + env)
 
     companion object {
@@ -30,12 +33,24 @@ data class Environment private constructor(private val env: Map<String, String>)
          */
         val JVM_PROPERTIES = System.getProperties().toEnvironment()
 
+        /**
+         * Load configuration from standard Properties file format on classpath
+         */
         fun fromResource(resource: String) =
             Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader().toProperties()
 
+        /**
+         * Load configuration from standard Properties file format on disk
+         */
         fun from(file: File) = file.reader().toProperties()
+
         fun from(vararg pairs: Pair<String, String>) = Environment(pairs.toMap())
+
+        /**
+         * Setup default configuration mappings using EnvironmentKey lens bindings
+         */
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
+
         private fun Reader.toProperties() = Properties().apply { load(this@toProperties) }.toEnvironment()
 
         private fun Properties.toEnvironment() = Environment(entries
