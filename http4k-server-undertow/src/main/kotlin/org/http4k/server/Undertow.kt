@@ -40,7 +40,9 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
     }
 }
 
-data class Undertow(val port: Int = 8000, val enableHttp2: Boolean = false) : ServerConfig {
+data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : ServerConfig {
+    constructor(port: Int = 8000) : this(port, false)
+
     override fun toServer(httpHandler: HttpHandler): Http4kServer =
         object : Http4kServer {
             val server = Undertow.builder()
@@ -52,6 +54,6 @@ data class Undertow(val port: Int = 8000, val enableHttp2: Boolean = false) : Se
 
             override fun stop() = apply { server.stop() }
 
-            override fun port(): Int = if(port > 0) port else (server.listenerInfo[0].address as InetSocketAddress).port
+            override fun port(): Int = if (port > 0) port else (server.listenerInfo[0].address as InetSocketAddress).port
         }
 }
