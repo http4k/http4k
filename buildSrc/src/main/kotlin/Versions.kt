@@ -7,7 +7,7 @@
 object Versions {
     const val jackson_module_kotlin: String = "2.9.7"
 
-    const val handlebars: String = "4.1.1"
+    const val handlebars: String = "4.1.2"
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.2"
 
@@ -27,7 +27,7 @@ object Versions {
 
     const val micrometer_core: String = "1.1.0"
 
-    const val netty_codec_http2: String = "4.1.30.Final"
+    const val netty_codec_http2: String = "4.1.31.Final"
 
     const val pebble: String = "3.0.5"
 
@@ -35,8 +35,9 @@ object Versions {
 
     const val javax_servlet_api: String = "4.0.1"
 
-    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String =
-            "0.2.6" // exceed the version found: 0.2.5
+    const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
+
+    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "4.0.1"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.5.4"
 
@@ -76,7 +77,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val selenium_api: String = "3.14.0"
+    const val selenium_api: String = "3.41.0"
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
@@ -90,8 +91,8 @@ object Versions {
 
         const val currentVersion: String = "4.10.2"
 
-        const val nightlyVersion: String = "5.1-20181030000041+0000"
+        const val nightlyVersion: String = "5.1-20181105000100+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.0-rc-1"
     }
 }
