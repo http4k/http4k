@@ -3,6 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.100.0 
+- Make `Undertow` API more friendly
 - Fix to JsonReadinessCheckResultRenderer to actually implement the correct interface
 
 ### v3.99.0 
