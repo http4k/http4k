@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.100.0 
+- Fix to JsonReadinessCheckResultRenderer to actually implement the correct interface
+
 ### v3.99.0 
 - Enhancement of `http4k-cloudnative` - now supports extra-health check routes, and provide way to load app configuration via Properties files.
 

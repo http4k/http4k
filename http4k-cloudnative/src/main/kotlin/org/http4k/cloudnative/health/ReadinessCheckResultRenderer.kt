@@ -1,6 +1,7 @@
 package org.http4k.cloudnative.health
 
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.format.Json
 
@@ -30,7 +31,7 @@ object DefaultReadinessCheckResultRenderer : ReadinessCheckResultRenderer {
  * Reporting of ReadinessCheckResults in a JSON tree
  */
 object JsonReadinessCheckResultRenderer {
-    operator fun <NODE> invoke(json: Json<NODE>): (ReadinessCheckResult) -> String {
+    operator fun <NODE> invoke(json: Json<NODE>): ReadinessCheckResultRenderer {
         fun render(result: ReadinessCheckResult) = json {
             val core = listOf(
                 "name" to string(result.name),
@@ -41,12 +42,14 @@ object JsonReadinessCheckResultRenderer {
                 else -> core
             }
         }
-        return {
-            json {
-                val children = it.map(::render).map { obj(it) }
-                val root = render(it)
+        return object : ReadinessCheckResultRenderer {
+            override fun invoke(p1: ReadinessCheckResult): String = json {
+                val children = p1.map(::render).map { obj(it) }
+                val root = render(p1)
                 pretty(obj(if (children.isEmpty()) root else root + ("children" to array(children))))
             }
+
+            override val contentType = APPLICATION_JSON
         }
     }
 }
