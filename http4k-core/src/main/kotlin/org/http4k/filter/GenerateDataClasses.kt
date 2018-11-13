@@ -7,7 +7,7 @@ import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
 import org.http4k.format.JsonType.Object
 import java.io.PrintStream
-import java.util.Random
+import kotlin.random.Random
 
 
 /**
@@ -17,7 +17,7 @@ import java.util.Random
  */
 class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
                                     private val out: PrintStream = System.out,
-                                    private val idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
+                                    private val idGenerator: () -> Int = { Math.abs(Random.nextInt()) }) : Filter {
 
     private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
 
