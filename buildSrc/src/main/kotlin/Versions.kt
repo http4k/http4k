@@ -17,7 +17,7 @@ object Versions {
 
     const val hamkrest: String = "1.6.0.0"
 
-    const val com_squareup_moshi: String = "1.7.0"
+    const val com_squareup_moshi: String = "1.8.0"
 
     const val okhttp: String = "3.11.0"
 
@@ -29,7 +29,7 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.31.Final"
 
-    const val pebble: String = "3.0.5"
+    const val pebble: String = "3.0.5" //available: "3.0.6"
 
     const val io_undertow: String = "2.0.15.Final"
 
@@ -55,17 +55,18 @@ object Versions {
 
     const val httpcore: String = "4.4.10"
 
-    const val http2_server: String = "9.4.12.v20180830"
+    const val http2_server: String = "9.4.14.v20181114"
 
-    const val javax_websocket_server_impl: String = "9.4.12.v20180830"
+    const val javax_websocket_server_impl: String =
+            "9.4.14.v20181114"
 
-    const val org_eclipse_jetty: String = "9.4.12.v20180830"
+    const val org_eclipse_jetty: String = "9.4.14.v20181114"
 
     const val java_websocket: String = "1.3.9"
 
     const val dokka_gradle_plugin: String = "0.9.17"
 
-    const val org_jetbrains_kotlin: String = "1.3.0"
+    const val org_jetbrains_kotlin: String = "1.3.10"
 
     const val json: String = "20180813"
 
@@ -77,7 +78,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val selenium_api: String = "3.14.0"
+    const val selenium_api: String = "3.141.59"
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
@@ -91,8 +92,8 @@ object Versions {
 
         const val currentVersion: String = "4.10.2"
 
-        const val nightlyVersion: String = "5.1-20181105000100+0000"
+        const val nightlyVersion: String = "5.1-20181116000014+0000"
 
-        const val releaseCandidate: String = "5.0-rc-1"
+        const val releaseCandidate: String = "5.0-rc-3"
     }
 }
