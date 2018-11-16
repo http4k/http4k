@@ -4,6 +4,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -76,7 +77,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
      * Make a concrete Lens for this spec that falls back to the default value if no value is found in the target.
      */
     open fun defaulted(name: String, default: OUT, description: String? = null): Lens<IN, OUT> =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+        defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
     /**
      * Make a concrete Lens for this spec that falls back to another lens if no value is found in the target.
@@ -105,7 +106,7 @@ open class LensSpec<IN, OUT>(protected val location: String,
 
     open val multi = object : MultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): Lens<IN, List<OUT>> =
-                defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): Lens<IN, List<OUT>> {
             val getLens = get(name)
@@ -154,14 +155,14 @@ open class BiDiLensSpec<IN, OUT>(location: String,
     internal fun <NEXT> mapWithNewMeta(nextIn: (OUT) -> NEXT, nextOut: (NEXT) -> OUT, paramMeta: ParamMeta) = BiDiLensSpec(location, paramMeta, get.map(nextIn), set.map(nextOut))
 
     override fun defaulted(name: String, default: OUT, description: String?) =
-            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
+        defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default }, description)
 
     override fun defaulted(name: String, default: Lens<IN, OUT>, description: String?): BiDiLens<IN, OUT> {
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(false, location, paramMeta, name, description),
-                { getLens(it).run { if (isEmpty()) default(it) else first() } },
-                { out: OUT, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
+            { getLens(it).run { if (isEmpty()) default(it) else first() } },
+            { out: OUT, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
 
@@ -169,8 +170,8 @@ open class BiDiLensSpec<IN, OUT>(location: String,
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(false, location, paramMeta, name, description),
-                { getLens(it).run { if (isEmpty()) null else first() } },
-                { out: OUT?, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
+            { getLens(it).run { if (isEmpty()) null else first() } },
+            { out: OUT?, target: IN -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
 
@@ -178,23 +179,23 @@ open class BiDiLensSpec<IN, OUT>(location: String,
         val getLens = get(name)
         val setLens = set(name)
         return BiDiLens(Meta(true, location, paramMeta, name, description),
-                {
-                    getLens(it).firstOrNull()
-                            ?: throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)))
-                },
-                { out: OUT, target: IN -> setLens(listOf(out), target) })
+            {
+                getLens(it).firstOrNull()
+                    ?: throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)))
+            },
+            { out: OUT, target: IN -> setLens(listOf(out), target) })
     }
 
     override val multi = object : BiDiMultiLensSpec<IN, OUT> {
         override fun defaulted(name: String, default: List<OUT>, description: String?): BiDiLens<IN, List<OUT>> =
-                defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
+            defaulted(name, Lens(Meta(false, location, paramMeta, name, description)) { default })
 
         override fun defaulted(name: String, default: Lens<IN, List<OUT>>, description: String?): BiDiLens<IN, List<OUT>> {
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, paramMeta, name, description),
-                    { getLens(it).run { if (isEmpty()) default(it) else this } },
-                    { out: List<OUT>, target: IN -> setLens(out, target) }
+                { getLens(it).run { if (isEmpty()) default(it) else this } },
+                { out: List<OUT>, target: IN -> setLens(out, target) }
             )
         }
 
@@ -202,8 +203,8 @@ open class BiDiLensSpec<IN, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(false, location, paramMeta, name, description),
-                    { getLens(it).run { if (isEmpty()) null else this } },
-                    { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
+                { getLens(it).run { if (isEmpty()) null else this } },
+                { out: List<OUT>?, target: IN -> setLens(out ?: emptyList(), target) }
             )
         }
 
@@ -211,8 +212,8 @@ open class BiDiLensSpec<IN, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(true, location, paramMeta, name, description),
-                    { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else this } },
-                    { out: List<OUT>, target: IN -> setLens(out, target) })
+                { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else this } },
+                { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }
 }
@@ -225,22 +226,23 @@ fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(String::toDouble, Do
 fun <IN> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
 fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
 fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
+fun <IN> BiDiLensSpec<IN, String>.duration() = map({ Duration.parse(it) }, { it.toString() })
 fun <IN> BiDiLensSpec<IN, String>.instant() = map(Instant::parse, ISO_INSTANT::format)
 fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> =
-        pattern.toRegex().run {
-            map { matchEntire(it)?.groupValues?.get(group)!! }
-        }
+    pattern.toRegex().run {
+        map { matchEntire(it)?.groupValues?.get(group)!! }
+    }
 
 fun <IN> BiDiLensSpec<IN, String>.uri() = map(Uri.Companion::of, Uri::toString)
 
 internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
 
 internal fun safeBooleanFrom(value: String): Boolean =
-        when {
-            value.toUpperCase() == "TRUE" -> true
-            value.toUpperCase() == "FALSE" -> false
-            else -> throw kotlin.IllegalArgumentException("illegal boolean")
-        }
+    when {
+        value.toUpperCase() == "TRUE" -> true
+        value.toUpperCase() == "FALSE" -> false
+        else -> throw kotlin.IllegalArgumentException("illegal boolean")
+    }

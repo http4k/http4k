@@ -6,6 +6,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 - upgrades to dependencies
 - Fix: Javadoc JARs were being generated as empty JARs
 - Improved Client-side HTTP status descriptions
+- Lenses now support Durations out of the box
+- Environments now support multi-value keys (comma separated)
 
 ### v3.100.0 
 - Make `Undertow` API more friendly

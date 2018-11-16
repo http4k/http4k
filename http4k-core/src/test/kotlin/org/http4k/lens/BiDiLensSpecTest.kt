@@ -6,6 +6,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -71,4 +72,7 @@ class BiDiLensSpecTest {
 
     @Test
     fun `zoned datetime`() = checkContract(spec.zonedDateTime(), ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")), "1970-01-01T00:00:00Z[UTC]", "", "123", "o", "o1970-01-01T00:00:00Z[UTC]", "o1970-01-01T00:00:00Z[UTC]1970-01-01T00:00:00Z[UTC]")
+
+    @Test
+    fun duration() = checkContract(spec.duration(), Duration.ofSeconds(35), "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
 }

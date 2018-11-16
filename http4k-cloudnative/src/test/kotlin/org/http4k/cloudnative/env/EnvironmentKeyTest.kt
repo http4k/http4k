@@ -25,7 +25,22 @@ class EnvironmentKeyTest {
 
         val withInjectedValue = env.with(lens of 80)
         assertThat(lens(withInjectedValue), equalTo(80))
+
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80"))
+
         assertThat(EnvironmentKey.int().required("SOME_VALUE")(withInjectedValue), equalTo(80))
+    }
+
+    @Test
+    fun `custom multi key roundtrip`() {
+        val lens = EnvironmentKey.int().multi.required("some-value")
+        assertThrows<LensFailure> { lens(env) }
+
+        val withInjectedValue = env.with(lens of listOf(80, 81))
+
+        assertThat(withInjectedValue["SOME_VALUE"], equalTo("80,81"))
+
+        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
     }
 
     @Test
