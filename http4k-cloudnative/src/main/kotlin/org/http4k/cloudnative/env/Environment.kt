@@ -19,7 +19,7 @@ import java.util.Properties
  * otherwise a standard comma is used - this means you MUST override the separator if you have single values which contain commas, otherwise
  * singular environment keys will just retrieve the first value.
  */
-data class Environment private constructor(private val contents: Map<String, String>, val separator: String = ",") {
+class Environment private constructor(private val contents: Map<String, String>, val separator: String = ",") {
     internal operator fun <T> get(key: Lens<Environment, T>) = key(this)
     internal operator fun get(key: String): String? = contents[key] ?: contents[key.convertFromKey()]
     internal operator fun set(key: String, value: String) = Environment(contents + (key.convertFromKey() to value))
