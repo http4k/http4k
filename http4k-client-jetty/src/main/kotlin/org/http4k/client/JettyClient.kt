@@ -7,7 +7,11 @@ import org.eclipse.jetty.client.util.InputStreamContentProvider
 import org.eclipse.jetty.client.util.InputStreamResponseListener
 import org.eclipse.jetty.http.HttpFields
 import org.eclipse.jetty.util.HttpCookieStore
-import org.http4k.core.*
+import org.http4k.core.BodyMode
+import org.http4k.core.Headers
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
@@ -43,12 +47,12 @@ object JettyClient {
                     }
                 } catch (e: ExecutionException) {
                     when (e.cause) {
-                        is UnknownHostException -> Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
-                        is ConnectException -> Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
+                        is UnknownHostException -> Response(UNKNOWN_HOST.toClientStatus(e))
+                        is ConnectException -> Response(CONNECTION_REFUSED.toClientStatus(e))
                         else -> throw e
                     }
                 } catch (e: TimeoutException) {
-                    Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
+                    Response(CLIENT_TIMEOUT.toClientStatus(e))
                 }
             }
 

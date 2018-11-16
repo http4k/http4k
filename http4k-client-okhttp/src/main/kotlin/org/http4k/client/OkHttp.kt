@@ -25,11 +25,11 @@ object OkHttp {
                 try {
                     client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
                 } catch (e: ConnectException) {
-                    Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
+                    Response(CONNECTION_REFUSED.toClientStatus(e))
                 } catch (e: UnknownHostException) {
-                    Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
+                    Response(UNKNOWN_HOST.toClientStatus(e))
                 } catch (e: SocketTimeoutException) {
-                    Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
+                    Response(CLIENT_TIMEOUT.toClientStatus(e))
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =
@@ -42,7 +42,7 @@ object OkHttp {
             else -> SERVICE_UNAVAILABLE
         }.description("Client Error: caused by ${e.localizedMessage}")))
 
-        override fun onResponse(call: Call?, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
+        override fun onResponse(call: Call, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
     }
 
     private fun defaultOkHttpClient() = OkHttpClient.Builder()

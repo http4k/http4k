@@ -1,6 +1,10 @@
 package org.http4k.client
 
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.net.ConnectException
@@ -36,9 +40,9 @@ object JavaHttpClient {
                 .flatten()
                 .fold(baseResponse) { acc, next -> acc.header(next.first, next.second) }
         } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
+            Response(UNKNOWN_HOST.toClientStatus(e))
         } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
+            Response(CONNECTION_REFUSED.toClientStatus(e))
         }
     }
 

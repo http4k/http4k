@@ -13,9 +13,13 @@ import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient
 import org.apache.http.impl.nio.client.HttpAsyncClients
-import org.http4k.core.*
+import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
+import org.http4k.core.Headers
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import java.net.SocketTimeoutException
@@ -42,7 +46,7 @@ object ApacheAsyncClient {
                         is ConnectTimeoutException -> CLIENT_TIMEOUT
                         is SocketTimeoutException -> CLIENT_TIMEOUT
                         else -> SERVICE_UNAVAILABLE
-                    }.description("Client Error: caused by ${e.localizedMessage}")))
+                    }.toClientStatus(e)))
                 })
             }
 
