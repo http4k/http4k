@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.101.0 
 - upgrades to dependencies
+- Fix: Javadoc JARs were being generated as empty JARs
 
 ### v3.100.0 
 - Make `Undertow` API more friendly
