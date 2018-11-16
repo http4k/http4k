@@ -62,15 +62,19 @@ allprojects {
         from sourceSets.main.allSource
     }
 
-    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
-        outputDirectory = javadoc.destinationDir
-        outputFormat = "javadoc"
-        processConfigurations = []
-    }
+//    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
+//        outputDirectory = javadoc.destinationDir
+//        outputFormat = "javadoc"
+//        processConfigurations = []
+//    }
+//    task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+//        classifier = 'javadoc'
+//        from dokkaJavadoc.outputDirectory
+//    }
 
-    task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier = 'javadoc'
-        from dokkaJavadoc.outputDirectory
+        from javadoc.destinationDir
     }
 
     task testJar(type: Jar) {
