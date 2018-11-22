@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.102.0
+- Introduce interface for Environment
+
 ### v3.101.0 
 - upgrades to dependencies
 - Improved Client-side HTTP status descriptions
