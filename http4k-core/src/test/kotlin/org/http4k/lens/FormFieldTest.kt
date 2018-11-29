@@ -68,9 +68,9 @@ class FormFieldTest {
 
     @Test
     fun `toString is ok`() {
-        assertThat(FormField.required("hello").toString(), equalTo("Required form 'hello'"))
-        assertThat(FormField.optional("hello").toString(), equalTo("Optional form 'hello'"))
-        assertThat(FormField.multi.required("hello").toString(), equalTo("Required form 'hello'"))
-        assertThat(FormField.multi.optional("hello").toString(), equalTo("Optional form 'hello'"))
+        assertThat(FormField.required("hello").toString(), equalTo("Required formData 'hello'"))
+        assertThat(FormField.optional("hello").toString(), equalTo("Optional formData 'hello'"))
+        assertThat(FormField.multi.required("hello").toString(), equalTo("Required formData 'hello'"))
+        assertThat(FormField.multi.optional("hello").toString(), equalTo("Optional formData 'hello'"))
     }
 }

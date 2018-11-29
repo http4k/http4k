@@ -152,7 +152,7 @@
             "type": "string"
           },
           {
-            "in": "form",
+            "in": "formData",
             "name": "form",
             "required": true,
             "type": "integer",
