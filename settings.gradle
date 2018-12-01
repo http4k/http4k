@@ -31,3 +31,5 @@ include 'http4k-template-thymeleaf'
 include 'http4k-testing-chaos'
 include 'http4k-testing-hamkrest'
 include 'http4k-testing-webdriver'
+
+enableFeaturePreview('STABLE_PUBLISHING')

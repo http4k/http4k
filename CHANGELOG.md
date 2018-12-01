@@ -2,6 +2,11 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.103.0 (uncut)
+- Upgraded some dependencies, including Gradle to v5.0.
+- Breaking: Resilience4j upgrade causes a break when providing custom config. Simply insert the Config type generic to fix:
+e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
+
 ### v3.102.1
 - Fix #197 -Swagger spec for form fields had incorrect description. 
 
