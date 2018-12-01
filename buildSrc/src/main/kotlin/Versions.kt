@@ -19,19 +19,19 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val okhttp: String = "3.11.0"
+    const val okhttp: String = "3.12.0"
 
     const val rerunner_jupiter: String = "1.1.1"
 
-    const val io_github_resilience4j: String = "0.13.1"
+    const val io_github_resilience4j: String = "0.13.2"
 
-    const val micrometer_core: String = "1.1.0"
+    const val micrometer_core: String = "1.1.1"
 
-    const val netty_codec_http2: String = "4.1.31.Final"
+    const val netty_codec_http2: String = "4.1.32.Final"
 
-    const val pebble: String = "3.0.5" //available: "3.0.6"
+    const val pebble: String = "3.0.6"
 
-    const val io_undertow: String = "2.0.15.Final"
+    const val io_undertow: String = "2.0.16.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -57,8 +57,7 @@ object Versions {
 
     const val http2_server: String = "9.4.14.v20181114"
 
-    const val javax_websocket_server_impl: String =
-            "9.4.14.v20181114"
+    const val javax_websocket_server_impl: String = "9.4.14.v20181114"
 
     const val org_eclipse_jetty: String = "9.4.14.v20181114"
 
@@ -72,7 +71,7 @@ object Versions {
 
     const val jsoup: String = "1.11.3"
 
-    const val org_junit_jupiter: String = "5.3.1"
+    const val org_junit_jupiter: String = "5.3.2"
 
     const val coveralls_gradle_plugin: String = "2.8.2"
 
@@ -90,10 +89,10 @@ object Versions {
     object Gradle {
         const val runningVersion: String = "4.10.2"
 
-        const val currentVersion: String = "4.10.2"
+        const val currentVersion: String = "5.0"
 
-        const val nightlyVersion: String = "5.1-20181116000014+0000"
+        const val nightlyVersion: String = "5.1-20181201000046+0000"
 
-        const val releaseCandidate: String = "5.0-rc-3"
+        const val releaseCandidate: String = ""
     }
 }
