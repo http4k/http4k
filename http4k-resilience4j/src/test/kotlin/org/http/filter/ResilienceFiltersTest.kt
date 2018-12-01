@@ -64,7 +64,7 @@ class ResilienceFiltersTest {
     @Test
     fun `retrying stops when successful result returned`() {
 
-        val config = RetryConfig.custom().intervalFunction { 0 }.build()
+        val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
         val responses = ArrayDeque<Response>()
@@ -81,7 +81,7 @@ class ResilienceFiltersTest {
     @Test
     fun `retrying eventually runs out and returns the last result`() {
 
-        val config = RetryConfig.custom().intervalFunction { 0 }.build()
+        val config = RetryConfig.custom<RetryConfig>().intervalFunction { 0 }.build()
         val retry = Retry.of("retrying", config)
 
         val responses = ArrayDeque<Response>()
@@ -129,5 +129,4 @@ class ResilienceFiltersTest {
         latch.await()
         bulkheading(Request(GET, "/second")).status shouldMatch equalTo(TOO_MANY_REQUESTS)
     }
-
 }
