@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.103.0 (uncut)
 - Upgraded some dependencies, including Gradle to v5.0.
-- Breaking: Resilience4j upgrade causes a break when providing custom config. Simply insert the Config type generic to fix:
+- Breaking: Resilience4j dependency upgrade causes a break when providing custom config. Simply insert the Config type generic to fix:
 e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
 
 ### v3.102.1
@@ -14,13 +14,13 @@ e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
 - Introduce interface for Environment
 
 ### v3.101.0 
-- upgrades to dependencies
+- Upgrades to dependencies
 - Improved Client-side HTTP status descriptions
 - Lenses now support Durations out of the box
 - Environments now support multi-value keys (comma separated)
 
 ### v3.100.0 
-- Make `Undertow` API more friendly
+- Make `Undertow` API friendlier
 - Fix to JsonReadinessCheckResultRenderer to actually implement the correct interface
 
 ### v3.99.0 
