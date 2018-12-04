@@ -8,7 +8,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
 
 ### v3.102.1
-- Fix #197 -Swagger spec for form fields had incorrect description. 
+- Fix #197 - Swagger spec for form fields had incorrect description. 
 
 ### v3.102.0
 - Introduce interface for Environment
