@@ -1,7 +1,12 @@
 package org.http4k.contract
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.HttpMessage
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.with
 import org.http4k.lens.BiDiBodyLens
 import org.http4k.lens.BodyLens
 import org.http4k.lens.Header
@@ -22,7 +27,7 @@ class RouteMetaDsl internal constructor() {
     internal val responses = Appendable<ResponseMeta>()
     var headers = Appendable<Lens<Request, *>>()
     var queries = Appendable<Lens<Request, *>>()
-    var body: BodyLens<*>? = null
+    internal var body: BodyLens<*>? = null
     var operationId: String? = null
 
     @JvmName("returningResponse")
@@ -48,6 +53,14 @@ class RouteMetaDsl internal constructor() {
      */
     @JvmName("returningStatus")
     fun returning(status: Status) = returning(ResponseMeta("", Response(status)))
+
+    /**
+     * Set the input body type for this request WITHOUT an example. Hence the content-type will be registered but no
+     * example schema will be generated.
+     */
+    fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
+        body = bodyLens
+    }
 
     /**
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId for this request body which

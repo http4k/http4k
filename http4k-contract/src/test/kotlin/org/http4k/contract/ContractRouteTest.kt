@@ -36,7 +36,7 @@ class ContractRouteTest {
         val route = "/" meta {
             headers += headerLens
             queries += queryLens
-            body = bodyLens
+            receiving(bodyLens)
         } bindContract GET to { _: Request -> Response(OK) }
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
@@ -50,7 +50,7 @@ class ContractRouteTest {
         val route = "/" meta {
             headers += headerLens
             queries += queryLens
-            body = bodyLens
+            receiving(bodyLens)
         } bindContract GET to { _: Request -> Response(OK) }
 
         val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")

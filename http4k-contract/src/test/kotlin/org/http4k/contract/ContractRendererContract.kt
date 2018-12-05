@@ -74,7 +74,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/echo" / Path.of("message") meta {
                 summary = "a post endpoint"
                 queries += Query.int().required("query")
-                body = customBody
                 consumes += listOf(ContentType.APPLICATION_XML, APPLICATION_JSON)
                 produces += APPLICATION_JSON
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
@@ -86,7 +85,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") meta {
                 summary = "a friendly endpoint"
                 queries += Query.boolean().required("query", "description of the query")
-                body = Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens()
+                receiving(Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens())
             }
                 bindContract GET to { a, _, _ -> { Response(OK).body(a) } },
             "/simples" meta { summary = "a simple endpoint" } bindContract GET to { Response(OK) }
