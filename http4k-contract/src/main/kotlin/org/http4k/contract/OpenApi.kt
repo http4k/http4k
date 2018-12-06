@@ -9,6 +9,7 @@ import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
@@ -47,14 +48,17 @@ class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NOD
             memo.add(path to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions)
         }
 
-    private fun renderMeta(it: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
+    private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
         obj(
             listOf(
-                "in" to string(it.location),
-                "name" to string(it.name),
-                "required" to boolean(it.required),
-                schema?.let { "schema" to it.node } ?: "type" to string(it.paramMeta.value)
-            ) + (it.description?.let { listOf("description" to string(it)) } ?: emptyList())
+                "in" to string(meta.location),
+                "name" to string(meta.name),
+                "required" to boolean(meta.required),
+                when (ObjectParam) {
+                    meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
+                    else -> "type" to string(meta.paramMeta.value)
+                }
+            ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
