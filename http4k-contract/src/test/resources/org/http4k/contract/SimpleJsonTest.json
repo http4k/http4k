@@ -2,7 +2,9 @@
   "resources": {
     "GET:/basepath/echo/{message}": "summary of this route",
     "POST:/basepath/echo/{message}": "a post endpoint",
-    "GET:/basepath/welcome/{firstName}/bertrand/{secondName}": "a friendly endpoint",
+    "POST:/basepath/welcome/{firstName}/bertrand/{secondName}": "a friendly endpoint",
+    "GET:/basepath/noexamplejson": "<unknown>",
+    "GET:/basepath/noexample": "<unknown>",
     "GET:/basepath/simples": "a simple endpoint"
   }
 }
