@@ -85,7 +85,10 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") meta {
                 summary = "a friendly endpoint"
                 queries += Query.boolean().required("query", "description of the query")
-                receiving(Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens())
+                receiving(Body.webForm(Validator.Strict,
+                    FormField.int().required("intForm", "description of the form field"),
+                    FormField.json().required("jsonForm", "description of the json form field")
+                ).toLens())
             } bindContract GET to { a, _, _ -> { Response(OK).body(a) } },
             "/noexamplejson" meta { receiving(Body.json("json").toLens()) } bindContract GET to { Response(OK) },
             "/noexample" meta { receiving(Body.string(TEXT_PLAIN).toLens()) } bindContract GET to { Response(OK) },

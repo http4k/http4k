@@ -153,10 +153,17 @@
           },
           {
             "in": "formData",
-            "name": "form",
+            "name": "intForm",
             "required": true,
             "type": "integer",
-            "description": "description of the form"
+            "description": "description of the form field"
+          },
+          {
+            "in": "formData",
+            "name": "jsonForm",
+            "required": true,
+            "type": "string",
+            "description": "description of the json form field"
           }
         ],
         "responses": {},
@@ -211,7 +218,9 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {},
