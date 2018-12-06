@@ -93,17 +93,31 @@
         "parameters": [
           {
             "in": "query",
-            "name": "required",
+            "name": "b",
             "required": true,
             "type": "boolean",
-            "description": "query1"
+            "description": "booleanQuery"
           },
           {
             "in": "query",
-            "name": "optional",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "stringQuery"
+          },
+          {
+            "in": "query",
+            "name": "i",
             "required": false,
             "type": "integer",
-            "description": "query2"
+            "description": "intQuery"
+          },
+          {
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "type": "string",
+            "description": "jsonQuery"
           }
         ],
         "responses": {},
@@ -125,17 +139,31 @@
         "parameters": [
           {
             "in": "header",
-            "name": "required",
+            "name": "b",
             "required": true,
             "type": "boolean",
-            "description": "header1"
+            "description": "booleanHeader"
           },
           {
             "in": "header",
-            "name": "optional",
+            "name": "s",
             "required": false,
-            "type": "boolean",
-            "description": "header2"
+            "type": "string",
+            "description": "stringHeader"
+          },
+          {
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "type": "integer",
+            "description": "stringHeader"
+          },
+          {
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "type": "string",
+            "description": "jsonHeader"
           }
         ],
         "responses": {},
@@ -245,17 +273,31 @@
         "parameters": [
           {
             "in": "formData",
-            "name": "intForm",
+            "name": "b",
             "required": true,
-            "type": "integer",
-            "description": "description of the form field"
+            "type": "boolean",
+            "description": "booleanField"
           },
           {
             "in": "formData",
-            "name": "jsonForm",
+            "name": "i",
+            "required": false,
+            "type": "integer",
+            "description": "intField"
+          },
+          {
+            "in": "formData",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "stringField"
+          },
+          {
+            "in": "formData",
+            "name": "j",
             "required": true,
             "type": "string",
-            "description": "description of the json form field"
+            "description": "jsonField"
           }
         ],
         "responses": {},

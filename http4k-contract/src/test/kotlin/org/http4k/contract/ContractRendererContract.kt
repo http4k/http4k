@@ -68,20 +68,26 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             } bindContract GET to { Response(OK) },
             "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> { Response(OK).body(a) } },
             "/queries" meta {
-                queries += Query.boolean().required("required", "query1")
-                queries += Query.int().optional("optional", "query2")
+                queries += Query.boolean().required("b", "booleanQuery")
+                queries += Query.string().optional("s", "stringQuery")
+                queries += Query.int().optional("i", "intQuery")
+                queries += Query.json().optional("j", "jsonQuery")
             } bindContract POST to { Response(OK).body("hello") },
             "/headers" meta {
-                headers += Header.boolean().required("required", "header1")
-                headers += Header.boolean().optional("optional", "header2")
+                headers += Header.boolean().required("b", "booleanHeader")
+                headers += Header.string().optional("s", "stringHeader")
+                headers += Header.int().optional("i", "stringHeader")
+                headers += Header.json().optional("j", "jsonHeader")
             } bindContract POST to { Response(OK).body("hello") },
             "/body_string" meta { receiving(Body.string(ContentType.TEXT_PLAIN).toLens()) } bindContract GET to { Response(OK) },
             "/body_json_noschema" meta { receiving(Body.json("json").toLens()) } bindContract GET to { Response(OK) },
             "/body_json_schema" meta { receiving(Body.json("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId") } bindContract GET to { Response(OK) },
             "/body_form" meta {
                 receiving(Body.webForm(Validator.Strict,
-                    FormField.int().required("intForm", "description of the form field"),
-                    FormField.json().required("jsonForm", "description of the json form field")
+                    FormField.boolean().required("b", "booleanField"),
+                    FormField.int().optional("i", "intField"),
+                    FormField.string().optional("s", "stringField"),
+                    FormField.json().required("j", "jsonField")
                 ).toLens())
             } bindContract POST to { Response(OK) },
 //            "/body_xml" meta { receiving(Body.xml("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }) } bindContract GET to { Response(OK) },
@@ -98,6 +104,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
 //        println(actual)
 //        ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(router).asServer(SunHttp(8000)).start().block()
-        assertThat(prettify(actual), equalTo(prettify(expected)))
+        assertThat("no match", prettify(actual), equalTo(prettify(expected)))
     }
 }
