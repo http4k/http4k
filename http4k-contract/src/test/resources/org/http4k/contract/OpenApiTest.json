@@ -122,7 +122,7 @@
       }
     },
     "/basepath/welcome/{firstName}/bertrand/{secondName}": {
-      "get": {
+      "post": {
         "tags": [
           "/basepath"
         ],

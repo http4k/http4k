@@ -89,7 +89,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     FormField.int().required("intForm", "description of the form field"),
                     FormField.json().required("jsonForm", "description of the json form field")
                 ).toLens())
-            } bindContract GET to { a, _, _ -> { Response(OK).body(a) } },
+            } bindContract POST to { a, _, _ -> { Response(OK).body(a) } },
             "/noexamplejson" meta { receiving(Body.json("json").toLens()) } bindContract GET to { Response(OK) },
             "/noexample" meta { receiving(Body.string(TEXT_PLAIN).toLens()) } bindContract GET to { Response(OK) },
             "/simples" meta { summary = "a simple endpoint" } bindContract GET to { Response(OK) }
