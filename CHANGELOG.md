@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.103.1
+- (Properly) Fix #198 - Rewrote OpenApi contract to ensure it stays fixed. H/T @reik-wargaming for the help in tracking this down.
+
 ### v3.103.0
 - "Fix" #198 - Breaking change made in `http4k-contracts` to clarify/deconfuse API. Hid `body` parameter in contract route meta DSL - it is now `receiving()`.
 - Upgraded some dependencies, including Gradle to v5.0.
