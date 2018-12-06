@@ -49,31 +49,28 @@ class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NOD
         }
 
     private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
-        val schemaOrType = when (ObjectParam) {
-            meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
-            else -> "type" to string(meta.paramMeta.value)
-        }
         obj(
             listOf(
                 "in" to string(meta.location),
                 "name" to string(meta.name),
                 "required" to boolean(meta.required),
-                schemaOrType
+                when (ObjectParam) {
+                    meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
+                    else -> "type" to string(meta.paramMeta.value)
+                }
             ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
     private fun renderBodyMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
-        val schemaOrType = if (meta.location != "formData") {
-            "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
-        } else "type" to string(meta.paramMeta.value)
-
         obj(
             listOf(
                 "in" to string(meta.location),
                 "name" to string(meta.name),
                 "required" to boolean(meta.required),
-                schemaOrType
+                if (meta.location != "formData") {
+                    "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
+                } else "type" to string(meta.paramMeta.value)
             ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
