@@ -58,7 +58,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
     fun `renders as expected`() {
         val customBody = Body.json("the body of the message").toLens()
 
-        val router = "/basepath" bind contract(renderer, "", ApiKey(Query.required("the_api_key"), { true }),
+        val router = "/basepath" bind contract(renderer, "/", ApiKey(Query.required("the_api_key"), { true }),
             "/echo" / Path.of("message") meta {
                 summary = "summary of this route"
                 description = "some rambling description of what this thing actually does"
@@ -95,9 +95,11 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/simples" meta { summary = "a simple endpoint" } bindContract GET to { Response(OK) }
         )
 
+
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-        println(actual)
+//        println(actual)
+//        ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(router).asServer(SunHttp(8000)).start().block()
         assertThat(prettify(actual), equalTo(prettify(expected)))
     }
 }
