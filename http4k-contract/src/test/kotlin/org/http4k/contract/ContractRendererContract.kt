@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -29,6 +30,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.Validator
 import org.http4k.lens.boolean
 import org.http4k.lens.int
+import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
@@ -69,8 +71,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 returning("no way jose" to FORBIDDEN)
                 tags += Tag("tag3")
                 tags += Tag("tag1")
-            }
-                bindContract GET to { msg -> { Response(OK).body(msg) } },
+            } bindContract GET to { msg -> { Response(OK).body(msg) } },
             "/echo" / Path.of("message") meta {
                 summary = "a post endpoint"
                 queries += Query.int().required("query")
@@ -80,19 +81,20 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 tags += Tag("tag1")
                 tags += listOf(Tag("tag2", "description of tag"), Tag("tag2", "description of tag"))
                 receiving(customBody to Argo.obj("anObject" to Argo.obj("notAStringField" to Argo.number(123))), "someOtherDefinitionId")
-            }
-                bindContract POST to { msg -> { Response(OK).body(msg) } },
+            } bindContract POST to { msg -> { Response(OK).body(msg) } },
             "/welcome" / Path.of("firstName") / "bertrand" / Path.of("secondName") meta {
                 summary = "a friendly endpoint"
                 queries += Query.boolean().required("query", "description of the query")
                 receiving(Body.webForm(Validator.Strict, FormField.int().required("form", "description of the form")).toLens())
-            }
-                bindContract GET to { a, _, _ -> { Response(OK).body(a) } },
+            } bindContract GET to { a, _, _ -> { Response(OK).body(a) } },
+            "/noexamplejson" meta { receiving(Body.json("json").toLens()) } bindContract GET to { Response(OK) },
+            "/noexample" meta { receiving(Body.string(TEXT_PLAIN).toLens()) } bindContract GET to { Response(OK) },
             "/simples" meta { summary = "a simple endpoint" } bindContract GET to { Response(OK) }
         )
 
         val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
+        println(actual)
         assertThat(prettify(actual), equalTo(prettify(expected)))
     }
 }

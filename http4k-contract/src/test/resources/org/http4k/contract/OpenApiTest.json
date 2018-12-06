@@ -167,6 +167,61 @@
         ]
       }
     },
+    "/basepath/noexamplejson": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "description": "json"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/noexample": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
     "/basepath/simples": {
       "get": {
         "tags": [
