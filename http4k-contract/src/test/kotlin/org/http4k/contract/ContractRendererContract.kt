@@ -4,8 +4,10 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
+import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -76,12 +78,18 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
                 headers += Header.string().optional("s", "stringHeader")
-                headers += Header.int().optional("i", "stringHeader")
+                headers += Header.int().optional("i", "intHeader")
                 headers += Header.json().optional("j", "jsonHeader")
             } bindContract POST to { Response(OK).body("hello") },
-            "/body_string" meta { receiving(Body.string(ContentType.TEXT_PLAIN).toLens()) } bindContract GET to { Response(OK) },
-            "/body_json_noschema" meta { receiving(Body.json("json").toLens()) } bindContract GET to { Response(OK) },
-            "/body_json_schema" meta { receiving(Body.json("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId") } bindContract GET to { Response(OK) },
+            "/body_string" meta { receiving(Body.string(ContentType.TEXT_PLAIN).toLens()) } bindContract POST to { Response(OK) },
+            "/body_json_noschema" meta {
+                receiving(Body.json("json").toLens())
+            }
+                bindContract POST to { Response(OK) },
+            "/body_json_schema" meta {
+                receiving(Body.json("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId")
+            }
+                bindContract POST to { Response(OK) },
             "/body_form" meta {
                 receiving(Body.webForm(Validator.Strict,
                     FormField.boolean().required("b", "booleanField"),
@@ -93,17 +101,19 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 //            "/body_xml" meta { receiving(Body.xml("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }) } bindContract GET to { Response(OK) },
             "/produces_and_consumes" meta {
                 produces += APPLICATION_JSON
-                consumes += APPLICATION_XML
+                produces += APPLICATION_XML
+                consumes += OCTET_STREAM
+                consumes += APPLICATION_FORM_URLENCODED
             } bindContract GET to { Response(OK) },
             "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
             } bindContract POST to { Response(OK) }
         )
 
-        val expected = String(this.javaClass.getResourceAsStream("${this.javaClass.simpleName}.json").readBytes())
+        val expected = String(javaClass.getResourceAsStream("${javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        println(actual)
 //        ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(router).asServer(SunHttp(8000)).start().block()
+//        println(actual)
         assertThat("no match", prettify(actual), equalTo(prettify(expected)))
     }
 }
