@@ -1,10 +1,15 @@
 {
   "resources": {
-    "GET:/basepath/echo/{message}": "summary of this route",
-    "POST:/basepath/echo/{message}": "a post endpoint",
-    "POST:/basepath/welcome/{firstName}/bertrand/{secondName}": "a friendly endpoint",
-    "GET:/basepath/noexamplejson": "<unknown>",
-    "GET:/basepath/noexample": "<unknown>",
-    "GET:/basepath/simples": "a simple endpoint"
+    "GET:/basepath/nometa": "<unknown>",
+    "GET:/basepath/descriptions": "endpoint",
+    "POST:/basepath/paths/{firstName}/bertrand/{age}": "<unknown>",
+    "POST:/basepath/queries": "<unknown>",
+    "POST:/basepath/headers": "<unknown>",
+    "GET:/basepath/body_string": "<unknown>",
+    "GET:/basepath/body_json_noschema": "<unknown>",
+    "GET:/basepath/body_json_schema": "<unknown>",
+    "POST:/basepath/body_form": "<unknown>",
+    "GET:/basepath/produces_and_consumes": "<unknown>",
+    "POST:/basepath/returning": "<unknown>"
   }
 }

@@ -11,109 +11,20 @@
       "name": "tag1"
     },
     {
-      "name": "tag2",
-      "description": "description of tag"
-    },
-    {
       "name": "tag3"
     }
   ],
   "paths": {
-    "/basepath/echo/{message}": {
+    "/basepath/nometa": {
       "get": {
         "tags": [
-          "tag1",
-          "tag3"
+          "/basepath"
         ],
-        "summary": "summary of this route",
-        "operationId": "echoMessage",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "<unknown>",
+        "produces": [],
         "consumes": [],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "header",
-            "required": false,
-            "type": "string",
-            "description": "description of the header"
-          },
-          {
-            "in": "path",
-            "name": "message",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "peachy",
-            "schema": {
-              "$ref": "#/definitions/object-1396932212"
-            }
-          },
-          "202": {
-            "description": "peachy",
-            "schema": {
-              "$ref": "#/definitions/someDefinitionId"
-            }
-          },
-          "403": {
-            "description": "no way jose"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "description": "some rambling description of what this thing actually does"
-      },
-      "post": {
-        "tags": [
-          "tag1",
-          "tag2"
-        ],
-        "summary": "a post endpoint",
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-          "application/xml",
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "query",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "in": "path",
-            "name": "message",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/someOtherDefinitionId"
-            },
-            "description": "the body of the message"
-          }
-        ],
-        "responses": {
-          "403": {
-            "description": "no way jose",
-            "schema": {
-              "$ref": "#/definitions/object1283926341"
-            }
-          }
-        },
+        "parameters": [],
+        "responses": {},
         "security": [
           {
             "api_key": []
@@ -121,24 +32,35 @@
         ]
       }
     },
-    "/basepath/welcome/{firstName}/bertrand/{secondName}": {
+    "/basepath/descriptions": {
+      "get": {
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "summary": "endpoint",
+        "operationId": "echoMessage",
+        "produces": [],
+        "consumes": [],
+        "parameters": [],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "description": "some rambling description of what this thing actually does"
+      }
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
         "tags": [
           "/basepath"
         ],
-        "summary": "a friendly endpoint",
+        "summary": "<unknown>",
         "produces": [],
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
+        "consumes": [],
         "parameters": [
-          {
-            "in": "query",
-            "name": "query",
-            "required": true,
-            "type": "boolean",
-            "description": "description of the query"
-          },
           {
             "in": "path",
             "name": "firstName",
@@ -147,23 +69,9 @@
           },
           {
             "in": "path",
-            "name": "secondName",
+            "name": "age",
             "required": true,
-            "type": "string"
-          },
-          {
-            "in": "formData",
-            "name": "intForm",
-            "required": true,
-            "type": "integer",
-            "description": "description of the form field"
-          },
-          {
-            "in": "formData",
-            "name": "jsonForm",
-            "required": true,
-            "type": "string",
-            "description": "description of the json form field"
+            "type": "boolean"
           }
         ],
         "responses": {},
@@ -174,7 +82,99 @@
         ]
       }
     },
-    "/basepath/noexamplejson": {
+    "/basepath/queries": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "required",
+            "required": true,
+            "type": "boolean",
+            "description": "query1"
+          },
+          {
+            "in": "query",
+            "name": "optional",
+            "required": false,
+            "type": "integer",
+            "description": "query2"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/headers": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "required",
+            "required": true,
+            "type": "boolean",
+            "description": "header1"
+          },
+          {
+            "in": "header",
+            "name": "optional",
+            "required": false,
+            "type": "boolean",
+            "description": "header2"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/body_string": {
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_noschema": {
       "get": {
         "tags": [
           "/basepath"
@@ -203,7 +203,7 @@
         ]
       }
     },
-    "/basepath/noexample": {
+    "/basepath/body_json_schema": {
       "get": {
         "tags": [
           "/basepath"
@@ -211,7 +211,7 @@
         "summary": "<unknown>",
         "produces": [],
         "consumes": [
-          "text/plain"
+          "application/json"
         ],
         "parameters": [
           {
@@ -219,8 +219,9 @@
             "name": "body",
             "required": true,
             "schema": {
-              "type": "string"
-            }
+              "$ref": "#/definitions/someDefinitionId"
+            },
+            "description": "json"
           }
         ],
         "responses": {},
@@ -231,16 +232,80 @@
         ]
       }
     },
-    "/basepath/simples": {
+    "/basepath/body_form": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "intForm",
+            "required": true,
+            "type": "integer",
+            "description": "description of the form field"
+          },
+          {
+            "in": "formData",
+            "name": "jsonForm",
+            "required": true,
+            "type": "string",
+            "description": "description of the json form field"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/produces_and_consumes": {
       "get": {
         "tags": [
           "/basepath"
         ],
-        "summary": "a simple endpoint",
-        "produces": [],
-        "consumes": [],
+        "summary": "<unknown>",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/xml"
+        ],
         "parameters": [],
         "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/basepath/returning": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [],
+        "parameters": [],
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "schema": {
+              "$ref": "#/definitions/object1283926341"
+            }
+          }
+        },
         "security": [
           {
             "api_key": []
@@ -257,23 +322,6 @@
     }
   },
   "definitions": {
-    "object-546230254": {
-      "type": "object",
-      "properties": {
-        "notAStringField": {
-          "type": "integer",
-          "example": 123
-        }
-      }
-    },
-    "someOtherDefinitionId": {
-      "type": "object",
-      "properties": {
-        "anObject": {
-          "$ref": "#/definitions/object-546230254"
-        }
-      }
-    },
     "object1283926341": {
       "type": "object",
       "properties": {
@@ -293,14 +341,6 @@
       }
     },
     "someDefinitionId": {
-      "type": "object",
-      "properties": {
-        "anAnotherObject": {
-          "$ref": "#/definitions/object-1365611171"
-        }
-      }
-    },
-    "object-1396932212": {
       "type": "object",
       "properties": {
         "anAnotherObject": {
