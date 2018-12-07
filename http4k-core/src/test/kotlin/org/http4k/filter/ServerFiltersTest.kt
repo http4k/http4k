@@ -113,15 +113,37 @@ class ServerFiltersTest {
     }
 
     @Test
-    fun `OPTIONS - requests are intercepted and returned with expected headers`() {
-        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
-        val response = handler(Request(OPTIONS, "/"))
+     fun `OPTIONS - requests are intercepted and returned with expected headers`() {
+         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         response shouldMatch hasStatus(OK)
-            .and(hasHeader("access-control-allow-origin", "foo, bar"))
+            .and(hasHeader("access-control-allow-origin", "foo"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
             .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
     }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when origin does not match`() {
+        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))
+
+        response shouldMatch hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+    }
+
+    @Test
+    fun `OPTIONS - requests are returned with expected headers when origin is not set`() {
+        val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
+        val response = handler(Request(OPTIONS, "/"))
+ 
+        response shouldMatch hasStatus(OK)
+            .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+     }
 
     @Test
     fun `catch all exceptions`() {
