@@ -38,10 +38,18 @@ object ServerFilters {
         operator fun invoke(policy: CorsPolicy) = Filter { next ->
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
+
+                val origin = it.header("Origin")
+                val allowedOrigin = when {
+                    policy.origins.contains("*") -> "*"
+                    policy.origins.contains(origin) -> origin!!
+                    else -> "null"
+                }
+
                 response.with(
-                        Header.required("access-control-allow-origin") of policy.origins.joined(),
-                        Header.required("access-control-allow-headers") of policy.headers.joined(),
-                        Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
+                    Header.required("access-control-allow-origin") of allowedOrigin,
+                    Header.required("access-control-allow-headers") of policy.headers.joined(),
+                    Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
                 )
             }
         }
