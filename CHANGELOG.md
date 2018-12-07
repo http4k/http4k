@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.103.2
+- Fix `access-control-allow-origin` returned when server supports multiple origins H/T @johnnorris
+
 ### v3.103.1
 - (Properly) Fix #198 - Rewrote OpenApi contract to ensure it stays fixed. H/T @reik-wargaming for the help in tracking this down.
 
