@@ -40,7 +40,7 @@ plugging together of services without HTTP container being required.
     * full suites of microservices
 * **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
     * Pluggable HTTP client adapters for Apache, Jetty, OkHttp and Websockets
-    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow, Apache (Httpcore) and SunHttp. 
+    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow, Apache (Httpcore), Ktor CIO and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
