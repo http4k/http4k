@@ -1,6 +1,8 @@
 package org.http4k.server
 
 import io.ktor.application.ApplicationCallPipeline
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.ApplicationRequest
 import io.ktor.request.httpMethod
@@ -19,6 +21,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.Header
 import java.util.concurrent.TimeUnit.SECONDS
 import io.ktor.http.Headers as KHeaders
 
@@ -29,8 +32,13 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
         private val engine = embeddedServer(CIO, port) {
             intercept(ApplicationCallPipeline.Call) {
                 val response = httpHandler(context.request.asHttp4k())
+                println(response)
                 response.transfer(context.response)
-                context.respondBytes(provider = { response.body.payload.array() })
+                context.respondBytes(
+                    contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) },
+                    provider = { response.body.payload.array() }
+
+                )
             }
         }
 
@@ -53,13 +61,14 @@ private fun ApplicationRequest.asHttp4k() =
 
 private fun Response.transfer(ktor: ApplicationResponse) {
     ktor.status(HttpStatusCode.fromValue(status.code))
-    headers.forEach { (key, value) -> ktor.header(key, value ?: "") }
+    headers
+        .filterNot { HttpHeaders.isUnsafe(it.first) }
+        .forEach { (key, value) -> ktor.header(key, value ?: "") }
 }
 
 fun main(args: Array<String>) {
     { r: Request ->
-        println(r.bodyString())
-        Response(OK).body(r.body).header("foo", "bar")
+        Response(OK).body(r.body).header("foo", "bar").header("foo", "bar2")
     }
         .asServer(KtorCIO(9000)).start().use {
             println(JavaHttpClient()(Request(POST, "http://localhost:9000/foo").body("hello")))
