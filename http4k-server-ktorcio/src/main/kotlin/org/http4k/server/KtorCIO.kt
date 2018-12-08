@@ -5,6 +5,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.ApplicationRequest
+import io.ktor.request.header
 import io.ktor.request.httpMethod
 import io.ktor.request.uri
 import io.ktor.response.ApplicationResponse
@@ -53,10 +54,9 @@ private fun KHeaders.toHttp4kHeaders(): Headers = names().flatMap { name ->
     (getAll(name) ?: emptyList()).map { name to it }
 }
 
-private fun ApplicationRequest.asHttp4k() =
-    Request(Method.valueOf(httpMethod.value), uri)
-        .body(receiveChannel().toInputStream())
-        .headers(headers.toHttp4kHeaders())
+private fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
+    .headers(headers.toHttp4kHeaders())
+    .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
 
 private fun Response.transfer(ktor: ApplicationResponse) {
     ktor.status(HttpStatusCode.fromValue(status.code))
