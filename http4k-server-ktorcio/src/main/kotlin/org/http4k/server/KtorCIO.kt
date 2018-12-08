@@ -32,16 +32,13 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine = embeddedServer(CIO, port) {
             intercept(ApplicationCallPipeline.Call) {
-                val response = httpHandler(context.request.asHttp4k())
-                response.transfer(context.response)
+                context.response.fromHttp4K(httpHandler(context.request.asHttp4k()))
             }
         }
 
         override fun start() = apply { engine.start() }
 
-        override fun stop() = apply {
-            engine.stop(1, 1, SECONDS)
-        }
+        override fun stop() = apply { engine.stop(1, 1, SECONDS) }
 
         override fun port() = engine.environment.connectors[0].port
     }
@@ -51,18 +48,18 @@ private fun KHeaders.toHttp4kHeaders(): Headers = names().flatMap { name ->
     (getAll(name) ?: emptyList()).map { name to it }
 }
 
-private fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
+fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
 
-private suspend fun Response.transfer(ktor: ApplicationResponse) {
-    ktor.status(HttpStatusCode.fromValue(status.code))
-    headers
+private suspend fun ApplicationResponse.fromHttp4K(response: Response) {
+    status(HttpStatusCode.fromValue(response.status.code))
+    response.headers
         .filterNot { HttpHeaders.isUnsafe(it.first) }
-        .forEach { (key, value) -> ktor.header(key, value ?: "") }
-    ktor.call.respondOutputStream(
-        contentType = Header.CONTENT_TYPE(this)?.let { ContentType.parse(it.toHeaderValue()) }
-    ) { body.stream.copyTo(this) }
+        .forEach { (key, value) -> header(key, value ?: "") }
+    call.respondOutputStream(
+        contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
+    ) { response.body.stream.copyTo(this) }
 }
 
 fun main(args: Array<String>) {
