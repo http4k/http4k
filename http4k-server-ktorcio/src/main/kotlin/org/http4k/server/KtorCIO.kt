@@ -1,6 +1,6 @@
 package org.http4k.server
 
-import io.ktor.application.ApplicationCallPipeline
+import io.ktor.application.ApplicationCallPipeline.ApplicationPhase.Call
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -31,8 +31,8 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
         private val engine = embeddedServer(CIO, port) {
-            intercept(ApplicationCallPipeline.Call) {
-                context.response.fromHttp4K(httpHandler(context.request.asHttp4k()))
+            intercept(Call) {
+                with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
             }
         }
 
@@ -52,7 +52,7 @@ suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
     response.headers
         .filterNot { HttpHeaders.isUnsafe(it.first) }
-        .forEach { (key, value) -> header(key, value ?: "") }
+        .forEach { header(it.first, it.second ?: "") }
     call.respondOutputStream(
         Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
     ) { response.body.stream.copyTo(this) }
