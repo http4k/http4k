@@ -34,9 +34,6 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
             intercept(ApplicationCallPipeline.Call) {
                 val response = httpHandler(context.request.asHttp4k())
                 response.transfer(context.response)
-                context.response.call.respondOutputStream(
-                    contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
-                ) { response.body.stream.copyTo(this) }
             }
         }
 
@@ -58,11 +55,14 @@ private fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.va
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
 
-private fun Response.transfer(ktor: ApplicationResponse) {
+private suspend fun Response.transfer(ktor: ApplicationResponse) {
     ktor.status(HttpStatusCode.fromValue(status.code))
     headers
         .filterNot { HttpHeaders.isUnsafe(it.first) }
         .forEach { (key, value) -> ktor.header(key, value ?: "") }
+    ktor.call.respondOutputStream(
+        contentType = Header.CONTENT_TYPE(this)?.let { ContentType.parse(it.toHeaderValue()) }
+    ) { body.stream.copyTo(this) }
 }
 
 fun main(args: Array<String>) {
