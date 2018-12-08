@@ -44,15 +44,11 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
     }
 }
 
-private fun KHeaders.toHttp4kHeaders(): Headers = names().flatMap { name ->
-    (getAll(name) ?: emptyList()).map { name to it }
-}
-
 fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), uri)
     .headers(headers.toHttp4kHeaders())
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
 
-private suspend fun ApplicationResponse.fromHttp4K(response: Response) {
+suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     status(HttpStatusCode.fromValue(response.status.code))
     response.headers
         .filterNot { HttpHeaders.isUnsafe(it.first) }
@@ -60,6 +56,10 @@ private suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     call.respondOutputStream(
         Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
     ) { response.body.stream.copyTo(this) }
+}
+
+private fun KHeaders.toHttp4kHeaders(): Headers = names().flatMap { name ->
+    (getAll(name) ?: emptyList()).map { name to it }
 }
 
 fun main(args: Array<String>) {
