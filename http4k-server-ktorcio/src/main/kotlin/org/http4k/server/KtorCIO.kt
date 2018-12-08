@@ -58,7 +58,7 @@ private suspend fun ApplicationResponse.fromHttp4K(response: Response) {
         .filterNot { HttpHeaders.isUnsafe(it.first) }
         .forEach { (key, value) -> header(key, value ?: "") }
     call.respondOutputStream(
-        contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
+        Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
     ) { response.body.stream.copyTo(this) }
 }
 
