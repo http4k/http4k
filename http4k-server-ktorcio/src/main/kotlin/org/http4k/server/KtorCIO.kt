@@ -9,12 +9,12 @@ import io.ktor.request.httpMethod
 import io.ktor.request.uri
 import io.ktor.response.ApplicationResponse
 import io.ktor.response.header
-import io.ktor.response.respondBytes
+import io.ktor.response.respondOutputStream
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import io.ktor.util.toMap
 import kotlinx.coroutines.io.jvm.javaio.toInputStream
 import org.http4k.client.JavaHttpClient
+import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
@@ -32,13 +32,10 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
         private val engine = embeddedServer(CIO, port) {
             intercept(ApplicationCallPipeline.Call) {
                 val response = httpHandler(context.request.asHttp4k())
-                println(response)
                 response.transfer(context.response)
-                context.respondBytes(
-                    contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) },
-                    provider = { response.body.payload.array() }
-
-                )
+                context.response.call.respondOutputStream(
+                    contentType = Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
+                ) { response.body.stream.copyTo(this) }
             }
         }
 
@@ -52,7 +49,9 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
     }
 }
 
-private fun KHeaders.toHttp4kHeaders() = toMap().flatMap { it.value.map { value -> it.key to value } }
+private fun KHeaders.toHttp4kHeaders(): Headers = names().flatMap { name ->
+    (getAll(name) ?: emptyList()).map { name to it }
+}
 
 private fun ApplicationRequest.asHttp4k() =
     Request(Method.valueOf(httpMethod.value), uri)
