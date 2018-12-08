@@ -156,14 +156,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     }
 
     @Test
-    fun `ok when length already set`() {
+    open fun `ok when length already set`() {
         val response = client(Request(GET, "http://localhost:$port/presetlength"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("content-length"), equalTo("0"))
     }
 
     @Test
-    fun `can start on port zero and then get the port`() {
+    open fun `can start on port zero and then get the port`() {
         routes(*routes.toTypedArray()).asServer(serverConfig(0)).start().use {
             assertThat(client(Request(GET, "http://localhost:${it.port()}/uri")).status, equalTo(OK))
         }
