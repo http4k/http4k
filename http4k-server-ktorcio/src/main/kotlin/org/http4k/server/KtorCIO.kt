@@ -29,7 +29,7 @@ import io.ktor.http.Headers as KHeaders
 data class KtorCIO(val port: Int = 8000) : ServerConfig {
 
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
-        private val engine: CIOApplicationEngine = embeddedServer(CIO, port, "127.0.0.1") {
+        private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
             intercept(Call) {
                 with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
                 return@intercept finish()
