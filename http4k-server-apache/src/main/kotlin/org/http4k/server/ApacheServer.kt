@@ -18,8 +18,7 @@ import org.http4k.core.safeLong
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 import java.net.InetAddress
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit.SECONDS
 import org.apache.http.HttpRequest as ApacheRequest
 import org.apache.http.HttpResponse as ApacheResponse
 
