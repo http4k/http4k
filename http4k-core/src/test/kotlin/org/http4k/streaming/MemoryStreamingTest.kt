@@ -6,12 +6,12 @@ import org.http4k.server.ServerConfig
 
 class MemoryStreamingTest : StreamingContract(StreamingTestConfiguration(5, 100, 100)) {
     override fun serverConfig(port: Int): ServerConfig = DummyServerConfig
-    override fun createClient(): HttpHandler = server
+    override fun createClient(): HttpHandler = app
 }
 
 object DummyServerConfig : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
-        override fun port() = -1
+        override fun port() = 0
         override fun start() = this
         override fun stop() = this
     }
