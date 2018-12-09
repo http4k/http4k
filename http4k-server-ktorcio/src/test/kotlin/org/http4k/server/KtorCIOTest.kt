@@ -3,7 +3,8 @@ package org.http4k.server
 import org.http4k.client.ApacheClient
 import org.junit.jupiter.api.Test
 
-class KtorCIOTest : ServerContract(::KtorCIO, ApacheClient()) {
+class KtorCIOTest : ServerContract({ KtorCIO(9898) }, ApacheClient()) {
+
     @Test
     override fun `ok when length already set`() {
     }
