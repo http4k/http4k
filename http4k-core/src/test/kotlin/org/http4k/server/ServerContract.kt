@@ -41,7 +41,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
         requiredMethods.map {
             "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
         }.plus(listOf(
-            "/headers" bind GET to { _: Request ->
+            "/headers" bind GET to {
                 Response(ACCEPTED)
                     .header("content-type", "text/plain")
             },
@@ -58,13 +58,12 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 }
             },
             "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
-            "/boom" bind GET to { _: Request -> throw IllegalArgumentException("BOOM!") }
+            "/boom" bind GET to { throw IllegalArgumentException("BOOM!") }
         ))
 
     @BeforeEach
     fun before() {
         server = routes(*routes.toTypedArray()).asServer(serverConfig(0)).start()
-        Thread.sleep(200) // HACK!
     }
 
     @Test

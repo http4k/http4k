@@ -35,7 +35,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
-    abstract fun serverConfig(port: Int): ServerConfig
+    abstract fun serverConfig(): ServerConfig
     abstract fun createClient(): HttpHandler
 
     private var countdown = CountDownLatch(config.beeps * 2)
@@ -49,7 +49,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @BeforeEach
     fun `set up`() {
-        server = app.asServer(serverConfig(0)).start()
+        server = app.asServer(serverConfig()).start()
         countdown = CountDownLatch(config.beeps * 2)
     }
 
