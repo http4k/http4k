@@ -26,25 +26,22 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
-
 abstract class StreamingContract(private val config: StreamingTestConfiguration = StreamingTestConfiguration()) {
     private val runningInIdea = ManagementFactory.getRuntimeMXBean().inputArguments.find { it.contains("idea") } != null
 
-    private var server: Http4kServer? = null
+    private lateinit var server: Http4kServer
 
-    open fun port() = server!!.port()
-
-    private val baseUrl by lazy { "http://0.0.0.0:${port()}" }
+    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val sharedList = CopyOnWriteArrayList<Char>()
 
     abstract fun serverConfig(port: Int): ServerConfig
     abstract fun createClient(): HttpHandler
 
-    private var countdown: CountDownLatch = CountDownLatch(config.beeps * 2)
+    private var countdown = CountDownLatch(config.beeps * 2)
 
     val app = routes(
-        "/stream-response" bind GET to { _: Request -> Response(Status.OK).body(beeper()) },
+        "/stream-response" bind GET to { Response(Status.OK).body(beeper()) },
         "/stream-request" bind POST to { request: Request ->
             captureReceivedStream { request.body.stream }; Response(Status.OK)
         }

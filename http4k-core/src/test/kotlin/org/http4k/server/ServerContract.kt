@@ -30,11 +30,9 @@ import java.util.Random
 
 abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler,
                               private val requiredMethods: Array<Method> = Method.values()) {
-    private var server: Http4kServer? = null
+    private lateinit var server: Http4kServer
 
-    open fun port() = server!!.port()
-
-    private val baseUrl by lazy { "http://0.0.0.0:${port()}" }
+    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
