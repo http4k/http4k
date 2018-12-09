@@ -32,6 +32,7 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
         private val engine: CIOApplicationEngine = embeddedServer(CIO, port) {
             intercept(Call) {
                 with(context) { response.fromHttp4K(httpHandler(request.asHttp4k())) }
+                return@intercept finish()
             }
         }
 
