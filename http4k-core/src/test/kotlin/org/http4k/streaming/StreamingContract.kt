@@ -50,7 +50,6 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     @BeforeEach
     fun `set up`() {
         server = app.asServer(serverConfig()).start()
-        println(server.port())
         countdown = CountDownLatch(config.beeps * 2)
     }
 
@@ -63,7 +62,6 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     fun `can stream response`() {
         captureReceivedStream { createClient()(Request(GET, "$baseUrl/stream-response")).body.stream }
 
-        Thread.currentThread().join()
         waitForCompletion()
 
         verifyStreamed()
