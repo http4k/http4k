@@ -50,6 +50,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     @BeforeEach
     fun `set up`() {
         server = app.asServer(serverConfig()).start()
+        println(server.port())
         countdown = CountDownLatch(config.beeps * 2)
     }
 
@@ -62,6 +63,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     fun `can stream response`() {
         captureReceivedStream { createClient()(Request(GET, "$baseUrl/stream-response")).body.stream }
 
+        Thread.currentThread().join()
         waitForCompletion()
 
         verifyStreamed()
@@ -81,7 +83,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     }
 
     private fun waitForCompletion() {
-        val succeeded: Boolean = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
+        val succeeded = countdown.await(config.maxTotalWaitInMillis, TimeUnit.MILLISECONDS)
         if (!succeeded) fail("Timed out waiting for server response")
     }
 
@@ -121,6 +123,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
 data class StreamingTestConfiguration(val beeps: Int = 5,
                                       val beepSize: Int = 20000,
-                                      val sleepTimeBetweenBeepsInMillis: Long = 500) {
-    val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * 2
+                                      val sleepTimeBetweenBeepsInMillis: Long = 500,
+                                      val multiplier: Int = 2) {
+    val maxTotalWaitInMillis = beeps * sleepTimeBetweenBeepsInMillis * multiplier
 }
