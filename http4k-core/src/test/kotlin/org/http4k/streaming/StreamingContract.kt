@@ -42,8 +42,8 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     val app = routes(
         "/stream-response" bind GET to { Response(Status.OK).body(beeper()) },
-        "/stream-request" bind POST to { request: Request ->
-            captureReceivedStream { request.body.stream }; Response(Status.OK)
+        "/stream-request" bind POST to {
+            captureReceivedStream { it.body.stream }; Response(Status.OK)
         }
     )
 
@@ -55,7 +55,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @AfterEach
     fun `tear down`() {
-        server?.stop()
+        server.stop()
     }
 
     @Test

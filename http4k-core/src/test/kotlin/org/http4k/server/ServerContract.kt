@@ -38,9 +38,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     private val random = (0 until size).map { '.' }.joinToString("")
 
     private val routes =
-        requiredMethods.map {
-            "/" + it.name bind it to { _: Request -> Response(OK).body(it.name) }
-        }.plus(listOf(
+        requiredMethods.map { m ->
+            "/" + m.name bind m to { Response(OK).body(m.name) }
+        } + listOf(
             "/headers" bind GET to {
                 Response(ACCEPTED)
                     .header("content-type", "text/plain")
@@ -49,7 +49,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/stream" bind GET to { Response(OK).with(Body.binary(ContentType.TEXT_PLAIN).toLens() of Body("hello".asByteBuffer())) },
             "/presetlength" bind GET to { Response(OK).header("Content-Length", "0") },
-            "/echo" bind POST to { req: Request -> Response(OK).body(req.bodyString()) },
+            "/echo" bind POST to { Response(OK).body(it.bodyString()) },
             "/request-headers" bind GET to { request: Request -> Response(OK).body(request.headerValues("foo").joinToString(", ")) },
             "/length" bind { req: Request ->
                 when (req.body) {
@@ -57,9 +57,9 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                     else -> Response(INTERNAL_SERVER_ERROR)
                 }
             },
-            "/uri" bind GET to { req: Request -> Response(OK).body(req.uri.toString()) },
+            "/uri" bind GET to { Response(OK).body(it.uri.toString()) },
             "/boom" bind GET to { throw IllegalArgumentException("BOOM!") }
-        ))
+        )
 
     @BeforeEach
     fun before() {
@@ -170,7 +170,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
     @AfterEach
     fun after() {
-        server?.stop()
+        server.stop()
     }
-
 }
