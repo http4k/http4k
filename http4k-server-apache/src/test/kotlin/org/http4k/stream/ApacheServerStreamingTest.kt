@@ -1,7 +1,7 @@
 package org.http4k.stream
 
 import org.http4k.client.ApacheClient
-import org.http4k.core.BodyMode
+import org.http4k.core.BodyMode.Stream
 import org.http4k.core.HttpHandler
 import org.http4k.server.ApacheServer
 import org.http4k.server.ServerConfig
@@ -11,5 +11,5 @@ class ApacheServerStreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = ApacheServer(0)
 
     override fun createClient(): HttpHandler =
-        ApacheClient(requestBodyMode = BodyMode.Stream, responseBodyMode = BodyMode.Stream)
+        ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
 }
