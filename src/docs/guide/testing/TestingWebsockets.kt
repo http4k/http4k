@@ -2,7 +2,6 @@ package guide.testing
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import cookbook.websockets.WebsocketContract
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -59,5 +58,7 @@ class WebsocketServerTest : WebsocketContract() {
     }
 
     @AfterEach
-    fun after() = server.stop()
+    fun after() {
+        server.stop()
+    }
 }

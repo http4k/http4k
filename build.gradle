@@ -1,24 +1,23 @@
 buildscript {
-    apply from: project.file('dependencies.gradle')
-
     repositories {
         mavenCentral()
         jcenter()
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
-        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.+'
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
+        classpath Libs.kotlin_gradle_plugin
+        classpath Libs.gradle_cobertura_plugin
+        classpath Libs.coveralls_gradle_plugin
+        classpath Libs.dokka_gradle_plugin
     }
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
-    id 'net.saliman.cobertura' version '2.4.0'
-    id 'com.github.kt3k.coveralls' version '2.8.1'
+    id "com.jfrog.bintray" version "1.8.4"
+    id 'net.saliman.cobertura' version '2.5.4'
+    id 'nebula.provided-base' version '3.0.3'
+    id 'com.github.kt3k.coveralls' version '2.8.2'
+    id 'jmfayard.github.io.gradle-kotlin-dsl-libs' version "0.2.6"
 }
 
 allprojects {
@@ -35,11 +34,11 @@ allprojects {
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'provided-base'
+    apply plugin: 'nebula.provided-base'
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
-        toolVersion = '0.8.1'
+        toolVersion = '0.8.2'
     }
 
     cobertura.coverageFormats = ['html', 'xml']
@@ -48,8 +47,8 @@ allprojects {
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
     compileTestKotlin.kotlinOptions.jvmTarget = "1.8"
 
-    sourceCompatibility= JavaVersion.VERSION_1_8
-    targetCompatibility =JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     version = project.hasProperty('releaseVersion') ? project.releaseVersion : 'LOCAL'
     group = 'org.http4k'
@@ -62,6 +61,16 @@ allprojects {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
+
+//    task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true, dependsOn: javadoc) {
+//        outputDirectory = javadoc.destinationDir
+//        outputFormat = "javadoc"
+//        processConfigurations = []
+//    }
+//    task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+//        classifier = 'javadoc'
+//        from dokkaJavadoc.outputDirectory
+//    }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier = 'javadoc'
@@ -149,14 +158,14 @@ allprojects {
 
     jacocoTestReport {
         reports {
-            xml.enabled true
+            xml.enabled = true
         }
     }
 }
 
 coveralls {
     sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
-    jacocoReportPath = "${buildDir}/reports/jacoco/test/jacocoRootReport.xml"
+    jacocoReportPath = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
@@ -168,12 +177,12 @@ task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
         html.enabled = true
         xml.enabled = true
         csv.enabled = false
-        xml.destination = "${buildDir}/reports/jacoco/test/jacocoRootReport.xml"
+        xml.destination = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")
     }
 }
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
 
     provided project(":http4k-core")
     provided project(":http4k-aws")
@@ -182,6 +191,7 @@ dependencies {
     provided project(":http4k-client-jetty")
     provided project(":http4k-client-okhttp")
     provided project(":http4k-client-websocket")
+    provided project(":http4k-cloudnative")
     provided project(":http4k-contract")
     provided project(":http4k-format-argo")
     provided project(":http4k-format-gson")
@@ -208,7 +218,7 @@ dependencies {
     provided project(":http4k-testing-hamkrest")
     provided project(":http4k-testing-webdriver")
 
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
 sourceSets {
@@ -223,7 +233,7 @@ sourceSets {
     }
 }
 
-task dokka (type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
+task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
     includes = ['src/packages.md']
     moduleName = "$rootProject.name"
     outputDirectory = "$buildDir/ddoc"

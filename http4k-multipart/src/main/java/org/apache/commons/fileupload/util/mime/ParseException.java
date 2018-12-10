@@ -19,7 +19,7 @@ package org.apache.commons.fileupload.util.mime;
 /**
  * @since 1.3
  */
-final class ParseException extends Exception {
+public final class ParseException extends Exception {
 
     /**
      * The UID to use when serializing this instance.

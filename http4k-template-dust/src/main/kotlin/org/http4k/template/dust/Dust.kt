@@ -128,7 +128,7 @@ class Dust(
 
             override fun wrap(obj: SingleThreadedDust) = DefaultPooledObject(obj)
         },
-        GenericObjectPoolConfig().apply {
+        GenericObjectPoolConfig<SingleThreadedDust>().apply {
             minIdle = precachePoolSize
         })
 

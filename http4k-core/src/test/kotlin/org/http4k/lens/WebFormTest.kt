@@ -7,9 +7,8 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.toBody
 import org.http4k.core.with
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
 import org.junit.jupiter.api.Test
@@ -29,13 +28,13 @@ class WebFormTest {
             webForm of WebForm().with(stringField of "world", intField of 123)
         )
 
-        assertThat(Header.Common.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
+        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
         assertThat(populatedRequest.bodyString(), equalTo("hello=world&another=123"))
     }
 
     @Test
     fun `web form blows up if not URL content type`() {
-        val request = emptyRequest.header("Content-Type", "unknown").body("hello=world&another=123".toBody())
+        val request = emptyRequest.header("Content-Type", "unknown").body(Body("hello=world&another=123"))
 
         assertThat({
             Body.webForm(Strict,
@@ -47,7 +46,7 @@ class WebFormTest {
 
     @Test
     fun `web form extracts ok form values`() {
-        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("hello=world&another=123".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("hello=world&another=123"))
 
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
@@ -59,7 +58,7 @@ class WebFormTest {
 
     @Test
     fun `feedback web form extracts ok form values and errors`() {
-        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("another=123".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("another=123"))
 
         val requiredString = FormField.required("hello")
         assertThat(Body.webForm(Feedback,
@@ -70,7 +69,7 @@ class WebFormTest {
 
     @Test
     fun `strict web form blows up with invalid form values`() {
-        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body("another=notANumber".toBody())
+        val request = emptyRequest.header("Content-Type", APPLICATION_FORM_URLENCODED.value).body(Body("another=notANumber"))
 
         val stringRequiredField = FormField.required("hello")
         val intRequiredField = FormField.int().required("another")

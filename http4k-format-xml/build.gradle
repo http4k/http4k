@@ -1,12 +1,12 @@
 description = 'Http4k XML support'
 
 dependencies {
-    provided kotlin_lib
-
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
+
     compile project(":http4k-format-gson")
-    compile 'org.json:json:20170516'
+    compile Libs.json
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile testing
+    testCompile Config.TestDependencies
 }

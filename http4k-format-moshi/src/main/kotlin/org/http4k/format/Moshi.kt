@@ -3,6 +3,7 @@ package org.http4k.format
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.ToJson
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.http4k.core.Body
@@ -20,6 +21,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -47,19 +50,23 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 object Moshi : ConfigurableMoshi(Moshi.Builder()
-        .add(custom(Duration::parse))
-        .add(custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
-        .add(custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
-        .add(custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
-        .add(custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
-        .add(custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
-        .add(custom(Companion::of))
-        .add(custom(::URL, URL::toExternalForm))
-        .add(custom(UUID::fromString))
-        .add(custom(::Regex, Regex::pattern))
+        .custom(Duration::parse)
+        .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+        .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+        .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+        .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
+        .custom(Companion::of)
+        .custom(::URL, URL::toExternalForm)
+        .custom(UUID::fromString)
+        .custom(::Regex, Regex::pattern)
         .add(KotlinJsonAdapterFactory()))
 
-private inline fun <T> custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
+private inline fun <reified T> Builder.custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }):Builder = add(adapter(readFn, writeFn))
+
+private inline fun <T> adapter(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
         object {
             @FromJson
             fun read(t: String): T = readFn(t)

@@ -28,7 +28,7 @@ data class SunHttp(val port: Int = 8000) : ServerConfig {
             server.start()
         }
 
-        override fun stop() = server.stop(0)
+        override fun stop() = apply { server.stop(0) }
     }
 }
 

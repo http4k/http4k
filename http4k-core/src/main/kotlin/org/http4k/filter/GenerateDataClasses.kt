@@ -7,7 +7,7 @@ import org.http4k.format.JsonType
 import org.http4k.format.JsonType.Array
 import org.http4k.format.JsonType.Object
 import java.io.PrintStream
-import java.util.Random
+import kotlin.random.Random
 
 
 /**
@@ -15,9 +15,9 @@ import java.util.Random
  * the number of class definitions by selecting the definition with the most fields (for cases where lists of items
  * have different fields).
  */
-class GenerateDataClasses<ROOT : NODE, out NODE>(private val json: Json<ROOT, NODE>,
-                                                       private val out: PrintStream = System.out,
-                                                       private val idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
+class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
+                                    private val out: PrintStream = System.out,
+                                    private val idGenerator: () -> Int = { Math.abs(Random.nextInt()) }) : Filter {
 
     private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
 
@@ -61,16 +61,18 @@ class GenerateDataClasses<ROOT : NODE, out NODE>(private val json: Json<ROOT, NO
         override fun asDefinitionString(): String = """data class ${clazz.capitalize()}(${fields.map { "val ${it.key}: ${it.value.asClassName()}?" }.joinToString(", ")})"""
     }
 
-    private fun process(name: String, node: NODE): Gen = when (json.typeOf(node)) {
-        Object -> ObjectGen(name, json.fields(node).map { it.first to process(it.first, it.second) }.toMap())
-        Array -> {
-            val arrayName = name.capitalize() + idGenerator()
-            ArrayGen(json.elements(node).map { process(arrayName, it) }.toSet())
+    private fun process(name: String, node: NODE): Gen = json {
+        when (typeOf(node)) {
+            Object -> ObjectGen(name, fields(node).map { it.first to process(it.first, it.second) }.toMap())
+            Array -> {
+                val arrayName = name.capitalize() + idGenerator()
+                ArrayGen(json.elements(node).map { process(arrayName, it) }.toSet())
+            }
+            JsonType.String -> Primitives.StringValue
+            JsonType.Integer -> Primitives.Number
+            JsonType.Number -> Primitives.Number
+            JsonType.Boolean -> Primitives.Boolean
+            JsonType.Null -> Primitives.Null
         }
-        JsonType.String -> Primitives.StringValue
-        JsonType.Integer -> Primitives.Number
-        JsonType.Number -> Primitives.Number
-        JsonType.Boolean -> Primitives.Boolean
-        JsonType.Null -> Primitives.Null
     }
 }

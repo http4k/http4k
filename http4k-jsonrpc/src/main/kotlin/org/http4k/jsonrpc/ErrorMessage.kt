@@ -3,12 +3,12 @@ package org.http4k.jsonrpc
 import org.http4k.format.Json
 
 open class ErrorMessage(val code: Int, val message: String) {
-    open fun <ROOT : NODE, NODE> data(json: Json<ROOT, NODE>): NODE? = null
+    open fun <NODE> data(json: Json<NODE>): NODE? = null
 
-    operator fun <ROOT : NODE, NODE> invoke(json: Json<ROOT, NODE>): NODE {
-        val fields = listOf("code" to json.number(code), "message" to json.string(message))
+    operator fun <NODE> invoke(json: Json<NODE>): NODE = json {
+        val fields = listOf("code" to number(code), "message" to string(message))
         val data = data(json)
-        return json.obj(data?.let { fields + ("data" to it) } ?: fields)
+        json.obj(data?.let { fields + ("data" to it) } ?: fields)
     }
 
     companion object {

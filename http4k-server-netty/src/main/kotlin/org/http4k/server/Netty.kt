@@ -89,7 +89,7 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             closeFuture = channel.closeFuture()
         }
 
-        override fun stop() {
+        override fun stop() = apply {
             closeFuture?.cancel(false)
             workerGroup.shutdownGracefully()
             masterGroup.shutdownGracefully()

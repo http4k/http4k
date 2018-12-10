@@ -22,66 +22,64 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
-import java.lang.Exception
 import java.net.SocketTimeoutException
 import java.net.URI
 
-class ApacheAsyncClient(
-    private val client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
-    private val responseBodyMode: BodyMode = Memory,
-    private val requestBodyMode: BodyMode = Memory
-) : AsyncHttpClient {
-
-    init {
+object ApacheAsyncClient {
+    operator fun invoke(
+        client: CloseableHttpAsyncClient = defaultApacheAsyncHttpClient(),
+        responseBodyMode: BodyMode = Memory,
+        requestBodyMode: BodyMode = Memory
+    ): AsyncHttpClient {
         if (!client.isRunning) client.start()
-    }
 
-    override fun close() = client.close()
+        return object : AsyncHttpClient {
+            override fun close() = client.close()
 
-    override fun invoke(request: Request, fn: (Response) -> Unit) {
-        client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
-            override fun cancelled() {
+            override fun invoke(request: Request, fn: (Response) -> Unit) {
+                client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
+                    override fun cancelled() {}
+
+                    override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
+
+                    override fun failed(e: Exception) = fn(Response(when (e) {
+                        is ConnectTimeoutException -> CLIENT_TIMEOUT
+                        is SocketTimeoutException -> CLIENT_TIMEOUT
+                        else -> SERVICE_UNAVAILABLE
+                    }.toClientStatus(e)))
+                })
             }
 
-            override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
+            private fun HttpResponse.toHttp4kResponse(): Response =
+                Response(statusLine.toTarget()).headers(allHeaders.toTarget()).run {
+                    entity?.let { body(responseBodyMode(it.content)) } ?: this
+                }
 
-            override fun failed(e: Exception) = fn(Response(when (e) {
-                is ConnectTimeoutException -> CLIENT_TIMEOUT
-                is SocketTimeoutException -> CLIENT_TIMEOUT
-                else -> SERVICE_UNAVAILABLE
-            }.description("Client Error: caused by ${e.localizedMessage}")))
-        })
-    }
+            private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
+                init {
+                    val request = this@toApacheRequest
+                    uri = URI(request.uri.toString())
+                    entity = when (requestBodyMode) {
+                        Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong()
+                            ?: -1)
+                        Memory -> ByteArrayEntity(request.body.payload.array())
+                    }
+                    request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
+                }
 
-    private fun HttpResponse.toHttp4kResponse(): Response =
-        Response(statusLine.toTarget()).headers(allHeaders.toTarget()).run {
-            entity?.let { body(responseBodyMode(it.content)) } ?: this
-        }
-
-    private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
-        init {
-            val request = this@toApacheRequest
-            uri = URI(request.uri.toString())
-            entity = when (requestBodyMode) {
-                Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-                Memory -> ByteArrayEntity(request.body.payload.array())
+                override fun getMethod(): String = this@toApacheRequest.method.name
             }
-            request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
+
+            private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
+
+            private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
+
         }
-
-        override fun getMethod(): String = this@toApacheRequest.method.name
     }
 
-    private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
-
-    private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
-
-    companion object {
-        private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
-            .setDefaultRequestConfig(RequestConfig.custom()
-                .setRedirectsEnabled(false)
-                .setCookieSpec(IGNORE_COOKIES)
-                .build()).build().apply { start() }
-
-    }
+    private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setRedirectsEnabled(false)
+            .setCookieSpec(IGNORE_COOKIES)
+            .build()).build().apply { start() }
 }

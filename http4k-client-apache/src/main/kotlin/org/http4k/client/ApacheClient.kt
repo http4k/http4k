@@ -38,29 +38,27 @@ import java.net.SocketTimeoutException
 import java.net.URI
 import java.net.UnknownHostException
 
-class ApacheClient(
-    private val client: CloseableHttpClient = defaultApacheHttpClient(),
-    private val responseBodyMode: BodyMode = Memory,
-    private val requestBodyMode: BodyMode = Memory
-) : HttpHandler {
+object ApacheClient {
+    operator fun invoke(
+        client: CloseableHttpClient = defaultApacheHttpClient(),
+        responseBodyMode: BodyMode = Memory,
+        requestBodyMode: BodyMode = Memory
+    ): HttpHandler =
+        { request ->
+            try {
+                client.execute(request.toApacheRequest(requestBodyMode)).toHttp4kResponse(responseBodyMode)
+            } catch (e: ConnectTimeoutException) {
+                Response(CLIENT_TIMEOUT.toClientStatus(e))
+            } catch (e: SocketTimeoutException) {
+                Response(CLIENT_TIMEOUT.toClientStatus(e))
+            } catch (e: HttpHostConnectException) {
+                Response(CONNECTION_REFUSED.toClientStatus(e))
+            } catch (e: UnknownHostException) {
+                Response(UNKNOWN_HOST.toClientStatus(e))
+            }
+        }
 
-    override fun invoke(request: Request): Response = try {
-        client.execute(request.toApacheRequest()).toHttp4kResponse()
-    } catch (e: ConnectTimeoutException) {
-        Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
-    } catch (e: SocketTimeoutException) {
-        Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
-    } catch (e: HttpHostConnectException) {
-        Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
-    } catch (e: UnknownHostException) {
-        Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
-    }
-
-    private fun CloseableHttpResponse.toHttp4kResponse() = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
-        entity?.let { body(responseBodyMode(it.content)) } ?: this
-    }
-
-    private fun Request.toApacheRequest(): HttpRequestBase {
+    private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
         val request = this@toApacheRequest
         val uri = URI(request.uri.toString())
 
@@ -70,18 +68,7 @@ class ApacheClient(
             OPTIONS -> HttpOptions(uri)
             TRACE -> HttpTrace(uri)
             DELETE -> HttpDelete(uri)
-            else ->
-                object : HttpEntityEnclosingRequestBase() {
-                    init {
-                        this.uri = uri
-                        entity = when (requestBodyMode) {
-                            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
-                            Memory -> ByteArrayEntity(request.body.payload.array())
-                        }
-                    }
-
-                    override fun getMethod() = request.method.name
-                }
+            else -> ApacheRequest(requestBodyMode, request)
         }
         request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
         return apacheRequest
@@ -91,12 +78,26 @@ class ApacheClient(
 
     private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
 
-    companion object {
-        private fun defaultApacheHttpClient() = HttpClients.custom()
-            .setDefaultRequestConfig(RequestConfig.custom()
-                .setRedirectsEnabled(false)
-                .setCookieSpec(IGNORE_COOKIES)
-                .build()).build()
-
+    private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
+        entity?.let { body(responseBodyMode(it.content)) } ?: this
     }
+
+    private fun defaultApacheHttpClient() = HttpClients.custom()
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setRedirectsEnabled(false)
+            .setCookieSpec(IGNORE_COOKIES)
+            .build()).build()
+
+}
+
+private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+    init {
+        uri = URI(request.uri.toString())
+        entity = when (requestBodyMode) {
+            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+            Memory -> ByteArrayEntity(request.body.payload.array())
+        }
+    }
+
+    override fun getMethod() = request.method.name
 }

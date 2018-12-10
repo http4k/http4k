@@ -3,16 +3,13 @@ package org.http4k.util
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
-import org.http4k.lens.ParamMeta.BooleanParam
-import org.http4k.lens.ParamMeta.IntegerParam
-import org.http4k.lens.ParamMeta.NumberParam
-import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.ParamMeta.*
 
 class IllegalSchemaException(message: String) : Exception(message)
 
 data class JsonSchema<out NODE>(val node: NODE, val definitions: Set<Pair<String, NODE>>)
 
-class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
+class JsonToJsonSchema<NODE>(private val json: Json<NODE>) {
     fun toSchema(node: NODE, overrideDefinitionId: String? = null) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
@@ -36,7 +33,7 @@ class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
         val (node, definitions) = json.elements(node).toList().firstOrNull()?.let {
             JsonSchema(it, definitions).toSchema()
         } ?: throw IllegalSchemaException("Cannot use an empty list to generate a schema!")
-        return JsonSchema(json.obj("type" to json.string("array"), "items" to node), definitions)
+        return JsonSchema(json { obj("type" to string("array"), "items" to node) }, definitions)
     }
 
     private fun JsonSchema<NODE>.objectSchema(overrideDefinitionId: String?): JsonSchema<NODE> {
@@ -44,12 +41,12 @@ class JsonToJsonSchema<ROOT : NODE, NODE>(private val json: Json<ROOT, NODE>) {
             JsonSchema(second, memoDefinitions).toSchema().let { memoFields.plus(first to it.node) to it.definitions }
         }
 
-        val newDefinition = json.obj("type" to json.string("object"), "properties" to json.obj(fields))
-        val definitionId = overrideDefinitionId ?: "object" + newDefinition!!.hashCode()
+        val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
+        val definitionId = overrideDefinitionId ?: "object"+newDefinition!!.hashCode()
         val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
-        return JsonSchema(json.obj("\$ref" to json.string("#/definitions/$definitionId")), allDefinitions)
+        return JsonSchema(json { obj("\$ref" to string("#/definitions/$definitionId")) }, allDefinitions)
     }
 
-    private fun ParamMeta.schema(example: NODE): NODE = json.obj("type" to json.string(value), "example" to example)
+    private fun ParamMeta.schema(example: NODE): NODE = json { obj("type" to string(value), "example" to example) }
 }
 

@@ -1,14 +1,8 @@
 package org.http4k.security
 
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Response
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
-import org.http4k.core.Uri
-import org.http4k.core.query
-import org.http4k.core.toUrlFormEncoded
-import org.http4k.core.with
-import org.http4k.lens.Header.Common.LOCATION
+import org.http4k.lens.Header.LOCATION
 
 class OAuthRedirectionFilter(
     private val providerConfig: OAuthProviderConfig,

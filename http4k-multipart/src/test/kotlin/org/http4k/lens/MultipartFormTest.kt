@@ -36,7 +36,7 @@ class MultipartFormTest {
             )
         )
 
-        assertThat(Header.Common.CONTENT_TYPE(populatedRequest), equalTo(CONTENT_TYPE_WITH_BOUNDARY))
+        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(CONTENT_TYPE_WITH_BOUNDARY))
         assertThat(populatedRequest.bodyString(), equalTo(validBody))
     }
 
@@ -51,7 +51,7 @@ class MultipartFormTest {
 
         assertThat({
             multipartFormLens(Validator.Strict)(request)
-        }, throws(lensFailureWith(Unsupported(Header.Common.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        }, throws(lensFailureWith(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test

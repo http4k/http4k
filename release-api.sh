@@ -18,7 +18,7 @@ set -o nounset
 #fi
 
 TMP=/tmp/http4k-api/
-./gradlew clean dokka
+./gradlew dokka
 rm -rf ${TMP}
 git clone https://${GH_TOKEN}@github.com/http4k/api.git ${TMP}
 rm -rf ${TMP}/*

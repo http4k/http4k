@@ -1,11 +1,12 @@
 description = 'A set of Hamkrest matchers for common http4k types'
 
 dependencies {
-    provided kotlin_lib
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
-    compile hamkrest
 
-    testCompile testing
+    compile Libs.hamkrest
+
     testCompile project(":http4k-format-jackson")
+    testCompile Config.TestDependencies
 }
 

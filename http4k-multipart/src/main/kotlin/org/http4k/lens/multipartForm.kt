@@ -47,13 +47,13 @@ fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<Multip
         BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
                 LensGet { _, target ->
                     listOf(MultipartFormBody.from(target, diskThreshold).apply {
-                        ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.Common.CONTENT_TYPE(target))
+                        ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.CONTENT_TYPE(target))
                     })
                 },
                 LensSet { _: String, values: List<Body>, target: HttpMessage ->
                     values.fold(target) { a, b ->
                         a.body(b)
-                                .with(Header.Common.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(defaultBoundary))
+                                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(defaultBoundary))
                     }
                 })
                 .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })

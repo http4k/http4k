@@ -10,7 +10,7 @@ class HttpMessageTest {
 
     @Test
     fun can_modify_body() {
-        val testBody = "abc".toBody()
+        val testBody = Body("abc")
         assertThat(Response(OK).body(testBody).body, equalTo(testBody))
     }
 

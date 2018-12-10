@@ -5,7 +5,7 @@
 <a href="https://travis-ci.org/http4k/http4k"><img alt="build status" src="https://travis-ci.org/http4k/http4k.svg?branch=master"/></a>
 <a href="https://coveralls.io/github/http4k/http4k?branch=master"><img alt="coverage" src="https://coveralls.io/repos/http4k/http4k/badge.svg?branch=master"></a>
 <a href="http//www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub license" src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat"></a>
-<a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.2-blue.svg"></a>
+<a href="http://kotlinlang.org"><img alt="kotlin" src="https://img.shields.io/badge/kotlin-1.3-blue.svg"></a>
 <a href="https://codebeat.co/projects/github-com-http4k-http4k-master"><img alt="codebeat badge" src="https://codebeat.co/badges/5b369ed4-af27-46f4-ad9c-a307d900617e"></a>
 <a href="https://kotlin.link"><img alt="Awesome Kotlin Badge" src="https://kotlin.link/awesome-kotlin.svg"></a>
 <br/>
@@ -50,6 +50,7 @@ plugging together of services without HTTP container being required.
     * Multipart form handling, including stream processing for uploaded files.
     * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
     * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
+    * Cloud-native tooling: support for 12-factor-based style apps.
     * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [**http4k**](https://github.com/http4k/http4k) apps
     * Testing: Hamkrest Matchers for [**http4k**](https://github.com/http4k/http4k) objects.
     * Testing: Chaos Injection mechanism, allowing simple, dynamic injection of failure modes into  [**http4k**](https://github.com/http4k/http4k) applications.
@@ -82,7 +83,7 @@ plugging together of services without HTTP container being required.
         * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
-    * Implement a single Factory method, then upload your[http4k](https://github.com/http4k/http4k)applications to AWS Lambda to be called from API Gateway. 
+    * Implement a single Factory method, then upload your [http4k](https://github.com/http4k/http4k) applications to AWS Lambda to be called from API Gateway. 
 * [Contracts:](https://http4k.org/guide/modules/contracts) 
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
@@ -117,6 +118,8 @@ plugging together of services without HTTP container being required.
         * **Dropbox** 
         * **Google** 
         * **Soundcloud**
+* [Cloud Native:](https://http4k.org/guide/modules/cloud_native)
+    * Tooling to support operating [http4k](https://github.com/http4k/http4k) applications in orchestrated cloud environments such as Kubernetes and CloudFoundry. 12-factor configuration, dual-port servers and health checks such as liveness and readiness checking. 
 * [WebDriver:](https://http4k.org/guide/modules/webdriver) 
     * Ultra-lightweight Selenium WebDriver implementation for [**http4k**](https://github.com/http4k/http4k)  application.
 * [Hamkrest:](https://http4k.org/guide/modules/hamkrest) 
@@ -130,9 +133,9 @@ This quick example is designed to convey the simplicity & features of [**http4k*
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    compile group: "org.http4k", name: "http4k-core", version: "3.37.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.37.0"
-    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.37.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.103.2"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.103.2"
+    compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.103.2"
 }
 ```
 
@@ -208,9 +211,9 @@ fun main(args: Array<String>) {
 //    HTTP/1.1 200
 //    cache-control: private, must-revalidate
 //    content-length: 9
-//    date: Thu, 08 Jun 3.37.03:01:13 GMT
+//    date: Thu, 08 Jun 3.103.23:01:13 GMT
 //    expires: 0
-//    server: Jetty(9.3.16.v3.37.020)
+//    server: Jetty(9.3.16.v3.103.220)
 //
 //    hello Bob
 }

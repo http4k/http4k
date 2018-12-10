@@ -11,7 +11,7 @@ import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.toParameters
 import org.http4k.core.with
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 
 class OAuthCallback(
     private val providerConfig: OAuthProviderConfig,

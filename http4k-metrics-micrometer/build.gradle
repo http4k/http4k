@@ -1,16 +1,11 @@
 description = 'Http4k metrics support, integrating with micrometer.io'
 
-ext {
-    ext.micrometer_version = '1.0.0-rc.6'
-}
-
 dependencies {
-    provided kotlin_lib
-
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
-    provided "io.micrometer:micrometer-core:$micrometer_version"
+    compile Libs.micrometer_core
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 

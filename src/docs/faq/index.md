@@ -6,7 +6,7 @@ Find here answers to the most common questions that we get asked about **http4k*
 ### General
 **Q. Is http4k a library or a framework?**
 
-**A.** Although it has many of the features of a framework, we consider http4k to be a library which adds a common HTTP routing layer. Is it incredibly unopinionated and has been designed to not enforce design decisions on the API user. We use http4k for applications both large and small, using no DI framework.
+**A.** Although it has many of the features of a framework, we consider http4k to be a library which adds a common HTTP routing layer. It is incredibly unopinionated and has been designed to not enforce design decisions on the API user. We use http4k for applications both large and small, using no DI framework.
 
 **Q. Is http4k currently used in production?**
 

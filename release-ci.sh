@@ -25,21 +25,23 @@ fi
 
 echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
 
-./gradlew -PreleaseVersion=$LOCAL_VERSION clean assemble \
+./gradlew -PreleaseVersion=$LOCAL_VERSION clean javadocJar assemble \
     :http4k-core:bintrayUpload \
     :http4k-aws:bintrayUpload \
-    :http4k-contract:bintrayUpload \
+    :http4k-cloudnative:bintrayUpload \
     :http4k-client-apache:bintrayUpload \
     :http4k-client-apache-async:bintrayUpload \
     :http4k-client-okhttp:bintrayUpload \
     :http4k-client-jetty:bintrayUpload \
     :http4k-client-websocket:bintrayUpload \
+    :http4k-contract:bintrayUpload \
     :http4k-incubator:bintrayUpload \
     :http4k-format-argo:bintrayUpload \
     :http4k-format-gson:bintrayUpload \
     :http4k-format-jackson:bintrayUpload \
     :http4k-format-moshi:bintrayUpload \
     :http4k-format-xml:bintrayUpload \
+    :http4k-jsonrpc:bintrayUpload \
     :http4k-metrics-micrometer:bintrayUpload \
     :http4k-multipart:bintrayUpload \
     :http4k-resilience4j:bintrayUpload \

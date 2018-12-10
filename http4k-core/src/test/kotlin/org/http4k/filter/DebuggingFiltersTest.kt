@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 class DebuggingFiltersTest {
+
     @Test
     fun `prints request and response`() {
         val os = ByteArrayOutputStream()
@@ -27,26 +28,26 @@ class DebuggingFiltersTest {
     }
 
     @Test
-    fun `prints stream body by default`(){
+    fun `suppresses stream body by default`(){
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
         PrintRequestAndResponse(PrintStream(os))
             .then(resp.toHttpHandler())(req)
         val actual = String(os.toByteArray())
-        assertThat(actual, containsSubstring(req.toString()))
-        assertThat(actual, containsSubstring(resp.toString()))
+        assertThat(actual, containsSubstring(req.body("<<stream>>").toString()))
+        assertThat(actual, containsSubstring(resp.body("<<stream>>").toString()))
     }
 
     @Test
-    fun `can suppress stream body`(){
+    fun `can print stream body`(){
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
-        PrintRequestAndResponse(PrintStream(os), false)
+        PrintRequestAndResponse(PrintStream(os), true)
             .then(resp.toHttpHandler())(req)
         val actual = String(os.toByteArray())
-        assertThat(actual, containsSubstring(req.body("<<stream>>").toString()))
-        assertThat(actual, containsSubstring(resp.body("<<stream>>").toString()))
+        assertThat(actual, containsSubstring(req.toString()))
+        assertThat(actual, containsSubstring(resp.toString()))
     }
 }

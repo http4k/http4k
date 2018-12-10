@@ -1,11 +1,10 @@
 description = 'Http4k multipart form support'
 
 dependencies {
-    provided kotlin_lib
-
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    testCompile testing
+    testCompile Config.TestDependencies
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
 }
 

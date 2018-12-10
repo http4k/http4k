@@ -36,5 +36,5 @@ fun main(args: Array<String>) {
     }
 
     // see some results
-    registry.forEachMeter { println("${it.id} ${it.type()} ${it.measure().joinToString(",")}") }
+    registry.forEachMeter { println("${it.id} ${it.measure().joinToString(",")}") }
 }

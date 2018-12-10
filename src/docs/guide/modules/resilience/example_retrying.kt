@@ -13,7 +13,7 @@ import java.util.ArrayDeque
 fun main(args: Array<String>) {
 
     // configure the retry filter here, with max attempts and backoff
-    val retry = Retry.of("retrying", RetryConfig.custom()
+    val retry = Retry.of("retrying", RetryConfig.custom<RetryConfig>()
         .maxAttempts(3)
         .intervalFunction { attempt: Int -> (attempt * 2).toLong() }
         .build())

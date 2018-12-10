@@ -1,6 +1,6 @@
 package org.http4k.core
 
-import org.http4k.lens.Header.Common.CONTENT_TYPE
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormParser
 import org.http4k.multipart.Part

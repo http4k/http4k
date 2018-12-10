@@ -12,8 +12,8 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.http4k.core.Body
-import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion
+import org.http4k.format.JsonType.Object
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
@@ -27,6 +27,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -35,6 +37,7 @@ import kotlin.reflect.KClass
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
 
 open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
+
     override fun typeOf(value: JsonElement): JsonType =
             when {
                 value.isJsonArray -> JsonType.Array
@@ -78,13 +81,14 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
         return root
     }
 
-    override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> {
-        val fieldList = mutableListOf<Pair<String, JsonElement>>()
-        for ((key, value) in node.asJsonObject.entrySet()) {
-            fieldList += key to value
-        }
-        return fieldList
-    }
+    override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
+            if (typeOf(node) != Object) emptyList() else {
+                val fieldList = mutableListOf<Pair<String, JsonElement>>()
+                for ((key, value) in node.asJsonObject.entrySet()) {
+                    fieldList += key to value
+                }
+                fieldList
+            }
 
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
@@ -99,24 +103,33 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    override fun textValueOf(node: JsonElement, name: String) = when (node) {
+        is JsonObject -> node[name].asString
+        else -> throw IllegalArgumentException("node is not an object")
+    }
 }
 
 object Gson : ConfigurableGson(GsonBuilder()
-        .registerTypeAdapter(Duration::class.java, custom(Duration::parse))
-        .registerTypeAdapter(LocalTime::class.java, custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format))
-        .registerTypeAdapter(LocalDate::class.java, custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format))
-        .registerTypeAdapter(LocalDateTime::class.java, custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format))
-        .registerTypeAdapter(ZonedDateTime::class.java, custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format))
-        .registerTypeAdapter(Instant::class.java, custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format))
-        .registerTypeAdapter(UUID::class.java, custom(UUID::fromString))
-        .registerTypeAdapter(Uri::class.java, custom(Companion::of))
-        .registerTypeAdapter(URL::class.java, custom(::URL, URL::toExternalForm))
-        .registerTypeAdapter(Regex::class.java, custom(::Regex, Regex::pattern))
+        .custom(Duration::parse)
+        .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+        .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+        .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+        .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
+        .custom(UUID::fromString)
+        .custom(Companion::of)
+        .custom(::URL, URL::toExternalForm)
+        .custom(::Regex, Regex::pattern)
         .serializeNulls())
 
 private interface BidiJson<T> : JsonSerializer<T>, JsonDeserializer<T>
 
-private inline fun <T> custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
+private inline fun <reified T> GsonBuilder.custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }): GsonBuilder = this.registerTypeAdapter(T::class.java, adapter(readFn, writeFn))
+
+private inline fun <T> adapter(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
         object : BidiJson<T> {
             override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(writeFn(src))
 

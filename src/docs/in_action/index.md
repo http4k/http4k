@@ -2,13 +2,27 @@ title: http4k in Action
 description: Example applications and usages of http4k, including TDD approach 
 
 # Rationale & design
-[Presentation about the development of http4k given at the Kotlin London meetup](https://www.http4k.org/server_as_a_function_in_kotlin)
 
-# See http4k in action in these example projects:
-* [Super quick start "Hello World" Github/Travis/Heroku CD pipeline)](https://start.http4k.org)
-* [Todo backend (standard routing version)](https://github.com/http4k/http4k-todo-backend)
-* [Todo backend (contract routing version)](https://github.com/http4k/http4k-contract-todo-backend)
-* [S3-backed Dropbox clone in <100 lines of code](https://github.com/daviddenton/http4k-demo-s3box)
-* [Simple websocket driven chat-server in 30 lines of code](https://github.com/daviddenton/http4k-demo-irc)
-* [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
-* [Stage-by-stage example of development process (London TDD style)](/guide/example)
+### KotlinConf presentations: Server as a Function. In Kotlin. __________________
+- [Slides](https://speakerdeck.com/daviddenton/server-as-a-function-in-kotlin)
+- [Video](http://bit.ly/serverasafunction)
+
+# See http4k in action in these example projects and repos:
+Each project is tagged with the http4k features it demonstrates:
+
+### ["Hello World"](https://start.http4k.org)
+<span class="pill">CD pipeline</span>
+### [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
+<span class="pill">Templates</span> <span class="pill">Testing</span> <span class="pill">JSON / Lenses</span> <span class="pill">CD pipeline</span> <span class="pill">OpenApi</span> <span class="pill">Static resources</span>
+### [Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)
+<span class="pill">Templates</span> <span class="pill">Testing</span> <span class="pill">Http Client</span> <span class="pill">Multipart</span> <span class="pill">AWS</span> <span class="pill">CD pipeline</span> <span class="pill">Serverless</span> <span class="pill">GraalVM</span>
+### [Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)
+<span class="pill">Testing</span> <span class="pill">Websockets</span> <span class="pill">CD Pipeline</span> <span class="pill">Static resources</span>
+### [Stage-by-stage example of London-style TDD development process](https://http4k.org/guide/example)
+<span class="pill">Testing</span> 
+### [Todo backend (standard routing)](https://github.com/http4k/http4k-todo-backend)
+<span class="pill">Testing</span> <span class="pill">JSON / Lenses</span> <span class="pill">CD pipeline</span>
+### [Todo backend (contract routing)](https://github.com/http4k/http4k-contract-todo-backend)
+<span class="pill">Testing</span> <span class="pill">JSON / Lenses</span> <span class="pill">OpenApi</span> <span class="pill">CD pipeline</span>
+### [Real World example (Medium clone)](https://github.com/alisabzevari/kotlin-http4k-realworld-example-app)
+<span class="pill">Testing</span> <span class="pill">Contracts</span> 

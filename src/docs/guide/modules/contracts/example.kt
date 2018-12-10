@@ -31,7 +31,7 @@ val stringBody = Body.string(TEXT_PLAIN).toLens()
 val route = ("/echo" / Path.of("name") meta {
     summary = "echo"
     queries += ageQuery
-    body = stringBody
+    receiving(stringBody)
 } bindContract Method.GET)
 
 //2. Dynamic binding of calls to an HttpHandler

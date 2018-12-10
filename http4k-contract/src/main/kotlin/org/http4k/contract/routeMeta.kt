@@ -27,32 +27,44 @@ class RouteMetaDsl internal constructor() {
     internal val responses = Appendable<ResponseMeta>()
     var headers = Appendable<Lens<Request, *>>()
     var queries = Appendable<Lens<Request, *>>()
-    var body: BodyLens<*>? = null
+    internal var body: BodyLens<*>? = null
     var operationId: String? = null
 
     @JvmName("returningResponse")
-    fun returning(descriptionToResponse: Pair<String, Response>) = returning(ResponseMeta(descriptionToResponse.first, descriptionToResponse.second))
+    fun returning(vararg descriptionToResponse: Pair<String, Response>) =
+        descriptionToResponse.forEach { (description, status) -> returning(ResponseMeta(description, status)) }
 
     /**
      * Add a possible response metadata to this Route
      */
     @JvmName("returningResponseMeta")
-    fun returning(responseMeta: ResponseMeta) {
-        responses += responseMeta
-        produces.plusAssign(Header.Common.CONTENT_TYPE(responseMeta.message)?.let { listOf(it) } ?: emptyList())
+    fun returning(vararg responseMetas: ResponseMeta) {
+        responseMetas.forEach { responses += it }
+        responseMetas.forEach {
+            produces += Header.CONTENT_TYPE(it.message)?.let { listOf(it) } ?: emptyList()
+        }
     }
 
     /**
      * Add a possible response description/reason and status to this Route
      */
     @JvmName("returningStatus")
-    fun returning(descriptionToStatus: Pair<String, Status>) = returning(descriptionToStatus.first to Response(descriptionToStatus.second))
+    fun returning(vararg descriptionsToStatus: Pair<String, Status>) =
+        descriptionsToStatus.forEach { (d, status) -> returning(d to Response(status)) }
 
     /**
-     * Add a possible response status to this Route
+     * Add possible response statuses to this Route
      */
     @JvmName("returningStatus")
-    fun returning(status: Status) = returning(ResponseMeta("", Response(status)))
+    fun returning(vararg statuses: Status) = statuses.forEach { returning(ResponseMeta("", Response(it))) }
+
+    /**
+     * Set the input body type for this request WITHOUT an example. Hence the content-type will be registered but no
+     * example schema will be generated.
+     */
+    fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
+        body = bodyLens
+    }
 
     /**
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId for this request body which

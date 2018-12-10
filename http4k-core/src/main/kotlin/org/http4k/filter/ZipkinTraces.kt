@@ -8,14 +8,13 @@ import org.http4k.lens.Header
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta.StringParam
-import java.util.Random
 
 import kotlin.experimental.and
+import kotlin.random.Random
 
 data class TraceId(val value: String) {
     companion object {
-        private val TraceRandom = Random()
-        fun new(random: Random = TraceRandom): TraceId {
+        fun new(random: Random = Random): TraceId {
             val randomBytes = ByteArray(8)
             random.nextBytes(randomBytes)
             val sb = StringBuilder(randomBytes.size * 2)

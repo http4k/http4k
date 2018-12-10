@@ -2,17 +2,19 @@ package org.http4k.jsonrpc
 
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.jsonrpc.MethodBindings.Companion.Auto
+import org.http4k.jsonrpc.MethodBindings.Companion.Manual
 
 object JsonRpc {
-    fun <ROOT : NODE, NODE : Any> auto(json: JsonLibAutoMarshallingJson<ROOT>,
+    fun <NODE : Any> auto(json: JsonLibAutoMarshallingJson<NODE>,
                                        errorHandler: ErrorHandler = defaultErrorHandler,
-                                       definitions: AutoMethodMappingsBuilder<ROOT>.() -> Unit): JsonRpcService<ROOT, ROOT> =
-            JsonRpcService(json, errorHandler, AutoMethodMappingsBuilder(json).apply(definitions).mappings())
+                                       fn: Auto<NODE>.() -> Unit): JsonRpcService<NODE> =
+            JsonRpcService(json, errorHandler, Auto(json).apply(fn))
 
-    fun <ROOT : NODE, NODE : Any> manual(json: Json<ROOT, NODE>,
+    fun <NODE : Any> manual(json: Json<NODE>,
                                          errorHandler: ErrorHandler = defaultErrorHandler,
-                                         definitions: ManualMethodMappingsBuilder<ROOT, NODE>.() -> Unit): JsonRpcService<ROOT, NODE> =
-            JsonRpcService(json, errorHandler, ManualMethodMappingsBuilder(json).apply(definitions).mappings())
+                                         fn: Manual<NODE>.() -> Unit): JsonRpcService<NODE> =
+            JsonRpcService(json, errorHandler, Manual(json).apply(fn))
 }
 
 typealias JsonRpcHandler<IN, OUT> = (IN) -> OUT

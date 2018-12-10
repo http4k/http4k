@@ -29,7 +29,7 @@ fun hasHeader(name: String): Matcher<HttpMessage> = has("Header '$name'", { m: H
 
 fun hasHeader(name: String, expected: List<String?>): Matcher<HttpMessage> = has("Header '$name'", { m: HttpMessage -> m.headerValues(name) }, equalTo(expected))
 
-fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-Type", { m: HttpMessage -> Header.Common.CONTENT_TYPE(m) }, equalTo(expected))
+fun hasContentType(expected: ContentType): Matcher<HttpMessage> = has("Content-Type", { m: HttpMessage -> Header.CONTENT_TYPE(m) }, equalTo(expected))
 
 fun hasBody(expected: Matcher<Body>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> m.body }, expected)
 
@@ -45,8 +45,8 @@ fun hasBody(expected: Regex): Matcher<HttpMessage> = hasBody(present(matches(exp
 
 fun <T> hasBody(lens: BodyLens<T>, matcher: Matcher<T>): Matcher<HttpMessage> = LensMatcher(has("Body", { m: HttpMessage -> lens(m) }, matcher))
 
-fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: ROOT): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
+fun <NODE> Json<NODE>.hasBody(expected: NODE): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, equalTo(expected))
 
-fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: Matcher<ROOT>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
+fun <NODE> Json<NODE>.hasBody(expected: Matcher<NODE>): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> parse(m.bodyString()) }, expected)
 
-fun <ROOT : NODE, NODE> Json<ROOT, NODE>.hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))
+fun <NODE> Json<NODE>.hasBody(expected: String): Matcher<HttpMessage> = has("Body", { m: HttpMessage -> compactify(m.bodyString()) }, equalTo(compactify(expected)))

@@ -1,27 +1,18 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
-import org.http4k.core.ContentType
-import org.http4k.core.Credentials
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.*
 import org.http4k.core.Method.OPTIONS
-import org.http4k.core.Request
-import org.http4k.core.RequestContext
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
-import org.http4k.core.Store
-import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
+import org.http4k.lens.RequestContextLens
 import org.http4k.routing.ResourceLoader
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import java.io.PrintWriter
@@ -47,10 +38,18 @@ object ServerFilters {
         operator fun invoke(policy: CorsPolicy) = Filter { next ->
             {
                 val response = if (it.method == OPTIONS) Response(OK) else next(it)
+
+                val origin = it.header("Origin")
+                val allowedOrigin = when {
+                    policy.origins.contains("*") -> "*"
+                    policy.origins.contains(origin) -> origin!!
+                    else -> "null"
+                }
+
                 response.with(
-                        Header.required("access-control-allow-origin") of policy.origins.joined(),
-                        Header.required("access-control-allow-headers") of policy.headers.joined(),
-                        Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
+                    Header.required("access-control-allow-origin") of allowedOrigin,
+                    Header.required("access-control-allow-headers") of policy.headers.joined(),
+                    Header.required("access-control-allow-methods") of policy.methods.map { it.name }.joined()
                 )
             }
         }
@@ -84,7 +83,10 @@ object ServerFilters {
      * Simple Basic Auth credential checking.
      */
     object BasicAuth {
-        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean): Filter = Filter { next ->
+        /**
+         * Credentials validation function
+         */
+        operator fun invoke(realm: String, authorize: (Credentials) -> Boolean) = Filter { next ->
             {
                 val credentials = it.basicAuthenticationCredentials()
                 if (credentials == null || !authorize(credentials)) {
@@ -93,9 +95,27 @@ object ServerFilters {
             }
         }
 
+        /**
+         * Static username/password validation
+         */
+        operator fun invoke(realm: String, user: String, password: String) = this(realm, Credentials(user, password))
 
-        operator fun invoke(realm: String, user: String, password: String): Filter = this(realm, Credentials(user, password))
-        operator fun invoke(realm: String, credentials: Credentials): Filter = this(realm) { it == credentials }
+        /**
+         * Static credentials validation
+         */
+        operator fun invoke(realm: String, credentials: Credentials) = this(realm) { it == credentials }
+
+        /**
+         * Population of a RequestContext with custom principal object
+         */
+        operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) = Filter { next ->
+            {
+                it.basicAuthenticationCredentials()
+                        ?.let(lookup)
+                        ?.let { found -> next(it.with(key of found)) }
+                        ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+            }
+        }
 
         private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")?.replace("Basic ", "")?.toCredentials()
 
@@ -106,12 +126,31 @@ object ServerFilters {
      * Bearer Auth token checking.
      */
     object BearerAuth {
-        operator fun invoke(checkToken: (String) -> Boolean): Filter = Filter { next ->
+        /**
+         * Static token validation
+         */
+        operator fun invoke(token: String) = BearerAuth { it == token }
+
+        /**
+         * Static token validation function
+         */
+        operator fun invoke(checkToken: (String) -> Boolean) = Filter { next ->
             {
                 if (it.bearerToken()?.let(checkToken) == true) next(it) else Response(UNAUTHORIZED)
             }
         }
-        operator fun invoke(token: String): Filter = BearerAuth() { it == token }
+
+        /**
+         * Population of a RequestContext with custom principal object
+         */
+        operator fun <T> invoke(key: RequestContextLens<T>, lookup: (String) -> T?) = Filter { next ->
+            {
+                it.bearerToken()
+                        ?.let(lookup)
+                        ?.let { found -> next(it.with(key of found)) }
+                        ?: Response(UNAUTHORIZED)
+            }
+        }
 
         private fun Request.bearerToken(): String? = header("Authorization")?.replace("Bearer ", "")
     }
@@ -187,6 +226,19 @@ object ServerFilters {
     }
 
     /**
+     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list. Does not currently support GZipping streams.
+     * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
+     * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
+     */
+    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>): Filter {
+        override fun invoke(next: HttpHandler): HttpHandler {
+            return RequestFilters.GunZip()
+                    .then(ResponseFilters.GZipContentTypes(compressibleContentTypes))
+                    .invoke(next)
+        }
+    }
+
+    /**
      * Initialise a RequestContext for each request which passes through the Filter stack,
      */
     object InitialiseRequestContext {
@@ -208,7 +260,7 @@ object ServerFilters {
     object SetContentType {
         operator fun invoke(contentType: ContentType): Filter = Filter { next ->
             {
-                next(it).with(Header.Common.CONTENT_TYPE of contentType)
+                next(it).with(CONTENT_TYPE of contentType)
             }
         }
     }

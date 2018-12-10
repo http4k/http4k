@@ -35,6 +35,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -95,6 +97,8 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 }
 
 val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
@@ -104,6 +108,8 @@ val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
         .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
         .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
         .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
         .custom(UUID::fromString)
         .custom(Companion::of)
         .custom(::URL, URL::toExternalForm)

@@ -1,8 +1,6 @@
 package org.http4k.filter
 
-import org.http4k.core.Filter
-import org.http4k.core.HttpTransaction
-import org.http4k.core.Response
+import org.http4k.core.*
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -54,7 +52,37 @@ object ResponseFilters {
     }
 
     /**
-     * Basic UnGZipping of Response. Does not currently support GZipping streams
+     * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
+     */
+    class GZipContentTypes(compressibleContentTypes: Set<ContentType>) : Filter {
+        private val compressibleMimeTypes = compressibleContentTypes
+                .map { it.value }
+                .map { it.split(";").first() }
+
+        override fun invoke(next: HttpHandler): HttpHandler {
+            return { request ->
+                next(request).let {
+                    if (requestAcceptsGzip(request) && isCompressible(it)) {
+                        it.body(it.body.gzipped()).replaceHeader("content-encoding", "gzip")
+                    } else {
+                        it
+                    }
+                }
+            }
+        }
+
+        private fun isCompressible(it: Response) =
+                compressibleMimeTypes.contains(mimeTypeOf(it))
+
+        private fun mimeTypeOf(it: Response) =
+                (it.header("content-type") ?: "").split(";").first().trim()
+
+        private fun requestAcceptsGzip(it: Request) =
+                (it.header("accept-encoding") ?: "").contains("gzip", true)
+    }
+
+    /**
+     * Basic GZipping of Response. Does not currently support GZipping streams
      */
     object GZip {
         operator fun invoke() = Filter { next ->

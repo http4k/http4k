@@ -8,6 +8,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Gson.auto
+import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
+import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -36,11 +38,13 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
 
 }
 
-class GsonTest : JsonContract<JsonElement, JsonElement>(Gson) {
+class GsonTest : JsonContract<JsonElement>(Gson) {
     override val prettyString = """{
   "hello": "world"
 }"""
 }
 
-class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement, JsonElement>(Gson)
-class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement, JsonElement>(Gson)
+class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement>(Gson)
+class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement>(Gson)
+class GsonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonElement>(Gson)
+class GsonManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonElement>(Gson)

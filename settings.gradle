@@ -6,6 +6,7 @@ include 'http4k-client-apache-async'
 include 'http4k-client-jetty'
 include 'http4k-client-okhttp'
 include 'http4k-client-websocket'
+include 'http4k-cloudnative'
 include 'http4k-contract'
 include 'http4k-format-argo'
 include 'http4k-format-gson'
@@ -30,3 +31,5 @@ include 'http4k-template-thymeleaf'
 include 'http4k-testing-chaos'
 include 'http4k-testing-hamkrest'
 include 'http4k-testing-webdriver'
+
+enableFeaturePreview('STABLE_PUBLISHING')

@@ -10,6 +10,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
+import org.http4k.core.extend
 import org.http4k.core.then
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
@@ -17,6 +18,7 @@ import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
 import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 object ClientFilters {
 
@@ -50,6 +52,16 @@ object ClientFilters {
                         .replaceHeader("Host", "${uri.host}${uri.port?.let { port -> ":$port" } ?: ""}"))
             }
         }
+    }
+
+    /**
+     * Sets the base uri (host + base path) on an outbound request. This is useful to separate configuration of remote endpoints
+     * from the logic required to construct the rest of the request.
+     */
+    object SetBaseUriFrom {
+        operator fun invoke(uri: Uri): Filter = SetHostFrom(uri).then(Filter { next ->
+            { request -> next(request.uri(uri.extend(request.uri))) }
+        })
     }
 
     object BasicAuth {
@@ -118,7 +130,7 @@ object ClientFilters {
 
         private fun removeExpired(now: LocalDateTime, storage: CookieStorage) = storage.retrieve().filter { it.isExpired(now) }.forEach { storage.remove(it.cookie.name) }
 
-        private fun Clock.now() = LocalDateTime.ofInstant(instant(), zone)
+        private fun Clock.now() = LocalDateTime.ofInstant(instant(), ZoneOffset.UTC)
     }
 
     /**

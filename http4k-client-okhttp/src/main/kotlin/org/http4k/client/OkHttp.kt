@@ -6,7 +6,6 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.create
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
 import org.http4k.core.BodyMode
-import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -19,17 +18,22 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private val bodyMode: BodyMode = BodyMode.Memory) : HttpHandler, AsyncHttpClient {
+object OkHttp {
+    operator fun invoke(client: OkHttpClient = defaultOkHttpClient(), bodyMode: BodyMode = BodyMode.Memory): DualSyncAsyncHttpHandler =
+        object : DualSyncAsyncHttpHandler {
+            override fun invoke(request: Request): Response =
+                try {
+                    client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+                } catch (e: ConnectException) {
+                    Response(CONNECTION_REFUSED.toClientStatus(e))
+                } catch (e: UnknownHostException) {
+                    Response(UNKNOWN_HOST.toClientStatus(e))
+                } catch (e: SocketTimeoutException) {
+                    Response(CLIENT_TIMEOUT.toClientStatus(e))
+                }
 
-    override fun invoke(request: Request): Response =
-        try {
-            client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
-        } catch (e: ConnectException) {
-            Response(CONNECTION_REFUSED.description("Client Error: caused by ${e.localizedMessage}"))
-        } catch (e: UnknownHostException) {
-            Response(UNKNOWN_HOST.description("Client Error: caused by ${e.localizedMessage}"))
-        } catch (e: SocketTimeoutException) {
-            Response(CLIENT_TIMEOUT.description("Client Error: caused by ${e.localizedMessage}"))
+            override operator fun invoke(request: Request, fn: (Response) -> Unit) =
+                client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
@@ -38,17 +42,12 @@ class OkHttp(private val client: OkHttpClient = defaultOkHttpClient(), private v
             else -> SERVICE_UNAVAILABLE
         }.description("Client Error: caused by ${e.localizedMessage}")))
 
-        override fun onResponse(call: Call?, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
+        override fun onResponse(call: Call, response: okhttp3.Response) = fn(response.asHttp4k(bodyMode))
     }
 
-    override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-        client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
-
-    companion object {
-        private fun defaultOkHttpClient() = OkHttpClient.Builder()
-            .followRedirects(false)
-            .build()
-    }
+    private fun defaultOkHttpClient() = OkHttpClient.Builder()
+        .followRedirects(false)
+        .build()
 }
 
 private fun Request.asOkHttp(): okhttp3.Request = headers.fold(okhttp3.Request.Builder()

@@ -10,19 +10,17 @@ import org.http4k.core.Request
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.junit.jupiter.api.Test
-import java.util.Random
+import kotlin.random.Random
 
 
 class TraceIdTest {
 
     @Test
     fun `creates a new random`() {
-        val r = Random()
-        r.setSeed(1)
-        TraceId.new(r) shouldMatch equalTo(TraceId("73d51abbd89cb819"))
-        TraceId.new(r) shouldMatch equalTo(TraceId("6f0efb6892f94d68"))
+        val r = Random(1)
+        TraceId.new(r) shouldMatch equalTo(TraceId("1a2ac523b005b1a4"))
+        TraceId.new(r) shouldMatch equalTo(TraceId("6d33b6a05a4abadf"))
     }
-
 }
 
 class SamplingDecisionTest {

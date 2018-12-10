@@ -5,13 +5,14 @@ import org.http4k.core.Request
 import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
-import java.io.Closeable
 
-interface Http4kServer: Closeable {
+interface Http4kServer : AutoCloseable {
     fun start(): Http4kServer
-    fun stop()
+    fun stop(): Http4kServer
     fun block() = Thread.currentThread().join()
-    override fun close() = stop()
+    override fun close() {
+        stop()
+    }
     fun port(): Int
 }
 
@@ -33,6 +34,7 @@ interface WsServerConfig : ServerConfig {
 
 @JvmName("consumerAsServer")
 fun WsConsumer.asServer(config: WsServerConfig): Http4kServer = { _: Request -> this@asServer }.asServer(config)
+
 fun WsHandler.asServer(config: WsServerConfig): Http4kServer = config.toWsServer(this)
 fun HttpHandler.asServer(config: ServerConfig): Http4kServer = config.toServer(this)
 fun PolyHandler.asServer(config: WsServerConfig): Http4kServer = config.toServer(http, ws)

@@ -1,17 +1,17 @@
 description = 'Http4k HTTP Server built on top of Apache httpcore'
 
 ext {
-    ext.apache_http_core_version = '4.4.6'
+    ext.apache_http_core_version = '4.4.10'
 }
 
 dependencies {
-    provided kotlin_lib
-
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
-    compile "org.apache.httpcomponents:httpcore:$apache_http_core_version"
+
+    compile Libs.httpcore // apache
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
 

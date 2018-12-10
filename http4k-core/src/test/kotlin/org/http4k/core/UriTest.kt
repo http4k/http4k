@@ -46,6 +46,11 @@ class UriTest {
     }
 
     @Test
+    fun `equality for round tripping`() {
+        assertThat(Uri.of("path"), equalTo(Uri.of(Uri.of("path").toString())))
+    }
+
+    @Test
     fun can_parse_minimal_uri() {
         val value = "http://host"
         val uri = Uri.of(value)
@@ -83,4 +88,17 @@ class UriTest {
         assertThat(encoded.fromPathEncoded(), equalTo(original))
     }
 
+    @Test
+    fun `can extend existing uri path`() {
+        assertThat(Uri.of("http://ignore").extend(Uri.of("/")), equalTo(Uri.of("http://ignore/")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("")), equalTo(Uri.of("http://ignore/a")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("/b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b")), equalTo(Uri.of("http://ignore/a/b")))
+        assertThat(Uri.of("http://ignore/a").extend(Uri.of("b/")), equalTo(Uri.of("http://ignore/a/b/")))
+    }
+
+    @Test
+    fun `can extend existing uri`(){
+        assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
+    }
 }

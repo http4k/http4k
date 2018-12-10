@@ -2,6 +2,92 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.103.2
+- Fix `access-control-allow-origin` returned when server supports multiple origins H/T @johnnorris
+
+### v3.103.1
+- (Properly) Fix #198 - Rewrote OpenApi contract to ensure it stays fixed. H/T @reik-wargaming for the help in tracking this down.
+
+### v3.103.0
+- "Fix" #198 - Breaking change made in `http4k-contracts` to clarify/deconfuse API. Hid `body` parameter in contract route meta DSL - it is now `receiving()`.
+- Upgraded some dependencies, including Gradle to v5.0.
+- Breaking: Resilience4j dependency upgrade causes a break when providing custom config. Simply insert the Config type generic to fix:
+e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
+
+### v3.102.1
+- Fix #197 - Swagger spec for form fields had incorrect description. 
+
+### v3.102.0
+- Introduce interface for Environment
+
+### v3.101.0 
+- Upgrades to dependencies
+- Improved Client-side HTTP status descriptions
+- Lenses now support Durations out of the box
+- Environments now support multi-value keys (comma separated)
+
+### v3.100.0 
+- Make `Undertow` API friendlier
+- Fix to JsonReadinessCheckResultRenderer to actually implement the correct interface
+
+### v3.99.0 
+- Enhancement of `http4k-cloudnative` - now supports extra-health check routes, and provide way to load app configuration via Properties files.
+
+### v3.98.0 
+- Add filter allowing Gzipping based on an allowed set of content types. H/T @jshiell
+- Change HttpHandler extending HttpClients to use `object invoke()` mechanism, as the individual clients have no visible API surface of their own. Introduced `DualSyncAsyncHttpHandler` interface.
+
+### v3.97.0
+- Webdriver checkbox handling improved. H/T @gypsydave5
+- upgrade to various versions
+
+### v3.96.0
+- upgrade to Kotlin 1.3.0
+
+### v3.95.1
+- Tweak to K8S port variables.
+
+### v3.95.0
+- (Unlikely break): Change `Http4kServer` interface to return `Unit` from `stop()`. This affects all server implementations.
+- Added DSL function for working with JSON objects (scopes JSON as `this`). `fun <T> Json<NODE>.invoke(Json<NODE>.() -> T)`
+- New module `http4k-cloudnative` contains classes to help run http4k services inside cloud-native environments, including K8S.
+- Upgrade some dependencies
+- Deprecation: Moved `Header.Common` fields to main `Header` object. Extension properties should go there now.
+
+### v3.94.1
+- Use UTC when checking cookie expiry
+
+### v3.94.0
+- Deprecate String.toBody()
+- Fix checkbox behaviour in webdriver
+
+### ~v3.39.4~ v3.93.4
+- Use Jetty latest release version (rather than RC one) 
+
+### v3.39.3
+- Fix #189 - Uri toString now omits leading slash if the authority of a Uri is blank. This *could* be a potential break, but is actually more consistent as a Uri can currently be relative or absolute.
+ 
+### v3.39.2
+- Extend `SetBaseUriFrom` to support query parameters 
+ 
+### v3.39.1
+- Added `SetBaseUriFrom` filter
+
+### v3.39.0
+- (Possible breaking change): `Json` is now only generified by a single type parameter instead of 2. For most usages, this type would have been identical anyway, but the upgrade of Argo has finally allowed the removal of this dead generic. Simply replace `Json<Node, Node>` with `Json<Node>`.
+- Added Offset datetime types to all JSON auto-marshalling libraries
+- Build logic for versioning is now in Kotlin. H/T @jmfayard for the PR
+- Upgrade Kotlin, and various other dependencies
+
+### v3.38.1
+- Fix `withChaosControls` URL pattern so that it matches sub-routes ok on original handler
+
+### v3.38.0
+- Added `BearerAuth` and `BasicAuth` implementations which populate `RequestContexts`. Plus cookbook example :)
+
+### v3.37.1
+- Fix #177 - Make RequestContexts thread-safe.
+
 ### v3.37.0
 - Upgrades to `http4k-testing-webdriver`. H/T @dickon for the PRs
 - Added `ProxyHost` request filter which is useful for writing proxy-type apps.

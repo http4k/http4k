@@ -1,12 +1,12 @@
 description = 'Http4k Handlebars templating support'
 
 dependencies {
-    provided kotlin_lib
-
+    provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
-    compile 'com.github.jknack:handlebars:4.0.6'
+
+    compile Libs.handlebars
 
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile testing
+    testCompile Config.TestDependencies
 }
 
