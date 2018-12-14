@@ -53,7 +53,6 @@ fun ApplicationRequest.asHttp4k() = Request(Method.valueOf(httpMethod.value), ur
     .body(receiveChannel().toInputStream(), header("Content-Length")?.toLong())
 
 suspend fun ApplicationResponse.fromHttp4K(response: Response) {
-    println("starting to transfer")
     status(HttpStatusCode.fromValue(response.status.code))
     response.headers
         .filterNot { HttpHeaders.isUnsafe(it.first) }
@@ -61,9 +60,7 @@ suspend fun ApplicationResponse.fromHttp4K(response: Response) {
     call.respondOutputStream(
         Header.CONTENT_TYPE(response)?.let { ContentType.parse(it.toHeaderValue()) }
     ) {
-        println("copy started")
         response.body.stream.copyTo(this)
-        println("copy finished")
     }
 }
 
