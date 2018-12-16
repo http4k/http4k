@@ -44,7 +44,7 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) {
-            ContractRoute(method, this@ContractRouteSpec0, routeMeta) { fn }
+            ContractRoute(method, this, routeMeta) { fn }
         }
     }
 
@@ -61,7 +61,7 @@ class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> P
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A) -> HttpHandler) = with(this@ContractRouteSpec1) {
-            ContractRoute(method, this@ContractRouteSpec1, routeMeta) { fn(it[a]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a]) }
         }
     }
 
@@ -78,7 +78,7 @@ class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegment
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B) -> HttpHandler) = with(this@ContractRouteSpec2) {
-            ContractRoute(method, this@ContractRouteSpec2, routeMeta) { fn(it[a], it[b]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b]) }
         }
     }
 
@@ -96,7 +96,7 @@ class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (Path
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C) -> HttpHandler) = with(this@ContractRouteSpec3) {
-            ContractRoute(method, this@ContractRouteSpec3, routeMeta) { fn(it[a], it[b], it[c]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c]) }
         }
     }
 
@@ -115,7 +115,7 @@ class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D) -> HttpHandler) = with(this@ContractRouteSpec4) {
-            ContractRoute(method, this@ContractRouteSpec4, routeMeta) { fn(it[a], it[b], it[c], it[d]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d]) }
         }
     }
 
@@ -133,7 +133,7 @@ class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E) -> HttpHandler) = with(this@ContractRouteSpec5) {
-            ContractRoute(method, this@ContractRouteSpec5, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e]) }
         }
     }
 
@@ -151,7 +151,7 @@ class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal cons
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E, F) -> HttpHandler) = with(this@ContractRouteSpec6) {
-            ContractRoute(method, this@ContractRouteSpec6, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f]) }
         }
     }
 
@@ -170,7 +170,7 @@ class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> intern
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E, F, G) -> HttpHandler) = with(this@ContractRouteSpec7) {
-            ContractRoute(method, this@ContractRouteSpec7, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g]) }
         }
     }
 
@@ -189,7 +189,7 @@ class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H>
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E, F, G, H) -> HttpHandler) = with(this@ContractRouteSpec8) {
-            ContractRoute(method, this@ContractRouteSpec8, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h]) }
         }
     }
 
@@ -209,8 +209,7 @@ class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H,
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E, F, G, H, I) -> HttpHandler): ContractRoute =
             with(this@ContractRouteSpec9) {
-                ContractRoute(method, this@ContractRouteSpec9, routeMeta
-                ) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
+                ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
             }
     }
 
@@ -230,8 +229,7 @@ class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(describe(Root)))
         infix fun to(fn: (A, B, C, D, E, F, G, H, I, J) -> HttpHandler) = with(this@ContractRouteSpec10) {
-            ContractRoute(method, this@ContractRouteSpec10, routeMeta
-            ) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i], it[j]) }
+            ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i], it[j]) }
         }
     }
 
