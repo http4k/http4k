@@ -2,7 +2,9 @@ package org.http4k.contract
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
@@ -38,6 +40,13 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
     override infix operator fun div(next: String) = ContractRouteSpec0({ it / next }, routeMeta)
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec1(pathFn, routeMeta, next)
+
+    class Binder(private val method: Method, private val spec: ContractRouteSpec0) {
+        fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta, val a: PathLens<A>) : ContractRouteSpec(pathFn, routeMeta, a) {
@@ -46,6 +55,13 @@ class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> P
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec2(pathFn, routeMeta, a, next)
+
+    class Binder<out A>(private val method: Method, private val spec: ContractRouteSpec1<A>) {
+        fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn(it[spec.a]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta, val a: PathLens<A>, val b: PathLens<B>) : ContractRouteSpec(pathFn, routeMeta, a, b) {
@@ -54,6 +70,13 @@ class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegment
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec3(pathFn, routeMeta, a, b, next)
+
+    class Binder<out A, out B>(private val method: Method, private val spec: ContractRouteSpec2<A, B>) {
+        fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn(it[spec.a], it[spec.b]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -63,6 +86,13 @@ class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (Path
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec4(pathFn, routeMeta, a, b, c, next)
+
+    class Binder<out A, out B, out C>(private val method: Method, private val spec: ContractRouteSpec3<A, B, C>) {
+        fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn(it[spec.a], it[spec.b], it[spec.c]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -73,6 +103,13 @@ class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec5(pathFn, routeMeta, a, b, c, d, next)
+
+    class Binder<out A, out B, out C, out D>(private val method: Method, private val spec: ContractRouteSpec4<A, B, C, D>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -82,56 +119,103 @@ class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec6(pathFn, routeMeta, a, b, c, d, e, next)
+
+    class Binder<out A, out B, out C, out D, out E>(private val method: Method, private val spec: ContractRouteSpec5<A, B, C, D, E>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                     val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>, val f: PathLens<F>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f) {
+                                                                                        val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>, val f: PathLens<F>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f) {
     override fun with(new: RouteMeta): ContractRouteSpec6<A, B, C, D, E, F> = ContractRouteSpec6(pathFn, new, a, b, c, d, e, f)
 
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec7(pathFn, routeMeta, a, b, c, d, e, f, next)
+
+    class Binder<out A, out B, out C, out D, out E, out F>(private val method: Method, private val spec: ContractRouteSpec6<A, B, C, D, E, F>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E, F) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta
+        ) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                   val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                   val f: PathLens<F>, val g: PathLens<G>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g) {
+                                                                                               val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
+                                                                                               val f: PathLens<F>, val g: PathLens<G>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g) {
     override fun with(new: RouteMeta): ContractRouteSpec7<A, B, C, D, E, F, G> = ContractRouteSpec7(pathFn, new, a, b, c, d, e, f, g)
 
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec8(pathFn, routeMeta, a, b, c, d, e, f, g, next)
+
+    class Binder<out A, out B, out C, out D, out E, out F, out G>(private val method: Method, private val spec: ContractRouteSpec7<A, B, C, D, E, F, G>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E, F, G) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta
+        ) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                   val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                   val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h) {
+                                                                                                      val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
+                                                                                                      val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h) {
     override fun with(new: RouteMeta): ContractRouteSpec8<A, B, C, D, E, F, G, H> = ContractRouteSpec8(pathFn, new, a, b, c, d, e, f, g, h)
 
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec9(pathFn, routeMeta, a, b, c, d, e, f, g, h, next)
+
+    class Binder<out A, out B, out C, out D, out E, out F, out G, out H>(private val method: Method, private val spec: ContractRouteSpec8<A, B, C, D, E, F, G, H>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E, F, G, H) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta
+        ) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H, out I> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                  val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                  val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i) {
+                                                                                                             val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
+                                                                                                             val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i) {
     override fun with(new: RouteMeta): ContractRouteSpec9<A, B, C, D, E, F, G, H, I> = ContractRouteSpec9(pathFn, new, a, b, c, d, e, f, g, h, i)
 
     override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec10(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, next)
+
+    class Binder<out A, out B, out C, out D, out E, out F, out G, out H, out I>(private val method: Method, private val spec: ContractRouteSpec9<A, B, C, D, E, F, G, H, I>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E, F, G, H, I) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta
+        ) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h], it[spec.i]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
-                                 val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
-                                 val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>,
-                                 val j: PathLens<J>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, j) {
+                                                                                                                     val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
+                                                                                                                     val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>,
+                                                                                                                     val j: PathLens<J>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, j) {
     override fun with(new: RouteMeta): ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J> = ContractRouteSpec10(pathFn, new, a, b, c, d, e, f, g, h, i, j)
 
     override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")
+
+    class Binder<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(private val method: Method, private val spec: ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J>) {
+        fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+        infix fun to(fn: (A, B, C, D, E, F, G, H, I, J) -> HttpHandler): ContractRoute = ContractRoute(method, spec, spec.routeMeta
+        ) { fn(it[spec.a], it[spec.b], it[spec.c], it[spec.d], it[spec.e], it[spec.f], it[spec.g], it[spec.h], it[spec.i], it[spec.j]) }
+    }
+
+    infix fun bindContract(method: Method) = Binder(method, this)
 }
 
 
