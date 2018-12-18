@@ -1,6 +1,11 @@
 package org.http4k.filter
 
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.HttpTransaction
+import org.http4k.core.Request
+import org.http4k.core.Response
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -56,8 +61,8 @@ object ResponseFilters {
      */
     class GZipContentTypes(compressibleContentTypes: Set<ContentType>) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
-                .map { it.value }
-                .map { it.split(";").first() }
+            .map { it.value }
+            .map { it.split(";").first() }
 
         override fun invoke(next: HttpHandler): HttpHandler {
             return { request ->
@@ -72,13 +77,13 @@ object ResponseFilters {
         }
 
         private fun isCompressible(it: Response) =
-                compressibleMimeTypes.contains(mimeTypeOf(it))
+            compressibleMimeTypes.contains(mimeTypeOf(it))
 
         private fun mimeTypeOf(it: Response) =
-                (it.header("content-type") ?: "").split(";").first().trim()
+            (it.header("content-type") ?: "").split(";").first().trim()
 
         private fun requestAcceptsGzip(it: Request) =
-                (it.header("accept-encoding") ?: "").contains("gzip", true)
+            (it.header("accept-encoding") ?: "").contains("gzip", true)
     }
 
     /**

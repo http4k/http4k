@@ -26,14 +26,12 @@ class TemplateRendererTest {
 
     @Test
     fun `eventually fails with ViewNotFound`() {
-        assertThat({noFinds.then(noFinds)(TestViewModel)} , throws<ViewNotFound>())
+        assertThat({ noFinds.then(noFinds)(TestViewModel) }, throws<ViewNotFound>())
     }
 
     @Test
     fun `can generate response with default code and content type`() {
-        finds.renderToResponse(TestViewModel) shouldMatch hasStatus(OK).
-            and(hasBody("org/http4k/template/TestViewModel")).
-            and(hasContentType(TEXT_HTML))
+        finds.renderToResponse(TestViewModel) shouldMatch hasStatus(OK).and(hasBody("org/http4k/template/TestViewModel")).and(hasContentType(TEXT_HTML))
     }
 
 

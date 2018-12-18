@@ -1,12 +1,21 @@
 package org.http4k.webdriver
 
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.with
 import org.http4k.lens.FormField
 import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
-import org.openqa.selenium.*
+import org.openqa.selenium.By
+import org.openqa.selenium.Dimension
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.Point
+import org.openqa.selenium.Rectangle
+import org.openqa.selenium.WebElement
 
 data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) : WebElement {
 

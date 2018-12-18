@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 
 class RequestContextsTest {

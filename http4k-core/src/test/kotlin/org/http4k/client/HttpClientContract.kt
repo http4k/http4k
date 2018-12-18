@@ -55,8 +55,8 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `can make call`() {
         val response = client(Request(POST, "http://localhost:$port/someUri")
-                .query("query", "123")
-                .header("header", "value").body("body"))
+            .query("query", "123")
+            .header("header", "value").body("body"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.header("uri"), equalTo("/someUri?query=123"))
@@ -136,7 +136,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `redirection response`() {
         val response = ClientFilters.FollowRedirects()
-                .then(client)(Request(GET, "http://localhost:$port/relative-redirect/5"))
+            .then(client)(Request(GET, "http://localhost:$port/relative-redirect/5"))
         response.status.shouldMatch(equalTo(OK))
         response.bodyString().shouldMatch(anything)
     }

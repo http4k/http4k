@@ -95,7 +95,7 @@ body""".toPayload()), equalTo(Response(OK)
         try {
             action()
             fail("should have failed")
-        } catch(e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             assertThat(e.message, equalTo(message))
         }
     }

@@ -13,6 +13,7 @@ interface Http4kServer : AutoCloseable {
     override fun close() {
         stop()
     }
+
     fun port(): Int
 }
 

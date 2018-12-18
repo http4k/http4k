@@ -44,33 +44,33 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
     inline fun <reified T : Any> asA(s: String): T = asA(s, T::class)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
-            Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asJsonString(it) })
+        Body.string(APPLICATION_JSON, description, contentNegotiation).map({ asA(it, T::class) }, { asJsonString(it) })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asJsonString(it) })
 }
 
 object Moshi : ConfigurableMoshi(Moshi.Builder()
-        .custom(Duration::parse)
-        .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
-        .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
-        .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-        .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
-        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
-        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
-        .custom(Companion::of)
-        .custom(::URL, URL::toExternalForm)
-        .custom(UUID::fromString)
-        .custom(::Regex, Regex::pattern)
-        .add(KotlinJsonAdapterFactory()))
+    .custom(Duration::parse)
+    .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+    .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+    .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+    .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+    .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+    .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+    .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
+    .custom(Companion::of)
+    .custom(::URL, URL::toExternalForm)
+    .custom(UUID::fromString)
+    .custom(::Regex, Regex::pattern)
+    .add(KotlinJsonAdapterFactory()))
 
-private inline fun <reified T> Builder.custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }):Builder = add(adapter(readFn, writeFn))
+private inline fun <reified T> Builder.custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }): Builder = add(adapter(readFn, writeFn))
 
 private inline fun <T> adapter(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
-        object {
-            @FromJson
-            fun read(t: String): T = readFn(t)
+    object {
+        @FromJson
+        fun read(t: String): T = readFn(t)
 
-            @ToJson
-            fun write(t: T): String = writeFn(t)
-        }
+        @ToJson
+        fun write(t: T): String = writeFn(t)
+    }

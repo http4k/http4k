@@ -34,13 +34,13 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
     }
 
     private fun ApacheRequest.asHttp4kRequest(): Request =
-            Request(Method.valueOf(requestLine.method), requestLine.uri)
-                    .headers(allHeaders.toHttp4kHeaders()).let {
-                        when (this) {
-                            is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
-                            else -> it.body(EmptyInputStream.INSTANCE, 0)
-                        }
-                    }
+        Request(Method.valueOf(requestLine.method), requestLine.uri)
+            .headers(allHeaders.toHttp4kHeaders()).let {
+                when (this) {
+                    is HttpEntityEnclosingRequest -> it.body(entity.content, getFirstHeader("Content-Length")?.value.safeLong())
+                    else -> it.body(EmptyInputStream.INSTANCE, 0)
+                }
+            }
 
     private val headersThatApacheInterceptorSets = setOf("Transfer-Encoding", "Content-Length")
 
@@ -68,14 +68,14 @@ data class ApacheServer(val port: Int = 8000, val address: InetAddress?) : Serve
 
         init {
             val bootstrap = ServerBootstrap.bootstrap()
-                    .setListenerPort(port)
-                    .setSocketConfig(SocketConfig.custom()
-                            .setTcpNoDelay(true)
-                            .setSoKeepAlive(true)
-                            .setSoReuseAddress(true)
-                            .setBacklogSize(1000)
-                            .build())
-                    .registerHandler("*", Http4kRequestHandler(httpHandler))
+                .setListenerPort(port)
+                .setSocketConfig(SocketConfig.custom()
+                    .setTcpNoDelay(true)
+                    .setSoKeepAlive(true)
+                    .setSoReuseAddress(true)
+                    .setBacklogSize(1000)
+                    .build())
+                .registerHandler("*", Http4kRequestHandler(httpHandler))
 
             if (address != null)
                 bootstrap.setLocalAddress(address)

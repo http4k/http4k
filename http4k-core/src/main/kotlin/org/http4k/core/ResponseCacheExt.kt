@@ -24,23 +24,23 @@ fun Response.staleWhileRevalidate(duration: Duration) = replaceHeader("Cache-Con
 fun Response.staleIfError(duration: Duration) = replaceHeader("Cache-Control", StaleIfErrorTtl(duration).replaceIn(header("Cache-Control")))
 
 private fun Response.addCacheability(value: String): Response =
-        replaceHeader("Cache-Control", value.ensureOnlyOnceIn(header("Cache-Control")))
+    replaceHeader("Cache-Control", value.ensureOnlyOnceIn(header("Cache-Control")))
 
 private fun Response.addCacheability(cacheability: Cacheability): Response =
-        replaceHeader("Cache-Control", cacheability(header("Cache-Control")))
+    replaceHeader("Cache-Control", cacheability(header("Cache-Control")))
 
 private enum class Cacheability {
     public,
     private;
 
     operator fun invoke(currentValue: String?): String =
-            currentValue?.let {
-                val split = currentValue.split(",")
-                (listOf(name) + split
-                        .map(String::trim)
-                        .filterNot { values().map { it.name }.contains(it) }).joinToString(", ")
-            } ?: name
+        currentValue?.let {
+            val split = currentValue.split(",")
+            (listOf(name) + split
+                .map(String::trim)
+                .filterNot { values().map { it.name }.contains(it) }).joinToString(", ")
+        } ?: name
 }
 
 private fun String.ensureOnlyOnceIn(currentValue: String?): String =
-        currentValue?.split(",")?.map(String::trim)?.toSet()?.plus(this)?.joinToString(", ") ?: this
+    currentValue?.split(",")?.map(String::trim)?.toSet()?.plus(this)?.joinToString(", ") ?: this

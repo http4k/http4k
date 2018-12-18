@@ -27,4 +27,5 @@ internal fun ApiGatewayProxyRequest.asHttp4k() = (headers ?: emptyMap()).toList(
     memo.header(first, second)
 }
 
-internal fun ApiGatewayProxyRequest.uri() = Uri.of(path ?: "").query((queryStringParameters ?: emptyMap()).toList().toUrlFormEncoded())
+internal fun ApiGatewayProxyRequest.uri() = Uri.of(path ?: "").query((queryStringParameters
+    ?: emptyMap()).toList().toUrlFormEncoded())

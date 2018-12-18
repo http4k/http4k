@@ -51,7 +51,7 @@ fun main(args: Array<String>) {
     val reps = 400
 
     listOf<(Int) -> ServerConfig>({ Jetty(it) }, { Undertow(it) }, { SunHttp(it) }, { Netty(it) })
-            .map { testWith(threads, reps, it, 8000) }
-            .sortedBy { it.time }
-            .forEach(::println)
+        .map { testWith(threads, reps, it, 8000) }
+        .sortedBy { it.time }
+        .forEach(::println)
 }

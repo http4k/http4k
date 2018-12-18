@@ -1,10 +1,15 @@
 package org.http4k.contract
 
 
-import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens

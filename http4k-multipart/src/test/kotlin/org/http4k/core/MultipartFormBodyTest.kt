@@ -17,10 +17,10 @@ class MultipartFormBodyTest {
         val file1 = FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())
         val file2 = FormFile("foo2.txt", TEXT_PLAIN, "content2".byteInputStream())
         val form = MultipartFormBody("bob") +
-                ("field" to "foo") +
-                ("field" to "bar") +
-                ("file" to file1) +
-                ("file" to file2)
+            ("field" to "foo") +
+            ("field" to "bar") +
+            ("file" to file1) +
+            ("file" to file2)
 
         assertThat(form.field("field"), equalTo("foo"))
         assertThat(form.fields("field"), equalTo(listOf("foo", "bar")))
@@ -32,32 +32,32 @@ class MultipartFormBodyTest {
     @Test
     fun roundtrip() {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
-                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
-                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
-                .body(form)
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+            .body(form)
 
         MultipartFormBody.from(req) shouldMatch equalTo(
-                MultipartFormBody("bob") + ("field" to "bar") +
-                        ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to "bar") +
+                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         )
     }
 
     @Test
     fun `can handle when body is already pulled into memory`() {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
-                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
-                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
-                .body(form)
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
+            .body(form)
 
         req.bodyString()
 
         MultipartFormBody.from(req) shouldMatch equalTo(
-                MultipartFormBody("bob") + ("field" to "bar") +
-                        ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to "bar") +
+                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         )
     }
 
@@ -94,15 +94,15 @@ class MultipartFormBodyTest {
         val original = streams.toMultipartForm()
 
         MultipartFormBody.from(Request(Method.POST, "/")
-                .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
-                .body(original))
+            .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
+            .body(original))
 
         streams shouldMatch closed //original stream are automatically closed during parsing
     }
 
     private fun List<TestInputStream>.toMultipartForm() =
-            foldIndexed(MultipartFormBody())
-            { index, acc, stream -> acc.plus("file$index" to FormFile("foo$index.txt", TEXT_PLAIN, stream)) }
+        foldIndexed(MultipartFormBody())
+        { index, acc, stream -> acc.plus("file$index" to FormFile("foo$index.txt", TEXT_PLAIN, stream)) }
 
     private class TestInputStream(private var text: String) : InputStream() {
         private val stream = text.byteInputStream()

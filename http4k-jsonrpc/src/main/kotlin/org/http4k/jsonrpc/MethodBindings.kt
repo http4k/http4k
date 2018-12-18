@@ -8,9 +8,9 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
 
     companion object {
         open class Manual<NODE : Any>(private val json: Json<NODE>) :
-                MethodBindings<NODE> {
+            MethodBindings<NODE> {
             override fun iterator() = methodMappings
-                    .map { JsonRpcMethodBinding(it.key, it.value) }.iterator()
+                .map { JsonRpcMethodBinding(it.key, it.value) }.iterator()
 
             private val methodMappings = mutableMapOf<String, JsonRpcHandler<NODE, NODE>>()
 
@@ -21,30 +21,30 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
             fun <IN, OUT> handler(paramsLens: Mapping<NODE, IN>,
                                   resultLens: Mapping<OUT, NODE>,
                                   fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
-                    handler(emptySet(), paramsLens, resultLens, fn)
+                handler(emptySet(), paramsLens, resultLens, fn)
 
             fun <IN, OUT> handler(paramsFieldNames: Set<String>,
                                   paramsLens: Mapping<NODE, IN>,
                                   resultLens: Mapping<OUT, NODE>,
                                   fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
-                    ParamMappingJsonRequestHandler(json, paramsFieldNames, paramsLens, fn, resultLens)
+                ParamMappingJsonRequestHandler(json, paramsFieldNames, paramsLens, fn, resultLens)
 
             fun <OUT> handler(resultLens: Mapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
-                    NoParamsJsonRequestHandler(block, resultLens)
+                NoParamsJsonRequestHandler(block, resultLens)
         }
 
         class Auto<NODE : Any>(val json: JsonLibAutoMarshallingJson<NODE>) :
-                Manual<NODE>(json) {
+            Manual<NODE>(json) {
 
             inline fun <reified IN : Any, OUT : Any> handler(paramsFieldNames: Set<String>,
                                                              noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
-                    handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
+                handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
 
             inline fun <reified IN : Any, OUT : Any> handler(noinline block: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
-                    handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), block)
+                handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), block)
 
             fun <OUT : Any> handler(block: () -> OUT): JsonRpcHandler<NODE, NODE> =
-                    handler(Mapping { json.asJsonObject(it) }, block)
+                handler(Mapping { json.asJsonObject(it) }, block)
         }
     }
 }

@@ -18,8 +18,8 @@ fun Response.Companion.parse(response: String): Response {
 }
 
 private fun lines(message: String): List<String> =
-        if (message.isBlank()) throw IllegalArgumentException("Empty message") else
-            message.split("\r\n")
+    if (message.isBlank()) throw IllegalArgumentException("Empty message") else
+        message.split("\r\n")
 
 private fun parseStatus(value: String): Status {
     val values = value.split(" ", limit = 3)
@@ -39,13 +39,13 @@ private fun parseHeader(line: String): Pair<String, String?> = line.split(": ").
 private fun headerLines(lines: List<String>) = lines.subList(1, lines.indexOf(""))
 
 private fun parseRequestLine(line: String): Pair<Method, Uri> =
-        with(line.split(" ")) {
-            when {
-                size < 2 -> throw IllegalArgumentException("Invalid request line: $line")
-                else -> try {
-                    Method.valueOf(this[0]) to Uri.of(this[1])
-                } catch (e: Exception) {
-                    throw IllegalArgumentException("Invalid method: ${this[0]}")
-                }
+    with(line.split(" ")) {
+        when {
+            size < 2 -> throw IllegalArgumentException("Invalid request line: $line")
+            else -> try {
+                Method.valueOf(this[0]) to Uri.of(this[1])
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Invalid method: ${this[0]}")
             }
         }
+    }

@@ -102,35 +102,35 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 }
 
 val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
-        .custom(Duration::parse)
-        .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
-        .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
-        .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-        .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
-        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
-        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
-        .custom(UUID::fromString)
-        .custom(Companion::of)
-        .custom(::URL, URL::toExternalForm)
-        .custom(::Regex, Regex::pattern)
+    .custom(Duration::parse)
+    .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+    .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+    .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+    .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+    .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+    .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+    .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
+    .custom(UUID::fromString)
+    .custom(Companion::of)
+    .custom(::URL, URL::toExternalForm)
+    .custom(::Regex, Regex::pattern)
 
 
 object Jackson : ConfigurableJackson(ObjectMapper()
-        .registerModule(defaultKotlinModuleWithHttp4kSerialisers)
-        .disableDefaultTyping()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(FAIL_ON_IGNORED_PROPERTIES, false)
-        .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
-        .configure(USE_BIG_INTEGER_FOR_INTS, true)
+    .registerModule(defaultKotlinModuleWithHttp4kSerialisers)
+    .disableDefaultTyping()
+    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+    .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+    .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+    .configure(USE_BIG_INTEGER_FOR_INTS, true)
 )
 
 private inline fun <reified T> KotlinModule.custom(crossinline read: (String) -> T, crossinline write: (T) -> String = { it.toString() }) =
-        apply {
-            addDeserializer(T::class.java, object : JsonDeserializer<T>() {
-                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = read(p.text)
-            })
-            addSerializer(T::class.java, object : JsonSerializer<T>() {
-                override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(write(value!!))
-            })
-        }
+    apply {
+        addDeserializer(T::class.java, object : JsonDeserializer<T>() {
+            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = read(p.text)
+        })
+        addSerializer(T::class.java, object : JsonSerializer<T>() {
+            override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(write(value!!))
+        })
+    }

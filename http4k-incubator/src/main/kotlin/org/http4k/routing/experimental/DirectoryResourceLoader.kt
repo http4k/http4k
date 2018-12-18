@@ -22,8 +22,8 @@ internal data class DirectoryResourceLoader(
     private fun indexFileIn(path: String) = path.pathJoin("index.html")
 
     private fun directoryRenderingHandler(dir: File, renderer: DirectoryRenderer) =
-            ResourceListingHandler(
-                    ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
-                    dir.listFiles().sortedBy { it.name }.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
-                    renderer)
+        ResourceListingHandler(
+            ResourceSummary(dir.name, Instant.ofEpochMilli(dir.lastModified())),
+            dir.listFiles().sortedBy { it.name }.map { ResourceSummary(it.name, Instant.ofEpochMilli(it.lastModified())) },
+            renderer)
 }

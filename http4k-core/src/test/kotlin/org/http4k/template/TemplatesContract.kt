@@ -52,6 +52,6 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     private fun checkNonExistent(renderer: TemplateRenderer) {
-        assertThat({ renderer(NonExistent) } , throws(equalTo(ViewNotFound(NonExistent))))
+        assertThat({ renderer(NonExistent) }, throws(equalTo(ViewNotFound(NonExistent))))
     }
 }

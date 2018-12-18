@@ -11,7 +11,7 @@ interface AsyncHttpClient : Closeable {
     override fun close() {}
 }
 
-interface DualSyncAsyncHttpHandler: HttpHandler, AsyncHttpClient
+interface DualSyncAsyncHttpHandler : HttpHandler, AsyncHttpClient
 
 /**
  * Convert a synchronous HttpHandler API to mimic AsyncHttpClient

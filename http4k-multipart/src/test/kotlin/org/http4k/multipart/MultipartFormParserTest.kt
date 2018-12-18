@@ -206,6 +206,6 @@ class MultipartFormParserTest {
 
 private fun List<Part>.close() = forEach(Part::close)
 
-private fun List<Part>.parts(name:String): List<Part> = filter { it.fieldName == name }
+private fun List<Part>.parts(name: String): List<Part> = filter { it.fieldName == name }
 
 internal fun Part.isInMemory(): Boolean = this is Part.InMemory

@@ -16,11 +16,11 @@ import org.http4k.server.asServer
 import java.lang.System.setProperty
 
 fun `latency injection proxy (between 100ms-500ms)`() =
-        ProxyHost(Https)
-                .then(JavaHttpClient())
-                .withChaosControls(Latency().appliedWhen(Always))
-                .asServer(SunHttp())
-                .start()
+    ProxyHost(Https)
+        .then(JavaHttpClient())
+        .withChaosControls(Latency().appliedWhen(Always))
+        .asServer(SunHttp())
+        .start()
 
 fun main(args: Array<String>) {
     setProperty("http.proxyHost", "localhost")

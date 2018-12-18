@@ -11,7 +11,7 @@ import java.util.UUID
 class PageTest {
     private val contents = File("src/test/resources/test.html").readText()
 
-    private val state = Page(Status.OK, {}, {null}, UUID.randomUUID(), "someUrl", contents)
+    private val state = Page(Status.OK, {}, { null }, UUID.randomUUID(), "someUrl", contents)
 
     @Test
     fun `title`() = assertThat(state.title, equalTo("Page title"))

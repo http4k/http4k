@@ -6,8 +6,8 @@ import java.io.InputStream
 import java.time.Instant
 
 internal class FileResource(
-        private val file: File,
-        override val contentType: ContentType
+    private val file: File,
+    override val contentType: ContentType
 ) : Resource {
 
     override fun openStream(): InputStream = file.inputStream()

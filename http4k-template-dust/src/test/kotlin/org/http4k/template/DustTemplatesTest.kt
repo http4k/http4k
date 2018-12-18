@@ -13,7 +13,7 @@ class DustWithHelpersTest {
         .CachingClasspath("org.http4k.template")
 
     data class Score(val player: String, val score: Int)
-    data class NeedsHelpers(val items: List<String>): ViewModel {
+    data class NeedsHelpers(val items: List<String>) : ViewModel {
         override fun template() = "NeedsHelpers"
     }
 

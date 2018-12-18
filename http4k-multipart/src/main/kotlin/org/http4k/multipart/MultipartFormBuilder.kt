@@ -66,16 +66,16 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     }
 
     fun attachment(fileName: String, contentType: String, contents: String): MultipartFormBuilder =
-            part(contents,
-                    Pair("Content-Disposition", listOf(Pair("attachment", null), Pair("filename", fileName))),
-                    Pair("Content-Type", listOf(Pair(contentType, null)))
-            )
+        part(contents,
+            Pair("Content-Disposition", listOf(Pair("attachment", null), Pair("filename", fileName))),
+            Pair("Content-Type", listOf(Pair(contentType, null)))
+        )
 
     fun file(fieldName: String, filename: String, contentType: String, contents: InputStream): MultipartFormBuilder =
-            part(contents,
-                    "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
-                    "Content-Type" to listOf(contentType to null)
-            )
+        part(contents,
+            "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
+            "Content-Type" to listOf(contentType to null)
+        )
 
     fun endMultipart(): MultipartFormBuilder = apply {
         add(boundary.pop())

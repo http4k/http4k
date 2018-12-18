@@ -25,10 +25,10 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
 
     private fun addPrefixToBoundary(boundary: ByteArray?): ByteArray =
     // in apache they just use BOUNDARY_PREFIX
-            ByteArray(boundary!!.size + FIELD_SEPARATOR.size).apply {
-                System.arraycopy(boundary, 0, this, 2, boundary.size)
-                System.arraycopy(FIELD_SEPARATOR, 0, this, 0, FIELD_SEPARATOR.size)
-            }
+        ByteArray(boundary!!.size + FIELD_SEPARATOR.size).apply {
+            System.arraycopy(boundary, 0, this, 2, boundary.size)
+            System.arraycopy(FIELD_SEPARATOR, 0, this, 0, FIELD_SEPARATOR.size)
+        }
 
     private fun findBoundary() {
         if (state == MultipartFormStreamState.FindPrefix) {
@@ -83,20 +83,20 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         } else {
             val contentDisposition = ParameterParser().parse(headers["Content-Disposition"], ';')
             val fieldName = (if (contentDisposition.containsKey("attachment")) mixedName else trim(contentDisposition["name"]))
-                    ?: throw ParseError("no name for part")
+                ?: throw ParseError("no name for part")
 
             StreamingPart(
-                    fieldName,
-                    !contentDisposition.containsKey("filename"),
-                    contentType,
-                    filenameFromMap(contentDisposition),
-                    BoundedInputStream(),
-                    headers)
+                fieldName,
+                !contentDisposition.containsKey("filename"),
+                contentType,
+                filenameFromMap(contentDisposition),
+                BoundedInputStream(),
+                headers)
         }
     }
 
     private fun filenameFromMap(contentDisposition: Map<String, String>): String? = if (contentDisposition.containsKey("filename")) trim(contentDisposition["filename"]
-            ?: "") else null
+        ?: "") else null
 
     private fun trim(string: String?): String? = string?.trim { it <= ' ' }
 
@@ -167,13 +167,13 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
         }
 
         private fun safelyParseNextPart(): StreamingPart? =
-                try {
-                    parseNextPart()
-                } catch (e: IOException) {
-                    nextIsKnown = true
-                    currentPart = null
-                    throw ParseError(e)
-                }
+            try {
+                parseNextPart()
+            } catch (e: IOException) {
+                nextIsKnown = true
+                currentPart = null
+                throw ParseError(e)
+            }
 
         private val isEndOfStream: Boolean
             get() = currentPart == null
@@ -277,10 +277,10 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
          * @throws IOException
          */
         fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset): Iterable<StreamingPart> =
-                StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE))
+            StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE))
 
         fun parse(boundary: ByteArray, inputStream: InputStream, encoding: Charset, maxStreamLength: Int): Iterable<StreamingPart> =
-                StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE, maxStreamLength))
+            StreamingMultipartFormParts(boundary, encoding, TokenBoundedInputStream(inputStream, DEFAULT_BUFSIZE, maxStreamLength))
 
         fun prependBoundaryWithStreamTerminator(boundary: ByteArray): ByteArray {
             val actualBoundary = ByteArray(boundary.size + 2)

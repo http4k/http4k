@@ -1,6 +1,6 @@
 package org.http4k.lens
 
-interface LensExtractor<in IN, out OUT>: (IN) -> OUT {
+interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
     /**
      * Lens operation to get the value from the target
      * @throws LensFailure if the value could not be retrieved from the target (missing/invalid etc)

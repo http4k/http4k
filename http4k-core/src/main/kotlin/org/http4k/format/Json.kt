@@ -79,7 +79,7 @@ interface Json<NODE> {
 
     fun textValueOf(node: NODE, name: String): String?
 
-    operator fun <T> invoke(fn:Json<NODE>.() -> T): T = run(fn)
+    operator fun <T> invoke(fn: Json<NODE>.() -> T): T = run(fn)
 }
 
 enum class JsonType {

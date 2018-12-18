@@ -17,7 +17,9 @@ import java.nio.ByteBuffer
 
 internal class Http4kWebSocketAdapter internal constructor(private val innerSocket: PushPullAdaptingWebSocket) {
     fun onError(throwable: Throwable) = innerSocket.triggerError(throwable)
-    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(WsStatus(statusCode, reason ?: "<unknown>"))
+    fun onClose(statusCode: Int, reason: String?) = innerSocket.triggerClose(WsStatus(statusCode, reason
+        ?: "<unknown>"))
+
     fun onMessage(body: Body) = innerSocket.triggerMessage(WsMessage(body))
 }
 

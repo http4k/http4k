@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 
 class UriTemplateTest {
 
-     @Test
-fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
+    @Test
+    fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
         val template = from("properties/{name}")
 
         assertThat(
@@ -108,14 +108,14 @@ fun encodesOnlyPathParamsWhichDontContainForwardSlashes() {
     }
 
     @Test
-    fun capturingPathVariableWithSlashes(){
+    fun capturingPathVariableWithSlashes() {
         val template = from("/{anything:.*}")
         assertThat(template.matches("/foo/bar"), equalTo(true))
         assertThat(template.extract("/foo/bar").getValue("anything"), equalTo("foo/bar"))
     }
 
     @Test
-    fun doesNotMatchPathWithSlashesForUnnamedVariable(){
+    fun doesNotMatchPathWithSlashesForUnnamedVariable() {
         assertThat(from("/{:.*}").matches("/foo/bar"), equalTo(false))
         assertThat(from("/{something:.*}").matches("/foo/bar"), equalTo(true))
     }

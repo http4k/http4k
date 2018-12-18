@@ -52,15 +52,15 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
     }
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse =
-            DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-                headers.forEach { (key, value) -> headers().set(key, value) }
-                body.stream.use { it.copyTo(ByteBufOutputStream(content())) }
-            }
+        DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
+            headers.forEach { (key, value) -> headers().set(key, value) }
+            body.stream.use { it.copyTo(ByteBufOutputStream(content())) }
+        }
 
     private fun FullHttpRequest.asRequest(): Request =
-            Request(valueOf(method().name()), Uri.of(uri()))
-                    .headers(headers().map { it.key to it.value })
-                    .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
+        Request(valueOf(method().name()), Uri.of(uri()))
+            .headers(headers().map { it.key to it.value })
+            .body(Body(ByteBufInputStream(content()), headers()["Content-Length"].safeLong()))
 }
 
 data class Netty(val port: Int = 8000) : ServerConfig {
@@ -73,16 +73,16 @@ data class Netty(val port: Int = 8000) : ServerConfig {
         override fun start(): Http4kServer = apply {
             val bootstrap = ServerBootstrap()
             bootstrap.group(masterGroup, workerGroup)
-                    .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
-                    .childHandler(object : ChannelInitializer<SocketChannel>() {
-                        public override fun initChannel(ch: SocketChannel) {
-                            ch.pipeline().addLast("codec", HttpServerCodec())
-                            ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
-                            ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 1000)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .channelFactory(ChannelFactory<ServerChannel> { NioServerSocketChannel() })
+                .childHandler(object : ChannelInitializer<SocketChannel>() {
+                    public override fun initChannel(ch: SocketChannel) {
+                        ch.pipeline().addLast("codec", HttpServerCodec())
+                        ch.pipeline().addLast("aggregator", HttpObjectAggregator(Int.MAX_VALUE))
+                        ch.pipeline().addLast("handler", Http4kChannelHandler(httpHandler))
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 1000)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
 
             val channel = bootstrap.bind(port).sync().channel()
             address = channel.localAddress() as InetSocketAddress

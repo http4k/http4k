@@ -13,7 +13,7 @@ import java.net.InetSocketAddress
 
 data class SunHttp(val port: Int = 8000) : ServerConfig {
     override fun toServer(httpHandler: HttpHandler): Http4kServer = object : Http4kServer {
-        override fun port(): Int = if(port > 0) port else server.address.port
+        override fun port(): Int = if (port > 0) port else server.address.port
 
         private val server = HttpServer.create(InetSocketAddress(port), 0)
         override fun start(): Http4kServer = apply {
@@ -40,6 +40,7 @@ private fun HttpExchange.populate(httpResponse: Response) {
 
 private fun HttpExchange.toRequest(): Request =
     Request(Method.valueOf(requestMethod),
-        requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) } ?: Uri.of(requestURI.rawPath))
+        requestURI.rawQuery?.let { Uri.of(requestURI.rawPath).query(requestURI.rawQuery) }
+            ?: Uri.of(requestURI.rawPath))
         .body(requestBody, requestHeaders.getFirst("Content-Length").safeLong())
         .headers(requestHeaders.toList().flatMap { (key, values) -> values.map { key to it } })

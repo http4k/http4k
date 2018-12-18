@@ -4,4 +4,4 @@ import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 
 class ApacheServerTest : ServerContract(::ApacheServer, ApacheClient(),
-        Method.values().filter { it != Method.PURGE }.toTypedArray())
+    Method.values().filter { it != Method.PURGE }.toTypedArray())

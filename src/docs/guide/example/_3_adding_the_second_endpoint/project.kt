@@ -28,8 +28,7 @@ fun MyMathsApp(): HttpHandler = CatchLensFailure.then(
 private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
     val values = Query.int().multi.defaulted("value", listOf())
 
-    return {
-        request: Request ->
+    return { request: Request ->
         val valuesToCalc = values.extract(request)
         val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
         Response(OK).body(answer.toString())

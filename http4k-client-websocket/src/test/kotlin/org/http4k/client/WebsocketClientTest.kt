@@ -30,14 +30,14 @@ class WebsocketClientTest {
     @BeforeEach
     fun before() {
         val ws = websockets(
-                "/{name}" bind { ws: Websocket ->
-                    val name = ws.upgradeRequest.path("name")!!
-                    ws.send(WsMessage(name))
-                    ws.onMessage {
-                        ws.send(it)
-                        ws.close(NORMAL)
-                    }
+            "/{name}" bind { ws: Websocket ->
+                val name = ws.upgradeRequest.path("name")!!
+                ws.send(WsMessage(name))
+                ws.onMessage {
+                    ws.send(it)
+                    ws.close(NORMAL)
                 }
+            }
         )
         server = ws.asServer(Jetty(0)).start()
     }

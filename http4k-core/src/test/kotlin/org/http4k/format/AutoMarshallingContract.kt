@@ -19,17 +19,17 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 data class CommonJdkPrimitives(
-        val duration: Duration,
-        val localDate: LocalDate,
-        val localTime: LocalTime,
-        val localDateTime: LocalDateTime,
-        val zonedDateTime: ZonedDateTime,
-        val offsetTime: OffsetTime,
-        val offsetDateTime: OffsetDateTime,
-        val instant: Instant,
-        val uuid: UUID,
-        val uri: Uri,
-        val url: URL
+    val duration: Duration,
+    val localDate: LocalDate,
+    val localTime: LocalTime,
+    val localDateTime: LocalDateTime,
+    val zonedDateTime: ZonedDateTime,
+    val offsetTime: OffsetTime,
+    val offsetDateTime: OffsetDateTime,
+    val instant: Instant,
+    val uuid: UUID,
+    val uri: Uri,
+    val url: URL
 )
 
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
@@ -61,17 +61,17 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val localTime = LocalTime.of(1, 1, 1)
         val zoneOffset = ZoneOffset.UTC
         val obj = CommonJdkPrimitives(
-                Duration.ofMillis(1000),
-                localDate,
-                localTime,
-                LocalDateTime.of(localDate, localTime),
-                ZonedDateTime.of(localDate, localTime, ZoneId.of("UTC")),
-                OffsetTime.of(localTime, zoneOffset),
-                OffsetDateTime.of(localDate, localTime, zoneOffset),
-                Instant.EPOCH,
-                UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
-                Uri.of("http://uri:8000"),
-                URL("http://url:9000")
+            Duration.ofMillis(1000),
+            localDate,
+            localTime,
+            LocalDateTime.of(localDate, localTime),
+            ZonedDateTime.of(localDate, localTime, ZoneId.of("UTC")),
+            OffsetTime.of(localTime, zoneOffset),
+            OffsetDateTime.of(localDate, localTime, zoneOffset),
+            Instant.EPOCH,
+            UUID.fromString("1a448854-1687-4f90-9562-7d527d64383c"),
+            Uri.of("http://uri:8000"),
+            URL("http://url:9000")
         )
         val out = j.asJsonString(obj)
         assertThat(out, equalTo(expectedAutoMarshallingResultPrimitives))

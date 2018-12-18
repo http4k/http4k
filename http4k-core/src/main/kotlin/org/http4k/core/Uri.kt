@@ -19,7 +19,8 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
         private fun parseAuthority(authority: String): Triple<String, String, Int?> = when {
             authority.isBlank() -> Triple("", "", null)
             else -> {
-                val (userInfo, host, portString) = AUTHORITY.matchEntire(authority)?.destructured ?: throw RuntimeException("Invalid authority: $authority")
+                val (userInfo, host, portString) = AUTHORITY.matchEntire(authority)?.destructured
+                    ?: throw RuntimeException("Invalid authority: $authority")
                 val port = portString.toIntOrNull()
                 Triple(userInfo, host, port)
             }
@@ -40,20 +41,20 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     fun query(query: String) = copy(query = query)
     fun fragment(fragment: String) = copy(fragment = fragment)
 
-    fun authority(authority: String): Uri = parseAuthority(authority).let {
-         (userInfo, host, port) ->  copy(userInfo = userInfo, host = host, port = port)
-     }
+    fun authority(authority: String): Uri = parseAuthority(authority).let { (userInfo, host, port) ->
+        copy(userInfo = userInfo, host = host, port = port)
+    }
 
     override fun toString() = StringBuilder()
-            .appendIfNotBlank(scheme, scheme, ":")
-            .appendIfNotBlank(authority, "//", authority)
-            .append(when {
-                authority.isBlank() -> path
-                path.isBlank() || path.startsWith("/") -> path
-                else -> "/$path"
-            })
-            .appendIfNotBlank(query, "?", query)
-            .appendIfNotBlank(fragment, "#", fragment).toString()
+        .appendIfNotBlank(scheme, scheme, ":")
+        .appendIfNotBlank(authority, "//", authority)
+        .append(when {
+            authority.isBlank() -> path
+            path.isBlank() || path.startsWith("/") -> path
+            else -> "/$path"
+        })
+        .appendIfNotBlank(query, "?", query)
+        .appendIfNotBlank(fragment, "#", fragment).toString()
 
 }
 

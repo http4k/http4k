@@ -58,7 +58,7 @@ class WebsocketServerTest : WebsocketContract() {
     }
 
     @AfterEach
-    fun after()  {
+    fun after() {
         server.stop()
     }
 }

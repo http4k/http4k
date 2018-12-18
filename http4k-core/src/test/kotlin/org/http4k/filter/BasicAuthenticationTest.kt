@@ -57,9 +57,9 @@ class BasicAuthenticationTest {
         val key = RequestContextKey.required<Credentials>(contexts)
 
         val handler =
-                ServerFilters.InitialiseRequestContext(contexts)
-                        .then(ServerFilters.BasicAuth("my realm", key) { it })
-                        .then { req -> Response(OK).body(key(req).toString()) }
+            ServerFilters.InitialiseRequestContext(contexts)
+                .then(ServerFilters.BasicAuth("my realm", key) { it })
+                .then { req -> Response(OK).body(key(req).toString()) }
 
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(GET, "/"))
 

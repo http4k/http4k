@@ -13,15 +13,15 @@ object ResourceLoaders {
 
     object Classpath {
         operator fun invoke(
-                basePackagePath: String = "/",
-                mimeTypes: MimeTypes = MimeTypes(),
-                // We don't want to be grubbing about in jar files for last modified dates, so we default to the creation
-                // time of the loader, which make everything out of date every time an app is started, but in date after that.
+            basePackagePath: String = "/",
+            mimeTypes: MimeTypes = MimeTypes(),
+            // We don't want to be grubbing about in jar files for last modified dates, so we default to the creation
+            // time of the loader, which make everything out of date every time an app is started, but in date after that.
 
-                // * Must truncate if we are not always to be ahead of the If-Last-Modified header because it doesn't support
-                // fractions of seconds.
-                constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS),
-                lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
+            // * Must truncate if we are not always to be ahead of the If-Last-Modified header because it doesn't support
+            // fractions of seconds.
+            constantLastModified: Instant? = Instant.now().truncatedTo(SECONDS),
+            lastModifiedFinder: (path: String) -> Instant? = { constantLastModified }
         ): Router = object : ResourceLoading {
             override fun match(path: String): Resource? {
                 val resourcePath = basePackagePath.withLeadingSlash().pathJoin(path.orIndexFile())
@@ -37,9 +37,9 @@ object ResourceLoaders {
     fun Directory(baseDir: String, mimeTypes: MimeTypes = MimeTypes()): Router = DirectoryResourceLoader(baseDir, mimeTypes, null)
 
     fun ListingDirectory(
-            baseDir: String,
-            mimeTypes: MimeTypes = MimeTypes(),
-            directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
+        baseDir: String,
+        mimeTypes: MimeTypes = MimeTypes(),
+        directoryRenderer: DirectoryRenderer = ::simpleDirectoryRenderer
     ): Router = DirectoryResourceLoader(baseDir, mimeTypes, directoryRenderer)
 }
 

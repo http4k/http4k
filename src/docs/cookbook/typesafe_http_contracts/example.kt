@@ -4,7 +4,6 @@ import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKey
 import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
-import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta

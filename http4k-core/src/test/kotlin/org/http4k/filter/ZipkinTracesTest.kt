@@ -48,17 +48,17 @@ class SamplingDecisionTest {
 class ZipkinTracesTest {
 
     private val requestWithTraces = Request(Method.GET, "")
-            .header("x-b3-traceid", "somevalue1")
-            .header("x-b3-spanid", "somevalue2")
-            .header("x-b3-parentspanid", "somevalue3")
+        .header("x-b3-traceid", "somevalue1")
+        .header("x-b3-spanid", "somevalue2")
+        .header("x-b3-parentspanid", "somevalue3")
 
     private val expectedWithTraces = ZipkinTraces(TraceId("somevalue1"), TraceId("somevalue2"), TraceId("somevalue3"), SAMPLE)
 
     private val requestWithDecision = Request(Method.GET, "")
-            .header("x-b3-traceid", "somevalue1")
-            .header("x-b3-spanid", "somevalue2")
-            .header("x-b3-parentspanid", "somevalue3")
-            .header("x-b3-sampled", "0")
+        .header("x-b3-traceid", "somevalue1")
+        .header("x-b3-spanid", "somevalue2")
+        .header("x-b3-parentspanid", "somevalue3")
+        .header("x-b3-sampled", "0")
 
     private val expectedWithDecision = ZipkinTraces(TraceId("somevalue1"), TraceId("somevalue2"), TraceId("somevalue3"), DO_NOT_SAMPLE)
 

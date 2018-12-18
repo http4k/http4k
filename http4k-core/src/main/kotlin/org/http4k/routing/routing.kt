@@ -74,17 +74,17 @@ fun Request.path(name: String): String? = when (this) {
 
 data class PathMethod(val path: String, val method: Method) {
     infix fun to(action: HttpHandler): RoutingHttpHandler =
-            when (action) {
-                is StaticRoutingHttpHandler -> action.withBasePath(path).let {
-                    object : RoutingHttpHandler by it {
-                        override fun match(request: Request): HttpHandler? = when (method) {
-                            request.method -> it.match(request)
-                            else -> null
-                        }
+        when (action) {
+            is StaticRoutingHttpHandler -> action.withBasePath(path).let {
+                object : RoutingHttpHandler by it {
+                    override fun match(request: Request): HttpHandler? = when (method) {
+                        request.method -> it.match(request)
+                        else -> null
                     }
                 }
-                else -> TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
             }
+            else -> TemplateRoutingHttpHandler(method, UriTemplate.from(path), action)
+        }
 }
 
 infix fun String.bind(method: Method): PathMethod = PathMethod(this, method)

@@ -12,9 +12,9 @@ import java.lang.System.setProperty
 
 fun `simple proxy`() =
     ProxyHost(Https)
-            .then(JavaHttpClient())
-            .asServer(SunHttp())
-            .start()
+        .then(JavaHttpClient())
+        .asServer(SunHttp())
+        .start()
 
 fun main(args: Array<String>) {
     setProperty("http.proxyHost", "localhost")

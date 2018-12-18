@@ -50,6 +50,7 @@ class JSoupWebElementTest {
 
     @Test
     fun `equality fails for different element`() = assertThat(element().equals(JSoupWebElement(navigate, getURL, Jsoup.parse("<blink />"))), equalTo(false))
+
     @Test
     fun `tag name`() = assertThat(element().tagName, equalTo("a"))
 

@@ -29,6 +29,7 @@ val responseBody = Body.string(ContentType.TEXT_PLAIN).toLens()
 
 // Most of the useful common JDK types are covered. However, if we want to use our own types, we can just use `map()`
 data class CustomType(val value: String)
+
 val requiredCustomQuery = Query.map(::CustomType, { it.value }).required("myCustomType")
 
 //To use the Lens, simply `invoke() or extract()` it using an HTTP message to extract the value, or alternatively `invoke() or inject()` it with the value if we are modifying (via copy) the message:

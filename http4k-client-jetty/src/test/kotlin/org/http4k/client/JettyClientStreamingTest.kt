@@ -5,7 +5,7 @@ import org.http4k.server.SunHttp
 import org.junit.jupiter.api.Test
 
 class JettyClientStreamingTest : HttpClientContract({ SunHttp(it) }, JettyClient(bodyMode = BodyMode.Stream),
-        JettyClient(bodyMode = BodyMode.Stream, requestModifier = timeout)) {
+    JettyClient(bodyMode = BodyMode.Stream, requestModifier = timeout)) {
 
     @Test
     override fun `can forward response body to another request`() {

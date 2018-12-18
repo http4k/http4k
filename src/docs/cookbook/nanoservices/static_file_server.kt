@@ -9,9 +9,9 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 fun `static file server`() =
-        static(Directory())
-                .asServer(SunHttp())
-                .start()
+    static(Directory())
+        .asServer(SunHttp())
+        .start()
 
 fun main(args: Array<String>) {
     `static file server`().use {

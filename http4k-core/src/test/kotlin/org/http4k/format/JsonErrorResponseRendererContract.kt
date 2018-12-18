@@ -9,7 +9,7 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
 
-abstract class JsonErrorResponseRendererContract<NODE: Any>(val j: Json<NODE>){
+abstract class JsonErrorResponseRendererContract<NODE : Any>(val j: Json<NODE>) {
 
     @Test
     fun `can build 400`() {

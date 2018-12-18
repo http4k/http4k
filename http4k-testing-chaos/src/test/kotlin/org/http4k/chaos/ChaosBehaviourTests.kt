@@ -79,8 +79,8 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
-                description,
-                hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
+            description,
+            hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
     }
 
     @Test
@@ -113,8 +113,8 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"status","status":404}""",
-                description,
-                hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
+            description,
+            hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
 }
 
@@ -132,8 +132,8 @@ class NoBodyBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"body"}""",
-                description,
-                hasStatus(OK).and(hasHeader("x-http4k-chaos", "No body")))
+            description,
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", "No body")))
     }
 }
 

@@ -37,10 +37,10 @@ class UriTest {
     @Test
     fun `handles no prefixed slash in a path`() {
         val uri = Uri.of("")
-                .scheme("https")
-                .host("example.com")
-                .port(1234)
-                .path("a/b/c")
+            .scheme("https")
+            .host("example.com")
+            .port(1234)
+            .path("a/b/c")
 
         assertThat(uri.toString(), equalTo("https://example.com:1234/a/b/c"))
     }
@@ -76,7 +76,7 @@ class UriTest {
     }
 
     @Test
-    fun parameters_can_be_defined_in_value(){
+    fun parameters_can_be_defined_in_value() {
         assertThat(Uri.of("http://www.google.com?a=b"), equalTo(Uri.of("http://www.google.com").query("a", "b")))
     }
 
@@ -98,7 +98,7 @@ class UriTest {
     }
 
     @Test
-    fun `can extend existing uri`(){
+    fun `can extend existing uri`() {
         assertThat(Uri.of("http://ignore?foo=bar").extend(Uri.of("/?abc=xyz")), equalTo(Uri.of("http://ignore/?foo=bar&abc=xyz")))
     }
 }

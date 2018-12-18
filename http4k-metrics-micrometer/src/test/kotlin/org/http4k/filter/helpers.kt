@@ -34,4 +34,6 @@ internal fun timerCount(value: Long) = has<Timer, Long>("count", { it.count() },
 internal fun timerTotalTime(millis: Long) =
     has<Timer, Long>("total time", { it.totalTime(TimeUnit.MILLISECONDS).toLong() }, equalTo(millis))
 
-internal fun description(value: String) = has<Meter, String>("description", { it.id.description ?: "unknown" }, equalTo(value))
+internal fun description(value: String) = has<Meter, String>("description", {
+    it.id.description ?: "unknown"
+}, equalTo(value))

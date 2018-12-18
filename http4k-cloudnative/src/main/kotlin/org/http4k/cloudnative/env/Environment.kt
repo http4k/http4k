@@ -1,10 +1,15 @@
 package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
-import org.http4k.lens.*
+import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.Lens
+import org.http4k.lens.LensGet
+import org.http4k.lens.LensSet
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.int
 import java.io.File
 import java.io.Reader
-import java.util.*
+import java.util.Properties
 
 
 /**
@@ -42,7 +47,7 @@ interface Environment {
          * Load configuration from standard Properties file format on classpath
          */
         fun fromResource(resource: String): Environment =
-                Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader().toProperties()
+            Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader().toProperties()
 
         /**
          * Load configuration from standard Properties file format on disk
@@ -59,13 +64,13 @@ interface Environment {
         private fun Reader.toProperties() = Properties().apply { load(this@toProperties) }.toEnvironment()
 
         private fun Properties.toEnvironment() = MapEnvironment(entries
-                .fold(emptyMap()) { acc, (k, v) -> acc.plus(k.toString().convertFromKey() to v.toString()) })
+            .fold(emptyMap()) { acc, (k, v) -> acc.plus(k.toString().convertFromKey() to v.toString()) })
     }
 }
 
 internal class OverridingEnvironment(
-        private val environment: Environment,
-        private val fallback: Environment
+    private val environment: Environment,
+    private val fallback: Environment
 ) : Environment {
     override fun <T> get(key: Lens<Environment, T>): T = environment[key] ?: fallback[key]
     override fun get(key: String): String? = environment[key] ?: fallback[key]
@@ -83,13 +88,13 @@ internal class MapEnvironment internal constructor(private val contents: Map<Str
  * EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the entire list, or override the comma separator in your initial Environment.
  */
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
-        LensGet { name, target -> target[name]?.split(target.separator) ?: emptyList() },
-        LensSet { name, values, target ->
-            values.fold(target) { acc, next ->
-                val existing = acc[name]?.let { listOf(it) } ?: emptyList()
-                acc.set(name, (existing + next).joinToString(target.separator))
-            }
+    LensGet { name, target -> target[name]?.split(target.separator) ?: emptyList() },
+    LensSet { name, values, target ->
+        values.fold(target) { acc, next ->
+            val existing = acc[name]?.let { listOf(it) } ?: emptyList()
+            acc.set(name, (existing + next).joinToString(target.separator))
         }
+    }
 ) {
     object k8s {
         operator fun <T> invoke(fn: EnvironmentKey.k8s.() -> T): T = fn(this)
@@ -98,13 +103,13 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
         val HEALTH_PORT = int().required("HEALTH_PORT")
 
         fun serviceUriFor(serviceName: String, isHttps: Boolean = false) = int()
-                .map(serviceName.toUriFor(isHttps), { it.port ?: 80 })
-                .required("${serviceName.convertFromKey().toUpperCase()}_SERVICE_PORT")
+            .map(serviceName.toUriFor(isHttps), { it.port ?: 80 })
+            .required("${serviceName.convertFromKey().toUpperCase()}_SERVICE_PORT")
 
         private fun String.toUriFor(https: Boolean): (Int) -> Uri = {
             Uri.of("/")
-                    .scheme(if (https) "https" else "http")
-                    .authority(if (it == 80 || it == 443) this else "$this:$it")
+                .scheme(if (https) "https" else "http")
+                .authority(if (it == 80 || it == 443) this else "$this:$it")
         }
     }
 }

@@ -51,7 +51,7 @@ object ChaosTriggers {
         operator fun invoke(trigger: Trigger) = object : Trigger {
             private val active = AtomicBoolean(true)
             override fun invoke(request: Request) =
-                    if (trigger(request)) active.get().also { active.set(false) } else false
+                if (trigger(request)) active.get().also { active.set(false) } else false
 
             override fun toString() = "Once (trigger = $trigger)"
         }
@@ -136,7 +136,9 @@ object ChaosTriggers {
         operator fun invoke(initial: Int): Trigger = object : Trigger {
             private val count = AtomicInteger(initial)
 
-            override fun invoke(req: Request) = if (count.get() > 0) { count.decrementAndGet(); true } else false
+            override fun invoke(req: Request) = if (count.get() > 0) {
+                count.decrementAndGet(); true
+            } else false
 
             override fun toString() = "Countdown (${count.get()} remaining)"
         }
@@ -155,7 +157,7 @@ internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = whe
 }
 
 private fun JsonNode.toRegexMap(name: String) =
-        asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
+    asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
 
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off

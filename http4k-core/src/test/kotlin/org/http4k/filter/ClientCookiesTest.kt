@@ -72,7 +72,8 @@ class ClientCookiesTest {
     fun `cookie expiry uses the same timezone as cookie parsing`() {
         val zoneId = ZoneId.of("Europe/London")
 
-        val cookie = Cookie.parse("foo=bar;Path=/;Expires=Thu, 25-Oct-2018 10:00:00 GMT;HttpOnly") ?: fail("Couldn't parse cookie")
+        val cookie = Cookie.parse("foo=bar;Path=/;Expires=Thu, 25-Oct-2018 10:00:00 GMT;HttpOnly")
+            ?: fail("Couldn't parse cookie")
         // this was 11:00:00 in Europe/London due to daylight savings
 
         val server = { request: Request ->

@@ -36,6 +36,7 @@ class JacksonTest : JsonContract<JsonNode>(Jackson) {
   "hello" : "world"
 }"""
 }
+
 class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode>(Jackson)
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode>(Jackson)
 class JacksonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(Jackson)

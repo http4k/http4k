@@ -39,28 +39,28 @@ class InvalidJsonException(messasge: String, cause: Throwable? = null) : Excepti
 open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
 
     override fun typeOf(value: JsonElement): JsonType =
-            when {
-                value.isJsonArray -> JsonType.Array
-                value.isJsonNull -> JsonType.Null
-                value.isJsonObject -> JsonType.Object
-                value.isJsonPrimitive -> {
-                    val prim = value.asJsonPrimitive
-                    when {
-                        prim.isBoolean -> JsonType.Boolean
-                        prim.isNumber -> JsonType.Number
-                        prim.isString -> JsonType.String
-                        else -> throw IllegalArgumentException("Don't know now to translate $value")
-                    }
+        when {
+            value.isJsonArray -> JsonType.Array
+            value.isJsonNull -> JsonType.Null
+            value.isJsonObject -> JsonType.Object
+            value.isJsonPrimitive -> {
+                val prim = value.asJsonPrimitive
+                when {
+                    prim.isBoolean -> JsonType.Boolean
+                    prim.isNumber -> JsonType.Number
+                    prim.isString -> JsonType.String
+                    else -> throw IllegalArgumentException("Don't know now to translate $value")
                 }
-                else -> throw IllegalArgumentException("Don't know now to translate $value")
             }
+            else -> throw IllegalArgumentException("Don't know now to translate $value")
+        }
 
     private val compact = builder.create()
     private val pretty = builder.setPrettyPrinting().create()
 
     override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).let {
         if (it.isJsonArray || it.isJsonObject) it else throw InvalidJsonException(
-                "Could not convert to a JSON Object or Array. $this"
+            "Could not convert to a JSON Object or Array. $this"
         )
     }
 
@@ -82,13 +82,13 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     }
 
     override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
-            if (typeOf(node) != Object) emptyList() else {
-                val fieldList = mutableListOf<Pair<String, JsonElement>>()
-                for ((key, value) in node.asJsonObject.entrySet()) {
-                    fieldList += key to value
-                }
-                fieldList
+        if (typeOf(node) != Object) emptyList() else {
+            val fieldList = mutableListOf<Pair<String, JsonElement>>()
+            for ((key, value) in node.asJsonObject.entrySet()) {
+                fieldList += key to value
             }
+            fieldList
+        }
 
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
@@ -111,27 +111,27 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 }
 
 object Gson : ConfigurableGson(GsonBuilder()
-        .custom(Duration::parse)
-        .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
-        .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
-        .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-        .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-        .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
-        .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
-        .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
-        .custom(UUID::fromString)
-        .custom(Companion::of)
-        .custom(::URL, URL::toExternalForm)
-        .custom(::Regex, Regex::pattern)
-        .serializeNulls())
+    .custom(Duration::parse)
+    .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
+    .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
+    .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
+    .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
+    .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
+    .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
+    .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
+    .custom(UUID::fromString)
+    .custom(Companion::of)
+    .custom(::URL, URL::toExternalForm)
+    .custom(::Regex, Regex::pattern)
+    .serializeNulls())
 
 private interface BidiJson<T> : JsonSerializer<T>, JsonDeserializer<T>
 
 private inline fun <reified T> GsonBuilder.custom(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }): GsonBuilder = this.registerTypeAdapter(T::class.java, adapter(readFn, writeFn))
 
 private inline fun <T> adapter(crossinline readFn: (String) -> T, crossinline writeFn: (T) -> String = { it.toString() }) =
-        object : BidiJson<T> {
-            override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(writeFn(src))
+    object : BidiJson<T> {
+        override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(writeFn(src))
 
-            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): T = readFn(json.asString)
-        }
+        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): T = readFn(json.asString)
+    }

@@ -29,25 +29,40 @@ object Argo : Json<JsonNode> {
     private val jdomParser = JdomParser()
 
     override fun String.asJsonObject(): JsonNode = this.let(jdomParser::parse)
-    override fun String?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.string(it) } ?: JsonNodeFactories.nullNode()
-    override fun Int?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it.toLong()) } ?: JsonNodeFactories.nullNode()
-    override fun Double?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(BigDecimal(it)) } ?: JsonNodeFactories.nullNode()
-    override fun Long?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) } ?: JsonNodeFactories.nullNode()
-    override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) } ?: JsonNodeFactories.nullNode()
-    override fun BigInteger?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) } ?: JsonNodeFactories.nullNode()
-    override fun Boolean?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.booleanNode(it) } ?: JsonNodeFactories.nullNode()
+    override fun String?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.string(it) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun Int?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it.toLong()) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun Double?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(BigDecimal(it)) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun Long?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun BigInteger?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.number(it) }
+        ?: JsonNodeFactories.nullNode()
+
+    override fun Boolean?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.booleanNode(it) }
+        ?: JsonNodeFactories.nullNode()
+
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = JsonNodeFactories.array(this)
     override fun JsonNode.asPrettyJsonString(): String = pretty.format(this)
     override fun JsonNode.asCompactJsonString(): String = compact.format(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode = `object`(this.map { field(it.first, it.second) })
     override fun fields(node: JsonNode) =
-            if(typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
+        if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
+
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements
     override fun text(value: JsonNode): String = value.text
     override fun bool(value: JsonNode): Boolean = value.getBooleanValue()
 
     override fun textValueOf(node: JsonNode, name: String) = with(node.getNode(name)) {
-         when (type) {
+        when (type) {
             JsonNodeType.STRING -> text
             JsonNodeType.TRUE -> "true"
             JsonNodeType.FALSE -> "false"

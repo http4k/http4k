@@ -39,7 +39,7 @@ object DebuggingFilters {
     }
 
     private fun HttpMessage.printable(debugStream: Boolean) =
-            if (debugStream || body is MemoryBody) this else body("<<stream>>")
+        if (debugStream || body is MemoryBody) this else body("<<stream>>")
 
     /**
      * Print details of a request and it's response.

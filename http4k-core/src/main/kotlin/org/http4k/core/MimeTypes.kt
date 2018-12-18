@@ -12,7 +12,7 @@ data class MimeTypes private constructor(private val map: Map<String, ContentTyp
         operator fun invoke(overrides: Map<String, ContentType> = emptyMap()): MimeTypes =
             if (overrides.isEmpty()) standardTypes else MimeTypes(standardTypes.map + overrides)
 
-        private val standardTypes : MimeTypes by lazy { MimeTypes(loadStandard()) }
+        private val standardTypes: MimeTypes by lazy { MimeTypes(loadStandard()) }
 
         private fun loadStandard(): Map<String, ContentType> =
             MimeTypes::class.java.getResourceAsStream("/META-INF/mime.types").reader().readLines().flatMap {

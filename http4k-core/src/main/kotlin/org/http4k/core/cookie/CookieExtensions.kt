@@ -24,7 +24,9 @@ internal fun String.toCookieList(): List<Cookie> = split(";").map { it.trim() }.
 
 fun Request.cookies(): List<Cookie> = header("Cookie")?.toCookieList() ?: listOf()
 
-fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending { it.path?.length ?: 0 }.firstOrNull()
+fun Request.cookie(name: String): Cookie? = cookies().filter { it.name == name }.sortedByDescending {
+    it.path?.length ?: 0
+}.firstOrNull()
 
 private fun List<Cookie>.toCookieString() = map(Cookie::keyValueCookieString).joinToString("; ")
 

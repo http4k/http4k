@@ -66,9 +66,9 @@ class ChaosControlsTest {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosControls(
-                Wait,
-                ApiKey(Header.required("secret"), { true }),
-                "/context"
+            Wait,
+            ApiKey(Header.required("secret"), { true }),
+            "/context"
         )
 
         appWithChaos(Request(GET, "/context/status")) shouldMatch hasStatus(UNAUTHORIZED)
@@ -80,9 +80,9 @@ class ChaosControlsTest {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
         val appWithChaos = app.withChaosControls(
-                Wait,
-                NoSecurity,
-                "/context"
+            Wait,
+            NoSecurity,
+            "/context"
         )
 
         appWithChaos(Request(GET, "/context/status")) shouldMatch hasStatus(OK)

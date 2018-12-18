@@ -57,7 +57,7 @@ class ContractRouteTest {
         val actual = route.toRouter(Root).match(invalidRequest)
         assertThat(actual, present())
         assertThat({ actual?.invoke(invalidRequest) },
-                throws(lensFailureWith(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
+            throws(lensFailureWith(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
@@ -153,21 +153,21 @@ class ContractRouteTest {
     @Test
     fun `5 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String) =
-                { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5) }
+            { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5) }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5", "value1value2value3value4value5")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5", "value1value2value3value4value5")
     }
 
     @Test
     fun `6 parts - matches route`() {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String) =
-                { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5 + value6) }
+            { _: Request -> Response(OK).body(value1 + value2 + value3 + value4 + value5 + value6) }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                Path.of("value5") / Path.of("value6")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6",
-                "value1value2value3value4value5value6")
+            Path.of("value5") / Path.of("value6")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6",
+            "value1value2value3value4value5value6")
     }
 
     @Test
@@ -175,13 +175,13 @@ class ContractRouteTest {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
                     value7: String) = { _: Request ->
             Response(OK).body(value1 + value2 + value3 + value4 +
-                    value5 + value6 + value7)
+                value5 + value6 + value7)
         }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                Path.of("value5") / Path.of("value6") / Path.of("value7")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7",
-                "value1value2value3value4value5value6value7")
+            Path.of("value5") / Path.of("value6") / Path.of("value7")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7",
+            "value1value2value3value4value5value6value7")
     }
 
     @Test
@@ -189,13 +189,13 @@ class ContractRouteTest {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
                     value7: String, value8: String) = { _: Request ->
             Response(OK).body(value1 + value2 +
-                    value3 + value4 + value5 + value6 + value7 + value8)
+                value3 + value4 + value5 + value6 + value7 + value8)
         }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8",
-                "value1value2value3value4value5value6value7value8")
+            Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8",
+            "value1value2value3value4value5value6value7value8")
     }
 
     @Test
@@ -203,14 +203,14 @@ class ContractRouteTest {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
                     value7: String, value8: String, value9: String) = { _: Request ->
             Response(OK).body(value1 +
-                    value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9)
+                value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9)
         }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
-                Path.of("value9")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8/value9",
-                "value1value2value3value4value5value6value7value8value9")
+            Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
+            Path.of("value9")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8/value9",
+            "value1value2value3value4value5value6value7value8value9")
     }
 
     @Test
@@ -218,22 +218,22 @@ class ContractRouteTest {
         fun matched(value1: String, value2: String, value3: String, value4: String, value5: String, value6: String,
                     value7: String, value8: String, value9: String, value10: String) = { _: Request ->
             Response(OK)
-                    .body(value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9 + value10)
+                .body(value1 + value2 + value3 + value4 + value5 + value6 + value7 + value8 + value9 + value10)
         }
 
         checkMatching(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
-                Path.of("value9") / Path.of("value10")
-                bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8/value9/value10",
-                "value1value2value3value4value5value6value7value8value9value10")
+            Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
+            Path.of("value9") / Path.of("value10")
+            bindContract GET to ::matched, "/value1/value2/value3/value4/value5/value6/value7/value8/value9/value10",
+            "value1value2value3value4value5value6value7value8value9value10")
     }
 
     @Test
     fun `11 parts - unsupported`() {
         assertThat({
             Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") /
-                    Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
-                    Path.of("value9") / Path.of("value10") / Path.of("value11")
+                Path.of("value5") / Path.of("value6") / Path.of("value7") / Path.of("value8") /
+                Path.of("value9") / Path.of("value10") / Path.of("value11")
         }, throws<UnsupportedOperationException>())
     }
 

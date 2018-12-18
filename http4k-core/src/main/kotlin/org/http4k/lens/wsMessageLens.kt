@@ -13,7 +13,9 @@ open class WsMessageLensSpec<out OUT>(internal val get: LensGet<WsMessage, OUT>)
     /**
      * Create a lens for this Spec
      */
-    open fun toLens(): WsMessageLens<OUT> = WsMessageLens { get("message")(it).firstOrNull() ?: throw LensFailure(Missing(meta)) }
+    open fun toLens(): WsMessageLens<OUT> = WsMessageLens {
+        get("message")(it).firstOrNull() ?: throw LensFailure(Missing(meta))
+    }
 
     /**
      * Create another WsMessageLensSpec which applies the uni-directional transformation to the result. Any resultant Lens can only be used to extract the final type from a WsMessage.
@@ -45,6 +47,7 @@ open class BiDiWsMessageLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
         )
     }
 }
+
 /**
  * A WsMessageLens provides the extraction of an entity from a target WsMessage.
  */

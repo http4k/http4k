@@ -37,7 +37,7 @@ interface ApiKey<out T> : Security {
         operator fun <T> invoke(param: Lens<Request, T>,
                                 validateKey: (T) -> Boolean,
                                 authorizeOptionsRequests: Boolean = true): ApiKey<T> =
-            object: ApiKey<T> {
+            object : ApiKey<T> {
                 override val param = param
                 override val filter = Filter { next ->
                     {

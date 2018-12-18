@@ -9,6 +9,7 @@ class ContractDsl {
     var descriptionPath = ""
     var summary: String = "<unknown>"
 }
+
 fun contractDsl(fn: ContractDsl.() -> Unit): Any = ContractDsl().apply(fn).run {
     this
 }

@@ -62,7 +62,7 @@ data class Cookie(val name: String, val value: String,
             for (supportedFormat in supportedFormats) {
                 try {
                     return LocalDateTime.parse(this, supportedFormat)
-                } catch(_: Exception) {
+                } catch (_: Exception) {
                 }
             }
             return null

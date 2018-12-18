@@ -29,7 +29,7 @@ class CurlTest {
     }
 
     @Test
-    fun `deals with headers with quotes`(){
+    fun `deals with headers with quotes`() {
         val curl = Request(Method.GET, "http://httpbin.org").header("foo", "my \"quoted\" header").toCurl()
         assertThat(curl, equalTo("""curl -X GET -H "foo:my \"quoted\" header" "http://httpbin.org""""))
     }

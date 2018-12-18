@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-interface Stage: (Request) -> Filter?
+interface Stage : (Request) -> Filter?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
@@ -57,10 +57,10 @@ object ChaosStages {
         private val current by lazy { AtomicReference(newStageFn()) }
 
         override fun invoke(request: Request): Filter? =
-                current.get()(request) ?: run {
-                    current.set(newStageFn())
-                    current.get()(request)
-                }
+            current.get()(request) ?: run {
+                current.set(newStageFn())
+                current.get()(request)
+            }
 
         override fun toString() = "Repeat [${current.get()}]"
     }
@@ -87,9 +87,9 @@ fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
         "wait" -> Wait
         "repeat" -> Repeat {
             this["stages"]!!
-                    .elements().asSequence()
-                    .map { it.asStage(clock) }
-                    .reduce { acc, next -> acc.then(next) }
+                .elements().asSequence()
+                .map { it.asStage(clock) }
+                .reduce { acc, next -> acc.then(next) }
         }
         "trigger" -> this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
         else -> throw IllegalArgumentException("unknown stage")

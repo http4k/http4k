@@ -43,9 +43,9 @@ class BearerAuthenticationTest {
         val key = RequestContextKey.required<Credentials>(contexts)
 
         val handler =
-                InitialiseRequestContext(contexts)
-                        .then(BearerAuth(key) { Credentials(it, it) })
-                        .then { req -> Response(OK).body(key(req).toString()) }
+            InitialiseRequestContext(contexts)
+                .then(BearerAuth(key) { Credentials(it, it) })
+                .then { req -> Response(OK).body(key(req).toString()) }
 
         val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
 

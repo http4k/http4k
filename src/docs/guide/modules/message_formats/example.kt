@@ -1,8 +1,12 @@
 package guide.modules.message_formats
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.core.*
+import org.http4k.core.Body
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asJsonArray
 import org.http4k.format.Jackson.asJsonObject

@@ -12,6 +12,7 @@ import org.http4k.lens.int
 
 // This is our custom Result/Either ADT, although it could be anything, like a Result4k Result (which has map() etc)
 sealed class Result<out T>
+
 data class Succeeded<out T>(val value: T) : Result<T>()
 data class Failed<out T>(val e: Exception) : Result<T>()
 

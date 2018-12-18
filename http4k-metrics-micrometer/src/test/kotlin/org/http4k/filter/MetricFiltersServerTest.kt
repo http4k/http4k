@@ -150,6 +150,6 @@ class MetricFiltersServerTest {
 
     private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
         hasCounter("http.server.request.count",
-            listOf(Tag.of("path", path),Tag.of( "method", method.name), Tag.of("status", status.code.toString()))
+            listOf(Tag.of("path", path), Tag.of("method", method.name), Tag.of("status", status.code.toString()))
         ).not()
 }

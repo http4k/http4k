@@ -13,20 +13,20 @@ import org.http4k.traffic.ReadWriteStream.Companion.Disk
 import java.lang.System.setProperty
 
 fun `recording traffic to disk proxy`() =
-        ProxyHost(Https)
-                .then(RecordTo(Disk("store")))
-                .then(JavaHttpClient())
-                .asServer(SunHttp())
-                .start()
+    ProxyHost(Https)
+        .then(RecordTo(Disk("store")))
+        .then(JavaHttpClient())
+        .asServer(SunHttp())
+        .start()
 
 fun `replay previously recorded traffic from a disk store`() =
-        JavaHttpClient().let { client ->
-            Disk("store").requests()
-                    .forEach {
-                        println(it)
-                        client(it)
-                    }
-        }
+    JavaHttpClient().let { client ->
+        Disk("store").requests()
+            .forEach {
+                println(it)
+                client(it)
+            }
+    }
 
 fun main(args: Array<String>) {
     setProperty("http.proxyHost", "localhost")

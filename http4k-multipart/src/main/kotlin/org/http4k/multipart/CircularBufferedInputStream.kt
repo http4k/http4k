@@ -80,7 +80,8 @@ internal open class CircularBufferedInputStream(private val inputStream: InputSt
         markInvalid = false
     }
 
-    @Synchronized override fun mark(readlimit: Int) {
+    @Synchronized
+    override fun mark(readlimit: Int) {
         if (readlimit > bufferSize) throw ArrayIndexOutOfBoundsException(String.format("Readlimit (%d) cannot be bigger than buffer size (%d)", readlimit, bufferSize))
         leftBounds = cursor
         markInvalid = false

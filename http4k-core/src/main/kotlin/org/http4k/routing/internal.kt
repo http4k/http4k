@@ -30,8 +30,8 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
             val lookupType = extMap.forFile(path)
             if (p1.method == GET && lookupType != OCTET_STREAM) {
                 Response(OK)
-                        .header("Content-Type", lookupType.value)
-                        .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
+                    .header("Content-Type", lookupType.value)
+                    .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
             } else Response(NOT_FOUND)
         } ?: Response(NOT_FOUND)
     } else Response(NOT_FOUND)
@@ -44,9 +44,9 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
 }
 
 internal data class StaticRoutingHttpHandler(private val pathSegments: String,
-                                    private val resourceLoader: ResourceLoader,
-                                    private val extraPairs: Map<String, ContentType>,
-                                    private val filter: Filter = Filter.NoOp
+                                             private val resourceLoader: ResourceLoader,
+                                             private val extraPairs: Map<String, ContentType>,
+                                             private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
     override fun withFilter(new: Filter): RoutingHttpHandler = copy(filter = new.then(filter))

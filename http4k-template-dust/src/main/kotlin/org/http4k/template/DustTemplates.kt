@@ -11,7 +11,7 @@ class DustTemplates(
     private val dustPluginScripts: List<URL> = emptyList()
 
 ) : Templates {
-    
+
     override fun Caching(baseTemplateDir: String): TemplateRenderer =
         dust4Http4K(true, loadFromFilesIn(baseTemplateDir))
 
@@ -27,10 +27,11 @@ class DustTemplates(
             precachePoolSize = precachePoolSize,
             dustPluginScripts = dustPluginScripts,
             loader = loader)
-        
+
         return fun(viewModel: ViewModel) =
-            dust.withTemplates { it.expandTemplate(viewModel.template(), viewModel,
-                onMissingTemplate = { throw ViewNotFound(viewModel) })
+            dust.withTemplates {
+                it.expandTemplate(viewModel.template(), viewModel,
+                    onMissingTemplate = { throw ViewNotFound(viewModel) })
             }
     }
 }

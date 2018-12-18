@@ -15,10 +15,10 @@ import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
     Cors(UnsafeGlobalPermissive)
-            .then { Response(OK).body("A normal response") }
-            .withChaosControls(ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(50)))
-            .asServer(SunHttp(9000))
-            .start()
-            .also { println("Visit the app at http://localhost:9000 or see the OpenApi at https://www.http4k.org/swagger2/?url=http://localhost:9000/chaos")}
-            .block()
+        .then { Response(OK).body("A normal response") }
+        .withChaosControls(ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(50)))
+        .asServer(SunHttp(9000))
+        .start()
+        .also { println("Visit the app at http://localhost:9000 or see the OpenApi at https://www.http4k.org/swagger2/?url=http://localhost:9000/chaos") }
+        .block()
 }

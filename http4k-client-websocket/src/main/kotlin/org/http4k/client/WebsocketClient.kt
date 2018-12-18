@@ -15,7 +15,6 @@ import org.http4k.websocket.WsStatus
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
 import java.time.Duration
@@ -53,10 +52,10 @@ private fun Headers.combineToMap() = this.groupBy { it.first }.mapValues { it.va
 
 private class AdaptingWebSocket(uri: Uri, private val client: WebSocketClient) : PushPullAdaptingWebSocket(Request(GET, uri)) {
     override fun send(message: WsMessage) =
-            when (message.body) {
-                is StreamBody -> client.send(message.body.payload)
-                else -> client.send(message.bodyString())
-            }
+        when (message.body) {
+            is StreamBody -> client.send(message.body.payload)
+            else -> client.send(message.bodyString())
+        }
 
     override fun close(status: WsStatus) = client.close(status.code, status.description)
 }
@@ -97,8 +96,8 @@ private class BlockingWsClient(private val queue: LinkedBlockingQueue<() -> WsMe
     override fun close(status: WsStatus) = client.close(status.code, status.description)
 
     override fun send(message: WsMessage): Unit =
-            when (message.body) {
-                is StreamBody -> client.send(message.body.payload)
-                else -> client.send(message.bodyString())
-            }
+        when (message.body) {
+            is StreamBody -> client.send(message.body.payload)
+            else -> client.send(message.bodyString())
+        }
 }

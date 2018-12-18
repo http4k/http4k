@@ -11,7 +11,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-val EchoBody : HttpHandler = { r -> Response(OK).body(r.bodyString()) }
+val EchoBody: HttpHandler = { r -> Response(OK).body(r.bodyString()) }
 
 class StaticPathTest {
     @Test

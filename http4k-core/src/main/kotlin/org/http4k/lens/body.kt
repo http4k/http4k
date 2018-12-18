@@ -136,15 +136,12 @@ interface ContentNegotiation {
     }
 }
 
-fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
-    = httpBodyRoot(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
+fun Body.Companion.string(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", StringParam, "body", description)), contentType, contentNegotiation)
     .map({ it.payload.asString() }, { it: String -> Body(it) })
 
-fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
-    = string(contentType, description, contentNegotiation).map(::nonEmpty) { it }
+fun Body.Companion.nonEmptyString(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = string(contentType, description, contentNegotiation).map(::nonEmpty) { it }
 
-fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None)
-    = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
+fun Body.Companion.binary(contentType: ContentType, description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", FileParam, "body", description)), contentType, contentNegotiation)
 
 fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
     pattern.toRegex().let { regex ->

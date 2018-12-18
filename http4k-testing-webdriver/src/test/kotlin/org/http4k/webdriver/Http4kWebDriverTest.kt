@@ -64,24 +64,23 @@ class Http4kWebDriverTest {
     @Test
     fun `POST form with empty action`() {
         var loadCount = 0
-        val driver = Http4kWebDriver {
-            req ->
-                loadCount++
-                val body = File("src/test/resources/test.html").readText()
-                Response(OK).body(body
-                        .replace("FORMMETHOD", Method.POST.name)
-                        .replace("THEMETHOD", req.method.name)
-                        .replace("THEBODY", req.bodyString())
-                        .replace("THEURL", req.uri.toString())
-                        .replace("THETIME", System.currentTimeMillis().toString())
-                        .replace("ACTION", "action")
-                )
+        val driver = Http4kWebDriver { req ->
+            loadCount++
+            val body = File("src/test/resources/test.html").readText()
+            Response(OK).body(body
+                .replace("FORMMETHOD", Method.POST.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action")
+            )
         }
         val n0 = loadCount
         driver.get("http://example.com/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://example.com/bob")
-        assertThat(loadCount, equalTo(n0+2))
+        assertThat(loadCount, equalTo(n0 + 2))
         assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }
@@ -89,24 +88,23 @@ class Http4kWebDriverTest {
     @Test
     fun `POST form with action set to empty string`() {
         var loadCount = 0
-        val driver = Http4kWebDriver {
-            req ->
+        val driver = Http4kWebDriver { req ->
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                    .replace("FORMMETHOD", Method.POST.name)
-                    .replace("THEMETHOD", req.method.name)
-                    .replace("THEBODY", req.bodyString())
-                    .replace("THEURL", req.uri.toString())
-                    .replace("THETIME", System.currentTimeMillis().toString())
-                    .replace("ACTION", "action=\"\"")
+                .replace("FORMMETHOD", Method.POST.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action=\"\"")
             )
         }
         val n0 = loadCount
         driver.get("http://127.0.0.1/bob")
         driver.findElement(By.id("button"))!!.submit()
         driver.assertOnPage("http://127.0.0.1/bob")
-        assertThat(loadCount, equalTo(n0+2))
+        assertThat(loadCount, equalTo(n0 + 2))
         assertThat(driver.findElement(By.tagName("thebody"))!!.text, equalTo("text1=textValue&checkbox1=checkbox&textarea1=textarea&select1=option1&select1=option2&button=yes"))
         assertThat(driver.findElement(By.tagName("themethod"))!!.text, equalTo("POST"))
     }

@@ -35,7 +35,7 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
 
             override fun stop(): Http4kServer = apply { server.stop() }
 
-            override fun port(): Int = if(port > 0) port else server.uri.port
+            override fun port(): Int = if (port > 0) port else server.uri.port
         }
     }
 }
@@ -58,23 +58,23 @@ typealias ConnectorBuilder = (Server) -> ServerConnector
 fun http(httpPort: Int): ConnectorBuilder = { server: Server -> ServerConnector(server).apply { port = httpPort } }
 
 fun http2(http2Port: Int, keystorePath: String, keystorePassword: String): ConnectorBuilder =
-        { server: Server ->
-            ServerConnector(server,
-                    SslConnectionFactory(
-                            SslContextFactory().apply {
-                                keyStorePath = keystorePath
-                                setKeyStorePassword(keystorePassword)
-                                cipherComparator = COMPARATOR
-                                provider = "Conscrypt"
-                            },
-                            "alpn"),
-                    ALPNServerConnectionFactory().apply {
-                        defaultProtocol = "h2"
-                    },
-                    HTTP2ServerConnectionFactory(HttpConfiguration().apply {
-                        sendServerVersion = false
-                        secureScheme = "https"
-                        securePort = http2Port
-                        addCustomizer(SecureRequestCustomizer())
-                    })).apply { port = http2Port }
-        }
+    { server: Server ->
+        ServerConnector(server,
+            SslConnectionFactory(
+                SslContextFactory().apply {
+                    keyStorePath = keystorePath
+                    setKeyStorePassword(keystorePassword)
+                    cipherComparator = COMPARATOR
+                    provider = "Conscrypt"
+                },
+                "alpn"),
+            ALPNServerConnectionFactory().apply {
+                defaultProtocol = "h2"
+            },
+            HTTP2ServerConnectionFactory(HttpConfiguration().apply {
+                sendServerVersion = false
+                secureScheme = "https"
+                securePort = http2Port
+                addCustomizer(SecureRequestCustomizer())
+            })).apply { port = http2Port }
+    }

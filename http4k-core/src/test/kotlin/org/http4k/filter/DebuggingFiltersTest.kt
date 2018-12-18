@@ -28,7 +28,7 @@ class DebuggingFiltersTest {
     }
 
     @Test
-    fun `suppresses stream body by default`(){
+    fun `suppresses stream body by default`() {
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
@@ -40,7 +40,7 @@ class DebuggingFiltersTest {
     }
 
     @Test
-    fun `can print stream body`(){
+    fun `can print stream body`() {
         val os = ByteArrayOutputStream()
         val req = Request(Method.GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())

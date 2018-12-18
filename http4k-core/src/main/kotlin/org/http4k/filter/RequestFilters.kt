@@ -38,8 +38,8 @@ object RequestFilters {
         operator fun invoke() = Filter { next ->
             { request ->
                 request.header("content-encoding")
-                        ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
+                    ?.let { if (it.contains("gzip")) it else null }
+                    ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
             }
         }
     }
@@ -65,7 +65,7 @@ object RequestFilters {
         operator fun invoke(mode: ProxyProtocolMode = ProxyProtocolMode.Http): Filter = Filter { next ->
             {
                 it.header("Host")?.let { host -> next(it.uri(mode(it.uri).authority(host))) }
-                        ?: Response(BAD_REQUEST.description("Cannot proxy without host header"))
+                    ?: Response(BAD_REQUEST.description("Cannot proxy without host header"))
             }
         }
     }

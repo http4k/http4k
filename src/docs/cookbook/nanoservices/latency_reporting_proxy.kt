@@ -13,10 +13,10 @@ import java.lang.System.setProperty
 
 fun `latency reporting proxy`() =
     ProxyHost(Https)
-            .then(ReportRouteLatency { req, ms -> println("$req took $ms") })
-            .then(JavaHttpClient())
-            .asServer(SunHttp())
-            .start()
+        .then(ReportRouteLatency { req, ms -> println("$req took $ms") })
+        .then(JavaHttpClient())
+        .asServer(SunHttp())
+        .start()
 
 fun main(args: Array<String>) {
     setProperty("http.proxyHost", "localhost")

@@ -33,9 +33,9 @@ abstract class AbstractAwsRealS3TestCase {
         properties.load(properties())
 
         assertThat(
-                "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
-                properties.getProperty("signMyLifeAway"),
-                equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
+            "Developer should understand what this test does- set signMyLifeAway property to the expected value.",
+            properties.getProperty("signMyLifeAway"),
+            equalTo("I've checked the code of this test and understand that it creates and deletes buckets and keys using my credentials"))
 
         scope = AwsCredentialScope(properties.getProperty("region"), properties.getProperty("service"))
         credentials = AwsCredentials(properties.getProperty("accessKey"), properties.getProperty("secretKey"))
@@ -54,7 +54,7 @@ abstract class AbstractAwsRealS3TestCase {
 
 
     protected fun aClient() = awsClientFilter(Payload.Mode.Signed)
-            .then(ApacheClient())
+        .then(ApacheClient())
 
     protected fun awsClientFilter(signed: Payload.Mode) = ClientFilters.AwsAuth(scope, credentials, payloadMode = signed)
 

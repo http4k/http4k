@@ -92,8 +92,8 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     override val asJson = """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
 
     override val expectedDescription = "has Method that is equal to GET and has Uri that has Path " +
-            "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
-            " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
+        "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
+        " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
 
     private fun assertMatchNoMatch(s: Trigger, match: Request, noMatch: Request) {
         assertThat(s(match), equalTo(true))
@@ -103,36 +103,36 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     @Test
     fun `matches path`() {
         assertMatchNoMatch(MatchRequest(path = Regex(".*bob")),
-                Request(GET, "/abob"),
-                Request(GET, "/bill"))
+            Request(GET, "/abob"),
+            Request(GET, "/bill"))
     }
 
     @Test
     fun `matches header`() {
         assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
-                request.header("header", "abob"),
-                request.header("header", "bill"))
+            request.header("header", "abob"),
+            request.header("header", "bill"))
     }
 
     @Test
     fun `matches query`() {
         assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
-                request.query("query", "abob"),
-                request.query("query", "bill"))
+            request.query("query", "abob"),
+            request.query("query", "bill"))
     }
 
     @Test
     fun `matches body`() {
         assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
-                request.body("abob"),
-                request.body("bill"))
+            request.body("abob"),
+            request.body("bill"))
     }
 
     @Test
     fun `matches method`() {
         assertMatchNoMatch(MatchRequest(method = "put"),
-                Request(PUT, "/abob"),
-                Request(GET, "/abob"))
+            Request(PUT, "/abob"),
+            Request(GET, "/abob"))
     }
 }
 

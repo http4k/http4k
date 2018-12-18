@@ -80,11 +80,11 @@ class ResponseCacheExtTest {
     @Test
     fun `should overwrite existing headers with new values`() {
         val chainedResponse = Response(Status.OK)
-                .public().private()
-                .noCache().noCache()
-                .noStore().noStore()
-                .maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2))
-                .staleIfError(Duration.ofMinutes(2)).staleIfError(Duration.ofMinutes(2))
+            .public().private()
+            .noCache().noCache()
+            .noStore().noStore()
+            .maxAge(Duration.ofMinutes(1)).maxAge(Duration.ofMinutes(2))
+            .staleIfError(Duration.ofMinutes(2)).staleIfError(Duration.ofMinutes(2))
 
         assertThat(chainedResponse.header("Cache-Control"), equalTo("private, no-cache, no-store, max-age=120, stale-if-error=120"))
     }

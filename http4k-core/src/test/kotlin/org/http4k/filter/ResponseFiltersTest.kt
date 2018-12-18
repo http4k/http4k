@@ -4,10 +4,16 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import org.http4k.core.*
+import org.http4k.core.Body
+import org.http4k.core.ContentType
+import org.http4k.core.HttpTransaction
 import org.http4k.core.HttpTransaction.Companion.ROUTING_GROUP_LABEL
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.then
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -65,7 +71,7 @@ class ResponseFiltersTest {
         fun assertSupportsZipping(body: String) {
             val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then { Response(OK).header("content-type", "text/html").body(body) }
             zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch
-                    hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
+                hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
         }
         assertSupportsZipping("foobar")
         assertSupportsZipping("")
@@ -76,7 +82,7 @@ class ResponseFiltersTest {
         fun assertSupportsZipping(body: String) {
             val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then { Response(OK).header("content-type", "text/html;charset=utf-8").body(body) }
             zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch
-                    hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
+                hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
         }
         assertSupportsZipping("foobar")
         assertSupportsZipping("")
@@ -86,14 +92,14 @@ class ResponseFiltersTest {
     fun `do not gzip response if content type is missing`() {
         val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then { Response(OK).body("unzipped") }
         zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch
-                hasBody(equalTo(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip"))
+            hasBody(equalTo(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip"))
     }
 
     @Test
     fun `do not gzip response if content type is not acceptable`() {
         val zipped = ResponseFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then { Response(OK).header("content-type", "image/png").body("unzipped") }
         zipped(Request(Method.GET, "").header("accept-encoding", "gzip")) shouldMatch
-                hasBody(equalTo(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip"))
+            hasBody(equalTo(Body("unzipped"))).and(!hasHeader("content-encoding", "gzip"))
     }
 
     @Test
@@ -159,7 +165,7 @@ class ResponseFiltersTest {
         }
 
         val handler = filter.then(
-                routes("/sue" bind routes("/bob/{name}" bind GET to { Response(OK) }))
+            routes("/sue" bind routes("/bob/{name}" bind GET to { Response(OK) }))
         )
 
         val request = Request(GET, "/sue/bob/rita")
@@ -167,6 +173,6 @@ class ResponseFiltersTest {
         handler(request)
 
         assertThat(transaction, equalTo(HttpTransaction(request,
-                Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
+            Response(OK), ZERO, mapOf(ROUTING_GROUP_LABEL to "sue/bob/{name}"))))
     }
 }

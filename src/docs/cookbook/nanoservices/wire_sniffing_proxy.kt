@@ -13,10 +13,10 @@ import java.lang.System.setProperty
 
 fun `wire sniffing proxy`() =
     ProxyHost(Https)
-            .then(PrintRequestAndResponse())
-            .then(JavaHttpClient())
-            .asServer(SunHttp())
-            .start()
+        .then(PrintRequestAndResponse())
+        .then(JavaHttpClient())
+        .asServer(SunHttp())
+        .start()
 
 fun main(args: Array<String>) {
     setProperty("http.proxyHost", "localhost")

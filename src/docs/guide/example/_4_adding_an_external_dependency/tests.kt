@@ -80,7 +80,7 @@ class RealRecorderTest : RecorderCdc() {
 
 class EndToEndTest {
     private val port = Random().nextInt(1000) + 8000
-    private val recorderPort = port+1
+    private val recorderPort = port + 1
     private val client = OkHttp()
     private val recorder = FakeRecorderHttp()
     private val server = MyMathServer(port, Uri.of("http://localhost:$recorderPort"))

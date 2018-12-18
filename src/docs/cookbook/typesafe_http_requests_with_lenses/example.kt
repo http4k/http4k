@@ -22,8 +22,7 @@ fun main(args: Array<String>) {
     val ageQuery = Query.int().optional("age")
     val childrenBody = Body.string(TEXT_PLAIN).map({ it.split(",").map(::Child) }, { it.map { it.name }.joinToString() }).toLens()
 
-    val endpoint = {
-        request: Request ->
+    val endpoint = { request: Request ->
 
         val name: String = nameHeader(request)
         val age: Int? = ageQuery(request)
