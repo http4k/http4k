@@ -191,7 +191,7 @@ public final class MimeUtility {
      *
      * @param word The possibly encoded word value.
      * @return The decoded word.
-     * @throws ParseException error
+     * @throws ParseException               error
      * @throws UnsupportedEncodingException error
      */
     private static String decodeWord(String word) throws ParseException, UnsupportedEncodingException {
