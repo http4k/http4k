@@ -43,20 +43,19 @@ object ApacheClient {
         client: CloseableHttpClient = defaultApacheHttpClient(),
         responseBodyMode: BodyMode = Memory,
         requestBodyMode: BodyMode = Memory
-    ): HttpHandler =
-        { request ->
-            try {
-                client.execute(request.toApacheRequest(requestBodyMode)).toHttp4kResponse(responseBodyMode)
-            } catch (e: ConnectTimeoutException) {
-                Response(CLIENT_TIMEOUT.toClientStatus(e))
-            } catch (e: SocketTimeoutException) {
-                Response(CLIENT_TIMEOUT.toClientStatus(e))
-            } catch (e: HttpHostConnectException) {
-                Response(CONNECTION_REFUSED.toClientStatus(e))
-            } catch (e: UnknownHostException) {
-                Response(UNKNOWN_HOST.toClientStatus(e))
-            }
+    ): HttpHandler = { request ->
+        try {
+            client.execute(request.toApacheRequest(requestBodyMode)).toHttp4kResponse(responseBodyMode)
+        } catch (e: ConnectTimeoutException) {
+            Response(CLIENT_TIMEOUT.toClientStatus(e))
+        } catch (e: SocketTimeoutException) {
+            Response(CLIENT_TIMEOUT.toClientStatus(e))
+        } catch (e: HttpHostConnectException) {
+            Response(CONNECTION_REFUSED.toClientStatus(e))
+        } catch (e: UnknownHostException) {
+            Response(UNKNOWN_HOST.toClientStatus(e))
         }
+    }
 
     private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
         val request = this@toApacheRequest

@@ -21,18 +21,17 @@ class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
 
     private fun flatten(list: Set<Gen>): Set<Gen> = list.flatMap { it }.toSet().let { if (it == list) list else flatten(it) }
 
-    override fun invoke(next: HttpHandler): HttpHandler =
-        { req ->
-            val response = next(req)
-            out.println("// result generated from ${req.uri}\n")
-            out.println(flatten(setOf(process("Base", json.body().toLens()(response))))
-                .toSet()
-                .groupBy { it.asClassName() }
-                .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
-                .sorted()
-                .joinToString("\n\n"))
-            response
-        }
+    override fun invoke(next: HttpHandler): HttpHandler = { req ->
+        val response = next(req)
+        out.println("// result generated from ${req.uri}\n")
+        out.println(flatten(setOf(process("Base", json.body().toLens()(response))))
+            .toSet()
+            .groupBy { it.asClassName() }
+            .mapNotNull { (_, gens) -> gens.mapNotNull(Gen::asDefinitionString).sortedByDescending { it.length }.firstOrNull() }
+            .sorted()
+            .joinToString("\n\n"))
+        response
+    }
 
     interface Gen : Iterable<Gen> {
         override fun iterator(): Iterator<Gen> = listOf(this).iterator()

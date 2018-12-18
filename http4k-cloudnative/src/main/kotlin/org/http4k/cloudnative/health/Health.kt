@@ -40,21 +40,20 @@ object Readiness {
     operator fun invoke(
         checks: List<ReadinessCheck> = emptyList(),
         renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer
-    ): HttpHandler =
-        {
-            val overall = when {
-                checks.isNotEmpty() -> checks.map { check ->
-                    try {
-                        check()
-                    } catch (e: Exception) {
-                        Failed(check.name, e)
-                    }
-                }.reduce { acc, result -> acc + result }
-                else -> Completed("success")
-            }
-            Response(if (overall.pass) OK else SERVICE_UNAVAILABLE)
-                .with(CONTENT_TYPE of renderer.contentType)
-                .body(renderer(overall))
+    ): HttpHandler = {
+        val overall = when {
+            checks.isNotEmpty() -> checks.map { check ->
+                try {
+                    check()
+                } catch (e: Exception) {
+                    Failed(check.name, e)
+                }
+            }.reduce { acc, result -> acc + result }
+            else -> Completed("success")
         }
+        Response(if (overall.pass) OK else SERVICE_UNAVAILABLE)
+            .with(CONTENT_TYPE of renderer.contentType)
+            .body(renderer(overall))
+    }
 
 }

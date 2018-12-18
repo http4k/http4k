@@ -64,14 +64,12 @@ object ResponseFilters {
             .map { it.value }
             .map { it.split(";").first() }
 
-        override fun invoke(next: HttpHandler): HttpHandler {
-            return { request ->
-                next(request).let {
-                    if (requestAcceptsGzip(request) && isCompressible(it)) {
-                        it.body(it.body.gzipped()).replaceHeader("content-encoding", "gzip")
-                    } else {
-                        it
-                    }
+        override fun invoke(next: HttpHandler): HttpHandler = { request ->
+            next(request).let {
+                if (requestAcceptsGzip(request) && isCompressible(it)) {
+                    it.body(it.body.gzipped()).replaceHeader("content-encoding", "gzip")
+                } else {
+                    it
                 }
             }
         }

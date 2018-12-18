@@ -17,8 +17,7 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
-    override fun invoke(nextHandler: HttpHandler): HttpHandler =
-        { req ->
+    override fun invoke(nextHandler: HttpHandler): HttpHandler = { req ->
             val body = routeMeta.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
             val overallFailure = body.plus(routeMeta.requestParams).fold(null as LensFailure?) { memo, next ->
                 try {
@@ -43,9 +42,7 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
 
     inner class Binder(private val method: Method) {
         fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
-        infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) {
-            ContractRoute(method, this, routeMeta) { fn }
-        }
+        infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) { ContractRoute(method, this, routeMeta) { fn } }
     }
 
     infix fun bindContract(method: Method) = Binder(method)
