@@ -1,13 +1,24 @@
 package org.http4k.filter
 
 import org.http4k.base64Decoded
-import org.http4k.core.*
+import org.http4k.core.ContentType
+import org.http4k.core.Credentials
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
+import org.http4k.core.Request
+import org.http4k.core.RequestContext
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
+import org.http4k.core.Store
+import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -60,8 +71,8 @@ object ServerFilters {
      */
     object RequestTracing {
         operator fun invoke(
-                startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
-                endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
+            startReportFn: (Request, ZipkinTraces) -> Unit = { _, _ -> },
+            endReportFn: (Request, Response, ZipkinTraces) -> Unit = { _, _, _ -> }): Filter = Filter { next ->
             {
                 val fromRequest = ZipkinTraces(it)
                 startReportFn(it, fromRequest)
@@ -111,9 +122,9 @@ object ServerFilters {
         operator fun <T> invoke(realm: String, key: RequestContextLens<T>, lookup: (Credentials) -> T?) = Filter { next ->
             {
                 it.basicAuthenticationCredentials()
-                        ?.let(lookup)
-                        ?.let { found -> next(it.with(key of found)) }
-                        ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
+                    ?.let(lookup)
+                    ?.let { found -> next(it.with(key of found)) }
+                    ?: Response(UNAUTHORIZED).header("WWW-Authenticate", "Basic Realm=\"$realm\"")
             }
         }
 
@@ -146,9 +157,9 @@ object ServerFilters {
         operator fun <T> invoke(key: RequestContextLens<T>, lookup: (String) -> T?) = Filter { next ->
             {
                 it.bearerToken()
-                        ?.let(lookup)
-                        ?.let { found -> next(it.with(key of found)) }
-                        ?: Response(UNAUTHORIZED)
+                    ?.let(lookup)
+                    ?.let { found -> next(it.with(key of found)) }
+                    ?: Response(UNAUTHORIZED)
             }
         }
 
@@ -171,8 +182,8 @@ object ServerFilters {
      */
     fun CatchLensFailure(failResponseFn: (LensFailure) -> Response = {
         Response(BAD_REQUEST.description(it.failures.joinToString("; ")))
-    }) = object : Filter {
-        override fun invoke(next: HttpHandler): HttpHandler = {
+    }) = Filter { next ->
+        {
             try {
                 next(it)
             } catch (lensFailure: LensFailure) {
@@ -230,11 +241,11 @@ object ServerFilters {
      * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
-    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>): Filter {
+    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>) : Filter {
         override fun invoke(next: HttpHandler): HttpHandler {
             return RequestFilters.GunZip()
-                    .then(ResponseFilters.GZipContentTypes(compressibleContentTypes))
-                    .invoke(next)
+                .then(ResponseFilters.GZipContentTypes(compressibleContentTypes))
+                .invoke(next)
         }
     }
 
@@ -277,9 +288,9 @@ object ServerFilters {
             {
                 val response = next(it)
                 toResourceName(response)
-                        ?.let {
-                            response.body(loader.load(it)?.readText() ?: "")
-                        } ?: response
+                    ?.let {
+                        response.body(loader.load(it)?.readText() ?: "")
+                    } ?: response
             }
         }
     }
