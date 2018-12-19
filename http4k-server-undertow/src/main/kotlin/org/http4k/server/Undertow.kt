@@ -35,9 +35,7 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
                 .flatMap { header -> header.map { header.headerName.toString() to it } })
             .body(inputStream, requestHeaders.getFirst("Content-Length").safeLong())
 
-    override fun handleRequest(exchange: HttpServerExchange) {
-        if (exchange.isInIoThread) exchange.dispatch(this) else safeHandler(exchange.asRequest()).into(exchange)
-    }
+    override fun handleRequest(exchange: HttpServerExchange) = safeHandler(exchange.asRequest()).into(exchange)
 }
 
 data class Undertow(val port: Int = 8000, val enableHttp2: Boolean) : ServerConfig {
