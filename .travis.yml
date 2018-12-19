@@ -11,17 +11,14 @@ matrix:
     - stage: build
       language: java
       jdk: openjdk11
-      before_install:
-        - rm "${JAVA_HOME}/lib/security/cacerts"
-        - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"    - stage: build
       script:
-      - "./gradlew -i check"
+        - "./gradlew -i check"
       after_success:
-      - "./gradlew jacocoRootReport coveralls"
+        - "./gradlew jacocoRootReport coveralls"
       cache:
         directories:
-        - "$HOME/.m2"
-        - "$HOME/.gradle"
+          - "$HOME/.m2"
+          - "$HOME/.gradle"
     - stage: bintray
       if: branch = master
       language: java
@@ -31,13 +28,13 @@ matrix:
       if: branch = master
       language: python
       script:
-      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-site.sh; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-site.sh; fi'
     - stage: api
       if: branch = master
       language: java
       jdk: openjdk11
       script:
-      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./release-api.sh; fi'
     - stage: maven central
       if: branch = master
       language: java
