@@ -27,7 +27,7 @@ fun <IN, OUT> LensExtractor<IN, OUT>.toResult(): LensExtractor<IN, Result<OUT>> 
 }
 
 // examples of using the above extension function
-fun main(args: Array<String>) {
+fun main() {
 
     val queryResultLens = Query.int().required("foo").toResult()
     val intResult: Result<Int> = queryResultLens.extract(Request(Method.GET, "/?foo=123"))

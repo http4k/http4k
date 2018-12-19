@@ -15,7 +15,7 @@ import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
-fun main(args: Array<String>) {
+fun main() {
     // we can bind HttpHandlers (which are just functions from  Request -> Response) to paths/methods to create a Route,
     // then combine many Routes together to make another HttpHandler
     val app: HttpHandler = routes(

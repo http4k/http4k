@@ -12,7 +12,7 @@ import org.http4k.filter.AwsAuth
 import org.http4k.filter.ClientFilters
 import java.util.UUID
 
-fun main(args: Array<String>) {
+fun main() {
 
     val region = "us-east-1"
     val service = "s3"

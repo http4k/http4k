@@ -15,7 +15,7 @@ import org.http4k.hamkrest.hasQuery
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.string
 
-fun main(args: Array<String>) {
+fun main() {
 
     val request = Request(Method.POST, "/?a=b").body("http4k is cool").header("my header", "a value")
 

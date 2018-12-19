@@ -73,7 +73,7 @@ class DatabaseCheck(private val db: RandomlyFailingDatabase) : ReadinessCheck {
 database.user.role=admin
  */
 
-fun main(args: Array<String>) {
+fun main() {
     val defaultConfig = Environment.defaults(
         EnvironmentKey.k8s.SERVICE_PORT of 8000,
         EnvironmentKey.k8s.HEALTH_PORT of 8001,

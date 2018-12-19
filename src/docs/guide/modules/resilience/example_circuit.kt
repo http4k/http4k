@@ -12,7 +12,7 @@ import java.time.Duration
 import java.util.ArrayDeque
 
 // Circuit state transition: CLOSED (ok) -> OPEN (dead) -> HALF_OPEN (test) -> CLOSED (ok)
-fun main(args: Array<String>) {
+fun main() {
 
     // these example responses are queued up to trigger the circuit state changes
     val responses = ArrayDeque<Response>()

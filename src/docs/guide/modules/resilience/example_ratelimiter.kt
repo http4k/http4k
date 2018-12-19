@@ -10,7 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import java.time.Duration
 
-fun main(args: Array<String>) {
+fun main() {
 
     // configure the rate limiter filter here
     val config = RateLimiterConfig.custom()

@@ -22,7 +22,7 @@ object TweetEchoLambda : AppLoader {
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
 
     // Launching your Lambda Function locally - by simply providing the operating ENVIRONMENT map as would
     // be configured on AWS.

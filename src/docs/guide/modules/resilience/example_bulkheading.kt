@@ -10,7 +10,7 @@ import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import kotlin.concurrent.thread
 
-fun main(args: Array<String>) {
+fun main() {
 
     // configure the Bulkhead filter here
     val config = BulkheadConfig.custom()

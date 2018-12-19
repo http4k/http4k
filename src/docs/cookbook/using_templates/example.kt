@@ -16,7 +16,7 @@ import org.http4k.template.view
 // setting the template property from ViewModel
 data class Person(val name: String, val age: Int) : ViewModel
 
-fun main(args: Array<String>) {
+fun main() {
 
     val renderer = HandlebarsTemplates().HotReload("src/docs")
 

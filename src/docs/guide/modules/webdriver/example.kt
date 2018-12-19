@@ -8,7 +8,7 @@ import org.http4k.routing.routes
 import org.http4k.webdriver.Http4kWebDriver
 import org.openqa.selenium.By
 
-fun main(args: Array<String>) {
+fun main() {
     val app = routes(
         "/hello" bind GET to {
             Response(OK).body("<html><title>hello</title></html>")

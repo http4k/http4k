@@ -22,7 +22,7 @@ import org.http4k.server.asServer
 
 val client = OkHttp()
 
-fun main(args: Array<String>) {
+fun main() {
 
     // chaos is split into "stages", which can be triggered by specific request or time-based criteria
     val doNothingStage = Wait.until { tx: Request -> tx.method == POST }

@@ -8,7 +8,7 @@ import org.http4k.core.toParametersMap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 
-fun main(args: Array<String>) {
+fun main() {
 
     val request = Request(Method.GET, "/").form("name", "rita").form("age", "55")
 

@@ -13,7 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-fun main(args: Array<String>) {
+fun main() {
     val app = routes("/" bind routes("/" bind GET to { Response(OK).body("hello!") }))
 
     val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always))

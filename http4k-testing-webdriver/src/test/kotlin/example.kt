@@ -9,7 +9,7 @@ import org.openqa.selenium.By
 /**
  * Simple demonstration of how to use the http4k web-driver to test http4k apps.
  */
-fun main(args: Array<String>) {
+fun main() {
 
     val app = routes(
         "/hello" bind GET to {

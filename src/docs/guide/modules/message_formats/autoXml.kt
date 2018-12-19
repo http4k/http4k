@@ -9,7 +9,7 @@ data class Wrapper(val message: MessageXml?)
 
 data class MessageXml(val subject: String?, val from: String?, val to: String?, val content: String?)
 
-fun main(args: Array<String>) {
+fun main() {
     // We can use the auto method here from the Xml message format object. Note that the
     // auto() method is an extension function which needs to be manually imported (IntelliJ won't pick it up automatically).
     // Also, this lense is ONLY one way - to extract values from a message

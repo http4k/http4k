@@ -8,7 +8,7 @@ import org.http4k.format.Jackson.auto
 data class Email(val value: String)
 data class Message(val subject: String, val from: Email, val to: Email)
 
-fun main(args: Array<String>) {
+fun main() {
     // We can use the auto method here from either Jackson, Gson or the Xml message format objects.
     // Note that the auto() method needs to be manually imported as IntelliJ won't pick it up automatically.
     val messageLens = Body.auto<Message>().toLens()

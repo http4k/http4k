@@ -16,7 +16,7 @@ fun `ticking websocket clock`() =
         }
     }.asServer(Jetty()).start()
 
-fun main(args: Array<String>) {
+fun main() {
     `ticking websocket clock`()
     WebsocketClient.nonBlocking(Uri.of("http://localhost:8000")).onMessage { println(it) }
 }

@@ -14,7 +14,7 @@ import org.http4k.lens.RequestContextKey
 import org.http4k.lens.RequestContextLens
 
 
-fun main(args: Array<String>) {
+fun main() {
     data class SharedState(val message: String)
 
 

@@ -21,7 +21,7 @@ import org.http4k.server.asServer
 
 data class Name(val value: String)
 
-fun main(args: Array<String>) {
+fun main() {
     // define fields using the standard lens syntax
     val nameField = MultipartFormField.map(::Name, Name::value).required("name")
     val imageFile = MultipartFormFile.optional("image")

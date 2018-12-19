@@ -13,7 +13,7 @@ fun `static file server`() =
         .asServer(SunHttp())
         .start()
 
-fun main(args: Array<String>) {
+fun main() {
     `static file server`().use {
         // by default, static servers will only serve known file types, or those registered on construction
         println(JavaHttpClient()(Request(GET, "http://localhost:8000/version.json")))

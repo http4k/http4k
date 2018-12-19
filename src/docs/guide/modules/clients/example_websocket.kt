@@ -9,7 +9,7 @@ import org.http4k.server.asServer
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 
-fun main(args: Array<String>) {
+fun main() {
 
     // a standard websocket app
     val server = websockets(

@@ -13,7 +13,7 @@ import org.http4k.filter.ServerFilters.Cors
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
-fun main(args: Array<String>) {
+fun main() {
     Cors(UnsafeGlobalPermissive)
         .then { Response(OK).body("A normal response") }
         .withChaosControls(ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(50)))

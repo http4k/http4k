@@ -34,7 +34,7 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 
-fun main(args: Array<String>) {
+fun main() {
 
     fun add(value1: Int, value2: Int): HttpHandler = {
         Response(OK).with(

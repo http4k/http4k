@@ -13,7 +13,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Duration
 
-fun main(args: Array<String>) {
+fun main() {
 
     val app = routes("foo/{name}" bind { _: Request -> Response(OK) })
 

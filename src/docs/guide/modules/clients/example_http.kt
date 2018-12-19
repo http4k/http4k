@@ -10,7 +10,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import kotlin.concurrent.thread
 
-fun main(args: Array<String>) {
+fun main() {
 
     // standard client
     val client = ApacheClient()

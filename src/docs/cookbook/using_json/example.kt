@@ -12,7 +12,7 @@ import org.http4k.format.Jackson.asJsonValue
 import org.http4k.format.Jackson.asPrettyJsonString
 import org.http4k.format.Jackson.json
 
-fun main(args: Array<String>) {
+fun main() {
 
     val json = Jackson
 

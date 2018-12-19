@@ -15,7 +15,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
-fun main(args: Array<String>) {
+fun main() {
 
     fun HttpMessage.logHeader(name: String) = "\n\t\t$name=${header(name)}"
     fun HttpMessage.traces() = logHeader("x-b3-traceid") + logHeader("x-b3-spanid") + logHeader("x-b3-parentspanid")

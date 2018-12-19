@@ -12,7 +12,7 @@ import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 
-fun main(args: Array<String>) {
+fun main() {
     val namePath = Path.of("name")
 
     val ws = websockets(

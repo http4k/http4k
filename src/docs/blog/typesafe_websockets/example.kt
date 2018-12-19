@@ -18,7 +18,7 @@ import org.http4k.websocket.WsMessage
 // in json, this looks like: {"value": 123, "currency: "EUR" }
 data class Money(val value: Int, val currency: String)
 
-fun main(args: Array<String>) {
+fun main() {
 
     // we use the Lens API to convert between the WsMessage and the Money instance, and to
     // dynamically bind the "name" from the path

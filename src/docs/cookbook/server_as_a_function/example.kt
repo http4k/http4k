@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 
-fun main(args: Array<String>) {
+fun main() {
 
     val app: HttpHandler = { request: Request -> Response(Status.OK).body("Hello, ${request.query("name")}!") }
 

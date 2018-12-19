@@ -46,7 +46,7 @@ fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Res
     return result
 }
 
-fun main(args: Array<String>) {
+fun main() {
     val threads = 250
     val reps = 400
 

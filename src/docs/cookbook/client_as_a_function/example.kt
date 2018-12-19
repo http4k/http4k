@@ -5,7 +5,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 
-fun main(args: Array<String>) {
+fun main() {
 
     val request = Request(Method.GET, "https://xkcd.com/info.0.json")
 

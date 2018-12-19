@@ -14,7 +14,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.http4k.lens.string
 
-fun main(args: Array<String>) {
+fun main() {
 
     data class Child(val name: String)
 

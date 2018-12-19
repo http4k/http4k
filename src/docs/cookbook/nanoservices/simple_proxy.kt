@@ -16,7 +16,7 @@ fun `simple proxy`() =
         .asServer(SunHttp())
         .start()
 
-fun main(args: Array<String>) {
+fun main() {
     setProperty("http.proxyHost", "localhost")
     setProperty("http.proxyPort", "8000")
     setProperty("http.nonProxyHosts", "localhost")

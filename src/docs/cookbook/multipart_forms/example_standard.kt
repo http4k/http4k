@@ -11,7 +11,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
-fun main(args: Array<String>) {
+fun main() {
 
     // extract the body from the request and then the fields/files from it
     val server = { r: Request ->

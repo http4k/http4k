@@ -11,7 +11,7 @@ sealed class SpiderReport
 data class Ok(val original: String, val sublinks: List<SpiderReport>) : SpiderReport()
 data class Unreachable(val original: String) : SpiderReport()
 
-fun main(args: Array<String>) {
+fun main() {
     val handler = ClientFilters.SetHostFrom(Uri.of("https://www.http4k.org"))
         .then(RequestFilters.Tap { println(it.uri) })
         .then(ClientFilters.FollowRedirects())

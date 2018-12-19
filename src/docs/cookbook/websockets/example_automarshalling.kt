@@ -12,7 +12,7 @@ import org.http4k.websocket.WsMessage
 
 data class Person(val name: String, val age: Int)
 
-fun main(args: Array<String>) {
+fun main() {
 
     // a lens that will marshall the Person object on and off the wire
     val personLens = WsMessage.auto<Person>().toLens()

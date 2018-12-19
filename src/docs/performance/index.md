@@ -12,7 +12,7 @@ For this benchmark, no customisation or performance tuning of the underlying ser
 HttpHandler was used which is then plugged into each custom backend, as below:
 
 ```kotlin
-fun main(args: Array<String>) {
+fun main() {
     Http4kBenchmarkServer.start(Undertow(9000))
 }
 ```

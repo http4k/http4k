@@ -25,7 +25,7 @@ import org.http4k.server.asServer
 
 data class AName(val value: String)
 
-fun main(args: Array<String>) {
+fun main() {
 
     val server = ServerFilters.ProcessFiles { multipartFile: MultipartEntity.File ->
         // do something with the file right here... like stream it to another server and return the reference

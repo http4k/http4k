@@ -8,7 +8,7 @@ import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteCache
 
-fun main(args: Array<String>) {
+fun main() {
 
     // set up storage to cache a set of HTTP traffic. Disk and Memory implementations are provided.
     val storage = ReadWriteCache.Disk()

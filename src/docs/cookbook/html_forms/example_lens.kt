@@ -15,7 +15,7 @@ import org.http4k.lens.webForm
 
 data class Name(val value: String)
 
-fun main(args: Array<String>) {
+fun main() {
 
     // define fields using the standard lens syntax
     val ageField = FormField.int().required("age")

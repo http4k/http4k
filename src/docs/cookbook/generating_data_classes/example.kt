@@ -7,7 +7,7 @@ import org.http4k.core.then
 import org.http4k.filter.GenerateDataClasses
 import org.http4k.format.Jackson
 
-fun main(args: Array<String>) {
+fun main() {
 
     val request = Request(GET, "http://api.icndb.com/jokes/random/3")
 

@@ -18,7 +18,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 
-fun main(args: Array<String>) {
+fun main() {
 
     // set these before running this example
     val googleClientId = System.getenv("CLIENT_ID")

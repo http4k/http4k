@@ -11,7 +11,7 @@ import org.http4k.filter.ServerFilters.BearerAuth
 import org.http4k.filter.ServerFilters.InitialiseRequestContext
 import org.http4k.lens.RequestContextKey
 
-fun main(args: Array<String>) {
+fun main() {
 
     val contexts = RequestContexts()
 

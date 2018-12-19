@@ -21,7 +21,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
 // this example shows how to configure a custom provider for the OAuth2 Auth Code Grant flow
-fun main(args: Array<String>) {
+fun main() {
     val port = 9000
 
     // the callback uri which is configured in our OAuth provider

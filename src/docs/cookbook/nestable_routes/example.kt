@@ -14,7 +14,7 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.routing.static
 
-fun main(args: Array<String>) {
+fun main() {
     val routesWithFilter =
         PrintRequestAndResponse().then(
             routes(

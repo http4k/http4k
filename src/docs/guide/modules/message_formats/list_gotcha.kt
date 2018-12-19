@@ -8,7 +8,7 @@ import java.util.Arrays
 
 data class MyIntWrapper(val value: Int)
 
-fun main(args: Array<String>) {
+fun main() {
     val aListLens = Body.auto<List<MyIntWrapper>>().toLens()
 
     val req = Request(Method.GET, "/").body(""" [ {"value":1}, {"value":2} ] """)

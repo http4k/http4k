@@ -11,7 +11,7 @@ import org.http4k.filter.MetricFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-fun main(args: Array<String>) {
+fun main() {
 
     // this is a micrometer registry used mostly for testing - substitute the correct implementation.
     val registry = SimpleMeterRegistry()
