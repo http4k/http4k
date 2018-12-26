@@ -20,11 +20,9 @@ interface Body : Closeable {
     val payload: ByteBuffer
 
     /**
-     * Important: As body's length is not always known (e.g. if streaming is activated in the server or client),
-     * attempting to retrieve this property can result in an IllegalStateException.
-     * @throws IllegalStateException
+     * Will be `null` for bodies where it's impossible to a priori determine - e.g. StreamBody
      */
-    val length: Long
+    val length: Long?
 
     companion object {
         operator fun invoke(body: String): Body = MemoryBody(body)
@@ -53,14 +51,9 @@ data class MemoryBody(override val payload: ByteBuffer) : Body {
  * 1. Attempts to consume the stream will pull all of the contents into memory, and should thus be avoided.
  * This includes calling `equals()` and `payload`
  * 2. If this Body is NOT being returned to the caller (via a Server implementation or otherwise), close() should be called.
- * 3. Depending on the source of the stream, this body may or may not contain a known length. Attempts to get the
- * length when there is none will cause an IllegalStateException to be thrown.
+ * 3. Depending on the source of the stream, this body may or may not contain a known length.
  */
-class StreamBody(override val stream: InputStream, length: Long?) : Body {
-    /**
-     * @throws IllegalStateException if there is no supplied body length
-     */
-    override val length: Long by lazy { length ?: throw IllegalStateException("Length is not set on StreamBody") }
+class StreamBody(override val stream: InputStream, override val length: Long? = null) : Body {
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
 
     override fun close() {

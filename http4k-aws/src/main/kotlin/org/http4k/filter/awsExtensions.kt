@@ -78,7 +78,7 @@ object Payload {
         }
 
         object Unsigned : Mode() {
-            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.body.length)
+            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.body.length!!)
         }
     }
 }

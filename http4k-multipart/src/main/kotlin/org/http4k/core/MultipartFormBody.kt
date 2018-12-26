@@ -48,7 +48,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     /**
      * @throws IllegalStateException if there is no supplied body length
      */
-    override val length: Long by lazy { throw IllegalStateException("Length is not available in MultipartFormBody") }
+    override val length: Long? = null
 
     constructor(boundary: String = UUID.randomUUID().toString()) : this(emptyList(), boundary)
 
