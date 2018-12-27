@@ -11,45 +11,39 @@ import java.io.FileNotFoundException
 
 class ThymeleafTemplates(private val configure: (TemplateEngine) -> TemplateEngine = { it },
                          private val classLoader: ClassLoader = ClassLoader.getSystemClassLoader()) : Templates {
-    override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
-        val templateEngine = TemplateEngine()
-        val loader = ClassLoaderTemplateResolver(classLoader)
-        loader.prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
-        templateEngine.setTemplateResolver(loader)
-        return ThymeleafTemplateRenderer(configure(templateEngine))
-    }
+    override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer =
+        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
+            setTemplateResolver(ClassLoaderTemplateResolver(classLoader).apply {
+                prefix = if (baseClasspathPackage.isEmpty()) "" else baseClasspathPackage.replace('.', '/') + "/"
+            })
+        }))
 
-    override fun Caching(baseTemplateDir: String): TemplateRenderer {
-        val templateEngine = TemplateEngine()
-        val loader = FileTemplateResolver()
-        loader.prefix = "$baseTemplateDir/"
-        templateEngine.setTemplateResolver(loader)
-        return ThymeleafTemplateRenderer(configure(templateEngine))
-    }
+    override fun Caching(baseTemplateDir: String): TemplateRenderer =
+        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
+            setTemplateResolver(FileTemplateResolver().apply {
+                prefix = "$baseTemplateDir/"
+            })
+        }))
 
-    override fun HotReload(baseTemplateDir: String): TemplateRenderer {
-        val templateEngine = TemplateEngine()
-        val loader = FileTemplateResolver()
-        loader.prefix = "$baseTemplateDir/"
-        val cache = StandardCacheManager()
-        cache.templateCacheMaxSize = 0
-        templateEngine.cacheManager = cache
-        templateEngine.setTemplateResolver(loader)
-        return ThymeleafTemplateRenderer(configure(templateEngine))
-    }
+    override fun HotReload(baseTemplateDir: String): TemplateRenderer =
+        ThymeleafTemplateRenderer(configure(TemplateEngine().apply {
+            cacheManager = StandardCacheManager().apply {
+                templateCacheMaxSize = 0
+            }
+            setTemplateResolver(FileTemplateResolver().apply {
+                prefix = "$baseTemplateDir/"
+            })
+        }))
 
     private class ThymeleafTemplateRenderer(private val engine: ITemplateEngine) : TemplateRenderer {
-        override fun invoke(viewModel: ViewModel): String {
-            val context = Context()
-            context.setVariable("model", viewModel)
-            return try {
-                engine.process(viewModel.template(), context)
-            } catch (e: TemplateInputException) {
-                e.printStackTrace()
-                when (e.cause) {
-                    is FileNotFoundException -> throw ViewNotFound(viewModel)
-                    else -> throw e
-                }
+        override fun invoke(viewModel: ViewModel): String = try {
+            engine.process(viewModel.template(), Context().apply {
+                setVariable("model", viewModel)
+            })
+        } catch (e: TemplateInputException) {
+            when (e.cause) {
+                is FileNotFoundException -> throw ViewNotFound(viewModel)
+                else -> throw e
             }
         }
     }
