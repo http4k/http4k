@@ -1,3 +1,5 @@
+import kotlin.String
+
 /**
  * Find which updates are available by running
  *     `$ ./gradlew syncLibs`
@@ -5,7 +7,7 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val jackson_module_kotlin: String = "2.9.7"
+    const val jackson_module_kotlin: String = "2.9.8"
 
     const val handlebars: String = "4.1.2"
 
@@ -37,7 +39,7 @@ object Versions {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "4.0.1"
+    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.0"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.5.4"
 
@@ -65,7 +67,7 @@ object Versions {
 
     const val dokka_gradle_plugin: String = "0.9.17"
 
-    const val org_jetbrains_kotlin: String = "1.3.10"
+    const val org_jetbrains_kotlin: String = "1.3.11" //available: "1.3.11"
 
     const val json: String = "20180813"
 
@@ -87,12 +89,12 @@ object Versions {
      *      ./gradle/wrapper/gradle-wrapper.properties
      */
     object Gradle {
-        const val runningVersion: String = "4.10.2"
+        const val runningVersion: String = "5.0"
 
         const val currentVersion: String = "5.0"
 
-        const val nightlyVersion: String = "5.1-20181201000046+0000"
+        const val nightlyVersion: String = "5.2-20181223000044+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.1-rc-3"
     }
 }
