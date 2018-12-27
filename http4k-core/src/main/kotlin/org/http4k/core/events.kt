@@ -12,6 +12,8 @@ interface Event {
 
 typealias Events = (Event) -> Unit
 
+fun Events.then(next: Events): Events = { it.also(this).also(next) }
+
 data class EventCategory(private val name: String) {
     override fun toString(): String = name
 }
