@@ -7,7 +7,9 @@ import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
@@ -31,9 +33,10 @@ class OAuthProviderTest {
 
     private val oAuthPersistence = FakeOAuthPersistence()
 
-    private fun oAuth(persistence: OAuthPersistence): OAuthProvider = OAuthProvider(
+    private fun oAuth(persistence: OAuthPersistence, status: Status = OK): OAuthProvider = OAuthProvider(
         providerConfig,
-        { Response(OK).body("access token goes here") }, Uri.of("http://callbackHost/callback"),
+        { Response(status).body("access token goes here") },
+        Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
         persistence,
         { it.query("nonce", "randomNonce") },
@@ -71,6 +74,11 @@ class OAuthProviderTest {
         oAuth(oAuthPersistence).callback(withCode) shouldMatch equalTo(invalidation)
 
         oAuth(oAuthPersistence).callback(withCodeAndInvalidState) shouldMatch equalTo(invalidation)
+    }
+
+    @Test
+    fun `when api returns bad status`() {
+        oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(Response(FORBIDDEN))
     }
 
     @Test
