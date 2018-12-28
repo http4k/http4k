@@ -189,7 +189,7 @@ class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H
                                                                                                                      val a: PathLens<A>, val b: PathLens<B>, val c: PathLens<C>, val d: PathLens<D>, val e: PathLens<E>,
                                                                                                                      val f: PathLens<F>, val g: PathLens<G>, val h: PathLens<H>, val i: PathLens<I>,
                                                                                                                      val j: PathLens<J>) : ContractRouteSpec(pathFn, routeMeta, a, b, c, d, e, f, g, h, i, j) {
-    override infix operator fun div(next: String) = throw UnsupportedOperationException("no longer paths!")
+    override infix operator fun div(next: String) = div(Path.fixed(next))
 
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = throw UnsupportedOperationException("no longer paths!")
 
