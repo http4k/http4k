@@ -2,7 +2,6 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
 
     dependencies {
@@ -26,6 +25,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
 
     apply plugin: 'kotlin'
