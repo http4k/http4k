@@ -30,7 +30,7 @@ object DebuggingFilters {
                         response
                     }
                 } catch (e: Exception) {
-                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri}  *****")
+                    out.println("***** RESPONSE FAILED to ${it.method}: ${it.uri} *****")
                     e.printStackTrace(out)
                     throw e
                 }
