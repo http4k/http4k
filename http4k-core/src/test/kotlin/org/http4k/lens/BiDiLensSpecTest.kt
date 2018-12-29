@@ -3,6 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
@@ -75,4 +76,7 @@ class BiDiLensSpecTest {
 
     @Test
     fun duration() = checkContract(spec.duration(), Duration.ofSeconds(35), "PT35S", "", "notathing", "o", "oPT35S", "oPT35SPT35S")
+
+    @Test
+    fun uri() = checkContract(spec.uri(), Uri.of("http://localhost"), "http://localhost", "", null, "o", "ohttp://localhost", "ohttp://localhosthttp://localhost")
 }
