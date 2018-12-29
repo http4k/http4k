@@ -68,8 +68,7 @@ class GenerateDataClasses<out NODE>(private val json: Json<NODE>,
                 ArrayGen(json.elements(node).map { process(arrayName, it) }.toSet())
             }
             JsonType.String -> Primitives.StringValue
-            JsonType.Integer -> Primitives.Number
-            JsonType.Number -> Primitives.Number
+            JsonType.Integer, JsonType.Number -> Primitives.Number
             JsonType.Boolean -> Primitives.Boolean
             JsonType.Null -> Primitives.Null
         }
