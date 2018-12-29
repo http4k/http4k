@@ -2,6 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
 
     dependencies {
@@ -38,10 +39,10 @@ allprojects {
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
-        toolVersion = '0.8.2'
+        toolVersion = '0.8.3-SNAPSHOT'
     }
 
-    cobertura.coverageFormats = ['html', 'xml']
+    cobertura.coverageFormats = ['hml', 'xml']
     cobertura.coverageSourceDirs = ['src/main/kotlin']
 
     compileKotlin.kotlinOptions.jvmTarget = "1.8"
