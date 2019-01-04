@@ -6,9 +6,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.StreamBody
 import org.http4k.core.Uri
-import org.http4k.testing.WsClient
 import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus

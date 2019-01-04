@@ -3,18 +3,13 @@ package org.http4k.testing
 import org.http4k.core.Request
 import org.http4k.websocket.PolyHandler
 import org.http4k.websocket.PushPullAdaptingWebSocket
+import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.util.ArrayDeque
-
-interface WsClient {
-    fun received(): Sequence<WsMessage>
-    fun close(status: WsStatus = NORMAL)
-    fun send(message: WsMessage)
-}
 
 data class ClosedWebsocket(val status: WsStatus = NORMAL) : Exception()
 

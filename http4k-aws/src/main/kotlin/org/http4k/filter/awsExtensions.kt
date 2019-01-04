@@ -16,13 +16,26 @@ import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
 import java.time.Clock
 
+/**
+ * Sign AWS requests using static credentials.
+ */
 fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                           credentials: AwsCredentials,
+                          clock: Clock = Clock.systemDefaultZone(),
+                          payloadMode: Payload.Mode = Payload.Mode.Signed) = ClientFilters.AwsAuth(scope, { credentials }, clock, payloadMode)
+
+/**
+ * Sign AWS requests using dynamically provided (expiring) credentials.
+ */
+fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
+                          credentialsProvider: () -> AwsCredentials,
                           clock: Clock = Clock.systemDefaultZone(),
                           payloadMode: Payload.Mode = Payload.Mode.Signed) =
     Filter { next ->
         {
             val payload = payloadMode(it)
+
+            val credentials = credentialsProvider()
 
             val date = AwsRequestDate.of(clock.instant())
 

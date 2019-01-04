@@ -1,5 +1,3 @@
-import kotlin.String
-
 /**
  * Find which updates are available by running
  *     `$ ./gradlew syncLibs`
@@ -67,7 +65,7 @@ object Versions {
 
     const val dokka_gradle_plugin: String = "0.9.17"
 
-    const val org_jetbrains_kotlin: String = "1.3.11" //available: "1.3.11"
+    const val org_jetbrains_kotlin: String = "1.3.11"
 
     const val json: String = "20180813"
 

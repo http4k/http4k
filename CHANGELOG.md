@@ -2,8 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.104.0 (uncut)
-- Upgrade to deps.
+### v3.104.0
+- Upgrade to various deps.
+- Add session token support to AWS filter, and "credentials provider" to allow for rotating AWS sessions. H/T @dhobbs.
+- Breaking: Moved WsClient from `org.http4k.testing` to `org.http4k.websocket`.
 
 ### v3.103.2
 - Fix `access-control-allow-origin` returned when server supports multiple origins H/T @johnnorris
