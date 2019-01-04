@@ -34,6 +34,10 @@ fun ClientFilters.AwsAuth(scope: AwsCredentialScope,
                     } else {
                         it
                     }
+                }.run {
+                    credentials.sessionToken?.let {
+                        replaceHeader("x-amz-security-token", credentials.sessionToken)
+                    } ?: this
                 }
 
 

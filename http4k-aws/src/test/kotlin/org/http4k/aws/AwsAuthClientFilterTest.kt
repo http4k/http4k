@@ -20,6 +20,7 @@ class AwsClientFilterTest {
 
     private val scope = AwsCredentialScope("us-east", "s3")
     private val credentials = AwsCredentials("access", "secret")
+    private val iamSessionCredentials = AwsCredentials("access", "secret", "sessionToken")
 
     private val clock = fixed(LocalDateTime.of(2016, 1, 27, 15, 32, 50, 27).toInstant(ZoneOffset.UTC), ZoneId.of("UTC"))
 
@@ -33,6 +34,16 @@ class AwsClientFilterTest {
 
         assertThat(audit.captured?.header("Authorization"),
             equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date, Signature=8afa7ee258c3eaa39b2764cbd52144fd7bbbe401876d4c9f359318963b82244d"))
+    }
+
+    @Test
+    fun `adds authorization header with session token`() {
+        val client = ClientFilters.AwsAuth(scope, iamSessionCredentials, clock).then(audit)
+
+        client(Request(Method.GET, "http://amazon/test").header("host", "foobar").header("content-length", "0"))
+
+        assertThat(audit.captured?.header("Authorization"),
+            equalTo("AWS4-HMAC-SHA256 Credential=access/20160127/us-east/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date;x-amz-security-token, Signature=f1cdc542e6d40d595876d461baa7f4ac6c9e5ef02b5f94bd983c493f677dcf41"))
     }
 
     @Test
