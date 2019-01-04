@@ -65,9 +65,9 @@ class CachingFiltersTest {
         val responseWithHeaders = Response(OK).header("Cache-Control", "rita").header("Expires", "sue").header("Vary", "bob")
         val response = getResponseWith(timings, responseWithHeaders)
 
-        response shouldMatch hasHeader("Cache-Control", "rita")
-        response shouldMatch hasHeader("Expires", "sue")
-        response shouldMatch hasHeader("Vary", "bob")
+        response shouldMatch hasHeader("Cache-Control", listOf("rita"))
+        response shouldMatch hasHeader("Expires", listOf("sue"))
+        response shouldMatch hasHeader("Vary", listOf("bob"))
     }
 
     @Test
