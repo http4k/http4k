@@ -122,7 +122,7 @@ object CachingFilters {
             operator fun invoke(clock: Clock, defaultCacheTimings: DefaultCacheTimings, predicate: (org.http4k.core.Response) -> Boolean = { it.status.code < 400 }): Filter {
 
                 fun addDefaultHeaderIfAbsent(response: org.http4k.core.Response, header: String, defaultProducer: () -> String) =
-                    response.header(header, response.header(header) ?: defaultProducer())
+                    response.replaceHeader(header, response.header(header) ?: defaultProducer())
 
                 fun addDefaultCacheHeadersIfAbsent(response: org.http4k.core.Response) =
                     addDefaultHeaderIfAbsent(response, "Cache-Control") {
