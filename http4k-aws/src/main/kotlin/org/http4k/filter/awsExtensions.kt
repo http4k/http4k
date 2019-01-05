@@ -95,7 +95,9 @@ object Payload {
         }
 
         object Unsigned : Mode() {
-            override operator fun invoke(request: Request) = CanonicalPayload("UNSIGNED-PAYLOAD", request.body.length)
+            override operator fun invoke(request: Request) = CanonicalPayload(
+                    "UNSIGNED-PAYLOAD",
+                    request.body.length ?: throw IllegalStateException("request body size could not be determined"))
         }
     }
 }
