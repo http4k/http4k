@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.105.0 (uncut)
+- Preventing FallbackCacheControl from duplicating existing headers. H/T @leandronunes85
+
 ### v3.104.0
 - Upgrade to various deps.
 - Add session token support to AWS filter, and "credentials provider" to allow for rotating AWS sessions. H/T @dhobbs.
