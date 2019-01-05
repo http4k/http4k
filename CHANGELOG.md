@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.105.0 (uncut)
 - Preventing FallbackCacheControl from duplicating existing headers. H/T @leandronunes85
+- Breaking: Make `Body.length` nullable instead of throwing exception when value is not available. H/T @zvozin
 
 ### v3.104.0
 - Upgrade to various deps.
