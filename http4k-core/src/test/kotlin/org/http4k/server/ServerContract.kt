@@ -26,13 +26,12 @@ import org.http4k.routing.routes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.Random
 
-abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, private val client: HttpHandler,
+abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, protected val client: HttpHandler,
                               private val requiredMethods: Array<Method> = Method.values()) {
     private lateinit var server: Http4kServer
 
-    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
