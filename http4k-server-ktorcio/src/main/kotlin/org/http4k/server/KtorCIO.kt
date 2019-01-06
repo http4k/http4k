@@ -14,15 +14,14 @@ import io.ktor.response.respondOutputStream
 import io.ktor.server.cio.CIO
 import io.ktor.server.cio.CIOApplicationEngine
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.engine.stopServerOnCancellation
 import kotlinx.coroutines.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.runBlocking
 import org.http4k.core.Headers
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.lens.Header
+import java.util.concurrent.TimeUnit
 import io.ktor.http.Headers as KHeaders
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -39,9 +38,7 @@ data class KtorCIO(val port: Int = 8000) : ServerConfig {
         override fun start() = apply { engine.start() }
 
         override fun stop() = apply {
-            runBlocking {
-                engine.stopServerOnCancellation()
-            }
+            engine.stop(1, 1, TimeUnit.SECONDS)
         }
 
         override fun port() = engine.environment.connectors[0].port
