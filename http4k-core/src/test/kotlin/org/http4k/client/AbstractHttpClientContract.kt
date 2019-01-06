@@ -23,9 +23,6 @@ import org.junit.jupiter.api.BeforeEach
 import java.util.Arrays
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
-//    @Rule
-//    @JvmField
-//    var retryRule = RetryRule.LOCAL
 
     private lateinit var server: Http4kServer
 

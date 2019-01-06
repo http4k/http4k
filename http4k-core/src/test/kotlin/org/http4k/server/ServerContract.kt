@@ -33,10 +33,6 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                               private val requiredMethods: Array<Method> = Method.values()) {
     private var server: Http4kServer? = null
 
-//    @Rule
-//    @JvmField
-//    var retryRule = RetryRule.LOCAL
-
     private val port = Random().nextInt(1000) + 8000
 
     private val size = 1000 * 1024

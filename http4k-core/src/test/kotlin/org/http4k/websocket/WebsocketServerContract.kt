@@ -26,10 +26,6 @@ import java.util.concurrent.CountDownLatch
 abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServerConfig, private val client: HttpHandler) {
     private lateinit var server: Http4kServer
 
-//    @Rule
-//    @JvmField
-//    var retryRule = RetryRule.CI
-
     private val port by lazy { server.port() }
 
     private val lens = WsMessage.string().map(String::toInt).toLens()

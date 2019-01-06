@@ -20,10 +20,6 @@ import java.util.concurrent.LinkedBlockingQueue
 class WebsocketClientTest {
     private lateinit var server: Http4kServer
 
-//    @Rule
-//    @JvmField
-//    var retryRule = RetryRule.CI
-
     private val port: Int
         get() = server.port()
 
