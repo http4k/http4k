@@ -10,7 +10,7 @@ import java.util.Random
 class KtorCIOStreamingTest : StreamingContract(
     StreamingTestConfiguration(multiplier = 4)
 ) {
-    override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 8000)
+    override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 10000)
 
     override fun createClient() = ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
 }

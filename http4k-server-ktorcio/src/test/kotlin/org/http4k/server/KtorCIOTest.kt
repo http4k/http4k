@@ -4,7 +4,7 @@ import org.http4k.client.ApacheClient
 import org.junit.jupiter.api.Test
 import java.util.Random
 
-class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 8000) }, ApacheClient()) {
+class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 10000) }, ApacheClient()) {
 
     @Test
     override fun `ok when length already set`() {
