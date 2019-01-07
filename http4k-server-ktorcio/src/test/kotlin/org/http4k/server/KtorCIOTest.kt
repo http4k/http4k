@@ -8,7 +8,7 @@ import java.util.Random
 class KtorCIOTest : ServerContract({ KtorCIO(Random().nextInt(1000) + 10000) }, ApacheClient()) {
 
     @BeforeEach
-    fun forceStart() {
+    fun sleepForABitBecauseStartupIsCrushinglySlow() {
         Thread.sleep(1000)
     }
 

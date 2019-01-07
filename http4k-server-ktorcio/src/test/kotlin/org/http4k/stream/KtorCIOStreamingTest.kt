@@ -2,8 +2,6 @@ package org.http4k.stream
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode.Stream
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.server.KtorCIO
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
@@ -14,8 +12,8 @@ class KtorCIOStreamingTest : StreamingContract(
     StreamingTestConfiguration(multiplier = 4)
 ) {
     @BeforeEach
-    fun forceStart() {
-        createClient()(Request(GET, baseUrl))
+    fun sleepForABitBecauseStartupIsCrushinglySlow() {
+        Thread.sleep(1000)
     }
 
     override fun serverConfig() = KtorCIO(Random().nextInt(1000) + 10000)
