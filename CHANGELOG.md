@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.106.0
+- Add `http4k-server-ktorcio` server backend. Note that whilst this module does allow http4k apps to plug into the Ktor-CIO engine, it does not provide fully front-to-back coroutine support.
+
 ### v3.105.0
 - Preventing FallbackCacheControl from duplicating existing headers. H/T @leandronunes85
 - Breaking: Make `Body.length` nullable instead of throwing exception when value is not available. H/T @zvozin
