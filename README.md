@@ -77,9 +77,10 @@ plugging together of services without HTTP container being required.
 * [Server:](https://http4k.org/guide/modules/servers)
     * **1LOC** server backend spinup for:
         * **Jetty** (including websocket support)
-        * **Netty**
         * **Undertow**
         * **Apache** (from httpcore)
+        * **Netty**
+        * **Ktor CIO**
         * **SunHttp** (bundled with `http4k-core`)
     * API design allows for plugging into configurable instances of each
 * [Serverless:](https://http4k.org/guide/modules/serverless)
