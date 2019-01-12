@@ -32,4 +32,4 @@ Out of the box, http4k provides implementations for several OAuth providers.
 
 <script src="https://gist-it.appspot.com/ttps://github.com/http4k/http4k/blob/master/src/docs/guide/modules/oauth/example_provider_oauth.kt"></script>
 
-See the [cookbook](/cookbook/oauth/) for a custom implementation.
+See the [cookbook](/cookbook/custom_oauth/) for a custom implementation.
