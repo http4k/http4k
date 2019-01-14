@@ -53,7 +53,7 @@ internal fun HttpHandler.toJettyHandler() = ServletContextHandler(SESSIONS).appl
     addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
 }
 
-typealias ConnectorBuilder = (Server) -> ServerConnector
+typealias ConnectorBuilder = (server: Server) -> ServerConnector
 
 fun http(httpPort: Int): ConnectorBuilder = { server: Server -> ServerConnector(server).apply { port = httpPort } }
 

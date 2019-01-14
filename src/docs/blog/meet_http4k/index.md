@@ -33,7 +33,7 @@ Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/fu
 ### Function 1: HttpHandler
 An `HttpHandler` represents an HTTP endpoint. It's not even an Interface, modelled merely as a [Typealias](https://kotlinlang.org/docs/reference/type-aliases.html):
 ```kotlin
-typealias HttpHandler = (Request) -> Response
+typealias HttpHandler = (req: Request) -> Response
 ```
 Below is a entire [**http4k**](https://github.com/http4k/http4k) application that echoes the request body back in the response. It only relies on the `http4k-core` module, which itself has zero dependencies:
 ```kotlin
@@ -88,7 +88,7 @@ Out of the multitude of JVM http frameworks out there, not many actually conside
 
 As per a core principle behind "Server as a Function", [**http4k**](https://github.com/http4k/http4k) provides a symmetric API for HTTP clients - ie. it's *exactly* the same API as is exposed in [**http4k**](https://github.com/http4k/http4k) server applications - the `HttpHandler`. Here's that entire API again, just in case you've forgotten:
 ```kotlin
-typealias HttpHandler = (Request) -> Response
+typealias HttpHandler = (req: Request) -> Response
 ```
 What does that mean in practice? Well - for one thing, it's less for your brain to learn  because you already know the API:
 ```kotlin

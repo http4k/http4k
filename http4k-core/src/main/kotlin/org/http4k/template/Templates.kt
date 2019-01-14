@@ -8,7 +8,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 
-typealias TemplateRenderer = (ViewModel) -> String
+typealias TemplateRenderer = (model: ViewModel) -> String
 
 /**
  * Supported template implementations for templating engine implementations

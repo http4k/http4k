@@ -116,4 +116,4 @@ object ResponseFilters {
     }
 }
 
-typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction
+typealias HttpTransactionLabeller = (tx: HttpTransaction) -> HttpTransaction

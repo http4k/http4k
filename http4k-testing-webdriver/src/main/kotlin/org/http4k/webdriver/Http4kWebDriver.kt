@@ -24,7 +24,7 @@ import java.util.Date
 import java.util.UUID
 import org.http4k.core.cookie.Cookie as HCookie
 
-typealias Navigate = (Request) -> Unit
+typealias Navigate = (req: Request) -> Unit
 typealias GetURL = () -> String?
 
 interface Http4KNavigation : Navigation {
