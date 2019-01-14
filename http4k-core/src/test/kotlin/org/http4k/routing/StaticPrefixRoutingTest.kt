@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status
+import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -13,7 +14,7 @@ class StaticPrefixRoutingTest {
 
     @BeforeEach
     fun before() {
-        app = routes("/bar" bind static(ResourceLoader.Classpath("bar")))
+        app = routes("/bar" bind static(Classpath("bar")))
     }
 
     @Test
@@ -42,6 +43,33 @@ class StaticPrefixRoutingTest {
         val result = app(Request(GET, "/bar/bar-xyz.html"))
         assertThat(result.status, equalTo(Status.OK))
         assertThat(result.bodyString(), equalTo("contents of bar/bar-xyz.html"))
+    }
+
+    @Test
+    fun `test static resource bar - bar`() {
+        val result = app(Request(GET, "/bar/bar/"))
+        assertThat(result.status, equalTo(Status.NOT_FOUND)) // because index.html is read only for root
+    }
+
+    @Test
+    fun `test static resource bar - bar - index html`() {
+        val result = app(Request(GET, "/bar/bar/index.html"))
+        assertThat(result.status, equalTo(Status.OK))
+        assertThat(result.bodyString(), equalTo("contents of bar/bar/index.html"))
+    }
+
+    @Test
+    fun `test static resource bar - bar - bar html`() {
+        val result = app(Request(GET, "/bar/bar/bar.html"))
+        assertThat(result.status, equalTo(Status.OK))
+        assertThat(result.bodyString(), equalTo("contents of bar/bar/bar.html"))
+    }
+
+    @Test
+    fun `test static resource bar - bar - bar-xyz html`() {
+        val result = app(Request(GET, "/bar/bar/bar-xyz.html"))
+        assertThat(result.status, equalTo(Status.OK))
+        assertThat(result.bodyString(), equalTo("contents of bar/bar/bar-xyz.html"))
     }
 
 }
