@@ -19,9 +19,9 @@ interface Websocket {
     fun onMessage(fn: (WsMessage) -> Unit)
 }
 
-typealias WsConsumer = (ws: Websocket) -> Unit
+typealias WsConsumer = (Websocket) -> Unit
 
-typealias WsHandler = (req: Request) -> WsConsumer?
+typealias WsHandler = (Request) -> WsConsumer?
 
 /**
  * A PolyHandler represents the combined routing logic of an Http handler and a Websocket handler.

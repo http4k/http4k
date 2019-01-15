@@ -20,7 +20,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 #### HttpHandlers 
 In **http4k**, an HTTP service is just a typealias of a simple function:
 ```kotlin
-typealias HttpHandler = (req: Request) -> Response
+typealias HttpHandler = (Request) -> Response
 ```
 
 First described in this Twitter paper ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf), this abstraction allows us lots of 

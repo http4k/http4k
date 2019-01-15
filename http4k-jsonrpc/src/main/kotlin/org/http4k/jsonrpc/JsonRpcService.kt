@@ -108,7 +108,7 @@ data class JsonRpcService<NODE : Any>(
 
 data class JsonRpcMethodBinding<IN, OUT>(val name: String, val handler: JsonRpcHandler<IN, OUT>)
 
-typealias ErrorHandler = (e: Throwable) -> ErrorMessage?
+typealias ErrorHandler = (Throwable) -> ErrorMessage?
 
 private const val jsonRpcVersion: String = "2.0"
 
