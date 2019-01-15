@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.106.1
+- Fix #207 - repeating prefixes in static routes are not handled correctly. H/T @ruXlab for the PR to fix.
+
 ### v3.106.0
 - Add `http4k-server-ktorcio` server backend. Note that whilst this module does allow http4k apps to plug into the Ktor-CIO engine, it does not provide fully front-to-back coroutine support.
 
