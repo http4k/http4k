@@ -37,7 +37,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
     } else Response(NOT_FOUND)
 
     private fun convertPath(path: String): String {
-        val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replace(pathSegments, "")
+        val newPath = if (pathSegments == "/" || pathSegments == "") path else path.replaceFirst(pathSegments, "")
         val resolved = if (newPath == "/" || newPath.isBlank()) "/index.html" else newPath
         return resolved.replaceFirst("/", "")
     }
