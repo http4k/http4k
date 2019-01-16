@@ -23,6 +23,8 @@ data class SubWithText1(val attr: String?, val content: String?)
 
 data class XmlNode(val SubWithText: List<SubWithText1>?, val subWithAttr: SubWithAttr?, val content: String?)
 
+data class SimpleDocument(val value:String)
+
 class XmlTest {
 
     private val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><Xml>asd<SubWithText attr="attrValue">subText</SubWithText><SubWithText attr="attrValue3">subText4</SubWithText><subWithAttr attr="attr2"/></Xml>"""
@@ -38,6 +40,14 @@ class XmlTest {
     @Test
     fun `roundtrip Xml node to and from String`() {
         assertThat(xml.asXmlDocument().asXmlString(), equalTo(xml))
+    }
+
+    @Test
+    fun `does not try to automatically convert numbers`(){
+        val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><value>1258421375.19</value>"""
+        val lens = Body.auto<SimpleDocument>().toLens()
+
+        assertThat(lens(Response(Status.OK).body(xml)), equalTo(SimpleDocument("1258421375.19")))
     }
 
     @Test
