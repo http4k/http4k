@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.107.0 (uncut)
 - Upgrade to various deps.
+- Fix #208 - Xml auto deserialisation incorrectly converting strings to numbers
 
 ### v3.106.1
 - Fix #207 - repeating prefixes in static routes are not handled correctly. H/T @ruXlab for the PR to fix.
