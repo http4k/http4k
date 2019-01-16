@@ -26,7 +26,7 @@ object Xml {
 
     inline fun <reified T : Any> String.asA(): T = Gson.asA(asXmlToJsonElement(), T::class)
 
-    fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this).toString())
+    fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this, true).toString())
 
     fun String.asXmlDocument(): Document =
         DocumentBuilderFactory
