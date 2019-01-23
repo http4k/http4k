@@ -1,7 +1,7 @@
 package org.http4k.traffic
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -32,8 +32,8 @@ class ReadWriteStreamTest {
         stream[request] = response
         stream[otherRequest] = otherResponse
 
-        stream.requests().toList() shouldMatch equalTo(listOf(request, otherRequest))
-        stream.responses().toList() shouldMatch equalTo(listOf(response, otherResponse))
+        assertThat(stream.requests().toList(), equalTo(listOf(request, otherRequest)))
+        assertThat(stream.responses().toList(), equalTo(listOf(response, otherResponse)))
     }
 
 }

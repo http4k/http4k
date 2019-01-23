@@ -1,6 +1,6 @@
 package org.http4k.cloudnative
 
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.JavaHttpClient
 import org.http4k.cloudnative.env.Environment
 import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
@@ -38,12 +38,12 @@ class Http4kK8sServerTest {
 
     @Test
     fun `app is available on port`() {
-        client(Request(GET, "http://localhost:${server.port()}")) shouldMatch hasStatus(I_M_A_TEAPOT)
+        assertThat(client(Request(GET, "http://localhost:${server.port()}")), hasStatus(I_M_A_TEAPOT))
     }
 
     @Test
     fun `health is available`() {
-        client(Request(GET, "http://localhost:${server.healthPort()}/liveness")) shouldMatch hasStatus(OK)
-        client(Request(GET, "http://localhost:${server.healthPort()}/readiness")) shouldMatch hasStatus(OK)
+        assertThat(client(Request(GET, "http://localhost:${server.healthPort()}/liveness")), hasStatus(OK))
+        assertThat(client(Request(GET, "http://localhost:${server.healthPort()}/readiness")), hasStatus(OK))
     }
 }

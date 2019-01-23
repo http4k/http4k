@@ -3,7 +3,6 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -25,27 +24,27 @@ class RequestFiltersTest {
     @Test
     fun `proxy host - http`() {
         val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
-        handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")) shouldMatch hasBody("http://bob.com:443/loop")
-        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
-        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
+        assertThat(handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")), hasBody("http://bob.com:443/loop"))
+        assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("http://bob.com/loop"))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
     }
 
     @Test
     fun `proxy host - https`() {
         val handler = RequestFilters.ProxyHost(Https).then { Response(OK).body(it.uri.toString()) }
-        handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")) shouldMatch hasBody("https://bob.com:443/loop")
-        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("https://bob.com/loop")
-        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
+        assertThat(handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")), hasBody("https://bob.com:443/loop"))
+        assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("https://bob.com/loop"))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
     }
 
     @Test
     fun `proxy host - port`() {
         val handler = RequestFilters.ProxyHost(Port).then { Response(OK).body(it.uri.toString()) }
-        handler(Request(GET, "http://localhost:443/loop").header("host", "bob.com")) shouldMatch hasBody("https://bob.com/loop")
-        handler(Request(GET, "http://localhost:81/loop").header("host", "bob.com:81")) shouldMatch hasBody("http://bob.com:81/loop")
-        handler(Request(GET, "http://localhost:80/loop").header("host", "bob.com:80")) shouldMatch hasBody("http://bob.com:80/loop")
-        handler(Request(GET, "http://localhost/loop").header("host", "bob.com")) shouldMatch hasBody("http://bob.com/loop")
-        handler(Request(GET, "http://localhost:9000/loop")) shouldMatch hasStatus(Status.BAD_REQUEST)
+        assertThat(handler(Request(GET, "http://localhost:443/loop").header("host", "bob.com")), hasBody("https://bob.com/loop"))
+        assertThat(handler(Request(GET, "http://localhost:81/loop").header("host", "bob.com:81")), hasBody("http://bob.com:81/loop"))
+        assertThat(handler(Request(GET, "http://localhost:80/loop").header("host", "bob.com:80")), hasBody("http://bob.com:80/loop"))
+        assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("http://bob.com/loop"))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
     }
 
     @Test
@@ -60,7 +59,7 @@ class RequestFiltersTest {
     fun `gzip request and add content encoding`() {
         fun assertSupportsZipping(body: String) {
             val handler = RequestFilters.GZip().then {
-                it shouldMatch hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip"))
+                assertThat(it, hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip")))
                 Response(OK)
             }
             handler(Request(Method.GET, "").body(body))
@@ -73,7 +72,7 @@ class RequestFiltersTest {
     fun `gunzip request which has gzip content encoding`() {
         fun assertSupportsUnzipping(body: String) {
             val handler = RequestFilters.GunZip().then {
-                it shouldMatch hasBody(body)
+                assertThat(it, hasBody(body))
                 Response(OK)
             }
             handler(Request(Method.GET, "").body(Body(body).gzipped()).header("content-encoding", "gzip"))
@@ -86,7 +85,7 @@ class RequestFiltersTest {
     fun `passthrough gunzip request with no transfer encoding`() {
         val body = "foobar"
         val handler = ResponseFilters.GunZip().then {
-            it shouldMatch hasBody(body)
+            assertThat(it, hasBody(body))
             Response(OK)
         }
         handler(Request(Method.GET, "").body(body))

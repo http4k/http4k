@@ -1,7 +1,7 @@
 package org.http4k.serverless.lambda
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
@@ -24,12 +24,12 @@ class LambdaFunctionTest {
             "a" to "b")
         val response = LambdaFunction(env).handle(request)
 
-        response.statusCode shouldMatch equalTo(201)
-        response.headers shouldMatch equalTo(env)
-        response.body shouldMatch equalTo(Request(GET, "/path")
+        assertThat(response.statusCode, equalTo(201))
+        assertThat(response.headers, equalTo(env))
+        assertThat(response.body, equalTo(Request(GET, "/path")
             .header("c", "d")
             .body("input body")
-            .query("query", "value").toString())
+            .query("query", "value").toString()))
     }
 
 }

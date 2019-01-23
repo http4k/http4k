@@ -2,7 +2,6 @@ package org.http4k.routing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
@@ -31,9 +30,9 @@ class RoutingTest {
             "/path3/{path:.*}" bind { _: Request -> Response(CREATED) }
         )
 
-        routes(Request(GET, "/path1/index.html")) shouldMatch hasStatus(OK)
-        routes(Request(GET, "/path2/index.html")) shouldMatch hasStatus(OK)
-        routes(Request(GET, "/path3/index.html")) shouldMatch hasStatus(CREATED)
+        assertThat(routes(Request(GET, "/path1/index.html")), hasStatus(OK))
+        assertThat(routes(Request(GET, "/path2/index.html")), hasStatus(OK))
+        assertThat(routes(Request(GET, "/path3/index.html")), hasStatus(CREATED))
     }
 
     @Test

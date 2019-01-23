@@ -1,8 +1,8 @@
 package org.http4k.security
 
 import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -27,35 +27,35 @@ class InsecureCookieBasedOAuthPersistenceTest {
 
     @Test
     fun `failed response has correct cookies`() {
-        persistence.authFailureResponse() shouldMatch equalTo(
+        assertThat(persistence.authFailureResponse(), equalTo(
             Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken")
-        )
+        ))
     }
 
     @Test
     fun `token retrieval based on cookie`() {
-        persistence.retrieveToken(Request(GET, "")) shouldMatch absent()
-        persistence.retrieveToken(Request(GET, "").cookie(Cookie("prefixAccessToken", "tokenValue"))) shouldMatch equalTo(AccessTokenContainer("tokenValue"))
+        assertThat(persistence.retrieveToken(Request(GET, "")), absent())
+        assertThat(persistence.retrieveToken(Request(GET, "").cookie(Cookie("prefixAccessToken", "tokenValue"))), equalTo(AccessTokenContainer("tokenValue")))
     }
 
     @Test
     fun `csrf retrieval based on cookie`() {
-        persistence.retrieveCsrf(Request(GET, "")) shouldMatch absent()
-        persistence.retrieveCsrf(Request(GET, "").cookie(Cookie("prefixCsrf", "csrfValue"))) shouldMatch equalTo(CrossSiteRequestForgeryToken("csrfValue"))
+        assertThat(persistence.retrieveCsrf(Request(GET, "")), absent())
+        assertThat(persistence.retrieveCsrf(Request(GET, "").cookie(Cookie("prefixCsrf", "csrfValue"))), equalTo(CrossSiteRequestForgeryToken("csrfValue")))
     }
 
     @Test
     fun `adds csrf as a cookie to the auth redirect`() {
-        persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")) shouldMatch equalTo(
+        assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue",
-                expires = LocalDateTime.now(clock).plus(cookieValidity))))
+                expires = LocalDateTime.now(clock).plus(cookieValidity)))))
     }
 
     @Test
     fun `adds csrf as a cookie to the token redirect`() {
-        persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessTokenContainer("tokenValue")) shouldMatch equalTo(
+        assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessTokenContainer("tokenValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue",
                 expires = LocalDateTime.now(clock).plus(cookieValidity))).invalidateCookie("prefixCsrf")
-        )
+        ))
     }
 }

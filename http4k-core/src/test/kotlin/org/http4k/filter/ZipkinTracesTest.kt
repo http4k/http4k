@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
@@ -18,8 +17,8 @@ class TraceIdTest {
     @Test
     fun `creates a new random`() {
         val r = Random(1)
-        TraceId.new(r) shouldMatch equalTo(TraceId("1a2ac523b005b1a4"))
-        TraceId.new(r) shouldMatch equalTo(TraceId("6d33b6a05a4abadf"))
+        assertThat(TraceId.new(r), equalTo(TraceId("1a2ac523b005b1a4")))
+        assertThat(TraceId.new(r), equalTo(TraceId("6d33b6a05a4abadf")))
     }
 }
 
@@ -27,20 +26,20 @@ class SamplingDecisionTest {
 
     @Test
     fun `accepts valid values`() {
-        SamplingDecision.from("1") shouldMatch equalTo(SAMPLE)
-        SamplingDecision.from("0") shouldMatch equalTo(DO_NOT_SAMPLE)
+        assertThat(SamplingDecision.from("1"), equalTo(SAMPLE))
+        assertThat(SamplingDecision.from("0"), equalTo(DO_NOT_SAMPLE))
     }
 
     @Test
     fun `defaults to sample`() {
-        SamplingDecision.from(null) shouldMatch equalTo(SAMPLE)
+        assertThat(SamplingDecision.from(null), equalTo(SAMPLE))
     }
 
     @Test
     fun `parses invalid values as sample`() {
-        SamplingDecision.from("true") shouldMatch equalTo(SAMPLE)
-        SamplingDecision.from("false") shouldMatch equalTo(SAMPLE)
-        SamplingDecision.from("wibble") shouldMatch equalTo(SAMPLE)
+        assertThat(SamplingDecision.from("true"), equalTo(SAMPLE))
+        assertThat(SamplingDecision.from("false"), equalTo(SAMPLE))
+        assertThat(SamplingDecision.from("wibble"), equalTo(SAMPLE))
     }
 
 }
@@ -72,23 +71,23 @@ class ZipkinTracesTest {
 
     @Test
     fun `gets a set of traces from a request without a sampling decision`() {
-        ZipkinTraces(requestWithTraces) shouldMatch equalTo(expectedWithTraces)
+        assertThat(ZipkinTraces(requestWithTraces), equalTo(expectedWithTraces))
     }
 
     @Test
     fun `gets a set of traces from a request with a sampling decision`() {
-        ZipkinTraces(requestWithDecision) shouldMatch equalTo(expectedWithDecision)
+        assertThat(ZipkinTraces(requestWithDecision), equalTo(expectedWithDecision))
     }
 
     @Test
     fun `puts expected things onto a request`() {
         val requestWithDefaultDecision = requestWithTraces.header("x-b3-sampled", "1")
-        ZipkinTraces(expectedWithTraces, Request(Method.GET, "")) shouldMatch equalTo(requestWithDefaultDecision)
+        assertThat(ZipkinTraces(expectedWithTraces, Request(Method.GET, "")), equalTo(requestWithDefaultDecision))
     }
 
     @Test
     fun `puts expected things onto a request with a sampling decision`() {
-        ZipkinTraces(expectedWithDecision, Request(Method.GET, "")) shouldMatch equalTo(requestWithDecision)
+        assertThat(ZipkinTraces(expectedWithDecision, Request(Method.GET, "")), equalTo(requestWithDecision))
     }
 
 }

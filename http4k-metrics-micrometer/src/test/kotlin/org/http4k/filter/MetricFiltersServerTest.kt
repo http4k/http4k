@@ -1,7 +1,7 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.Method
@@ -48,9 +48,9 @@ class MetricFiltersServerTest {
 
     @Test
     fun `routes with timer generate request timing metrics tagged with path and method and status`() {
-        server(Request(GET, "/timed/one")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
         repeat(2) {
-            server(Request(POST, "/timed/two/bob")) shouldMatch (hasStatus(OK) and hasBody("bob"))
+            assertThat(server(Request(POST, "/timed/two/bob")), (hasStatus(OK) and hasBody("bob")))
         }
 
         assert(registry,
@@ -63,9 +63,9 @@ class MetricFiltersServerTest {
 
     @Test
     fun `routes with counter generate request count metrics tagged with path and method and status`() {
-        server(Request(GET, "/counted/one")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
         repeat(2) {
-            server(Request(POST, "/counted/two/bob")) shouldMatch (hasStatus(OK) and hasBody("bob"))
+            assertThat(server(Request(POST, "/counted/two/bob")), (hasStatus(OK) and hasBody("bob")))
         }
 
         assert(registry,
@@ -76,8 +76,8 @@ class MetricFiltersServerTest {
 
     @Test
     fun `routes without metrics generate nothing`() {
-        server(Request(GET, "/unmetered/one")) shouldMatch hasStatus(OK)
-        server(Request(DELETE, "/unmetered/two")) shouldMatch hasStatus(INTERNAL_SERVER_ERROR)
+        assertThat(server(Request(GET, "/unmetered/one")), hasStatus(OK))
+        assertThat(server(Request(DELETE, "/unmetered/two")), hasStatus(INTERNAL_SERVER_ERROR))
 
         assert(registry,
             hasNoRequestTimer(GET, "unmetered_one", OK),
@@ -92,7 +92,7 @@ class MetricFiltersServerTest {
         requestTimer = MetricFilters.Server.RequestTimer(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") }, clock)
 
-        server(Request(GET, "/timed/one")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/timed/one")), hasStatus(OK))
 
         assert(registry,
             hasRequestTimer(1, 1, "custom.requests", "custom.description", "foo" to "bar")
@@ -104,7 +104,7 @@ class MetricFiltersServerTest {
         requestCounter = MetricFilters.Server.RequestCounter(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") })
 
-        server(Request(GET, "/counted/one")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/counted/one")), hasStatus(OK))
 
         assert(registry,
             hasRequestCounter(1, "custom.requests", "custom.description", "foo" to "bar")
@@ -113,14 +113,14 @@ class MetricFiltersServerTest {
 
     @Test
     fun `timed routes without uri template generate request timing metrics tagged with unmapped path value`() {
-        server(Request(GET, "/otherTimed/test.json")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/otherTimed/test.json")), hasStatus(OK))
 
         assert(registry, hasRequestTimer(1, 1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 
     @Test
     fun `counted routes without uri template generate request count metrics tagged with unmapped path value`() {
-        server(Request(GET, "/otherCounted/test.json")) shouldMatch hasStatus(OK)
+        assertThat(server(Request(GET, "/otherCounted/test.json")), hasStatus(OK))
         assert(registry, hasRequestCounter(1, tags = *arrayOf("path" to "UNMAPPED", "method" to "GET", "status" to "200")))
     }
 

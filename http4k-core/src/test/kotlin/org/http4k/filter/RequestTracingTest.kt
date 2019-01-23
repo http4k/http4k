@@ -3,7 +3,6 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -31,10 +30,10 @@ class RequestTracingTest {
         val client: HttpHandler = ClientFilters.RequestTracing().then {
             val actual = ZipkinTraces(it)
 
-            actual.traceId shouldMatch equalTo(originalTraceId)
-            actual.parentSpanId shouldMatch equalTo(originalSpanId)
-            actual.spanId shouldMatch present()
-            actual.samplingDecision shouldMatch equalTo(DO_NOT_SAMPLE)
+            assertThat(actual.traceId, equalTo(originalTraceId))
+            assertThat(actual.parentSpanId, equalTo(originalSpanId))
+            assertThat(actual.spanId, present())
+            assertThat(actual.samplingDecision, equalTo(DO_NOT_SAMPLE))
 
             Response(OK)
         }

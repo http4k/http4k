@@ -1,8 +1,8 @@
 package org.http4k.security
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -46,15 +46,14 @@ class OAuthProviderTest {
     @Test
     fun `filter - when accessToken value is present, request is let through`() {
         oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessTokenContainer("randomToken"))
-        oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")) shouldMatch
-            hasStatus(OK).and(hasBody("i am witorious!"))
+        assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")), hasStatus(OK).and(hasBody("i am witorious!")))
     }
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
         Request(GET, "/")
-        oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")) shouldMatch hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader))
+        assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     private val base = Request(GET, "/")
@@ -67,18 +66,18 @@ class OAuthProviderTest {
     fun `callback - when invalid inputs passed, we get forbidden with cookie invalidation`() {
         val invalidation = Response(FORBIDDEN)
 
-        oAuth(oAuthPersistence).callback(base) shouldMatch equalTo(invalidation)
+        assertThat(oAuth(oAuthPersistence).callback(base), equalTo(invalidation))
 
-        oAuth(oAuthPersistence).callback(withCookie) shouldMatch equalTo(invalidation)
+        assertThat(oAuth(oAuthPersistence).callback(withCookie), equalTo(invalidation))
 
-        oAuth(oAuthPersistence).callback(withCode) shouldMatch equalTo(invalidation)
+        assertThat(oAuth(oAuthPersistence).callback(withCode), equalTo(invalidation))
 
-        oAuth(oAuthPersistence).callback(withCodeAndInvalidState) shouldMatch equalTo(invalidation)
+        assertThat(oAuth(oAuthPersistence).callback(withCodeAndInvalidState), equalTo(invalidation))
     }
 
     @Test
     fun `when api returns bad status`() {
-        oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(Response(FORBIDDEN))
+        assertThat(oAuth(oAuthPersistence, INTERNAL_SERVER_ERROR).callback(withCodeAndValidStateButNoUrl), equalTo(Response(FORBIDDEN)))
     }
 
     @Test
@@ -90,7 +89,7 @@ class OAuthProviderTest {
             .header("Location", "/")
             .header("action", "assignToken")
 
-        oAuth(oAuthPersistence).callback(withCodeAndValidStateButNoUrl) shouldMatch equalTo(validRedirectToRoot)
+        assertThat(oAuth(oAuthPersistence).callback(withCodeAndValidStateButNoUrl), equalTo(validRedirectToRoot))
     }
 
 }

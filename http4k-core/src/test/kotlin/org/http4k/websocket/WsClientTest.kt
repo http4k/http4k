@@ -3,7 +3,6 @@ package org.http4k.websocket
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -44,7 +43,7 @@ class WsClientTest {
 
         { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
 
-        consumer.websocket.upgradeRequest shouldMatch equalTo(Request(Method.GET, "/"))
+        assertThat(consumer.websocket.upgradeRequest, equalTo(Request(Method.GET, "/")))
     }
 
     @Test
@@ -53,11 +52,11 @@ class WsClientTest {
         val client = { _: Request -> consumer }.testWsClient(Request(Method.GET, "/"))!!
 
         client.send(message)
-        consumer.messages shouldMatch equalTo(listOf(message))
+        assertThat(consumer.messages, equalTo(listOf(message)))
         client.error(error)
-        consumer.throwable shouldMatch equalTo(listOf(error))
+        assertThat(consumer.throwable, equalTo(listOf(error)))
         client.close(NEVER_CONNECTED)
-        consumer.closed.get() shouldMatch equalTo(NEVER_CONNECTED)
+        assertThat(consumer.closed.get(), equalTo(NEVER_CONNECTED))
     }
 
     @Test
@@ -70,7 +69,7 @@ class WsClientTest {
         }.testWsClient(Request(Method.GET, "/"))!!
 
         val received = client.received()
-        received.take(1).first() shouldMatch equalTo(message)
+        assertThat(received.take(1).first(), equalTo(message))
     }
 
     @Test

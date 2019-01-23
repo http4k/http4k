@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -71,7 +70,7 @@ class ContractRouteTest {
         val route = pair to { _, _ -> { _: Request -> Response(OK) } }
         val request = route.newRequest(Uri.of("http://rita.com"))
 
-        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello%20world"))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
     }
 
     @Test
@@ -81,7 +80,7 @@ class ContractRouteTest {
         val pair = "/bob" bindContract GET
         val request = pair.newRequest(Uri.of("http://rita.com"))
 
-        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/bob"))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/bob")))
     }
 
     @Test
@@ -92,7 +91,7 @@ class ContractRouteTest {
             queries += Query.required("")
         } bindContract GET).newRequest(Uri.of("http://rita.com"))
 
-        request.with(path1 of 123, path2 of "hello world") shouldMatch equalTo(Request(GET, "http://rita.com/123/hello%20world"))
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
     }
 
     @Test

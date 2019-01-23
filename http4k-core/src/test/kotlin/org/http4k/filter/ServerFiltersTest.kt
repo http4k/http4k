@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -59,22 +58,22 @@ class ServerFiltersTest {
         var newThreadLocal: ZipkinTraces? = null
         val svc = ServerFilters.RequestTracing().then {
             newThreadLocal = ZipkinTraces.THREAD_LOCAL.get()!!
-            newThreadLocal!!.traceId shouldMatch present()
-            newThreadLocal!!.spanId shouldMatch present()
-            newThreadLocal!!.parentSpanId shouldMatch absent()
-            newThreadLocal!!.samplingDecision shouldMatch equalTo(SAMPLE)
+            assertThat(newThreadLocal!!.traceId, present())
+            assertThat(newThreadLocal!!.spanId, present())
+            assertThat(newThreadLocal!!.parentSpanId, absent())
+            assertThat(newThreadLocal!!.samplingDecision, equalTo(SAMPLE))
 
             val setOnRequest = ZipkinTraces(it)
-            setOnRequest.traceId shouldMatch equalTo(newThreadLocal!!.traceId)
-            setOnRequest.spanId shouldMatch equalTo(newThreadLocal!!.spanId)
-            setOnRequest.parentSpanId shouldMatch absent()
-            setOnRequest.samplingDecision shouldMatch equalTo(newThreadLocal!!.samplingDecision)
+            assertThat(setOnRequest.traceId, equalTo(newThreadLocal!!.traceId))
+            assertThat(setOnRequest.spanId, equalTo(newThreadLocal!!.spanId))
+            assertThat(setOnRequest.parentSpanId, absent())
+            assertThat(setOnRequest.samplingDecision, equalTo(newThreadLocal!!.samplingDecision))
             Response(OK)
         }
 
         val received = ZipkinTraces(svc(Request(GET, "")))
 
-        received shouldMatch equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE))
+        assertThat(received, equalTo(ZipkinTraces(newThreadLocal!!.traceId, newThreadLocal!!.spanId, null, SAMPLE)))
     }
 
     @Test
@@ -94,21 +93,21 @@ class ServerFiltersTest {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
             val setOnRequest = ZipkinTraces(it)
 
-            actual shouldMatch equalTo(originalTraces)
-            setOnRequest shouldMatch equalTo(originalTraces)
+            assertThat(actual, equalTo(originalTraces))
+            assertThat(setOnRequest, equalTo(originalTraces))
             Response(OK)
         }
 
         val originalRequest = ZipkinTraces(originalTraces, Request(GET, ""))
         val actual = svc(originalRequest)
-        ZipkinTraces(actual) shouldMatch equalTo(originalTraces)
+        assertThat(ZipkinTraces(actual), equalTo(originalTraces))
 
-        start!!.first shouldMatch equalTo(originalRequest)
-        start!!.second shouldMatch equalTo(originalTraces)
+        assertThat(start!!.first, equalTo(originalRequest))
+        assertThat(start!!.second, equalTo(originalTraces))
 
-        end!!.first shouldMatch equalTo(originalRequest)
-        end!!.second shouldMatch equalTo(ZipkinTraces(originalTraces, Response(OK)))
-        end!!.third shouldMatch equalTo(originalTraces)
+        assertThat(end!!.first, equalTo(originalRequest))
+        assertThat(end!!.second, equalTo(ZipkinTraces(originalTraces, Response(OK))))
+        assertThat(end!!.third, equalTo(originalTraces))
     }
 
     @Test
@@ -116,10 +115,10 @@ class ServerFiltersTest {
         val handler = ServerFilters.Cors(UnsafeGlobalPermissive).then { Response(I_M_A_TEAPOT) }
         val response = handler(Request(GET, "/"))
 
-        response shouldMatch hasStatus(I_M_A_TEAPOT)
+        assertThat(response, hasStatus(I_M_A_TEAPOT)
             .and(hasHeader("access-control-allow-origin", "*"))
             .and(hasHeader("access-control-allow-headers", "content-type"))
-            .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD"))
+            .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD")))
     }
 
     @Test
@@ -127,10 +126,10 @@ class ServerFiltersTest {
         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
-        response shouldMatch hasStatus(OK)
+        assertThat(response, hasStatus(OK)
             .and(hasHeader("access-control-allow-origin", "foo"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -138,10 +137,10 @@ class ServerFiltersTest {
         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))
 
-        response shouldMatch hasStatus(OK)
+        assertThat(response, hasStatus(OK)
             .and(hasHeader("access-control-allow-origin", "null"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -149,10 +148,10 @@ class ServerFiltersTest {
         val handler = ServerFilters.Cors(CorsPolicy(listOf("foo", "bar"), listOf("rita", "sue", "bob"), listOf(DELETE, POST))).then { Response(INTERNAL_SERVER_ERROR) }
         val response = handler(Request(OPTIONS, "/"))
 
-        response shouldMatch hasStatus(OK)
+        assertThat(response, hasStatus(OK)
             .and(hasHeader("access-control-allow-origin", "null"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-            .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -165,7 +164,7 @@ class ServerFiltersTest {
         val sw = StringWriter()
         e.printStackTrace(PrintWriter(sw))
 
-        response shouldMatch hasStatus(I_M_A_TEAPOT).and(hasBody(sw.toString()))
+        assertThat(response, hasStatus(I_M_A_TEAPOT).and(hasBody(sw.toString())))
     }
 
     @Test
@@ -174,8 +173,8 @@ class ServerFiltersTest {
 
         val response = handler(Request(GET, "/").header("foo", "one").header("bar", "two"))
 
-        response shouldMatch hasHeader("foo", "one")
-        response shouldMatch hasHeader("bar", "two")
+        assertThat(response, hasHeader("foo", "one"))
+        assertThat(response, hasHeader("bar", "two"))
     }
 
     @Test
@@ -190,18 +189,17 @@ class ServerFiltersTest {
     @Test
     fun `gunzip request and gzip response`() {
         val handler = ServerFilters.GZip().then {
-            it shouldMatch hasBody(equalTo("hello"))
+            assertThat(it, hasBody(equalTo("hello")))
             Response(OK).body(it.body)
         }
 
-        handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
-            hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
+        assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
     }
 
     @Test
     fun `passes through non-gzipped request`() {
         val handler = ServerFilters.GZip().then {
-            it shouldMatch hasBody("hello")
+            assertThat(it, hasBody("hello"))
             Response(OK).body("hello")
         }
 
@@ -211,29 +209,27 @@ class ServerFiltersTest {
     @Test
     fun `gunzip request and gzip response with matching content type`() {
         val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
-            it shouldMatch hasBody(equalTo("hello"))
+            assertThat(it, hasBody(equalTo("hello")))
             Response(OK).header("content-type", "text/plain").body(it.body)
         }
 
-        handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
-            hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
+        assertThat(handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
     }
 
     @Test
     fun `gunzip request and do not gzip response with unmatched content type`() {
         val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then {
-            it shouldMatch hasBody(equalTo("hello"))
+            assertThat(it, hasBody(equalTo("hello")))
             Response(OK).header("content-type", "text/plain").body(it.body)
         }
 
-        handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())) shouldMatch
-            !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello"))))
+        assertThat(handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
     }
 
     @Test
     fun `passes through non-gzipped request despite content type`() {
         val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
-            it shouldMatch hasBody("hello")
+            assertThat(it, hasBody("hello"))
             Response(OK).body("hello")
         }
 
@@ -248,7 +244,7 @@ class ServerFiltersTest {
 
         val response = handler(Request(GET, "/"))
 
-        response shouldMatch hasStatus(OK).and(hasBody("header 'bob' must be string, header 'bill' is required"))
+        assertThat(response, hasStatus(OK).and(hasBody("header 'bob' must be string, header 'bill' is required")))
     }
 
     @Test
@@ -258,8 +254,8 @@ class ServerFiltersTest {
 
         val response = handler(Request(GET, "/"))
 
-        response shouldMatch hasStatus(BAD_REQUEST)
-        response.status.description shouldMatch equalTo("header 'bob' must be string; header 'bill' is required")
+        assertThat(response, hasStatus(BAD_REQUEST))
+        assertThat(response.status.description, equalTo("header 'bob' must be string; header 'bill' is required"))
     }
 
     @Test
@@ -283,7 +279,7 @@ class ServerFiltersTest {
 
         val response = handler(Request(GET, "/"))
 
-        response shouldMatch hasStatus(UNSUPPORTED_MEDIA_TYPE)
+        assertThat(response, hasStatus(UNSUPPORTED_MEDIA_TYPE))
     }
 
     @Test
@@ -298,22 +294,22 @@ class ServerFiltersTest {
             })
             .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
 
-        handler(Request(GET, "/")) shouldMatch hasBody("manchu")
+        assertThat(handler(Request(GET, "/")), hasBody("manchu"))
     }
 
     @Test
     fun `replace response contents with static file`() {
         fun returning(status: Status) = ServerFilters.ReplaceResponseContentsWithStaticFile().then { Response(status).body(status.toString()) }
 
-        returning(NOT_FOUND)(Request(GET, "/")) shouldMatch hasBody("404 contents")
-        returning(OK)(Request(GET, "/")) shouldMatch hasBody(Status.OK.toString())
+        assertThat(returning(NOT_FOUND)(Request(GET, "/")), hasBody("404 contents"))
+        assertThat(returning(OK)(Request(GET, "/")), hasBody(Status.OK.toString()))
     }
 
     @Test
     fun `set content type`() {
         val handler = ServerFilters.SetContentType(OCTET_STREAM).then { Response(OK) }
 
-        handler(Request(GET, "/")) shouldMatch hasContentType(OCTET_STREAM)
+        assertThat(handler(Request(GET, "/")), hasContentType(OCTET_STREAM))
     }
 
 }

@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -107,7 +106,7 @@ class ClientFiltersTest {
             Response(OK)
         }
 
-        svc(Request(GET, "")) shouldMatch equalTo(Response(OK))
+        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
         assertThat(start, equalTo(Request(GET, "") to ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SamplingDecision.SAMPLE)))
         assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SamplingDecision.SAMPLE))))
     }
@@ -119,31 +118,31 @@ class ClientFiltersTest {
             Response(OK)
         }
 
-        svc(Request(GET, "")) shouldMatch equalTo(Response(OK))
+        assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
     }
 
     @Test
     fun `set host on client`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost:123")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost:123/loop").and(hasHeader("Host", "localhost:123"))
+        assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost:123/loop").and(hasHeader("Host", "localhost:123")))
     }
 
     @Test
     fun `set host without port on client`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/loop").and(hasHeader("Host", "localhost"))
+        assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost/loop").and(hasHeader("Host", "localhost")))
     }
 
     @Test
     fun `set host without port on client does not set path`() {
         val handler = ClientFilters.SetHostFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/loop").and(hasHeader("Host", "localhost"))
+        assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost/loop").and(hasHeader("Host", "localhost")))
     }
 
     @Test
     fun `set base uri appends path`() {
         val handler = ClientFilters.SetBaseUriFrom(Uri.of("http://localhost/a-path")).then { Response(OK).header("Host", it.header("Host")).body(it.uri.toString()) }
-        handler(Request(GET, "/loop")) shouldMatch hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "localhost"))
+        assertThat(handler(Request(GET, "/loop")), hasBody("http://localhost/a-path/loop").and(hasHeader("Host", "localhost")))
     }
 
     @Test
@@ -153,17 +152,17 @@ class ClientFiltersTest {
         val response = handler(Request(GET, "/loop").query("foo", "bar"))
 
         val reconstructedRequest = Request.parse(response.bodyString())
-        reconstructedRequest shouldMatch equalTo(Request(GET, "http://localhost/a-path/loop").query("a", "b").query("foo", "bar").header("Host", "localhost"))
+        assertThat(reconstructedRequest, equalTo(Request(GET, "http://localhost/a-path/loop").query("a", "b").query("foo", "bar").header("Host", "localhost")))
     }
 
     @Test
     fun `gzip request and gunzip response`() {
         val handler = ClientFilters.GZip().then {
-            it shouldMatch hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped())))
+            assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
             Response(OK).header("content-encoding", "gzip").body(it.body)
         }
 
-        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
+        assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
     }
 
     @Test
@@ -172,6 +171,6 @@ class ClientFiltersTest {
             Response(OK).body("hello")
         }
 
-        handler(Request(GET, "/").body("hello")) shouldMatch hasBody("hello")
+        assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
     }
 }

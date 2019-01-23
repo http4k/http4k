@@ -3,7 +3,6 @@ package org.http4k.template
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Status.Companion.OK
@@ -31,7 +30,7 @@ class TemplateRendererTest {
 
     @Test
     fun `can generate response with default code and content type`() {
-        finds.renderToResponse(TestViewModel) shouldMatch hasStatus(OK).and(hasBody("org/http4k/template/TestViewModel")).and(hasContentType(TEXT_HTML))
+        assertThat(finds.renderToResponse(TestViewModel), hasStatus(OK).and(hasBody("org/http4k/template/TestViewModel")).and(hasContentType(TEXT_HTML)))
     }
 
 

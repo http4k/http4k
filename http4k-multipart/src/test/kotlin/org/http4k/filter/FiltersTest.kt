@@ -1,7 +1,7 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.ProcessFiles
 import org.http4k.core.ContentType
 import org.http4k.core.FormFile
@@ -38,8 +38,8 @@ class FiltersTest {
 
         val response = service(req)
 
-        files shouldMatch equalTo(listOf("foo.txt"))
-        response shouldMatch hasBody("field=bar&file=foo.txt&field=bar")
+        assertThat(files, equalTo(listOf("foo.txt")))
+        assertThat(response, hasBody("field=bar&file=foo.txt&field=bar"))
     }
 
 }

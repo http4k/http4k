@@ -1,8 +1,8 @@
 package org.http4k.traffic
 
 import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -29,7 +29,7 @@ class ReadWriteCacheTest {
         val request = Request(Method.GET, "/")
         val response = Response(Status.OK).body("hello")
         cache[request] = response
-        cache[request] shouldMatch equalTo(response)
-        cache[Request(Method.GET, "/bob")] shouldMatch absent()
+        assertThat(cache[request], equalTo(response))
+        assertThat(cache[Request(Method.GET, "/bob")], absent())
     }
 }

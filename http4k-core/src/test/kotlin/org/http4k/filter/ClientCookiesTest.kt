@@ -1,7 +1,7 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -30,7 +30,7 @@ class ClientCookiesTest {
 
         (0..3).forEach {
             val response = client(Request(Method.GET, "/"))
-            response shouldMatch hasHeader("Set-Cookie", """counter="${it + 1}"; """)
+            assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}"; """))
         }
     }
 
@@ -59,13 +59,13 @@ class ClientCookiesTest {
 
         client(Request(Method.GET, "/set"))
 
-        cookieStorage.retrieve().size shouldMatch equalTo(1)
+        assertThat(cookieStorage.retrieve().size, equalTo(1))
 
-        client(Request(Method.GET, "/get")) shouldMatch hasBody("bar")
+        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
 
         clock.add(10)
 
-        client(Request(Method.GET, "/get")) shouldMatch hasBody("gone")
+        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
     }
 
     @Test
@@ -99,15 +99,15 @@ class ClientCookiesTest {
 
         client(Request(Method.GET, "/set"))
 
-        cookieStorage.retrieve().size shouldMatch equalTo(1)
+        assertThat(cookieStorage.retrieve().size, equalTo(1))
 
         // if the parser uses UTC and the expiry checker uses local time then this will be 'gone'
-        client(Request(Method.GET, "/get")) shouldMatch hasBody("bar")
+        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
 
         clock.add(1)
 
         // if the parser uses local time and the expiry checker uses UTC then this will be 'bar'
-        client(Request(Method.GET, "/get")) shouldMatch hasBody("gone")
+        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
     }
 
     fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0

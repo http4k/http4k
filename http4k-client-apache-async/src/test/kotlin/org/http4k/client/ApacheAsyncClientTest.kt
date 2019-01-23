@@ -1,6 +1,6 @@
 package org.http4k.client
 
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
 import org.apache.http.concurrent.FutureCallback
 import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient
@@ -40,7 +40,7 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
             override fun close() {}
 
         })(Request(Method.GET, "http://localhost:8000")) {
-            it shouldMatch hasStatus(CLIENT_TIMEOUT)
+            assertThat(it, hasStatus(CLIENT_TIMEOUT))
             latch.countDown()
         }
 

@@ -2,7 +2,6 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -63,8 +62,8 @@ class XmlTest {
         val original = Request(GET, "/").query("foo", xmlString)
         val lens = Query.xml().required("foo")
         val out = lens(original)
-        out.asXmlString() shouldMatch equalTo(xmlString)
-        lens(out, Request(GET, "/")) shouldMatch equalTo(original)
+        assertThat(out.asXmlString(), equalTo(xmlString))
+        assertThat(lens(out, Request(GET, "/")), equalTo(original))
     }
 
 }

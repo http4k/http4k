@@ -3,7 +3,6 @@ package org.http4k.server
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.asByteBuffer
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -113,13 +112,13 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
     fun `length is set on body if it is sent`() {
         val response = client(Request(POST, "$baseUrl/length")
             .body("12345").header("Content-Length", "5"))
-        response shouldMatch hasStatus(OK).and(hasBody("5"))
+        assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
     @Test
     fun `length is ignored on body if it not well formed`() {
         val response = client(Request(POST, "$baseUrl/length").header("Content-Length", "nonsense").body("12345"))
-        response shouldMatch hasStatus(OK).and(hasBody("5"))
+        assertThat(response, hasStatus(OK).and(hasBody("5")))
     }
 
     @Test

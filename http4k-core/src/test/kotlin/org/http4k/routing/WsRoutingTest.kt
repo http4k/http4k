@@ -1,8 +1,8 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.websocket.Websocket
@@ -46,13 +46,13 @@ class WsRoutingTest {
             }
 
         })
-        request.get().path("name") shouldMatch equalTo("correct")
+        assertThat(request.get().path("name"), equalTo("correct"))
     }
 
     @Test
     fun `not found`() {
         val websockets = websockets()
 
-        websockets(Request(GET, "/path1/index.html")) shouldMatch absent()
+        assertThat(websockets(Request(GET, "/path1/index.html")), absent())
     }
 }

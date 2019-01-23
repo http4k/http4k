@@ -2,7 +2,6 @@ package org.http4k.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
@@ -42,21 +41,21 @@ class BodyTest {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
-        strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")) shouldMatch equalTo("some value")
+        assertThat(strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() {
         val strictNoDirectiveBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.StrictNoDirective).toLens()
         assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
-        strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")) shouldMatch equalTo("some value")
+        assertThat(strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid content type when ContentNegotiation NonStrict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.NonStrict).toLens()
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
-        strictBody(emptyRequest.body("some value")) shouldMatch equalTo("some value")
+        assertThat(strictBody(emptyRequest.body("some value")), equalTo("some value"))
     }
 
     @Test

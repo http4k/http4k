@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.lens.Header
 import org.junit.jupiter.api.Test
@@ -38,10 +37,10 @@ class MultipartFormBodyTest {
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
-        MultipartFormBody.from(req) shouldMatch equalTo(
+        assertThat(MultipartFormBody.from(req), equalTo(
             MultipartFormBody("bob") + ("field" to "bar") +
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
-        )
+        ))
     }
 
     @Test
@@ -55,10 +54,10 @@ class MultipartFormBodyTest {
 
         req.bodyString()
 
-        MultipartFormBody.from(req) shouldMatch equalTo(
+        assertThat(MultipartFormBody.from(req), equalTo(
             MultipartFormBody("bob") + ("field" to "bar") +
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
-        )
+        ))
     }
 
     @Test
@@ -67,11 +66,11 @@ class MultipartFormBodyTest {
 
         val body = streams.toMultipartForm()
 
-        streams shouldMatch open
+        assertThat(streams, open)
 
         body.close()
 
-        streams shouldMatch closed
+        assertThat(streams, closed)
     }
 
     @Test
@@ -80,11 +79,11 @@ class MultipartFormBodyTest {
 
         val body = streams.toMultipartForm()
 
-        streams shouldMatch open
+        assertThat(streams, open)
 
         body.stream.close()
 
-        streams shouldMatch closed
+        assertThat(streams, closed)
     }
 
     @Test
@@ -97,7 +96,8 @@ class MultipartFormBodyTest {
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
             .body(original))
 
-        streams shouldMatch closed //original stream are automatically closed during parsing
+        assertThat(streams, closed)
+        //original stream are automatically closed during parsing
     }
 
     private fun List<TestInputStream>.toMultipartForm() =

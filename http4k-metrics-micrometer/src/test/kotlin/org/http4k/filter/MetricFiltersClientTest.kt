@@ -1,7 +1,7 @@
 package org.http4k.filter
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.http4k.core.HttpHandler
@@ -33,9 +33,9 @@ class MetricFiltersClientTest {
 
     @Test
     fun `timed requests generate timing metrics tagged with method and status and host`() {
-        timedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
+        assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
         repeat(2) {
-            timedClient(Request(POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(NOT_FOUND)
+            assertThat(timedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
         assert(registry,
@@ -46,9 +46,9 @@ class MetricFiltersClientTest {
 
     @Test
     fun `counted requests generate count metrics tagged with method and status and host`() {
-        countedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
+        assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
         repeat(2) {
-            countedClient(Request(POST, "http://another.server.com:8888/missing")) shouldMatch hasStatus(NOT_FOUND)
+            assertThat(countedClient(Request(POST, "http://another.server.com:8888/missing")), hasStatus(NOT_FOUND))
         }
 
         assert(registry,
@@ -62,7 +62,7 @@ class MetricFiltersClientTest {
         requestTimer = MetricFilters.Client.RequestTimer(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") }, clock)
 
-        timedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
+        assertThat(timedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
         assert(registry,
             hasRequestTimer(1, 1, "custom.requests", "custom.description", tags = *arrayOf("foo" to "bar"))
@@ -74,7 +74,7 @@ class MetricFiltersClientTest {
         requestCounter = MetricFilters.Client.RequestCounter(registry, "custom.requests", "custom.description",
             { it.label("foo", "bar") })
 
-        countedClient(Request(GET, "http://test.server.com:9999/one")) shouldMatch hasStatus(OK)
+        assertThat(countedClient(Request(GET, "http://test.server.com:9999/one")), hasStatus(OK))
 
         assert(registry,
             hasRequestCounter(1, "custom.requests", "custom.description",

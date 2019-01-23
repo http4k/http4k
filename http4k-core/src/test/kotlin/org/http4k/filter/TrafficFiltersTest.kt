@@ -1,7 +1,7 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -21,10 +21,10 @@ class TrafficFiltersTest {
 
         val handler = TrafficFilters.RecordTo(stream).then { response }
 
-        handler(request) shouldMatch equalTo(response)
+        assertThat(handler(request), equalTo(response))
 
-        stream.requests().toList() shouldMatch equalTo(listOf(request))
-        stream.responses().toList() shouldMatch equalTo(listOf(response))
+        assertThat(stream.requests().toList(), equalTo(listOf(request)))
+        assertThat(stream.responses().toList(), equalTo(listOf(response)))
     }
 
     @Test
@@ -34,8 +34,8 @@ class TrafficFiltersTest {
         val notFound = Response(Status.NOT_FOUND)
         val handler = TrafficFilters.ServeCachedFrom(cache).then { notFound }
 
-        handler(request) shouldMatch equalTo(response)
-        handler(Request(Method.GET, "/bob2")) shouldMatch equalTo(notFound)
+        assertThat(handler(request), equalTo(response))
+        assertThat(handler(Request(Method.GET, "/bob2")), equalTo(notFound))
     }
 
 }

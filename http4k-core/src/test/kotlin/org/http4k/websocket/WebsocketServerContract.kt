@@ -1,7 +1,7 @@
 package org.http4k.websocket
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.client.WebsocketClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -69,7 +69,7 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
 
     @Test
     fun `can do standard http traffic`() {
-        client(Request(GET, "http://localhost:$port/hello/bob")) shouldMatch hasBody("bob")
+        assertThat(client(Request(GET, "http://localhost:$port/hello/bob")), hasBody("bob"))
     }
 
     @Test
@@ -77,21 +77,21 @@ abstract class WebsocketServerContract(private val serverConfig: (Int) -> WsServ
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/hello/bob"))
 
         client.send(WsMessage("hello"))
-        client.received().take(2).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream())))
+        assertThat(client.received().take(2).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("goodbye bob".byteInputStream()))))
     }
 
     @Test
     fun `errors are propagated to the "on error" handler`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/errors"))
         client.send(WsMessage("hello"))
-        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("websocket 'message' must be object")))
+        assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("websocket 'message' must be object"))))
     }
 
     @Test
     fun `should correctly set query parameters on upgrade request passed into the web socket`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/queries?query=foo"))
         client.send(WsMessage("hello"))
-        client.received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("foo")))
+        assertThat(client.received().take(1).toList(), equalTo(listOf(WsMessage("foo"))))
     }
 
     @Test

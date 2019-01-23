@@ -1,7 +1,7 @@
 package org.http4k.client
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Uri
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -47,7 +47,7 @@ class WebsocketClientTest {
     fun `blocking`() {
         val client = WebsocketClient.blocking(Uri.of("ws://localhost:$port/bob"))
         client.send(WsMessage("hello"))
-        client.received().take(3).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
+        assertThat(client.received().take(3).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
     }
 
     @Test
@@ -71,7 +71,7 @@ class WebsocketClientTest {
             queue.add { null }
         }
 
-        received.take(4).toList() shouldMatch equalTo(listOf(WsMessage("bob"), WsMessage("hello")))
-        connected shouldMatch equalTo(true)
+        assertThat(received.take(4).toList(), equalTo(listOf(WsMessage("bob"), WsMessage("hello"))))
+        assertThat(connected, equalTo(true))
     }
 }

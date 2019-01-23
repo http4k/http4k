@@ -3,7 +3,6 @@ package org.http4k.serverless
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -18,7 +17,7 @@ class BootstrapAppLoaderTest {
     @Test
     fun `loads the expected app`() {
         val app = BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to TestApp::class.java.name))
-        app(Request(Method.GET, "/")) shouldMatch hasStatus(Status.CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestApp::class.java.name))
+        assertThat(app(Request(Method.GET, "/")), hasStatus(Status.CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestApp::class.java.name)))
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.anything
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -36,7 +35,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     open fun `can forward response body to another request`() {
         val response = client(Request(GET, "http://localhost:$port/stream"))
         val echoResponse = client(Request(POST, "http://localhost:$port/echo").body(response.body))
-        echoResponse.bodyString().shouldMatch(equalTo("stream"))
+        assertThat(echoResponse.bodyString(), equalTo("stream"))
     }
 
     @Test
@@ -129,22 +128,22 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     @Test
     fun `empty body`() {
         val response = client(Request(GET, "http://localhost:$port/empty"))
-        response.status.successful.shouldMatch(equalTo(true))
-        response.bodyString().shouldMatch(equalTo(""))
+        assertThat(response.status.successful, equalTo(true))
+        assertThat(response.bodyString(), equalTo(""))
     }
 
     @Test
     fun `redirection response`() {
         val response = ClientFilters.FollowRedirects()
             .then(client)(Request(GET, "http://localhost:$port/relative-redirect/5"))
-        response.status.shouldMatch(equalTo(OK))
-        response.bodyString().shouldMatch(anything)
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), anything)
     }
 
     @Test
     fun `send binary data`() {
         val response = client(Request(POST, "http://localhost:$port/check-image").body(Body(ByteBuffer.wrap(testImageBytes()))))
-        response.status.shouldMatch(equalTo(OK))
+        assertThat(response.status, equalTo(OK))
     }
 
     @Test

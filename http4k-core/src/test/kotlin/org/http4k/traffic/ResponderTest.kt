@@ -1,7 +1,7 @@
 package org.http4k.traffic
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -22,8 +22,8 @@ class ResponderTest {
         cache[request] = response
 
         val responder = Responder.from(cache)
-        responder(request) shouldMatch equalTo(response)
-        responder(Request(Method.GET, "/rita")) shouldMatch hasStatus(SERVICE_UNAVAILABLE)
+        assertThat(responder(request), equalTo(response))
+        assertThat(responder(Request(Method.GET, "/rita")), hasStatus(SERVICE_UNAVAILABLE))
     }
 
     @Test
@@ -34,9 +34,9 @@ class ResponderTest {
 
         val responder = Responder.from(stream)
 
-        responder(request) shouldMatch equalTo(response)
-        responder(request2) shouldMatch equalTo(response)
-        responder(Request(Method.GET, "/rita")) shouldMatch hasStatus(SERVICE_UNAVAILABLE)
+        assertThat(responder(request), equalTo(response))
+        assertThat(responder(request2), equalTo(response))
+        assertThat(responder(Request(Method.GET, "/rita")), hasStatus(SERVICE_UNAVAILABLE))
     }
 
 }
