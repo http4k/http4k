@@ -21,7 +21,7 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
 class Recorder(private val client: HttpHandler) {
-    fun record(value: Int): Unit {
+    fun record(value: Int) {
         val response = client(Request(POST, "/$value"))
         if (response.status != ACCEPTED) throw RuntimeException("recorder returned ${response.status}")
     }

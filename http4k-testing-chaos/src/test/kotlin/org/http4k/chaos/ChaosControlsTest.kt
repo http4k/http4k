@@ -1,7 +1,8 @@
 package org.http4k.chaos
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
+
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.ChaosTriggers.Always
@@ -35,30 +36,30 @@ class ChaosControlsTest {
 
         val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always))
 
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasStatus(OK).and(hasBody(originalChaos))
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(originalChaos)
-        appWithChaos(Request(POST, "/")) shouldMatch hasStatus(NOT_FOUND)
-        appWithChaos(Request(GET, "/")) shouldMatch hasStatus(NOT_FOUND)
-        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasStatus(OK).and(hasBody(noChaos))
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(GET, "/")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(POST, "/chaos/activate/new").body("""
-            [{
-                "type":"trigger",
-                "trigger": {
-                    "type":"always"
-                },
-                "behaviour":{
-                    "type":"status",
-                    "status":418
-                }
-            }]""".trimIndent())) shouldMatch hasStatus(OK).and(hasBody(customChaos))
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(customChaos)
-        appWithChaos(Request(GET, "/")) shouldMatch hasStatus(I_M_A_TEAPOT)
-        appWithChaos(Request(POST, "/chaos/deactivate")) shouldMatch hasStatus(OK).and(hasBody(noChaos))
-        appWithChaos(Request(GET, "/chaos/status")) shouldMatch hasBody(noChaos)
-        appWithChaos(Request(POST, "/chaos/activate")) shouldMatch hasStatus(OK).and(hasBody(customChaos))
+        assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
+        assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
+        assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(originalChaos))
+        assertThat(appWithChaos(Request(POST, "/")), hasStatus(NOT_FOUND))
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
+        assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
+        assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
+        assertThat(appWithChaos(Request(POST, "/chaos/activate/new").body("""
+                   [{
+                       "type":"trigger",
+                       "trigger": {
+                           "type":"always"
+                       },
+                       "behaviour":{
+                           "type":"status",
+                           "status":418
+                       }
+                   }]""".trimIndent())), hasStatus(OK).and(hasBody(customChaos)))
+        assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(customChaos))
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
+        assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
+        assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
+        assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(customChaos)))
     }
 
     @Test
@@ -71,8 +72,8 @@ class ChaosControlsTest {
             "/context"
         )
 
-        appWithChaos(Request(GET, "/context/status")) shouldMatch hasStatus(UNAUTHORIZED)
-        appWithChaos(Request(GET, "/context/status").header("secret", "whatever")) shouldMatch hasStatus(OK)
+        assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
+        assertThat(appWithChaos(Request(GET, "/context/status").header("secret", "whatever")), hasStatus(OK))
     }
 
     @Test
@@ -85,7 +86,7 @@ class ChaosControlsTest {
             "/context"
         )
 
-        appWithChaos(Request(GET, "/context/status")) shouldMatch hasStatus(OK)
-        appWithChaos(Request(GET, "/foo/bob")) shouldMatch hasStatus(I_M_A_TEAPOT).and(hasBody("foobob"))
+        assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
+        assertThat(appWithChaos(Request(GET, "/foo/bob")), hasStatus(I_M_A_TEAPOT).and(hasBody("foobob")))
     }
 }

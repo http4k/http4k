@@ -1,7 +1,8 @@
 package guide.testing
 
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
+
 import org.http4k.client.WebsocketClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -37,7 +38,7 @@ abstract class WebsocketContract {
 
     @Test
     fun `echoes back connected name`() {
-        client().received().take(1).toList() shouldMatch equalTo(listOf(WsMessage("hello bob")))
+        assertThat(client().received().take(1).toList(), equalTo(listOf(WsMessage("hello bob"))))
     }
 }
 

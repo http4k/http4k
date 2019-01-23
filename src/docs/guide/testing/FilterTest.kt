@@ -1,7 +1,8 @@
 package guide.testing
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
+
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -24,6 +25,6 @@ class FilterTest {
     fun `adds a special header`() {
         val handler: HttpHandler = AddLatency.then { Response(OK) }
         val response: Response = handler(Request(GET, "/echo/my+great+message"))
-        response shouldMatch hasStatus(OK).and(hasHeader("x-extra-header", "some value"))
+        assertThat(response, hasStatus(OK).and(hasHeader("x-extra-header", "some value")))
     }
 }

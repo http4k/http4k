@@ -1,8 +1,9 @@
 package cookbook.test_driven_apps
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
+
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class AnswerRecorder(private val httpClient: HttpHandler) : (Int) -> Unit {
-    override fun invoke(answer: Int): Unit {
+    override fun invoke(answer: Int) {
         httpClient(Request(POST, "/" + answer.toString()))
     }
 }
@@ -45,8 +46,8 @@ class EndpointUnitTest {
         var answer: Int? = null
         val unit = myMathsEndpoint({ first, second -> first + second }, { answer = it })
         val response = unit(Request(GET, "/").query("first", "123").query("second", "456"))
-        answer shouldMatch equalTo(579)
-        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
+        assertThat(answer, equalTo(579))
+        assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
     }
 }
 
@@ -73,14 +74,14 @@ class FunctionalTest {
     @Test
     fun `adds numbers`() {
         val response = app(Request(GET, "/add").query("first", "123").query("second", "456"))
-        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
-        recorderHttp.calls shouldMatch equalTo(listOf(579))
+        assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
+        assertThat(recorderHttp.calls, equalTo(listOf(579)))
     }
 
     @Test
     fun `not found`() {
         val response = app(Request(GET, "/nothing").query("first", "123").query("second", "456"))
-        response shouldMatch hasStatus(NOT_FOUND)
+        assertThat(response, hasStatus(NOT_FOUND))
     }
 }
 
@@ -96,13 +97,13 @@ class EndToEndTest {
     private val server = MyMathServer(8000, Uri.of("http://localhost:8001"))
 
     @BeforeEach
-    fun setup(): Unit {
+    fun setup() {
         recorder.start()
         server.start()
     }
 
     @AfterEach
-    fun teardown(): Unit {
+    fun teardown() {
         server.stop()
         recorder.stop()
     }
@@ -111,8 +112,8 @@ class EndToEndTest {
     fun `adds numbers`() {
         val response = client(Request(GET, "http://localhost:8000/add").query("first", "123").query("second", "456"))
         println(response)
-        response shouldMatch hasStatus(OK).and(hasBody("the answer is 579"))
-        recorderHttp.calls shouldMatch equalTo(listOf(579))
+        assertThat(response, hasStatus(OK).and(hasBody("the answer is 579")))
+        assertThat(recorderHttp.calls, equalTo(listOf(579)))
     }
 
 }

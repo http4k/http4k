@@ -1,8 +1,9 @@
 package guide.modules.hamkrest
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
+
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
@@ -20,19 +21,19 @@ fun main() {
     val request = Request(Method.POST, "/?a=b").body("http4k is cool").header("my header", "a value")
 
     // status
-    Response(OK) shouldMatch hasStatus(OK)
+    assertThat(Response(OK), hasStatus(OK))
 
     // query
-    request shouldMatch hasQuery("a", "b")
+    assertThat(request, hasQuery("a", "b"))
 
     // header
-    request shouldMatch hasHeader("my header", "a value")
+    assertThat(request, hasHeader("my header", "a value"))
 
     // body
-    request shouldMatch hasBody(equalTo("http4k is cool"))
-    request shouldMatch hasBody("http4k is cool")
-    request shouldMatch hasBody(Body.string(ContentType.TEXT_HTML).toLens(), equalTo("http4k is cool"))
+    assertThat(request, hasBody(equalTo("http4k is cool")))
+    assertThat(request, hasBody("http4k is cool"))
+    assertThat(request, hasBody(Body.string(ContentType.TEXT_HTML).toLens(), equalTo("http4k is cool")))
 
     // composite
-    request shouldMatch hasBody(equalTo("http4k is cool")).and(hasQuery("a", "b"))
+    assertThat(request, hasBody(equalTo("http4k is cool")).and(hasQuery("a", "b")))
 }

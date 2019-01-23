@@ -1,7 +1,8 @@
 package guide.example._3_adding_the_second_endpoint
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
+
 import guide.example._3_adding_the_second_endpoint.Matchers.answerShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
@@ -16,10 +17,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Random
 
-object Matchers {
 
+object Matchers {
     fun Response.answerShouldBe(expected: Int) {
-        this shouldMatch hasStatus(OK).and(hasBody(expected.toString()))
+        assertThat(this, hasStatus(OK).and(hasBody(expected.toString())))
     }
 }
 
@@ -29,18 +30,18 @@ class EndToEndTest {
     private val server = MyMathServer(port)
 
     @BeforeEach
-    fun setup(): Unit {
+    fun setup() {
         server.start()
     }
 
     @AfterEach
-    fun teardown(): Unit {
+    fun teardown() {
         server.stop()
     }
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(GET, "http://localhost:$port/ping")) shouldMatch hasStatus(OK)
+        assertThat(client(Request(GET, "http://localhost:$port/ping")), hasStatus(OK))
         client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
         client(Request(GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
     }
@@ -61,7 +62,7 @@ class AddFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        client(Request(GET, "/add?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
+        assertThat(client(Request(GET, "/add?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
     }
 }
 
@@ -80,6 +81,6 @@ class MultiplyFunctionalTest {
 
     @Test
     fun `bad request when some values are not numbers`() {
-        client(Request(GET, "/multiply?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
+        assertThat(client(Request(GET, "/multiply?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
     }
 }

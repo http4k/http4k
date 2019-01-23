@@ -1,6 +1,7 @@
 package guide.example._1_building_a_walking_skeleton
 
-import com.natpryce.hamkrest.should.shouldMatch
+
+import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -17,17 +18,17 @@ class EndToEndTest {
     private val server = MyMathServer(port)
 
     @BeforeEach
-    fun setup(): Unit {
+    fun setup() {
         server.start()
     }
 
     @AfterEach
-    fun teardown(): Unit {
+    fun teardown() {
         server.stop()
     }
 
     @Test
     fun `responds to ping`() {
-        client(Request(GET, "http://localhost:$port/ping")) shouldMatch hasStatus(OK)
+        assertThat(client(Request(GET, "http://localhost:$port/ping")), hasStatus(OK))
     }
 }

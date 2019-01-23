@@ -1,7 +1,8 @@
 package guide.testing
 
 import com.natpryce.hamkrest.and
-import com.natpryce.hamkrest.should.shouldMatch
+import com.natpryce.hamkrest.assertion.assertThat
+
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -20,6 +21,6 @@ class StaticPathTest {
         Request(GET, "/anything").body("my data is large")
         val response: Response = EchoBody(Request(GET, "/anything").body("my data is large"))
 
-        response shouldMatch hasStatus(OK).and(hasBody("my data is large"))
+        assertThat(response, hasStatus(OK).and(hasBody("my data is large")))
     }
 }

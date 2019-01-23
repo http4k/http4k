@@ -1,8 +1,9 @@
 package org.http4k.chaos
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
+
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
@@ -41,7 +42,7 @@ abstract class ChaosStageContract {
     @Test
     fun `deserialises from JSON`() {
         val clock = Clock.fixed(Instant.EPOCH, ZoneId.of("UTC"))
-        asJson.asJsonObject().asStage(clock).toString() shouldMatch equalTo(expectedDescription)
+        assertThat(asJson.asJsonObject().asStage(clock).toString(), equalTo(expectedDescription))
     }
 }
 
@@ -52,7 +53,7 @@ class WaitTest : ChaosStageContract() {
     @Test
     fun `Wait does not match the response`() {
         val app = Wait.asFilter().then { response }
-        app(Request(GET, "")) shouldMatch equalTo(response)
+        assertThat(app(Request(GET, "")), equalTo(response))
     }
 }
 
@@ -74,13 +75,13 @@ class RepeatTest : ChaosStageContract() {
         }.until { it.method == DELETE }
             .asFilter().then { response }
 
-        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(OPTIONS, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-        app(Request(GET, "")) shouldMatch equalTo(Response(GATEWAY_TIMEOUT))
-        app(Request(TRACE, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(DELETE, "")) shouldMatch equalTo(response)
+        assertThat(app(Request(GET, "")), equalTo(Response(I_M_A_TEAPOT)))
+        assertThat(app(Request(POST, "")), equalTo(Response(NOT_FOUND)))
+        assertThat(app(Request(GET, "")), equalTo(Response(NOT_FOUND)))
+        assertThat(app(Request(OPTIONS, "")), equalTo(Response(GATEWAY_TIMEOUT)))
+        assertThat(app(Request(GET, "")), equalTo(Response(GATEWAY_TIMEOUT)))
+        assertThat(app(Request(TRACE, "")), equalTo(Response(I_M_A_TEAPOT)))
+        assertThat(app(Request(DELETE, "")), equalTo(response))
     }
 }
 
@@ -88,11 +89,11 @@ class VariableStageTest {
     @Test
     fun `should provide ability to modify stage at runtime`() {
         val variable = Variable()
-        variable.toString() shouldMatch equalTo(("Always None"))
-        variable(request)!!.then { response }(request) shouldMatch equalTo(response)
+        assertThat(variable.toString(), equalTo(("Always None")))
+        assertThat(variable(request)!!.then { response }(request), equalTo(response))
         variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always) }
-        variable.toString() shouldMatch equalTo(("Repeat [Always ReturnStatus (404)]"))
-        variable(request)!!.then { response }(request) shouldMatch hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404")))
+        assertThat(variable.toString(), equalTo(("Repeat [Always ReturnStatus (404)]")))
+        assertThat(variable(request)!!.then { response }(request), hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
 }
 
@@ -102,9 +103,9 @@ class ChaosStageOperationsTest {
         val app = chaosStage(NOT_FOUND).until { it.method == POST }
             .asFilter().then { response }
 
-        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(POST, "")) shouldMatch equalTo(response)
-        app(Request(GET, "")) shouldMatch equalTo(response)
+        assertThat(app(Request(GET, "")), equalTo(Response(NOT_FOUND)))
+        assertThat(app(Request(POST, "")), equalTo(response))
+        assertThat(app(Request(GET, "")), equalTo(response))
     }
 
     @Test
@@ -114,11 +115,11 @@ class ChaosStageOperationsTest {
             .then(chaosStage(INTERNAL_SERVER_ERROR))
             .asFilter().then { response }
 
-        app(Request(GET, "")) shouldMatch equalTo(Response(I_M_A_TEAPOT))
-        app(Request(POST, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(GET, "")) shouldMatch equalTo(Response(NOT_FOUND))
-        app(Request(TRACE, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
-        app(Request(GET, "")) shouldMatch equalTo(Response(INTERNAL_SERVER_ERROR))
+        assertThat(app(Request(GET, "")), equalTo(Response(I_M_A_TEAPOT)))
+        assertThat(app(Request(POST, "")), equalTo(Response(NOT_FOUND)))
+        assertThat(app(Request(GET, "")), equalTo(Response(NOT_FOUND)))
+        assertThat(app(Request(TRACE, "")), equalTo(Response(INTERNAL_SERVER_ERROR)))
+        assertThat(app(Request(GET, "")), equalTo(Response(INTERNAL_SERVER_ERROR)))
     }
 }
 

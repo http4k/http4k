@@ -1,8 +1,8 @@
 package guide.example._4_adding_an_external_dependency
 
 import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.should.shouldMatch
 import guide.example._4_adding_an_external_dependency.Matchers.answerShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
@@ -31,11 +31,9 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.Random
 
-
 object Matchers {
-
     fun Response.answerShouldBe(expected: Int) {
-        this shouldMatch hasStatus(OK).and(hasBody(expected.toString()))
+        assertThat(this, hasStatus(OK).and(hasBody(expected.toString())))
     }
 }
 
@@ -48,7 +46,7 @@ abstract class RecorderCdc {
         checkAnswerRecorded()
     }
 
-    open fun checkAnswerRecorded(): Unit {}
+    open fun checkAnswerRecorded() {}
 }
 
 class FakeRecorderHttp : HttpHandler {
@@ -69,7 +67,7 @@ class FakeRecorderTest : RecorderCdc() {
     override val client = FakeRecorderHttp()
 
     override fun checkAnswerRecorded() {
-        client.calls shouldMatch equalTo(listOf(123))
+        assertThat(client.calls, equalTo(listOf(123)))
     }
 }
 
@@ -87,20 +85,20 @@ class EndToEndTest {
     private val recorderServer = recorder.asServer(Jetty(recorderPort))
 
     @BeforeEach
-    fun setup(): Unit {
+    fun setup() {
         recorderServer.start()
         server.start()
     }
 
     @AfterEach
-    fun teardown(): Unit {
+    fun teardown() {
         server.stop()
         recorderServer.stop()
     }
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        client(Request(GET, "http://localhost:$port/ping")) shouldMatch hasStatus(OK)
+        assertThat(client(Request(GET, "http://localhost:$port/ping")), hasStatus(OK))
         client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
         client(Request(GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
     }
@@ -117,19 +115,19 @@ class AddFunctionalTest {
     @Test
     fun `adds values together`() {
         env.client(Request(GET, "/add?value=1&value=2")).answerShouldBe(3)
-        env.recorder.calls shouldMatch equalTo(listOf(3))
+        assertThat(env.recorder.calls, equalTo(listOf(3)))
     }
 
     @Test
     fun `answer is zero when no values`() {
         env.client(Request(GET, "/add")).answerShouldBe(0)
-        env.recorder.calls shouldMatch equalTo(listOf(0))
+        assertThat(env.recorder.calls, equalTo(listOf(0)))
     }
 
     @Test
     fun `bad request when some values are not numbers`() {
-        env.client(Request(GET, "/add?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
-        env.recorder.calls.isEmpty() shouldMatch equalTo(true)
+        assertThat(env.client(Request(GET, "/add?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        assertThat(env.recorder.calls.isEmpty(), equalTo(true))
     }
 }
 
@@ -139,18 +137,18 @@ class MultiplyFunctionalTest {
     @Test
     fun `products values together`() {
         env.client(Request(GET, "/multiply?value=2&value=4")).answerShouldBe(8)
-        env.recorder.calls shouldMatch equalTo(listOf(8))
+        assertThat(env.recorder.calls, equalTo(listOf(8)))
     }
 
     @Test
     fun `answer is zero when no values`() {
         env.client(Request(GET, "/multiply")).answerShouldBe(0)
-        env.recorder.calls shouldMatch equalTo(listOf(0))
+        assertThat(env.recorder.calls, equalTo(listOf(0)))
     }
 
     @Test
     fun `bad request when some values are not numbers`() {
-        env.client(Request(GET, "/multiply?value=1&value=notANumber")) shouldMatch hasStatus(BAD_REQUEST)
-        env.recorder.calls.isEmpty() shouldMatch equalTo(true)
+        assertThat(env.client(Request(GET, "/multiply?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        assertThat(env.recorder.calls.isEmpty(), equalTo(true))
     }
 }
