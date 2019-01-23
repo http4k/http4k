@@ -140,7 +140,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     @Test
     fun compactify() {
         j {
-            assertThat(compactify("""{   "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
+            assertThat(compactify("""{  "hello"  :  "world"   }"""), equalTo("""{"hello":"world"}"""))
         }
     }
 

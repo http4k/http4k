@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class BasicAuthenticationTest {
     @Test
     fun fails_to_authenticate() {
-        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(Status.OK) }
         val response = handler(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
         assertThat(response.header("WWW-Authenticate"), equalTo("Basic Realm=\"my realm\""))
@@ -25,28 +25,28 @@ class BasicAuthenticationTest {
 
     @Test
     fun authenticate_using_client_extension() {
-        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(Status.OK) }
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
 
     @Test
     fun fails_to_authenticate_if_credentials_do_not_match() {
-        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(Status.OK) }
         val response = ClientFilters.BasicAuth("user", "wrong").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
     fun allow_injecting_authorize_function() {
-        val handler = ServerFilters.BasicAuth("my realm") { it.user == "user" && it.password == "password" }.then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm") { it.user == "user" && it.password == "password" }.then { Response(Status.OK) }
         val response = ClientFilters.BasicAuth("user", "password").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }
 
     @Test
     fun allow_injecting_credential_provider() {
-        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { _: Request -> Response(Status.OK) }
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(Status.OK) }
         val response = ClientFilters.BasicAuth { Credentials("user", "password") }.then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(OK))
     }

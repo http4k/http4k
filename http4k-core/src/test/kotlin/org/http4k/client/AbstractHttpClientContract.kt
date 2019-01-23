@@ -45,14 +45,14 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
             "/cookies" bind GET to { req: Request ->
                 Response(OK).body(req.cookies().joinToString(",") { it.name + "=" + it.value })
             },
-            "/empty" bind GET to { _: Request -> Response(OK).body("") },
+            "/empty" bind GET to { Response(OK).body("") },
             "/relative-redirect/{times}" bind GET to { req: Request ->
                 val times = req.path("times")?.toInt() ?: 0
                 if (times == 0) Response(OK)
                 else Response(FOUND).header("Location", "/relative-redirect/${times - 1}")
             },
-            "/redirect" bind GET to { _: Request -> Response(FOUND).header("Location", "/someUri").body("") },
-            "/stream" bind GET to { _: Request -> Response(OK).body("stream".byteInputStream()) },
+            "/redirect" bind GET to { Response(FOUND).header("Location", "/someUri").body("") },
+            "/stream" bind GET to { Response(OK).body("stream".byteInputStream()) },
             "/delay/{millis}" bind GET to { r: Request ->
                 Thread.sleep(r.path("millis")!!.toLong())
                 Response(OK)

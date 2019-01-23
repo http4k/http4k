@@ -212,8 +212,8 @@ class ChaosPolicyOperationTest {
 }
 
 class ChaosTriggerLogicalOperatorTest {
-    private val isFalse: Trigger = { _: Request -> false }
-    private val isTrue: Trigger = { _: Request -> true }
+    private val isFalse: Trigger = { false }
+    private val isTrue: Trigger = { true }
 
     @Test
     fun invert() {
