@@ -17,17 +17,17 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
     override fun invoke(nextHandler: HttpHandler): HttpHandler = { req ->
-            val body = routeMeta.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
-            val overallFailure = body.plus(routeMeta.requestParams).fold(null as LensFailure?) { memo, next ->
-                try {
-                    next(req)
-                    memo
-                } catch (e: LensFailure) {
-                    memo?.let { LensFailure(it.failures + e.failures, e) } ?: e
-                }
+        val body = routeMeta.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
+        val overallFailure = body.plus(routeMeta.requestParams).fold(null as LensFailure?) { memo, next ->
+            try {
+                next(req)
+                memo
+            } catch (e: LensFailure) {
+                memo?.let { LensFailure(it.failures + e.failures, e) } ?: e
             }
-            overallFailure?.let { throw it } ?: nextHandler(req)
         }
+        overallFailure?.let { throw it } ?: nextHandler(req)
+    }
 
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 

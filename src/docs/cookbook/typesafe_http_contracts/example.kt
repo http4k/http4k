@@ -63,7 +63,7 @@ fun main() {
             description = "Adds 2 numbers together"
             returning("The result" to OK)
         } bindContract GET to { Response(OK).body("pong") },
-        "/add" / Path.int().of("value1") / Path.int().of("value2")  meta {
+        "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
             summary = "add"
             description = "Adds 2 numbers together"
             returning("The result" to OK)
@@ -75,7 +75,7 @@ fun main() {
             returning("The result" to OK)
         } bindContract GET
             // note here that the trailing parameter can be ignored - it would simply be the value "divide".
-            to { first, second, _ -> { Response(OK).body((first / second).toString())} },
+            to { first, second, _ -> { Response(OK).body((first / second).toString()) } },
         "/echo" / Path.of("name") meta {
             summary = "echo"
             queries += ageQuery

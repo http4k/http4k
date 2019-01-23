@@ -49,7 +49,7 @@ class Http4kRequestHandler(handler: HttpHandler) : HttpRequestHandler {
             setStatusCode(status.code)
             setReasonPhrase(status.description)
             headers.filter { !headersThatApacheInterceptorSets.contains(it.first) }.forEach { (key, value) -> addHeader(key, value) }
-            entity = InputStreamEntity(body.stream,body.length ?: -1L)
+            entity = InputStreamEntity(body.stream, body.length ?: -1L)
         }
     }
 

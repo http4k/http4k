@@ -23,7 +23,7 @@ data class SubWithText1(val attr: String?, val content: String?)
 
 data class XmlNode(val SubWithText: List<SubWithText1>?, val subWithAttr: SubWithAttr?, val content: String?)
 
-data class SimpleDocument(val value:String)
+data class SimpleDocument(val value: String)
 
 class XmlTest {
 
@@ -43,7 +43,7 @@ class XmlTest {
     }
 
     @Test
-    fun `does not try to automatically convert numbers`(){
+    fun `does not try to automatically convert numbers`() {
         val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><value>1258421375.19</value>"""
         val lens = Body.auto<SimpleDocument>().toLens()
 

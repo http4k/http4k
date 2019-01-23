@@ -42,7 +42,8 @@ internal class ResourceLoadingHandler(
 
     override fun invoke(request: Request): Response =
         if (request.method == GET && request.uri.path.startsWith(pathSegments))
-            resourceLoader.match(request.uri(of(convertPath(request.uri.path))))?.invoke(request) ?: Response(NOT_FOUND)
+            resourceLoader.match(request.uri(of(convertPath(request.uri.path))))?.invoke(request)
+                ?: Response(NOT_FOUND)
         else
             Response(NOT_FOUND)
 

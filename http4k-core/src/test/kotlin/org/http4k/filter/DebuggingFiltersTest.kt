@@ -34,7 +34,7 @@ class DebuggingFiltersTest {
         val req = Request(Method.GET, "")
         try {
             PrintRequestAndResponse(PrintStream(os))
-                .then { throw IllegalArgumentException("foobar") } (req)
+                .then { throw IllegalArgumentException("foobar") }(req)
             fail("did not throw")
         } catch (e: IllegalArgumentException) {
         }

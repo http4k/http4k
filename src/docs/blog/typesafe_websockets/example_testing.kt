@@ -11,9 +11,9 @@ import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
-import org.http4k.websocket.WsClient
 import org.http4k.testing.testWsClient
 import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsClient
 import org.http4k.websocket.WsHandler
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.AfterEach
