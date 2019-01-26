@@ -161,10 +161,6 @@ object Libs {
     const val jetty_servlet: String =
         "org.eclipse.jetty:jetty-servlet:" + Versions.org_eclipse_jetty
 
-    const val org_jacoco_agent: String = "org.jacoco:org.jacoco.agent:" + Versions.org_jacoco
-
-    const val org_jacoco_ant: String = "org.jacoco:org.jacoco.ant:" + Versions.org_jacoco
-
     /**
      * [Java-WebSocket website](https://github.com/TooTallNate/Java-WebSocket) */
     const val java_websocket: String =

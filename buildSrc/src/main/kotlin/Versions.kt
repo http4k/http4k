@@ -25,11 +25,11 @@ object Versions {
 
     const val io_github_resilience4j: String = "0.13.2"
 
-    const val ktor_server_cio: String = "1.1.1"
+    const val ktor_server_cio: String = "1.1.2"
 
     const val micrometer_core: String = "1.1.2"
 
-    const val netty_codec_http2: String = "4.1.32.Final"
+    const val netty_codec_http2: String = "4.1.33.Final"
 
     const val pebble: String = "3.0.7"
 
@@ -39,7 +39,7 @@ object Versions {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3"
+    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.0"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.6.0"
 
@@ -53,9 +53,9 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val httpclient: String = "4.5.6"
+    const val httpclient: String = "4.5.7"
 
-    const val httpcore: String = "4.4.10"
+    const val httpcore: String = "4.4.11"
 
     const val http2_server: String = "9.4.14.v20181114"
 
@@ -63,13 +63,11 @@ object Versions {
 
     const val org_eclipse_jetty: String = "9.4.14.v20181114"
 
-    const val org_jacoco: String = "0.8.3"
-
     const val java_websocket: String = "1.3.9"
 
     const val dokka_gradle_plugin: String = "0.9.17"
 
-    const val org_jetbrains_kotlin: String = "1.3.11"
+    const val org_jetbrains_kotlin: String = "1.3.20"
 
     const val json: String = "20180813"
 
@@ -95,7 +93,7 @@ object Versions {
 
         const val currentVersion: String = "5.1.1"
 
-        const val nightlyVersion: String = "5.2-20190116011919+0000"
+        const val nightlyVersion: String = "5.3-20190126000049+0000"
 
         const val releaseCandidate: String = ""
     }
