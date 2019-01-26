@@ -25,7 +25,6 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
 
     apply plugin: 'kotlin'
@@ -39,7 +38,7 @@ allprojects {
     apply plugin: 'org.jetbrains.dokka'
 
     jacoco {
-        toolVersion = '0.8.3-SNAPSHOT'
+        toolVersion = '0.8.3'
     }
 
     cobertura.coverageFormats = ['hml', 'xml']

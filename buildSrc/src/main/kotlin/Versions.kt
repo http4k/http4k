@@ -63,7 +63,7 @@ object Versions {
 
     const val org_eclipse_jetty: String = "9.4.14.v20181114"
 
-    const val org_jacoco: String = "0.8.3-SNAPSHOT"
+    const val org_jacoco: String = "0.8.3"
 
     const val java_websocket: String = "1.3.9"
 
