@@ -29,12 +29,15 @@ fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, kotlin.Long::toSt
 fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, kotlin.Double::toString)
 fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, kotlin.Float::toString)
 fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, kotlin.Boolean::toString)
-fun BiDiMapping.Companion.uuid() = BiDiMapping(UUID::fromString)
-fun BiDiMapping.Companion.uri() = BiDiMapping(Uri.Companion::of)
-fun BiDiMapping.Companion.url() = BiDiMapping(::URL, URL::toExternalForm)
 fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ if (it.isEmpty()) throw IllegalArgumentException() else it })
 fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ matchEntire(it)?.groupValues?.get(group)!! }) }
+fun BiDiMapping.Companion.regexObject() = BiDiMapping(::Regex, Regex::pattern)
+
 fun BiDiMapping.Companion.duration() = BiDiMapping(Duration::parse)
+fun BiDiMapping.Companion.uri() = BiDiMapping(Uri.Companion::of)
+fun BiDiMapping.Companion.url() = BiDiMapping(::URL, URL::toExternalForm)
+fun BiDiMapping.Companion.uuid() = BiDiMapping(UUID::fromString)
+
 fun BiDiMapping.Companion.instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
 fun BiDiMapping.Companion.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
 fun BiDiMapping.Companion.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)

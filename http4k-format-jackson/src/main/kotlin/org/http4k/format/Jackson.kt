@@ -22,24 +22,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
-import org.http4k.core.Uri.Companion
 import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.duration
+import org.http4k.lens.instant
+import org.http4k.lens.localDate
+import org.http4k.lens.localDateTime
+import org.http4k.lens.localTime
+import org.http4k.lens.offsetDateTime
+import org.http4k.lens.offsetTime
+import org.http4k.lens.regexObject
+import org.http4k.lens.uri
+import org.http4k.lens.url
+import org.http4k.lens.uuid
+import org.http4k.lens.zonedDateTime
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.net.URL
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.OffsetTime
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.UUID
 import kotlin.reflect.KClass
 
 open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
@@ -102,19 +103,18 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 }
 
 val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
-    .custom(Duration::parse)
-    .custom({ LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }, DateTimeFormatter.ISO_LOCAL_TIME::format)
-    .custom({ LocalDate.parse(it, DateTimeFormatter.ISO_DATE) }, DateTimeFormatter.ISO_DATE::format)
-    .custom({ LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME) }, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format)
-    .custom({ ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }, DateTimeFormatter.ISO_ZONED_DATE_TIME::format)
-    .custom(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
-    .custom(OffsetTime::parse, DateTimeFormatter.ISO_OFFSET_TIME::format)
-    .custom(OffsetDateTime::parse, DateTimeFormatter.ISO_OFFSET_DATE_TIME::format)
-    .custom(UUID::fromString)
-    .custom(Companion::of)
-    .custom(::URL, URL::toExternalForm)
-    .custom(::Regex, Regex::pattern)
-
+    .custom(BiDiMapping.duration())
+    .custom(BiDiMapping.uri())
+    .custom(BiDiMapping.url())
+    .custom(BiDiMapping.uuid())
+    .custom(BiDiMapping.regexObject())
+    .custom(BiDiMapping.instant())
+    .custom(BiDiMapping.localTime())
+    .custom(BiDiMapping.localDate())
+    .custom(BiDiMapping.localDateTime())
+    .custom(BiDiMapping.zonedDateTime())
+    .custom(BiDiMapping.offsetTime())
+    .custom(BiDiMapping.offsetDateTime())
 
 object Jackson : ConfigurableJackson(ObjectMapper()
     .registerModule(defaultKotlinModuleWithHttp4kSerialisers)
@@ -125,12 +125,12 @@ object Jackson : ConfigurableJackson(ObjectMapper()
     .configure(USE_BIG_INTEGER_FOR_INTS, true)
 )
 
-private inline fun <reified T> KotlinModule.custom(crossinline read: (String) -> T, crossinline write: (T) -> String = { it.toString() }) =
+private inline fun <reified T> KotlinModule.custom(mapping: BiDiMapping<T>) =
     apply {
         addDeserializer(T::class.java, object : JsonDeserializer<T>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = read(p.text)
+            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)
         })
         addSerializer(T::class.java, object : JsonSerializer<T>() {
-            override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(write(value!!))
+            override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
         })
     }

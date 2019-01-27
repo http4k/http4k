@@ -223,7 +223,7 @@ fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(BiDiMapping.boolean
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(BiDiMapping.uuid())
 fun <IN> BiDiLensSpec<IN, String>.uri() = map(BiDiMapping.uri())
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1) = map(BiDiMapping.regex(pattern, group))
-
+fun <IN> BiDiLensSpec<IN, String>.regexObject() = map(BiDiMapping.regexObject())
 fun <IN> BiDiLensSpec<IN, String>.duration() = map(BiDiMapping.duration())
 fun <IN> BiDiLensSpec<IN, String>.instant() = map(BiDiMapping.instant())
 fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(BiDiMapping.localDateTime(formatter))
