@@ -7,6 +7,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 - Extracted out new `BiDiMapping` type, which encapsulates string <-> type conversions and removes a 
 boatload of duplications. These conversions are now used consistently across all the various places 
 (Lenses, auto-mapping).
+- Improved configurability of `AutoMarshallingJson` instances.
 
 ### v3.107.0
 - Upgrade to various deps.
