@@ -17,18 +17,6 @@ import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.duration
-import org.http4k.lens.instant
-import org.http4k.lens.localDate
-import org.http4k.lens.localDateTime
-import org.http4k.lens.localTime
-import org.http4k.lens.offsetDateTime
-import org.http4k.lens.offsetTime
-import org.http4k.lens.regexObject
-import org.http4k.lens.uri
-import org.http4k.lens.url
-import org.http4k.lens.uuid
-import org.http4k.lens.zonedDateTime
 import org.http4k.websocket.WsMessage
 import java.lang.reflect.Type
 import java.math.BigDecimal
@@ -111,23 +99,18 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     }
 }
 
-object Gson : ConfigurableGson(GsonBuilder()
-    .custom(BiDiMapping.duration())
-    .custom(BiDiMapping.uri())
-    .custom(BiDiMapping.url())
-    .custom(BiDiMapping.uuid())
-    .custom(BiDiMapping.regexObject())
-    .custom(BiDiMapping.instant())
-    .custom(BiDiMapping.localTime())
-    .custom(BiDiMapping.localDate())
-    .custom(BiDiMapping.localDateTime())
-    .custom(BiDiMapping.zonedDateTime())
-    .custom(BiDiMapping.offsetTime())
-    .custom(BiDiMapping.offsetDateTime())
-    .serializeNulls())
+class ConfigureGsonBuilder : ConfigureAutoMarshallingJson<GsonBuilder> {
+    private val builder = GsonBuilder().serializeNulls()
 
-inline fun <reified T> GsonBuilder.custom(mapping: BiDiMapping<T>): GsonBuilder = registerTypeAdapter(T::class.java, object : JsonSerializer<T>, JsonDeserializer<T> {
-    override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(mapping.write(src))
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        builder.registerTypeAdapter(mapping.clazz, object : JsonSerializer<T>, JsonDeserializer<T> {
+            override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
 
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): T = mapping.read(json.asString)
-})
+            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asString)
+        })
+    }
+
+    override fun done(): GsonBuilder = builder
+}
+
+object Gson : ConfigurableGson(ConfigureGsonBuilder().withStandardMappings())

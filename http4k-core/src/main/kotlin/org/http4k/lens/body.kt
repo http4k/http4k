@@ -146,5 +146,5 @@ fun Body.Companion.binary(contentType: ContentType, description: String? = null,
 fun Body.Companion.regex(pattern: String, group: Int = 1, contentType: ContentType = ContentType.TEXT_PLAIN, description: String? = null, contentNegotiation: ContentNegotiation = None) =
     BiDiMapping.regex(pattern, group).let { string(contentType, description, contentNegotiation).map(it) }
 
-internal fun <NEXT> BiDiBodyLensSpec<String>.map(mapping: BiDiMapping<NEXT>) = map(
+internal fun <IN, NEXT> BiDiBodyLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(
     { mapping.read(it) }, { mapping.write(it) })

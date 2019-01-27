@@ -113,8 +113,8 @@ fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(BiDiMapp
 fun Path.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(BiDiMapping.offsetTime(formatter))
 fun Path.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(BiDiMapping.offsetDateTime(formatter))
 
-internal fun <NEXT> BiDiPathLensSpec<String>.map(mapping: BiDiMapping<NEXT>) = map(
+internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(
     { mapping.read(it) }, { mapping.write(it) })
 
-internal fun <NEXT> BiDiPathLensSpec<String>.mapWithNewMeta(mapping: BiDiMapping<NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
+internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
     { mapping.read(it) }, { mapping.write(it) }, paramMeta)

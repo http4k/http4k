@@ -233,8 +233,8 @@ fun <IN> BiDiLensSpec<IN, String>.localTime(formatter: DateTimeFormatter = ISO_L
 fun <IN> BiDiLensSpec<IN, String>.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(BiDiMapping.offsetTime(formatter))
 fun <IN> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(BiDiMapping.offsetDateTime(formatter))
 
-internal fun <NEXT, IN> BiDiLensSpec<IN, String>.mapWithNewMeta(mapping: BiDiMapping<NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
+internal fun <NEXT, IN, OUT> BiDiLensSpec<IN, OUT>.mapWithNewMeta(mapping: BiDiMapping<OUT, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
     { mapping.read(it) }, { mapping.write(it) }, paramMeta)
 
-internal fun <NEXT, IN> BiDiLensSpec<IN, String>.map(mapping: BiDiMapping<NEXT>) = map(
+internal fun <NEXT, IN, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(
     { mapping.read(it) }, { mapping.write(it) })

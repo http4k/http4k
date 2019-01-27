@@ -26,18 +26,6 @@ import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.duration
-import org.http4k.lens.instant
-import org.http4k.lens.localDate
-import org.http4k.lens.localDateTime
-import org.http4k.lens.localTime
-import org.http4k.lens.offsetDateTime
-import org.http4k.lens.offsetTime
-import org.http4k.lens.regexObject
-import org.http4k.lens.uri
-import org.http4k.lens.url
-import org.http4k.lens.uuid
-import org.http4k.lens.zonedDateTime
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -102,35 +90,27 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 }
 
-val defaultKotlinModuleWithHttp4kSerialisers = KotlinModule()
-    .custom(BiDiMapping.duration())
-    .custom(BiDiMapping.uri())
-    .custom(BiDiMapping.url())
-    .custom(BiDiMapping.uuid())
-    .custom(BiDiMapping.regexObject())
-    .custom(BiDiMapping.instant())
-    .custom(BiDiMapping.localTime())
-    .custom(BiDiMapping.localDate())
-    .custom(BiDiMapping.localDateTime())
-    .custom(BiDiMapping.zonedDateTime())
-    .custom(BiDiMapping.offsetTime())
-    .custom(BiDiMapping.offsetDateTime())
+class ConfigureJackson : ConfigureAutoMarshallingJson<ObjectMapper> {
+    private val kotlinModule = KotlinModule()
 
-object Jackson : ConfigurableJackson(ObjectMapper()
-    .registerModule(defaultKotlinModuleWithHttp4kSerialisers)
-    .disableDefaultTyping()
-    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .configure(FAIL_ON_IGNORED_PROPERTIES, false)
-    .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
-    .configure(USE_BIG_INTEGER_FOR_INTS, true)
-)
-
-inline fun <reified T> KotlinModule.custom(mapping: BiDiMapping<T>) =
-    apply {
-        addDeserializer(T::class.java, object : JsonDeserializer<T>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)
-        })
-        addSerializer(T::class.java, object : JsonSerializer<T>() {
-            override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
-        })
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        kotlinModule.apply {
+            addDeserializer(mapping.clazz, object : JsonDeserializer<T>() {
+                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)
+            })
+            addSerializer(mapping.clazz, object : JsonSerializer<T>() {
+                override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
+            })
+        }
     }
+
+    override fun done(): ObjectMapper = ObjectMapper()
+        .registerModule(kotlinModule)
+        .disableDefaultTyping()
+        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(FAIL_ON_IGNORED_PROPERTIES, false)
+        .configure(USE_BIG_DECIMAL_FOR_FLOATS, true)
+        .configure(USE_BIG_INTEGER_FOR_INTS, true)
+}
+
+object Jackson : ConfigurableJackson(ConfigureJackson().withStandardMappings())

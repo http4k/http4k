@@ -13,19 +13,7 @@ import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
-import org.http4k.lens.duration
-import org.http4k.lens.instant
-import org.http4k.lens.localDate
-import org.http4k.lens.localDateTime
-import org.http4k.lens.localTime
-import org.http4k.lens.offsetDateTime
-import org.http4k.lens.offsetTime
-import org.http4k.lens.regexObject
 import org.http4k.lens.string
-import org.http4k.lens.uri
-import org.http4k.lens.url
-import org.http4k.lens.uuid
-import org.http4k.lens.zonedDateTime
 import org.http4k.websocket.WsMessage
 import kotlin.reflect.KClass
 
@@ -50,25 +38,23 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asJsonString(it) })
 }
 
-object Moshi : ConfigurableMoshi(Moshi.Builder()
-    .custom(BiDiMapping.duration())
-    .custom(BiDiMapping.uri())
-    .custom(BiDiMapping.url())
-    .custom(BiDiMapping.uuid())
-    .custom(BiDiMapping.regexObject())
-    .custom(BiDiMapping.instant())
-    .custom(BiDiMapping.localTime())
-    .custom(BiDiMapping.localDate())
-    .custom(BiDiMapping.localDateTime())
-    .custom(BiDiMapping.zonedDateTime())
-    .custom(BiDiMapping.offsetTime())
-    .custom(BiDiMapping.offsetDateTime())
-    .add(KotlinJsonAdapterFactory()))
+object Moshi : ConfigurableMoshi(ConfigureMoshi().withStandardMappings())
 
-inline fun <reified T> Builder.custom(mapping: BiDiMapping<T>): Builder = add(T::class.java, object : JsonAdapter<T>() {
-    override fun fromJson(reader: JsonReader) = mapping.read(reader.nextString())
+class ConfigureMoshi : ConfigureAutoMarshallingJson<Builder> {
+    private val builder = Moshi.Builder().add(KotlinJsonAdapterFactory())
 
-    override fun toJson(writer: JsonWriter, value: T?) {
-        value?.let { writer.value(mapping.write(it)) } ?: writer.nullValue()
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        println("registering " + mapping.clazz)
+        builder.add(mapping.clazz, object : JsonAdapter<T>() {
+            override fun fromJson(reader: JsonReader) = mapping.read(reader.nextString())
+
+            override fun toJson(writer: JsonWriter, value: T?) {
+                Thread.dumpStack()
+                println(mapping.clazz)
+                value?.let { writer.value(mapping.write(it)) } ?: writer.nullValue()
+            }
+        })
     }
-})
+
+    override fun done(): Builder = builder
+}

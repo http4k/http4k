@@ -20,8 +20,13 @@ import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
-data class BiDiMapping<T>(val read: (String) -> T, val write: (T) -> String = { it.toString() }) {
-    companion object
+/**
+ * A BiDiMapping defines a standardised transformation
+ */
+class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val read: (IN) -> OUT, val write: (OUT) -> IN) {
+    companion object {
+        inline operator fun <reified T> invoke(noinline read: (String) -> T, noinline write: (T) -> String) = BiDiMapping(T::class.java, read, write)
+    }
 }
 
 fun BiDiMapping.Companion.int() = BiDiMapping(String::toInt, kotlin.Int::toString)
@@ -29,14 +34,14 @@ fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, kotlin.Long::toSt
 fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, kotlin.Double::toString)
 fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, kotlin.Float::toString)
 fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, kotlin.Boolean::toString)
-fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ if (it.isEmpty()) throw IllegalArgumentException() else it })
-fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ matchEntire(it)?.groupValues?.get(group)!! }) }
+fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ if (it.isEmpty()) throw IllegalArgumentException() else it }, { it })
+fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ matchEntire(it)?.groupValues?.get(group)!! }, { it }) }
 fun BiDiMapping.Companion.regexObject() = BiDiMapping(::Regex, Regex::pattern)
 
-fun BiDiMapping.Companion.duration() = BiDiMapping(Duration::parse)
-fun BiDiMapping.Companion.uri() = BiDiMapping(Uri.Companion::of)
+fun BiDiMapping.Companion.duration() = BiDiMapping(Duration::parse, Duration::toString)
+fun BiDiMapping.Companion.uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
 fun BiDiMapping.Companion.url() = BiDiMapping(::URL, URL::toExternalForm)
-fun BiDiMapping.Companion.uuid() = BiDiMapping(UUID::fromString)
+fun BiDiMapping.Companion.uuid() = BiDiMapping(UUID::fromString, UUID::toString)
 
 fun BiDiMapping.Companion.instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
 fun BiDiMapping.Companion.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)

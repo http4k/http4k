@@ -13,7 +13,6 @@ import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.junit.jupiter.api.Test
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
-
     @Test
     fun ` roundtrip arbitary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
