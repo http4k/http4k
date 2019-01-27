@@ -99,13 +99,12 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
 
 fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder> {
-    override fun <T> text(mapping: BiDiMapping<String, T>) = this@asConfigurable.text(mapping)
-    override fun done(): GsonBuilder = this@asConfigurable
-}
-fun <T> GsonBuilder.text(mapping: BiDiMapping<String, T>) {
-    registerTypeAdapter(mapping.clazz, object : JsonSerializer<T>, JsonDeserializer<T> {
-        override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<T>, JsonDeserializer<T> {
+            override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
 
-        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asString)
-    })
+            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asString)
+        })
+    }
+    override fun done(): GsonBuilder = this@asConfigurable
 }
