@@ -38,53 +38,24 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
-    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = apply {
-        mapping.apply {
-            add(clazz, object : JsonAdapter<OUT>() {
-                override fun fromJson(reader: JsonReader) = read(reader.nextLong().toBigInteger())
+    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, { value(it) }, { nextLong().toBigInteger() })
+
+    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, { value(it) }, { nextDouble().toBigDecimal() })
+
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, { value(it) }, { nextBoolean() })
+
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, { value(it) }, { nextString() })
+
+    private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonWriter.(IN) -> Unit, read: JsonReader.() -> IN) =
+        apply {
+            add(mapping.clazz, object : JsonAdapter<OUT>() {
+                override fun fromJson(reader: JsonReader) = mapping.read(reader.read())
 
                 override fun toJson(writer: JsonWriter, value: OUT?) {
-                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
+                    value?.let { writer.write(mapping.write(it)) } ?: writer.nullValue()
                 }
             })
         }
-    }
-
-    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply {
-        mapping.apply {
-            add(clazz, object : JsonAdapter<OUT>() {
-                override fun fromJson(reader: JsonReader) = read(reader.nextDouble().toBigDecimal())
-
-                override fun toJson(writer: JsonWriter, value: OUT?) {
-                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
-                }
-            })
-        }
-    }
-
-    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = apply {
-        mapping.apply {
-            add(clazz, object : JsonAdapter<OUT>() {
-                override fun fromJson(reader: JsonReader) = read(reader.nextBoolean())
-
-                override fun toJson(writer: JsonWriter, value: OUT?) {
-                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
-                }
-            })
-        }
-    }
-
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply {
-        mapping.apply {
-            add(clazz, object : JsonAdapter<OUT>() {
-                override fun fromJson(reader: JsonReader) = read(reader.nextString())
-
-                override fun toJson(writer: JsonWriter, value: OUT?) {
-                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
-                }
-            })
-        }
-    }
 
     // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
     override fun done(): Moshi.Builder = this@asConfigurable.add(KotlinJsonAdapterFactory())
