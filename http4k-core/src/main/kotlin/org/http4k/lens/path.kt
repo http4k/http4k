@@ -7,15 +7,13 @@ import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.routing.path
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.util.UUID
 
 
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
@@ -97,19 +95,25 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.nonEmptyString() = map(::nonEmpty) { it }
-fun Path.int() = mapWithNewMeta(String::toInt, Int::toString, NumberParam)
-fun Path.long() = mapWithNewMeta(String::toLong, Long::toString, NumberParam)
-fun Path.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun Path.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun Path.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
-fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
-fun Path.instant() = map(Instant::parse, DateTimeFormatter.ISO_INSTANT::format)
-fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
-fun Path.uuid() = map(UUID::fromString, java.util.UUID::toString)
-fun Path.regex(pattern: String, group: Int = 1): PathLensSpec<String> = apply {
-    return with(pattern.toRegex()) {
-        map { matchEntire(it)?.groupValues?.get(group)!! }
-    }
-}
+fun Path.int() = mapWithNewMeta(BiDiMapping.int(), ParamMeta.IntegerParam)
+fun Path.long() = mapWithNewMeta(BiDiMapping.long(), ParamMeta.IntegerParam)
+fun Path.double() = mapWithNewMeta(BiDiMapping.double(), NumberParam)
+fun Path.float() = mapWithNewMeta(BiDiMapping.float(), NumberParam)
+fun Path.boolean() = mapWithNewMeta(BiDiMapping.boolean(), BooleanParam)
+fun Path.uuid() = map(BiDiMapping.uuid())
+fun Path.uri() = map(BiDiMapping.uri())
+fun Path.regex(pattern: String, group: Int = 1) = map(BiDiMapping.regex(pattern, group))
+fun Path.duration() = map(BiDiMapping.duration())
+fun Path.instant() = map(BiDiMapping.instant())
+fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(BiDiMapping.localDateTime(formatter))
+fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(BiDiMapping.zonedDateTime(formatter))
+fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(BiDiMapping.localDate(formatter))
+fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(BiDiMapping.localTime(formatter))
+fun Path.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(BiDiMapping.offsetTime(formatter))
+fun Path.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(BiDiMapping.offsetDateTime(formatter))
+
+internal fun <NEXT> BiDiPathLensSpec<String>.map(mapping: BiDiMapping<NEXT>) = map(
+    { mapping.read(it) }, { mapping.write(it) })
+
+internal fun <NEXT> BiDiPathLensSpec<String>.mapWithNewMeta(mapping: BiDiMapping<NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
+    { mapping.read(it) }, { mapping.write(it) }, paramMeta)

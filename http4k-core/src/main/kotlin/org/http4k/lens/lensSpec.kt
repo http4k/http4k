@@ -1,20 +1,15 @@
 package org.http4k.lens
 
-import org.http4k.core.Uri
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_INSTANT
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
+import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.util.UUID
 
 class LensGet<in IN, out OUT> private constructor(private val getFn: (String, IN) -> List<OUT>) {
     operator fun invoke(name: String) = { target: IN -> getFn(name, target) }
@@ -219,30 +214,27 @@ open class BiDiLensSpec<IN, OUT>(location: String,
 }
 
 fun <IN> BiDiLensSpec<IN, String>.string() = this
-fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = map(::nonEmpty) { it }
-fun <IN> BiDiLensSpec<IN, String>.int() = mapWithNewMeta(String::toInt, Int::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String>.long() = mapWithNewMeta(String::toLong, Long::toString, IntegerParam)
-fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(String::toDouble, Double::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(String::toFloat, Float::toString, NumberParam)
-fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(::safeBooleanFrom, Boolean::toString, BooleanParam)
-fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map({ LocalDate.parse(it, formatter) }, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.duration() = map({ Duration.parse(it) }, { it.toString() })
-fun <IN> BiDiLensSpec<IN, String>.instant() = map(Instant::parse, ISO_INSTANT::format)
-fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map({ LocalDateTime.parse(it, formatter) }, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map({ ZonedDateTime.parse(it, formatter) }, formatter::format)
-fun <IN> BiDiLensSpec<IN, String>.uuid() = map(UUID::fromString, java.util.UUID::toString)
-fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1): LensSpec<IN, String> =
-    pattern.toRegex().run {
-        map { matchEntire(it)?.groupValues?.get(group)!! }
-    }
+fun <IN> BiDiLensSpec<IN, String>.nonEmptyString() = map(BiDiMapping.nonEmptyString())
+fun <IN> BiDiLensSpec<IN, String>.int() = mapWithNewMeta(BiDiMapping.int(), IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.long() = mapWithNewMeta(BiDiMapping.long(), IntegerParam)
+fun <IN> BiDiLensSpec<IN, String>.double() = mapWithNewMeta(BiDiMapping.double(), NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.float() = mapWithNewMeta(BiDiMapping.float(), NumberParam)
+fun <IN> BiDiLensSpec<IN, String>.boolean() = mapWithNewMeta(BiDiMapping.boolean(), BooleanParam)
+fun <IN> BiDiLensSpec<IN, String>.uuid() = map(BiDiMapping.uuid())
+fun <IN> BiDiLensSpec<IN, String>.uri() = map(BiDiMapping.uri())
+fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1) = map(BiDiMapping.regex(pattern, group))
 
-fun <IN> BiDiLensSpec<IN, String>.uri() = map(Uri.Companion::of, Uri::toString)
+fun <IN> BiDiLensSpec<IN, String>.duration() = map(BiDiMapping.duration())
+fun <IN> BiDiLensSpec<IN, String>.instant() = map(BiDiMapping.instant())
+fun <IN> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(BiDiMapping.localDateTime(formatter))
+fun <IN> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(BiDiMapping.zonedDateTime(formatter))
+fun <IN> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(BiDiMapping.localDate(formatter))
+fun <IN> BiDiLensSpec<IN, String>.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(BiDiMapping.localTime(formatter))
+fun <IN> BiDiLensSpec<IN, String>.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(BiDiMapping.offsetTime(formatter))
+fun <IN> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(BiDiMapping.offsetDateTime(formatter))
 
-internal fun nonEmpty(value: String): String = if (value.isEmpty()) throw IllegalArgumentException() else value
+internal fun <NEXT, IN> BiDiLensSpec<IN, String>.mapWithNewMeta(mapping: BiDiMapping<NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
+    { mapping.read(it) }, { mapping.write(it) }, paramMeta)
 
-internal fun safeBooleanFrom(value: String): Boolean =
-    when {
-        value.toUpperCase() == "TRUE" -> true
-        value.toUpperCase() == "FALSE" -> false
-        else -> throw kotlin.IllegalArgumentException("illegal boolean")
-    }
+internal fun <NEXT, IN> BiDiLensSpec<IN, String>.map(mapping: BiDiMapping<NEXT>) = map(
+    { mapping.read(it) }, { mapping.write(it) })
