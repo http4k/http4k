@@ -25,7 +25,7 @@ import java.util.UUID
  */
 class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val read: (IN) -> OUT, val write: (OUT) -> IN) {
     companion object {
-        inline operator fun <reified T> invoke(noinline read: (String) -> T, noinline write: (T) -> String) = BiDiMapping(T::class.java, read, write)
+        inline operator fun <IN, reified T> invoke(noinline read: (IN) -> T, noinline write: (T) -> IN) = BiDiMapping(T::class.java, read, write)
     }
 }
 
@@ -34,8 +34,8 @@ fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, kotlin.Long::toSt
 fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, kotlin.Double::toString)
 fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, kotlin.Float::toString)
 fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, kotlin.Boolean::toString)
-fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ if (it.isEmpty()) throw IllegalArgumentException() else it }, { it })
-fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ matchEntire(it)?.groupValues?.get(group)!! }, { it }) }
+fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException() else s }, { it })
+fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
 fun BiDiMapping.Companion.regexObject() = BiDiMapping(::Regex, Regex::pattern)
 
 fun BiDiMapping.Companion.duration() = BiDiMapping(Duration::parse, Duration::toString)

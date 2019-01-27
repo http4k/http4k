@@ -13,15 +13,32 @@ import org.http4k.lens.uri
 import org.http4k.lens.url
 import org.http4k.lens.uuid
 import org.http4k.lens.zonedDateTime
+import java.math.BigDecimal
+import java.math.BigInteger
 
 /**
  * This is the main interface which should be
  */
 interface AutoMappingConfiguration<T> {
     /**
+     * Add a customised boolean <-> T mapping to this JSON instance.
+     */
+    fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>): AutoMappingConfiguration<T>
+
+    /**
+     * Add a customised number <-> T mapping to this JSON instance.
+     */
+    fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>): AutoMappingConfiguration<T>
+
+    /**
+     * Add a customised decimal <-> T mapping to this JSON instance.
+     */
+    fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>): AutoMappingConfiguration<T>
+
+    /**
      * Add a customised string <-> T mapping to this JSON instance.
      */
-    fun <T> text(mapping: BiDiMapping<String, T>)
+    fun <OUT> text(mapping: BiDiMapping<String, OUT>): AutoMappingConfiguration<T>
 
     /**
      * Finalise the mapping configurations.

@@ -5,6 +5,8 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
@@ -35,6 +37,10 @@ data class CommonJdkPrimitives(
 data class ArbObject(val string: String, val child: ArbObject?, val numbers: List<Int>, val bool: Boolean)
 
 data class RegexHolder(val regex: Regex)
+
+data class BooleanHolder(val value: Boolean)
+data class BigDecimalHolder(val value: BigDecimal)
+data class BigIntegerHolder(val value: BigInteger)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
@@ -85,4 +91,34 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         assertThat(out, equalTo("""{"regex":".*"}"""))
         assertThat(j.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
     }
+
+    @Test
+    fun `roundtrip custom number`() {
+        val json = customJson()
+
+        val wrapper = BigIntegerHolder(1.toBigInteger())
+        assertThat(json.asJsonString(wrapper), equalTo("1"))
+        assertThat(json.asA("1", BigIntegerHolder::class), equalTo(wrapper))
+    }
+
+    @Test
+    fun `roundtrip custom decimal`() {
+        val json = customJson()
+
+        val wrapper = BigDecimalHolder(1.01.toBigDecimal())
+        assertThat(json.asJsonString(wrapper), equalTo("1.01"))
+        assertThat(json.asA("1.01", BigDecimalHolder::class), equalTo(wrapper))
+    }
+
+    @Test
+    fun `roundtrip custom boolean`() {
+        val json = customJson()
+
+        val wrapper = BooleanHolder(true)
+        assertThat(json.asJsonString(wrapper), equalTo("true"))
+        assertThat(json.asA("true", BooleanHolder::class), equalTo(wrapper))
+    }
+
+    abstract fun customJson(): AutoMarshallingJson
+
 }

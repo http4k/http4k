@@ -13,6 +13,8 @@ import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.reflect.KClass
 
 open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
@@ -36,12 +38,48 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
-    override fun <T> text(mapping: BiDiMapping<String, T>) {
+    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = apply {
         mapping.apply {
-            add(clazz, object : JsonAdapter<T>() {
+            add(clazz, object : JsonAdapter<OUT>() {
+                override fun fromJson(reader: JsonReader) = read(reader.nextLong().toBigInteger())
+
+                override fun toJson(writer: JsonWriter, value: OUT?) {
+                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
+                }
+            })
+        }
+    }
+
+    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply {
+        mapping.apply {
+            add(clazz, object : JsonAdapter<OUT>() {
+                override fun fromJson(reader: JsonReader) = read(reader.nextDouble().toBigDecimal())
+
+                override fun toJson(writer: JsonWriter, value: OUT?) {
+                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
+                }
+            })
+        }
+    }
+
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = apply {
+        mapping.apply {
+            add(clazz, object : JsonAdapter<OUT>() {
+                override fun fromJson(reader: JsonReader) = read(reader.nextBoolean())
+
+                override fun toJson(writer: JsonWriter, value: OUT?) {
+                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
+                }
+            })
+        }
+    }
+
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply {
+        mapping.apply {
+            add(clazz, object : JsonAdapter<OUT>() {
                 override fun fromJson(reader: JsonReader) = read(reader.nextString())
 
-                override fun toJson(writer: JsonWriter, value: T?) {
+                override fun toJson(writer: JsonWriter, value: OUT?) {
                     value?.let { writer.value(write(it)) } ?: writer.nullValue()
                 }
             })

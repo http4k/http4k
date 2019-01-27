@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -10,6 +11,7 @@ import org.http4k.core.with
 import org.http4k.format.Gson.auto
 import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
 import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -36,6 +38,14 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     override fun `fails decoding when a required value is null`() {
     }
 
+    override fun customJson() = object : ConfigurableGson(
+        GsonBuilder()
+            .asConfigurable()
+            .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+            .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+            .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
+            .done()
+    ) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {

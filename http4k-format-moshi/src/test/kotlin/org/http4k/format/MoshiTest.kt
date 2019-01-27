@@ -7,6 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Test
 
 class MoshiAutoTest : AutoMarshallingContract(Moshi) {
@@ -37,4 +38,13 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
         val expected = arrayOf(obj)
         assertThat(actual.toList().toString(), actual.toList(), equalTo(expected.toList()))
     }
+
+    override fun customJson() = object : ConfigurableMoshi(
+        com.squareup.moshi.Moshi.Builder()
+            .asConfigurable()
+            .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+            .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+            .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
+            .done()
+    ) {}
 }

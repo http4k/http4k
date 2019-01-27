@@ -1,6 +1,7 @@
 package org.http4k.format
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
@@ -10,9 +11,11 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
 import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
+import org.http4k.lens.BiDiMapping
 import org.junit.jupiter.api.Test
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
+
     @Test
     fun ` roundtrip arbitary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
@@ -28,6 +31,15 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
         assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(arrayOf(obj).toList()))
     }
+
+    override fun customJson() = object : ConfigurableJackson(
+        KotlinModule()
+            .asConfigurable()
+            .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+            .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+            .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
+            .done()
+    ) {}
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {
