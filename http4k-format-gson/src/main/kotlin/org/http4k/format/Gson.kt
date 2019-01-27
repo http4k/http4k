@@ -126,7 +126,7 @@ object Gson : ConfigurableGson(GsonBuilder()
     .custom(BiDiMapping.offsetDateTime())
     .serializeNulls())
 
-private inline fun <reified T> GsonBuilder.custom(mapping: BiDiMapping<T>): GsonBuilder = registerTypeAdapter(T::class.java, object : JsonSerializer<T>, JsonDeserializer<T> {
+inline fun <reified T> GsonBuilder.custom(mapping: BiDiMapping<T>): GsonBuilder = registerTypeAdapter(T::class.java, object : JsonSerializer<T>, JsonDeserializer<T> {
     override fun serialize(src: T, typeOfSrc: Type, context: JsonSerializationContext): JsonElement = JsonPrimitive(mapping.write(src))
 
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): T = mapping.read(json.asString)

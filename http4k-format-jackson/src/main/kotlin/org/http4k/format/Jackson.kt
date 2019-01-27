@@ -125,7 +125,7 @@ object Jackson : ConfigurableJackson(ObjectMapper()
     .configure(USE_BIG_INTEGER_FOR_INTS, true)
 )
 
-private inline fun <reified T> KotlinModule.custom(mapping: BiDiMapping<T>) =
+inline fun <reified T> KotlinModule.custom(mapping: BiDiMapping<T>) =
     apply {
         addDeserializer(T::class.java, object : JsonDeserializer<T>() {
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)

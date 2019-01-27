@@ -1,10 +1,10 @@
 package org.http4k.format
 
-import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
-import com.squareup.moshi.ToJson
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -65,10 +65,10 @@ object Moshi : ConfigurableMoshi(Moshi.Builder()
     .custom(BiDiMapping.offsetDateTime())
     .add(KotlinJsonAdapterFactory()))
 
-private inline fun <reified T> Builder.custom(mapping: BiDiMapping<T>): Builder = add(object {
-    @FromJson
-    fun read(t: String): T = mapping.read(t)
+inline fun <reified T> Builder.custom(mapping: BiDiMapping<T>): Builder = add(T::class.java, object : JsonAdapter<T>() {
+    override fun fromJson(reader: JsonReader) = mapping.read(reader.nextString())
 
-    @ToJson
-    fun write(t: T): String = mapping.write(t)
+    override fun toJson(writer: JsonWriter, value: T?) {
+        value?.let { writer.value(mapping.write(it)) } ?: writer.nullValue()
+    }
 })
