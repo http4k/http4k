@@ -17,19 +17,22 @@ import org.http4k.lens.zonedDateTime
 /**
  * This is the main interface which should be
  */
-interface ConfigureAutoMarshallingJson<T> {
+interface AutoMappingConfiguration<T> {
     /**
      * Add a customised string <-> T mapping to this JSON instance.
      */
     fun <T> text(mapping: BiDiMapping<String, T>)
 
+    /**
+     * Finalise the mapping configurations.
+     */
     fun done(): T
 }
 
 /**
  * This is the set of (additional) standardised string <-> type mappings which http4k supports out of the box.
  */
-fun <T> ConfigureAutoMarshallingJson<T>.withStandardMappings(): T = apply {
+fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(BiDiMapping.duration())
     text(BiDiMapping.uri())
     text(BiDiMapping.url())
@@ -42,4 +45,4 @@ fun <T> ConfigureAutoMarshallingJson<T>.withStandardMappings(): T = apply {
     text(BiDiMapping.zonedDateTime())
     text(BiDiMapping.offsetTime())
     text(BiDiMapping.offsetDateTime())
-}.done()
+}

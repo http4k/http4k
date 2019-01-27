@@ -4,6 +4,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLensSpec
@@ -34,14 +35,19 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.string().map({ it.asA(T::class) }, { asJsonString(it) })
 }
 
-fun <T> Moshi.Builder.text(mapping: BiDiMapping<String, T>) {
-    mapping.apply {
-        add(clazz, object : JsonAdapter<T>() {
-            override fun fromJson(reader: JsonReader) = read(reader.nextString())
+fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        mapping.apply {
+            add(clazz, object : JsonAdapter<T>() {
+                override fun fromJson(reader: JsonReader) = read(reader.nextString())
 
-            override fun toJson(writer: JsonWriter, value: T?) {
-                value?.let { writer.value(write(it)) } ?: writer.nullValue()
-            }
-        })
+                override fun toJson(writer: JsonWriter, value: T?) {
+                    value?.let { writer.value(write(it)) } ?: writer.nullValue()
+                }
+            })
+        }
     }
+
+    // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
+    override fun done(): Moshi.Builder = this@asConfigurable.add(KotlinJsonAdapterFactory())
 }

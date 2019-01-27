@@ -1,18 +1,14 @@
 package org.http4k.format
 
 import com.google.gson.GsonBuilder
-import org.http4k.lens.BiDiMapping
 
 /**
- * To implement custom JSON configuration, copy and modify this file
+ * To implement custom JSON configuration, create your own object singleton. Extra mappings can be added before done() is called.
  */
-
-object Gson : ConfigurableGson(ConfigureGsonBuilder().withStandardMappings())
-
-class ConfigureGsonBuilder : ConfigureAutoMarshallingJson<GsonBuilder> {
-    private val builder = GsonBuilder().serializeNulls()
-
-    override fun <T> text(mapping: BiDiMapping<String, T>) = builder.text(mapping)
-
-    override fun done(): GsonBuilder = builder
-}
+object Gson : ConfigurableGson(
+    GsonBuilder()
+        .serializeNulls()
+        .asConfigurable()
+        .withStandardMappings()
+        .done()
+)

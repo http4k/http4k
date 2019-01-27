@@ -86,11 +86,15 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 }
 
-fun <T> KotlinModule.text(mapping: BiDiMapping<String, T>) {
-    addDeserializer(mapping.clazz, object : JsonDeserializer<T>() {
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)
-    })
-    addSerializer(mapping.clazz, object : JsonSerializer<T>() {
-        override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
-    })
+fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapper> {
+    override fun <T> text(mapping: BiDiMapping<String, T>) {
+        addDeserializer(mapping.clazz, object : JsonDeserializer<T>() {
+            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T = mapping.read(p.text)
+        })
+        addSerializer(mapping.clazz, object : JsonSerializer<T>() {
+            override fun serialize(value: T?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
+        })
+    }
+
+    override fun done(): ObjectMapper = ObjectMapper().registerModule(this@asConfigurable)
 }
