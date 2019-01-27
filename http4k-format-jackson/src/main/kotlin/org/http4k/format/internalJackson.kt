@@ -87,41 +87,23 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 }
 
 fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapper> {
-    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = apply {
-        addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.bigIntegerValue)
-        })
-        addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value))
-        })
-    }
+    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = convert(mapping, JsonGenerator::writeNumber, JsonParser::getBigIntegerValue)
 
-    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply {
-        addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.decimalValue)
-        })
-        addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value))
-        })
-    }
+    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = convert(mapping, JsonGenerator::writeNumber, JsonParser::getDecimalValue)
 
-    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = apply {
-        addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.booleanValue)
-        })
-        addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeBoolean(mapping.write(value))
-        })
-    }
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = convert(mapping, JsonGenerator::writeBoolean, JsonParser::getBooleanValue)
 
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply {
-        addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-            override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.text)
-        })
-        addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value))
-        })
-    }
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = convert(mapping, JsonGenerator::writeString, JsonParser::getText)
+
+    private fun <IN, OUT> convert(mapping: BiDiMapping<IN, OUT>, write: JsonGenerator.(IN) -> Unit, read: JsonParser.() -> IN): AutoMappingConfiguration<ObjectMapper> =
+        apply {
+            addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
+                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.read())
+            })
+            addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
+                override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.write(mapping.write(value))
+            })
+        }
 
     override fun done(): ObjectMapper = ObjectMapper().registerModule(this@asConfigurable)
 }
