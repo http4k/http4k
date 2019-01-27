@@ -92,7 +92,7 @@ fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapp
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.bigIntegerValue)
         })
         addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value!!))
+            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value))
         })
     }
 
@@ -101,7 +101,7 @@ fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapp
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.decimalValue)
         })
         addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value!!))
+            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeNumber(mapping.write(value))
         })
     }
 
@@ -110,7 +110,7 @@ fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapp
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.booleanValue)
         })
         addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeBoolean(mapping.write(value!!))
+            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeBoolean(mapping.write(value))
         })
     }
 
@@ -119,7 +119,7 @@ fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapp
             override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.read(p.text)
         })
         addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-            override fun serialize(value: OUT?, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value!!))
+            override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.writeString(mapping.write(value))
         })
     }
 
