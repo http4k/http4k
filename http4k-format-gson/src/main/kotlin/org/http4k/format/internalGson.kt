@@ -99,37 +99,22 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
 
 fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder> {
-    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = apply {
-        this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
-            override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
+    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBoolean)
 
-            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asBoolean)
-        })
-    }
+    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigInteger)
 
-    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = apply {
-        this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
-            override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
+    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigDecimal)
 
-            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asBigInteger)
-        })
-    }
+    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsString)
 
-    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = apply {
-        this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
-            override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
+    private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, asPrimitive: IN.() -> JsonPrimitive, value: JsonElement.() -> IN) =
+        apply {
+            this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
+                override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = mapping.map(src).asPrimitive()
 
-            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asBigDecimal)
-        })
-    }
-
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = apply {
-        this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
-            override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = JsonPrimitive(mapping.write(src))
-
-            override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.read(json.asString)
-        })
-    }
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.map(json.value())
+            })
+        }
 
     override fun done(): GsonBuilder = this@asConfigurable
 }

@@ -21,19 +21,25 @@ import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 import java.util.UUID
 
 /**
- * A BiDiMapping defines a standardised transformation
+ * A BiDiMapping defines a reusable bidirectional transformation between an input and output type
  */
-class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val read: (IN) -> OUT, val write: (OUT) -> IN) {
+class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, private val asOut: (IN) -> OUT, private val asIn: (OUT) -> IN) {
+    @JvmName("mapIn")
+    fun map(out: OUT): IN = asIn(out)
+
+    @JvmName("mapOut")
+    fun map(asIn: IN): OUT = asOut(asIn)
+
     companion object {
         inline operator fun <IN, reified T> invoke(noinline read: (IN) -> T, noinline write: (T) -> IN) = BiDiMapping(T::class.java, read, write)
     }
 }
 
-fun BiDiMapping.Companion.int() = BiDiMapping(String::toInt, kotlin.Int::toString)
-fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, kotlin.Long::toString)
-fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, kotlin.Double::toString)
-fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, kotlin.Float::toString)
-fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, kotlin.Boolean::toString)
+fun BiDiMapping.Companion.int() = BiDiMapping(String::toInt, Int::toString)
+fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, Long::toString)
+fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, Double::toString)
+fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, Float::toString)
+fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, Boolean::toString)
 fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException() else s }, { it })
 fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
 fun BiDiMapping.Companion.regexObject() = BiDiMapping(::Regex, Regex::pattern)
@@ -55,5 +61,5 @@ internal fun safeBooleanFrom(value: String): Boolean =
     when {
         value.toUpperCase() == "TRUE" -> true
         value.toUpperCase() == "FALSE" -> false
-        else -> throw kotlin.IllegalArgumentException("illegal boolean")
+        else -> throw IllegalArgumentException("illegal boolean")
     }
