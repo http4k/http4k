@@ -41,7 +41,7 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 object Moshi : ConfigurableMoshi(ConfigureMoshi().withStandardMappings())
 
 class ConfigureMoshi : ConfigureAutoMarshallingJson<Builder> {
-    private val builder = Moshi.Builder().add(KotlinJsonAdapterFactory())
+    private val builder = Moshi.Builder()
 
     override fun <T> text(mapping: BiDiMapping<String, T>) {
         println("registering " + mapping.clazz)
@@ -56,5 +56,6 @@ class ConfigureMoshi : ConfigureAutoMarshallingJson<Builder> {
         })
     }
 
-    override fun done(): Builder = builder
+    // add the Kotlin adapter last, as it will hjiack our custom mappings otherwise
+    override fun done(): Builder = builder.add(KotlinJsonAdapterFactory())
 }
