@@ -12,9 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.DebuggingFilters
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.hamkrest.hasBody
@@ -299,8 +297,8 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
             "}"
 
     private fun rpcRequestWithBody(body: String): Response =
-        DebuggingFilters.PrintRequest().then(rpc).invoke(Request(POST, "/rpc")
-        .with(Body.string(APPLICATION_JSON).toLens() of body))
+        rpc(Request(POST, "/rpc")
+            .with(Body.string(APPLICATION_JSON).toLens() of body))
 
     protected fun hasSuccessResponse(result: String, id: String): Matcher<Response> =
         hasResponse(Success(result, id))
