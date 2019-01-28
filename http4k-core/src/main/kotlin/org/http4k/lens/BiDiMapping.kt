@@ -41,29 +41,34 @@ class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val as
     }
 }
 
-fun BiDiMapping.Companion.int() = BiDiMapping(String::toInt, Int::toString)
-fun BiDiMapping.Companion.long() = BiDiMapping(String::toLong, Long::toString)
-fun BiDiMapping.Companion.double() = BiDiMapping(String::toDouble, Double::toString)
-fun BiDiMapping.Companion.float() = BiDiMapping(String::toFloat, Float::toString)
-fun BiDiMapping.Companion.bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
-fun BiDiMapping.Companion.bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
-fun BiDiMapping.Companion.boolean() = BiDiMapping(::safeBooleanFrom, Boolean::toString)
-fun BiDiMapping.Companion.nonEmptyString() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException() else s }, { it })
-fun BiDiMapping.Companion.regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
-fun BiDiMapping.Companion.regexObject() = BiDiMapping(::Regex, Regex::pattern)
+/**
+ * A set of standardised String <-> Type conversions which are used throughout http4k
+ */
+object StringBiDiMappings {
+    fun int() = BiDiMapping(String::toInt, Int::toString)
+    fun long() = BiDiMapping(String::toLong, Long::toString)
+    fun double() = BiDiMapping(String::toDouble, Double::toString)
+    fun float() = BiDiMapping(String::toFloat, Float::toString)
+    fun bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
+    fun bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
+    fun boolean() = BiDiMapping(::safeBooleanFrom, Boolean::toString)
+    fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException() else s }, { it })
+    fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
+    fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
 
-fun BiDiMapping.Companion.duration() = BiDiMapping(Duration::parse, Duration::toString)
-fun BiDiMapping.Companion.uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
-fun BiDiMapping.Companion.url() = BiDiMapping(::URL, URL::toExternalForm)
-fun BiDiMapping.Companion.uuid() = BiDiMapping(UUID::fromString, UUID::toString)
+    fun duration() = BiDiMapping(Duration::parse, Duration::toString)
+    fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
+    fun url() = BiDiMapping(::URL, URL::toExternalForm)
+    fun uuid() = BiDiMapping(UUID::fromString, UUID::toString)
 
-fun BiDiMapping.Companion.instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
-fun BiDiMapping.Companion.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
-fun BiDiMapping.Companion.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)
-fun BiDiMapping.Companion.localDateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = BiDiMapping({ LocalDateTime.parse(it, formatter) }, formatter::format)
-fun BiDiMapping.Companion.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
-fun BiDiMapping.Companion.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
-fun BiDiMapping.Companion.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+    fun instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
+    fun localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
+    fun localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)
+    fun localDateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = BiDiMapping({ LocalDateTime.parse(it, formatter) }, formatter::format)
+    fun zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
+    fun offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
+    fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+}
 
 internal fun safeBooleanFrom(value: String): Boolean =
     when {

@@ -12,7 +12,7 @@ import org.http4k.format.Jackson.auto
 import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
 import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.http4k.lens.BiDiMapping
-import org.http4k.lens.bigDecimal
+import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Test
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
@@ -39,7 +39,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
             .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
             .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
-            .text(BiDiMapping.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
+            .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
     ) {}
 }

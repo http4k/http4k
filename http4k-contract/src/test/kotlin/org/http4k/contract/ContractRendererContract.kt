@@ -37,8 +37,6 @@ import org.http4k.routing.bind
 import org.junit.jupiter.api.Test
 
 abstract class ContractRendererContract(private val renderer: ContractRenderer) {
-    fun name(): String = this.javaClass.simpleName
-
     @Test
     fun `can build 400`() {
         val response = renderer.badRequest(listOf(

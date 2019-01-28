@@ -8,7 +8,7 @@ import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Moshi.auto
 import org.http4k.lens.BiDiMapping
-import org.http4k.lens.bigDecimal
+import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Test
 
 class MoshiAutoTest : AutoMarshallingContract(Moshi) {
@@ -46,7 +46,7 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
             .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
             .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
-            .text(BiDiMapping.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
+            .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
     ) {}
 }
