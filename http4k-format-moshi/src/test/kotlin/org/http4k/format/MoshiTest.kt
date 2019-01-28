@@ -43,8 +43,8 @@ class MoshiAutoTest : AutoMarshallingContract(Moshi) {
     override fun customJson() = object : ConfigurableMoshi(
         com.squareup.moshi.Moshi.Builder()
             .asConfigurable()
-            .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
-            .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+            .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+            .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
             .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()

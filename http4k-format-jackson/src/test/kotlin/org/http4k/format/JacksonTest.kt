@@ -36,8 +36,8 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
     override fun customJson() = object : ConfigurableJackson(
         KotlinModule()
             .asConfigurable()
-            .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
-            .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+            .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+            .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
             .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
