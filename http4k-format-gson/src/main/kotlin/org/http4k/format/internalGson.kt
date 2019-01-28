@@ -99,12 +99,12 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
 
 fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder> {
+    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsInt)
+    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsLong)
+    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsDouble)
     override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBoolean)
-
-    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigInteger)
-
-    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigDecimal)
-
+    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigInteger)
+    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsBigDecimal)
     override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsString)
 
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, asPrimitive: IN.() -> JsonPrimitive, value: JsonElement.() -> IN) =

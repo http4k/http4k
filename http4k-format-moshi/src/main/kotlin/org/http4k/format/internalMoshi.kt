@@ -38,12 +38,12 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 }
 
 fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Builder> {
-    override fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, { value(it) }, { nextLong().toBigInteger() })
-
-    override fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, { value(it) }, { nextDouble().toBigDecimal() })
-
+    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, { value(it) }, { nextInt() })
+    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, { value(it) }, { nextLong() })
+    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, { value(it) }, { nextDouble() })
+    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, { value(it) }, { nextLong().toBigInteger() })
+    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, { value(it) }, { nextDouble().toBigDecimal() })
     override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, { value(it) }, { nextBoolean() })
-
     override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, { value(it) }, { nextString() })
 
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonWriter.(IN) -> Unit, read: JsonReader.() -> IN) =

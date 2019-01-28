@@ -6,27 +6,16 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
- * This is the main interface which should be
+ * This is the generic interface used to configure auto-mapping functionality for message format libraries.
+ * The various methods here can be used to provide custom mapping behaviour (say for domain classes).
  */
 interface AutoMappingConfiguration<T> {
-    /**
-     * Add a customised boolean <-> T mapping to this JSON instance.
-     */
     fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>): AutoMappingConfiguration<T>
-
-    /**
-     * Add a customised number <-> T mapping to this JSON instance.
-     */
-    fun <OUT> number(mapping: BiDiMapping<BigInteger, OUT>): AutoMappingConfiguration<T>
-
-    /**
-     * Add a customised decimal <-> T mapping to this JSON instance.
-     */
-    fun <OUT> decimal(mapping: BiDiMapping<BigDecimal, OUT>): AutoMappingConfiguration<T>
-
-    /**
-     * Add a customised string <-> T mapping to this JSON instance.
-     */
+    fun <OUT> int(mapping: BiDiMapping<Int, OUT>): AutoMappingConfiguration<T>
+    fun <OUT> long(mapping: BiDiMapping<Long, OUT>): AutoMappingConfiguration<T>
+    fun <OUT> double(mapping: BiDiMapping<Double, OUT>): AutoMappingConfiguration<T>
+    fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>): AutoMappingConfiguration<T>
+    fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>): AutoMappingConfiguration<T>
     fun <OUT> text(mapping: BiDiMapping<String, OUT>): AutoMappingConfiguration<T>
 
     /**
