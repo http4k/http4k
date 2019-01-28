@@ -40,11 +40,11 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                                                              noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                 handler(paramsFieldNames, Mapping { json.asA(it, IN::class) }, Mapping { json.asJsonObject(it) }, fn)
 
-            inline fun <reified IN : Any, OUT : Any> handler(noinline block: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
-                handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), block)
+            inline fun <reified IN : Any, OUT : Any> handler(noinline fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+                handler(IN::class.javaObjectType.declaredFields.map { it.name }.toSet(), fn)
 
-            fun <OUT : Any> handler(block: () -> OUT): JsonRpcHandler<NODE, NODE> =
-                handler(Mapping { json.asJsonObject(it) }, block)
+            fun <OUT : Any> handler(fn: () -> OUT): JsonRpcHandler<NODE, NODE> =
+                handler(Mapping { json.asJsonObject(it) }, fn)
         }
     }
 }

@@ -43,6 +43,7 @@ nav:
       - Typesafe contracts: guide/modules/contracts/index.md
       - OAuth: guide/modules/oauth/index.md
       - Cloud native: guide/modules/cloud_native/index.md
+      - JSON RPC: guide/modules/jspnrpc/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
