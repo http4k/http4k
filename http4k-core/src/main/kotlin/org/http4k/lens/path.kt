@@ -4,6 +4,7 @@ import org.http4k.core.Request
 import org.http4k.core.fromFormEncoded
 import org.http4k.core.toPathEncoded
 import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.routing.path
@@ -95,10 +96,12 @@ object Path : BiDiPathLensSpec<String>(StringParam,
 }
 
 fun Path.string() = this
-fun Path.int() = mapWithNewMeta(BiDiMapping.int(), ParamMeta.IntegerParam)
-fun Path.long() = mapWithNewMeta(BiDiMapping.long(), ParamMeta.IntegerParam)
+fun Path.int() = mapWithNewMeta(BiDiMapping.int(), IntegerParam)
+fun Path.long() = mapWithNewMeta(BiDiMapping.long(), IntegerParam)
 fun Path.double() = mapWithNewMeta(BiDiMapping.double(), NumberParam)
 fun Path.float() = mapWithNewMeta(BiDiMapping.float(), NumberParam)
+fun Path.bigInteger() = mapWithNewMeta(BiDiMapping.bigInteger(), IntegerParam)
+fun Path.bigDecimal() = mapWithNewMeta(BiDiMapping.bigDecimal(), NumberParam)
 fun Path.boolean() = mapWithNewMeta(BiDiMapping.boolean(), BooleanParam)
 fun Path.uuid() = map(BiDiMapping.uuid())
 fun Path.uri() = map(BiDiMapping.uri())
@@ -113,7 +116,7 @@ fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(BiDiMapp
 fun Path.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(BiDiMapping.offsetTime(formatter))
 fun Path.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(BiDiMapping.offsetDateTime(formatter))
 
-internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::map, mapping::map)
+internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-    mapping::map, mapping::map, paramMeta)
+    mapping::invoke, mapping::invoke, paramMeta)

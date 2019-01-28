@@ -49,10 +49,10 @@ fun Moshi.Builder.asConfigurable() = object : AutoMappingConfiguration<Moshi.Bui
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonWriter.(IN) -> Unit, read: JsonReader.() -> IN) =
         apply {
             add(mapping.clazz, object : JsonAdapter<OUT>() {
-                override fun fromJson(reader: JsonReader) = mapping.map(reader.read())
+                override fun fromJson(reader: JsonReader) = mapping.invoke(reader.read())
 
                 override fun toJson(writer: JsonWriter, value: OUT?) {
-                    value?.let { writer.write(mapping.map(it)) } ?: writer.nullValue()
+                    value?.let { writer.write(mapping(it)) } ?: writer.nullValue()
                 }
             })
         }

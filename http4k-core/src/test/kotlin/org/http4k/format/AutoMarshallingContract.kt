@@ -41,6 +41,8 @@ data class RegexHolder(val regex: Regex)
 data class BooleanHolder(val value: Boolean)
 data class BigDecimalHolder(val value: BigDecimal)
 data class BigIntegerHolder(val value: BigInteger)
+data class MappedBigDecimalHolder(val value: BigDecimal)
+data class HolderHolder(val value: MappedBigDecimalHolder)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
@@ -99,6 +101,15 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val wrapper = BigIntegerHolder(1.toBigInteger())
         assertThat(json.asJsonString(wrapper), equalTo("1"))
         assertThat(json.asA("1", BigIntegerHolder::class), equalTo(wrapper))
+    }
+
+    @Test
+    fun `roundtrip custom mapped number`() {
+        val json = customJson()
+
+        val wrapper = HolderHolder(MappedBigDecimalHolder(1.01.toBigDecimal()))
+        assertThat(json.asJsonString(wrapper), equalTo("""{"value":"1.01"}"""))
+        assertThat(json.asA("""{"value":"1.01"}""", HolderHolder::class), equalTo(wrapper))
     }
 
     @Test

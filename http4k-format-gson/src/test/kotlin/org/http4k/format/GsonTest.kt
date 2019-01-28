@@ -12,6 +12,7 @@ import org.http4k.format.Gson.auto
 import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
 import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.bigDecimal
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -44,6 +45,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
             .decimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
             .number(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
+            .text(BiDiMapping.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
             .done()
     ) {}
 }

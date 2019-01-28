@@ -7,6 +7,8 @@ import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -44,6 +46,12 @@ class BiDiLensSpecTest {
 
     @Test
     fun double() = checkContract(spec.double(), 123.0, "123.0", "", "invalid", "o", "o123.0", "o123.0123.0")
+
+    @Test
+    fun bigDecimal() = checkContract(spec.bigDecimal(), BigDecimal("123.0"), "123.0", "", "invalid", "o", "o123.0", "o123.0123.0")
+
+    @Test
+    fun bigInteger() = checkContract(spec.bigInteger(), BigInteger("123"), "123", "", "invalid", "o", "o123", "o123123")
 
     @Test
     fun `local date`() = checkContract(spec.localDate(), LocalDate.of(2001, 1, 1), "2001-01-01", "", "123", "o", "o2001-01-01", "o2001-01-012001-01-01")

@@ -110,9 +110,9 @@ fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder
     private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, asPrimitive: IN.() -> JsonPrimitive, value: JsonElement.() -> IN) =
         apply {
             this@asConfigurable.registerTypeAdapter(mapping.clazz, object : JsonSerializer<OUT>, JsonDeserializer<OUT> {
-                override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = mapping.map(src).asPrimitive()
+                override fun serialize(src: OUT, typeOfSrc: Type, context: JsonSerializationContext) = mapping(src).asPrimitive()
 
-                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.map(json.value())
+                override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext) = mapping.invoke(json.value())
             })
         }
 
