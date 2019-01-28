@@ -42,17 +42,25 @@ fun main() {
 
     val rpcHandler: HttpHandler = JsonRpc.auto(json, CounterErrorHandler) {
         method("increment", handler(counter::increment))
-        method("incrementDefinedFields", handler(setOf("value", "ignored"), counter::increment))
         method("current", handler(counter::currentValue))
     }
 
-    val request = """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": -1}, "id": 1} """
-
-    println(
-        rpcHandler(
-            Request(Method.POST, "/rpc")
-                .header("Content-Type", "application/json")
-                .body(request)
+    fun runRequest(s: String) {
+        println(
+            rpcHandler(
+                Request(Method.POST, "/rpc")
+                    .header("Content-Type", "application/json")
+                    .body(s)
+            )
         )
-    )
+    }
+
+    val increment = """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": 3}, "id": 1} """
+    runRequest(increment)
+
+    val incrementInvalid = """ {"jsonrpc": "2.0", "method": "increment", "params": {"value": -1}, "id": 2} """
+    runRequest(incrementInvalid)
+
+    val current = """ {"jsonrpc": "2.0", "method": "current", "id": 3} """
+    runRequest(current)
 }
