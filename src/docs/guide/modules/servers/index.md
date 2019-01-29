@@ -15,9 +15,13 @@ description: Feature overview of the http4k-server modules, covering Server back
 **SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.109.0"```
 
 ### About
-Server-backend modules provide a consistent API mount HttpHandlers into the specified container in 1 LOC, by simply passing a `ServerConfig` implementation (in this case `Jetty`):
+Server-backend modules provide a consistent API to mount HttpHandlers into the specified container in 1 LOC, by 
+simply passing it to the relevant `ServerConfig` implementation (in this case `Jetty`):
 
-```kotlin
-{ request: Request -> Response(OK).body("Hello World") }.asServer(Jetty(8000)).start().block()
-```
-Alternatively, all server-backend modules allow for plugging **http4k** handlers into the relevant server API, which allows for custom Server configuration.
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/servers/example_http.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/servers/example_http.kt"></script>
+
+### Customisation
+Each of the server backends implement an interface `ServerConfig`, which is written with sensible defaults for the server in questions, 
+but is also designed to be used as a starting point for tweaking to API user needs. To customize, simply use the relevant `ServerConfig` 
+class as a starting point and reimplement as required.
