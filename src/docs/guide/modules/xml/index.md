@@ -8,7 +8,7 @@ description: Feature overview of the http4k-format-xml module, which includes a 
 This module adds the ability to use XML as a first-class citizen when reading from and to HTTP messages. It also adds an 
 automarshalling facility to read XML node objects directly into a custom type which matches the schema:
 
-#### XML [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt)
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt"></script>
 
