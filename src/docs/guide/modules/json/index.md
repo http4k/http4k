@@ -1,5 +1,5 @@
 title: http4k Message Format Modules
-description: Feature overview of the http4k-format modules, including JSON and XML automarshalling
+description: Feature overview of the JSON http4k-format modules, several of which support automarshalling into data classes.
 
 ### Installation (Gradle)
 **Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "3.109.0"```
@@ -10,12 +10,10 @@ description: Feature overview of the http4k-format modules, including JSON and X
 
 **Moshi:** ```compile group: "org.http4k", name: "http4k-format-moshi", version: "3.109.0"```
 
-**Xml:** ```compile group: "org.http4k", name: "http4k-format-xml", version: "3.109.0"```
-
 ### About
-These modules add the ability to use JSON/XML as a first-class citizen when reading from and to HTTP messages. Each implementation adds a set of 
+These modules add the ability to use JSON as a first-class citizen when reading from and to HTTP messages. Each implementation adds a set of 
 standard methods and extension methods for converting common types into native JSON/XML objects, including custom Lens methods for each library so that 
-JSON/XML node objects can be written and read directly from HTTP messages:
+JSON node objects can be written and read directly from HTTP messages:
 
 #### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/example.kt)
 
@@ -31,11 +29,7 @@ We can use this facility in **http4k** to automatically marshall objects to/from
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoJson.kt"></script>
 
-#### XML [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt)
-
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/message_formats/autoXml.kt"></script>
-
-There is a utility to generate Kotlin code for JSON and XML data class code [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
+There is a utility to generate Kotlin data class code for JSON documents [here](http://http4k-data-class-gen.herokuapp.com) . These data classes are compatible with using the `Body.auto<T>()` functionality. 
 
 #### FAQ (aka gotchas) regarding Auto-marshalling capabilities
 
