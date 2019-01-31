@@ -1,4 +1,4 @@
-package guide.modules.message_formats
+package guide.modules.json
 
 import org.http4k.core.Body
 import org.http4k.core.Method

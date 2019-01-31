@@ -1,9 +1,9 @@
 package guide.modules.jsonrpc
 
-import guide.modules.message_formats.json
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.format.Jackson
 import org.http4k.format.Json
 import org.http4k.jsonrpc.ErrorHandler
 import org.http4k.jsonrpc.ErrorMessage
@@ -40,7 +40,7 @@ object CounterErrorHandler : ErrorHandler {
 fun main() {
     val counter = Counter()
 
-    val rpcHandler: HttpHandler = JsonRpc.auto(json, CounterErrorHandler) {
+    val rpcHandler: HttpHandler = JsonRpc.auto(Jackson, CounterErrorHandler) {
         method("increment", handler(counter::increment))
         method("current", handler(counter::currentValue))
     }

@@ -27,15 +27,18 @@ class RouteMetaDsl internal constructor() {
     internal val responses = Appendable<ResponseMeta>()
     var headers = Appendable<Lens<Request, *>>()
     var queries = Appendable<Lens<Request, *>>()
-    internal var body: BodyLens<*>? = null
+    internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
 
+    /**
+     * Add possible responses to this Route.
+     */
     @JvmName("returningResponse")
     fun returning(vararg descriptionToResponse: Pair<String, Response>) =
         descriptionToResponse.forEach { (description, status) -> returning(ResponseMeta(description, status)) }
 
     /**
-     * Add a possible response metadata to this Route
+     * Add possible response metadata to this Route.
      */
     @JvmName("returningResponseMeta")
     fun returning(vararg responseMetas: ResponseMeta) {
@@ -49,36 +52,45 @@ class RouteMetaDsl internal constructor() {
      * Add a possible response description/reason and status to this Route
      */
     @JvmName("returningStatus")
-    fun returning(vararg descriptionsToStatus: Pair<String, Status>) =
-        descriptionsToStatus.forEach { (d, status) -> returning(d to Response(status)) }
+    fun returning(vararg statusesToDescriptions: Pair<Status, String>) =
+        statusesToDescriptions.forEach { (status, d) -> returning(d to Response(status)) }
 
     /**
-     * Add possible response statuses to this Route
+     * Add possible response statuses to this Route with no example.
      */
     @JvmName("returningStatus")
     fun returning(vararg statuses: Status) = statuses.forEach { returning(ResponseMeta("", Response(it))) }
 
     /**
-     * Set the input body type for this request WITHOUT an example. Hence the content-type will be registered but no
-     * example schema will be generated.
+     * Add an example response (using a Lens and a value) to this Route. It is also possible to pass in the definitionId for this response body which
+     * will override the naturally generated one.
      */
-    fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
-        body = bodyLens
+    @JvmName("returningStatus")
+    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String = "", definitionId: String? = null) {
+        returning(ResponseMeta(description, Response(status).with(body.first of body.second), definitionId))
     }
 
     /**
      * Add an example request (using a Lens and a value) to this Route. It is also possible to pass in the definitionId for this request body which
      * will override the naturally generated one.
      */
-    fun <T> receiving(bodyToDefinitionId: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
-        body = bodyToDefinitionId.first
-        request = RequestMeta(Request(GET, "").with(bodyToDefinitionId.first of bodyToDefinitionId.second), definitionId)
+    fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
+        requestBody = body.first
+        request = RequestMeta(Request(GET, "").with(body.first of body.second), definitionId)
+    }
+
+    /**
+     * Set the input body type for this request WITHOUT an example. Hence the content-type will be registered but no
+     * example schema will be generated.
+     */
+    fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
+        requestBody = bodyLens
     }
 }
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), body, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, operationId
+        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, operationId
     )
 }
 

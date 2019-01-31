@@ -24,6 +24,12 @@ combined into `RouteModules`, which have the following features:
 
 When launched, OpenApi/Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
+#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt"></script>
+
+When launched, OpenApi/Swagger format documentation (including JSON schema models) can be found at the route of the module.
+
 For a more extended example, see the following example apps: 
 
 - [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
