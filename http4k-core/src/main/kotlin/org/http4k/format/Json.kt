@@ -70,7 +70,7 @@ interface Json<NODE> {
     fun <IN> BiDiLensSpec<IN, String>.json() = lens(this)
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
         httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
-            .map({ it.payload.asString() }, { it: String -> Body(it) })
+            .map({ it.payload.asString() }, { Body(it) })
             .map({ parse(it) }, { compact(it) })
 
     fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation)

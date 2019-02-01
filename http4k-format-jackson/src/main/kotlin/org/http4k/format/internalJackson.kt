@@ -18,10 +18,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
-import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -79,11 +81,22 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) =
+        Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
+
+    fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
+    fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
+
+    inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(description: String? = null,
+                                                                          contentNegotiation: ContentNegotiation = None) =
+        Body.string(APPLICATION_JSON, description, contentNegotiation).map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
+
+    inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
+        WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 }
 
 fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapper> {
