@@ -104,9 +104,6 @@ class PathTest {
     fun regex() = checkContract(Path.regex("v(\\d+)", 1), "v123", "123")
 
     @Test
-    fun `regex object`() = checkContract(Path.regexObject(), "v(\\d+)", "v(\\d+)".toRegex())
-
-    @Test
     fun boolean() {
         checkContract(Path.boolean(), "true", true)
         checkContract(Path.boolean(), "false", false)
