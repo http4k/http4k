@@ -19,6 +19,14 @@ interface AutoMappingConfiguration<T> {
     fun <OUT> text(mapping: BiDiMapping<String, OUT>): AutoMappingConfiguration<T>
 
     /**
+     * Prevent the unmarshalling of raw (unbounded) strings. Useful when we are taking data from the Internet and want
+     * to ensure that all inbound fields are represented by bounded or validated types.
+     */
+    fun prohibitStrings(): AutoMappingConfiguration<T> = text(BiDiMapping<String, String>({
+        throw IllegalArgumentException("Unmarshalling unbounded strings is prohibited")
+    }, { it }))
+
+    /**
      * Finalise the mapping configurations.
      */
     fun done(): T

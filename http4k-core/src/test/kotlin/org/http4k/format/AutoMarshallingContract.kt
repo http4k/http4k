@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -38,6 +39,7 @@ data class ArbObject(val string: String, val child: ArbObject?, val numbers: Lis
 
 data class RegexHolder(val regex: Regex)
 
+data class StringHolder(val value: String)
 data class BooleanHolder(val value: Boolean)
 data class BigDecimalHolder(val value: BigDecimal)
 data class BigIntegerHolder(val value: BigInteger)
@@ -128,6 +130,15 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val wrapper = BooleanHolder(true)
         assertThat(json.asJsonString(wrapper), equalTo("true"))
         assertThat(json.asA("true", BooleanHolder::class), equalTo(wrapper))
+    }
+
+    @Test
+    fun `prohibit strings`() {
+        val json = customJson()
+
+        assertThat(json.asJsonString(StringHolder("hello")), equalTo("""{"value":"hello"}"""))
+
+        assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws(isA<IllegalArgumentException>()))
     }
 
     abstract fun customJson(): AutoMarshallingJson

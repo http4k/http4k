@@ -42,6 +42,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     override fun customJson() = object : ConfigurableGson(
         GsonBuilder()
             .asConfigurable()
+            .prohibitStrings()
             .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
             .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))

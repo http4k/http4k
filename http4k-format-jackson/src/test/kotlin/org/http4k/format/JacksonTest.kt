@@ -70,6 +70,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
     override fun customJson() = object : ConfigurableJackson(
         KotlinModule()
             .asConfigurable()
+            .prohibitStrings()
             .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
             .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
             .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
