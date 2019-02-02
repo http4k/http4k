@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.112.0 (uncut)
+- Add support for prohibiting String unmarshalling in JSON auto-marshalling configuration
+
 ### v3.111.0
 - Add support for JSON views in `Jackson` module. H/T @xhanin for the donkey work.
 
