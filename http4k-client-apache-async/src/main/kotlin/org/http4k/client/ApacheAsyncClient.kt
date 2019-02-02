@@ -5,8 +5,13 @@ import org.apache.http.HttpResponse
 import org.apache.http.StatusLine
 import org.apache.http.client.config.CookieSpecs.IGNORE_COOKIES
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpHead
+import org.apache.http.client.methods.HttpOptions
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.client.methods.HttpTrace
 import org.apache.http.concurrent.FutureCallback
 import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.entity.ByteArrayEntity
@@ -17,6 +22,7 @@ import org.http4k.core.BodyMode
 import org.http4k.core.BodyMode.Memory
 import org.http4k.core.BodyMode.Stream
 import org.http4k.core.Headers
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -37,10 +43,10 @@ object ApacheAsyncClient {
             override fun close() = client.close()
 
             override fun invoke(request: Request, fn: (Response) -> Unit) {
-                client.execute(request.toApacheRequest(), object : FutureCallback<HttpResponse> {
+                client.execute(request.toApacheRequest(requestBodyMode), object : FutureCallback<HttpResponse> {
                     override fun cancelled() {}
 
-                    override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse())
+                    override fun completed(result: HttpResponse) = fn(result.toHttp4kResponse(responseBodyMode))
 
                     override fun failed(e: Exception) = fn(Response(when (e) {
                         is ConnectTimeoutException -> CLIENT_TIMEOUT
@@ -49,37 +55,49 @@ object ApacheAsyncClient {
                     }.toClientStatus(e)))
                 })
             }
+        }
+    }
+}
 
-            private fun HttpResponse.toHttp4kResponse(): Response =
-                Response(statusLine.toTarget()).headers(allHeaders.toTarget()).run {
-                    entity?.let { body(responseBodyMode(it.content)) } ?: this
-                }
+private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
+    .setDefaultRequestConfig(RequestConfig.custom()
+        .setRedirectsEnabled(false)
+        .setCookieSpec(IGNORE_COOKIES)
+        .build()).build().apply { start() }
 
-            private fun Request.toApacheRequest(): HttpRequestBase = object : HttpEntityEnclosingRequestBase() {
-                init {
-                    val request = this@toApacheRequest
-                    uri = URI(request.uri.toString())
-                    entity = when (requestBodyMode) {
-                        Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong()
-                            ?: -1)
-                        Memory -> ByteArrayEntity(request.body.payload.array())
-                    }
-                    request.headers.filter { !it.first.equals("content-length", true) }.map { addHeader(it.first, it.second) }
-                }
+private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
 
-                override fun getMethod(): String = this@toApacheRequest.method.name
-            }
+private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
 
-            private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
+private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
+    val request = this@toApacheRequest
+    val uri = URI(request.uri.toString())
 
-            private fun Array<Header>.toTarget(): Headers = listOf(*this.map { it.name to it.value }.toTypedArray())
+    val apacheRequest = when (method) {
+        Method.HEAD -> HttpHead(uri)
+        Method.GET -> HttpGet(uri)
+        Method.OPTIONS -> HttpOptions(uri)
+        Method.TRACE -> HttpTrace(uri)
+        Method.DELETE -> HttpDelete(uri)
+        else -> ApacheRequest(requestBodyMode, request)
+    }
+    request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
+    return apacheRequest
+}
 
+private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
+    init {
+        uri = URI(request.uri.toString())
+        entity = when (requestBodyMode) {
+            Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1)
+            Memory -> ByteArrayEntity(request.body.payload.array())
         }
     }
 
-    private fun defaultApacheAsyncHttpClient() = HttpAsyncClients.custom()
-        .setDefaultRequestConfig(RequestConfig.custom()
-            .setRedirectsEnabled(false)
-            .setCookieSpec(IGNORE_COOKIES)
-            .build()).build().apply { start() }
+    override fun getMethod() = request.method.name
 }
+
+private fun HttpResponse.toHttp4kResponse(responseBodyMode: BodyMode): Response =
+    Response(statusLine.toTarget()).headers(allHeaders.toTarget()).run {
+        entity?.let { body(responseBodyMode(it.content)) } ?: this
+    }
