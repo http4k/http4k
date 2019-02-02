@@ -56,32 +56,37 @@ object ApacheClient {
             Response(UNKNOWN_HOST.toClientStatus(e))
         }
     }
-}
 
-private fun defaultApacheHttpClient() = HttpClients.custom()
-    .setDefaultRequestConfig(RequestConfig.custom()
-        .setRedirectsEnabled(false)
-        .setCookieSpec(IGNORE_COOKIES)
-        .build()).build()
+    private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
+        val request = this@toApacheRequest
+        val uri = URI(request.uri.toString())
 
-private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
-
-private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
-
-private fun Request.toApacheRequest(requestBodyMode: BodyMode): HttpRequestBase {
-    val request = this@toApacheRequest
-    val uri = URI(request.uri.toString())
-
-    val apacheRequest = when (method) {
-        HEAD -> HttpHead(uri)
-        GET -> HttpGet(uri)
-        OPTIONS -> HttpOptions(uri)
-        TRACE -> HttpTrace(uri)
-        DELETE -> HttpDelete(uri)
-        else -> ApacheRequest(requestBodyMode, request)
+        val apacheRequest = when (method) {
+            HEAD -> HttpHead(uri)
+            GET -> HttpGet(uri)
+            OPTIONS -> HttpOptions(uri)
+            TRACE -> HttpTrace(uri)
+            DELETE -> HttpDelete(uri)
+            else -> ApacheRequest(requestBodyMode, request)
+        }
+        request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
+        return apacheRequest
     }
-    request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
-    return apacheRequest
+
+    private fun StatusLine.toTarget() = Status(statusCode, reasonPhrase)
+
+    private fun Array<Header>.toTarget(): Headers = listOf(*map { it.name to it.value }.toTypedArray())
+
+    private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
+        entity?.let { body(responseBodyMode(it.content)) } ?: this
+    }
+
+    private fun defaultApacheHttpClient() = HttpClients.custom()
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setRedirectsEnabled(false)
+            .setCookieSpec(IGNORE_COOKIES)
+            .build()).build()
+
 }
 
 private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpEntityEnclosingRequestBase() {
@@ -94,8 +99,4 @@ private class ApacheRequest(requestBodyMode: BodyMode, private val request: Requ
     }
 
     override fun getMethod() = request.method.name
-}
-
-private fun CloseableHttpResponse.toHttp4kResponse(responseBodyMode: BodyMode) = with(Response(statusLine.toTarget()).headers(allHeaders.toTarget())) {
-    entity?.let { body(responseBodyMode(it.content)) } ?: this
 }
