@@ -13,7 +13,11 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -55,6 +59,15 @@ class BiDiLensSpecTest {
 
     @Test
     fun `local date`() = checkContract(spec.localDate(), LocalDate.of(2001, 1, 1), "2001-01-01", "", "123", "o", "o2001-01-01", "o2001-01-012001-01-01")
+
+    @Test
+    fun `local time`() = checkContract(spec.localTime(), LocalTime.of(1, 1, 1), "01:01:01", "", "123", "o", "o01:01:01", "o01:01:0101:01:01")
+
+    @Test
+    fun `offset time`() = checkContract(spec.offsetTime(), OffsetTime.of(1, 1, 1, 0, ZoneOffset.UTC), "01:01:01Z", "", "123", "o", "o01:01:01Z", "o01:01:01Z01:01:01Z")
+
+    @Test
+    fun `offset date time`() = checkContract(spec.offsetDateTime(), OffsetDateTime.of(LocalDate.of(2001, 1, 1), LocalTime.of(1, 1, 1), ZoneOffset.UTC), "2001-01-01T01:01:01Z", "", "123", "o", "o2001-01-01T01:01:01Z", "o2001-01-01T01:01:01Z2001-01-01T01:01:01Z")
 
     @Test
     fun uuid() = checkContract(spec.uuid(), UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", "", "123", "o", "of5fc0a3f-ecb5-4ab3-bc75-185165dc4844", "of5fc0a3f-ecb5-4ab3-bc75-185165dc4844f5fc0a3f-ecb5-4ab3-bc75-185165dc4844")

@@ -16,12 +16,12 @@ object BiDiLensContract {
     },
         LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
-    fun <IN, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, s: IN, modifiedValue: IN, listModifiedValue: IN) {
+    fun <IN, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, unmodifiedValue: IN, modifiedValue: IN, listModifiedValue: IN) {
         //synonym methods
+        assertThat(spec.required("hello").inject(tValue, unmodifiedValue), equalTo(modifiedValue))
         assertThat(spec.required("hello").extract(validValue), equalTo(tValue))
-        assertThat(spec.required("hello").inject(tValue, s), equalTo(modifiedValue))
         assertThat(spec.required("hello")[validValue], equalTo(tValue))
-        assertThat(spec.required("hello").set(s, tValue), equalTo(modifiedValue))
+        assertThat(spec.required("hello").set(unmodifiedValue, tValue), equalTo(modifiedValue))
 
         val optionalLens = spec.optional("hello")
         assertThat(optionalLens(validValue), equalTo(tValue))
@@ -31,7 +31,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ optionalLens(invalidValue) }, throws(lensFailureWith(Invalid(optionalLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(optionalLens(tValue, s), equalTo(modifiedValue))
+        assertThat(optionalLens(tValue, unmodifiedValue), equalTo(modifiedValue))
 
         val optionalMultiLens = spec.multi.optional("hello")
         assertThat(optionalMultiLens(validValue), equalTo(listOf(tValue)))
@@ -40,7 +40,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ optionalMultiLens(invalidValue) }, throws(lensFailureWith(Invalid(optionalLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(optionalMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
+        assertThat(optionalMultiLens(listOf(tValue, tValue), unmodifiedValue), equalTo(listModifiedValue))
 
         val requiredLens = spec.required("hello")
         assertThat(requiredLens(validValue), equalTo(tValue))
@@ -49,7 +49,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ requiredLens(invalidValue) }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(requiredLens(tValue, s), equalTo(modifiedValue))
+        assertThat(requiredLens(tValue, unmodifiedValue), equalTo(modifiedValue))
 
         val requiredMultiLens = spec.multi.required("hello")
         assertThat(requiredMultiLens(validValue), equalTo(listOf(tValue)))
@@ -58,7 +58,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ requiredMultiLens(invalidValue) }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(requiredMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
+        assertThat(requiredMultiLens(listOf(tValue, tValue), unmodifiedValue), equalTo(listModifiedValue))
 
         val defaultedLens = spec.defaulted("hello", tValue)
         assertThat(defaultedLens(validValue), equalTo(tValue))
@@ -67,7 +67,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ defaultedLens(invalidValue) }, throws(lensFailureWith(Invalid(defaultedLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(defaultedLens(tValue, s), equalTo(modifiedValue))
+        assertThat(defaultedLens(tValue, unmodifiedValue), equalTo(modifiedValue))
 
         val defaultedMultiLens = spec.multi.defaulted("hello", listOf(tValue))
         assertThat(defaultedMultiLens(validValue), equalTo(listOf(tValue)))
@@ -76,7 +76,7 @@ object BiDiLensContract {
         invalidValue?.let {
             assertThat({ defaultedMultiLens(invalidValue) }, throws(lensFailureWith(Invalid(defaultedMultiLens.meta), overallType = Failure.Type.Invalid)))
         }
-        assertThat(defaultedMultiLens(listOf(tValue, tValue), s), equalTo(listModifiedValue))
+        assertThat(defaultedMultiLens(listOf(tValue, tValue), unmodifiedValue), equalTo(listModifiedValue))
     }
 }
 

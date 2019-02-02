@@ -11,9 +11,12 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.with
 import org.http4k.routing.RoutedRequest
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -77,37 +80,49 @@ class PathTest {
     }
 
     @Test
-    fun `int`() = checkContract(Path.int(), "123", 123)
+    fun int() = checkContract(Path.int(), "123", 123)
 
     @Test
-    fun `long`() = checkContract(Path.long(), "123", 123)
+    fun long() = checkContract(Path.long(), "123", 123)
 
     @Test
-    fun `float`() = checkContract(Path.float(), "123.0", 123f)
+    fun float() = checkContract(Path.float(), "123.0", 123f)
 
     @Test
-    fun `double`() = checkContract(Path.double(), "123.0", 123.0)
+    fun double() = checkContract(Path.double(), "123.0", 123.0)
 
     @Test
-    fun `local date`() = checkContract(Path.localDate(), "2001-01-01", LocalDate.of(2001, 1, 1))
+    fun bigInteger() = checkContract(Path.bigInteger(), "100", BigInteger.valueOf(100))
 
     @Test
-    fun `uuid`() = checkContract(Path.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
+    fun bigDecimal() = checkContract(Path.bigDecimal(), "100", BigDecimal(100))
 
     @Test
-    fun `regex`() = checkContract(Path.regex("v(\\d+)", 1), "v123", "123")
+    fun uuid() = checkContract(Path.uuid(), "f5fc0a3f-ecb5-4ab3-bc75-185165dc4844", UUID.fromString("f5fc0a3f-ecb5-4ab3-bc75-185165dc4844"))
 
     @Test
-    fun `boolean`() {
+    fun regex() = checkContract(Path.regex("v(\\d+)", 1), "v123", "123")
+
+    @Test
+    fun `regex object`() = checkContract(Path.regexObject(), "v(\\d+)", "v(\\d+)".toRegex())
+
+    @Test
+    fun boolean() {
         checkContract(Path.boolean(), "true", true)
         checkContract(Path.boolean(), "false", false)
     }
 
     @Test
-    fun `datetime`() = checkContract(Path.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
+    fun datetime() = checkContract(Path.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
 
     @Test
-    fun `instant`() = checkContract(Path.instant(), "1970-01-01T00:00:00Z", Instant.EPOCH)
+    fun instant() = checkContract(Path.instant(), "1970-01-01T00:00:00Z", Instant.EPOCH)
+
+    @Test
+    fun `local date`() = checkContract(Path.localDate(), "2001-01-01", LocalDate.of(2001, 1, 1))
+
+    @Test
+    fun `local time`() = checkContract(Path.localTime(), "01:01:01", LocalTime.of(1, 1, 1))
 
     @Test
     fun `zoned datetime`() = checkContract(Path.zonedDateTime(), "1970-01-01T00:00:00Z[UTC]", ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))

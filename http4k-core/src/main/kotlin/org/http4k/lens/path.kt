@@ -12,8 +12,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
-import java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
-import java.time.format.DateTimeFormatter.ISO_OFFSET_TIME
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
 
@@ -113,8 +111,6 @@ fun Path.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(Stri
 fun Path.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(StringBiDiMappings.zonedDateTime(formatter))
 fun Path.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(StringBiDiMappings.localDate(formatter))
 fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBiDiMappings.localTime(formatter))
-fun Path.offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = map(StringBiDiMappings.offsetTime(formatter))
-fun Path.offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = map(StringBiDiMappings.offsetDateTime(formatter))
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
