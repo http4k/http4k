@@ -1,6 +1,5 @@
 package org.http4k.util
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Jackson
@@ -30,7 +29,7 @@ class JsonToJsonSchemaTest {
         }
 
         val actual = JsonToJsonSchema(json).toSchema(model, "bob")
-        val expected: JsonNode = "JsonSchema_main.json".readResource().asJsonValue()
+        val expected = "JsonSchema_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
         val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
 //        println(json.pretty(obj(actual.definitions)))

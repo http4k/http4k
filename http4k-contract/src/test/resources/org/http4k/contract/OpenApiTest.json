@@ -346,7 +346,7 @@
           "403": {
             "description": "no way jose",
             "schema": {
-              "$ref": "#/definitions/object1283926341"
+              "$ref": "#/definitions/object-1662053258"
             }
           }
         },
@@ -366,7 +366,7 @@
     }
   },
   "definitions": {
-    "object1283926341": {
+    "object-1662053258": {
       "type": "object",
       "properties": {
         "aString": {
@@ -375,7 +375,7 @@
         }
       }
     },
-    "object-1365611171": {
+    "object1482787387": {
       "type": "object",
       "properties": {
         "aNumberField": {
@@ -388,7 +388,7 @@
       "type": "object",
       "properties": {
         "anAnotherObject": {
-          "$ref": "#/definitions/object-1365611171"
+          "$ref": "#/definitions/object1482787387"
         }
       }
     }
