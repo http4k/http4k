@@ -15,9 +15,9 @@ import java.time.ZoneId
  * This is an example implementation which stores CSRF and AccessTokenEnvelope values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
-open class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
-                                               private val cookieValidity: Duration = Duration.ofHours(1),
-                                               private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
+class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
+                                          private val cookieValidity: Duration = Duration.ofHours(1),
+                                          private val clock: Clock = Clock.systemUTC()) : OAuthPersistence {
 
     private val csrfName = "${cookieNamePrefix}Csrf"
 

@@ -16,9 +16,9 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.format.Argo
-import org.http4k.format.Argo.json
-import org.http4k.format.Argo.prettify
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.json
+import org.http4k.format.Jackson.prettify
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
@@ -85,7 +85,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             }
                 bindContract POST to { Response(OK) },
             "/body_json_schema" meta {
-                receiving(Body.json("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId")
+                receiving(Body.json("json").toLens() to Jackson { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId")
             }
                 bindContract POST to { Response(OK) },
             "/body_form" meta {
@@ -104,7 +104,7 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                 consumes += APPLICATION_FORM_URLENCODED
             } bindContract GET to { Response(OK) },
             "/returning" meta {
-                returning("no way jose" to Response(FORBIDDEN).with(customBody of Argo.obj("aString" to Argo.string("a message of some kind"))))
+                returning("no way jose" to Response(FORBIDDEN).with(customBody of Jackson { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { Response(OK) }
         )
 

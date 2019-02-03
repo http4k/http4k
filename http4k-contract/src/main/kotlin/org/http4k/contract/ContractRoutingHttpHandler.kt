@@ -6,7 +6,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchLensFailure
@@ -37,16 +36,16 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val standardFilters = preSecurityFilter.then(security.filter).then(postSecurityFilter)
 
-    private val handler: HttpHandler = {
-        match(it)?.invoke(it) ?: standardFilters.then { Response(NOT_FOUND.description("Route not found")) }(it)
-    }
+    private val handler: HttpHandler = { match(it)?.invoke(it) ?: standardFilters.then { renderer.notFound() }(it) }
 
     override fun invoke(request: Request): Response = handler(request)
 
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
 
+    private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
+
     private val routers: List<Pair<Filter, Router>> = routes
-        .map { CatchLensFailure.then(identify(it)).then(standardFilters) to it.toRouter(contractRoot) }
+        .map { catchLensFailure.then(identify(it)).then(standardFilters) to it.toRouter(contractRoot) }
         .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
     private val noMatch: HttpHandler? = null

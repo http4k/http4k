@@ -1,6 +1,6 @@
 package org.http4k.contract
 
-import org.http4k.format.Argo
+import org.http4k.format.Jackson
 import org.http4k.lens.Query
 
 class ContractDsl {
@@ -15,7 +15,7 @@ fun contractDsl(fn: ContractDsl.() -> Unit): Any = ContractDsl().apply(fn).run {
 }
 
 val a = contractDsl {
-    renderer = OpenApi(ApiInfo("foo", "bbb", "asd"), Argo)
+    renderer = OpenApi(ApiInfo("foo", "bbb", "asd"), Jackson)
     security = ApiKey(Query.required("the_api_key"), { true })
 //        routes += contractRoute"/echo" / Path.of("message")
 //    header Header . optional ("header", "description of the header")

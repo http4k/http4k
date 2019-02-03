@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.112.0 (uncut)
 - Add support for prohibiting String unmarshalling in JSON auto-marshalling configuration
+- HTTP Contracts now use the underlying `ContractRenderer` to produce the BadRequest and NotFound responses. Made `OpenAPI` open so that these responses can be customised.
 
 ### v3.111.0
 - Add support for JSON views in `Jackson` module. H/T @xhanin for the donkey work.

@@ -7,6 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
@@ -19,6 +20,8 @@ abstract class RoutingHttpHandlerContract {
 
     abstract val handler: RoutingHttpHandler
 
+    open val expectedNotFoundBody = ""
+
     @Test
     fun `matches a particular route`() {
         assertThat(handler(Request(GET, validPath)), hasStatus(OK))
@@ -26,7 +29,7 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `does not match a particular route`() {
-        assertThat(handler(Request(GET, "/not-found")), hasStatus(NOT_FOUND))
+        assertThat(handler(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
     }
 
     @Test
@@ -38,7 +41,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     open fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
-        assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo"))
+        assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
     }
 
     @Test
@@ -65,7 +68,7 @@ abstract class RoutingHttpHandlerContract {
         assertThat(withBase(Request(GET, "$prePrefix$prefix$validPath")), hasStatus(OK))
     }
 
-    protected fun filterAppending(value: String) = Filter { next ->
+    private fun filterAppending(value: String) = Filter { next ->
         {
             next(it).replaceHeader("res-header", next(it).header("res-header").orEmpty() + value)
         }

@@ -1,5 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.format.Argo
+import org.http4k.format.Jackson
 
-class SimpleJsonTest : ContractRendererContract(SimpleJson(Argo))
+class SimpleJsonTest : ContractRendererContract(SimpleJson(Jackson))

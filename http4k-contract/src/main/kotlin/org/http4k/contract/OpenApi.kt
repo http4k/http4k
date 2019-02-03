@@ -15,14 +15,13 @@ import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
-class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NODE>) : ContractRenderer {
+open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NODE>) : ContractRenderer {
 
     private val schemaGenerator = JsonToJsonSchema(json)
-    private val errors = JsonErrorResponseRenderer(json)
 
-    override fun badRequest(failures: List<Failure>) = errors.badRequest(failures)
+    override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
 
-    override fun notFound() = errors.notFound()
+    override fun notFound() = JsonErrorResponseRenderer(json).notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         Response(OK)

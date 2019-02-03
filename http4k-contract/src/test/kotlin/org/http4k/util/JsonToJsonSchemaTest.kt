@@ -1,16 +1,16 @@
 package org.http4k.util
 
-import argo.jdom.JsonNode
+import com.fasterxml.jackson.databind.JsonNode
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.format.Argo
-import org.http4k.format.Argo.obj
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.obj
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 import java.math.BigDecimal
 
 class JsonToJsonSchemaTest {
-    private val json = Argo
+    private val json = Jackson
 
     private fun String.readResource(): InputStream = JsonToJsonSchemaTest::class.java.getResourceAsStream(this)
     private fun InputStream.asJsonValue() = json.parse(String(readBytes()))
