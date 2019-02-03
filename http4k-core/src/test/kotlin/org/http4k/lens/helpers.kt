@@ -85,13 +85,11 @@ data class MyCustomBodyType(val value: String)
 fun lensFailureWith(vararg failures: Failure, overallType: Failure.Type) = object : Matcher<LensFailure> {
     private val expectedList = failures.toList()
     override val description: String = "LensFailure with type $overallType and failures $expectedList"
-    override fun invoke(actual: LensFailure): MatchResult =
-        if (actual.failures != expectedList) {
-            MatchResult.Mismatch("\n${actual.failures}\ninstead of \n$expectedList")
-        } else if (actual.overall() != overallType) {
-            MatchResult.Mismatch("${actual.overall()}\ninstead of $overallType")
-        } else
-            MatchResult.Match
+    override fun invoke(actual: LensFailure) = when {
+        actual.failures != expectedList -> MatchResult.Mismatch("\n${actual.failures}\ninstead of \n$expectedList")
+        actual.overall() != overallType -> MatchResult.Mismatch("${actual.overall()}\ninstead of $overallType")
+        else -> MatchResult.Match
+    }
 }
 
-inline fun <reified T> targetIsA() = Matcher<LensFailure>("target", { it.target is T })
+inline fun <reified T> targetIsA() = Matcher<LensFailure>("target") { it.target is T }

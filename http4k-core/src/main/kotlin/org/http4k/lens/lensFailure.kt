@@ -26,7 +26,6 @@ data class Missing(override val meta: Meta) : Failure(Type.Missing) {
 }
 
 data class Invalid(override val meta: Meta) : Failure(Type.Invalid) {
-
     override fun toString(): String = "${meta.location} '${meta.name}' must be ${meta.paramMeta.value}"
 }
 
