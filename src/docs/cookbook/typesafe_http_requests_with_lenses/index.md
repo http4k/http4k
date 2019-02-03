@@ -15,7 +15,7 @@ Errors in extracting Lenses are propagated as exceptions which are caught and ha
 
 ### Using custom "Result" ADTs
 An alternative approach to using Exceptions to automatically produce `BadRequests` is to use an Either-type structure, and this would be easy to implement - but the lack of an in-built Result/Either type in the standard Kotlin library means that we 
-don't have a single representation to use without shackling ourselves to another Either-containing library such as Funktionale or Result4k.
+don't have a single representation to use without shackling ourselves to another Either-containing library such as Arrow or Result4k.
 
 Additionally, the lack of Higher Kinded Types in Kotlin means that we are unable to provide a generic method for converting standard lenses. However, it is easy to implement an extension method to use in specific use cases.
 
