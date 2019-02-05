@@ -30,11 +30,11 @@ class BiDiLensSpecTest {
         LensGet { _: String, str: String ->
             if (str.isBlank()) emptyList() else listOf(str)
         },
-        LensSet { _: String, values: List<String>, str: String -> values.fold(str, { memo, next -> memo + next }) })
+        LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
     private val oSpec = BiDiLensSpec("location", StringParam,
         LensGet { _: String, (s) -> s?.let(::listOf) ?: emptyList() },
-        LensSet { _: String, values: List<String>, str: Container -> values.fold(str, { (value), next -> Container(value + next) }) })
+        LensSet { _: String, values: List<String>, str: Container -> values.fold(str) { (value), next -> Container(value + next) } })
 
     @Test
     fun nonEmptyString() = checkContract(oSpec.nonEmptyString(), "123", Container("123"), Container(null), Container(""), Container("o"), Container("o123"), Container("o123123"))

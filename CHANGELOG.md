@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.112.1
+- Re-add `Path.nonEmptyString()` which was accidentally removed. 
+
 ### v3.112.0
 - Add support for prohibiting String unmarshalling in JSON auto-marshalling configuration.
 - HTTP Contracts now use the underlying `ContractRenderer` to produce the BadRequest and NotFound responses. Made `OpenAPI` open so that these responses can be customised.

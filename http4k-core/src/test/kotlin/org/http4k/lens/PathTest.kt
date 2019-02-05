@@ -80,6 +80,13 @@ class PathTest {
     }
 
     @Test
+    fun nonEmptyString() {
+        val requiredLens = Path.nonEmptyString().of("hello")
+        assertThat(requiredLens("123"), equalTo("123"))
+        assertThat({ requiredLens("") }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+    }
+
+    @Test
     fun int() = checkContract(Path.int(), "123", 123)
 
     @Test
