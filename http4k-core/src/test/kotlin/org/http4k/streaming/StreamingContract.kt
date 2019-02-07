@@ -41,9 +41,9 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     private var countdown = CountDownLatch(config.beeps * 2)
 
     val app = routes(
-        "/stream-response" bind GET to { Response(Status.OK).body(beeper()) },
+        "/stream-response" bind GET to { Response(Status.OK).body(beeper("server")) },
         "/stream-request" bind POST to {
-            captureReceivedStream { it.body.stream }; Response(Status.OK)
+            captureReceivedStream("server") { it.body.stream }; Response(Status.OK)
         }
     )
 
@@ -60,7 +60,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     fun `can stream response`() {
-        captureReceivedStream { createClient()(Request(GET, "$baseUrl/stream-response")).body.stream }
+        captureReceivedStream("client") { createClient()(Request(GET, "$baseUrl/stream-response")).body.stream }
 
         waitForCompletion()
 
@@ -69,7 +69,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
     @Test
     fun `can stream request`() {
-        createClient()(Request(POST, "$baseUrl/stream-request").body(beeper()))
+        createClient()(Request(POST, "$baseUrl/stream-request").body(beeper("client")))
 
         waitForCompletion()
 
@@ -85,18 +85,19 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
         if (!succeeded) fail("Timed out waiting for server response")
     }
 
-    private fun captureReceivedStream(streamSource: () -> InputStream) {
+    private fun captureReceivedStream(location: String, streamSource: () -> InputStream) {
         val responseStream = streamSource()
+        if (runningInIdea) println("incoming stream is now available")
 
         responseStream.bufferedReader().forEachLine {
-            if (runningInIdea) println("received")
+            if (runningInIdea) println("$location received")
 
             sharedList.add('r')
             countdown.countDown()
         }
     }
 
-    private fun beeper(): InputStream {
+    private fun beeper(location: String): InputStream {
         val input = PipedInputStream()
         val output = PipedOutputStream(input)
 
@@ -104,7 +105,7 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
 
         thread {
             (1..5).forEach {
-                if (runningInIdea) println("sent")
+                if (runningInIdea) println("$location sent")
 
                 output.write(line.toByteArray())
                 sharedList.add('s')
