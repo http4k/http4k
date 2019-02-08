@@ -3,7 +3,6 @@ package cookbook.test_driven_apps
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -34,7 +33,7 @@ class AnswerRecorder(private val httpClient: HttpHandler) : (Int) -> Unit {
     }
 }
 
-fun myMathsEndpoint(fn: (Int, Int) -> Int, recorder: (Int) -> Unit): HttpHandler = { req ->
+fun myMathsEndpoint(fn: (Int, Int) -> Int, recorder: (Int) -> Unit) = HttpHandler { req ->
     val answer = fn(req.query("first")!!.toInt(), req.query("second")!!.toInt())
     recorder(answer)
     Response(OK).body("the answer is $answer")

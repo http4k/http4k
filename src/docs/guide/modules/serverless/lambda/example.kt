@@ -16,7 +16,7 @@ import org.http4k.util.proxy
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 // It is the only actual piece of code that needs to be written.
 object TweetEchoLambda : AppLoader {
-    override fun invoke(env: Map<String, String>): HttpHandler = {
+    override fun invoke(env: Map<String, String>) = HttpHandler {
         Response(OK).body(it.bodyString().take(17))
     }
 }

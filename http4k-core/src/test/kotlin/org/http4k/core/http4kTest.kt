@@ -12,7 +12,7 @@ class AsyncHttpClientTest {
     @Test
     fun `can convert a synchronous HttpHandler to mimic the AsyncHttpClient API`() {
 
-        val handler = { _: Request -> Response(OK) }.withAsyncApi()
+        val handler = HttpHandler { Response(OK) }.withAsyncApi()
 
         val latch = CountDownLatch(1)
         handler(Request(GET, "/")) {

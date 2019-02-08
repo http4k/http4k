@@ -35,7 +35,7 @@ Scenarios such as "what happens if this HTTP dependency continually takes > 5 se
 
 * All incoming and outgoing HTTP services are modelled as `HttpHandler`, which is modelled as `(Request) -> Response`:
 ```kotlin
-val handler: HttpHandler = { request: Request -> Response(OK) }
+val handler = HttpHandler { request: Request -> Response(OK) }
 ```
 * Pre/post processing is done using a `Filter`, which is modelled as `(HttpHandler) -> HttpHandler`. Filters can therefore be composed together to make reusable "stacks" of behaviour which can be applied to a terminating `HttpHandler` - to yield 
 a decorated `HttpHandler`:

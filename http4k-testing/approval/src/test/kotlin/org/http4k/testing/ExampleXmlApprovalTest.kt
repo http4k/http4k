@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(XmlApprovalTest::class)
 class ExampleXmlApprovalTest {
 
-    private val app: HttpHandler = {
+    private val app = HttpHandler {
         Response(OK)
             .with(CONTENT_TYPE of APPLICATION_XML)
             .body("""<?xml version="1.0" encoding="UTF-8"?><UriContainer><field>foo.bar</field></UriContainer>""")

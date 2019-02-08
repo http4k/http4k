@@ -2,7 +2,17 @@ package org.http4k.core
 
 import org.http4k.routing.RoutingHttpHandler
 
-typealias HttpHandler = (Request) -> Response
+typealias HandleRequest = (Request) -> Response
+
+interface HttpHandler {
+    operator fun invoke(request: Request): Response
+
+    companion object {
+        operator fun invoke(fn: HandleRequest) = object : HttpHandler {
+            override operator fun invoke(request: Request): Response = fn(request)
+        }
+    }
+}
 
 fun interface Filter : (HttpHandler) -> HttpHandler {
     companion object
@@ -10,8 +20,10 @@ fun interface Filter : (HttpHandler) -> HttpHandler {
 
 val Filter.Companion.NoOp: Filter get() = Filter { next -> { next(it) } }
 
-fun Filter.then(next: Filter): Filter = Filter { this(next(it)) }
+fun Filter.then(fn: HandleRequest) = then(HttpHandler(fn))
 
-fun Filter.then(next: HttpHandler): HttpHandler = { this(next)(it) }
+fun Filter.then(next: Filter) = Filter { this(next(HttpHandler(it)))::invoke }
 
-fun Filter.then(routingHttpHandler: RoutingHttpHandler): RoutingHttpHandler = routingHttpHandler.withFilter(this)
+fun Filter.then(next: HttpHandler) = HttpHandler { this(next)(it) }
+
+fun Filter.then(routingHttpHandler: RoutingHttpHandler) = routingHttpHandler.withFilter(this)

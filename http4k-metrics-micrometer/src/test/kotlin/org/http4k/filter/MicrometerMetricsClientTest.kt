@@ -23,6 +23,9 @@ class MicrometerMetricsClientTest {
     private var requestTimer = ClientFilters.MicrometerMetrics.RequestTimer(registry, clock = clock)
     private var requestCounter = ClientFilters.MicrometerMetrics.RequestCounter(registry, clock = clock)
     private val remoteServerMock: HttpHandler = {
+    private var requestTimer = MetricFilters.Client.RequestTimer(registry, clock = clock)
+    private var requestCounter = MetricFilters.Client.RequestCounter(registry)
+    private val remoteServerMock = HttpHandler {
         when (it.uri.path) {
             "/one" -> Response(OK)
             else -> Response(NOT_FOUND)

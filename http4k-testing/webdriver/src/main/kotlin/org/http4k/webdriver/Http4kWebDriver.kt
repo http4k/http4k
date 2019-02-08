@@ -1,6 +1,7 @@
 package org.http4k.webdriver
 
 import org.http4k.core.Filter
+import org.http4k.core.HandleRequest
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -10,18 +11,15 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.cookie.CookieStorage
 import org.http4k.filter.cookie.LocalCookie
-import org.openqa.selenium.Alert
-import org.openqa.selenium.By
-import org.openqa.selenium.Cookie
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.*
 import org.openqa.selenium.WebDriver.Navigation
-import org.openqa.selenium.WebElement
 import java.net.URL
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 import java.util.UUID
+import kotlin.NoSuchElementException
 import org.http4k.core.cookie.Cookie as HCookie
 
 typealias Navigate = (Request) -> Unit
@@ -32,6 +30,8 @@ interface Http4KNavigation : Navigation {
 }
 
 class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
+    constructor(fn: HandleRequest) : this(HttpHandler(fn))
+
     private val handler = ClientFilters.FollowRedirects()
         .then(ClientFilters.Cookies(storage = cookieStorage()))
         .then(Filter { next -> { request -> latestUri = request.uri.toString(); next(request) } })

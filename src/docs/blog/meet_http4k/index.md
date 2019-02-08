@@ -131,8 +131,8 @@ and clients are interchangeable, they can be plugged together in memory without 
 testing insanely fast:
 
 ```kotlin
-fun MyApp1(): HttpHandler = { Response(OK) }
-fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
+fun MyApp1() = HttpHandler { Response(OK) }
+fun MyApp2(app1: HttpHandler) = HttpHandler { app1(it) }
 
 val app1: HttpHandler = MyApp1()
 val app2: HttpHandler = MyApp2(app1)
@@ -227,7 +227,7 @@ is AWS, there is a fair amount of configuration required to make this possible, 
 Here's a simple example:
 ```kotlin
 object TweetEcho : AppLoader {
-    override fun invoke(env: Map<String, String>): HttpHandler = {
+    override fun invoke(env: Map<String, String>) = HttpHandler {
         Response(OK).body(it.bodyString().take(140))
     }
 }

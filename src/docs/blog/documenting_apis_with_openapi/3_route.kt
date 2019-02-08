@@ -24,7 +24,7 @@ fun Greetings(): ContractRoute {
     val age = Query.int().map(::Age).required("age", "Your age")
     val favouriteDrink = Query.map(::Drink).optional("drink", "Your favourite beverage")
 
-    fun handler(name: String): HttpHandler = { req: Request ->
+    fun handler(name: String) = HttpHandler { req: Request ->
         val drinkToOffer: Drink? = favouriteDrink(req)
         val beverage: String = drinkToOffer?.name ?: if (age(req).value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")

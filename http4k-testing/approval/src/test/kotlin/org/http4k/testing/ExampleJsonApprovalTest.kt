@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(JsonApprovalTest::class)
 class ExampleJsonApprovalTest {
 
-    private val app: HttpHandler = {
+    private val app = HttpHandler {
         Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body("""{"message":"value"}""")

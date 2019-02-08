@@ -3,6 +3,7 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.NoSecurity.filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -19,7 +20,7 @@ class ApiKeySecurityTest {
     @Test
     fun `valid API key is granted access and result carried through`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, "?name=1"))
 
@@ -30,7 +31,7 @@ class ApiKeySecurityTest {
     @Test
     fun `OPTIONS request is granted access even with no API key if toggled off`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }, false).filter(next)(Request(OPTIONS, "/"))
 
@@ -41,7 +42,7 @@ class ApiKeySecurityTest {
     @Test
     fun `missing API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, ""))
 
@@ -51,7 +52,7 @@ class ApiKeySecurityTest {
     @Test
     fun `bad API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, "?name=asdasd"))
 
@@ -61,10 +62,19 @@ class ApiKeySecurityTest {
     @Test
     fun `unknown API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { false }).filter(next)(Request(GET, "?name=1"))
 
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
+
+    @Test
+    fun `no security is rather lax`() {
+        val response = filter(HttpHandler { Response(OK).body("hello") })(Request(Method.GET, ""))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response.bodyString(), equalTo("hello"))
+    }
+
 }

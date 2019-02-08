@@ -40,7 +40,7 @@ class OAuthProvidersTest {
         )
     }
 
-    private fun client(auth: String): HttpHandler = {
+    private fun client(auth: String) = HttpHandler {
         assertThat(it.uri, hasAuthority(auth))
         Response(OK)
     }

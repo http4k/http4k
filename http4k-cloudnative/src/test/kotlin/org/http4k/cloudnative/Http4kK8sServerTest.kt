@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test
 
 class Http4kK8sServerTest {
 
-    private val app: HttpHandler = { Response(I_M_A_TEAPOT) }
+    private val app = HttpHandler { Response(I_M_A_TEAPOT) }
     private val env = Environment.EMPTY.with(SERVICE_PORT of 0, HEALTH_PORT of 0)
     private val server = app.asK8sServer(::SunHttp, env)
 

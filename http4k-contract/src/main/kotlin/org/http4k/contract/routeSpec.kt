@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.core.HandleRequest
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -29,6 +30,7 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
     override infix operator fun <NEXT> div(next: PathLens<NEXT>) = ContractRouteSpec1(pathFn, routeMeta, next)
 
     inner class Binder(method: Method) : ContractRequestBuilder(method) {
+        infix fun to(fn: HandleRequest) = to(HttpHandler(fn))
         infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) { ContractRoute(method, this, routeMeta) { fn } }
     }
 

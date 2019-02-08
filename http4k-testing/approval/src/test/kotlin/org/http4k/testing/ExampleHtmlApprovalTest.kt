@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(HtmlApprovalTest::class)
 class ExampleHtmlApprovalTest {
 
-    private val app: HttpHandler = {
+    private val app = HttpHandler {
         Response(OK)
             .with(CONTENT_TYPE of TEXT_HTML)
             .body("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

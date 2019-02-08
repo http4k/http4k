@@ -31,7 +31,7 @@ fun main() {
     // chain the stages together with then() and create the Chaos Engine (activated)
     val engine = ChaosEngine(doNothingStage.then(errorStage)).enable()
 
-    val svc: HttpHandler = { Response(OK).body("A normal response") }
+    val svc = HttpHandler { Response(OK).body("A normal response") }
     engine.then(svc).asServer(SunHttp(9000)).start().use {
         repeat(10) { performA(GET) }
 

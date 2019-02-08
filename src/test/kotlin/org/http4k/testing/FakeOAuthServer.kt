@@ -46,9 +46,9 @@ class FakeOAuthServer(oAuthClientConfig: OAuthProviderConfig, serviceName: Strin
 
     private val generatedCodes = mutableMapOf<UUID, Credentials>()
 
-    private val login: HttpHandler = { templates.renderToResponse(OAuthLogin(serviceName, redirectUri(it))) }
+    private val login = HttpHandler { templates.renderToResponse(OAuthLogin(serviceName, redirectUri(it))) }
 
-    private val submit: HttpHandler = {
+    private val submit = HttpHandler {
         val submitted = loginForm(it)
         val credentials = Credentials(user(submitted), password(submitted))
         when {
@@ -72,5 +72,5 @@ class FakeOAuthServer(oAuthClientConfig: OAuthProviderConfig, serviceName: Strin
         )
     )
 
-    override fun invoke(p1: Request): Response = api(p1)
+    override fun invoke(request: Request): Response = api(request)
 }

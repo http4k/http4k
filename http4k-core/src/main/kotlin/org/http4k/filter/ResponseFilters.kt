@@ -75,7 +75,7 @@ object ResponseFilters {
             .map { it.value }
             .map { it.split(";").first() }
 
-        override fun invoke(next: HttpHandler): HttpHandler = { request ->
+        override fun invoke(next: HttpHandler) = HttpHandler { request ->
             next(request).let {
                 if (requestAcceptsGzip(request) && isCompressible(it)) {
                     compressionMode.compress(it.body).apply(it)

@@ -1,6 +1,7 @@
 package cookbook.container_integration
 
 import org.http4k.client.ApacheClient
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,7 +11,7 @@ import org.http4k.server.asServer
 
 fun main() {
 
-    val app = { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
+    val app = HttpHandler { request: Request -> Response(OK).body("Hello, ${request.query("name")}!") }
 
     val jettyServer = app.asServer(Jetty(9000)).start()
 

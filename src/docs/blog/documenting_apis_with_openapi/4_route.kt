@@ -25,7 +25,7 @@ fun Family(): ContractRoute {
 
     val responseLens = Body.auto<Person>("The matched family tree").toLens()
 
-    fun handler(queryName: String): HttpHandler = {
+    fun handler(queryName: String) = HttpHandler {
         fun Person.search(): Person? = when (name) {
             queryName -> this
             else -> children.firstOrNull { it.search() != null }

@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Credentials
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -38,7 +39,7 @@ class OAuthProviderTest {
 
     private fun oAuth(persistence: OAuthPersistence, status: Status = OK, responseType: ResponseType = ResponseType.Code): OAuthProvider = OAuthProvider(
         providerConfig,
-        { Response(status).body("access token goes here") },
+        HttpHandler { Response(status).body("access token goes here") },
         Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
         persistence,

@@ -3,6 +3,9 @@ package cookbook.multipart_forms
 import org.http4k.client.ApacheClient
 import org.http4k.core.ContentType
 import org.http4k.core.Method.POST
+import org.http4k.core.FormFile
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,7 +18,7 @@ import org.http4k.server.asServer
 fun main() {
 
     // extract the body from the request and then the fields/files from it
-    val server = { r: Request ->
+    val server = HttpHandler { r: Request ->
         val receivedForm = MultipartFormBody.from(r)
         println(receivedForm.fieldValues("field"))
         println(receivedForm.field("field2"))

@@ -41,7 +41,7 @@ fun main() {
         )
     )
 
-    val http: HttpHandler = { _: Request -> Response(OK).body("hiya world") }
+    val http = HttpHandler { _: Request -> Response(OK).body("hiya world") }
 
     // the poly-handler can serve both http and ws protocols.
     PolyHandler(http, ws).asServer(Jetty(9000)).start().block()

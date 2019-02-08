@@ -12,7 +12,7 @@ class AuthRequestTrackingFilter(
     private val extractor: AuthRequestExtractor,
     private val authoriseRequestErrorRender: AuthoriseRequestErrorRender
 ) : Filter {
-    override fun invoke(next: HttpHandler) = { request: Request ->
+    override fun invoke(next: HttpHandler) = HttpHandler { request: Request ->
         extractor.extract(request)
             .map {
                 val response = next(request)

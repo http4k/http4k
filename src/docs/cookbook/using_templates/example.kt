@@ -22,7 +22,7 @@ fun main() {
 
     val view = Body.viewModel(renderer, TEXT_HTML).toLens()
 
-    val app: HttpHandler = {
+    val app = HttpHandler {
         val viewModel = Person("Bob", 45)
         Response(OK).body(renderer(viewModel))
         // OR:

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(ApprovalTest::class)
 class ExampleApprovalTest {
 
-    private val app: HttpHandler = { Response(OK).body("hello world") }
+    private val app = HttpHandler { Response(OK).body("hello world") }
 
     @Test
     fun `check response content`(approver: Approver) {

@@ -1,8 +1,8 @@
 package guide.modules.contracts
 
+
 // for this example we're using Jackson - note that the auto method imported is an extension
 // function that is defined on the Jackson instance
-
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bind
 import org.http4k.contract.contract
@@ -44,7 +44,7 @@ fun greetRoute(): ContractRoute {
 
     // the this function will dynamically supply a new HttpHandler for each call. The number of parameters
     // matches the number of dynamic sections in the path (1)
-    fun greet(nameFromPath: String): HttpHandler = { request: Request ->
+    fun greet(nameFromPath: String) = HttpHandler { request: Request ->
         val age = ageQuery(request)
         val sentMessage = stringBody(request)
 
@@ -71,7 +71,7 @@ fun echoRoute(): ContractRoute {
     } bindContract POST
 
     // note that because we don't have any dynamic parameters, we can use a HttpHandler instance instead of a function
-    val echo: HttpHandler = { request: Request ->
+    val echo = HttpHandler { request: Request ->
         val received: NameAndMessage = body(request)
         Response(OK).with(body of received)
     }

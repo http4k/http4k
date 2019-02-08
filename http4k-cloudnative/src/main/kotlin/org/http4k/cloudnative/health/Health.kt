@@ -2,6 +2,7 @@ package org.http4k.cloudnative.health
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -31,7 +32,9 @@ object Health {
 /**
  * The Liveness check is used to determine if an app is alive.
  */
-object Liveness : HttpHandler by { Response(OK) }
+object Liveness : HttpHandler {
+    override fun invoke(request: Request) = Response(OK)
+}
 
 /**
  * The Readiness check is used to determine if an app is prepared to receive live traffic.
@@ -40,7 +43,7 @@ object Readiness {
     operator fun invoke(
         checks: List<ReadinessCheck> = emptyList(),
         renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer
-    ): HttpHandler = {
+    ) = HttpHandler {
         val overall: ReadinessCheckResult = when {
             checks.isNotEmpty() -> checks.map { check ->
                 try {

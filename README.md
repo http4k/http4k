@@ -27,7 +27,7 @@
  [http4k] is a lightweight but fully-featured HTTP toolkit written in pure [Kotlin](https://kotlinlang.org/) that enables the serving and consuming of HTTP services in a functional and consistent way. [http4k] applications are *just* Kotlin functions which can be mounted into a running backend. For example, here's a simple echo server:
  
 ```kotlin
- val app: HttpHandler = { request: Request -> Response(OK).body(request.body) }
+ val app = HttpHandler { request: Request -> Response(OK).body(request.body) }
  val server = app.asServer(SunHttp(8000)).start()
 ```
 

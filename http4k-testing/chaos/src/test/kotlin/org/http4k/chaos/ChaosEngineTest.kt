@@ -5,6 +5,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.NoSecurity
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -122,7 +124,7 @@ class ChaosEngineTest {
 
     @Test
     fun `combines with a standard handler route blocks`() {
-        val app = { _: Request -> Response(I_M_A_TEAPOT) }
+        val app = HttpHandler { Response(I_M_A_TEAPOT) }
 
         val appWithChaos = app.withChaosApi(controlsPath = "/context")
 

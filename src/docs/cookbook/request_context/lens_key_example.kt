@@ -25,7 +25,7 @@ fun main() {
         }
     }
 
-    fun PrintState(key: RequestContextLens<SharedState>): HttpHandler = { request ->
+    fun PrintState(key: RequestContextLens<SharedState>) = HttpHandler { request ->
         // we can just extract the Lens state from the request like any other standard Lens
         println(key(request))
         Response(OK)
