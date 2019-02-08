@@ -50,6 +50,7 @@ class Status internal constructor(val code: Int, val description: String, privat
         val EXPECTATION_FAILED = Status(417, "Expectation Failed")
         val I_M_A_TEAPOT = Status(418, "I'm a teapot") //RFC2324
         val UNPROCESSABLE_ENTITY = Status(422, "Unprocessable Entity")
+        val UPGRADE_REQUIRED = Status(426, "Upgrade Required")
         val TOO_MANY_REQUESTS = Status(429, "Too many requests")
 
         private val SERVER_ERROR = 500..599
