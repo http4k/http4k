@@ -40,7 +40,9 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) {
     }
 
     private fun JsonSchema<NODE>.objectSchema(overrideDefinitionId: String?): JsonSchema<NODE> {
-        val (fields, subDefinitions) = json.fields(node).fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
+        val (fields, subDefinitions) = json.fields(node)
+                .filter { json.typeOf(it.second) != JsonType.Null } // filter out null fields for which type can't be inferred
+                .fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
             JsonSchema(second, memoDefinitions).toSchema().let { memoFields.plus(first to it.node) to it.definitions }
         }
 
