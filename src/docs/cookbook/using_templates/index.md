@@ -5,8 +5,8 @@ Example showing how to use the Templating modules - in this case Handlebars, bot
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.112.1"
-    compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.112.1"
+    compile group: "org.http4k", name: "http4k-core", version: "3.112.2"
+    compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.112.2"
 ```
 
 ### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_templates/example.kt)
