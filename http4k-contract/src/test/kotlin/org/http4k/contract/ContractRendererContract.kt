@@ -85,7 +85,8 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
             }
                 bindContract POST to { Response(OK) },
             "/body_json_schema" meta {
-                receiving(Body.json("json").toLens() to Jackson { obj("anAnotherObject" to obj("aNumberField" to number(123))) }, "someDefinitionId")
+                receiving(Body.json("json").toLens() to Jackson {
+                    obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123))) }, "someDefinitionId")
             }
                 bindContract POST to { Response(OK) },
             "/body_form" meta {
