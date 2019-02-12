@@ -54,7 +54,6 @@ nav:
       - 2. Adding an endpoint: guide/example/_2_adding_the_first_endpoint/index.md
       - 3. Adding another endpoint: guide/example/_3_adding_the_second_endpoint/index.md
       - 4. An external dependency: guide/example/_4_adding_an_external_dependency/index.md
-    - API docs: api/index.md
   - Cookbook:
     - Server as a function: cookbook/server_as_a_function/index.md
     - Client as a function: cookbook/client_as_a_function/index.md
