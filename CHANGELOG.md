@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.112.2
+- Fix #212 - allow null values in HTTP contract definitions. This does mean we lose the type definition for 
+that field, but we don't blow up silently (which was the previous behaviour);
+
 ### v3.112.1
 - Re-add `Path.nonEmptyString()` which was accidentally removed. 
 
