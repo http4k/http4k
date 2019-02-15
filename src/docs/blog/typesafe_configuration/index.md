@@ -7,7 +7,8 @@ description: An overview of how to configure http4k applications using the http4
 
 ### Intro
 This post covers the various concerns around configuring HTTP apps, and introduces the recommended method for safely 
-addressing these when deploying [http4k](https://http4k.org) applications into cloud-native environments.
+addressing these when deploying [http4k](https://http4k.org) applications into cloud-native environments using the 
+Kotlin type system.
 
 ### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/) applications, 
@@ -41,12 +42,12 @@ Obviously, the above is still not very safe - a failed coercion will still fail 
 `NullPointerException`. We can do better.
 
 #### 2. Security
-Most apps will have both sensitive and non-sensitive values. Sensitive such as application secrets, DB passwords or API 
-keys should (as far as is reasonable) be handled in a way that avoid storing directly in memory in a readable format, 
-where they may be inadvertently inspected or outputted into a log file.
+The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
+application secrets, DB passwords or API keys should (as far as is reasonable) be handled in a way that avoid storing 
+directly in memory in a readable format, where they may be inadvertently inspected or outputted into a log file.
 
 #### 3. Optionality
-Not all configuration values will be always required, so there are 3 distinct modes of optionality available:
+Not all configuration values will be required, so there are 3 distinct modes of optionality available for each parameter:
 
 - *Required:* These values must be injected for each environment, with no default value defined. Most configurations such 
 as hostnames should always use this form to maximise operational safety.
