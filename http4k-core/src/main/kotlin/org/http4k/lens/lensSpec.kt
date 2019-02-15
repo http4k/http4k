@@ -224,6 +224,7 @@ fun <IN> BiDiLensSpec<IN, String>.bigInteger() = mapWithNewMeta(StringBiDiMappin
 fun <IN> BiDiLensSpec<IN, String>.bigDecimal() = mapWithNewMeta(StringBiDiMappings.bigDecimal(), NumberParam)
 fun <IN> BiDiLensSpec<IN, String>.uuid() = map(StringBiDiMappings.uuid())
 fun <IN> BiDiLensSpec<IN, String>.uri() = map(StringBiDiMappings.uri())
+fun <IN> BiDiLensSpec<IN, String>.bytes() = map { s: String -> s.toByteArray() }
 fun <IN> BiDiLensSpec<IN, String>.regex(pattern: String, group: Int = 1) = map(StringBiDiMappings.regex(pattern, group))
 fun <IN> BiDiLensSpec<IN, String>.regexObject() = map(StringBiDiMappings.regexObject())
 fun <IN> BiDiLensSpec<IN, String>.duration() = map(StringBiDiMappings.duration())
@@ -238,4 +239,4 @@ fun <IN> BiDiLensSpec<IN, String>.offsetDateTime(formatter: DateTimeFormatter = 
 internal fun <NEXT, IN, OUT> BiDiLensSpec<IN, OUT>.mapWithNewMeta(mapping: BiDiMapping<OUT, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
     mapping::invoke, mapping::invoke, paramMeta)
 
-internal fun <NEXT, IN, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(mapping::invoke, mapping::invoke)
+fun <NEXT, IN, OUT> BiDiLensSpec<IN, OUT>.map(mapping: BiDiMapping<OUT, NEXT>) = map(mapping::invoke, mapping::invoke)

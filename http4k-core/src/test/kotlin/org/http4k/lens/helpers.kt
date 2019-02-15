@@ -29,7 +29,7 @@ object BiDiLensContract {
         assertThat((spec.map { it.toString() }.optional("hello"))(validValue), equalTo(tValue.toString()))
         assertThat(optionalLens(nullValue), absent())
         invalidValue?.let {
-            assertThat({ optionalLens(invalidValue) }, throws(lensFailureWith(Invalid(optionalLens.meta), overallType = Failure.Type.Invalid)))
+            assertThat("expecting to invalid with optional", { optionalLens(invalidValue) }, throws(lensFailureWith(Invalid(optionalLens.meta), overallType = Failure.Type.Invalid)))
         }
         assertThat(optionalLens(tValue, unmodifiedValue), equalTo(modifiedValue))
 

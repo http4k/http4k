@@ -3,7 +3,7 @@ description: An overview of the Kotlin "Server as a Function" library, http4k
 
 # Server as a Function. In Kotlin. Typesafe. Without the Server.
 
-##### [@daviddenton](http://github.com/daviddenton) / november 2017
+##### [@daviddenton](http://github.com/daviddenton) 
 
 ## Meet [**http4k**](https://github.com/http4k/http4k)
 

@@ -100,4 +100,11 @@ class BiDiLensSpecTest {
 
     @Test
     fun uri() = checkContract(spec.uri(), Uri.of("http://localhost"), "http://localhost", "", null, "o", "ohttp://localhost", "ohttp://localhosthttp://localhost")
+
+    @Test
+    fun bytes() {
+        val requiredLens = spec.bytes().required("hello")
+        assertThat(String(requiredLens("123")), equalTo("123"))
+        assertThat({ requiredLens("") }, throws(lensFailureWith(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
+    }
 }
