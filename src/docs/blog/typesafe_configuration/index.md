@@ -33,22 +33,10 @@ operational domain type that can validate format and avoid confusion. A good exa
 values as integer values - timeouts can be interpreted incorrectly in the wrong unit (seconds instead of milliseconds). 
 Kotlin gives us a simple way to do this using data classes:
 
-```kotlin
-data class Port(val value: Int) {
-    init {
-        if (value < 0 || value > 65535) throw IllegalArgumentException("Out of range Port: $value'")
-    }
-}
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt"></script>
 
-fun main() {
-    val port = Port(System.getenv("HTTP_PORT").toInt())
-    
-    val handler = { r: Request -> Response(Status.OK).body(r.body) }
-    handler.asServer(::SunHttp, Port(8000)).start()
-}
-```
-
-Obviously, the above is still not very safe - a failed coercion will still fail 
+Obviously, the above is still not very safe - a failed coercion will still fail with an `IllegalArgumentException`. We can do better.
 
 #### 2. Security
 Most apps will have both sensitive and non-sensitive values. Sensitive such as application secrets, DB passwords or API 
@@ -66,19 +54,19 @@ which could be data-driven (ie. not known at compile-time).
 are not.
 
 #### 4. Multiplicity
-Most of these values may have one or multiple values and need to be converted safely from the injected string 
+Configuration parameters may have one or many values and need to be converted safely from the injected string 
 representation into their internally represented types at application startup. Illegal or missing values should produce 
 a reasonable error and stop the app from starting.
 
 #### 5. Overriding
-We probably also want to avoid defining all values for all possible environments - for example in test cases, so the ability 
+We also want to avoid defining all values for all possible environments - for example in test cases, so the ability 
 to overlay configuration sets on top of each other is useful. Although it is against the rules of 12-factor, it is sometimes 
-convenient to source from a variety of locations:
+convenient to source parameter values from a variety of locations when running applications in non-cloud environments:
 
 - System Environment variables
 - Properties files
 - JAR resources
 - Local files
-- In-memory defined configurations
+- Source code defined environmental configuration
 
 ### Introducing http4k Environments

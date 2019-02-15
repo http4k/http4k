@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.cloudnative.env.Authority
 import org.http4k.cloudnative.env.Host
 import org.http4k.cloudnative.env.Port
-import org.http4k.server.SunHttp
 import org.junit.Test
 
 class CloudNativeExtTest {
@@ -31,11 +30,5 @@ class CloudNativeExtTest {
             assertThat(this, equalTo(Uri.of("http://localhost:82")))
             assertThat(authority(), equalTo(newAuthority))
         }
-    }
-
-    @Test
-    fun `can HttpHandler to a server`() {
-        val handler = { r: Request -> Response(Status.OK) }
-        assertThat(handler.asServer(::SunHttp, Port(8000)).port(), equalTo(8000))
     }
 }
