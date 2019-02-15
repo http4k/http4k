@@ -37,7 +37,8 @@ Kotlin gives us a simple way to do this using data classes:
 ##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt"></script>
 
-Obviously, the above is still not very safe - a failed coercion will still fail with an `IllegalArgumentException`. We can do better.
+Obviously, the above is still not very safe - a failed coercion will still fail with an `IllegalArgumentException` or a 
+`NullPointerException`. We can do better.
 
 #### 2. Security
 Most apps will have both sensitive and non-sensitive values. Sensitive such as application secrets, DB passwords or API 
