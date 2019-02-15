@@ -169,11 +169,20 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    fun `can retrieve body for diffMoshierent statuses`() {
+    fun `can retrieve body for different statuses`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
             assertThat(response.status, equalTo(Status(statusCode, "")))
             assertThat(response.bodyString(), equalTo("body for status $statusCode"))
+        }
+    }
+
+    @Test
+    fun `handles empty response body for different statuses`() {
+        listOf(200, 301, 400, 404, 500).forEach { statusCode ->
+            val response = client(Request(GET, "http://localhost:$port/status-no-body/$statusCode"))
+            assertThat(response.status, equalTo(Status(statusCode, "")))
+            assertThat(response.bodyString(), equalTo(""))
         }
     }
 
