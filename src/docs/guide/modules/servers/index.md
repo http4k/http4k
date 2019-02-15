@@ -2,17 +2,17 @@ title: http4k Server Modules
 description: Feature overview of the http4k-server modules, covering Server backends
 
 ### Installation (Gradle)
-**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.112.2"```
+**Apache:** ```compile group: "org.http4k", name: "http4k-server-apache", version: "3.113.0"```
 
-**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.112.2"```
+**Jetty:** ```compile group: "org.http4k", name: "http4k-server-jetty", version: "3.113.0"```
 
-**Ktor CIO:** ```compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.112.2"```
+**Ktor CIO:** ```compile group: "org.http4k", name: "http4k-server-ktorcio", version: "3.113.0"```
 
-**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.112.2"```
+**Netty:** ```compile group: "org.http4k", name: "http4k-server-netty", version: "3.113.0"```
 
-**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.112.2"```
+**Undertow:** ```compile group: "org.http4k", name: "http4k-server-undertow", version: "3.113.0"```
 
-**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.112.2"```
+**SunHttp (for development only):** ```compile group: "org.http4k", name: "http4k-core", version: "3.113.0"```
 
 ### About
 Server-backend modules provide a consistent API to mount HttpHandlers into the specified container in 1 LOC, by 
