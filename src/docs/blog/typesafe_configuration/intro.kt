@@ -7,5 +7,5 @@ data class Port(val value: Int) {
 }
 
 fun main() {
-    val port = Port(System.getenv("HTTP_PORT").toInt())
+    val port = Port(System.getenv()["HTTP_PORT"]!!.toInt())
 }
