@@ -70,6 +70,10 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
             "/status/{status}" bind GET to { r: Request ->
                 val status = Status(r.path("status")!!.toInt(), "")
                 Response(status).body("body for status ${status.code}")
+            },
+            "/status-no-body/{status}" bind GET to { r: Request ->
+                val status = Status(r.path("status")!!.toInt(), "")
+                Response(status)
             })
         server = app.asServer(serverConfig(0)).start()
     }

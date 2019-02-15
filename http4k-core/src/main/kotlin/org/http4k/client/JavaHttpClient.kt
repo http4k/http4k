@@ -7,6 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
+import java.io.ByteArrayInputStream
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -48,11 +49,13 @@ object JavaHttpClient {
 
     // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
     private fun HttpURLConnection.body(status: Status) =
-        resolveStream(status).readBytes().let { ByteBuffer.wrap(it) }.let { Body(it) }
+            Body(resolveStream(status).readBytes().let { ByteBuffer.wrap(it) })
 
     private fun HttpURLConnection.resolveStream(status: Status) =
         when {
             status.serverError || status.clientError -> errorStream
             else -> inputStream
-        }
+        } ?: EMPTY_STREAM
+
+    private val EMPTY_STREAM = ByteArrayInputStream(ByteArray(0))
 }
