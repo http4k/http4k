@@ -25,10 +25,10 @@ values to check them as soon as possible in the application bootstrap phase.
 Most applications will require a variety of configuration primitive types, which may or may not map to the Java/Kotlin 
 standard types:
 
-- *strings* such as service URLs, log levels, or AWS role names
-- *numeric* values such as Ports or retry counts
-- *booleans* such as debug switch or feature flags
-- *duration* values for timeouts, backoff times
+- **strings** such as service URLs, log levels, or AWS role names
+- **numeric** values such as Ports or retry counts
+- **booleans** such as debug switch or feature flags
+- **duration** values for timeouts, backoff times
 
 Additionally, these raw types are not enough to guarantee safety - it is best to marshall the values into a suitable 
 operational domain type that can validate format and avoid confusion. A good example of this is the passing of temporal 
@@ -49,11 +49,11 @@ directly in memory in a readable format, where they may be inadvertently inspect
 #### 3. Optionality
 Not all configuration values will be required, so there are 3 distinct modes of optionality available for each parameter:
 
-- *Required:* These values must be injected for each environment, with no default value defined. Most configurations such 
+- **Required:** These values must be injected for each environment, with no default value defined. Most configurations such 
 as hostnames should always use this form to maximise operational safety.
-- *Optional:* These values can be supplied, but there is no default value. This category fits well with dynamic properties 
+- **Optional:** These values can be supplied, but there is no default value. This category fits well with dynamic properties 
 which could be data-driven (ie. not known at compile-time).
-- *Defaulted:* These values can be supplied, but a fallback value (or chain of other config values) will be used if they 
+- **Defaulted:** These values can be supplied, but a fallback value (or chain of other config values) will be used if they 
 are not.
 
 #### 4. Multiplicity
