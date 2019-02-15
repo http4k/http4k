@@ -6,7 +6,8 @@ description: An overview of how to configure http4k applications using the http4
 ##### [@daviddenton](http://github.com/daviddenton) 
 
 ### Intro
-This post intro
+This post covers the various concerns around configuring HTTP apps, and introduces the recommended method for safely 
+addressing these when deploying [http4k](https://http4k.org) applications into cloud-native environments.
 
 ### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/) applications, 
@@ -70,3 +71,5 @@ convenient to source parameter values from a variety of locations when running a
 - Source code defined environmental configuration
 
 ### Introducing http4k Environments
+There are already many options for configurational libraries written in Kotlin, but [http4k](https://http4k.org) also provides one in the 
+`http4k-cloudnative` mecude
