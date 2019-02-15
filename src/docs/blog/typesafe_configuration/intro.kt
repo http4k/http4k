@@ -6,4 +6,6 @@ data class Port(val value: Int) {
     }
 }
 
-val port = Port(System.getenv("HTTP_PORT").toInt())
+fun main() {
+    val port = Port(System.getenv("HTTP_PORT").toInt())
+}

@@ -58,7 +58,10 @@ are not.
 
 #### 4. Multiplicity
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
-representation into their internally represented types at application startup. Illegal or missing values should produce 
+representation into their internally represented types at application startup. 
+
+
+Illegal or missing values should produce 
 a reasonable error and stop the app from starting.
 
 #### 5. Overriding
