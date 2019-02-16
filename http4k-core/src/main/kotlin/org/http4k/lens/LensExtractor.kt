@@ -19,5 +19,4 @@ interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
      * Lens operation to get the value from the target. Synonym for invoke(IN)
      */
     operator fun <R : IN> get(target: R) = extract(target)
-
 }

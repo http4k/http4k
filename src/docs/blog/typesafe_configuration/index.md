@@ -100,13 +100,42 @@ Implementing this kind of fallback logic manually, you'd end up with code like t
 ## Introducing http4k Environments
 There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
 [libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
-which leverages the power of the Lens system already built into the http4k core library to provide a consistent experience
+which leverages the power of the Lens system already built into the http4k core library to provide a consistent 
+experience. In case you're new to Lenses, here's a recap...
 
+### Lenses - a recap
+Lenses in [http4k] are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
+although this concept has been extended within the http4k ecosystem to support that of a form handling and request 
+contexts. 
 
+A Lens itself is an object which defines type parameters representing input `IN` and output `OUT` types and implements 
+one (a `Lens`) or both (a `BiDiLens`) of the following interfaces:
 
+1. **LensExtractor** - takes a value of type `IN` and extracts a value of type `OUT`
+2. **LensInjector** - takes a value of type `IN` and a value of type `OUT` and returns a modified value of type `IN` 
+with the value injected into it.
 
-- lens recap
-- environment keys
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_lens_definition.kt"></script>
+
+The creation of a Lens consists of 5 main concerns:
+
+1. **targeting** determines where the Lens expects to extract and inject the values from/to, which can consist of both 
+an overall target and a name within that target.
+2. **multiplicity** handling which defines how many of a particular value we are attempting to handle.
+3. the **transformation** chain of function composition which forms a specification for converting one type to another. 
+This is done in code using the `map()` method defined on the Lens.
+4. the **optionality** of a Lens denotes the behaviour if/when a value cannot be found in the target.
+
+To define a Lens instance through the http4k Lens API, we take an initial **target** specification, decide it's 
+**multiplicity**, provide any **transformations** with `map()`, and finally reify the specification into a Lens instance 
+by deciding it's optionality.
+
+It sounds involved, but it is consistent and the fluent API has been designed to make it simpler. By way of an example, 
+here we define a Lens which is **targetted** at the **required** querystring parameter "pageNumber", and which extracts 
+and injects values of custom type `Page`.
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_lens_example.kt"></script>
+
 - environments
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_overriding.kt"></script>
