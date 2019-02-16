@@ -25,7 +25,7 @@ values to check them as soon as possible in the application bootstrap phase.
 Kotlin's type system guards us against missing values being injected - for instance the following code will throw a 
 `IllegalStateException` due to a typo in the parameter name:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_missing.kt"></script>
 
 However not all configuration values will be required. We can define that there are 3 distinct modes of optionality 
 available for each parameter:
@@ -52,14 +52,14 @@ But handling these raw types alone is not enough to guarantee safety - it is bes
 suitable operational/domain type that can validate the input and avoid confusion. Kotlin gives us a simple way to do this 
 using `require` as a guard:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_validation.kt"></script>
 
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
 example of this is the passing of temporal values as integral values - timeouts defined this way could be easily be 
 parsed into the wrong time unit (seconds instead of milliseconds). Using a higher level primitive such as `Duration` 
 will help us here.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_typesafe.kt"></script>
  
 Obviously, the above is still not very safe - a failed coercion will now fail with one of 3 different exceptions depending 
 on if the value was missing (`IllegalStateException`), unparsable (`DateTimeParseException`) or invalid 
@@ -70,7 +70,7 @@ wish to parse.
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
 representation (usually comma-separated) and into their internally represented types at application startup. 
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_multiplicity.kt"></script>
 
 Once again, the splitting code will need to be repeated for each config value.
 
@@ -81,7 +81,7 @@ directly in memory in a readable format, where they may be inadvertently inspect
 
 Mistakes such as in the code below are easily done, and asking for trouble...
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/security.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_secrets.kt"></script>
 
 #### 5. Configuration Context & Overriding
 We also want to avoid defining all values for all possible scenarios - for example in test cases, so the ability 
@@ -95,13 +95,26 @@ convenient to source parameter values from a variety of contexts when running ap
 - Source code defined environmental configuration
 
 Implementing this kind of fallback logic manually, you'd end up with code like the below: 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/overriding.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre_overriding.kt"></script>
 
 ## Introducing http4k Environments
 There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
 [libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
-which leverages the power of the Lens system already built into the http4k core library.
+which leverages the power of the Lens system already built into the http4k core library to provide a consistent experience
 
+
+
+
+- lens recap
+- environment keys
+- environments
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_overriding.kt"></script>
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_typesafe.kt"></script>
+
+- secrets
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post_secrets.kt"></script>
 
 
 [github]: http://github.com/daviddenton
