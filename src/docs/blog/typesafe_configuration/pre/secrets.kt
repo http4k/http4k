@@ -1,4 +1,4 @@
-package blog.typesafe_configuration
+package blog.typesafe_configuration.pre
 
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET

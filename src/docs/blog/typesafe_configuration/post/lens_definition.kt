@@ -1,4 +1,4 @@
-package blog.typesafe_configuration
+package blog.typesafe_configuration.post
 
 interface LensExtractor<in IN, out OUT> : (IN) -> OUT {
     override operator fun invoke(target: IN): OUT
