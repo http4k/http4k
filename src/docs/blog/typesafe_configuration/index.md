@@ -11,7 +11,7 @@ addressing these when deploying [http4k](https://http4k.org) applications into c
 Kotlin type system.
 
 ### Concerns when configuring applications
-One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/) applications, 
+One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/), 
 and especially in containerised cloud-native apps, is to inject all app configuration through the use of environmental 
 variables. Additionally, when using more restrictive settings (such as utilising JVM security manager policies or through 
 the use of container images which don't provide an OS baseline) it may not be possible to read files from disk, which 
