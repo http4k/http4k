@@ -94,12 +94,15 @@ convenient to source parameter values from a variety of contexts when running ap
 - Local files
 - Source code defined environmental configuration
 
+Implementing this kind of fallback logic manually, you'd end up with code like the below: 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/overriding.kt"></script>
 
 ## Introducing http4k Environments
 There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
 [libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
 which leverages the power of the Lens system already built into the http4k core library.
+
+
 
 [github]: http://github.com/daviddenton
 [12factor]: https://12factor.net/
