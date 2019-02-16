@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.113.0 (uncut)
+- Trim leading and trailing whitespace from extracted `EnvironmentKey` values.
+
 ### v3.113.0
 - Added some common types for Environmental setup, and equivalent BiDiLens mappings
 - Handle null response in Java Http client. H/T @FredNordin

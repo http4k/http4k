@@ -88,7 +88,7 @@ internal class MapEnvironment internal constructor(private val contents: Map<Str
  * EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the entire list, or override the comma separator in your initial Environment.
  */
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
-    LensGet { name, target -> target[name]?.split(target.separator) ?: emptyList() },
+    LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
     LensSet { name, values, target ->
         values.fold(target) { acc, next ->
             val existing = acc[name]?.let { listOf(it) } ?: emptyList()

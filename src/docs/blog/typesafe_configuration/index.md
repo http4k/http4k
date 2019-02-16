@@ -21,7 +21,25 @@ There are several particular relevant concerns that we need to address, but over
 that any misconfiguration of the application will result in it failing to startup. For this reason we want to reify all 
 values to check them as soon as possible in the application bootstrap phase.
 
-#### 1. Type coercion
+#### 1. Optionality
+Kotlin's type system guards us against missing values being injected - for instance the following code will throw a 
+`IllegalStateException` due to a typo in the parameter name:
+
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt"></script>
+
+However not all configuration values will be required. We can define that there are 3 distinct modes of optionality 
+available for each parameter:
+
+- **Required:** These values must be injected for each environment, with no default value defined. Most configurations such 
+as hostnames should always use this form to maximise operational safety.
+- **Optional:** These values can be supplied, but there is no default value. This category fits well with dynamic properties 
+which could be data-driven (ie. not known at compile-time).
+- **Defaulted:** These values can be supplied, but a fallback value (or chain of other config values) will be used if they 
+are not.
+
+
+#### 2. Type coercion
 Most applications will require a variety of configuration primitive types, which may or may not map to the Java/Kotlin 
 standard types:
 
@@ -32,41 +50,36 @@ standard types:
 
 Additionally, understanding these raw types is not enough to guarantee safety - it is best to marshall the values into a 
 suitable operational/domain type that can validate the input and avoid confusion. Kotlin gives us a simple way to do this 
-using `require`:
+using `require` as a guard:
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/primitive.kt)
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/primitive.kt"></script>
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt"></script>
 
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
-example of this is the passing of temporal values as integral values - timeouts defined this way could be parsed as the 
-wrong unit (seconds instead of milliseconds).
+example of this is the passing of temporal values as integral values - timeouts defined this way could be easily be 
+parsed into the wrong time unit (seconds instead of milliseconds). We can combine
 
 ##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt"></script>
  
-Obviously, the above is still not very safe - a failed coercion will still fail with an `IllegalArgumentException` or a 
-`NullPointerException`. We can do better.
+Obviously, the above is still not very safe - a failed coercion will now fail with one of 3 different exceptions depending 
+on if the value was missing (`IllegalStateException`), unparsable (`DateTimeParseException`) or invalid 
+(`IllegalArgumentException`). Additionally, the conversion code from `String -> Duration` must be repeated for each value 
+that we wish to parse.
 
-#### 2. Security
-The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
-application secrets, DB passwords or API keys should (as far as is reasonable) be handled in a way that avoid storing 
-directly in memory in a readable format, where they may be inadvertently inspected or outputted into a log file.
-
-#### 3. Optionality
-Not all configuration values will be required, so there are 3 distinct modes of optionality available for each parameter:
-
-- **Required:** These values must be injected for each environment, with no default value defined. Most configurations such 
-as hostnames should always use this form to maximise operational safety.
-- **Optional:** These values can be supplied, but there is no default value. This category fits well with dynamic properties 
-which could be data-driven (ie. not known at compile-time).
-- **Defaulted:** These values can be supplied, but a fallback value (or chain of other config values) will be used if they 
-are not.
-
-#### 4. Multiplicity
+#### 3. Multiplicity
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
 representation into their internally represented types at application startup. 
 
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt"></script>
+
 Illegal or missing values should produce a reasonable error and stop the app from starting.
+
+#### 4. Security
+The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
+application secrets, DB passwords or API keys should (as far as is reasonable) be handled in a way that avoid storing 
+directly in memory in a readable format, where they may be inadvertently inspected or outputted into a log file.
 
 #### 5. Configuration Context & Overriding
 We also want to avoid defining all values for all possible scenarios - for example in test cases, so the ability 

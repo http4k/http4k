@@ -41,6 +41,7 @@ class EnvironmentKeyTest {
         assertThat(withInjectedValue["SOME_VALUE"], equalTo("80,81"))
 
         assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(withInjectedValue), equalTo(listOf(80, 81)))
+        assertThat(EnvironmentKey.int().multi.required("SOME_VALUE")(from("SOME_VALUE" to "80  , 81  ")), equalTo(listOf(80, 81)))
     }
 
     @Test
