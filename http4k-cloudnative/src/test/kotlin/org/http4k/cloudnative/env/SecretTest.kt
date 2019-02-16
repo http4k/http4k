@@ -28,5 +28,14 @@ class SecretTest {
     fun `can clear the value`() {
         assertThat(Secret("mySecret").clear().stringValue(), equalTo("\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"))
     }
+
+    @Test
+    fun `can use the value, after which it is cleared`() {
+        val secret = Secret("mySecret")
+
+        secret.use { assertThat(it.stringValue(), equalTo("mySecret")) }
+
+        assertThat(secret.stringValue(), equalTo("\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"))
+    }
 }
 

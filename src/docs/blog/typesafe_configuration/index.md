@@ -150,7 +150,12 @@ objects.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/typesafe.kt"></script>
 
-- secrets
+##### Handling failure
+When using the [http4k] Environment to define config, missing or values which cannot be deserialised all now cause 
+a `LensFailure` to be thrown with a descriptive error message. As before, this results in the application failing to 
+start, but as the exception if both consistent and explicit, diagnosing the problem becomes much simpler.
+
+###
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/secrets.kt"></script>
 
 
