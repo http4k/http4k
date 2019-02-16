@@ -6,9 +6,9 @@ description: An overview of how to configure http4k applications using the http4
 ##### [@daviddenton](http://github.com/daviddenton) 
 
 ### Intro
-This post covers the various concerns around configuring HTTP apps, and introduces the recommended method for safely 
-addressing these when deploying [http4k](https://http4k.org) applications into cloud-native environments using the 
-Kotlin type system.
+This post covers the various concerns around configuring HTTP apps, and introduces the [http4k](https://http4k.org) 
+approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type 
+system for maximum safely and code reuse.
 
 ### Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/), 
@@ -38,6 +38,7 @@ which could be data-driven (ie. not known at compile-time).
 - **Defaulted:** These values can be supplied, but a fallback value (or chain of other config values) will be used if they 
 are not.
 
+Missing values should produce a reasonable error and stop the app from starting.
 
 #### 2. Type coercion
 Most applications will require a variety of configuration primitive types, which may or may not map to the Java/Kotlin 
@@ -73,8 +74,6 @@ representation into their internally represented types at application startup.
 
 ##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt"></script>
-
-Illegal or missing values should produce a reasonable error and stop the app from starting.
 
 #### 4. Security
 The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
