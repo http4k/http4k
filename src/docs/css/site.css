@@ -37,7 +37,8 @@ ul.statusLink li {
 .octocat {
     position: relative;
     top: 1px;
-    width: 16px ;
+    width: 16px;
+    content: url("/img/octocat-32.png");
 }
 
 .pill {

@@ -13,7 +13,7 @@ A set of classes to provide simple recording/replaying of HTTP traffic. This is 
 Using `Filters` it's possible to record traffic and then return recorded content instead of making repeated calls. Note that the provided storage 
 implementations DO NOT have any facility for Cache Control or eviction, or respect any response headers around caching. Requests are indexed in a way optimised for retrieval.
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_cache.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_cache.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_cache.kt"></script>
 
@@ -21,7 +21,7 @@ implementations DO NOT have any facility for Cache Control or eviction, or respe
 
 Using `Filters` it's possible to record a stream traffic and then replay recorded content instead. Requests are indexed in a way optimised for iteration.
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_stream.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_stream.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/record_and_replay/example_stream.kt"></script>
 

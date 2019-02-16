@@ -15,7 +15,7 @@ These modules add the ability to use JSON as a first-class citizen when reading 
 standard methods and extension methods for converting common types into native JSON/XML objects, including custom Lens methods for each library so that 
 JSON node objects can be written and read directly from HTTP messages:
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/example.kt"></script>
 
@@ -25,7 +25,7 @@ Some of the message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechan
 
 We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt"></script>
 
@@ -43,7 +43,7 @@ This is demonstrated by the following, where you can see that the output of the 
 
 As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLens()` instead, and then compare using `Arrays.equal()`
 
-[<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/list_gotcha.kt)
+[<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/list_gotcha.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/list_gotcha.kt"></script>
 

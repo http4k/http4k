@@ -9,5 +9,5 @@ Example of how to use the JSON library API wrappers, in this case the module use
     compile group: "org.http4k", name: "http4k-format-jackson", version: "3.113.0"
 ```
 
-### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_json/example.kt)
+### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_json/example.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/using_json/example.kt"></script>

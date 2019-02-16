@@ -18,13 +18,13 @@ combined into `RouteModules`, which have the following features:
 (http://json-schema.org/) models for messages.
 - **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt"></script>
 
 When launched, OpenApi/Swagger format documentation (including JSON schema models) can be found at the route of the module.
 
-#### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt"></script>
 

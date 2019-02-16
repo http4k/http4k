@@ -26,7 +26,7 @@ To enable OAuth integration, construct a configured instance of `OAuthProvider`.
 1. A fully configured API client (which populated the Host on the URI) - this allows different
 implementations of the provider to be used across environments.
 
-### Example provider [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/oauth/example_provider_oauth.kt)
+### Example provider [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/oauth/example_provider_oauth.kt)
 
 Out of the box, http4k provides implementations for several OAuth providers.
 

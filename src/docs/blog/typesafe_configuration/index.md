@@ -3,15 +3,15 @@ description: An overview of how to configure http4k applications using the http4
 
 # Add typesafe 12-factor configuration to http4k apps with Environments.
 
-##### [@daviddenton](http://github.com/daviddenton) 
+##### [@daviddenton][github] 
 
 ### Intro
-This post covers the various concerns around configuring HTTP apps, and introduces the [http4k](https://http4k.org) 
+This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] 
 approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type 
 system for maximum safely and code reuse.
 
 ### Concerns when configuring applications
-One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/), 
+One of the tenets of operating applications according to the principles of [12factor], 
 and especially in containerised cloud-native apps, is to inject all app configuration through the use of environmental 
 variables. Additionally, when using more restrictive settings (such as utilising JVM security manager policies or through 
 the use of container images which don't provide an OS baseline) it may not be possible to read files (such as YAML, JSON 
@@ -25,7 +25,7 @@ values to check them as soon as possible in the application bootstrap phase.
 Kotlin's type system guards us against missing values being injected - for instance the following code will throw a 
 `IllegalStateException` due to a typo in the parameter name:
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt)
+##### Code [<img class="octocat">][illegalstate]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt"></script>
 
 However not all configuration values will be required. We can define that there are 3 distinct modes of optionality 
@@ -42,37 +42,38 @@ Missing values should produce a reasonable error and stop the app from starting.
 
 #### 2. Type coercion
 Most applications will require a variety of configuration primitive types, which may or may not map to the Java/Kotlin 
-standard types:
+standard types, including:
 
 - **strings** such as service URLs, log levels, or AWS role names
-- **numeric** values such as Ports or retry counts
+- **numeric** values such as ports or retry counts
 - **booleans** such as debug switch or feature flags
 - **duration** values for timeouts, backoff times
 
-Additionally, understanding these raw types is not enough to guarantee safety - it is best to marshall the values into a 
+But handling these raw types alone is not enough to guarantee safety - it is best to marshall the values into a 
 suitable operational/domain type that can validate the input and avoid confusion. Kotlin gives us a simple way to do this 
 using `require` as a guard:
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt)
+##### Code [<img class="octocat">][port]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt"></script>
 
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
 example of this is the passing of temporal values as integral values - timeouts defined this way could be easily be 
-parsed into the wrong time unit (seconds instead of milliseconds). We can combine
+parsed into the wrong time unit (seconds instead of milliseconds). Using a higher level primitive such as `Duration` 
+will help us here.
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt)
+##### Code [<img class="octocat">][timeout]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt"></script>
  
 Obviously, the above is still not very safe - a failed coercion will now fail with one of 3 different exceptions depending 
 on if the value was missing (`IllegalStateException`), unparsable (`DateTimeParseException`) or invalid 
-(`IllegalArgumentException`). Additionally, the conversion code from `String -> Duration` must be repeated for each value 
-that we wish to parse.
+(`IllegalArgumentException`). The conversion code from `String -> Duration` must also be repeated for each value that we 
+wish to parse.
 
 #### 3. Multiplicity
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
 representation into their internally represented types at application startup. 
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt)
+##### Code [<img class="octocat">][multiplicity]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt"></script>
 
 #### 4. Security
@@ -92,8 +93,21 @@ convenient to source parameter values from a variety of contexts when running ap
 - Source code defined environmental configuration
 
 ### Introducing http4k Environments
-There are [already](https://github.com/ufoscout/properlty) [many](https://github.com/config4k/config4k) 
-[options](https://github.com/uchuhimo/konf) [for](https://github.com/jdiazcano/cfg4k) 
-[configurational](https://github.com/daviddenton/configur8) [libraries](https://github.com/mariomac/kaconf) written in 
-Kotlin, but [http4k](https://http4k.org) also provides an option in the `http4k-cloudnative` add-on module. 
+There are [already][properlty] [many][config4k] 
+[options][konf] [for][cfg4k] 
+[configurational][configur8] [libraries][kaconf] written in 
+Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module. 
 
+[github]: http://github.com/daviddenton
+[12factor]: https://12factor.net/
+[http4k]: https://http4k.org
+[illegalstate]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt
+[port]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt
+[timeout]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt
+[multiplicity]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt
+[properlty]: https://github.com/ufoscout/properlty
+[config4k]: https://github.com/config4k/config4k
+[konf]: https://github.com/uchuhimo/konf
+[cfg4k]: https://github.com/jdiazcano/cfg4k
+[configur8]: https://github.com/daviddenton/configur8
+[kaconf]: https://github.com/mariomac/kaconf

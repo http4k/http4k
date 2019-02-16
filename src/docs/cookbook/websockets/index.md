@@ -21,15 +21,15 @@ The simplest possible Websocket can be mounted as a `WsConsumer` function onto a
 { ws: Websocket -> ws.send(WsMessage("hello")) }.asServer(Jetty(9000)).start()
 ```
 
-### Mixing HTTP and Websocket services [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt)
+### Mixing HTTP and Websocket services [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt)
 Both Websockets and Http handlers in **http4k** are routed using a similar path-based API. We combine them into a single `PolyHandler` which can handle both `http://` and `ws://`, and then convert to a Server as usual:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_polyhandler.kt"></script>
 
-### Automarshalling Websockets messages [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt)
+### Automarshalling Websockets messages [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt)
 Using the standard Lens API, we can auto-convert Websocket messages on and off the wire. This example uses the Jackson for the marshalling:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_automarshalling.kt"></script>
 
-### Testing Websockets [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)
+### Testing Websockets [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/websockets/example_testing.kt)
 **http4k** provides Websockets that are both typesafe (via the Lens API), and testable. Both `WsHandlers` and `PolyHandlers` are convertible to a `WsClient` which provides a synchronous API for testing reactions to Websocket events in an offline environment.
 
 In the below example, we have gone one step further - defining a contract test case and then providing 2 implementations of it - one for unit-testing (in memory), one using a server. [**http4k**](https://github.com/http4k/http4k) provides clients with an identical interface for both cases, meaning it's possible reuse the same test logic:
