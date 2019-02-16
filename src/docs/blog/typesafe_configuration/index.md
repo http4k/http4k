@@ -5,12 +5,12 @@ description: An overview of how to configure http4k applications using the http4
 
 ##### [@daviddenton][github] 
 
-### Intro
+## Intro
 This post covers the various concerns around configuring HTTP apps, and introduces the [http4k] 
 approach for addressing these when deploying applications into cloud-native environments, which leverages the Kotlin type 
 system for maximum safely and code reuse.
 
-### Concerns when configuring applications
+## Concerns when configuring applications
 One of the tenets of operating applications according to the principles of [12factor], 
 and especially in containerised cloud-native apps, is to inject all app configuration through the use of environmental 
 variables. Additionally, when using more restrictive settings (such as utilising JVM security manager policies or through 
@@ -25,7 +25,6 @@ values to check them as soon as possible in the application bootstrap phase.
 Kotlin's type system guards us against missing values being injected - for instance the following code will throw a 
 `IllegalStateException` due to a typo in the parameter name:
 
-##### Code [<img class="octocat">][illegalstate]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt"></script>
 
 However not all configuration values will be required. We can define that there are 3 distinct modes of optionality 
@@ -53,7 +52,6 @@ But handling these raw types alone is not enough to guarantee safety - it is bes
 suitable operational/domain type that can validate the input and avoid confusion. Kotlin gives us a simple way to do this 
 using `require` as a guard:
 
-##### Code [<img class="octocat">][port]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt"></script>
 
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
@@ -61,7 +59,6 @@ example of this is the passing of temporal values as integral values - timeouts 
 parsed into the wrong time unit (seconds instead of milliseconds). Using a higher level primitive such as `Duration` 
 will help us here.
 
-##### Code [<img class="octocat">][timeout]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt"></script>
  
 Obviously, the above is still not very safe - a failed coercion will now fail with one of 3 different exceptions depending 
@@ -71,15 +68,20 @@ wish to parse.
 
 #### 3. Multiplicity
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
-representation into their internally represented types at application startup. 
+representation (usually comma-separated) and into their internally represented types at application startup. 
 
-##### Code [<img class="octocat">][multiplicity]
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt"></script>
+
+Once again, the splitting code will need to be repeated for each config value.
 
 #### 4. Security
 The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
 application secrets, DB passwords or API keys should (as far as is reasonable) be handled in a way that avoid storing 
 directly in memory in a readable format, where they may be inadvertently inspected or outputted into a log file.
+
+Mistakes such as in the code below are easily done, and asking for trouble...
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/security.kt"></script>
 
 #### 5. Configuration Context & Overriding
 We also want to avoid defining all values for all possible scenarios - for example in test cases, so the ability 
@@ -92,19 +94,16 @@ convenient to source parameter values from a variety of contexts when running ap
 - Local files
 - Source code defined environmental configuration
 
-### Introducing http4k Environments
-There are [already][properlty] [many][config4k] 
-[options][konf] [for][cfg4k] 
-[configurational][configur8] [libraries][kaconf] written in 
-Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module. 
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/overriding.kt"></script>
+
+## Introducing http4k Environments
+There are [already][properlty] [many][config4k] [options][konf] [for][cfg4k] [configurational][configur8] 
+[libraries][kaconf] written in Kotlin, but [http4k] also provides an option in the `http4k-cloudnative` add-on module 
+which leverages the power of the Lens system already built into the http4k core library.
 
 [github]: http://github.com/daviddenton
 [12factor]: https://12factor.net/
 [http4k]: https://http4k.org
-[illegalstate]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/illegalstate.kt
-[port]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/port.kt
-[timeout]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt
-[multiplicity]: https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/multiplicity.kt
 [properlty]: https://github.com/ufoscout/properlty
 [config4k]: https://github.com/config4k/config4k
 [konf]: https://github.com/uchuhimo/konf
