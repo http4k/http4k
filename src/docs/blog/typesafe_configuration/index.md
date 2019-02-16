@@ -131,7 +131,7 @@ To define a Lens instance through the [http4k] Lens API, we take an initial **ta
 by deciding it's optionality.
 
 It sounds involved, but it is consistent and the fluent API has been designed to make it simpler. By way of an example, 
-here we define a Lens which is **targetted** at the **required** querystring parameter "pageNumber", and which extracts 
+here we define a Lens which is **targeted** at the **required** querystring parameter "pageNumber", and which extracts 
 and injects values of custom type `Page`.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/lens_example.kt"></script>
