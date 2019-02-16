@@ -14,8 +14,8 @@ Kotlin type system.
 One of the tenets of operating applications according to the principles of [12-factor](https://12factor.net/), 
 and especially in containerised cloud-native apps, is to inject all app configuration through the use of environmental 
 variables. Additionally, when using more restrictive settings (such as utilising JVM security manager policies or through 
-the use of container images which don't provide an OS baseline) it may not be possible to read files from disk, which 
-reinforces this approach.
+the use of container images which don't provide an OS baseline) it may not be possible to read files (such as YAML, JSON 
+etc) from disk, which reinforces this approach.
 
 There are several particular relevant concerns that we need to address, but overall the effect that we are looking for is 
 that any misconfiguration of the application will result in it failing to startup. For this reason we want to reify all 
@@ -30,14 +30,20 @@ standard types:
 - **booleans** such as debug switch or feature flags
 - **duration** values for timeouts, backoff times
 
-Additionally, these raw types are not enough to guarantee safety - it is best to marshall the values into a suitable 
-operational domain type that can validate format and avoid confusion. A good example of this is the passing of temporal 
-values as integer values - timeouts can be interpreted incorrectly in the wrong unit (seconds instead of milliseconds). 
-Kotlin gives us a simple way to do this using data classes:
+Additionally, understanding these raw types is not enough to guarantee safety - it is best to marshall the values into a 
+suitable operational/domain type that can validate the input and avoid confusion. Kotlin gives us a simple way to do this 
+using `require`:
 
-##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt)
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/intro.kt"></script>
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/primitive.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/primitive.kt"></script>
 
+Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
+example of this is the passing of temporal values as integral values - timeouts defined this way could be parsed as the 
+wrong unit (seconds instead of milliseconds).
+
+##### Code [<img class="octocat" src="/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/timeout.kt"></script>
+ 
 Obviously, the above is still not very safe - a failed coercion will still fail with an `IllegalArgumentException` or a 
 `NullPointerException`. We can do better.
 
@@ -60,14 +66,12 @@ are not.
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
 representation into their internally represented types at application startup. 
 
+Illegal or missing values should produce a reasonable error and stop the app from starting.
 
-Illegal or missing values should produce 
-a reasonable error and stop the app from starting.
-
-#### 5. Overriding
-We also want to avoid defining all values for all possible environments - for example in test cases, so the ability 
+#### 5. Configuration Context & Overriding
+We also want to avoid defining all values for all possible scenarios - for example in test cases, so the ability 
 to overlay configuration sets on top of each other is useful. Although it is against the rules of 12-factor, it is sometimes 
-convenient to source parameter values from a variety of locations when running applications in non-cloud environments:
+convenient to source parameter values from a variety of contexts when running applications in non-cloud environments:
 
 - System Environment variables
 - Properties files
@@ -76,5 +80,8 @@ convenient to source parameter values from a variety of locations when running a
 - Source code defined environmental configuration
 
 ### Introducing http4k Environments
-There are already many options for configurational libraries written in Kotlin, but [http4k](https://http4k.org) also provides one in the 
-`http4k-cloudnative` mecude
+There are [already](https://github.com/ufoscout/properlty) [many](https://github.com/config4k/config4k) 
+[options](https://github.com/uchuhimo/konf) [for](https://github.com/jdiazcano/cfg4k) 
+[configurational](https://github.com/daviddenton/configur8) [libraries](https://github.com/mariomac/kaconf) written in 
+Kotlin, but [http4k](https://http4k.org) also provides an option in the `http4k-cloudnative` add-on module. 
+

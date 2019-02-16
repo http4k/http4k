@@ -2,7 +2,7 @@ package org.http4k.cloudnative.env
 
 data class Host(val value: String) {
     init {
-        if (value.isEmpty()) throw IllegalArgumentException("Could not construct Host from '$value'")
+        require(!value.isEmpty()) { "Could not construct Host from '$value'" }
     }
 
     companion object {
