@@ -117,7 +117,7 @@ with the value injected into it.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/lens_definition.kt"></script>
 
-The creation of a Lens consists of 5 main concerns:
+The creation of a Lens consists of 4 main concerns:
 
 1. **targeting** determines where the Lens expects to extract and inject the values from/to, which can consist of both 
 an overall target and a name within that target.
