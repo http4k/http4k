@@ -1,11 +1,11 @@
 title: http4k Performance
 description: An overview of http4k performance
 
-The **http4k** server-backend modules provide a very thin adapter layer over the raw APIs of the underlying servers, so 
+The [http4k] server-backend modules provide a very thin adapter layer over the raw APIs of the underlying servers, so 
 generally performs at a very low overhead compared to the raw server.
 
 ### Tech Empower Benchmarks
-We have entered **http4k** into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
+We have entered [http4k] into the prominent [Tech Empower Framework Benchmarks](https://www.techempower.com/benchmarks/) 
 project, which assesses frameworks over a series of realistic tests. 
 
 For this benchmark, no customisation or performance tuning of the underlying servers was done - the default application 
@@ -21,38 +21,41 @@ Command-line JVM options, however, were tuned for the test to take advantage of 
 
 The full implementation of the benchmark can be found [here](https://github.com/TechEmpower/FrameworkBenchmarks/tree/master/frameworks/Kotlin/http4k).
 
-### Results - Round 16
-Overall, http4k did very well in this round of benchmarking, especially considering that the ethos of the library is one of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
+### Results - Round 17
+Overall, http4k did very well in this round of benchmarking, especially considering that the ethos of the library is one 
+of excellent Developer experience over and above high-end performance (which tends to result in less friendly APIs).
 
-The big surprise was the high performance of the Apache server backend, which consistently outranked Undertow (which is the the most fully featured of all the supported backends and our default option). The SunHttp backend, which we entered for a baseline comparison, unfortunately didn't produce any results in this round.
+The big surprise was the high performance of the Apache server backend, which consistently outranked Undertow (which is 
+the the most fully featured of all the supported backends and our default option). The SunHttp backend, which we entered 
+for a baseline comparison, unfortunately didn't produce any results in this round.
 
-For each of the sections below, the rankings are based only on JVM-based entries.
-
-#### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=fortune&l=fjd30b):
-*Top rank: 11/82 - Apache backend*
+#### DB query + HTML rendering: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=fortune&l=fjd30b):
+*Top rank: 6/73 - Apache backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
 Handlebars templating engine is used for rendering.
 
-#### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=query&l=fjd30b):
-*Top rank: 3/76 - Jetty backend*
+#### Multiple DB queries: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=query&l=fjd30b):
+*Top rank: 3/66 - Jetty backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
 
-#### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=db&l=fjd30b):
-*Top rank: 7/78 - Apache backend*
+#### Single DB query: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=db&l=fjd30b):
+*Top rank: 8/68 - Apache backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
 
-#### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=update&l=fjd30b):
-*Top rank: 11/69 - Jetty backend*
+#### Random DB updates: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=update&l=fjd30b):
+*Top rank: 14/59 - Jetty backend*
 
 Database driver used is PostgreSql backed by a Hikari pool.
 
-#### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=json&l=fjd30b):
-*Top rank: 23/77 - Apache backend*
+#### JSON Serialization: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=json&l=fjd30b):
+*Top rank: 20/69 - Apache backend*
 
 The standard Jackson module is used for JSON creation and marshalling.
 
-#### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r16&hw=ph&test=plaintext&l=fjd30b):
-*Top rank: 23/73 - Apache backend*
+#### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=plaintext&l=fjd30b):
+*Top rank: 23/66 - Apache backend*
+
+[http4k]: https://http4k.org
