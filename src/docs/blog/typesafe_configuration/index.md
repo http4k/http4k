@@ -55,7 +55,7 @@ using `require` as a guard:
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre/validation.kt"></script>
 
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
-example of this is the passing of temporal values as integral values - timeouts defined this way could be easily be 
+example of this is the passing of temporal values as integers - timeouts defined this way could be easily be 
 parsed into the wrong time unit (seconds instead of milliseconds). Using a higher level primitive such as `Duration` 
 will help us here.
 
