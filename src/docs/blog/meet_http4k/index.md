@@ -36,16 +36,16 @@ every integration under the sun - merely simple points to allow those integratio
 
 Another thing to say is that (not very much) of [http4k] is new - it's rather the 
 distillation of 15 years worth of experience of using various server-side libraries and hence most of the good ideas are 
-stolen. For instance - the routing module is inspired by [UtterlyIdle](https://github.com/bodar/utterlyidle), the basic 
-"Server as a function" model is stolen from [Finagle](https://twitter.github.io/finagle/), and the contract module
- OpenApi/Swagger generator is ported from [Fintrospect](http://fintrospect.io/). 
+stolen. For instance - the routing module is inspired by [UtterlyIdle], the basic 
+"Server as a function" model is stolen from [Finagle], and the contract module
+ OpenApi/Swagger generator is ported from [Fintrospect]. 
 
 With the growing adoption of Kotlin, we wanted something that would fully leverage the functional features of the language 
 and it felt like a good time to start something from scratch, whilst avoiding the *magic* that plagues other frameworks. 
 Hence, [http4k] is primarily designed to be a Kotlin-first library.
 
 ## Claim A: Small, simple, immutable.
-Based on the awesome ["Your Server as a Function"](https://monkey.org/~marius/funsrv.pdf) paper from Twitter, [http4k] 
+Based on the awesome ["Your Server as a Function"] paper from Twitter, [http4k] 
 apps are modelled by composing 2 types of simple, independent function. 
 
 ### Function 1: HttpHandler
@@ -78,7 +78,7 @@ Ktor CIO, and SunHttp are available) and change the call to `asServer()`.
 interface Filter : (HttpHandler) -> HttpHandler
 ```
 For API conciseness and discoverability reasons this is modelled as an Interface and not a [Typealias] - it also has a 
-couple of Kotlin [extension methods](https://kotlinlang.org/docs/reference/extensions.html) to allow you to compose 
+couple of Kotlin [extension methods] to allow you to compose 
 `Filters` with `HttpHandlers` and other `Filters`:
 ```kotlin
 val setContentType = Filter { next ->
@@ -93,7 +93,7 @@ val decoratedApp: HttpHandler = composedFilter.then(app)
 Filters are also trivial to test independently, because they are generally just stateless functions.
 
 ### Routing
-[http4k](https://github.com/http4k/http4k)'s nestable routing looks a lot like every other Sinatra-style framework these 
+[http4k]'s nestable routing looks a lot like every other Sinatra-style framework these 
 days, and allows for infinitely nesting `HttpHandlers` - this just exposes another `HttpHandler` so you can easily extract, 
 test and reuse sets of routes as easily as you could with one:
 ```kotlin
@@ -137,7 +137,7 @@ fun MyApp2(app1: HttpHandler): HttpHandler = { app1(it) }
 val app1: HttpHandler = MyApp1()
 val app2: HttpHandler = MyApp2(app1)
 ```
-[http4k] provides a HTTP client adapters for both [Apache](https://hc.apache.org/) and [OkHttp](http://square.github.io/okhttp/), 
+[http4k] provides a HTTP client adapters for both [Apache] and [OkHttp], 
 all with streaming support.
 
 ## Claim C. Typesafe HTTP with Lenses
@@ -148,7 +148,7 @@ val request = Request(GET, "http://server/search?page=123")
 val page: Int = request.query("page")!!.toInt
 ```
 ...but we also want to ensure that the expected values are both present and valid, since the above example will fail if 
-either of those things is not true. For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing) to enforce the expected HTTP contract.
+either of those things is not true. For this purpose, we can use a [Lens] to enforce the expected HTTP contract.
 
 The use of Lenses in [http4k] applications can remove the need for writing any parsing or validation code for all incoming 
 data (including Forms), as validations are taken care of by the library. 
@@ -216,8 +216,8 @@ generate a set of data classes for a given messages.
 
 ## Claim D. Serverless
 Ah yes - Serverless - the latest in the Cool Kids Club and killer fodder for the resume. Well, since [http4k] is server 
-independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), 
-and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. 
+independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda], 
+and then call them by setting up the [API Gateway] to proxy requests to the function. 
 Effectively, the combination of these two services become just another Server back-end supported by the library.
 
 In order to achieve this, only a single interface `AppLoader` needs to be implemented - this is responsible for creating 
@@ -236,7 +236,7 @@ object TweetEcho : AppLoader {
 }
 ```
 Since [http4k] is very dependency-light, full binary uploads of these AWS Lambdas tend to be very small - and by utilising 
-[Proguard](https://www.guardsquare.com/en/proguard) we've seen the size of a Lambda UberJar go as small as 150kb.
+[Proguard] we've seen the size of a Lambda UberJar go as small as 150kb.
 
 Introduced in v3.0.0, this support is available in the `http4k-serverless-lambda` module.
 
@@ -244,7 +244,7 @@ Introduced in v3.0.0, this support is available in the `http4k-serverless-lambda
 As pointed out above, `http4k-core` module has zero dependencies. It is also small, even though it also provides:
 
 * Support for static file-serving with HotReload.
-* A bunch of useful Filters for stuff like [Zipkin](http://zipkin.io/) Request Tracing.
+* A bunch of useful Filters for stuff like [Zipkin] Request Tracing.
 * Support for Request Contexts.
 * Facilities to record and replay HTTP traffic.
 
@@ -255,22 +255,22 @@ and consistency:
 * Popular JSON/XML (Gson, Jackson, Moshi, etc) library support for HTTP bodies.
 * Typesafe HTML Form and Multipart Forms processing, with support for Streaming uploads to a storage service. Forms can 
 also be configured to collect errors instead of just rejecting outright.
-* Typesafe contract module, providing live [OpenApi/Swagger](https://www.openapis.org/) documentation.
-* [AWS](https://aws.amazon.com/) request signing.
-* [Resilience4j](http://resilience4j.github.io/resilience4j/) integration, including Circuit Breakers & Rate Limiting.
-* Testing support via [Hamkrest](https://github.com/npryce/hamkrest) matchers and an in-memory 
-[WebDriver](https://github.com/SeleniumHQ/selenium) implementation.
+* Typesafe contract module, providing live [OpenApi/Swagger] documentation.
+* [AWS] request signing.
+* [Resilience4j] integration, including Circuit Breakers & Rate Limiting.
+* Testing support via [Hamkrest] matchers and an in-memory 
+[WebDriver] implementation.
 
 Finally, [http4k] is **proven in production**, it has been adopted in at least 2 global investment banks and is serving 
 the vast majority of traffic for a major publishing website (in the top 1000 sites globally according to 
-[alexa.com](https://alexa.com) - ie. easily serving 10s of million hits per day on a few nodes) since March 2017. 
+[alexa.com] - ie. easily serving 10s of million hits per day on a few nodes) since March 2017. 
 
 You can see a few example applications [here](/in_action/), including a bootstrap project for creating a 
 [**Github -> Travis -> Heroku** CD pipeline](https://github.com/http4k/http4k-bootstrap) in a single command.
 
 Well, that's it for this whirlwind tour - we hope you found it worth reading this far! We'd love you to try out [http4k] 
 and feedback why you love/hate/are indifferent to it :) . And if you want to get involved or chat to the authors, we hang 
-out in the friendly #http4k channel @ [slack.kotlinlang,org](http://slack.kotlinlang.org/).
+out in the friendly #http4k channel @ [slack.kotlinlang,org].
 
 ##### Footnotes
 * **"But... but... but... asynchronous! And Webscale!"**, *I heard them froth*. Yes, you are correct - "Server as a Function" 
@@ -283,6 +283,24 @@ allow us to revisit this decision.
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
+["Your Server as a Function"]: https://monkey.org/~marius/funsrv.pdf
+[Finagle]: https://twitter.github.io/finagle/
+[Fintrospect]: http://fintrospect.io/
+[UtterlyIdle]: https://github.com/bodar/utterlyidle
 [Typealias]: https://kotlinlang.org/docs/reference/type-aliases.html
 [extension methods]: https://kotlinlang.org/docs/reference/extensions.html
-[blog post](https://www.http4k.org/blog/typesafe_websockets/)
+[blog post]: https://www.http4k.org/blog/typesafe_websockets/
+[Lens]: https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing
+[slack.kotlinlang,org]: http://slack.kotlinlang.org/
+[Apache]: https://hc.apache.org/
+[OkHttp]: http://square.github.io/okhttp/
+[Proguard]: https://www.guardsquare.com/en/proguard
+[Zipkin]: http://zipkin.io/
+[OpenApi/Swagger]: https://www.openapis.org/
+[AWS]: https://aws.amazon.com/
+[Resilience4j]: http://resilience4j.github.io/resilience4j/
+[Hamkrest]: https://github.com/npryce/hamkrest
+[WebDriver]: https://github.com/SeleniumHQ/selenium
+[alexa.com]: https://alexa.com
+[API Gateway]: https://aws.amazon.com/api-gateway
+[AWS Lambda]: https://aws.amazon.com/lambda
