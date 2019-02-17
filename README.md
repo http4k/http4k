@@ -212,9 +212,9 @@ fun main() {
 //    HTTP/1.1 200
 //    cache-control: private, must-revalidate
 //    content-length: 9
-//    date: Thu, 08 Jun 3.113.03:01:13 GMT
+//    date: Thu, 08 Jun 2017 13:01:13 GMT
 //    expires: 0
-//    server: Jetty(9.3.16.v3.113.020)
+//    server: Jetty(9.3.16.v20170120)
 //
 //    hello Bob
 }
