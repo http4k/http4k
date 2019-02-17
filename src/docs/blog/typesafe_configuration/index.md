@@ -57,29 +57,29 @@ using `require` as a guard:
 Additionally to the above, it is important to represent those values in a form that cannot be misinterpreted. A good 
 example of this is the passing of temporal values as integers - timeouts defined this way could be easily be 
 parsed into the wrong time unit (seconds instead of milliseconds). Using a higher level primitive such as `Duration` 
-will help us here.
+will help us here:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre/typesafe.kt"></script>
  
-Obviously, the above is still not very safe - a failed coercion will now fail with one of 3 different exceptions depending 
-on if the value was missing (`IllegalStateException`), unparsable (`DateTimeParseException`) or invalid 
-(`IllegalArgumentException`). The conversion code from `String -> Duration` must also be repeated for each value that we 
-wish to parse.
+Obviously, the above is still not very safe - and what's more, a coercion could now fail with one of 3 different 
+exceptions depending on if the value was missing (`IllegalStateException`), unparsable (`DateTimeParseException`) or 
+invalid (`IllegalArgumentException`). The conversion code from `String -> Duration` must also be repeated (or extracted) 
+for each value that we wish to parse.
 
 #### 3. Multiplicity
 Configuration parameters may have one or many values and need to be converted safely from the injected string 
-representation (usually comma-separated) and into their internally represented types at application startup. 
+representation (usually comma-separated) and into their internally represented types at application startup: 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre/multiplicity.kt"></script>
 
-Once again, the splitting code will need to be repeated for each config value.
+Once again, the splitting code will need to be repeated for each config value, or extracted to a library function.
 
 #### 4. Security
 The configuration of a standard app will generally contain both sensitive and non-sensitive values. Sensitive such as 
-application secrets, DB passwords or API keys should (as far as is reasonable) be handled in a way that avoid storing 
-directly in memory in a readable format, where they may be inadvertently inspected or outputted into a log file.
+application secrets, DB passwords or API keys should be handled in a way that avoid storing directly in memory in a 
+readable format or long lived fashion, where they may be inadvertently inspected or outputted into a log file.
 
-Mistakes such as in the code below are easily done, and asking for trouble...
+Dangling code situations such as in the code below are common, and are asking for trouble...
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/pre/secrets.kt"></script>
 
@@ -104,12 +104,14 @@ which leverages the power of the Lens system already built into the core library
 API users. In case you're new to Lenses, here's a recap...
 
 ### Lenses - a recap
-Lenses in [http4k] are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
+In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
 although this concept has been extended within the [http4k] ecosystem to support that of a form handling and request 
-contexts. 
+contexts.
 
-A Lens itself is an object which defines type parameters representing input `IN` and output `OUT` types and implements 
-one (a `Lens`) or both (a `BiDiLens`) of the following interfaces:
+A Lens is an stateless object responsible for either the one-way (or Bidirectional) transformation of
+
+It defines type parameters representing input `IN` and output `OUT` types and implements 
+one (for a `Lens`) or both (for a `BiDiLens`) of the following interfaces:
 
 1. **LensExtractor** - takes a value of type `IN` and extracts a value of type `OUT`
 2. **LensInjector** - takes a value of type `IN` and a value of type `OUT` and returns a modified value of type `IN` 
@@ -131,10 +133,13 @@ To define a Lens instance through the [http4k] Lens API, we take an initial **ta
 by deciding it's optionality.
 
 It sounds involved, but it is consistent and the fluent API has been designed to make it simpler. By way of an example, 
-here we define a Lens which is **targeted** at the **required** querystring parameter "pageNumber", and which extracts 
-and injects values of custom type `Page`.
+here we define a bi-directional Lens for custom type `Page`, extracted from a querystring value and defaulting to Page 1.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/lens_example.kt"></script>
+
+In [http4k], Lenses are typically used to provide typesafe conversion of typed values into and out of HTTP messages, 
+although this concept has been extended within the [http4k] ecosystem to support that of a form handling and request 
+contexts.
 
 ## http4k Environments
 in [http4k], an `Environment` object is a context which holds configuration values. It effectively behaves like a 
@@ -146,7 +151,7 @@ component values.
 If you're using any of the other Kotlin-based configuration libraries, the above should look pretty familiar. The 
 difference starts to become apparent when attempting to retrieve values from the `Environment` instance. This is done 
 using `EnviromentKey` Lenses, which are an extension of the [http4k] Lens system that specifically targets `Environment` 
-objects.
+objects. 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/typesafe.kt"></script>
 
@@ -155,13 +160,13 @@ When using the [http4k] Environment to define config, missing or values which ca
 a `LensFailure` to be thrown with a descriptive error message. As before, this results in the application failing to 
 start, but as the exception if both consistent and explicit, diagnosing the problem becomes much simpler.
 
-###
+#### Secrets
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/secrets.kt"></script>
 
 
 [github]: http://github.com/daviddenton
-[12factor]: https://12factor.net/
 [http4k]: https://http4k.org
+[12factor]: https://12factor.net/
 [properlty]: https://github.com/ufoscout/properlty
 [config4k]: https://github.com/config4k/config4k
 [konf]: https://github.com/uchuhimo/konf
