@@ -35,6 +35,7 @@ class OAuthServerTest {
                 tokenPath = "/oauth2/token",
                 validateClientAndRedirectionUri = { _, _ -> true },
                 authorizationCodes = DummyAuthorizationCodes(),
+                accessTokens = DummyAccessTokens(),
                 persistence = InsecureCookieBasedOAuthRequestPersistence()
         )
 

@@ -6,7 +6,6 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
@@ -18,6 +17,7 @@ import org.http4k.lens.uri
 import org.http4k.lens.uuid
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.AccessTokenContainer
 import org.http4k.security.oauth.server.OAuthServer.Companion.clientId
 import org.http4k.security.oauth.server.OAuthServer.Companion.redirectUri
 import org.http4k.security.oauth.server.OAuthServer.Companion.scopes
@@ -28,11 +28,10 @@ class OAuthServer(
         tokenPath: String,
         private val validateClientAndRedirectionUri: ClientValidator,
         private val authorizationCodes: AuthorizationCodes,
+        accessTokens: AccessTokens,
         private val persistence: OAuthRequestPersistence
 ) {
-    val tokenRoute = routes(tokenPath bind POST to {
-        Response(OK).body("an-access-token")
-    })
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
     val authenticationStart = Filter { next ->
         {
@@ -68,6 +67,10 @@ class OAuthServer(
     }
 }
 
+interface AccessTokens {
+    fun create(): AccessTokenContainer
+}
+
 interface OAuthRequestPersistence {
     fun store(authorizationRequest: AuthorizationRequest, response: Response): Response
     fun retrieve(request: Request): AuthorizationRequest
@@ -81,7 +84,11 @@ interface AuthorizationCodes {
 typealias ClientValidator = (ClientId, Uri) -> Boolean
 
 class DummyAuthorizationCodes : AuthorizationCodes {
-    override fun create(): AuthorizationCode = AuthorizationCode("dummy-token")
+    override fun create() = AuthorizationCode("dummy-token")
+}
+
+class DummyAccessTokens : AccessTokens {
+    override fun create() = AccessTokenContainer("dummy-access-token")
 }
 
 class InsecureCookieBasedOAuthRequestPersistence : OAuthRequestPersistence {
