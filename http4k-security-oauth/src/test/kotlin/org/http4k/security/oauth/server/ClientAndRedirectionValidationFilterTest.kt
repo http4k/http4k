@@ -14,14 +14,14 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-internal class AuthenticationStartFilterTest {
+internal class ClientAndRedirectionValidationFilterTest {
     private val validClientId = ClientId("a-client")
     private val validRedirectUri = Uri.of("https://a-redirect-uri")
 
     private val loginPage = { _: Request -> Response(OK).body("login page") }
     private val isLoginPage = hasStatus(OK) and hasBody("login page")
 
-    private val filter = AuthenticationStartFilter { client_id, redirect_uri ->
+    private val filter = ClientAndRedirectionValidationFilter { client_id, redirect_uri ->
         client_id == validClientId && redirect_uri == validRedirectUri
     }
         .then(loginPage)

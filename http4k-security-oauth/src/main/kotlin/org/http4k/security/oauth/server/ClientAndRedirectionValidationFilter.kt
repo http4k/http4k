@@ -7,7 +7,7 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
-class AuthenticationStartFilter(
+class ClientAndRedirectionValidationFilter(
     private val validateClientAndRedirectionUri: ClientValidator
 ) : Filter {
 

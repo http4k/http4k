@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -33,7 +34,10 @@ class AuthenticationCompleteFilterTest {
         )
 
     val filter = AuthenticationCompleteFilter(
-        DummyAuthorizationCodes()
+        DummyAuthorizationCodes(),
+        ClientAndRedirectionValidationFilter { client_id, redirect_uri ->
+            client_id == authorizationRequest.client && redirect_uri == authorizationRequest.redirectUri
+        }
     ).then(loginAction)
 
     @Test
@@ -52,6 +56,16 @@ class AuthenticationCompleteFilterTest {
         val response = filter(Request(Method.POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
 
         assertThat(response, hasStatus(UNAUTHORIZED))
+    }
+
+    @Test
+    fun `validates client_id and redirect_uri values`() {
+        val invalidAuthorizationRequest = authorizationRequest
+            .copy(client = ClientId("invalid"), redirectUri = Uri.of("http://invalid"))
+
+        val response = filter(Request(Method.GET, "/login").withAuthorization(invalidAuthorizationRequest))
+        assertThat(response, hasStatus(Status.BAD_REQUEST))
+        assertThat(response.status.description, equalTo("invalid 'client_id' and/or 'redirect_uri'"))
     }
 }
 

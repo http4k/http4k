@@ -19,11 +19,13 @@ class OAuthServer(
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens) {
 
+    private val validationFilter = ClientAndRedirectionValidationFilter(validateClientAndRedirectionUri)
+
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
-    val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri)
+    val authenticationStart = validationFilter
 
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")
