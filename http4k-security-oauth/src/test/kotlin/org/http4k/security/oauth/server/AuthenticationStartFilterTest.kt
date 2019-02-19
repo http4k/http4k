@@ -3,7 +3,6 @@ package org.http4k.security.oauth.server
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.has
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -22,13 +21,9 @@ internal class AuthenticationStartFilterTest {
     private val loginPage = { _: Request -> Response(OK).body("login page") }
     private val isLoginPage = hasStatus(OK) and hasBody("login page")
 
-    private val persistence = InMemoryOAuthRequestPersistence()
-
-    private val filter = AuthenticationStartFilter(
-        { client_id, redirect_uri ->
-            client_id == validClientId && redirect_uri == validRedirectUri
-        },
-        persistence)
+    private val filter = AuthenticationStartFilter { client_id, redirect_uri ->
+        client_id == validClientId && redirect_uri == validRedirectUri
+    }
         .then(loginPage)
 
 
@@ -39,10 +34,6 @@ internal class AuthenticationStartFilterTest {
             .query("redirect_uri", validRedirectUri.toString())
         )
         assertThat(response, isLoginPage)
-        assertThat(persistence.authorizationRequest,
-            has(AuthorizationRequest::client, equalTo(validClientId)) and
-                has(AuthorizationRequest::redirectUri, equalTo(validRedirectUri))
-        )
     }
 
     @Test

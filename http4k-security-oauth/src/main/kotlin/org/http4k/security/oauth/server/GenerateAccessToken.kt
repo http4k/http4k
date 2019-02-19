@@ -6,6 +6,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 
 class GenerateAccessToken(private val accessTokens: AccessTokens) : HttpHandler {
-        override fun invoke(p1: Request): Response =
+        override fun invoke(request: Request): Response =
                 Response(Status.OK).body(accessTokens.create().value)
 }

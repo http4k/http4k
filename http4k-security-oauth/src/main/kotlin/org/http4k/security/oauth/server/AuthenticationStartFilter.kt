@@ -8,8 +8,7 @@ import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
 class AuthenticationStartFilter(
-    private val validateClientAndRedirectionUri: ClientValidator,
-    private val persistence: OAuthRequestPersistence
+    private val validateClientAndRedirectionUri: ClientValidator
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
@@ -19,7 +18,7 @@ class AuthenticationStartFilter(
                 if (!validateClientAndRedirectionUri(authorizationRequest.client, authorizationRequest.redirectUri)) {
                     Response(Status.BAD_REQUEST.description("invalid 'client_id' and/or 'redirect_uri'"))
                 } else {
-                    persistence.store(authorizationRequest, next(it))
+                    next(it)
                 }
             }
 }

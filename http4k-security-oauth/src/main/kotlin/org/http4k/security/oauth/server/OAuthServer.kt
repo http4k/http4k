@@ -2,7 +2,6 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.lens.Query
 import org.http4k.lens.uri
@@ -13,20 +12,18 @@ import org.http4k.security.oauth.server.OAuthServer.Companion.clientId
 import org.http4k.security.oauth.server.OAuthServer.Companion.redirectUri
 import org.http4k.security.oauth.server.OAuthServer.Companion.scopes
 import org.http4k.security.oauth.server.OAuthServer.Companion.state
-import java.util.*
 
 class OAuthServer(
     tokenPath: String,
     validateClientAndRedirectionUri: ClientValidator,
     authorizationCodes: AuthorizationCodes,
-    accessTokens: AccessTokens,
-    persistence: OAuthRequestPersistence) {
+    accessTokens: AccessTokens) {
 
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
-    val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri, persistence)
+    val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri)
 
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, persistence)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")
@@ -40,12 +37,6 @@ interface AccessTokens {
     fun create(): AccessTokenContainer
 }
 
-interface OAuthRequestPersistence {
-    fun store(authorizationRequest: AuthorizationRequest, response: Response): Response
-    fun retrieve(request: Request): AuthorizationRequest
-    fun clear(authorizationRequest: AuthorizationRequest, response: Response): Response
-}
-
 interface AuthorizationCodes {
     fun create(): AuthorizationCode
 }
@@ -53,16 +44,14 @@ interface AuthorizationCodes {
 typealias ClientValidator = (ClientId, Uri) -> Boolean
 
 data class AuthorizationRequest(
-        val id: UUID,
         val client: ClientId,
         val scopes: List<String>,
         val redirectUri: Uri,
         val state: String?
 )
 
-internal fun Request.authorizationRequest(id: UUID = UUID.randomUUID()) =
+internal fun Request.authorizationRequest() =
         AuthorizationRequest(
-                id,
                 clientId(this),
                 scopes(this) ?: listOf(),
                 redirectUri(this),

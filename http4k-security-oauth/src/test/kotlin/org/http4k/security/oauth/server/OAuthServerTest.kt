@@ -30,23 +30,26 @@ import org.junit.jupiter.api.Test
 
 class OAuthServerTest {
 
-    private val debug = true
+    private val debug = false
 
     @Test
     fun `can follow authorization code flow`() {
         val authenticationServer = customOauthAuthorizationServer()
         val consumerApp = oauthClientApp(authenticationServer, debug)
 
-        val browser = Filter.NoOp
-                .then(ClientFilters.FollowRedirects())
-                .then(ClientFilters.Cookies())
-                .then(debugFilter(debug))
+        val browser = Filter.NoOp.then(debugFilter(debug))
+            .then(ClientFilters.Cookies())
             .then(authenticationServer + consumerApp)
 
-        val preAuthResponse = browser(Request(GET, "/a-protected-resource"))
-        assertThat(preAuthResponse, hasStatus(OK) and hasBody("Please authenticate"))
+        val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
 
-        val postAuthResponse = browser(Request(POST, "/my-login-page").form("some", "credentials"))
+        val preAuthResponse = browser(Request(GET, "/a-protected-resource"))
+        val loginPage = preAuthResponse.header("location")!!
+
+        val loginPageResponse = browser(Request(GET, loginPage))
+        assertThat(loginPageResponse, hasStatus(OK) and hasBody("Please authenticate"))
+
+        val postAuthResponse = browserWithRedirection(Request(POST, loginPage).form("some", "credentials"))
         assertThat(postAuthResponse, hasStatus(OK) and hasBody("user resource"))
     }
 
@@ -55,8 +58,7 @@ class OAuthServerTest {
             tokenPath = "/oauth2/token",
             validateClientAndRedirectionUri = { _, _ -> true },
             authorizationCodes = DummyAuthorizationCodes(),
-            accessTokens = DummyAccessTokens(),
-            persistence = InsecureCookieBasedOAuthRequestPersistence()
+            accessTokens = DummyAccessTokens()
         )
 
         return routes(
