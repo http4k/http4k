@@ -7,6 +7,9 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.core.then
@@ -17,29 +20,49 @@ import java.util.*
 
 class AuthenticationCompleteFilterTest {
 
-    private val loginAction = { _: Request -> Response(Status.OK).body("login page") }
+    private val loginAction = { request: Request ->
+        if (request.query("fail") == "true")
+            Response(UNAUTHORIZED)
+        else Response(Status.OK)
+    }
+
     private val persistence = InMemoryOAuthRequestPersistence()
 
-    @Test
-    fun `redirects on successful login`() {
-        val redirectUri = Uri.of("http://destination")
-        persistence.store(AuthorizationRequest(
+    private val authorizationRequest =
+        AuthorizationRequest(
             UUID.randomUUID(),
             ClientId("a-client-id"),
             listOf("email"),
-            redirectUri,
+            Uri.of("http://destination"),
             "some state"
-        ), Response(Status.OK))
+        )
 
-        val filter = AuthenticationCompleteFilter(
-            DummyAuthorizationCodes(),
-            persistence
-        ).then(loginAction)
+    val filter = AuthenticationCompleteFilter(
+        DummyAuthorizationCodes(),
+        persistence
+    ).then(loginAction)
+
+    @Test
+    fun `redirects on successful login`() {
+        persistence.store(authorizationRequest, Response(OK))
 
         val response = filter(Request(Method.POST, "/login"))
 
-        assertThat(response, hasStatus(Status.TEMPORARY_REDIRECT)
-            and hasHeader("location", redirectUri.query("code", "dummy-token").query("state", "some state").toString()))
+        assertThat(response, hasStatus(TEMPORARY_REDIRECT)
+            and hasHeader("location",
+            authorizationRequest.redirectUri
+                .query("code", "dummy-token")
+                .query("state", "some state").toString()))
+        assertThat(persistence.isEmpty, equalTo(true))
+    }
+
+    @Test
+    fun `does not redirect if login is not successful`() {
+        persistence.store(authorizationRequest, Response(Status.OK))
+
+        val response = filter(Request(Method.POST, "/login").query("fail", "true"))
+
+        assertThat(response, hasStatus(UNAUTHORIZED))
         assertThat(persistence.isEmpty, equalTo(true))
     }
 }
