@@ -21,9 +21,8 @@ internal class ClientAndRedirectionValidationFilterTest {
     private val loginPage = { _: Request -> Response(OK).body("login page") }
     private val isLoginPage = hasStatus(OK) and hasBody("login page")
 
-    private val filter = ClientAndRedirectionValidationFilter { client_id, redirect_uri ->
-        client_id == validClientId && redirect_uri == validRedirectUri
-    }
+    private val filter =
+        ClientValidationFilter(HardcodedClientValidator(validClientId, validRedirectUri))
         .then(loginPage)
 
 

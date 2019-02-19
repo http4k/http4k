@@ -7,15 +7,13 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
-class ClientAndRedirectionValidationFilter(
-    private val validateClientAndRedirectionUri: ClientValidator
-) : Filter {
+class ClientValidationFilter(private val clientValidator: ClientValidator) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
         ServerFilters.CatchLensFailure
             .then {
                 val authorizationRequest = it.authorizationRequest()
-                if (!validateClientAndRedirectionUri(authorizationRequest.client, authorizationRequest.redirectUri)) {
+                if (!clientValidator.validate(authorizationRequest.client, authorizationRequest.redirectUri)) {
                     Response(Status.BAD_REQUEST.description("invalid 'client_id' and/or 'redirect_uri'"))
                 } else {
                     next(it)

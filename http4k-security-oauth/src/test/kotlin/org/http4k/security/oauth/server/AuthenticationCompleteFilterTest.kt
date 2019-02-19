@@ -35,10 +35,7 @@ class AuthenticationCompleteFilterTest {
 
     val filter = AuthenticationCompleteFilter(
         DummyAuthorizationCodes(),
-        ClientAndRedirectionValidationFilter { client_id, redirect_uri ->
-            client_id == authorizationRequest.client && redirect_uri == authorizationRequest.redirectUri
-        }
-    ).then(loginAction)
+        ClientValidationFilter(HardcodedClientValidator(authorizationRequest.client, authorizationRequest.redirectUri))).then(loginAction)
 
     @Test
     fun `redirects on successful login`() {

@@ -21,11 +21,11 @@ import org.http4k.security.oauth.server.OAuthServer.Companion.state
  */
 class OAuthServer(
     tokenPath: String,
-    validateClientAndRedirectionUri: ClientValidator,
+    clientValidator: ClientValidator,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens) {
 
-    private val validationFilter = ClientAndRedirectionValidationFilter(validateClientAndRedirectionUri)
+    private val validationFilter = ClientValidationFilter(clientValidator)
 
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
@@ -43,8 +43,6 @@ class OAuthServer(
         val state = Query.optional("state")
     }
 }
-
-typealias ClientValidator = (ClientId, Uri) -> Boolean
 
 data class AuthorizationRequest(
         val client: ClientId,

@@ -9,7 +9,7 @@ import org.http4k.core.then
 
 class AuthenticationCompleteFilter(
     private val authorizationCodes: AuthorizationCodes,
-    private val validationFilter: ClientAndRedirectionValidationFilter
+    private val validationFilter: ClientValidationFilter
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =

@@ -56,7 +56,7 @@ class OAuthServerTest {
     private fun customOauthAuthorizationServer(): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
-            validateClientAndRedirectionUri = { _, _ -> true },
+            clientValidator = DummyClientValidator(),
             authorizationCodes = DummyAuthorizationCodes(),
             accessTokens = DummyAccessTokens()
         )
