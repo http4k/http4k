@@ -1,16 +1,13 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
-import org.http4k.core.query
 import org.http4k.core.with
 import org.http4k.lens.Query
 import org.http4k.lens.uri
@@ -35,20 +32,7 @@ class OAuthServer(
 
     val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri, persistence)
 
-    val authenticationComplete = Filter { next ->
-        { request ->
-            val response = next(request)
-            val authorizationRequest = persistence.retrieve(request)
-            val postAuthResponse = if (response.status.successful) {
-                Response(Status.TEMPORARY_REDIRECT)
-                        .header("location", authorizationRequest.redirectUri
-                                .query("code", authorizationCodes.create().value)
-                                .query("state", authorizationRequest.state)
-                                .toString())
-            } else response
-            persistence.clear(authorizationRequest, postAuthResponse)
-        }
-    }
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, persistence)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

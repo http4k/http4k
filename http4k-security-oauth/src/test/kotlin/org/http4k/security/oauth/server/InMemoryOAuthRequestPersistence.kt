@@ -12,12 +12,11 @@ class InMemoryOAuthRequestPersistence : OAuthRequestPersistence {
             this.internalRequest = authorizationRequest
         }
 
-    override fun retrieve(request: Request): AuthorizationRequest {
-        TODO("not implemented")
-    }
+    override fun retrieve(request: Request): AuthorizationRequest = authorizationRequest
 
-    override fun clear(authorizationRequest: AuthorizationRequest, response: Response): Response {
-        TODO("not implemented")
+    override fun clear(authorizationRequest: AuthorizationRequest, response: Response) =
+        response.also {
+            this.internalRequest = null
     }
 
     val authorizationRequest: AuthorizationRequest get() = internalRequest ?: fail("No authorizationRequest persisted")
