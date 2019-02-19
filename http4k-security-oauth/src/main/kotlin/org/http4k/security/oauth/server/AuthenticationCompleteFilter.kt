@@ -15,8 +15,8 @@ class AuthenticationCompleteFilter(
     override fun invoke(next: HttpHandler): HttpHandler =
         validationFilter.then { request ->
             val response = next(request)
-            val authorizationRequest = request.authorizationRequest()
             if (response.status.successful) {
+                val authorizationRequest = request.authorizationRequest()
                 Response(Status.TEMPORARY_REDIRECT)
                     .header("location", authorizationRequest.redirectUri
                         .query("code", authorizationCodes.create().value)
