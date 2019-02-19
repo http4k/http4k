@@ -26,23 +26,14 @@ import java.util.*
 
 class OAuthServer(
         tokenPath: String,
-        private val validateClientAndRedirectionUri: ClientValidator,
+        validateClientAndRedirectionUri: ClientValidator,
         private val authorizationCodes: AuthorizationCodes,
         accessTokens: AccessTokens,
         private val persistence: OAuthRequestPersistence
 ) {
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
-    val authenticationStart = Filter { next ->
-        {
-            val authorizationRequest = it.authorizationRequest()
-            if (!validateClientAndRedirectionUri(authorizationRequest.client, authorizationRequest.redirectUri)) {
-                Response(Status.BAD_REQUEST)
-            } else {
-                persistence.store(authorizationRequest, next(it))
-            }
-        }
-    }
+    val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri, persistence)
 
     val authenticationComplete = Filter { next ->
         { request ->
