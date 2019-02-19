@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -39,5 +40,6 @@ class AuthenticationCompleteFilterTest {
 
         assertThat(response, hasStatus(Status.TEMPORARY_REDIRECT)
             and hasHeader("location", redirectUri.query("code", "dummy-token").query("state", "some state").toString()))
+        assertThat(persistence.isEmpty, equalTo(true))
     }
 }

@@ -20,4 +20,6 @@ class InMemoryOAuthRequestPersistence : OAuthRequestPersistence {
     }
 
     val authorizationRequest: AuthorizationRequest get() = internalRequest ?: fail("No authorizationRequest persisted")
+    val isEmpty get() = internalRequest == null
+
 }
