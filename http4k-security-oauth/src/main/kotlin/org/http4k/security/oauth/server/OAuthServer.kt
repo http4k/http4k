@@ -52,14 +52,6 @@ interface AuthorizationCodes {
 
 typealias ClientValidator = (ClientId, Uri) -> Boolean
 
-class DummyAuthorizationCodes : AuthorizationCodes {
-    override fun create() = AuthorizationCode("dummy-token")
-}
-
-class DummyAccessTokens : AccessTokens {
-    override fun create() = AccessTokenContainer("dummy-access-token")
-}
-
 data class AuthorizationRequest(
         val id: UUID,
         val client: ClientId,
