@@ -11,5 +11,10 @@ interface ClientValidator {
      * - check that client_id is a valid, registered app
      * - redirection URI is one of the allowed ones for that app
      */
-    fun validate(clientId: ClientId, redirectionUri: Uri): Boolean
+    fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean
+
+    /**
+     * Validate that credentials provided by the client match its registration records
+     */
+    fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean
 }

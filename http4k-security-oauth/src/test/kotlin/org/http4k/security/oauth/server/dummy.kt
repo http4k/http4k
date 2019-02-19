@@ -13,13 +13,19 @@ class DummyAccessTokens : AccessTokens {
 }
 
 class DummyClientValidator : ClientValidator {
-    override fun validate(clientId: ClientId, redirectionUri: Uri): Boolean = true
+    override fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean = true
+
+    override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
 }
 
 class HardcodedClientValidator(
     private val expectedClientId: ClientId,
-    private val expectedRedirectionUri: Uri
+    private val expectedRedirectionUri: Uri,
+    private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
 ) : ClientValidator {
-    override fun validate(clientId: ClientId, redirectionUri: Uri) =
+    override fun validateRedirection(clientId: ClientId, redirectionUri: Uri) =
         clientId == this.expectedClientId && redirectionUri == this.expectedRedirectionUri
+
+    override fun validateCredentials(clientId: ClientId, clientSecret: String) =
+        clientId == expectedClientId && clientSecret == expectedClientSecret
 }
