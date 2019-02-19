@@ -1,11 +1,18 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.core.*
+import org.http4k.core.Filter
+import org.http4k.core.Method
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
+import org.http4k.core.query
+import org.http4k.core.with
 import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.lens.uuid
@@ -20,7 +27,7 @@ import java.util.*
 class OAuthServer(
         tokenPath: String,
         private val validateClientAndRedirectionUri: ClientValidator,
-        private val generateAuthorizationCode: AuthorizationCodeGenerator,
+        private val authorizationCodes: AuthorizationCodes,
         private val persistence: OAuthRequestPersistence
 ) {
     val tokenRoute = routes(tokenPath bind POST to {
@@ -45,7 +52,7 @@ class OAuthServer(
             val postAuthResponse = if (response.status.successful) {
                 Response(Status.TEMPORARY_REDIRECT)
                         .header("location", authorizationRequest.redirectUri
-                                .query("code", generateAuthorizationCode().value)
+                                .query("code", authorizationCodes.create().value)
                                 .query("state", authorizationRequest.state)
                                 .toString())
             } else response
@@ -67,8 +74,15 @@ interface OAuthRequestPersistence {
     fun clear(authorizationRequest: AuthorizationRequest, response: Response): Response
 }
 
+interface AuthorizationCodes {
+    fun create(): AuthorizationCode
+}
+
 typealias ClientValidator = (ClientId, Uri) -> Boolean
-typealias AuthorizationCodeGenerator = () -> AuthorizationCode
+
+class DummyAuthorizationCodes : AuthorizationCodes {
+    override fun create(): AuthorizationCode = AuthorizationCode("dummy-token")
+}
 
 class InsecureCookieBasedOAuthRequestPersistence : OAuthRequestPersistence {
     private val cookieName = "OauthRequest"

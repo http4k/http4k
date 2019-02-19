@@ -1,9 +1,18 @@
 package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.assertion.assertThat
-import org.http4k.core.*
+import org.http4k.core.Credentials
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.NoOp
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.body.form
+import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.hamkrest.hasBody
@@ -25,7 +34,7 @@ class OAuthServerTest {
         val server = OAuthServer(
                 tokenPath = "/oauth2/token",
                 validateClientAndRedirectionUri = { _, _ -> true },
-                generateAuthorizationCode = { AuthorizationCode("dummy-token") },
+                authorizationCodes = DummyAuthorizationCodes(),
                 persistence = InsecureCookieBasedOAuthRequestPersistence()
         )
 
