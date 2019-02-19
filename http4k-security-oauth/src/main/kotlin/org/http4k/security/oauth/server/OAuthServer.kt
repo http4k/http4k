@@ -7,12 +7,18 @@ import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.AccessTokenContainer
 import org.http4k.security.oauth.server.OAuthServer.Companion.clientId
 import org.http4k.security.oauth.server.OAuthServer.Companion.redirectUri
 import org.http4k.security.oauth.server.OAuthServer.Companion.scopes
 import org.http4k.security.oauth.server.OAuthServer.Companion.state
 
+/**
+ * Provide help creating OAuth Authorization Server with Authorization Code Flow
+ *
+ * References:
+ *  - Authorization Code Grant flow spec: https://tools.ietf.org/html/rfc6749#page-23
+ *  - OAuth 2 Security Best Current Practices: https://tools.ietf.org/html/draft-ietf-oauth-security-topics-11
+ */
 class OAuthServer(
     tokenPath: String,
     validateClientAndRedirectionUri: ClientValidator,
@@ -21,10 +27,13 @@ class OAuthServer(
 
     private val validationFilter = ClientAndRedirectionValidationFilter(validateClientAndRedirectionUri)
 
+    // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
+    // use this filter to protect your authentication/authorization pages
     val authenticationStart = validationFilter
 
+    // use this filter to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter)
 
     companion object {
@@ -33,14 +42,6 @@ class OAuthServer(
         val redirectUri = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
     }
-}
-
-interface AccessTokens {
-    fun create(): AccessTokenContainer
-}
-
-interface AuthorizationCodes {
-    fun create(): AuthorizationCode
 }
 
 typealias ClientValidator = (ClientId, Uri) -> Boolean
