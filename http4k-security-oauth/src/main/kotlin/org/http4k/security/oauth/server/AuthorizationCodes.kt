@@ -7,5 +7,10 @@ interface AuthorizationCodes {
     /**
      * Create new authorization code to be given to client after the user successfully authorize access
      */
-    fun create(): AuthorizationCode
+    fun create(authorizationRequest: AuthorizationRequest): AuthorizationCode
+
+    /**
+     * Destroys an authorization token after it's been used to generate an access token
+     */
+    fun destroy(authorizationCode: AuthorizationCode)
 }

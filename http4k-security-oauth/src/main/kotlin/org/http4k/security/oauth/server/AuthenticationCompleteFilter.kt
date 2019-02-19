@@ -19,7 +19,7 @@ class AuthenticationCompleteFilter(
                 val authorizationRequest = request.authorizationRequest()
                 Response(Status.TEMPORARY_REDIRECT)
                     .header("location", authorizationRequest.redirectUri
-                        .query("code", authorizationCodes.create().value)
+                        .query("code", authorizationCodes.create(authorizationRequest).value)
                         .query("state", authorizationRequest.state)
                         .toString())
             } else response

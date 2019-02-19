@@ -9,5 +9,5 @@ interface AccessTokens {
     /**
      * Creates a new access token for a valid authorization code
      */
-    fun create(): AccessTokenContainer
+    fun create(authorizationCode: AuthorizationCode): AccessTokenContainer
 }

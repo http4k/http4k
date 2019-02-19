@@ -4,11 +4,12 @@ import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
 
 class DummyAuthorizationCodes : AuthorizationCodes {
-    override fun create() = AuthorizationCode("dummy-token")
+    override fun create(authorizationRequest: AuthorizationRequest) = AuthorizationCode("dummy-token")
+    override fun destroy(authorizationCode: AuthorizationCode) = Unit
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create() = AccessTokenContainer("dummy-access-token")
+    override fun create(authorizationCode: AuthorizationCode) = AccessTokenContainer("dummy-access-token")
 }
 
 class DummyClientValidator : ClientValidator {
