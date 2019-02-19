@@ -16,12 +16,12 @@ import org.http4k.security.oauth.server.OAuthServer.Companion.state
 import java.util.*
 
 class OAuthServer(
-        tokenPath: String,
-        validateClientAndRedirectionUri: ClientValidator,
-        private val authorizationCodes: AuthorizationCodes,
-        accessTokens: AccessTokens,
-        private val persistence: OAuthRequestPersistence
-) {
+    tokenPath: String,
+    validateClientAndRedirectionUri: ClientValidator,
+    authorizationCodes: AuthorizationCodes,
+    accessTokens: AccessTokens,
+    persistence: OAuthRequestPersistence) {
+
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(accessTokens))
 
     val authenticationStart = AuthenticationStartFilter(validateClientAndRedirectionUri, persistence)
