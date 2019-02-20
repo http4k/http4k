@@ -2,7 +2,10 @@ package org.http4k.cloudnative.env
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.throws
 import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import java.util.concurrent.atomic.AtomicReference
 
 class SecretTest {
 
@@ -15,8 +18,16 @@ class SecretTest {
     }
 
     @Test
-    fun `string value`() {
-        assertThat(aSecret.stringValue(), equalTo("mySecret"))
+    fun `can use the value, after which it is cleared`() {
+        assertEqualTo(aSecret, "mySecret".toByteArray())
+        assertThat(aSecret.use { it }, equalTo("mySecret"))
+        assertEqualTo(aSecret, ByteArray(0))
+    }
+
+    @Test
+    fun `using the value twice throws up`() {
+        aSecret.use { it }
+        assertThat({ aSecret.use { it } }, throws<IllegalStateException>())
     }
 
     @Test
@@ -24,18 +35,11 @@ class SecretTest {
         assertThat(aSecret.toString(), equalTo("Secret(hashcode = 1666631293)"))
     }
 
-    @Test
-    fun `can clear the value`() {
-        assertThat(Secret("mySecret").clear().stringValue(), equalTo("\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"))
-    }
-
-    @Test
-    fun `can use the value, after which it is cleared`() {
-        val secret = Secret("mySecret")
-
-        secret.use { assertThat(it.stringValue(), equalTo("mySecret")) }
-
-        assertThat(secret.stringValue(), equalTo("\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"))
+    private fun assertEqualTo(secret: Secret, bytes: ByteArray) {
+        val field = secret::class.java.declaredFields[0]
+        field.trySetAccessible()
+        @Suppress("UNCHECKED_CAST")
+        assertTrue((field.get(secret) as AtomicReference<ByteArray>).get()!!.contentEquals(bytes))
     }
 }
 

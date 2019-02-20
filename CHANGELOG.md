@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.113.0 (uncut)
 - Trim leading and trailing whitespace from extracted `EnvironmentKey` values.
+- Secret is now only usable once.
 
 ### v3.113.0
 - Added some common types for Environmental setup, and equivalent BiDiLens mappings

@@ -2,22 +2,34 @@ package org.http4k.cloudnative.env
 
 import java.io.Closeable
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.atomic.AtomicReference
 
 /**
- * A secret is a value which tries very hard not to expose itself as a string, by storing it's value in a byte array. It is also able to be cleared after construction.
+ * A secret is a value which tries very hard not to expose itself as a string, by storing it's value in a byte array.
+ * You can "use" the value only once, after which the value is destroyed
  */
-data class Secret(val value: ByteArray) : Closeable {
+class Secret(input: ByteArray) : Closeable {
     constructor(value: String) : this(value.toByteArray(StandardCharsets.UTF_8))
 
-    override fun equals(other: Any?): Boolean = value.contentEquals((other as Secret).value)
+    init {
+        require(input.isNotEmpty()) { "Cannot create an empty secret" }
+    }
 
-    override fun hashCode(): Int = value.contentHashCode()
+    private val value = AtomicReference(input)
 
-    override fun toString(): String = "Secret(hashcode = ${hashCode()})"
+    private val initialHashcode = input.contentHashCode()
 
-    fun stringValue(): String = value.toString(Charsets.UTF_8)
+    override fun equals(other: Any?): Boolean = (value.get()
+            ?: ByteArray(0)).contentEquals((other as Secret).value.get())
 
-    fun clear() = apply { (0 until value.size).forEach { value[it] = 0 } }
+    override fun hashCode(): Int = initialHashcode
 
-    override fun close(): Unit = run { clear() }
+    override fun toString(): String = "Secret(hashcode = $initialHashcode)"
+
+    fun <T> use(fn: (String) -> T) = with(value.get()) {
+        if (isNotEmpty()) fn(toString(Charsets.UTF_8))
+        else throw IllegalStateException("Cannot read a secret more than once")
+    }.apply { close() }
+
+    override fun close(): Unit = run { value.set(ByteArray(0)) }
 }
