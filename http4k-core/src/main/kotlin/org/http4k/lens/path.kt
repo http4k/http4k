@@ -3,20 +3,14 @@ package org.http4k.lens
 import org.http4k.core.Request
 import org.http4k.core.fromFormEncoded
 import org.http4k.core.toPathEncoded
-import org.http4k.lens.ParamMeta.BooleanParam
-import org.http4k.lens.ParamMeta.IntegerParam
-import org.http4k.lens.ParamMeta.NumberParam
-import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.lens.ParamMeta.*
 import org.http4k.routing.path
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
-import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
-import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import java.time.format.DateTimeFormatter.*
 
 
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
-    it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta))
+    it.path(meta.name)?.let(get) ?: throw LensFailure(Missing(meta), target = it)
 }) {
 
     operator fun invoke(target: String) = try {
@@ -41,7 +35,7 @@ open class PathLensSpec<out OUT>(protected val paramMeta: ParamMeta, internal va
     open fun of(name: String, description: String? = null): PathLens<OUT> {
         val getLens = get(name)
         val meta = Meta(true, "path", paramMeta, name, description)
-        return PathLens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) }
+        return PathLens(meta) { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) }
     }
 
     /**
@@ -72,7 +66,7 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
 
         val meta = Meta(true, "path", paramMeta, name, description)
         return BiDiPathLens(meta,
-            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta)) },
+                { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
             { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
@@ -85,7 +79,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name)
         return object : PathLens<String>(meta,
-            { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta)) }) {
+                { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
             override fun toString(): String = name
 
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()

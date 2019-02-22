@@ -169,7 +169,7 @@ open class BiDiLensSpec<IN : Any, OUT>(location: String,
         return BiDiLens(Meta(true, location, paramMeta, name, description),
                 {
                     getLens(it).firstOrNull()
-                            ?: throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)))
+                            ?: throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it)
                 },
                 { out: OUT, target: IN -> setLens(listOf(out), target) })
     }
@@ -200,7 +200,7 @@ open class BiDiLensSpec<IN : Any, OUT>(location: String,
             val getLens = get(name)
             val setLens = set(name)
             return BiDiLens(Meta(true, location, paramMeta, name, description),
-                    { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description))) else this } },
+                    { getLens(it).run { if (isEmpty()) throw LensFailure(Missing(Meta(true, location, paramMeta, name, description)), target = it) else this } },
                     { out: List<OUT>, target: IN -> setLens(out, target) })
         }
     }

@@ -46,7 +46,7 @@ open class BodyLensSpec<out OUT>(internal val metas: List<Meta>, internal val co
      * Create a lens for this Spec
      */
     open fun toLens(): BodyLens<OUT> = with(get("")) {
-        BodyLens(metas, contentType) { this(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing)) }
+        BodyLens(metas, contentType) { this(it).firstOrNull() ?: throw LensFailure(metas.map(::Missing), target = it) }
     }
 
     /**
@@ -77,7 +77,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
         val getLens = get("")
         val setLens = set("")
         return BiDiBodyLens(metas, contentType,
-            { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing)) else it.first() } },
+                { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing), target = it) else it.first() } },
             { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }
@@ -106,7 +106,7 @@ interface ContentNegotiation {
          */
         val Strict = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
+                if (actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
             }
         }
         /**
@@ -114,7 +114,7 @@ interface ContentNegotiation {
          */
         val StrictNoDirective = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
+                if (expected.value != actual?.value) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
             }
         }
 
@@ -123,7 +123,7 @@ interface ContentNegotiation {
          */
         val NonStrict = object : ContentNegotiation {
             override fun invoke(expected: ContentType, actual: ContentType?) {
-                if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta))
+                if (actual != null && actual != expected) throw LensFailure(Unsupported(CONTENT_TYPE.meta), target = actual)
             }
         }
 

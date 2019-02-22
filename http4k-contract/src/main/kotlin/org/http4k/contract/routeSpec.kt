@@ -1,10 +1,6 @@
 package org.http4k.contract
 
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Uri
+import org.http4k.core.*
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
@@ -23,7 +19,7 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
                 next(req)
                 memo
             } catch (e: LensFailure) {
-                memo?.let { LensFailure(it.failures + e.failures, e) } ?: e
+                memo?.let { LensFailure(it.failures + e.failures, e, e.target) } ?: e
             }
         }
         overallFailure?.let { throw it } ?: nextHandler(req)

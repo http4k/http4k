@@ -1,7 +1,7 @@
 package org.http4k.lens
 
 enum class Validator(private val actOn: (List<Failure>) -> List<Failure>) {
-    Strict({ if (it.isNotEmpty()) throw LensFailure(it) else it }),
+    Strict({ if (it.isNotEmpty()) throw LensFailure(it, target = null) else it }),
     Feedback({ it }),
     Ignore({ emptyList<Failure>() });
 
