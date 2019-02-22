@@ -9,13 +9,13 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.int
 import java.io.File
 import java.io.Reader
-import java.util.Properties
+import java.util.*
 
 
 /**
- * This models the runtime environment of the shell where the app is running. Optionally pass a separator to use for multi-values
- * otherwise a standard comma is used - this means you MUST override the separator if you have single values which contain commas, otherwise
- * singular environment keys will just retrieve the first value.
+ * This models the runtime environment of the shell where the app is running. Optionally pass a separator to use for
+ * multi-values otherwise a standard comma is used - this means you MUST override the separator if you have single values
+ * which contain commas, otherwise singular environment keys will just retrieve the first value.
  */
 interface Environment {
     val separator: String get() = ","
@@ -84,8 +84,9 @@ internal class MapEnvironment internal constructor(private val contents: Map<Str
 }
 
 /**
- * This models the key used to get a value out of the  Environment using the standard Lens mechanic. Note that if your values contain commas, either use a
- * EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the entire list, or override the comma separator in your initial Environment.
+ * This models the key used to get a value out of the  Environment using the standard Lens mechanic. Note that if your
+ * values contain commas, either use a EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the
+ * entire list, or override the comma separator in your initial Environment.
  */
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
     LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
