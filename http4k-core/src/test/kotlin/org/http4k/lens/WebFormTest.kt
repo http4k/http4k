@@ -3,11 +3,8 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Body
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
@@ -41,7 +38,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             ).toLens()(request)
-        }, throws(lensFailureWith<WebForm>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
@@ -75,7 +72,7 @@ class WebFormTest {
         val intRequiredField = FormField.int().required("another")
         assertThat(
             { Body.webForm(Strict, stringRequiredField, intRequiredField).toLens()(request) },
-                throws(lensFailureWith<WebForm>(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+                throws(lensFailureWith<Any?>(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 
