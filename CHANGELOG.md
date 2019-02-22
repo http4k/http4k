@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.113.0 (uncut)
+### v3.114.0 (uncut)
 - (Possible Break): Fix #215 - `LensFailure` does not always include target object. Only change to the API 
 is that `IN` generic in Lenses is now bounded by `IN : Any`. This fix is a actually internally consistent as 
 we could not always include the target otherwise (which is an `Any?`).
