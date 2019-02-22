@@ -25,7 +25,7 @@ import java.time.Duration
 import java.time.Duration.ofMillis
 import java.util.concurrent.ThreadLocalRandom
 
-val Header.Common.CHAOS; get() = Header.required("x-http4k-chaos")
+val Header.CHAOS; get() = Header.required("x-http4k-chaos")
 
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
@@ -47,7 +47,7 @@ object ChaosBehaviours {
                 val delay = ThreadLocalRandom.current()
                     .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
                 sleep(delay.toLong())
-                next(it).with(Header.Common.CHAOS of "Latency (${delay}ms)")
+                next(it).with(Header.CHAOS of "Latency (${delay}ms)")
             }
 
             override fun toString() = "Latency (range = $min to $max)"
@@ -82,7 +82,7 @@ object ChaosBehaviours {
     object ReturnStatus {
         operator fun invoke(status: Status = INTERNAL_SERVER_ERROR) = object : Behaviour {
             override fun invoke(next: HttpHandler): HttpHandler = {
-                Response(status).with(Header.Common.CHAOS of "Status ${status.code}")
+                Response(status).with(Header.CHAOS of "Status ${status.code}")
             }
 
             override fun toString() = "ReturnStatus (${status.code})"
@@ -94,7 +94,7 @@ object ChaosBehaviours {
      */
     object NoBody {
         operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = { next(it).body(EMPTY).with(Header.Common.CHAOS of "No body") }
+            override fun invoke(next: HttpHandler): HttpHandler = { next(it).body(EMPTY).with(Header.CHAOS of "No body") }
             override fun toString() = "NoBody"
         }
     }
