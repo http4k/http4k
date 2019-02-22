@@ -17,6 +17,7 @@ class CloudNativeExtTest {
         with(originalUri.host(newHost)) {
             assertThat(this, equalTo(Uri.of("http://hello:80")))
             assertThat(host(), equalTo(newHost))
+            assertThat(host().asAuthority(), equalTo(Authority(host())))
         }
 
         val newPort = Port(81)

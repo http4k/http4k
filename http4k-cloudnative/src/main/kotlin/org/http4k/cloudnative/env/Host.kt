@@ -5,6 +5,8 @@ data class Host(val value: String) {
         require(!value.isEmpty()) { "Could not construct Host from '$value'" }
     }
 
+    fun asAuthority() = Authority(this)
+
     companion object {
         val localhost = Host("localhost")
     }
