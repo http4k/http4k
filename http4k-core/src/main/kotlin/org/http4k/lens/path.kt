@@ -3,10 +3,16 @@ package org.http4k.lens
 import org.http4k.core.Request
 import org.http4k.core.fromFormEncoded
 import org.http4k.core.toPathEncoded
-import org.http4k.lens.ParamMeta.*
+import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.routing.path
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.*
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+import java.time.format.DateTimeFormatter.ISO_LOCAL_TIME
+import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
 
 open class PathLens<out FINAL>(meta: Meta, private val get: (String) -> FINAL) : Lens<Request, FINAL>(meta, {
@@ -67,13 +73,13 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
         val meta = Meta(true, "path", paramMeta, name, description)
         return BiDiPathLens(meta,
                 { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
-            { it: OUT, target: Request -> setLens(listOf(it), target) })
+                { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
-    LensGet { _, target -> listOf(target.fromFormEncoded()) },
-    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
+        LensGet { _, target -> listOf(target.fromFormEncoded()) },
+        LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
@@ -110,4 +116,4 @@ fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-    mapping::invoke, mapping::invoke, paramMeta)
+        mapping::invoke, mapping::invoke, paramMeta)

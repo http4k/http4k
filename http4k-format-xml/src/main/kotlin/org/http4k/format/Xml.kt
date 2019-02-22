@@ -5,8 +5,14 @@ import org.http4k.asByteBuffer
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.lens.*
+import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.BodyLensSpec
+import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.httpBodyRoot
 import org.json.XML
 import org.w3c.dom.Document
 import java.io.StringWriter
@@ -33,7 +39,7 @@ object Xml {
         it.toString()
     }
 
-    fun <IN : Any> BiDiLensSpec<IN, String>.xml() = this.map({ it.asXmlDocument() }, { it.asXmlString() })
+    fun <IN : Any> BiDiLensSpec<IN, String>.xml() = map({ it.asXmlDocument() }, { it.asXmlString() })
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =

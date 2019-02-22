@@ -109,5 +109,4 @@ class HeaderTest {
         assertThat(reqWithHeader.header("Content-Type"), equalTo("value"))
         assertThat(lens(reqWithHeader), equalTo(ContentType("value")))
     }
-
 }

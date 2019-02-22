@@ -10,9 +10,14 @@ import org.http4k.cloudnative.health.Completed
 import org.http4k.cloudnative.health.Health
 import org.http4k.cloudnative.health.ReadinessCheck
 import org.http4k.cloudnative.health.ReadinessCheckResult
-import org.http4k.core.*
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.lens.Lens

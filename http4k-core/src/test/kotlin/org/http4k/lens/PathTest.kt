@@ -3,13 +3,22 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.*
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.core.UriTemplate
+import org.http4k.core.with
 import org.http4k.routing.RoutedRequest
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 

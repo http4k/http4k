@@ -9,7 +9,16 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.*
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -18,14 +27,14 @@ class BiDiLensSpecTest {
     data class Container(val s: String?)
 
     private val spec = BiDiLensSpec("location", StringParam,
-        LensGet { _: String, str: String ->
-            if (str.isBlank()) emptyList() else listOf(str)
-        },
-        LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
+            LensGet { _: String, str: String ->
+                if (str.isBlank()) emptyList() else listOf(str)
+            },
+            LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
     private val oSpec = BiDiLensSpec("location", StringParam,
-        LensGet { _: String, (s) -> s?.let(::listOf) ?: emptyList() },
-        LensSet { _: String, values: List<String>, str: Container -> values.fold(str) { (value), next -> Container(value + next) } })
+            LensGet { _: String, (s) -> s?.let(::listOf) ?: emptyList() },
+            LensSet { _: String, values: List<String>, str: Container -> values.fold(str) { (value), next -> Container(value + next) } })
 
     @Test
     fun nonEmptyString() = checkContract(oSpec.nonEmptyString(), "123", Container("123"), Container(null), Container(""), Container("o"), Container("o123"), Container("o123123"))

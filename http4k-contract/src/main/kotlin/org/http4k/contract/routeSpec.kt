@@ -1,6 +1,10 @@
 package org.http4k.contract
 
-import org.http4k.core.*
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Uri
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
@@ -173,9 +177,9 @@ class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H,
 
     inner class Binder(method: Method) : ContractRequestBuilder(method) {
         infix fun to(fn: (A, B, C, D, E, F, G, H, I) -> HttpHandler): ContractRoute =
-            with(this@ContractRouteSpec9) {
-                ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
-            }
+                with(this@ContractRouteSpec9) {
+                    ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
+                }
     }
 
     infix fun bindContract(method: Method) = Binder(method)
