@@ -233,7 +233,3 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
 }
 
 fun <T> T.with(vararg modifiers: (T) -> T): T = modifiers.fold(this) { memo, next -> next(memo) }
-
-@Deprecated("Removed in favour of explicit body creation", ReplaceWith("Body(this)", "org.http4k.core.Body"))
-fun String.toBody(): Body = Body(this)
-

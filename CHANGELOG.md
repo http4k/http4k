@@ -8,6 +8,7 @@ is that `IN` generic in Lenses is now bounded by `IN : Any`. This fix is a actua
 we could not always include the target otherwise (which is an `Any?`).
 - Trim leading and trailing whitespace from extracted `EnvironmentKey` values.
 - Secret value is now only usable once via the `use()` function.
+- Removed deprecations
 
 ### v3.113.0
 - Added some common types for Environmental setup, and equivalent BiDiLens mappings

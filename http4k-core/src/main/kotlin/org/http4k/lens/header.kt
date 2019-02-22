@@ -24,12 +24,4 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
         ContentType::toHeaderValue).optional("content-type")
 
     val LOCATION = map({ of(it) }, Uri::toString).required("location")
-
-    object Common {
-        @Deprecated("moved to main Header object", ReplaceWith("Header.CONTENT_TYPE"))
-        val CONTENT_TYPE = Header.CONTENT_TYPE
-
-        @Deprecated("moved to main Header object", ReplaceWith("Header.LOCATION"))
-        val LOCATION = Header.LOCATION
-    }
 }
