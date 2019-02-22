@@ -1,12 +1,8 @@
 package org.http4k.lens
 
 
-import com.natpryce.hamkrest.MatchResult
-import com.natpryce.hamkrest.Matcher
-import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.*
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.throws
 import org.http4k.lens.ParamMeta.StringParam
 
 object BiDiLensContract {
@@ -16,7 +12,7 @@ object BiDiLensContract {
     },
         LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
-    fun <IN, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, unmodifiedValue: IN, modifiedValue: IN, listModifiedValue: IN) {
+    fun <IN : Any, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, unmodifiedValue: IN, modifiedValue: IN, listModifiedValue: IN) {
         //synonym methods
         assertThat(spec.required("hello").inject(tValue, unmodifiedValue), equalTo(modifiedValue))
         assertThat(spec.required("hello").extract(validValue), equalTo(tValue))

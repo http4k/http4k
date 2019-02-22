@@ -18,18 +18,18 @@ interface MethodBindings<NODE> : Iterable<JsonRpcMethodBinding<NODE, NODE>> {
                 methodMappings[name] = handler
             }
 
-            fun <IN, OUT> handler(paramsLens: Mapping<NODE, IN>,
-                                  resultLens: Mapping<OUT, NODE>,
-                                  fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <IN, OUT : Any> handler(paramsLens: Mapping<NODE, IN>,
+                                        resultLens: Mapping<OUT, NODE>,
+                                        fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                 handler(emptySet(), paramsLens, resultLens, fn)
 
-            fun <IN, OUT> handler(paramsFieldNames: Set<String>,
-                                  paramsLens: Mapping<NODE, IN>,
-                                  resultLens: Mapping<OUT, NODE>,
-                                  fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <IN, OUT : Any> handler(paramsFieldNames: Set<String>,
+                                        paramsLens: Mapping<NODE, IN>,
+                                        resultLens: Mapping<OUT, NODE>,
+                                        fn: (IN) -> OUT): JsonRpcHandler<NODE, NODE> =
                 ParamMappingJsonRequestHandler(json, paramsFieldNames, paramsLens, fn, resultLens)
 
-            fun <OUT> handler(resultLens: Mapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
+            fun <OUT : Any> handler(resultLens: Mapping<OUT, NODE>, block: () -> OUT): JsonRpcHandler<NODE, NODE> =
                 NoParamsJsonRequestHandler(block, resultLens)
         }
 

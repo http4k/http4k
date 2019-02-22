@@ -3,15 +3,9 @@ package org.http4k.format
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.lens.BiDiBodyLensSpec
-import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.BiDiWsMessageLensSpec
-import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.*
 import org.http4k.lens.ContentNegotiation.Companion.None
-import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.httpBodyRoot
-import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -66,12 +60,12 @@ interface Json<NODE> {
     fun parse(s: String): NODE = s.asJsonObject()
     fun pretty(node: NODE): String = node.asPrettyJsonString()
     fun compact(node: NODE): String = node.asCompactJsonString()
-    fun <IN> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })
-    fun <IN> BiDiLensSpec<IN, String>.json() = lens(this)
+    fun <IN : Any> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })
+    fun <IN : Any> BiDiLensSpec<IN, String>.json() = lens(this)
     fun body(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> =
-        httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
-            .map({ it.payload.asString() }, { Body(it) })
-            .map({ parse(it) }, { compact(it) })
+            httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
+                    .map({ it.payload.asString() }, { Body(it) })
+                    .map({ parse(it) }, { compact(it) })
 
     fun Body.Companion.json(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<NODE> = body(description, contentNegotiation)
 

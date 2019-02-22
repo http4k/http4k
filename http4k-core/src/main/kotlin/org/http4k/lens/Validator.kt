@@ -5,7 +5,7 @@ enum class Validator(private val actOn: (List<Failure>) -> List<Failure>) {
     Feedback({ it }),
     Ignore({ emptyList<Failure>() });
 
-    operator fun <T> invoke(entity: T, vararg formFields: Lens<T, *>): List<Failure> =
+    operator fun <T : Any> invoke(entity: T, vararg formFields: Lens<T, *>): List<Failure> =
         formFields.fold(emptyList<Failure>()) { memo, next ->
             try {
                 next(entity)
