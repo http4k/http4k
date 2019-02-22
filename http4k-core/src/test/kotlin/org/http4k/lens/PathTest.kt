@@ -3,23 +3,14 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Method
+import org.http4k.core.*
 import org.http4k.core.Method.GET
-import org.http4k.core.Request
-import org.http4k.core.Uri
-import org.http4k.core.UriTemplate
-import org.http4k.core.with
 import org.http4k.routing.RoutedRequest
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.UUID
+import java.time.*
+import java.util.*
 
 
 class PathTest {
@@ -31,7 +22,7 @@ class PathTest {
 
     @Test
     fun `fixed value mismatch`() {
-        assertThat({ (Path.fixed("hello"))("world") }, throws(lensFailureWith(overallType = Failure.Type.Invalid)))
+        assertThat({ (Path.fixed("hello"))("world") }, throws(lensFailureWith<String>(overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -57,7 +48,7 @@ class PathTest {
     @Test
     fun `invalid value`() {
         val path = Path.map(String::toInt).of("hello")
-        assertThat({ path("world") }, throws(lensFailureWith(Invalid(path.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ path("world") }, throws(lensFailureWith<String>(Invalid(path.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -83,7 +74,7 @@ class PathTest {
     fun nonEmptyString() {
         val requiredLens = Path.nonEmptyString().of("hello")
         assertThat(requiredLens("123"), equalTo("123"))
-        assertThat({ requiredLens("") }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -134,6 +125,6 @@ class PathTest {
     private fun <T> checkContract(Path: PathLensSpec<T>, valueAsString: String, tValue: T) {
         val requiredLens = Path.of("hello")
         assertThat(requiredLens(valueAsString), equalTo(tValue))
-        assertThat({ requiredLens("hello") }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredLens("hello") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 }

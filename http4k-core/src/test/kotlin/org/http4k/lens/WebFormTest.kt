@@ -41,7 +41,7 @@ class WebFormTest {
                 FormField.required("hello"),
                 FormField.int().required("another")
             ).toLens()(request)
-        }, throws(lensFailureWith(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        }, throws(lensFailureWith<WebForm>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
@@ -75,7 +75,7 @@ class WebFormTest {
         val intRequiredField = FormField.int().required("another")
         assertThat(
             { Body.webForm(Strict, stringRequiredField, intRequiredField).toLens()(request) },
-            throws(lensFailureWith(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+                throws(lensFailureWith<WebForm>(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 

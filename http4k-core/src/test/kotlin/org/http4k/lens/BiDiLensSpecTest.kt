@@ -9,17 +9,8 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.OffsetTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.UUID
+import java.time.*
+import java.util.*
 
 
 class BiDiLensSpecTest {
@@ -77,7 +68,7 @@ class BiDiLensSpecTest {
         val requiredLens = spec.regex("v(\\d+)", 1).required("hello")
         assertThat(requiredLens("v123"), equalTo("123"))
         assertThat((spec.regex("v(\\d+)", 1).map(String::toInt).required("hello"))("v123"), equalTo(123))
-        assertThat({ requiredLens("hello") }, throws(lensFailureWith(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredLens("hello") }, throws(lensFailureWith<String>(Invalid(requiredLens.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
@@ -105,6 +96,6 @@ class BiDiLensSpecTest {
     fun bytes() {
         val requiredLens = spec.bytes().required("hello")
         assertThat(String(requiredLens("123")), equalTo("123"))
-        assertThat({ requiredLens("") }, throws(lensFailureWith(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
     }
 }

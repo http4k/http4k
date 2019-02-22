@@ -3,11 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.cloudnative.env.Authority
-import org.http4k.cloudnative.env.Host
-import org.http4k.cloudnative.env.Port
-import org.http4k.cloudnative.env.Secret
-import org.http4k.cloudnative.env.Timeout
+import org.http4k.cloudnative.env.*
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.BiDiLensContract.spec
 import org.junit.jupiter.api.Test
@@ -30,6 +26,6 @@ class CloudNativeExtTest {
     fun secret() {
         val requiredLens = spec.secret().required("hello")
         assertThat(requiredLens("123"), equalTo(Secret("123".toByteArray())))
-        assertThat({ requiredLens("") }, throws(lensFailureWith(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
     }
 }

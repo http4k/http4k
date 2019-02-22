@@ -33,11 +33,11 @@ class CookiesTest {
     fun `value missing`() {
         assertThat(Cookies.optional("world")(request), absent())
         val required = Cookies.required("world")
-        assertThat({ required(request) }, throws(lensFailureWith(Missing(required.meta), overallType = Failure.Type.Missing)))
+        assertThat({ required(request) }, throws(lensFailureWith<Request>(Missing(required.meta), overallType = Failure.Type.Missing)))
 
         assertThat(Cookies.multi.optional("world")(request), absent())
         val optionalMulti = Cookies.multi.required("world")
-        assertThat({ optionalMulti(request) }, throws(lensFailureWith(Missing(optionalMulti.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith<Request>(Missing(optionalMulti.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
@@ -45,16 +45,16 @@ class CookiesTest {
         val asInt = Cookies.map { it.value.toInt() }
 
         val required = asInt.required("hello")
-        assertThat({ required(request) }, throws(lensFailureWith(Invalid(required.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ required(request) }, throws(lensFailureWith<Request>(Invalid(required.meta), overallType = Failure.Type.Invalid)))
 
         val optional = asInt.optional("hello")
-        assertThat({ optional(request) }, throws(lensFailureWith(Invalid(optional.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optional(request) }, throws(lensFailureWith<Request>(Invalid(optional.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMulti = asInt.multi.required("hello")
-        assertThat({ requiredMulti(request) }, throws(lensFailureWith(Invalid(requiredMulti.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMulti(request) }, throws(lensFailureWith<Request>(Invalid(requiredMulti.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMulti = asInt.multi.optional("hello")
-        assertThat({ optionalMulti(request) }, throws(lensFailureWith(Invalid(optionalMulti.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMulti(request) }, throws(lensFailureWith<Request>(Invalid(optionalMulti.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

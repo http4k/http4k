@@ -3,12 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Body
-import org.http4k.core.ContentType
-import org.http4k.core.FormFile
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.with
+import org.http4k.core.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -51,7 +46,7 @@ class MultipartFormTest {
 
         assertThat({
             multipartFormLens(Validator.Strict)(request)
-        }, throws(lensFailureWith(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        }, throws(lensFailureWith<MultipartForm>(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
@@ -102,7 +97,7 @@ class MultipartFormTest {
         )
         assertThat(
             { multipartFormLens(Validator.Strict)(request) },
-            throws(lensFailureWith(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+                throws(lensFailureWith<MultipartForm>(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 

@@ -31,26 +31,26 @@ class MultipartFormFileTest {
     fun `value missing`() {
         assertThat(MultipartFormFile.optional("world")(form()), absent())
         val requiredFormFile = MultipartFormFile.required("world")
-        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith(Missing(requiredFormFile.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Missing(requiredFormFile.meta), overallType = Failure.Type.Missing)))
 
         assertThat(MultipartFormFile.multi.optional("world")(form()), absent())
         val optionalMultiFormFile = MultipartFormFile.multi.required("world")
-        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith(Missing(optionalMultiFormFile.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Missing(optionalMultiFormFile.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).required("hello")
-        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val optionalFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).optional("hello")
-        assertThat({ optionalFormFile(form()) }, throws(lensFailureWith(Invalid(optionalFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(optionalFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormFile(form()) }, throws(lensFailureWith(Invalid(requiredMultiFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMultiFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredMultiFormFile.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith(Invalid(optionalMultiFormFile.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMultiFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(optionalMultiFormFile.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test

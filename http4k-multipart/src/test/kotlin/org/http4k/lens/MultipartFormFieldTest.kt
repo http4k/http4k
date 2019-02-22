@@ -25,26 +25,26 @@ class MultipartFormFieldTest {
     fun `value missing`() {
         assertThat(MultipartFormField.optional("world")(form), absent())
         val requiredFormField = MultipartFormField.required("world")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith<MultipartForm>(Missing(requiredFormField.meta), overallType = Failure.Type.Missing)))
 
         assertThat(MultipartFormField.multi.optional("world")(form), absent())
         val optionalMultiFormField = MultipartFormField.multi.required("world")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Missing(optionalMultiFormField.meta), overallType = Failure.Type.Missing)))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith<MultipartForm>(Missing(optionalMultiFormField.meta), overallType = Failure.Type.Missing)))
     }
 
     @Test
     fun `invalid value`() {
         val requiredFormField = MultipartFormField.map(String::toInt).required("hello")
-        assertThat({ requiredFormField(form) }, throws(lensFailureWith(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalFormField = MultipartFormField.map(String::toInt).optional("hello")
-        assertThat({ optionalFormField(form) }, throws(lensFailureWith(Invalid(optionalFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(optionalFormField.meta), overallType = Failure.Type.Invalid)))
 
         val requiredMultiFormField = MultipartFormField.map(String::toInt).multi.required("hello")
-        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith(Invalid(requiredMultiFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ requiredMultiFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredMultiFormField.meta), overallType = Failure.Type.Invalid)))
 
         val optionalMultiFormField = MultipartFormField.map(String::toInt).multi.optional("hello")
-        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith(Invalid(optionalMultiFormField.meta), overallType = Failure.Type.Invalid)))
+        assertThat({ optionalMultiFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(optionalMultiFormField.meta), overallType = Failure.Type.Invalid)))
     }
 
     @Test
