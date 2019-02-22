@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -39,22 +40,22 @@ class BodyTest {
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation Strict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
-        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Request>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
-        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith<Request>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Any?>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat(strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid or missing content type when ContentNegotiation StrictNoDirective`() {
         val strictNoDirectiveBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.StrictNoDirective).toLens()
-        assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Request>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat({ strictNoDirectiveBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Any?>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat(strictNoDirectiveBody(emptyRequest.header("content-type", "text/plain;  charset= not-utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
     fun `rejects invalid content type when ContentNegotiation NonStrict`() {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.NonStrict).toLens()
-        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith<Request>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
+        assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;  charset= not-utf-8  ").body("some value")) }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat(strictBody(emptyRequest.body("some value")), equalTo("some value"))
     }
 
@@ -97,8 +98,8 @@ class BodyTest {
     fun `can create a one way custom Body type`() {
         val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType).toLens()
         assertThat(customBody(emptyRequest
-            .header("Content-type", TEXT_PLAIN.toHeaderValue())
-            .body("hello world!")), equalTo(MyCustomBodyType("hello world!")))
+                .header("Content-type", TEXT_PLAIN.toHeaderValue())
+                .body("hello world!")), equalTo(MyCustomBodyType("hello world!")))
     }
 }
 
