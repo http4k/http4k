@@ -6,3 +6,4 @@ jdk:
 build:
   ci:
     - "./gradlew -i check jacocoRootReport"
+    - "cp build/reports/jacoco/test/jacocoRootReport.xml shippable/codecoverage"
