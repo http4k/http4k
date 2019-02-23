@@ -160,19 +160,19 @@ When using the [http4k] Environment to define config, missing or values which ca
 a `LensFailure` to be thrown with a descriptive error message. As before, this results in the application failing to 
 start, but as the exception if both consistent and explicit, diagnosing the problem becomes much simpler.
 
-#### Extra primitives
-Timeout, Host, Port
-
 #### Single-shot Secrets
-In order to avoid the accidental exposure of secrets into the application runtime, a new type `Secret` has been introduced, 
-which tries as much as possible to avoid exposing it's internal value as a readable `String`. The `Secret` class is 
-designed to only have it's value read once, and only within a specific `use()` block, after which the underlying value 
-is internally overwritten.
+In order to avoid the accidental exposure of sensitive information such as passwords into the application runtime, a new 
+type `Secret` has been introduced, which tries as much as possible to avoid exposing it's internal value as a readable 
+`String`. The `Secret` class is designed to only have the string version of it's value read once, and only within a 
+specific `use()` block, after which the underlying value is internally overwritten and further attempts to read it throw 
+an `IllegalStateException`. 
 
-As with other primitives, `Secret` is available by default.
+The typical use-case for this block is to set-up a SQL `Datasource` or to create a `Filter` which adds authentication to 
+all outbound requests, as in the example below:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/typesafe_configuration/post/secrets.kt"></script>
 
+As with other supported primitives, `Secret` is available by default in all supported Lens Locations.
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
