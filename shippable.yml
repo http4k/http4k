@@ -1,0 +1,8 @@
+language: java
+
+jdk:
+  - openjdk11
+
+build:
+  ci:
+    - "./gradlew -i check jacocoRootReport"
