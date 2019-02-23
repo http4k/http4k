@@ -55,7 +55,6 @@ allprojects {
 
     test {
         useJUnitPlatform()
-        reports.html.enabled = false
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {
@@ -162,11 +161,6 @@ allprojects {
             xml.enabled = true
         }
     }
-}
-
-task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/junit")
-    reportOn subprojects*.test
 }
 
 coveralls {
