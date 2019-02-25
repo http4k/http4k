@@ -1,5 +1,6 @@
 package org.http4k.cloudnative.env
 
+import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
@@ -19,9 +20,15 @@ class SecretTest {
 
     @Test
     fun `can use the value, after which it is cleared`() {
-        assertEqualTo(aSecret, "mySecret".toByteArray())
-        assertThat(aSecret.use { it }, equalTo("mySecret"))
-        assertEqualTo(aSecret, ByteArray(0))
+        val inputBytes = "mySecret".toByteArray()
+        val secretWithBytes = Secret(inputBytes)
+
+        assertEqualTo(secretWithBytes, "mySecret".toByteArray())
+        assertThat(secretWithBytes.use { it }, equalTo("mySecret"))
+        assertEqualTo(secretWithBytes, ByteArray(0))
+
+        assertThat(inputBytes.size, equalTo("mySecret".length))
+        assertThat(inputBytes.toList(), allElements(equalTo(0.toByte())))
     }
 
     @Test

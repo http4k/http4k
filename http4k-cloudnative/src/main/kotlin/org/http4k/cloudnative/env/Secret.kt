@@ -2,6 +2,7 @@ package org.http4k.cloudnative.env
 
 import java.io.Closeable
 import java.nio.charset.StandardCharsets
+import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -27,9 +28,12 @@ class Secret(input: ByteArray) : Closeable {
     override fun toString(): String = "Secret(hashcode = $initialHashcode)"
 
     fun <T> use(fn: (String) -> T) = with(value.get()) {
-        if (isNotEmpty()) fn(toString(Charsets.UTF_8))
+        if (isNotEmpty()) fn(toString(UTF_8))
         else throw IllegalStateException("Cannot read a secret more than once")
     }.apply { close() }
 
-    override fun close(): Unit = run { value.set(ByteArray(0)) }
+    override fun close(): Unit = run {
+        value.get().apply { (0 until size).forEach { this[it] = 0 } }
+        value.set(ByteArray(0))
+    }
 }
