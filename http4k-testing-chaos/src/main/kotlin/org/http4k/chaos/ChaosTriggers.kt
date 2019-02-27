@@ -21,7 +21,7 @@ import org.http4k.hamkrest.hasUriPath
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.util.Random
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -48,12 +48,13 @@ object ChaosTriggers {
      * Single application predicated on the ChaosTrigger. Further matches don't apply
      */
     object Once {
-        operator fun invoke(trigger: Trigger) = object : Trigger {
+        operator fun invoke(trigger: Trigger? = Always) = object : Trigger {
             private val active = AtomicBoolean(true)
-            override fun invoke(request: Request) =
-                if (trigger(request)) active.get().also { active.set(false) } else false
+            override fun invoke(request: Request): Boolean {
+                return if (trigger?.invoke(request) != false) active.get().also { active.set(false) } else false
+            }
 
-            override fun toString() = "Once (trigger = $trigger)"
+            override fun toString() = "Once" + (trigger?.let { " (trigger = $trigger)" } ?: "")
         }
     }
 
@@ -150,7 +151,7 @@ internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = whe
     "delay" -> Delay(nonNullable("period"), clock)
     "countdown" -> Countdown(nonNullable("count"))
     "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
-    "once" -> Once(this["trigger"].asTrigger(clock))
+    "once" -> Once(this["trigger"]?.asTrigger(clock))
     "percentage" -> PercentageBased(this["percentage"].asInt())
     "always" -> Always
     else -> throw IllegalArgumentException("unknown trigger")

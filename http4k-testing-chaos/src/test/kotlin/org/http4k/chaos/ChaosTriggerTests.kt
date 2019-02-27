@@ -3,7 +3,6 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.chaos.ChaosTriggers.Countdown
@@ -32,7 +31,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant.EPOCH
 import java.time.ZoneId.of
-import java.util.Properties
+import java.util.*
 
 private val request = Request(GET, "")
 
@@ -92,8 +91,8 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     override val asJson = """{"type":"request","method":"get","path":".*bob","queries":{"query":".*query"},"headers":{"header":".*header"},"body":".*body"}"""
 
     override val expectedDescription = "has Method that is equal to GET and has Uri that has Path " +
-        "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
-        " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
+            "that is not null & matches .*bob and has Query 'query' that is not null & matches .*query and has Header" +
+            " 'header' that is not null & matches .*header and has Body that is not null & matches .*body"
 
     private fun assertMatchNoMatch(s: Trigger, match: Request, noMatch: Request) {
         assertThat(s(match), equalTo(true))
@@ -103,36 +102,36 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     @Test
     fun `matches path`() {
         assertMatchNoMatch(MatchRequest(path = Regex(".*bob")),
-            Request(GET, "/abob"),
-            Request(GET, "/bill"))
+                Request(GET, "/abob"),
+                Request(GET, "/bill"))
     }
 
     @Test
     fun `matches header`() {
         assertMatchNoMatch(MatchRequest(headers = mapOf("header" to Regex(".*bob"))),
-            request.header("header", "abob"),
-            request.header("header", "bill"))
+                request.header("header", "abob"),
+                request.header("header", "bill"))
     }
 
     @Test
     fun `matches query`() {
         assertMatchNoMatch(MatchRequest(queries = mapOf("query" to Regex(".*bob"))),
-            request.query("query", "abob"),
-            request.query("query", "bill"))
+                request.query("query", "abob"),
+                request.query("query", "bill"))
     }
 
     @Test
     fun `matches body`() {
         assertMatchNoMatch(MatchRequest(body = Regex(".*bob")),
-            request.body("abob"),
-            request.body("bill"))
+                request.body("abob"),
+                request.body("bill"))
     }
 
     @Test
     fun `matches method`() {
         assertMatchNoMatch(MatchRequest(method = "put"),
-            Request(PUT, "/abob"),
-            Request(GET, "/abob"))
+                Request(PUT, "/abob"),
+                Request(GET, "/abob"))
     }
 }
 
@@ -187,7 +186,13 @@ class OnceTest : ChaosTriggerContract() {
     override val expectedDescription = "Once (trigger = Deadline (1970-01-01T00:00:00Z))"
 
     @Test
-    fun `Once only fires once`() {
+    fun `deserialises from JSON no trigger`() {
+        val clock = Clock.fixed(EPOCH, of("UTC"))
+        assertThat("""{"type":"once"}""".asJsonObject().asTrigger(clock).toString(), equalTo("Once"))
+    }
+
+    @Test
+    fun `Once only fires once with trigger`() {
         val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(Status.OK) }
         assertThat(http(Request(POST, "/foo")), hasStatus(OK))
         assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR))
@@ -237,3 +242,13 @@ class ChaosTriggerLogicalOperatorTest {
         assertThat((isTrue or isTrue).toString(), equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean"))
     }
 }
+//
+//fun main() {
+//    val request = Request(POST, "/chaos/activate/new")
+//            .header("content-type", "application/json")
+//            .body("[{\"type\":\"trigger\",\"behaviour\":{\"type\":\"status\",\"status\":418},\"trigger\":{\"type\":\"once\"}}]")
+//
+//    val h = { _: Request -> Response(Status.OK) }.withChaosControls()
+//    val response = h(request)
+//    assertThat(response.bodyString(), response.status, equalTo(OK))
+//}
