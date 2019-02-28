@@ -48,7 +48,7 @@ object ChaosTriggers {
      * Single application predicated on the ChaosTrigger. Further matches don't apply
      */
     object Once {
-        operator fun invoke(trigger: Trigger? = Always) = object : Trigger {
+        operator fun invoke(trigger: Trigger? = Always()) = object : Trigger {
             private val active = AtomicBoolean(true)
             override fun invoke(request: Request): Boolean {
                 return if (trigger?.invoke(request) != false) active.get().also { active.set(false) } else false
@@ -61,9 +61,11 @@ object ChaosTriggers {
     /**
      * Applies to every transaction.
      */
-    object Always : Trigger {
-        override fun invoke(request: Request) = true
-        override fun toString() = "Always"
+    object Always {
+        operator fun invoke() = object : Trigger {
+            override fun invoke(request: Request) = true
+            override fun toString() = "Always"
+        }
     }
 
     /**
@@ -153,12 +155,12 @@ internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = whe
     "request" -> MatchRequest(asNullable("method"), asNullable("path"), toRegexMap("queries"), toRegexMap("headers"), asNullable("body"))
     "once" -> Once(this["trigger"]?.asTrigger(clock))
     "percentage" -> PercentageBased(this["percentage"].asInt())
-    "always" -> Always
+    "always" -> Always()
     else -> throw IllegalArgumentException("unknown trigger")
 }
 
 private fun JsonNode.toRegexMap(name: String) =
-    asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
+        asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
 
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off

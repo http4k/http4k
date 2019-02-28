@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.115.0 (uncut)
 - Simplified usage of `Once` chaos trigger.
+- Consistentified (!) construction of Chaos Behaviours, Stages and Triggers
 
 ### v3.114.0
 - (Possible Break): Fix #215 - `LensFailure` does not always include target object. Only change to the API 

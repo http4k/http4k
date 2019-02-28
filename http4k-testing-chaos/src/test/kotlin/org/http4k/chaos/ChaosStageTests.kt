@@ -70,10 +70,10 @@ class RepeatTest : ChaosStageContract() {
     fun `repeat starts again at the beginning`() {
         val app = Repeat {
             chaosStage(I_M_A_TEAPOT).until { it.method == POST }
-                .then(chaosStage(NOT_FOUND).until { it.method == OPTIONS })
-                .then(chaosStage(GATEWAY_TIMEOUT).until { it.method == TRACE })
+                    .then(chaosStage(NOT_FOUND).until { it.method == OPTIONS })
+                    .then(chaosStage(GATEWAY_TIMEOUT).until { it.method == TRACE })
         }.until { it.method == DELETE }
-            .asFilter().then { response }
+                .asFilter().then { response }
 
         assertThat(app(Request(GET, "")), equalTo(Response(I_M_A_TEAPOT)))
         assertThat(app(Request(POST, "")), equalTo(Response(NOT_FOUND)))
@@ -91,7 +91,7 @@ class VariableStageTest {
         val variable = Variable()
         assertThat(variable.toString(), equalTo(("Always None")))
         assertThat(variable(request)!!.then { response }(request), equalTo(response))
-        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always) }
+        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always()) }
         assertThat(variable.toString(), equalTo(("Repeat [Always ReturnStatus (404)]")))
         assertThat(variable(request)!!.then { response }(request), hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
@@ -101,7 +101,7 @@ class ChaosStageOperationsTest {
     @Test
     fun `until stops when the trigger is hit`() {
         val app = chaosStage(NOT_FOUND).until { it.method == POST }
-            .asFilter().then { response }
+                .asFilter().then { response }
 
         assertThat(app(Request(GET, "")), equalTo(Response(NOT_FOUND)))
         assertThat(app(Request(POST, "")), equalTo(response))
@@ -111,9 +111,9 @@ class ChaosStageOperationsTest {
     @Test
     fun `then moves onto the next stage`() {
         val app = chaosStage(I_M_A_TEAPOT).until { it.method == POST }
-            .then(chaosStage(NOT_FOUND).until { it.method == TRACE })
-            .then(chaosStage(INTERNAL_SERVER_ERROR))
-            .asFilter().then { response }
+                .then(chaosStage(NOT_FOUND).until { it.method == TRACE })
+                .then(chaosStage(INTERNAL_SERVER_ERROR))
+                .asFilter().then { response }
 
         assertThat(app(Request(GET, "")), equalTo(Response(I_M_A_TEAPOT)))
         assertThat(app(Request(POST, "")), equalTo(Response(NOT_FOUND)))

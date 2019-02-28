@@ -157,7 +157,7 @@ class AlwaysTest : ChaosTriggerContract() {
 
     @Test
     fun `Always applies by default`() {
-        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always).asFilter().then { Response(OK) }
+        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).asFilter().then { Response(OK) }
         assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR).and(hasBody("")).and(hasHeader("x-http4k-chaos", "Status 500")))
     }
 }
@@ -205,7 +205,7 @@ class ChaosPolicyOperationTest {
 
     @Test
     fun `Until stops a behaviour when triggered`() {
-        val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always).until { it.method == POST }
+        val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).until { it.method == POST }
         assertThat(stage.toString(), equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean"))
 
         val http: HttpHandler = stage.asFilter().then { Response(Status.OK) }

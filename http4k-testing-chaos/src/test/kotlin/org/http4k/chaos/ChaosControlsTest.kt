@@ -34,7 +34,7 @@ class ChaosControlsTest {
     fun `can convert a normal app to be chaotic`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always))
+        val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
 
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
@@ -67,9 +67,9 @@ class ChaosControlsTest {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosControls(
-            Wait,
-            ApiKey(Header.required("secret"), { true }),
-            "/context"
+                Wait,
+                ApiKey(Header.required("secret"), { true }),
+                "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
@@ -81,9 +81,9 @@ class ChaosControlsTest {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
         val appWithChaos = app.withChaosControls(
-            Wait,
-            NoSecurity,
-            "/context"
+                Wait,
+                NoSecurity,
+                "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))

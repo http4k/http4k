@@ -3,7 +3,6 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
 import com.natpryce.hamkrest.throws
 import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
@@ -28,7 +27,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofMillis
-import java.util.Properties
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
@@ -79,8 +78,8 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
-            description,
-            hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
+                description,
+                hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
     }
 
     @Test
@@ -113,8 +112,8 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"status","status":404}""",
-            description,
-            hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
+                description,
+                hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
 }
 
@@ -132,8 +131,8 @@ class NoBodyBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"body"}""",
-            description,
-            hasStatus(OK).and(hasHeader("x-http4k-chaos", "No body")))
+                description,
+                hasStatus(OK).and(hasHeader("x-http4k-chaos", "No body")))
     }
 }
 

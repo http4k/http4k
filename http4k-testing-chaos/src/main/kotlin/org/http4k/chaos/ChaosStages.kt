@@ -57,10 +57,10 @@ object ChaosStages {
         private val current by lazy { AtomicReference(newStageFn()) }
 
         override fun invoke(request: Request): Filter? =
-            current.get()(request) ?: run {
-                current.set(newStageFn())
-                current.get()(request)
-            }
+                current.get()(request) ?: run {
+                    current.set(newStageFn())
+                    current.get()(request)
+                }
 
         override fun toString() = "Repeat [${current.get()}]"
     }
@@ -76,7 +76,7 @@ object ChaosStages {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: Stage = None().appliedWhen(Always)) : Stage {
+    class Variable(var current: Stage = None().appliedWhen(Always())) : Stage {
         override fun invoke(request: Request) = current(request)
         override fun toString() = current.toString()
     }
@@ -87,9 +87,9 @@ fun JsonNode.asStage(clock: Clock = Clock.systemUTC()): Stage {
         "wait" -> Wait
         "repeat" -> Repeat {
             this["stages"]!!
-                .elements().asSequence()
-                .map { it.asStage(clock) }
-                .reduce { acc, next -> acc.then(next) }
+                    .elements().asSequence()
+                    .map { it.asStage(clock) }
+                    .reduce { acc, next -> acc.then(next) }
         }
         "trigger" -> this["behaviour"]!!.asBehaviour().appliedWhen(this["trigger"]!!.asTrigger(clock))
         else -> throw IllegalArgumentException("unknown stage")
