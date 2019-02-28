@@ -40,24 +40,24 @@ import java.time.Clock
  *  By default, controls are mounted at the root path /chaos
  */
 object ChaosControls {
-    private val setStages = Body.json().map { node ->
-        (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
-            .map { it.asStage(Clock.systemUTC()) }
-            .reduce { acc, next -> acc.then(next) }
-    }.toLens()
-
     operator fun invoke(
-        trigger: SwitchTrigger,
-        variable: Variable,
-        controlsPath: String = "/chaos",
-        security: Security = NoSecurity,
-        openApiPath: String = "",
-        corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+            trigger: SwitchTrigger,
+            variable: Variable,
+            controlsPath: String = "/chaos",
+            security: Security = NoSecurity,
+            openApiPath: String = "",
+            corsPolicy: CorsPolicy = UnsafeGlobalPermissive
 
     ): RoutingHttpHandler {
+        val setStages = Body.json().map { node ->
+            (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
+                    .map { it.asStage(Clock.systemUTC()) }
+                    .reduce { acc, next -> acc.then(next) }
+        }.toLens()
+
         val showCurrentStatus: HttpHandler = {
             Response(OK).with(Body.json().toLens() of obj(
-                "chaos" to string(if (trigger.isActive()) variable.toString() else "none")
+                    "chaos" to string(if (trigger.isActive()) variable.toString() else "none")
             ))
         }
 
@@ -88,29 +88,29 @@ object ChaosControls {
         )
 
         return controlsPath bind
-            Cors(corsPolicy)
-                .then(
-                    contract(OpenApi(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson),
-                        openApiPath,
-                        security,
-                        "/status" meta {
-                            summary = "show the current chaos being applied"
-                        } bindContract GET to showCurrentStatus,
-                        "/activate/new" meta {
-                            summary = "activate new chaos on all routes"
-                            receiving(Body.json("New chaos to be applied").toLens() to exampleChaos)
-                        } bindContract POST to activate.then(showCurrentStatus),
-                        "/activate" meta {
-                            summary = "activate chaos on all routes"
-                        } bindContract POST to activate.then(showCurrentStatus),
-                        "/deactivate" meta {
-                            summary = "deactivate the chaos on all routes"
-                        } bindContract POST to deactivate.then(showCurrentStatus),
-                        "/toggle" meta {
-                            summary = "toggle the chaos on all routes"
-                        } bindContract POST to toggle.then(showCurrentStatus)
-                    )
-                )
+                Cors(corsPolicy)
+                        .then(
+                                contract(OpenApi(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson),
+                                        openApiPath,
+                                        security,
+                                        "/status" meta {
+                                            summary = "show the current chaos being applied"
+                                        } bindContract GET to showCurrentStatus,
+                                        "/activate/new" meta {
+                                            summary = "activate new chaos on all routes"
+                                            receiving(Body.json("New chaos to be applied").toLens() to exampleChaos)
+                                        } bindContract POST to activate.then(showCurrentStatus),
+                                        "/activate" meta {
+                                            summary = "activate chaos on all routes"
+                                        } bindContract POST to activate.then(showCurrentStatus),
+                                        "/deactivate" meta {
+                                            summary = "deactivate the chaos on all routes"
+                                        } bindContract POST to deactivate.then(showCurrentStatus),
+                                        "/toggle" meta {
+                                            summary = "toggle the chaos on all routes"
+                                        } bindContract POST to toggle.then(showCurrentStatus)
+                                )
+                        )
     }
 }
 
