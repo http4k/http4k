@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Defines a periodic element during which a particular ChaosBehaviour is active.
  */
-interface Stage : (Request) -> Filter?
+typealias Stage = (Request) -> Filter?
 
 /**
  * Chain the next ChaosBehaviour to apply when this stage is finished.
