@@ -20,6 +20,8 @@ fun main() {
     driver.navigate().to("http://localhost:10000/hello")
 
     println(driver.title)
+
+    // Note that we are using `org.http4k.webdriver.By`, as opposed to the ones from `org.openqa.selenium.By`
     println(driver.findElement(By.tagName("title")))
 
 // prints:
