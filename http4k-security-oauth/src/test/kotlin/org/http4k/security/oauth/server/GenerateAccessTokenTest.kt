@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.DAYS
 import java.time.temporal.TemporalUnit
 
 class GenerateAccessTokenTest {
@@ -73,7 +73,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles expired code`() {
-        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH.plus(1, ChronoUnit.DAYS)))
+        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH.plus(1, DAYS)))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -104,7 +104,7 @@ class GenerateAccessTokenTest {
     }
 
     @Test
-    fun `handles redirectUridifferent from one in authorization code`(){
+    fun `handles redirectUri different from one in authorization code`(){
         val expiredCode = codes.create(AuthorizationCodeDetails(request.client, Uri.of("somethingelse"), Instant.EPOCH))
 
         val response = handler(Request(Method.POST, "/token")
