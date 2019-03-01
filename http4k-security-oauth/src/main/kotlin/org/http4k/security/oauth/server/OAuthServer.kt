@@ -2,16 +2,11 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.oauth.server.OAuthServer.Companion.clientId
-import org.http4k.security.oauth.server.OAuthServer.Companion.redirectUri
-import org.http4k.security.oauth.server.OAuthServer.Companion.scopes
-import org.http4k.security.oauth.server.OAuthServer.Companion.state
 import java.time.Clock
 
 /**
@@ -47,20 +42,14 @@ class OAuthServer(
     }
 }
 
-data class AuthRequest(
-        val client: ClientId,
-        val scopes: List<String>,
-        val redirectUri: Uri,
-        val state: String?
-)
+data class ClientId(val value: String)
+
+data class AuthorizationCode(val value: String)
 
 internal fun Request.authorizationRequest() =
     AuthRequest(
-                clientId(this),
-                scopes(this) ?: listOf(),
-                redirectUri(this),
-                state(this)
-        )
-
-data class ClientId(val value: String)
-data class AuthorizationCode(val value: String)
+        OAuthServer.clientId(this),
+        OAuthServer.scopes(this) ?: listOf(),
+        OAuthServer.redirectUri(this),
+        OAuthServer.state(this)
+    )
