@@ -21,7 +21,7 @@ class GenerateAccessToken(
     private val clientValidator: ClientValidator,
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
-    private val clock: Clock = Clock.systemUTC()
+    private val clock: Clock
 ) : HttpHandler {
 
         override fun invoke(request: Request): Response {
@@ -38,7 +38,7 @@ class GenerateAccessToken(
 
                 val codeDetails = authorizationCodes.detailsFor(accessTokenRequest.authorizationCode)
 
-                if (codeDetails.expiresAt.isAfter(clock.instant())) {
+                if (codeDetails.expiresAt.isBefore(clock.instant())) {
                         return Response(Status.BAD_REQUEST).body("Authorization code has expired")
                 }
 

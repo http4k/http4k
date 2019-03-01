@@ -31,7 +31,7 @@ class OAuthServer(
     private val validationFilter = ClientValidationFilter(clientValidator)
 
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens))
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock))
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = validationFilter

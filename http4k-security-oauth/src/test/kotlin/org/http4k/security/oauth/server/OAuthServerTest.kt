@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test
 
 class OAuthServerTest {
 
-    private val debug = false
+    private val debug = true
 
     @Test
     fun `can follow authorization code flow`() {
