@@ -16,7 +16,7 @@ import org.http4k.routing.routes
 fun main() {
     val app = routes("/" bind routes("/" bind GET to { Response(OK).body("hello!") }))
 
-    val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always))
+    val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
 
     println(">>chaos is deactivated by default")
     println(appWithChaos(Request(GET, "/chaos/status")).bodyString())
