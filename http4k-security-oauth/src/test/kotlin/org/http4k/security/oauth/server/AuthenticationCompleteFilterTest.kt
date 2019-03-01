@@ -15,6 +15,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 
 class AuthenticationCompleteFilterTest {
@@ -34,8 +35,8 @@ class AuthenticationCompleteFilterTest {
         )
 
     val filter = AuthenticationCompleteFilter(
-        DummyAuthorizationCodes(),
-        ClientValidationFilter(HardcodedClientValidator(authorizationRequest.client, authorizationRequest.redirectUri))).then(loginAction)
+        DummyAuthorizationCodes(authorizationRequest),
+        ClientValidationFilter(HardcodedClientValidator(authorizationRequest.client, authorizationRequest.redirectUri)), FixedClock).then(loginAction)
 
     @Test
     fun `redirects on successful login`() {

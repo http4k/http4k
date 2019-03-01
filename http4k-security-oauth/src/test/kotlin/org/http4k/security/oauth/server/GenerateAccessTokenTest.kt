@@ -14,13 +14,13 @@ import org.http4k.core.body.form
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.time.Instant
 
 class GenerateAccessTokenTest {
 
     private val codes = InMemoryAuthorizationCodes()
     private val request = AuthorizationRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
-    private val code = codes.create(request)
+    private val code = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH))
     private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens())
 
     @Test
@@ -67,18 +67,3 @@ class GenerateAccessTokenTest {
     }
 }
 
-private class InMemoryAuthorizationCodes : AuthorizationCodes {
-    private val codes = mutableMapOf<AuthorizationCode, AuthorizationRequest>()
-
-    override fun destroy(authorizationCode: AuthorizationCode) {
-        codes.remove(authorizationCode)
-    }
-
-    override fun create(authorizationRequest: AuthorizationRequest): AuthorizationCode =
-        AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = authorizationRequest
-        }
-
-    fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode)
-
-}

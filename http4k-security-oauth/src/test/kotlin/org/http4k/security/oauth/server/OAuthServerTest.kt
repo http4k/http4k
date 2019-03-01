@@ -25,6 +25,7 @@ import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 
 
@@ -57,8 +58,9 @@ class OAuthServerTest {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
             clientValidator = DummyClientValidator(),
-            authorizationCodes = DummyAuthorizationCodes(),
-            accessTokens = DummyAccessTokens()
+            authorizationCodes = InMemoryAuthorizationCodes(),
+            accessTokens = DummyAccessTokens(),
+            clock = FixedClock
         )
 
         return routes(

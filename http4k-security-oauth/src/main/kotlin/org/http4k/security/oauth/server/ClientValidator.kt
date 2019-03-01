@@ -3,7 +3,7 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Uri
 
 /**
- * Provides a consistent way to validate clients attempting to use an authorization code flow
+ * Provides a consistent way to retrieve clients attempting to use an authorization code flow
  */
 interface ClientValidator {
     /**

@@ -6,10 +6,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.query
 import org.http4k.core.then
+import java.time.Clock
 
 class AuthenticationCompleteFilter(
     private val authorizationCodes: AuthorizationCodes,
-    private val validationFilter: ClientValidationFilter
+    private val validationFilter: ClientValidationFilter,
+    private val clock: Clock
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
@@ -17,9 +19,15 @@ class AuthenticationCompleteFilter(
             val response = next(request)
             if (response.status.successful) {
                 val authorizationRequest = request.authorizationRequest()
+                val code = authorizationCodes.create(
+                    AuthorizationCodeDetails(
+                        authorizationRequest.client,
+                        authorizationRequest.redirectUri,
+                        clock.instant()
+                    ))
                 Response(Status.TEMPORARY_REDIRECT)
                     .header("location", authorizationRequest.redirectUri
-                        .query("code", authorizationCodes.create(authorizationRequest).value)
+                        .query("code", code.value)
                         .query("state", authorizationRequest.state)
                         .toString())
             } else response

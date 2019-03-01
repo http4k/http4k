@@ -11,6 +11,7 @@ import org.http4k.security.oauth.server.OAuthServer.Companion.clientId
 import org.http4k.security.oauth.server.OAuthServer.Companion.redirectUri
 import org.http4k.security.oauth.server.OAuthServer.Companion.scopes
 import org.http4k.security.oauth.server.OAuthServer.Companion.state
+import java.time.Clock
 
 /**
  * Provide help creating OAuth Authorization Server with Authorization Code Flow
@@ -23,7 +24,9 @@ class OAuthServer(
     tokenPath: String,
     clientValidator: ClientValidator,
     authorizationCodes: AuthorizationCodes,
-    accessTokens: AccessTokens) {
+    accessTokens: AccessTokens,
+    clock: Clock
+) {
 
     private val validationFilter = ClientValidationFilter(clientValidator)
 
@@ -34,7 +37,7 @@ class OAuthServer(
     val authenticationStart = validationFilter
 
     // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter, clock)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

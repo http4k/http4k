@@ -6,7 +6,7 @@ import org.http4k.core.Status.Companion.FORBIDDEN
 
 /**
  * Provides persistence for OAuth lifecycle values:
- *  - CrossSiteRequestForgeryToken - used to validate that authorisation code assignment responses are genuinely from the end-service.
+ *  - CrossSiteRequestForgeryToken - used to retrieve that authorisation code assignment responses are genuinely from the end-service.
  *  - AccessTokenContainer - provides time-limited access to protected API resources on the end-service.
  */
 interface OAuthPersistence {
