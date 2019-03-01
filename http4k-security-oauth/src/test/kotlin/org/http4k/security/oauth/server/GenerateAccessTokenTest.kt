@@ -26,7 +26,7 @@ class GenerateAccessTokenTest {
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val request = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
-    private val code = codes.create(request.client, request.redirectUri)
+    private val code = codes.create(request)
     private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock)
 
     @Test
@@ -76,7 +76,7 @@ class GenerateAccessTokenTest {
     fun `handles expired code`() {
         handlerClock.advance(1, SECONDS)
 
-        val expiredCode = codes.create(request.client, request.redirectUri)
+        val expiredCode = codes.create(request)
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -92,7 +92,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles client id different from one in authorization code`(){
-        val storedCode = codes.create(ClientId("different client"), request.redirectUri)
+        val storedCode = codes.create(request.copy(client = ClientId("different client")))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -108,7 +108,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles redirectUri different from one in authorization code`(){
-        val storedCode = codes.create(request.client, Uri.of("somethingelse"))
+        val storedCode = codes.create(request.copy(redirectUri = Uri.of("somethingelse")))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)

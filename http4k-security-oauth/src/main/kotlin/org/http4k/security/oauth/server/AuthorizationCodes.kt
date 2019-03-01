@@ -12,7 +12,7 @@ interface AuthorizationCodes {
      * The generated authorization code needs to be associated with the clientId and redirectUri for later verification.
      * It should also be associated with a given expire date (recommended to be shorter than 10 minutes)
      */
-    fun create(clientId: ClientId, redirectUri: Uri): AuthorizationCode
+    fun create(authRequest: AuthRequest): AuthorizationCode
 
     /**
      * Retrieve the details of an authorization code
