@@ -14,14 +14,19 @@ import org.http4k.core.body.form
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
+import java.time.Clock
 import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
 class GenerateAccessTokenTest {
 
     private val codes = InMemoryAuthorizationCodes()
     private val request = AuthorizationRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val code = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH))
-    private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens())
+    private val clock = SettableClock()
+    private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), clock)
 
     @Test
     fun `generates a dummy token`() {
@@ -65,5 +70,34 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(UNAUTHORIZED) and hasBody("Invalid client credentials"))
     }
+
+    @Test
+    fun `handles expired code`() {
+        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH.plus(1, ChronoUnit.DAYS)))
+
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", expiredCode.value)
+            .form("client_id", request.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", request.redirectUri.toString())
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Authorization code has expired"))
+    }
 }
 
+class SettableClock : Clock() {
+    private var currentTime = Instant.EPOCH
+
+    fun advance(amount: Long, unit: TemporalUnit) {
+        currentTime = currentTime.plus(amount, unit)
+    }
+
+    override fun withZone(zone: ZoneId?): Clock = this
+
+    override fun getZone(): ZoneId = ZoneId.systemDefault()
+
+    override fun instant(): Instant = currentTime
+}

@@ -15,11 +15,14 @@ import org.http4k.security.oauth.server.GenerateAccessToken.Companion.authorizat
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientId
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientSecret
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.redirectUri
+import java.time.Clock
 
 class GenerateAccessToken(
     private val clientValidator: ClientValidator,
     private val authorizationCodes: AuthorizationCodes,
-    private val accessTokens: AccessTokens) : HttpHandler {
+    private val accessTokens: AccessTokens,
+    private val clock: Clock = Clock.systemUTC()
+) : HttpHandler {
 
         override fun invoke(request: Request): Response {
                 val form = accessTokenForm(request)
@@ -31,6 +34,11 @@ class GenerateAccessToken(
 
                 if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
                         return Response(Status.UNAUTHORIZED).body("Invalid client credentials")
+                }
+
+                if (authorizationCodes.detailsFor(accessTokenRequest.authorizationCode)
+                        .expiresAt.isAfter(clock.instant())) {
+                        return Response(Status.BAD_REQUEST).body("Authorization code has expired")
                 }
 
                 return Response(Status.OK).body(accessTokens.create(accessTokenRequest.authorizationCode).value).also {
