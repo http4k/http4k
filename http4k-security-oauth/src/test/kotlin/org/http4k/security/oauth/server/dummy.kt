@@ -1,12 +1,14 @@
 package org.http4k.security.oauth.server
 
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
 import java.time.Clock
 import java.time.Instant
 import java.util.*
 
-class DummyAuthorizationCodes(private val request: AuthorizationRequest) : AuthorizationCodes {
+class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
     override fun create(clientId: ClientId, redirectUri: Uri): AuthorizationCode = AuthorizationCode("dummy-token")
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH)
     override fun destroy(authorizationCode: AuthorizationCode) = Unit
@@ -18,8 +20,12 @@ class DummyAccessTokens : AccessTokens {
 
 class DummyClientValidator : ClientValidator {
     override fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean = true
-
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
+}
+
+class DummyOAuthAuthRequestPersistence : AuthRequestPersistence {
+    override fun storeAuthRequest(authRequest: AuthRequest, response: Response): Response = response
+    override fun retrieveAuthRequest(request: Request): AuthRequest? = request.authorizationRequest()
 }
 
 class HardcodedClientValidator(

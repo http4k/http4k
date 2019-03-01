@@ -5,18 +5,17 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.query
-import org.http4k.core.then
 
 class AuthenticationCompleteFilter(
     private val authorizationCodes: AuthorizationCodes,
-    private val validationFilter: ClientValidationFilter
+    private val requestPersistence: AuthRequestPersistence
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
-        validationFilter.then { request ->
+         { request ->
             val response = next(request)
             if (response.status.successful) {
-                val authorizationRequest = request.authorizationRequest()
+                val authorizationRequest = requestPersistence.retrieveAuthRequest(request) ?: error("authorization request could not be found!")
                 val code = authorizationCodes.create(
                         authorizationRequest.client,
                     authorizationRequest.redirectUri

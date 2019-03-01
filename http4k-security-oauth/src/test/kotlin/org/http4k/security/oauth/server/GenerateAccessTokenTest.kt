@@ -25,7 +25,7 @@ class GenerateAccessTokenTest {
 
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
-    private val request = AuthorizationRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
+    private val request = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val code = codes.create(request.client, request.redirectUri)
     private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock)
 

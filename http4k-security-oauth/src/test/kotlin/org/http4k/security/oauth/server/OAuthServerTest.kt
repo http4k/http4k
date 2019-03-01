@@ -12,6 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.then
@@ -38,8 +39,9 @@ class OAuthServerTest {
         val authenticationServer = customOauthAuthorizationServer()
         val consumerApp = oauthClientApp(authenticationServer, debug)
 
-        val browser = Filter.NoOp.then(debugFilter(debug))
+        val browser = Filter.NoOp
             .then(ClientFilters.Cookies())
+            .then(debugFilter(debug))
             .then(authenticationServer + consumerApp)
 
         val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
@@ -54,9 +56,38 @@ class OAuthServerTest {
         assertThat(postAuthResponse, hasStatus(OK) and hasBody("user resource"))
     }
 
+    @Test
+    fun `authorization flow with oauth request persistence`() {
+        val authenticationServer = customOauthAuthorizationServerWithPersistence()
+        val consumerApp = oauthClientApp(authenticationServer, debug)
+
+        val browser = Filter.NoOp
+            .then(ClientFilters.Cookies())
+            .then(debugFilter(debug))
+            .then(authenticationServer + consumerApp)
+
+        val browserWithRedirection = ClientFilters.FollowRedirects().then(browser)
+
+        val preAuthResponse = browser(Request(GET, "/a-protected-resource"))
+        val loginPage = preAuthResponse.header("location")!!
+
+        val loginPageResponse = browser(Request(GET, loginPage))
+        assertThat(loginPageResponse, hasStatus(OK) and hasBody("Please authenticate"))
+
+        val postAuthResponse = browser(Request(POST, loginPage).form("some", "credentials"))
+        val verifyPage = postAuthResponse.header("location")!!
+
+        val verifyPageResponse = browser(Request(GET, verifyPage))
+        assertThat(verifyPageResponse, hasStatus(OK) and hasBody("Allow my-app to access name and age?"))
+
+        val postConfirmationResponse = browserWithRedirection(Request(POST, verifyPage))
+        assertThat(postConfirmationResponse, hasStatus(OK) and hasBody("user resource"))
+    }
+
     private fun customOauthAuthorizationServer(): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
+            authRequestPersistence = DummyOAuthAuthRequestPersistence(),
             clientValidator = DummyClientValidator(),
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
@@ -70,17 +101,41 @@ class OAuthServerTest {
         )
     }
 
+    private fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
+        val requestPersistence = InsecureCookieBasedAuthRequestPersistence()
+
+        val server = OAuthServer(
+            tokenPath = "/oauth2/token",
+            authRequestPersistence = requestPersistence,
+            clientValidator = DummyClientValidator(),
+            authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
+            accessTokens = DummyAccessTokens(),
+            clock = FixedClock
+        )
+
+        return routes(
+            server.tokenRoute,
+            "/my-login-page" bind GET to server.authenticationStart.then { Response(OK).body("Please authenticate") },
+            "/my-login-page" bind POST to { Response(TEMPORARY_REDIRECT).header("location", "/verify-scope") },
+            "/verify-scope" bind GET to {
+                val flow = requestPersistence.retrieveAuthRequest(it) ?: error("flow was not persisted")
+                Response(OK).body("Allow ${flow.client.value} to access ${flow.scopes.joinToString(" and ")}?")
+            },
+            "/verify-scope" bind POST to server.authenticationComplete.then { Response(OK) }
+        )
+    }
+
     private fun oauthClientApp(tokenClient: HttpHandler, debug: Boolean): RoutingHttpHandler {
         val persistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 
         val oauthProvider = OAuthProvider(
             OAuthProviderConfig(Uri.of("http://irrelevant"),
                 "/my-login-page", "/oauth2/token",
-                Credentials("username", "somepassword"),
+                Credentials("my-app", "somepassword"),
                 Uri.of("https://irrelevant")),
             debugFilter(debug).then(tokenClient),
             Uri.of("/my-callback"),
-            listOf("nameScope", "familyScope"),
+            listOf("name", "age"),
             persistence
         )
 

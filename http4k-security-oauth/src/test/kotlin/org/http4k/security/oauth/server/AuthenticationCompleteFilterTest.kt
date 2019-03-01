@@ -2,7 +2,6 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -26,7 +25,7 @@ class AuthenticationCompleteFilterTest {
     }
 
     private val authorizationRequest =
-        AuthorizationRequest(
+        AuthRequest(
             ClientId("a-client-id"),
             listOf("email"),
             Uri.of("http://destination"),
@@ -35,7 +34,7 @@ class AuthenticationCompleteFilterTest {
 
     val filter = AuthenticationCompleteFilter(
         DummyAuthorizationCodes(authorizationRequest),
-        ClientValidationFilter(HardcodedClientValidator(authorizationRequest.client, authorizationRequest.redirectUri))).then(loginAction)
+        DummyOAuthAuthRequestPersistence()).then(loginAction)
 
     @Test
     fun `redirects on successful login`() {
@@ -54,19 +53,9 @@ class AuthenticationCompleteFilterTest {
 
         assertThat(response, hasStatus(UNAUTHORIZED))
     }
-
-    @Test
-    fun `validates client_id and redirect_uri values`() {
-        val invalidAuthorizationRequest = authorizationRequest
-            .copy(client = ClientId("invalid"), redirectUri = Uri.of("http://invalid"))
-
-        val response = filter(Request(Method.GET, "/login").withAuthorization(invalidAuthorizationRequest))
-        assertThat(response, hasStatus(Status.BAD_REQUEST))
-        assertThat(response.status.description, equalTo("invalid 'client_id' and/or 'redirect_uri'"))
-    }
 }
 
-private fun Request.withAuthorization(authorizationRequest: AuthorizationRequest) =
+private fun Request.withAuthorization(authorizationRequest: AuthRequest) =
     with(OAuthServer.clientId of authorizationRequest.client)
         .with(OAuthServer.scopes of authorizationRequest.scopes)
         .with(OAuthServer.redirectUri of authorizationRequest.redirectUri)

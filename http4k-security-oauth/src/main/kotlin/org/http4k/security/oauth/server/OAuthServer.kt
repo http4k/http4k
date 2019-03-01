@@ -3,6 +3,7 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
@@ -22,32 +23,31 @@ import java.time.Clock
  */
 class OAuthServer(
     tokenPath: String,
+    authRequestPersistence: AuthRequestPersistence,
     clientValidator: ClientValidator,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
     clock: Clock
 ) {
-
-    private val validationFilter = ClientValidationFilter(clientValidator)
-
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock))
 
     // use this filter to protect your authentication/authorization pages
-    val authenticationStart = validationFilter
+    val authenticationStart = ClientValidationFilter(clientValidator)
+        .then(AuthRequestPersistenceFilter(authRequestPersistence))
 
     // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestPersistence)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")
-        val scopes = Query.map({ it.split(",").toList() }, { it.joinToString(",") }).optional("scopes")
+        val scopes = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val redirectUri = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
     }
 }
 
-data class AuthorizationRequest(
+data class AuthRequest(
         val client: ClientId,
         val scopes: List<String>,
         val redirectUri: Uri,
@@ -55,7 +55,7 @@ data class AuthorizationRequest(
 )
 
 internal fun Request.authorizationRequest() =
-        AuthorizationRequest(
+    AuthRequest(
                 clientId(this),
                 scopes(this) ?: listOf(),
                 redirectUri(this),
