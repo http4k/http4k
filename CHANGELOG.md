@@ -216,8 +216,8 @@ e.g. `RetryConfig.custom()` -> `RetryConfig.custom<RetryConfig>()`
 - Allow all server implementations to start on port 0 (ie. find a free port) and then report it back as a part of the `Http4kServer` interface
 
 ### v3.29.0
-- Make HTTP clients resilient to unknown host and connectionrefused exceptions
-- Implememted #134 - Added default (de)serialization for common JDK primitives to all Auto-marshalling JSON modules - eg. datetimes and UUIDs
+- Make HTTP clients resilient to unknown host and connection refused exceptions
+- Implemented #134 - Added default (de)serialization for common JDK primitives to all Auto-marshalling JSON modules - eg. date times and UUIDs
 
 ### v3.28.0
 - Fix #131 - Uri's created with paths that don't contain leading slashes.
