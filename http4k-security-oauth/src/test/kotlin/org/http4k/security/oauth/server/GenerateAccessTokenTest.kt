@@ -86,6 +86,38 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Authorization code has expired"))
     }
+
+    @Test
+    fun `handles client id different from one in authorization code`(){
+        val expiredCode = codes.create(AuthorizationCodeDetails(ClientId("different client"), request.redirectUri, Instant.EPOCH))
+
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", expiredCode.value)
+            .form("client_id", request.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", request.redirectUri.toString())
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Invalid client_id"))
+    }
+
+    @Test
+    fun `handles redirectUridifferent from one in authorization code`(){
+        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, Uri.of("somethingelse"), Instant.EPOCH))
+
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", expiredCode.value)
+            .form("client_id", request.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", request.redirectUri.toString())
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Invalid redirect_uri"))
+    }
 }
 
 class SettableClock : Clock() {

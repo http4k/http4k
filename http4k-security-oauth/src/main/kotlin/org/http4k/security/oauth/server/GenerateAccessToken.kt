@@ -36,9 +36,18 @@ class GenerateAccessToken(
                         return Response(Status.UNAUTHORIZED).body("Invalid client credentials")
                 }
 
-                if (authorizationCodes.detailsFor(accessTokenRequest.authorizationCode)
-                        .expiresAt.isAfter(clock.instant())) {
+                val codeDetails = authorizationCodes.detailsFor(accessTokenRequest.authorizationCode)
+
+                if (codeDetails.expiresAt.isAfter(clock.instant())) {
                         return Response(Status.BAD_REQUEST).body("Authorization code has expired")
+                }
+
+                if (codeDetails.clientId != accessTokenRequest.clientId) {
+                        return Response(Status.BAD_REQUEST).body("Invalid client_id")
+                }
+
+                if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
+                        return Response(Status.BAD_REQUEST).body("Invalid redirect_uri")
                 }
 
                 return Response(Status.OK).body(accessTokens.create(accessTokenRequest.authorizationCode).value).also {
