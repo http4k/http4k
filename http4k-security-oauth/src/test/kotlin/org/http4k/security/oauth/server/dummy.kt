@@ -2,11 +2,12 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
+import java.time.Clock
 import java.time.Instant
 import java.util.*
 
 class DummyAuthorizationCodes(private val request: AuthorizationRequest) : AuthorizationCodes {
-    override fun create(details: AuthorizationCodeDetails): AuthorizationCode = AuthorizationCode("dummy-token")
+    override fun create(clientId: ClientId, redirectUri: Uri): AuthorizationCode = AuthorizationCode("dummy-token")
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH)
     override fun destroy(authorizationCode: AuthorizationCode) = Unit
 }
@@ -33,15 +34,15 @@ class HardcodedClientValidator(
         clientId == expectedClientId && clientSecret == expectedClientSecret
 }
 
-class InMemoryAuthorizationCodes : AuthorizationCodes {
+class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {
     private val codes = mutableMapOf<AuthorizationCode, AuthorizationCodeDetails>()
 
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
 
-    override fun create(details: AuthorizationCodeDetails): AuthorizationCode {
+    override fun create(clientId: ClientId, redirectUri: Uri): AuthorizationCode {
         return AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = details
+            codes[it] = AuthorizationCodeDetails(clientId, redirectUri, clock.instant())
         }
     }
 

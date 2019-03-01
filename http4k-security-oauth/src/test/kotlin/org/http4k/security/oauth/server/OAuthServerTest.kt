@@ -58,7 +58,7 @@ class OAuthServerTest {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
             clientValidator = DummyClientValidator(),
-            authorizationCodes = InMemoryAuthorizationCodes(),
+            authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
             clock = FixedClock
         )

@@ -13,6 +13,7 @@ import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
@@ -22,11 +23,11 @@ import java.time.temporal.TemporalUnit
 
 class GenerateAccessTokenTest {
 
-    private val codes = InMemoryAuthorizationCodes()
+    private val handlerClock = SettableClock()
+    private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val request = AuthorizationRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
-    private val code = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH))
-    private val clock = SettableClock()
-    private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), clock)
+    private val code = codes.create(request.client, request.redirectUri)
+    private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock)
 
     @Test
     fun `generates a dummy token`() {
@@ -73,9 +74,9 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles expired code`() {
-        clock.advance(1, SECONDS)
+        handlerClock.advance(1, SECONDS)
 
-        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH))
+        val expiredCode = codes.create(request.client, request.redirectUri)
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -91,12 +92,12 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles client id different from one in authorization code`(){
-        val expiredCode = codes.create(AuthorizationCodeDetails(ClientId("different client"), request.redirectUri, Instant.EPOCH))
+        val storedCode = codes.create(ClientId("different client"), request.redirectUri)
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
-            .form("code", expiredCode.value)
+            .form("code", storedCode.value)
             .form("client_id", request.client.value)
             .form("client_secret", "a-secret")
             .form("redirect_uri", request.redirectUri.toString())
@@ -107,12 +108,12 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles redirectUri different from one in authorization code`(){
-        val expiredCode = codes.create(AuthorizationCodeDetails(request.client, Uri.of("somethingelse"), Instant.EPOCH))
+        val storedCode = codes.create(request.client, Uri.of("somethingelse"))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
-            .form("code", expiredCode.value)
+            .form("code", storedCode.value)
             .form("client_id", request.client.value)
             .form("client_secret", "a-secret")
             .form("redirect_uri", request.redirectUri.toString())

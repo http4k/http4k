@@ -37,7 +37,7 @@ class OAuthServer(
     val authenticationStart = validationFilter
 
     // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter, clock)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, validationFilter)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

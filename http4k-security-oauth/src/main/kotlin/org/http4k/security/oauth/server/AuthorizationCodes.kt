@@ -10,7 +10,7 @@ interface AuthorizationCodes {
     /**
      * Create new authorization code to be given to client after the user successfully authorize access
      */
-    fun create(details: AuthorizationCodeDetails): AuthorizationCode
+    fun create(clientId: ClientId, redirectUri: Uri): AuthorizationCode
 
     /**
      * Retrieve the details of an authorization code
