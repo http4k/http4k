@@ -10,26 +10,25 @@ import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.By
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
 import java.io.File
 import java.net.URL
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.Date
+import java.util.*
 import org.http4k.core.cookie.Cookie as HCookie
 
 class Http4kWebDriverTest {
     private val driver = Http4kWebDriver { req ->
         val body = File("src/test/resources/test.html").readText()
         Response(OK).body(body
-            .replace("FORMMETHOD", Method.POST.name)
-            .replace("THEMETHOD", req.method.name)
-            .replace("THEBODY", req.bodyString())
-            .replace("THEURL", req.uri.toString())
-            .replace("THETIME", System.currentTimeMillis().toString())
-            .replace("ACTION", "action=\"/form\"")
+                .replace("FORMMETHOD", Method.POST.name)
+                .replace("THEMETHOD", req.method.name)
+                .replace("THEBODY", req.bodyString())
+                .replace("THEURL", req.uri.toString())
+                .replace("THETIME", System.currentTimeMillis().toString())
+                .replace("ACTION", "action=\"/form\"")
         )
     }
 
@@ -68,12 +67,12 @@ class Http4kWebDriverTest {
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action")
+                    .replace("FORMMETHOD", Method.POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action")
             )
         }
         val n0 = loadCount
@@ -92,12 +91,12 @@ class Http4kWebDriverTest {
             loadCount++
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                .replace("FORMMETHOD", Method.POST.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"\"")
+                    .replace("FORMMETHOD", Method.POST.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"\"")
             )
         }
         val n0 = loadCount
@@ -115,12 +114,12 @@ class Http4kWebDriverTest {
         val driver = Http4kWebDriver { req ->
             val body = File("src/test/resources/test.html").readText()
             Response(OK).body(body
-                .replace("FORMMETHOD", Method.GET.name)
-                .replace("THEMETHOD", req.method.name)
-                .replace("THEBODY", req.bodyString())
-                .replace("THEURL", req.uri.toString())
-                .replace("THETIME", System.currentTimeMillis().toString())
-                .replace("ACTION", "action=\"/form\"")
+                    .replace("FORMMETHOD", Method.GET.name)
+                    .replace("THEMETHOD", req.method.name)
+                    .replace("THEBODY", req.bodyString())
+                    .replace("THEURL", req.uri.toString())
+                    .replace("THETIME", System.currentTimeMillis().toString())
+                    .replace("ACTION", "action=\"/form\"")
             )
         }
 
@@ -199,7 +198,7 @@ class Http4kWebDriverTest {
         assertLinkGoesTo("/", By.id("rootBackPath"), "/bob/link")
     }
 
-    private fun assertLinkGoesTo(initial: String, by: By, expected: String) {
+    private fun assertLinkGoesTo(initial: String, by: org.openqa.selenium.By, expected: String) {
         driver.get(initial)
         driver.findElement(by)!!.click()
         driver.assertOnPage(expected)

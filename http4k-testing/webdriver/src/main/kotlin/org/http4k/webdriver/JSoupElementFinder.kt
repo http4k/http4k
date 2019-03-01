@@ -4,10 +4,6 @@ import org.jsoup.nodes.Element
 import org.openqa.selenium.By
 import org.openqa.selenium.SearchContext
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.internal.FindsByClassName
-import org.openqa.selenium.internal.FindsByCssSelector
-import org.openqa.selenium.internal.FindsById
-import org.openqa.selenium.internal.FindsByTagName
 
 class JSoupElementFinder(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) :
     FindsByCssSelector, FindsByTagName, FindsById, FindsByClassName, SearchContext {
@@ -20,12 +16,10 @@ class JSoupElementFinder(private val navigate: Navigate, private val getURL: Get
     override fun findElementsByTagName(tagName: String) = findElementsByCssSelector(tagName)
 
     override fun findElementById(id: String) = findElementsById(id).firstOrNull()
+internal class JSoupElementFinder(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) :
+        SearchContext {
 
-    override fun findElementsById(id: String) = findElementsByCssSelector("#$id")
-
-    override fun findElementByCssSelector(selector: String) = findElementsByCssSelector(selector).firstOrNull()
-
-    override fun findElementsByCssSelector(selector: String): List<WebElement> = element.select(selector).map { JSoupWebElement(navigate, getURL, it) }
+    internal fun findElementsByCssQuery(query: String) = element.select(query).map { JSoupWebElement(navigate, getURL, it) }
 
     override fun findElement(by: By): WebElement? = by.findElement(this)
 

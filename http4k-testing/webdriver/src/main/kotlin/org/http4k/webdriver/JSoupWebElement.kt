@@ -11,14 +11,15 @@ import org.http4k.lens.Validator
 import org.http4k.lens.WebForm
 import org.http4k.lens.webForm
 import org.jsoup.nodes.Element
-import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.Point
 import org.openqa.selenium.Rectangle
 import org.openqa.selenium.WebElement
 
-data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, private val element: Element) : WebElement {
+data class JSoupWebElement(private val navigate: Navigate, private val getURL: GetURL, val element: Element) : WebElement {
+
+    override fun toString(): String = element.toString()
 
     override fun getTagName(): String = element.tagName()
 
@@ -46,29 +47,29 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
         current("form")?.let {
             val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: POST
             val inputs = it
-                .findElements(By.tagName("input"))
-                .filter { it.getAttribute("name") != "" }
-                .filterNot(::isUncheckedInput)
-                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                    .findElements(By.tagName("input"))
+                    .filter { it.getAttribute("name") != "" }
+                    .filterNot(::isUncheckedInput)
+                    .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val textareas = it.findElements(By.tagName("textarea"))
-                .filter { it.getAttribute("name") != "" }
-                .map { it.getAttribute("name") to listOf(it.text) }
+                    .filter { it.getAttribute("name") != "" }
+                    .map { it.getAttribute("name") to listOf(it.text) }
             val selects = it.findElements(By.tagName("select"))
-                .filter { it.getAttribute("name") != "" }
-                .map {
-                    it.getAttribute("name") to it.findElements(By.tagName("option"))
-                        .filter { it.isSelected }
-                        .map { it.getAttribute("value") }
-                }
+                    .filter { it.getAttribute("name") != "" }
+                    .map {
+                        it.getAttribute("name") to it.findElements(By.tagName("option"))
+                                .filter { it.isSelected }
+                                .map { it.getAttribute("value") }
+                    }
             val buttons = it.findElements(By.tagName("button"))
-                .filter { it.getAttribute("name") != "" && it == this }
-                .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
+                    .filter { it.getAttribute("name") != "" && it == this }
+                    .map { it.getAttribute("name") to listOf(it.getAttribute("value")) }
             val form = WebForm(inputs.plus(textareas).plus(selects).plus(buttons)
-                .groupBy { it.first }
+                    .groupBy { it.first }
                 .mapValues { it.value.map { it.second }.flatten() })
 
             val body = Body.webForm(Validator.Strict,
-                *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
+                    *(form.fields.map { FormField.multi.required(it.key) }.toTypedArray())).toLens()
 
             val formtarget = Uri.of(it.element.attr("action") ?: "")
             val current = getURL()
@@ -143,9 +144,9 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun hashCode(): Int = element.hashCode()
 
-    override fun findElement(by: By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
+    override fun findElement(by: org.openqa.selenium.By): WebElement? = JSoupElementFinder(navigate, getURL, element).findElement(by)
 
-    override fun findElements(by: By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
+    override fun findElements(by: org.openqa.selenium.By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
 
     private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
@@ -155,46 +156,46 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     companion object {
         private val booleanAttributes = listOf(
-            "async",
-            "autofocus",
-            "autoplay",
-            "checked",
-            "compact",
-            "complete",
-            "controls",
-            "declare",
-            "defaultchecked",
-            "defaultselected",
-            "defer",
-            "disabled",
-            "draggable",
-            "ended",
-            "formnovalidate",
-            "hidden",
-            "indeterminate",
-            "iscontenteditable",
-            "ismap",
-            "itemscope",
-            "loop",
-            "multiple",
-            "muted",
-            "nohref",
-            "noresize",
-            "noshade",
-            "novalidate",
-            "nowrap",
-            "open",
-            "paused",
-            "pubdate",
-            "readonly",
-            "required",
-            "reversed",
-            "scoped",
-            "seamless",
-            "seeking",
-            "selected",
-            "truespeed",
-            "willvalidate"
+                "async",
+                "autofocus",
+                "autoplay",
+                "checked",
+                "compact",
+                "complete",
+                "controls",
+                "declare",
+                "defaultchecked",
+                "defaultselected",
+                "defer",
+                "disabled",
+                "draggable",
+                "ended",
+                "formnovalidate",
+                "hidden",
+                "indeterminate",
+                "iscontenteditable",
+                "ismap",
+                "itemscope",
+                "loop",
+                "multiple",
+                "muted",
+                "nohref",
+                "noresize",
+                "noshade",
+                "novalidate",
+                "nowrap",
+                "open",
+                "paused",
+                "pubdate",
+                "readonly",
+                "required",
+                "reversed",
+                "scoped",
+                "seamless",
+                "seeking",
+                "selected",
+                "truespeed",
+                "willvalidate"
         )
     }
 }
