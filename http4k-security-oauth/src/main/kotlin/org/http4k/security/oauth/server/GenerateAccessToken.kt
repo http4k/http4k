@@ -52,9 +52,8 @@ class GenerateAccessToken(
             return Response(BAD_REQUEST).body("Invalid redirect_uri")
         }
 
-        return Response(OK).body(accessTokens.create(accessTokenRequest.authorizationCode).value).also {
-            authorizationCodes.destroy(accessTokenRequest.authorizationCode)
-        }
+        return Response(OK).body(accessTokens.create(accessTokenRequest.authorizationCode).value)
+            .also { authorizationCodes.destroy(accessTokenRequest.authorizationCode) }
     }
 
     companion object {
