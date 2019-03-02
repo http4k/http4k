@@ -3,7 +3,7 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.query
 
 class AuthenticationCompleteFilter(
@@ -17,10 +17,10 @@ class AuthenticationCompleteFilter(
             if (response.status.successful) {
                 val authorizationRequest = requestPersistence.retrieveAuthRequest(request)
                     ?: error("Authorization request could not be found.")
-                
+
                 val code = authorizationCodes.create(authorizationRequest)
 
-                Response(Status.TEMPORARY_REDIRECT)
+                Response(SEE_OTHER)
                     .header("location", authorizationRequest.redirectUri
                         .query("code", code.value)
                         .query("state", authorizationRequest.state)

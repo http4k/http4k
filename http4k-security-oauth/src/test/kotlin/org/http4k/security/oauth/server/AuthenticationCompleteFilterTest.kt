@@ -6,7 +6,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.query
@@ -40,7 +40,7 @@ class AuthenticationCompleteFilterTest {
     fun `redirects on successful login`() {
         val response = filter(Request(Method.POST, "/login").withAuthorization(authorizationRequest))
 
-        assertThat(response, hasStatus(TEMPORARY_REDIRECT)
+        assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
             authorizationRequest.redirectUri
                 .query("code", "dummy-token")
