@@ -2,6 +2,7 @@ package org.http4k.chaos
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Wait
@@ -16,9 +17,11 @@ import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.UriTemplate
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
@@ -87,6 +90,26 @@ class ChaosControlsTest {
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
-        assertThat(appWithChaos(Request(GET, "/foo/bob")), hasStatus(I_M_A_TEAPOT).and(hasBody("foobob")))
+
+        val routed = appWithChaos(Request(GET, "/foo/bob"))
+        assertThat(routed, hasStatus(I_M_A_TEAPOT).and(hasBody("foobob")))
+        assertThat((routed as RoutedResponse).xUriTemplate, equalTo(UriTemplate.from("{bib}/{bar}")))
+    }
+
+    @Test
+    fun `combines with a standard handler route blocks`() {
+        val app = { _: Request -> Response(I_M_A_TEAPOT) }
+
+        val appWithChaos = app.withChaosControls(
+            Wait,
+            NoSecurity,
+            "/context"
+        )
+
+        assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
+
+        val routed = appWithChaos(Request(GET, "/foo/bob"))
+        assertThat(routed, hasStatus(I_M_A_TEAPOT))
+        assertThat((routed as RoutedResponse).xUriTemplate, equalTo(UriTemplate.from("{path:.*}")))
     }
 }

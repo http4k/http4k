@@ -20,5 +20,4 @@ class HttpTransactionTest {
         val response = RoutedResponse(Response(OK), UriTemplate.from("hello"))
         assertThat(HttpTransaction(Request(GET, Uri.of("/")), response, ZERO).routingGroup, equalTo("hello"))
     }
-
 }

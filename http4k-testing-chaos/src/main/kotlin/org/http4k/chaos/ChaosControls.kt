@@ -123,9 +123,20 @@ fun HttpHandler.withChaosControls(stage: Stage = Wait,
                                   controlsPath: String = "/chaos",
                                   openApiPath: String = "",
                                   corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosControls(stage, security, controlsPath, openApiPath, corsPolicy)
+
+/**
+ * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
+ * Optionally a Security can be passed to limit access to the chaos controls.
+ */
+fun RoutingHttpHandler.withChaosControls(stage: Stage = Wait,
+                                         security: Security = NoSecurity,
+                                         controlsPath: String = "/chaos",
+                                         openApiPath: String = "",
+                                         corsPolicy: CorsPolicy = UnsafeGlobalPermissive
 ): RoutingHttpHandler {
     val trigger = SwitchTrigger()
     val variable = Variable(stage)
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
-    return routes(ChaosControls(trigger, variable, controlsPath, security, openApiPath, corsPolicy), "/{x-chaos:.*}" bind repeatStage.asFilter().then(this))
+    return routes(ChaosControls(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
 }
