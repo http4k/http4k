@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.115.0 (uncut)
+### v3.115.0
 - Chaos now do not blat `x-uri-template` when used with a `RoutingHttpHandler`
 - Simplified usage of `Once` chaos trigger.
 - (Slight break) Consistentified (!) construction of Chaos Behaviours, Stages and Triggers. Replaced 
