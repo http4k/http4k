@@ -18,7 +18,7 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) {
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
         when (json.typeOf(node)) {
             JsonType.Object -> objectSchema(overrideDefinitionId)
-            JsonType.Array -> arraySchema()
+            JsonType.Array -> arraySchema(overrideDefinitionId)
             JsonType.String -> JsonSchema(StringParam.schema(json.string(json.text(node))), definitions)
             JsonType.Number -> numberSchema()
             JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
@@ -32,9 +32,9 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) {
         return JsonSchema(schema, definitions)
     }
 
-    private fun JsonSchema<NODE>.arraySchema(): JsonSchema<NODE> {
+    private fun JsonSchema<NODE>.arraySchema(overrideDefinitionId: String?): JsonSchema<NODE> {
         val (node, definitions) = json.elements(node).toList().firstOrNull()?.let {
-            JsonSchema(it, definitions).toSchema()
+            JsonSchema(it, definitions).toSchema(overrideDefinitionId)
         } ?: throw IllegalSchemaException("Cannot use an empty list to generate a schema!")
         return JsonSchema(json { obj("type" to string("array"), "items" to node) }, definitions)
     }

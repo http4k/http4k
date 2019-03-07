@@ -96,3 +96,5 @@ val handler: HttpHandler = routes("/api/v1" bind contract)
 fun main() {
     println(handler(Request(GET, "/api/v1/swagger.json")))
 }
+
+

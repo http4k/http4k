@@ -15,7 +15,7 @@ class JsonToJsonSchemaTest {
     private fun InputStream.asJsonValue() = json.parse(String(readBytes()))
 
     @Test
-    fun `renders all different types of json value as expected`() {
+    fun `renders object contents of different types of json value as expected`() {
         val model = json {
             obj(
                 "aString" to string("aStringValue"),
@@ -29,9 +29,23 @@ class JsonToJsonSchemaTest {
         }
 
         val actual = JsonToJsonSchema(json).toSchema(model, "bob")
-        val expected = "JsonSchema_main.json".readResource().asJsonValue()
+        val expected = "JsonSchema_object_main.json".readResource().asJsonValue()
         assertThat(actual.node, equalTo(expected))
-        val expectedDefs = "JsonSchema_definitions.json".readResource().asJsonValue()
+        val expectedDefs = "JsonSchema_object_definitions.json".readResource().asJsonValue()
+//        println(json.pretty(obj(actual.definitions)))
+        assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
+    }
+
+    @Test
+    fun `renders array contents of different types of json value as expected`() {
+        val model = json {
+            array(listOf(obj("anotherString" to string("yetAnotherString"))))
+        }
+
+        val actual = JsonToJsonSchema(json).toSchema(model, "bob")
+        val expected = "JsonSchema_array_main.json".readResource().asJsonValue()
+        assertThat(actual.node, equalTo(expected))
+        val expectedDefs = "JsonSchema_array_definitions.json".readResource().asJsonValue()
 //        println(json.pretty(obj(actual.definitions)))
         assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
     }
