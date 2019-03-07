@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.115.1
 - Fix #217 - Cannot override the definitionId of a top-level array in OpenAPI
+- Upgrade deps
 
 ### v3.115.0
 - Chaos now do not blat `x-uri-template` when used with a `RoutingHttpHandler`
