@@ -45,3 +45,13 @@ matrix:
       language: java
       jdk: openjdk11
       script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-2.sh; fi'
+    - stage: maven central 3
+      if: branch = master
+      language: java
+      jdk: openjdk11
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-3.sh; fi'
+    - stage: maven central 4
+      if: branch = master
+      language: java
+      jdk: openjdk11
+      script: 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_wait 90 ./release-maven-central-4.sh; fi'

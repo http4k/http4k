@@ -40,10 +40,11 @@ ensure_release_commit
 
 echo "Making $LOCAL_VERSION available in Maven central..."
 
-maven_publish "http4k-core"
-maven_publish "http4k-server-apache"
-maven_publish "http4k-server-jetty"
-maven_publish "http4k-server-netty"
-maven_publish "http4k-server-undertow"
-maven_publish "http4k-serverless-lambda"
-maven_publish "http4k-contract"
+maven_publish "http4k-format-gson"
+maven_publish "http4k-format-jackson"
+maven_publish "http4k-format-argo"
+maven_publish "http4k-format-moshi"
+maven_publish "http4k-format-xml"
+maven_publish "http4k-testing-chaos"
+maven_publish "http4k-testing-hamkrest"
+maven_publish "http4k-testing-webdriver"
