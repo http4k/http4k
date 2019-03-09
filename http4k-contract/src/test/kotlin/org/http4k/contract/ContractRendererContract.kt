@@ -97,7 +97,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
                     FormField.json().required("j", "jsonField")
                 ).toLens())
             } bindContract POST to { Response(OK) },
-//            "/body_xml" meta { receiving(Body.xml("json").toLens() to Argo { obj("anAnotherObject" to obj("aNumberField" to number(123))) }) } bindContract GET to { Response(OK) },
             "/produces_and_consumes" meta {
                 produces += APPLICATION_JSON
                 produces += APPLICATION_XML
@@ -111,7 +110,6 @@ abstract class ContractRendererContract(private val renderer: ContractRenderer) 
 
         val expected = String(javaClass.getResourceAsStream("${javaClass.simpleName}.json").readBytes())
         val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(router).asServer(SunHttp(8000)).start().block()
 //        println(actual)
         assertThat("no match", prettify(actual), equalTo(prettify(expected)))
     }
