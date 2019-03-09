@@ -1,7 +1,8 @@
 package org.http4k.lens
 
 
-import com.natpryce.hamkrest.MatchResult
+import com.natpryce.hamkrest.MatchResult.Match
+import com.natpryce.hamkrest.MatchResult.Mismatch
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
@@ -87,9 +88,9 @@ inline fun <reified T> lensFailureWith(vararg failures: Failure, overallType: Fa
     private val expectedList = failures.toList()
     override val description: String = "LensFailure with type $overallType and failures $expectedList"
     override fun invoke(actual: LensFailure) = when {
-        actual.failures != expectedList -> MatchResult.Mismatch("\n${actual.failures}\ninstead of \n$expectedList")
-        actual.overall() != overallType -> MatchResult.Mismatch("${actual.overall()}\ninstead of $overallType")
-        else -> MatchResult.Match
+        actual.failures != expectedList -> Mismatch("\n${actual.failures}\ninstead of \n$expectedList")
+        actual.overall() != overallType -> Mismatch("${actual.overall()}\ninstead of $overallType")
+        else -> Match
     }
 }.and(targetIsA<T>())
 

@@ -8,6 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
+import org.http4k.lens.Validator
 
 abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
                                                       val routeMeta: RouteMeta,
@@ -17,16 +18,8 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
     override fun invoke(nextHandler: HttpHandler): HttpHandler = { req ->
-        val body = routeMeta.body?.let { listOf(it::invoke) } ?: emptyList<(Request) -> Any?>()
-        val overallFailure = body.plus(routeMeta.requestParams).fold(null as LensFailure?) { memo, next ->
-            try {
-                next(req)
-                memo
-            } catch (e: LensFailure) {
-                memo?.let { LensFailure(it.failures + e.failures, e, e.target) } ?: e
-            }
-        }
-        overallFailure?.let { throw it } ?: nextHandler(req)
+        val failures = Validator.Strict(req, *routeMeta.paramsToValidate().toTypedArray())
+        if (failures.isEmpty()) nextHandler(req) else throw LensFailure(failures, target = req)
     }
 
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"

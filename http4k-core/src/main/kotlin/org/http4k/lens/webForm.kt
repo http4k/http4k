@@ -21,7 +21,7 @@ data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(
 
 fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =
     httpBodyRoot(formFields.map { it.meta }, APPLICATION_FORM_URLENCODED, StrictNoDirective)
-        .map({ it.payload.asString() }, { it: String -> Body(it) })
+        .map({ it.payload.asString() }, { Body(it) })
         .map(
             { WebForm(formParametersFrom(it), emptyList()) },
             { (fields) -> fields.flatMap { pair -> pair.value.map { pair.key to it } }.toUrlFormEncoded() })

@@ -108,4 +108,8 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val operationId: String? = null) {
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
+
+    internal fun paramsToValidate() =
+        requestParams + (this.body?.let { listOf(it) } ?: emptyList<BodyLens<*>>())
+
 }

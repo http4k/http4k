@@ -15,7 +15,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.lens.Failure
+import org.http4k.lens.Failure.Type
 import org.http4k.lens.Header
 import org.http4k.lens.Missing
 import org.http4k.lens.Path
@@ -36,7 +36,7 @@ class ContractRouteTest {
             headers += headerLens
             queries += queryLens
             receiving(bodyLens)
-        } bindContract GET to { _: Request -> Response(OK) }
+        } bindContract GET to { Response(OK) }
 
         assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
     }
@@ -45,18 +45,20 @@ class ContractRouteTest {
     fun `validates contract - failure`() {
         val headerLens = Header.required("header")
         val queryLens = Query.required("query")
+        val anotherQueryLens = Query.required("anotherQuery")
         val bodyLens = Body.string(TEXT_PLAIN).toLens()
         val route = "/" meta {
             headers += headerLens
             queries += queryLens
+            queries += anotherQueryLens
             receiving(bodyLens)
-        } bindContract GET to { _: Request -> Response(OK) }
+        } bindContract GET to { Response(OK) }
 
         val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
         val actual = route.toRouter(Root).match(invalidRequest)
         assertThat(actual, present())
         assertThat({ actual?.invoke(invalidRequest) },
-                throws(lensFailureWith<Request>(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
+            throws(lensFailureWith<Request>(Missing(queryLens.meta), Missing(anotherQueryLens.meta), overallType = Type.Missing)))
     }
 
     @Test

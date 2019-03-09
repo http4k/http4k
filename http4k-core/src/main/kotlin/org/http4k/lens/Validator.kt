@@ -1,23 +1,21 @@
 package org.http4k.lens
 
 /**
- * Runs through a list of lenses and extracts the values from each one, collecting the results
+ * Runs through a list of lenses and extracts the values from each one, collecting the errors
  */
-enum class Validator(private val actOn: (List<Failure>) -> List<Failure>) {
-    Strict({ if (it.isNotEmpty()) throw LensFailure(it, target = null) else it }),
-    Feedback({ it }),
-    Ignore({ emptyList<Failure>() }),
-    None({ emptyList<Failure>() }) {
-        override fun <T : Any> invoke(entity: T, vararg lenses: Lens<T, *>) = emptyList<Failure>()
-    };
+enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
+    Strict({ if (it.failures.isNotEmpty()) throw it else it.failures }),
+    Feedback({ it.failures }),
+    Ignore({ emptyList<Failure>() });
 
-    open operator fun <T : Any> invoke(entity: T, vararg lenses: Lens<T, *>): List<Failure> =
-        lenses.fold(emptyList<Failure>()) { memo, next ->
+    open operator fun <T : Any> invoke(entity: T, vararg lenses: LensExtractor<T, *>) = actOn(
+        lenses.fold(LensFailure(emptyList(), null, entity)) { memo: LensFailure, next ->
             try {
                 next(entity)
                 memo
             } catch (e: LensFailure) {
-                memo.plus(e.failures)
+                LensFailure(memo.failures + e.failures, null, entity)
             }
-        }.let(actOn)
+        }
+    )
 }

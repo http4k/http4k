@@ -12,7 +12,6 @@ class CloudNativeExtTest {
 
     @Test
     fun `can HttpHandler to a server`() {
-        val handler = { r: Request -> Response(Status.OK) }
-        assertThat(handler.asServer(::SunHttp, Port(8000)).port(), equalTo(8000))
+        assertThat({ _: Request -> Response(Status.OK) }.asServer(::SunHttp, Port(8000)).port(), equalTo(8000))
     }
 }
