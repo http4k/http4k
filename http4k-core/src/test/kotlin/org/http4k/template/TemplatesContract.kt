@@ -43,7 +43,8 @@ abstract class TemplatesContract<out T : Templates>(protected val templates: T) 
     }
 
     private fun checkOnClasspath(renderer: TemplateRenderer) {
-        assertThat(renderer(OnClasspath(items)), equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
+        val actual = renderer(OnClasspath(items))
+        assertThat(actual, equalTo("<ul><li>Name:<span>item1</span>Price:<span>£1</span><ul><li>Feature:<span>pretty</span></li></ul></li><li>Name:<span>item2</span>Price:<span>£3</span><ul><li>Feature:<span>nasty</span></li></ul></li></ul>"))
     }
 
     private fun checkAtRoot(renderer: TemplateRenderer) {

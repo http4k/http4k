@@ -223,4 +223,8 @@ object Libs {
     /**
      * [thymeleaf website](http://www.thymeleaf.org) */
     const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
+
+    /**
+     * [apache freemarker website](https://freemarker.apache.org) */
+    const val freemarker: String = "org.freemarker:freemarker:" + Versions.freemarker
 }

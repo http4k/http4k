@@ -4,6 +4,8 @@ description: Feature overview of the http4k-templating modules
 ### Installation (Gradle)
 **Dust:** ```compile group: "org.http4k", name: "http4k-template-dust", version: "3.115.1"```
 
+**Freemarker:** ```compile group: "org.http4k", name: "http4k-template-freemarker", version: "3.115.1"```
+
 **Handlebars:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.115.1"```
 
 **Pebble:** ```compile group: "org.http4k", name: "http4k-template-pebble", version: "3.115.1"```

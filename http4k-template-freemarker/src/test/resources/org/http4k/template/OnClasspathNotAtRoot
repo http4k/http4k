@@ -1,0 +1,1 @@
+<ul><#list items as item><li>Name:<span>${item.name}</span>Price:<span>${item.price}</span><ul><#list item.features as feature><li>Feature:<span>${feature.description}</span></li></#list></ul></li></#list></ul>
