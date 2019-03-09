@@ -41,6 +41,7 @@ ensure_release_commit
 echo "Making $LOCAL_VERSION available in Maven central..."
 
 maven_publish "http4k-template-dust"
+maven_publish "http4k-template-freemarker"
 maven_publish "http4k-template-handlebars"
 maven_publish "http4k-template-pebble"
 maven_publish "http4k-template-thymeleaf"

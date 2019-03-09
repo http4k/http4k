@@ -42,7 +42,7 @@ plugging together of services without HTTP container being required.
     * Pluggable HTTP client adapters for Apache, Jetty, OkHttp and Websockets
     * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow, Apache (Httpcore), Ktor CIO and SunHttp. 
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
-    * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust and Thymeleaf
+    * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust, Thymeleaf and Freemarker
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
     * Typesafe, auto-validating, self-documenting (via OpenApi/Swagger) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
@@ -93,6 +93,7 @@ plugging together of services without HTTP container being required.
 * [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 
+        * **Freemarker**
         * **Handlebars** 
         * **Pebble**
         * **Thymeleaf**

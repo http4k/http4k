@@ -83,6 +83,8 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
+    const val freemarker: String = "2.3.28"
+
     /**
      *
      *   To update Gradle, edit the wrapper file at path:
