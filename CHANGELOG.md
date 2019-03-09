@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.116.0 (uncut)
+- Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this.
+- Upgrade deps
+
 ### v3.115.1
 - Fix #217 - Cannot override the definitionId of a top-level array in OpenAPI
 - Upgrade deps

@@ -29,7 +29,7 @@ object Versions {
 
     const val micrometer_core: String = "1.1.3"
 
-    const val netty_codec_http2: String = "4.1.33.Final"
+    const val netty_codec_http2: String = "4.1.34.Final"
 
     const val pebble: String = "3.0.8"
 
@@ -63,6 +63,8 @@ object Versions {
 
     const val org_eclipse_jetty: String = "9.4.15.v20190215"
 
+    const val freemarker: String = "2.3.28"
+
     const val java_websocket: String = "1.4.0"
 
     const val dokka_gradle_plugin: String = "0.9.17"
@@ -83,8 +85,6 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
-    const val freemarker: String = "2.3.28"
-
     /**
      *
      *   To update Gradle, edit the wrapper file at path:
@@ -95,7 +95,7 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190307000626+0000"
+        const val nightlyVersion: String = "5.4-20190309000107+0000"
 
         const val releaseCandidate: String = "5.3-rc-1"
     }

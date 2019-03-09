@@ -162,6 +162,10 @@ object Libs {
             "org.eclipse.jetty:jetty-servlet:" + Versions.org_eclipse_jetty
 
     /**
+     * [freemarker website](https://freemarker.apache.org/) */
+    const val freemarker: String = "org.freemarker:freemarker:" + Versions.freemarker
+
+    /**
      * [Java-WebSocket website](https://github.com/TooTallNate/Java-WebSocket) */
     const val java_websocket: String =
             "org.java-websocket:Java-WebSocket:" + Versions.java_websocket
@@ -223,8 +227,4 @@ object Libs {
     /**
      * [thymeleaf website](http://www.thymeleaf.org) */
     const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
-
-    /**
-     * [apache freemarker website](https://freemarker.apache.org) */
-    const val freemarker: String = "org.freemarker:freemarker:" + Versions.freemarker
 }
