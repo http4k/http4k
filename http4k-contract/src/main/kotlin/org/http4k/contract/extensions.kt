@@ -5,13 +5,49 @@ import org.http4k.contract.PreFlightExtraction.Companion.All
 import org.http4k.core.Method
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
+import org.http4k.util.Appendable
 
-fun contract(vararg serverRoutes: ContractRoute) = contract(NoRenderer, "", NoSecurity, *serverRoutes)
-fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract(renderer, "", *serverRoutes)
-fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract(renderer, descriptionPath, NoSecurity, *serverRoutes)
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) =
-    contract(renderer, descriptionPath, security, All, *serverRoutes)
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, preFlightExtraction: PreFlightExtraction = All, vararg serverRoutes: ContractRoute) = ContractRoutingHttpHandler(renderer, security, descriptionPath, preFlightExtraction, serverRoutes.asList())
+fun contract(vararg serverRoutes: ContractRoute) = contract {
+    routes += serverRoutes.toList()
+}
+
+fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.routes += serverRoutes.toList()
+}
+
+fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.descriptionPath = descriptionPath
+    this.routes += serverRoutes.toList()
+}
+
+fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.security = security
+    this.descriptionPath = descriptionPath
+    this.routes += serverRoutes.toList()
+}
+
+fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, preFlightExtraction: PreFlightExtraction = All, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.security = security
+    this.descriptionPath = descriptionPath
+    this.preFlightExtraction = preFlightExtraction
+    this.routes += serverRoutes.toList()
+}
+
+fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
+    ContractRoutingHttpHandler(renderer, security, descriptionPath, preFlightExtraction, routes.all)
+}
+
+class ContractBuilder internal constructor() {
+    var renderer: ContractRenderer = NoRenderer
+    var security: Security = NoSecurity
+    var descriptionPath = ""
+    var preFlightExtraction: PreFlightExtraction = All
+    var routes = Appendable<ContractRoute>()
+}
 
 operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), RouteMeta()) / next
 

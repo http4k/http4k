@@ -8,19 +8,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.util.Appendable
-
-
-fun contract(fn: ContractBuilder.() -> Unit): Any = ContractBuilder().apply(fn).run {
-    contract(renderer, descriptionPath, security, *routes.all.toTypedArray())
-}
-
-class ContractBuilder internal constructor() {
-    var renderer: ContractRenderer = NoRenderer
-    var security: Security = NoSecurity
-    var descriptionPath = ""
-    var routes = Appendable<ContractRoute>()
-}
 
 val app = contract {
     renderer = OpenApi(ApiInfo("foo", "bar", "boring"), Jackson)

@@ -85,12 +85,13 @@ fun main() {
     val handler = routes(
         "/context" bind filter.then(contract),
         "/static" bind NoCache().then(static(Classpath("cookbook"))),
-        "/" bind contract(OpenApi(ApiInfo("my great super api", "v1.0"), Argo),
-            "/echo" / Path.of("name") meta {
+        "/" bind contract {
+            renderer = OpenApi(ApiInfo("my great super api", "v1.0"), Argo)
+            routes += "/echo" / Path.of("name") meta {
                 summary = "echo"
                 queries += ageQuery
             } bindContract GET to ::echo
-        )
+        }
     )
 
     ServerFilters.Cors(CorsPolicy.UnsafeGlobalPermissive).then(handler).asServer(Jetty(8000)).start()

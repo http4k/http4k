@@ -31,25 +31,23 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
+abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract() {
 
     private data class ARandomObject(val field: String)
 
     private val requiredQuery = Query.int().required("foo")
     private val requiredBody = Body.auto<ARandomObject>().toLens()
 
-    override val handler =
-        contract(SimpleJson(Jackson), "/",
-            validPath bindContract GET to { Response(OK).with(header of header(it)) },
-            "/bad-request" bindContract GET to { requiredQuery(it); Response(OK) },
-            "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
-            "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
-            "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { Response(OK) },
-            "/bad-request-body-override-precheck" meta {
-                receiving(requiredBody)
-                preFlightExtraction = IgnoreBody
-            } bindContract GET to { Response(OK) }
-        )
+    val contractRoutes = listOf(
+        validPath bindContract GET to { Response(OK).with(header of header(it)) },
+        "/bad-request" bindContract GET to { requiredQuery(it); Response(OK) },
+        "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
+        "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
+        "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { Response(OK) },
+        "/bad-request-body-override-precheck" meta {
+            receiving(requiredBody)
+            preFlightExtraction = IgnoreBody
+        } bindContract GET to { Response(OK) })
 
     private val header = Header.optional("FILTER")
 
@@ -58,7 +56,10 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `by default the description lives at the route`() {
         Request(GET, "/root")
-        val response = ("/root" bind contract(SimpleJson(Jackson), security = ApiKey(Query.required("goo"), { false }))).invoke(Request(GET, "/root"))
+        val response = ("/root" bind contract {
+            renderer = SimpleJson(Jackson)
+            security = ApiKey(Query.required("goo"), { false })
+        }).invoke(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
     }
@@ -69,8 +70,11 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
             { next(it.with(header of "true")) }
         }
 
-        val root = "/root" bind contract(SimpleJson(Jackson), "/docs",
-            "/" bindContract GET to { Response(OK).with(header of header(it)) })
+        val root = "/root" bind contract {
+            renderer = SimpleJson(Jackson)
+            descriptionPath = "/docs"
+            routes += "/" bindContract GET to { Response(OK).with(header of header(it)) }
+        }
         val withRoute = filter.then(root)
 
         val response = withRoute(Request(GET, "/root"))
@@ -94,8 +98,9 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() {
         val root = routes(
-            "/root/bar" bind contract(
-                "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) })
+            "/root/bar" bind contract {
+                routes += "/foo/bar" bindContract GET to { Response(NOT_IMPLEMENTED) }
+            }
         )
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
 
