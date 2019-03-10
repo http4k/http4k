@@ -1,41 +1,10 @@
 package org.http4k.contract
 
-
 import org.http4k.contract.PreFlightExtraction.Companion.All
 import org.http4k.core.Method
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 import org.http4k.util.Appendable
-
-fun contract(vararg serverRoutes: ContractRoute) = contract {
-    routes += serverRoutes.toList()
-}
-
-fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.routes += serverRoutes.toList()
-}
-
-fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.descriptionPath = descriptionPath
-    this.routes += serverRoutes.toList()
-}
-
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.security = security
-    this.descriptionPath = descriptionPath
-    this.routes += serverRoutes.toList()
-}
-
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, preFlightExtraction: PreFlightExtraction = All, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.security = security
-    this.descriptionPath = descriptionPath
-    this.preFlightExtraction = preFlightExtraction
-    this.routes += serverRoutes.toList()
-}
 
 fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
     ContractRoutingHttpHandler(renderer, security, descriptionPath, preFlightExtraction, routes.all)
@@ -74,3 +43,32 @@ infix fun <A, B, C, D, E, F, G, H, I> ContractRouteSpec9<A, B, C, D, E, F, G, H,
 infix fun <A, B, C, D, E, F, G, H, I, J> ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec10(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g, h, i, j)
 
 internal fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
+
+@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList() }", ReplaceWith("BROKEN! use example"))
+fun contract(vararg serverRoutes: ContractRoute) = contract {
+    routes += serverRoutes.toList()
+}
+
+@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer }",
+    ReplaceWith("BROKEN! use example"))
+fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.routes += serverRoutes.toList()
+}
+
+@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer }",
+    ReplaceWith("BROKEN! use example"))
+fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.descriptionPath = descriptionPath
+    this.routes += serverRoutes.toList()
+}
+
+@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer; this.descriptionPath = descriptionPath; this.security = security }",
+    ReplaceWith("BROKEN! use example"))
+fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) = contract {
+    this.renderer = renderer
+    this.security = security
+    this.descriptionPath = descriptionPath
+    this.routes += serverRoutes.toList()
+}

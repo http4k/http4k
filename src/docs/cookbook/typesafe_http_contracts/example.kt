@@ -53,38 +53,41 @@ fun main() {
         println(tx.labels.toString() + " took " + tx.duration)
     }
 
-    val security = ApiKey(Query.int().required("apiKey"), {
-        it == 42
-    })
+    val mySecurity = ApiKey(Query.int().required("apiKey"), { it == 42 })
 
-    val contract = contract(OpenApi(ApiInfo("my great api", "v1.0"), Argo), "/docs/swagger.json", security,
-        "/ping" meta {
+    val contract = contract {
+        renderer = OpenApi(ApiInfo("my great api", "v1.0"), Argo)
+        descriptionPath = "/docs/swagger.json"
+        security = mySecurity
+
+        routes += "/ping" meta {
             summary = "add"
             description = "Adds 2 numbers together"
             returning(OK to "The result")
-        } bindContract GET to { Response(OK).body("pong") },
-        "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
+        } bindContract GET to { Response(OK).body("pong") }
+
+        routes += "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
             summary = "add"
             description = "Adds 2 numbers together"
             returning(OK to "The result")
-        } bindContract GET
-            to ::add,
-        Path.int().of("value1") / Path.int().of("value2") / "divide" meta {
+        } bindContract GET to ::add
+
+        // note here that the trailing parameter can be ignored - it would simply be the value "divide".
+        routes += Path.int().of("value1") / Path.int().of("value2") / "divide" meta {
             summary = "divide"
             description = "Divides 2 numbers"
             returning(OK to "The result")
-        } bindContract GET
-            // note here that the trailing parameter can be ignored - it would simply be the value "divide".
-            to { first, second, _ -> { Response(OK).body((first / second).toString()) } },
-        "/echo" / Path.of("name") meta {
+        } bindContract GET to { first, second, _ -> { Response(OK).body((first / second).toString()) } }
+
+        routes += "/echo" / Path.of("name") meta {
             summary = "echo"
             queries += ageQuery
         } bindContract GET to ::echo
-    )
+    }
 
     val handler = routes(
         "/context" bind filter.then(contract),
-        "/static" bind NoCache().then(static(Classpath("cookbook"))),
+        "/static" bind NoCache().then(static(Classpath("cookbook/nestable_routes"))),
         "/" bind contract {
             renderer = OpenApi(ApiInfo("my great super api", "v1.0"), Argo)
             routes += "/echo" / Path.of("name") meta {

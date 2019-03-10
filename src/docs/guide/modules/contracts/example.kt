@@ -81,14 +81,18 @@ fun echoRoute(): ContractRoute {
 }
 
 // use another Lens to set up the API-key - the answer is 42!
-val security = ApiKey(Query.int().required("api"), { it == 42 })
+val mySecurity = ApiKey(Query.int().required("api"), { it == 42 })
 
 // Combine the Routes into a contract and bind to a context, defining a renderer (in this example
 // OpenApi/Swagger) and a security model (in this case an API-Key):
-val contract = contract(OpenApi(ApiInfo("My great API", "v1.0"), Jackson), "/swagger.json", security,
-    greetRoute(),
-    echoRoute()
-)
+val contract = contract {
+    renderer = OpenApi(ApiInfo("My great API", "v1.0"), Jackson)
+    descriptionPath = "/swagger.json"
+    security = mySecurity
+    routes += greetRoute()
+    routes += echoRoute()
+}
+
 val handler: HttpHandler = routes("/api/v1" bind contract)
 
 
