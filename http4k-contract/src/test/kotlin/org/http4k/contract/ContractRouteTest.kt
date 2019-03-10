@@ -5,86 +5,21 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
-import org.http4k.contract.PreFlightExtraction.Companion.All
-import org.http4k.core.Body
-import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.lens.Failure.Type
-import org.http4k.lens.Header
-import org.http4k.lens.LensExtractor
-import org.http4k.lens.Missing
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.lens.lensFailureWith
 import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
-
-    @Test
-    fun `validates contract - success`() {
-        val headerLens = Header.required("header")
-        val queryLens = Query.required("query")
-        val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" meta {
-            headers += headerLens
-            queries += queryLens
-            receiving(bodyLens)
-        } bindContract GET to { Response(OK) }
-
-        assertThat(route.toRouter(PreFlightExtractionFilter(route.meta, All), Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
-    }
-
-    @Test
-    fun `validates contract - failure`() {
-        val headerLens = Header.required("header")
-        val queryLens = Query.required("query")
-        val anotherQueryLens = Query.required("anotherQuery")
-        val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" meta {
-            headers += headerLens
-            queries += queryLens
-            queries += anotherQueryLens
-            receiving(bodyLens)
-        } bindContract GET to { Response(OK) }
-
-        val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
-        val actual = route.toRouter(PreFlightExtractionFilter(route.meta, All), Root).match(invalidRequest)
-        assertThat(actual, present())
-        assertThat({ actual?.invoke(invalidRequest) },
-            throws(lensFailureWith<Request>(Missing(queryLens.meta), Missing(anotherQueryLens.meta), overallType = Type.Missing)))
-    }
-
-    @Test
-    fun `validates contract - ignored`() {
-        val headerLens = Header.required("header")
-        val queryLens = Query.required("query")
-        val anotherQueryLens = Query.required("anotherQuery")
-        val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" meta {
-            headers += headerLens
-            queries += queryLens
-            queries += anotherQueryLens
-            receiving(bodyLens)
-        } bindContract GET to { Response(OK) }
-
-        val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
-        val actual = route.toRouter(PreFlightExtractionFilter(route.meta, object : PreFlightExtraction {
-            override fun invoke(p1: RouteMeta) = emptyList<LensExtractor<Request, *>>()
-        }), Root).match(invalidRequest)
-        assertThat(actual, present())
-        assertThat(actual!!(invalidRequest), equalTo(Response(OK)))
-    }
 
     @Test
     fun `can build a request from a route`() {
@@ -124,7 +59,7 @@ class ContractRouteTest {
     @Test
     fun `0 parts - matches route`() {
         val route = "/" bindContract GET to { Response(OK) }
-        val router = route.toRouter(Filter.NoOp, Root)
+        val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
         assertThat(router.match(Request(GET, "/bob")), absent())
@@ -265,12 +200,12 @@ class ContractRouteTest {
     }
 
     private fun checkMatching(route: ContractRoute, valid: String, expected: String) {
-        val routerOnNoPrefix = route.toRouter(Filter.NoOp, Root)
+        val routerOnNoPrefix = route.toRouter(Root)
         assertThat(routerOnNoPrefix.match(Request(GET, "")), absent())
         assertThat(routerOnNoPrefix.match(Request(POST, valid)), absent())
         assertThat(routerOnNoPrefix.match(Request(GET, valid))?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
 
-        val routerOnPrefix = route.toRouter(Filter.NoOp, Root / "somePrefix")
+        val routerOnPrefix = route.toRouter(Root / "somePrefix")
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix")), absent())
         assertThat(routerOnPrefix.match(Request(POST, "/somePrefix/$valid")), absent())
         assertThat(routerOnPrefix.match(Request(GET, "/somePrefix/$valid"))?.invoke(Request(GET, valid))?.bodyString(), equalTo(expected))
