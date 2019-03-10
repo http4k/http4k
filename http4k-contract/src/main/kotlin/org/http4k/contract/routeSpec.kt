@@ -1,26 +1,18 @@
 package org.http4k.contract
 
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Uri
-import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
-import org.http4k.lens.Validator.Strict
 
 abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
                                                       val routeMeta: RouteMeta,
-                                                      vararg val pathLenses: PathLens<*>) : Filter {
+                                                      vararg val pathLenses: PathLens<*>) {
     abstract infix operator fun <T> div(next: PathLens<T>): ContractRouteSpec
 
     open infix operator fun div(next: String) = div(Path.fixed(next))
-
-    override fun invoke(nextHandler: HttpHandler): HttpHandler = { req ->
-        val failures = Strict(req, *routeMeta.preFlightValidation(routeMeta).toTypedArray())
-        if (failures.isEmpty()) nextHandler(req) else throw LensFailure(failures, target = req)
-    }
 
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 

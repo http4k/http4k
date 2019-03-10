@@ -9,6 +9,8 @@ import org.http4k.core.Response
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters.CatchLensFailure
+import org.http4k.lens.LensFailure
+import org.http4k.lens.Validator
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandler
@@ -45,8 +47,12 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
 
     private val routers = routes
-        .map { catchLensFailure.then(identify(it)).then(standardFilters) to it.toRouter(contractRoot) }
-        .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        .map {
+            catchLensFailure
+                .then(identify(it))
+                .then(standardFilters) to it.toRouter(PreFlightExtractionFilter(it.meta, preFlightExtraction), contractRoot)
+        }
+        .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(Filter.NoOp, contractRoot))
 
     private val noMatch: HttpHandler? = null
 
@@ -68,4 +74,12 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 }
             }
         }
+}
+
+internal class PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: PreFlightExtraction) : Filter {
+    private val preFlightChecks = (meta.preFlightExtraction ?: preFlightExtraction)(meta).toTypedArray()
+    override fun invoke(next: HttpHandler): HttpHandler = {
+        val failures = Validator.Strict(it, *preFlightChecks)
+        if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
+    }
 }

@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.PreFlightExtraction.Companion.All
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method.GET
@@ -30,7 +29,7 @@ class RouteMetaDsl internal constructor() {
     var queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
-    var preFlightValidation: PreFlightExtraction = All
+    var preFlightExtraction: PreFlightExtraction? = null
 
     /**
      * Add possible responses to this Route.
@@ -92,7 +91,7 @@ class RouteMetaDsl internal constructor() {
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightValidation, operationId
+        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightExtraction, operationId
     )
 }
 
@@ -107,7 +106,7 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val consumes: Set<ContentType> = emptySet(),
                      val requestParams: List<Lens<Request, *>> = emptyList(),
                      val responses: List<ResponseMeta> = emptyList(),
-                     val preFlightValidation: PreFlightExtraction = All,
+                     val preFlightExtraction: PreFlightExtraction? = null,
                      val operationId: String? = null) {
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)

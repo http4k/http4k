@@ -4,7 +4,8 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.116.0 (uncut)
 - Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this.
-- Added `PreFlightValidation`
+- Added `PreFlightExtraction` to contract module, which adds the ability to disable body-checking for contract routes. 
+This will allow refining of routes or entire contracts to be more efficient.
 - Upgrade deps
 
 ### v3.115.1

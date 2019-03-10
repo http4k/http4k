@@ -17,11 +17,18 @@ import org.http4k.lens.LensExtractor
 interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
     companion object {
 
+        /**
+         * Check the entire contract, including the body.
+         */
         object All : PreFlightExtraction {
             override fun invoke(meta: RouteMeta) = IgnoreBody(meta) + (meta.body?.let { listOf(it) }
                 ?: emptyList<BodyLens<*>>())
         }
 
+        /**
+         * Check all parts of the contract apart from the body, relying on the HttpHandler code to raise a correct
+         * LensFailure if extraction fails. Use this option to avoid re-extracting the body multiple times.
+         */
         object IgnoreBody : PreFlightExtraction {
             override fun invoke(meta: RouteMeta) = meta.requestParams
         }
