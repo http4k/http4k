@@ -34,11 +34,16 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
     private data class ARandomObject(val field: String)
 
+    private val requiredQuery = Query.int().required("foo")
+    private val requiredBody = Body.auto<ARandomObject>().toLens()
+
     override val handler =
         contract(SimpleJson(Jackson), "/",
             validPath bindContract GET to { Response(OK).with(header of header(it)) },
-            "/bad-request" bindContract GET to { Query.int().required("foo")(it); Response(OK) },
-            "/bad-request-body" bindContract GET to { Body.auto<ARandomObject>().toLens()(it); Response(OK) }
+            "/bad-request" bindContract GET to { requiredQuery(it); Response(OK) },
+            "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
+            "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
+            "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { Response(OK) }
         )
 
     private val header = Header.optional("FILTER")
@@ -193,8 +198,15 @@ class ContractRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     }
 
     @Test
+    fun `handles bad request via contract violation - parameter`() {
+        assertThat(handler(Request(GET, "/bad-request-query-via-meta")),
+            hasStatus(BAD_REQUEST) and
+                hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}"""))
+    }
+
+    @Test
     fun `handles bad request - body`() {
-        assertThat(handler(Request(GET, "/bad-request-body")),
+        assertThat(handler(Request(GET, "/bad-request-body-via-meta")),
             hasStatus(BAD_REQUEST) and
                 hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}"""))
     }
