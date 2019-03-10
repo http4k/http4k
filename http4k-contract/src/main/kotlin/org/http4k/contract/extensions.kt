@@ -11,7 +11,6 @@ fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = c
 fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract(renderer, descriptionPath, NoSecurity, *serverRoutes)
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) =
     contract(renderer, descriptionPath, security, All, *serverRoutes)
-
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, preFlightExtraction: PreFlightExtraction = All, vararg serverRoutes: ContractRoute) = ContractRoutingHttpHandler(renderer, security, descriptionPath, preFlightExtraction, serverRoutes.asList())
 
 operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), RouteMeta()) / next
