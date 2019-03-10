@@ -71,7 +71,6 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         }
 
         val root = "/root" bind contract {
-            renderer = SimpleJson(Jackson)
             descriptionPath = "/docs"
             routes += "/" bindContract GET to { Response(OK).with(header of header(it)) }
         }
@@ -86,9 +85,9 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `traffic goes to the path specified`() {
         val root = routes(
-            "/root/bar" bind contract(
-                "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK) } })
-        )
+            "/root/bar" bind contract {
+                routes += "/foo/bar" / Path.of("world") bindContract GET to { _ -> { Response(OK) } }
+            })
         val response = root(Request(GET, "/root/bar/foo/bar/hello")) as RoutedResponse
 
         assertThat(response.status, equalTo(OK))
@@ -110,9 +109,9 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 //    @Test
 //    fun `OPTIONS traffic goes to the path and handler specified if the route responds to OPTIONS`() {
 //        val root = org.http4k.routing.routes(
-//            "/root/bar" bind contract(
-//                "/foo/bar" bindContract OPTIONS to { Response(NOT_IMPLEMENTED) })
-//        )
+//            "/root/bar" bind contract {
+//               routes += "/foo/bar" bindContract OPTIONS to { Response(NOT_IMPLEMENTED) })
+//        }
 //        val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
 //
 //        assertThat(response.status, equalTo(NOT_IMPLEMENTED))
@@ -121,8 +120,9 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `identifies called route using identity header on request`() {
         val root = routes(
-            "/root" bind contract(
-                Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } })
+            "/root" bind contract {
+                routes += Path.fixed("hello") / Path.of("world") bindContract GET to { _, _ -> { Response(OK) } }
+            }
         )
         val response: RoutedResponse = root(Request(GET, "/root/hello/planet")) as RoutedResponse
 
@@ -132,19 +132,20 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
-        val root = "/root" bind contract(SimpleJson(Jackson), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
-        )
-
+        val root = "/root" bind contract {
+            security = ApiKey(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { Response(OK) }
+        }
         val response = root(Request(GET, "/root/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
     fun `pre-security filter is applied before security`() {
-        val root = "/root" bind contract(SimpleJson(Jackson), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
-        ).withFilter(Filter { next ->
+        val root = "/root" bind contract {
+            security = ApiKey(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { Response(OK) }
+        }.withFilter(Filter { next ->
             {
                 next(it.query("key", "bob"))
             }
@@ -155,9 +156,10 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
     @Test
     fun `post-security filter is applied after security`() {
-        val root = "/root" bind contract(SimpleJson(Jackson), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK).body(it.body) }
-        ).withPostSecurityFilter(Filter { next ->
+        val root = "/root" bind contract {
+            security = ApiKey(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
+        }.withPostSecurityFilter(Filter { next ->
             {
                 next(it.body("body"))
             }
@@ -168,9 +170,10 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
-        val root = "/root" bind contract(SimpleJson(Jackson), "", ApiKey(Query.required("key"), { it == "bob" }),
-            "/bob" bindContract GET to { Response(OK) }
-        )
+        val root = "/root" bind contract {
+            security = ApiKey(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { Response(OK) }
+        }
 
         val response = root(Request(GET, "/root/bob?key=bob"))
         assertThat(response.status, equalTo(OK))
@@ -178,8 +181,9 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
     @Test
     fun `can change path to description route`() {
-        val response = ("/root/foo" bind contract(SimpleJson(Jackson), "/docs/swagger.json"))
-            .invoke(Request(GET, "/root/foo/docs/swagger.json"))
+        val response = ("/root/foo" bind contract {
+            descriptionPath = "/docs/swagger.json"
+        }).invoke(Request(GET, "/root/foo/docs/swagger.json"))
         assertThat(response.status, equalTo(OK))
     }
 
@@ -190,10 +194,10 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
                 next(it.header("foo", "bar"))
             }
         }
-        val contract = contract(
-            "/test"
-                bindContract GET to
-                { Response(OK).body(it.headerValues("foo").toString()) })
+        val contract = contract {
+            routes += "/test" bindContract GET to
+                { Response(OK).body(it.headerValues("foo").toString()) }
+        }
 
         val response = (filter.then(contract))(Request(GET, "/test"))
         assertThat(response.status, equalTo(OK))
