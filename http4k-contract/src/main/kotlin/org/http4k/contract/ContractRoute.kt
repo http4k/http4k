@@ -2,6 +2,7 @@ package org.http4k.contract
 
 
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
@@ -40,7 +41,13 @@ class ContractRoute internal constructor(internal val method: Method,
                         ?.let {
                             if (request.method == OPTIONS) {
                                 { Response(OK) }
-                            } else spec.then(toHandler(it))
+                            } else spec
+                                .then(Filter { next ->
+                                    {
+                                        next(it)
+                                    }
+                                })
+                                .then(toHandler(it))
                         }
                 } catch (e: LensFailure) {
                     null

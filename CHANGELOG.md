@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.116.0 (uncut)
 - Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this.
+- Added `PreFlightValidation`
 - Upgrade deps
 
 ### v3.115.1

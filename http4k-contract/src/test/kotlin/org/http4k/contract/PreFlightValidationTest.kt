@@ -2,10 +2,8 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.PreFlightValidation.Companion.All
-import org.http4k.contract.PreFlightValidation.Companion.BodyOnly
-import org.http4k.contract.PreFlightValidation.Companion.NonBodyOnly
-import org.http4k.contract.PreFlightValidation.Companion.None
+import org.http4k.contract.PreFlightExtraction.Companion.All
+import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.lens.Header
@@ -26,17 +24,7 @@ class PreFlightValidationTest {
     }
 
     @Test
-    fun nonBodyOnly() {
-        assertThat(NonBodyOnly(routeMeta), equalTo(routeMeta.requestParams))
-    }
-
-    @Test
-    fun bodyOnly() {
-        assertThat(BodyOnly(routeMeta), equalTo(listOf(routeMeta.body)))
-    }
-
-    @Test
-    fun none() {
-        assertThat(None(routeMeta), equalTo(emptyList()))
+    fun ignoreBody() {
+        assertThat(IgnoreBody(routeMeta), equalTo(routeMeta.requestParams))
     }
 }

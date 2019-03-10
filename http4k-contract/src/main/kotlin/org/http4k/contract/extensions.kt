@@ -1,15 +1,18 @@
 package org.http4k.contract
 
 
+import org.http4k.contract.PreFlightExtraction.Companion.All
 import org.http4k.core.Method
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
 
 fun contract(vararg serverRoutes: ContractRoute) = contract(NoRenderer, "", NoSecurity, *serverRoutes)
-fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract(renderer, "", NoSecurity, *serverRoutes)
+fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract(renderer, "", *serverRoutes)
 fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract(renderer, descriptionPath, NoSecurity, *serverRoutes)
 fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) =
-    ContractRoutingHttpHandler(renderer, security, descriptionPath, serverRoutes.map { it })
+    contract(renderer, descriptionPath, security, All, *serverRoutes)
+
+fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, preFlightExtraction: PreFlightExtraction = All, vararg serverRoutes: ContractRoute) = ContractRoutingHttpHandler(renderer, security, descriptionPath, preFlightExtraction, serverRoutes.asList())
 
 operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), RouteMeta()) / next
 

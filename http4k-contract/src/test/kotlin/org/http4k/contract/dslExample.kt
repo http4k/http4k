@@ -22,8 +22,8 @@ class ContractBuilder internal constructor() {
     var routes = Appendable<ContractRoute>()
 }
 
-val handler = contract {
-    renderer = OpenApi(ApiInfo("foo", "bbb", "asd"), Jackson)
+val app = contract {
+    renderer = OpenApi(ApiInfo("foo", "bar", "boring"), Jackson)
     security = ApiKey(Query.required("the_api_key"), { true })
 
     routes += "/echo" / Path.of("message") meta {
