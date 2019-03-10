@@ -20,15 +20,15 @@ class ContractRoute internal constructor(internal val method: Method,
                                          internal val meta: RouteMeta,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    internal val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatMap { it }
+    internal val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 
-    internal val jsonRequest: RequestMeta? = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
+    internal val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
     internal val tags = meta.tags.toSet().sortedBy { it.name }
 
-    fun newRequest(baseUri: Uri): Request = Request(method, "").uri(baseUri.path(spec.describe(Root)))
+    fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
-    internal fun toRouter(contractRoot: PathSegments): Router = object : Router {
+    internal fun toRouter(contractRoot: PathSegments) = object : Router {
 
         override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
@@ -48,9 +48,9 @@ class ContractRoute internal constructor(internal val method: Method,
             } else null
     }
 
-    internal fun describeFor(contractRoot: PathSegments): String = spec.describe(contractRoot)
+    internal fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
 
-    override fun toString(): String = "${method.name}: ${spec.describe(Root)}"
+    override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }
 
 internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
@@ -61,5 +61,5 @@ internal class ExtractedParts(private val mapping: Map<PathLens<*>, *>) {
 private operator fun <T> PathSegments.invoke(index: Int, fn: (String) -> T): T? = toList().let { if (it.size > index) fn(it[index]) else null }
 
 private fun PathSegments.extract(lenses: List<PathLens<*>>): ExtractedParts? =
-    if (this.toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens::invoke) }.toMap()) else null
+    if (toList().size == lenses.size) ExtractedParts(lenses.mapIndexed { index, lens -> lens to this(index, lens::invoke) }.toMap()) else null
 

@@ -8,7 +8,7 @@ import org.http4k.core.Uri
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Path
 import org.http4k.lens.PathLens
-import org.http4k.lens.Validator
+import org.http4k.lens.Validator.Strict
 
 abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments) -> PathSegments,
                                                       val routeMeta: RouteMeta,
@@ -18,7 +18,7 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     open infix operator fun div(next: String) = div(Path.fixed(next))
 
     override fun invoke(nextHandler: HttpHandler): HttpHandler = { req ->
-        val failures = Validator.Strict(req, *routeMeta.paramsToValidate().toTypedArray())
+        val failures = Strict(req, *routeMeta.preFlightValidation(routeMeta).toTypedArray())
         if (failures.isEmpty()) nextHandler(req) else throw LensFailure(failures, target = req)
     }
 
@@ -170,9 +170,9 @@ class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H,
 
     inner class Binder(method: Method) : ContractRequestBuilder(method) {
         infix fun to(fn: (A, B, C, D, E, F, G, H, I) -> HttpHandler): ContractRoute =
-                with(this@ContractRouteSpec9) {
-                    ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
-                }
+            with(this@ContractRouteSpec9) {
+                ContractRoute(method, this, routeMeta) { fn(it[a], it[b], it[c], it[d], it[e], it[f], it[g], it[h], it[i]) }
+            }
     }
 
     infix fun bindContract(method: Method) = Binder(method)
