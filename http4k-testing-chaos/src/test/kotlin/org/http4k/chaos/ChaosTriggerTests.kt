@@ -31,7 +31,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.Instant.EPOCH
 import java.time.ZoneId.of
-import java.util.*
+import java.util.Properties
 
 private val request = Request(GET, "")
 
@@ -242,13 +242,3 @@ class ChaosTriggerLogicalOperatorTest {
         assertThat((isTrue or isTrue).toString(), equalTo("(org.http4k.core.Request) -> kotlin.Boolean OR (org.http4k.core.Request) -> kotlin.Boolean"))
     }
 }
-//
-//fun main() {
-//    val request = Request(POST, "/chaos/activate/new")
-//            .header("content-type", "application/json")
-//            .body("[{\"type\":\"trigger\",\"behaviour\":{\"type\":\"status\",\"status\":418},\"trigger\":{\"type\":\"once\"}}]")
-//
-//    val h = { _: Request -> Response(Status.OK) }.withChaosControls()
-//    val response = h(request)
-//    assertThat(response.bodyString(), response.status, equalTo(OK))
-//}

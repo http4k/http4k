@@ -39,7 +39,7 @@ import java.time.Clock
  *
  *  By default, controls are mounted at the root path /chaos
  */
-object ChaosControls {
+object ChaosEngine {
     operator fun invoke(
         trigger: SwitchTrigger,
         variable: Variable,
@@ -47,7 +47,6 @@ object ChaosControls {
         chaosSecurity: Security = NoSecurity,
         openApiPath: String = "",
         corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-
     ): RoutingHttpHandler {
         val setStages = Body.json().map { node ->
             (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
@@ -119,25 +118,41 @@ object ChaosControls {
  * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun HttpHandler.withChaosControls(stage: Stage = Wait,
-                                  security: Security = NoSecurity,
-                                  controlsPath: String = "/chaos",
-                                  openApiPath: String = "",
-                                  corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosControls(stage, security, controlsPath, openApiPath, corsPolicy)
+fun HttpHandler.withChaosEngine(stage: Stage = Wait,
+                                security: Security = NoSecurity,
+                                controlsPath: String = "/chaos",
+                                openApiPath: String = "",
+                                corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
 
 /**
  * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
+fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
+                                       security: Security = NoSecurity,
+                                       controlsPath: String = "/chaos",
+                                       openApiPath: String = "",
+                                       corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+): RoutingHttpHandler {
+    val trigger = SwitchTrigger()
+    val variable = Variable(stage)
+    val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
+    return routes(ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
+}
+
+@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
 fun RoutingHttpHandler.withChaosControls(stage: Stage = Wait,
                                          security: Security = NoSecurity,
                                          controlsPath: String = "/chaos",
                                          openApiPath: String = "",
                                          corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-): RoutingHttpHandler {
-    val trigger = SwitchTrigger()
-    val variable = Variable(stage)
-    val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
-    return routes(ChaosControls(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
-}
+) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
+
+@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
+fun HttpHandler.withChaosControls(stage: Stage = Wait,
+                                  security: Security = NoSecurity,
+                                  controlsPath: String = "/chaos",
+                                  openApiPath: String = "",
+                                  corsPolicy: CorsPolicy = UnsafeGlobalPermissive) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
+

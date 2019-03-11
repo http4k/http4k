@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.117.0 (uncut)
+- Renamed `ChaosControls` to `ChaosEngine`
+
 ### v3.116.0
 - Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this
 - `http4k-contract` has a new DSL for construction of the contract which replaces the old one (now 

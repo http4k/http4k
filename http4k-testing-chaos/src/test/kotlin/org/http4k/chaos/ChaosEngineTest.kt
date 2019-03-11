@@ -27,7 +27,7 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.junit.jupiter.api.Test
 
-class ChaosControlsTest {
+class ChaosEngineTest {
 
     private val noChaos = """{"chaos":"none"}"""
     private val originalChaos = """{"chaos":"Always ReturnStatus (404)"}"""
@@ -37,7 +37,7 @@ class ChaosControlsTest {
     fun `can convert a normal app to be chaotic`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosControls(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
+        val appWithChaos = app.withChaosEngine(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
 
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
@@ -69,7 +69,7 @@ class ChaosControlsTest {
     fun `can configure chaos controls`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosControls(
+        val appWithChaos = app.withChaosEngine(
                 Wait,
                 ApiKey(Header.required("secret"), { true }),
                 "/context"
@@ -83,7 +83,7 @@ class ChaosControlsTest {
     fun `combines with other route blocks`() {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
-        val appWithChaos = app.withChaosControls(
+        val appWithChaos = app.withChaosEngine(
                 Wait,
                 NoSecurity,
                 "/context"
@@ -100,7 +100,7 @@ class ChaosControlsTest {
     fun `combines with a standard handler route blocks`() {
         val app = { _: Request -> Response(I_M_A_TEAPOT) }
 
-        val appWithChaos = app.withChaosControls(
+        val appWithChaos = app.withChaosEngine(
             Wait,
             NoSecurity,
             "/context"
