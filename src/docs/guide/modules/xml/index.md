@@ -2,7 +2,7 @@ title: http4k XML messaging Module
 description: Feature overview of the http4k-format-xml module, which includes a limited automarshalling capability
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-format-xml", version: "3.116.0"```
+```compile group: "org.http4k", name: "http4k-format-xml", version: "3.117.0"```
 
 ### About
 This module adds the ability to use XML as a first-class citizen when reading from and to HTTP messages. It also adds an 
