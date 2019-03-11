@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.118.0
+- Tweak `contract()` DSL to add remaining options for configuration.
+
 ### v3.117.0
 - Renamed `ChaosControls` (deprecated) to `ChaosEngine`.
 
