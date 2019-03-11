@@ -3,15 +3,15 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.117.0
-- Renamed `ChaosControls` to `ChaosEngine`
+- Renamed `ChaosControls` (deprecated) to `ChaosEngine`.
 
 ### v3.116.0
 - Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this
 - `http4k-contract` has a new DSL for construction of the contract which replaces the old one (now 
 deprecated). This is consistent with the `meta` DSL used to construct individual contract routes 
 and avoids repetition of the old API. We attempted to implement the standard replace-with deprecation, but IntelliJ didn't like it (too complex maybe), so we've hard coded the warning instead which code which should work.
-- Added `PreFlightExtraction` to contract module, which adds the ability to disable body-checking for contract routes. This will allow refining of routes or entire contracts to be more efficient
-- Upgrade deps
+- Added `PreFlightExtraction` to contract module, which adds the ability to disable body-checking for contract routes. This will allow refining of routes or entire contracts to be more efficient.
+- Upgrade deps.
 
 ### v3.115.1
 - Fix #217 - Cannot override the definitionId of a top-level array in OpenAPI
