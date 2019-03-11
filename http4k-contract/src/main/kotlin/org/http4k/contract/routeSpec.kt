@@ -17,7 +17,7 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     internal fun describe(contractRoot: PathSegments): String = "${pathFn(contractRoot)}${if (pathLenses.isNotEmpty()) "/${pathLenses.joinToString("/")}" else ""}"
 
     open inner class ContractRequestBuilder(internal val method: Method) {
-        fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(describe(Root)))
+        fun newRequest(baseUri: Uri = Uri.of("")) = Request(method, "").uri(baseUri.path(describe(Root)))
     }
 }
 

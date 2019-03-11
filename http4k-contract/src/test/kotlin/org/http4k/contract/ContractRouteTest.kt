@@ -51,9 +51,20 @@ class ContractRouteTest {
         val path2 = Path.string().of("bob")
         val request = (path1 / path2 meta {
             queries += Query.required("")
-        } bindContract GET).newRequest(Uri.of("http://rita.com"))
+        } bindContract GET).newRequest(Uri.of("http://rita.com/base"))
 
         assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "http://rita.com/123/hello%20world")))
+    }
+
+    @Test
+    fun `can build a request from a routespec - no base`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val request = (path1 / path2 meta {
+            queries += Query.required("")
+        } bindContract GET).newRequest()
+
+        assertThat(request.with(path1 of 123, path2 of "hello world"), equalTo(Request(GET, "/123/hello%20world")))
     }
 
     @Test
