@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import org.http4k.cloudnative.NotFound
+import org.http4k.cloudnative.UpstreamRequestFailed
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -25,14 +26,6 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.Test
 
 class HandleUpstreamRequestFailedTest {
-
-    private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>, acceptNotFound: Boolean = true) = assertThat(stackWith(acceptNotFound, input)(Request(GET, "")), responseMatcher)
-
-    private fun stackWith(acceptNotFound: Boolean, input: Status): HttpHandler {
-        return ServerFilters.HandleUpstreamRequestFailed()
-            .then(ClientFilters.HandleUpstreamRequestFailed(acceptNotFound))
-            .then { Response(input).body(input.code.toString()) }
-    }
 
     @Test
     fun `when server and client filters are used together, converts errors as expected`() {
@@ -58,4 +51,18 @@ class HandleUpstreamRequestFailedTest {
         assertThat(ClientFilters.HandleUpstreamRequestFailed().then { Response(NOT_FOUND) }(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 
+    @Test
+    fun `server handles custom exception`() {
+        assertThat(ServerFilters.HandleUpstreamRequestFailed().then { throw CustomUpstreamFailure }(Request(GET, "")), hasStatus(SERVICE_UNAVAILABLE).and(hasBody(CustomUpstreamFailure.localizedMessage)))
+    }
+
+    private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>, acceptNotFound: Boolean = true) = assertThat(stackWith(acceptNotFound, input)(Request(GET, "")), responseMatcher)
+
+    private fun stackWith(acceptNotFound: Boolean, input: Status): HttpHandler {
+        return ServerFilters.HandleUpstreamRequestFailed()
+            .then(ClientFilters.HandleUpstreamRequestFailed(acceptNotFound))
+            .then { Response(input).body(input.code.toString()) }
+    }
+
+    private object CustomUpstreamFailure : UpstreamRequestFailed("foo")
 }

@@ -21,50 +21,48 @@ import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 
 /**
  * Handle exceptions from upstream calls and convert them into sensible server-side errors.
+ * Optionally pass in a function to format the response body from the exception.
  */
-fun ServerFilters.HandleUpstreamRequestFailed() = Filter { next ->
-    {
-        try {
-            next(it)
-        } catch (e: Conflict) {
-            SERVICE_UNAVAILABLE.toResponse(e)
-        } catch (e: BadRequest) {
-            SERVICE_UNAVAILABLE.toResponse(e)
-        } catch (e: InternalServerError) {
-            SERVICE_UNAVAILABLE.toResponse(e)
-        } catch (e: BadGateway) {
-            SERVICE_UNAVAILABLE.toResponse(e)
-        } catch (e: ServiceUnavailable) {
-            SERVICE_UNAVAILABLE.toResponse(e)
-        } catch (e: ClientTimeout) {
-            GATEWAY_TIMEOUT.toResponse(e)
-        } catch (e: NotFound) {
-            NOT_FOUND.toResponse(e)
+fun ServerFilters.HandleUpstreamRequestFailed(
+    exceptionToBody: UpstreamRequestFailed.() -> String = { localizedMessage }
+): Filter {
+    fun Status.toResponse(e: UpstreamRequestFailed) = Response(this).body(e.exceptionToBody())
+
+    return Filter { next ->
+        {
+            try {
+                next(it)
+            } catch (e: ClientTimeout) {
+                GATEWAY_TIMEOUT.toResponse(e)
+            } catch (e: NotFound) {
+                NOT_FOUND.toResponse(e)
+            } catch (e: UpstreamRequestFailed) {
+                SERVICE_UNAVAILABLE.toResponse(e)
+            }
         }
     }
 }
 
-private fun Status.toResponse(e: UpstreamRequestFailed) = Response(this).body(e.message ?: "")
-
 /**
  * Convert upstream errors from upstream into exceptions which can be handled at a higher level.
+ * Optionally pass in a function to format the exception message from the response.
  */
 fun ClientFilters.HandleUpstreamRequestFailed(
-    notFoundIsExpected: Boolean = true,
-    toBody: Response.() -> String = Response::bodyString
+    notFoundIsAcceptable: Boolean = true,
+    responseToMessage: Response.() -> String = Response::bodyString
 ) = Filter { next ->
     {
         next(it).apply {
             if (!status.successful)
                 when (status) {
-                    NOT_FOUND -> if (!notFoundIsExpected) throw NotFound(toBody())
-                    BAD_GATEWAY -> throw BadGateway(toBody())
-                    BAD_REQUEST -> throw BadRequest(toBody())
-                    CONFLICT -> throw Conflict(toBody())
-                    CLIENT_TIMEOUT -> throw ClientTimeout(toBody())
-                    GATEWAY_TIMEOUT -> throw ClientTimeout(toBody())
-                    SERVICE_UNAVAILABLE -> throw ServiceUnavailable(toBody())
-                    else -> throw InternalServerError(toBody())
+                    NOT_FOUND -> if (!notFoundIsAcceptable) throw NotFound(responseToMessage())
+                    BAD_GATEWAY -> throw BadGateway(responseToMessage())
+                    BAD_REQUEST -> throw BadRequest(responseToMessage())
+                    CONFLICT -> throw Conflict(responseToMessage())
+                    CLIENT_TIMEOUT -> throw ClientTimeout(responseToMessage())
+                    GATEWAY_TIMEOUT -> throw ClientTimeout(responseToMessage())
+                    SERVICE_UNAVAILABLE -> throw ServiceUnavailable(responseToMessage())
+                    else -> throw InternalServerError(responseToMessage())
                 }
         }
     }
