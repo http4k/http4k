@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.119.0
+- Add `UpstreamRequestFailed` exceptions and `HandleUpstreamRequestFailed` filters to 
+`http4k-cloudnative`. These allow apps to neatly deal with upstream failure in a sensible way.
+
 ### v3.118.0
 - Tweak `contract()` DSL to add remaining options for configuration.
 
