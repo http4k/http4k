@@ -40,9 +40,9 @@ interface Json<NODE> {
     fun text(value: NODE): String
     fun bool(value: NODE): Boolean
 
-    fun compactify(s: String) = parse(s).asCompactJsonString()
+    fun compactify(input: String) = parse(input).asCompactJsonString()
 
-    fun prettify(s: String) = parse(s).asPrettyJsonString()
+    fun prettify(input: String) = parse(input).asPrettyJsonString()
 
     // Utility methods - used when we don't know which implementation we are using
     fun string(value: String): NODE = value.asJsonValue()
@@ -63,7 +63,7 @@ interface Json<NODE> {
         return i.asJsonValue()
     }
 
-    fun parse(s: String): NODE = s.asJsonObject()
+    fun parse(input: String): NODE = input.asJsonObject()
     fun pretty(node: NODE): String = node.asPrettyJsonString()
     fun compact(node: NODE): String = node.asCompactJsonString()
     fun <IN : Any> lens(spec: BiDiLensSpec<IN, String>) = spec.map({ parse(it) }, { compact(it) })

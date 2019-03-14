@@ -23,11 +23,11 @@ open class ConfigurableMoshi(builder: Moshi.Builder) : AutoMarshallingJson() {
 
     private fun <T> adapterFor(c: Class<T>): JsonAdapter<T> = moshi.adapter(c).failOnUnknown()
 
-    override fun asJsonString(a: Any): String = adapterFor(a.javaClass).toJson(a)
+    override fun asJsonString(input: Any): String = adapterFor(input.javaClass).toJson(input)
 
     fun <T : Any> asJsonString(t: T, c: KClass<T>): String = adapterFor(c.java).toJson(t)
 
-    override fun <T : Any> asA(s: String, c: KClass<T>): T = adapterFor(c.java).fromJson(s)!!
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = adapterFor(target.java).fromJson(input)!!
 
     inline fun <reified T : Any> asA(s: String): T = asA(s, T::class)
 

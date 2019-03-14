@@ -80,9 +80,9 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun text(value: JsonElement): String = value.asString
     override fun bool(value: JsonElement): Boolean = value.asBoolean
 
-    override fun asJsonObject(a: Any): JsonElement = compact.toJsonTree(a)
-    override fun <T : Any> asA(s: String, c: KClass<T>): T = compact.fromJson(s, c.java)
-    override fun <T : Any> asA(j: JsonElement, c: KClass<T>): T = compact.fromJson(j, c.java)
+    override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
+    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
 
     inline fun <reified T : Any> JsonElement.asA(): T = asA(this, T::class)
 

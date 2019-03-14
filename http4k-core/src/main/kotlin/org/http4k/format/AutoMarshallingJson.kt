@@ -3,25 +3,24 @@ package org.http4k.format
 import kotlin.reflect.KClass
 
 abstract class AutoMarshallingJson {
+    abstract fun asJsonString(input: Any): String
 
-    abstract fun asJsonString(a: Any): String
-
-    abstract fun <T : Any> asA(s: String, c: KClass<T>): T
+    abstract fun <T : Any> asA(input: String, target: KClass<T>): T
 
     @JvmName("stringAsA")
-    fun <T : Any> String.asA(c: KClass<T>): T = asA(this, c)
+    fun <T : Any> String.asA(target: KClass<T>): T = asA(this, target)
 }
 
 abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), Json<NODE> {
-    override fun asJsonString(a: Any): String = compact(asJsonObject(a))
+    override fun asJsonString(input: Any): String = compact(asJsonObject(input))
 
-    abstract fun asJsonObject(a: Any): NODE
+    abstract fun asJsonObject(input: Any): NODE
 
-    abstract fun <T : Any> asA(j: NODE, c: KClass<T>): T
+    abstract fun <T : Any> asA(j: NODE, target: KClass<T>): T
 
     @JvmName("anyAsJsonObject")
     fun Any.asJsonObject(): NODE = asJsonObject(this)
 
     @JvmName("nodeAsA")
-    fun <T : Any> NODE.asA(c: KClass<T>): T = asA(this, c)
+    fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
 }
