@@ -1,5 +1,8 @@
 package org.http4k.format
 
+import org.http4k.core.Body
+import org.http4k.lens.BiDiBodyLensSpec
+import org.http4k.lens.ContentNegotiation
 import kotlin.reflect.KClass
 
 abstract class AutoMarshallingJson {
@@ -23,4 +26,6 @@ abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), J
 
     @JvmName("nodeAsA")
     fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA(T::class) }, { it.asJsonObject() })
 }

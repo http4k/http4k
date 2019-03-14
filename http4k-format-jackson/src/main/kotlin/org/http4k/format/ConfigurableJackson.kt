@@ -73,9 +73,6 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        Body.json(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
-
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
