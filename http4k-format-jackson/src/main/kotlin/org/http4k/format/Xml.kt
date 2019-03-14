@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
-object Xml : ConfigurableXml(KotlinModule().asConfigurableXml()
+object Xml : ConfigurableJacksonXml(KotlinModule().asConfigurableXml()
     .withStandardMappings()
     .done()
     .disableDefaultTyping()
