@@ -16,13 +16,21 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.asString
 import org.http4k.core.Body
+import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
@@ -99,7 +107,13 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 }
 
-fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapper> {
+fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
+
+fun KotlinModule.asConfigurableXml() = asConfigurable(
+    XmlMapper(JacksonXmlModule().apply { setDefaultUseWrapper(false) })
+)
+
+private fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfiguration<T> = object : AutoMappingConfiguration<T> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getIntValue)
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getLongValue)
     override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getDoubleValue)
@@ -118,5 +132,17 @@ fun KotlinModule.asConfigurable() = object : AutoMappingConfiguration<ObjectMapp
             })
         }
 
-    override fun done(): ObjectMapper = ObjectMapper().registerModule(this@asConfigurable)
+    override fun done(): T = mapper.apply { registerModule(this@asConfigurable) }
 }
+
+open class ConfigurableXml(val mapper: XmlMapper) {
+    fun Any.asXmlString() = mapper.writeValueAsString(this)
+
+    inline fun <reified T : Any> String.asA(): T = mapper.readValue(this, T::class.java)
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
+        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+            .map({ it.payload.asString() }, { Body(it) })
+            .map({ it.asA<T>() }, { it.asXmlString() })
+}
+
