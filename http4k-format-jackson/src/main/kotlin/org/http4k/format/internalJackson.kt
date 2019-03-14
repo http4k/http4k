@@ -1,13 +1,7 @@
 package org.http4k.format
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.BigIntegerNode
 import com.fasterxml.jackson.databind.node.BooleanNode
@@ -16,15 +10,12 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.BiDiBodyLensSpec
-import org.http4k.lens.BiDiMapping
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
@@ -105,34 +96,6 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
-}
-
-fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
-
-fun KotlinModule.asConfigurableXml() = asConfigurable(
-    XmlMapper(JacksonXmlModule().apply { setDefaultUseWrapper(false) })
-)
-
-private fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfiguration<T> = object : AutoMappingConfiguration<T> {
-    override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getIntValue)
-    override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getLongValue)
-    override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getDoubleValue)
-    override fun <OUT> bigInteger(mapping: BiDiMapping<BigInteger, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getBigIntegerValue)
-    override fun <OUT> bigDecimal(mapping: BiDiMapping<BigDecimal, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getDecimalValue)
-    override fun <OUT> boolean(mapping: BiDiMapping<Boolean, OUT>) = adapter(mapping, JsonGenerator::writeBoolean, JsonParser::getBooleanValue)
-    override fun <OUT> text(mapping: BiDiMapping<String, OUT>) = adapter(mapping, JsonGenerator::writeString, JsonParser::getText)
-
-    private fun <IN, OUT> adapter(mapping: BiDiMapping<IN, OUT>, write: JsonGenerator.(IN) -> Unit, read: JsonParser.() -> IN) =
-        apply {
-            addDeserializer(mapping.clazz, object : JsonDeserializer<OUT>() {
-                override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OUT = mapping.invoke(p.read())
-            })
-            addSerializer(mapping.clazz, object : JsonSerializer<OUT>() {
-                override fun serialize(value: OUT, gen: JsonGenerator, serializers: SerializerProvider) = gen.write(mapping(value))
-            })
-        }
-
-    override fun done(): T = mapper.apply { registerModule(this@asConfigurable) }
 }
 
 open class ConfigurableXml(val mapper: XmlMapper) {
