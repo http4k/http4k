@@ -8,12 +8,13 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.format.Xml.auto
 import org.junit.jupiter.api.Test
 
 data class Base(val xml: XmlNode?)
 
-data class SubWithAttr(val attr: String?)
+data class SubWithAttr(val attr: Uri?)
 
 @JsonPropertyOrder("attr", "content")
 data class SubWithText1(val attr: String?, val content: String?)
@@ -30,7 +31,7 @@ class JacksonXmlTest {
 
     private val base = Base(
         XmlNode(listOf(SubWithText1("attr1", "content1"), SubWithText1("attr2", "content2")),
-            SubWithAttr("attr3"), "content3"))
+            SubWithAttr(Uri.of("attr3")), "content3"))
     private val lens = Body.auto<Base>().toLens()
 
     @Test
@@ -42,7 +43,7 @@ class JacksonXmlTest {
                 Base(
                     XmlNode(
                         listOf(SubWithText1("attr1", "content1"), SubWithText1("attr2", "content2")),
-                        SubWithAttr("attr3"), "content3")
+                        SubWithAttr(Uri.of("attr3")), "content3")
                 )
             )
         )
