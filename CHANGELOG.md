@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.120.0 (uncut)
+### v3.120.0
 - Deprecated `Body.view()` lens construction in favour of a `Body.viewModel()` call which removes the 
 implicitly called `toLens()`. This allows further mapping from one `ViewModel` type to another, 
 and brings the view lens construction into line with the rest of the extension functions on `Body`.
