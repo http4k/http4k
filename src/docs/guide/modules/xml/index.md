@@ -2,8 +2,8 @@ title: http4k XML messaging Modules
 description: Feature overview of the modules providing XML support, including an auto-marshalling capability
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-format-xml", version: "3.119.0"```
-```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.119.0"```
+```compile group: "org.http4k", name: "http4k-format-xml", version: "3.120.0"```
+```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.120.0"```
 
 ### About
 These modules provide auto-marshalling functionality to convert XML into arbitrary data classes. The 2 differ slightly in 
