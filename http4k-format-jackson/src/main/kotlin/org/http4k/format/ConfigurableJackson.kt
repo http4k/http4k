@@ -34,9 +34,9 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
 
     override fun String.asJsonObject(): JsonNode = mapper.readValue(this, JsonNode::class.java)
     override fun String?.asJsonValue(): JsonNode = this?.let { TextNode(this) } ?: NullNode.instance
-    override fun Int?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this.toBigInteger()) } ?: NullNode.instance
+    override fun Int?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(toBigInteger()) } ?: NullNode.instance
     override fun Double?.asJsonValue(): JsonNode = this?.let { DecimalNode(BigDecimal(this)) } ?: NullNode.instance
-    override fun Long?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this.toBigInteger()) } ?: NullNode.instance
+    override fun Long?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(toBigInteger()) } ?: NullNode.instance
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance

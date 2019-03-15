@@ -48,7 +48,7 @@ object WebsocketClient {
     }
 }
 
-private fun Headers.combineToMap() = this.groupBy { it.first }.mapValues { it.value.map { it.second }.joinToString(", ") }
+private fun Headers.combineToMap() = groupBy { it.first }.mapValues { it.value.map { it.second }.joinToString(", ") }
 
 private class AdaptingWebSocket(uri: Uri, private val client: WebSocketClient) : PushPullAdaptingWebSocket(Request(GET, uri)) {
     override fun send(message: WsMessage) =

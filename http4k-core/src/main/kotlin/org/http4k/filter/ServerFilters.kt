@@ -44,7 +44,7 @@ object ServerFilters {
      * Add Cors headers to the Response, according to the passed CorsPolicy
      */
     object Cors {
-        private fun List<String>.joined() = this.joinToString(", ")
+        private fun List<String>.joined() = joinToString(", ")
 
         operator fun invoke(policy: CorsPolicy) = Filter { next ->
             {

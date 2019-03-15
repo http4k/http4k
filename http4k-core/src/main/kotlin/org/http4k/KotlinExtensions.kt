@@ -7,9 +7,9 @@ import java.util.Base64
 
 fun ByteBuffer.asString(): String = String(array())
 
-fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(this.toByteArray())
+fun String.asByteBuffer(): ByteBuffer = ByteBuffer.wrap(toByteArray())
 
-fun String.quoted() = "\"${this.replace("\"", "\\\"")}\""
+fun String.quoted() = "\"${replace("\"", "\\\"")}\""
 
 fun String.unquoted(): String = replaceFirst("^\"".toRegex(), "").replaceFirst("\"$".toRegex(), "").replace("\\\"", "\"")
 

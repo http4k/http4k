@@ -267,6 +267,6 @@ class Http4kWebDriverTest {
     }
 
     private fun WebDriver.assertOnPage(expected: String) {
-        assertThat(this.findElement(By.tagName("h1"))!!.text, equalTo(expected))
+        assertThat(findElement(By.tagName("h1"))!!.text, equalTo(expected))
     }
 }

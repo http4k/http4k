@@ -69,4 +69,4 @@ fun Uri.extend(uri: Uri): Uri =
 
 private fun Uri.appendToPath(path: String): Uri =
     if (path == "") this
-    else copy(path = (this.path.removeSuffix("/") + "/" + path.removePrefix("/")))
+    else copy(path = (path.removeSuffix("/") + "/" + path.removePrefix("/")))

@@ -9,7 +9,7 @@ data class OnClasspath(val items: List<Item>) : ViewModel {
 }
 
 data class OnClasspathNotAtRoot(val items: List<Item>) : ViewModel {
-    override fun template() = this.javaClass.simpleName
+    override fun template() = javaClass.simpleName
 }
 
 data class AtRoot(val items: List<Item>) : ViewModel {

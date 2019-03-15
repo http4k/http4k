@@ -14,7 +14,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
     private val iterator = StreamingMultipartFormPartIterator()
 
     private var boundary = prependBoundaryWithStreamTerminator(boundary)
-    private var boundaryWithPrefix = addPrefixToBoundary(this.boundary)
+    private var boundaryWithPrefix = addPrefixToBoundary(boundary)
     private var state: MultipartFormStreamState = MultipartFormStreamState.FindBoundary
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
@@ -75,7 +75,7 @@ internal class StreamingMultipartFormParts private constructor(boundary: ByteArr
             oldBoundary = boundary
             oldBoundaryWithPrefix = boundaryWithPrefix
             boundary = (String(STREAM_TERMINATOR, encoding) + trim(contentTypeParams["boundary"])!!).toByteArray(encoding)
-            boundaryWithPrefix = addPrefixToBoundary(this.boundary)
+            boundaryWithPrefix = addPrefixToBoundary(boundary)
 
             state = MultipartFormStreamState.FindBoundary
 

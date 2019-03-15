@@ -35,4 +35,4 @@ private fun HttpServletRequest.headerParameters(): Headers =
 
 private fun Enumeration<String>.asPairs(key: String): Parameters = asSequence().map { key to it }.toList()
 
-private fun String?.toQueryString(): String = if (this != null && this.isNotEmpty()) "?" + this else ""
+private fun String?.toQueryString(): String = if (this != null && isNotEmpty()) "?" + this else ""

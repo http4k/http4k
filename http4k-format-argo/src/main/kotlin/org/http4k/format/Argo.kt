@@ -28,7 +28,7 @@ object Argo : Json<JsonNode> {
     private val compact = CompactJsonFormatter()
     private val jdomParser = JdomParser()
 
-    override fun String.asJsonObject(): JsonNode = this.let(jdomParser::parse)
+    override fun String.asJsonObject(): JsonNode = let(jdomParser::parse)
     override fun String?.asJsonValue(): JsonNode = this?.let { JsonNodeFactories.string(it) }
         ?: JsonNodeFactories.nullNode()
 
@@ -53,7 +53,7 @@ object Argo : Json<JsonNode> {
     override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = JsonNodeFactories.array(this)
     override fun JsonNode.asPrettyJsonString(): String = pretty.format(this)
     override fun JsonNode.asCompactJsonString(): String = compact.format(this)
-    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode = `object`(this.map { field(it.first, it.second) })
+    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode = `object`(map { field(it.first, it.second) })
     override fun fields(node: JsonNode) =
         if (typeOf(node) != Object) emptyList() else node.fieldList.map { it.name.text to it.value }
 

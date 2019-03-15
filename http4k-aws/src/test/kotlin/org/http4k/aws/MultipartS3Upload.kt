@@ -49,7 +49,7 @@ object MultipartS3Upload {
         ).asSequence().map { it.byteInputStream() }
     }
 
-    private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (this.status != Status.OK) throw UploadError(this, uploadId) }
+    private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (status != Status.OK) throw UploadError(this, uploadId) }
 
     private data class UploadError(val response: Response, val uploadId: UploadId?) : Exception()
 }

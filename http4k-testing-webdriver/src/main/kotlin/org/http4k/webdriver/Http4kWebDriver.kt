@@ -73,7 +73,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
         navigateTo(Request(GET, url).body(""))
     }
 
-    fun get(uri: Uri) = this.get(uri.toString())
+    fun get(uri: Uri) = get(uri.toString())
 
     override fun getCurrentUrl(): String? = current?.url
 

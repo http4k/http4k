@@ -5,7 +5,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.format.Xml.auto
 
-data class XmlWrapper(val message: MessageXml?)
+data class XmlWrapper(val mesApacheClientStreamingContractessage: MessageXml?)
 
 data class MessageXml(val subject: String?, val from: String?, val to: String?, val content: String?)
 

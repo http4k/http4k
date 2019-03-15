@@ -33,7 +33,7 @@ object Xml : AutoMarshallingXml() {
         DocumentBuilderFactory
             .newInstance()
             .newDocumentBuilder()
-            .parse(this.byteInputStream())
+            .parse(byteInputStream())
 
     fun Document.asXmlString(): String = StringWriter().let {
         TransformerFactory.newInstance().newTransformer().transform(DOMSource(this), StreamResult(it))

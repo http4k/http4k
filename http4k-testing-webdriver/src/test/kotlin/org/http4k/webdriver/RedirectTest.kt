@@ -60,6 +60,6 @@ class RedirectTest {
         )
     }
 
-    private fun HCookie.toSeleniumCookie() = Cookie(this.name, this.value, this.path)
+    private fun HCookie.toSeleniumCookie() = Cookie(name, value, path)
 
 }

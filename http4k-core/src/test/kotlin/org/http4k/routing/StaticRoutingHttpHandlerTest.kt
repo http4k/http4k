@@ -27,7 +27,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         extraPairs = emptyMap()
     )
 
-    private val pkg = this.javaClass.`package`.name.replace('.', '/')
+    private val pkg = javaClass.`package`.name.replace('.', '/')
 
     @Test
     fun `looks up contents of existing root file`() {

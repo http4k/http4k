@@ -146,7 +146,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun findElements(by: By) = JSoupElementFinder(navigate, getURL, element).findElements(by)
 
-    private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else this.parent()?.current(tag)
+    private fun current(tag: String): JSoupWebElement? = if (isA(tag)) this else parent()?.current(tag)
 
     private fun parent(): JSoupWebElement? = element.parent()?.let { JSoupWebElement(navigate, getURL, it) }
 

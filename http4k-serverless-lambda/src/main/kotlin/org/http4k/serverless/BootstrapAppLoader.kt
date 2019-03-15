@@ -8,7 +8,7 @@ object BootstrapAppLoader : AppLoader {
     const val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
 
     override fun invoke(environment: Map<String, String>): HttpHandler = try {
-        val loadClass = this.javaClass.classLoader.loadClass(environment[HTTP4K_BOOTSTRAP_CLASS])
+        val loadClass = javaClass.classLoader.loadClass(environment[HTTP4K_BOOTSTRAP_CLASS])
         (loadClass.getDeclaredField("INSTANCE").get(null) as AppLoader)(environment)
     } catch (e: ClassNotFoundException) {
         throw BootstrapException("Could not find AppLoader class: ${e.message}")
