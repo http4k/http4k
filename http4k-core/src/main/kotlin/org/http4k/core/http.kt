@@ -162,7 +162,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
-    override fun headers(newHeaders: Headers) = copy(headers = headers + newHeaders)
+    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
@@ -212,7 +212,7 @@ interface Response : HttpMessage {
 data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers + (name to value))
 
-    override fun headers(newHeaders: Headers) = copy(headers = headers + newHeaders)
+    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
