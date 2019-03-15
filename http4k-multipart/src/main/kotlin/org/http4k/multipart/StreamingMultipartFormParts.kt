@@ -10,15 +10,15 @@ import java.util.NoSuchElementException
 /**
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
  */
-internal class StreamingMultipartFormParts private constructor(boundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
+internal class StreamingMultipartFormParts private constructor(inBoundary: ByteArray, private val encoding: Charset, private val inputStream: TokenBoundedInputStream) : Iterable<StreamingPart> {
     private val iterator = StreamingMultipartFormPartIterator()
 
-    private var boundary = prependBoundaryWithStreamTerminator(boundary)
+    private var boundary = prependBoundaryWithStreamTerminator(inBoundary)
     private var boundaryWithPrefix = addPrefixToBoundary(boundary)
     private var state: MultipartFormStreamState = MultipartFormStreamState.FindBoundary
     // yes yes, I should use a stack or something for this
     private var mixedName: String? = null
-    private var oldBoundary = boundary
+    private var oldBoundary = inBoundary
     private var oldBoundaryWithPrefix = boundaryWithPrefix
 
     override fun iterator() = iterator
