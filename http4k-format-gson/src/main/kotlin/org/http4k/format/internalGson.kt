@@ -12,8 +12,6 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.http4k.lens.BiDiMapping
-import org.http4k.lens.BiDiWsMessageLensSpec
-import org.http4k.websocket.WsMessage
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -80,10 +78,6 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
-
-    inline fun <reified T : Any> JsonElement.asA(): T = asA(this, T::class)
-
-    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
     override fun textValueOf(node: JsonElement, name: String) = when (node) {
         is JsonObject -> node[name].asString

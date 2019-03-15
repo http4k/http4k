@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
-import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.string
@@ -41,27 +40,19 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
-    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode {
-        val root = mapper.createArrayNode()
-        root.addAll(this.toList())
-        return root
-    }
+    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().apply { addAll(toList()) }
 
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
-    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode {
-        val root = mapper.createObjectNode()
-        root.setAll(mapOf(*this.toList().toTypedArray()))
-        return root
-    }
+    override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
+        mapper.createObjectNode().also { it.setAll(mapOf(*toList().toTypedArray())) }
 
-    override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> {
-        val fieldList = mutableListOf<Pair<String, JsonNode>>()
-        for ((key, value) in node.fields()) {
-            fieldList += key to value
+    override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> =
+        mutableListOf<Pair<String, JsonNode>>().apply {
+            for ((key, value) in node.fields()) {
+                this += key to value
+            }
         }
-        return fieldList
-    }
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
@@ -70,10 +61,6 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.convertValue(input.asJsonObject(), target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
-
-    inline fun <reified T : Any> JsonNode.asA(): T = asA(this, T::class)
-
-    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 
