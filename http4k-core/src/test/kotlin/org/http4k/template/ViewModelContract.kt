@@ -19,7 +19,7 @@ abstract class ViewModelContract(private val templates: Templates) {
     fun `renders from Body`() {
         val renderer = templates.CachingClasspath()
 
-        val view = Body.view(renderer, TEXT_HTML)
+        val view = Body.viewModel(renderer, TEXT_HTML).toLens()
 
         val response = view(OnClasspath(items), Response(OK))
 

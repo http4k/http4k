@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
-import org.http4k.template.view
+import org.http4k.template.viewModel
 
 // this view has the default template path of: cookbook/using_templates/Person.hbs, although that is overridable by
 // setting the template property from ViewModel
@@ -20,7 +20,7 @@ fun main() {
 
     val renderer = HandlebarsTemplates().HotReload("src/docs")
 
-    val view = Body.view(renderer, TEXT_HTML)
+    val view = Body.viewModel(renderer, TEXT_HTML).toLens()
 
     val app: HttpHandler = {
         val viewModel = Person("Bob", 45)

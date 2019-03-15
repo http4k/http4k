@@ -2,6 +2,13 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.120.0 (uncut)
+- Deprecated `Body.view()` lens construction in favour of a `Body.viewModel()` call which removes the 
+implicitly called `toLens()`. This allows further mapping from one `ViewModel` type to another, 
+and brings the view lens construction into line with the rest of the extension functions on `Body`.
+- Add auto-marshalling XML support to `http4k-format-jackson` module. Note that this is for 
+auto-marshalling of data-classes only and does not expose an XML DOM model.
+
 ### v3.119.0
 - Add `UpstreamRequestFailed` exceptions and `HandleUpstreamRequestFailed` filters to 
 `http4k-cloudnative`. These allow apps to neatly deal with upstream failure in a sensible way.

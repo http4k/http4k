@@ -10,7 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.template.HandlebarsTemplates
 import org.http4k.template.ViewModel
-import org.http4k.template.view
+import org.http4k.template.viewModel
 
 data class Person(val name: String, val age: Int) : ViewModel
 
@@ -28,7 +28,7 @@ fun main() {
     println(app(Request(Method.GET, "/someUrl")))
 
     // the lens example uses the Body.view to also set the content type, and avoid using Strings
-    val viewLens = Body.view(renderer, ContentType.TEXT_HTML)
+    val viewLens = Body.viewModel(renderer, ContentType.TEXT_HTML).toLens()
 
     val appUsingLens: HttpHandler = {
         Response(OK).with(viewLens of Person("Bob", 45))

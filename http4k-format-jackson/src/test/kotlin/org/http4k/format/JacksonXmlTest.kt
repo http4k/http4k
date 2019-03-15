@@ -9,7 +9,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.format.Xml.auto
+import org.http4k.format.JacksonXml.auto
 import org.junit.jupiter.api.Test
 
 data class Base(val xml: XmlNode?)
@@ -24,15 +24,18 @@ data class XmlNode(val subWithText: List<SubWithText1>?, val subWithAttr: SubWit
 
 data class SimpleDocument(val value: String)
 
-class JacksonXmlTest {
-    private val xml = """
-<Base><xml><subWithText><attr>attr1</attr><content>content1</content></subWithText><subWithText><attr>attr2</attr><content>content2</content></subWithText><subWithAttr><attr>attr3</attr></subWithAttr><content>content3</content></xml></Base>
-""".trimMargin()
+class JacksonXmlTest : AutoXmlContract(JacksonXml) {
+    private val lens = Body.auto<Base>().toLens()
 
-    private val base = Base(
+    val base = Base(
         XmlNode(listOf(SubWithText1("attr1", "content1"), SubWithText1("attr2", "content2")),
             SubWithAttr(Uri.of("attr3")), "content3"))
-    private val lens = Body.auto<Base>().toLens()
+
+    @Test
+    override fun `roundtrip xml to and from object`() {
+        assertThat(JacksonXml.asA(xml, Base::class), equalTo(base))
+        assertThat(JacksonXml.asXmlString(base), equalTo(xml))
+    }
 
     @Test
     fun `roundtrip xml to and from body ext method`() {

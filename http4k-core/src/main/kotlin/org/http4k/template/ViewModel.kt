@@ -13,5 +13,10 @@ interface ViewModel {
     fun template(): String = javaClass.name.replace('.', '/')
 }
 
+fun Body.Companion.viewModel(renderer: TemplateRenderer, contentType: ContentType) =
+    string(contentType)
+        .map<ViewModel>({ throw UnsupportedOperationException("Cannot parse a ViewModel") }, renderer::invoke)
+
+@Deprecated("Use viewModel() instead", ReplaceWith("Body.viewModel(renderer, contentType).toLens()"))
 fun Body.Companion.view(renderer: TemplateRenderer, contentType: ContentType): BiDiBodyLens<ViewModel> =
-    string(contentType).map<ViewModel>({ object : ViewModel {} }, renderer::invoke).toLens()
+    viewModel(renderer, contentType).toLens()

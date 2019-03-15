@@ -7,9 +7,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.BodyLensSpec
 import org.http4k.lens.ContentNegotiation
-import org.http4k.lens.ContentNegotiation.Companion.None
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.httpBodyRoot
@@ -21,18 +19,21 @@ import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.reflect.KClass
 
-object Xml {
+object Xml : AutoMarshallingXml() {
 
-    inline fun <reified T : Any> String.asA(): T = Gson.asA(asXmlToJsonElement(), T::class)
+    override fun Any.asXmlString(): String = throw UnsupportedOperationException("")
+
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = Gson.asA(input.asXmlToJsonElement(), target)
 
     fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this, true).toString())
 
     fun String.asXmlDocument(): Document =
-            DocumentBuilderFactory
-                    .newInstance()
-                    .newDocumentBuilder()
-                    .parse(this.byteInputStream())
+        DocumentBuilderFactory
+            .newInstance()
+            .newDocumentBuilder()
+            .parse(this.byteInputStream())
 
     fun Document.asXmlString(): String = StringWriter().let {
         TransformerFactory.newInstance().newTransformer().transform(DOMSource(this), StreamResult(it))
@@ -43,12 +44,7 @@ object Xml {
 
     fun Body.Companion.xml(description: String? = null,
                            contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<Document> =
-            httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
-                    .map(Body::payload) { Body(it) }
-                    .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
-
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None): BodyLensSpec<T> =
-            httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
-                    .map({ it.payload.asString() }, { Body(it) })
-                    .map { it.asA<T>() }
+        httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_XML, contentNegotiation)
+            .map(Body::payload) { Body(it) }
+            .map(ByteBuffer::asString, String::asByteBuffer).map({ it.asXmlDocument() }, { it.asXmlString() })
 }
