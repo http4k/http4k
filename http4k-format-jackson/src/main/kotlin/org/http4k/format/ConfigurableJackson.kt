@@ -40,19 +40,21 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
-    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().apply { addAll(toList()) }
+    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().also {
+        it.addAll(toList())
+    }
 
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also { it.setAll(mapOf(*toList().toTypedArray())) }
+        mapper.createObjectNode().also {
+            it.setAll(mapOf(*toList().toTypedArray()))
+        }
 
     override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> =
-        mutableListOf<Pair<String, JsonNode>>().apply {
-            for ((key, value) in node.fields()) {
-                this += key to value
-            }
-        }
+        node.fields().asSequence().map { (key, value) ->
+            key to value
+        }.toList()
 
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
