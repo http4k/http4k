@@ -5,6 +5,8 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
+    const val jackson_dataformat_xml: String = "2.9.8"
+
     const val jackson_module_kotlin: String = "2.9.8"
 
     const val handlebars: String = "4.1.2"
@@ -19,7 +21,7 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val okhttp: String = "3.13.1"
+    const val okhttp: String = "3.14.0"
 
     const val rerunner_jupiter: String = "1.1.1"
 
@@ -95,8 +97,8 @@ object Versions {
 
         const val currentVersion: String = "5.2.1"
 
-        const val nightlyVersion: String = "5.4-20190309000107+0000"
+        const val nightlyVersion: String = "5.4-20190315000123+0000"
 
-        const val releaseCandidate: String = "5.3-rc-1"
+        const val releaseCandidate: String = "5.3-rc-3"
     }
 }

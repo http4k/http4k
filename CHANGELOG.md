@@ -8,6 +8,7 @@ implicitly called `toLens()`. This allows further mapping from one `ViewModel` t
 and brings the view lens construction into line with the rest of the extension functions on `Body`.
 - Add auto-marshalling XML support to `http4k-format-jackson` module. Note that this is for 
 auto-marshalling of data-classes only and does not expose an XML DOM model.
+- Upgrade deps.
 
 ### v3.119.0
 - Add `UpstreamRequestFailed` exceptions and `HandleUpstreamRequestFailed` filters to 

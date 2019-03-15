@@ -5,7 +5,7 @@ dependencies {
     provided project(":http4k-core")
 
     compile Libs.jackson_module_kotlin
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0'
+    compile Libs.jackson_dataformat_xml
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
