@@ -7,21 +7,13 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.lens.BiDiMapping
 import java.math.BigDecimal
 import java.math.BigInteger
 
 
-fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
-
-fun KotlinModule.asConfigurableXml() = asConfigurable(
-    XmlMapper(JacksonXmlModule().apply { setDefaultUseWrapper(false) })
-)
-
-private fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfiguration<T> = object : AutoMappingConfiguration<T> {
+fun <T : ObjectMapper> KotlinModule.asConfigurable(mapper: T): AutoMappingConfiguration<T> = object : AutoMappingConfiguration<T> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getIntValue)
     override fun <OUT> long(mapping: BiDiMapping<Long, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getLongValue)
     override fun <OUT> double(mapping: BiDiMapping<Double, OUT>) = adapter(mapping, JsonGenerator::writeNumber, JsonParser::getDoubleValue)

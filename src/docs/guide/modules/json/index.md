@@ -1,4 +1,4 @@
-title: http4k Message Format Modules
+title: http4k JSON Message Format Modules
 description: Feature overview of the JSON http4k-format modules, several of which support automarshalling into data classes.
 
 ### Installation (Gradle)
@@ -6,7 +6,7 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 
 **Gson:**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "3.120.0"```
 
-**Jackson (JSON & XML):** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.120.0"```
+**Jackson:** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.120.0"```
 
 **Moshi:** ```compile group: "org.http4k", name: "http4k-format-moshi", version: "3.120.0"```
 

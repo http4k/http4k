@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
@@ -76,3 +77,5 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     inline fun <reified T : Any, reified V : Any> WsMessage.Companion.autoView() =
         WsMessage.string().map({ it.asUsingView(T::class, V::class) }, { it.asCompactJsonStringUsingView(V::class) })
 }
+
+fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())

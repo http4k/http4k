@@ -196,6 +196,7 @@ dependencies {
     provided project(":http4k-format-argo")
     provided project(":http4k-format-gson")
     provided project(":http4k-format-jackson")
+    provided project(":http4k-format-jackson-xml")
     provided project(":http4k-format-moshi")
     provided project(":http4k-format-xml")
     provided project(":http4k-incubator")
