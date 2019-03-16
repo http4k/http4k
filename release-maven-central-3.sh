@@ -42,6 +42,7 @@ echo "Making $LOCAL_VERSION available in Maven central..."
 
 maven_publish "http4k-format-gson"
 maven_publish "http4k-format-jackson"
+maven_publish "http4k-format-jackson-xml"
 maven_publish "http4k-format-argo"
 maven_publish "http4k-format-moshi"
 maven_publish "http4k-format-xml"
