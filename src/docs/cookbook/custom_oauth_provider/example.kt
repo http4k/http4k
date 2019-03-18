@@ -1,4 +1,4 @@
-package cookbook.custom_oauth
+package cookbook.custom_oauth_provider
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.Credentials
