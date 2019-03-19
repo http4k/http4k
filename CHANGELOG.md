@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.123.0
+- Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers
+
 ### v3.122.0
 - Generified `GenerateXmlDataClasses` filter, and added default implementations for 
  `http4k-format-jackson-xml` and `http4k-format-xml` modules.
