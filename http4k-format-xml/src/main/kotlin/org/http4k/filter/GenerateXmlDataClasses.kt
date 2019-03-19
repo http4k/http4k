@@ -11,11 +11,9 @@ import java.util.Random
 
 class GenerateXmlDataClasses(out: PrintStream = System.out,
                              idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) : Filter {
-
     private val chains = GenerateDataClasses(Gson, out, idGenerator).then(Filter { next ->
         {
-            val originalResponse = next(it)
-            originalResponse.with(Gson.body().toLens() of (originalResponse.bodyString().asXmlToJsonElement()))
+            next(it).run { with(Gson.body().toLens() of bodyString().asXmlToJsonElement()) }
         }
     })
 
