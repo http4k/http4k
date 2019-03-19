@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.122.0
+- Add `GenerateDataClasses` filter to `http4k-format-jackson-xml`.
+
 ### v3.121.0
 - Moved Jackson XML support to new module `http4k-format-jackson-xml`. Note that this is for 
  auto-marshalling of data-classes only and does not expose an XML DOM model.
