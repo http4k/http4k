@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-class JacksonGenerateXmlDataClassesTest {
+class JacksonXmlGenerateXmlDataClassesTest {
 
     private val input = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><Xml>asd<SubWithText attr="attrValue">subText</SubWithText><SubWithText attr="attrValue3">subText4</SubWithText><subWithAttr attr="attr2"/></Xml>"""
 
@@ -20,7 +20,7 @@ class JacksonGenerateXmlDataClassesTest {
 
         val os = ByteArrayOutputStream()
 
-        val app = JacksonGenerateXmlDataClasses(PrintStream(os), { 1 }).then { Response(Status.OK).body(input) }
+        val app = JacksonXmlGenerateXmlDataClasses(PrintStream(os), { 1 }).then { Response(Status.OK).body(input) }
 
         app(Request(GET, "/bob"))
 

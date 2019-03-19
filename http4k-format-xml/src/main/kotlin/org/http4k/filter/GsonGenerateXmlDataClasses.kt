@@ -11,5 +11,5 @@ import java.util.Random
 object GsonGenerateXmlDataClasses {
     operator fun invoke(out: PrintStream = System.out,
                         idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) =
-        GenerateXmlDataClasses(Gson, out, { Xml.asXmlToJsonElement(it) }, idGenerator)
+        GenerateXmlDataClasses(Gson, Xml, out, idGenerator)
 }

@@ -8,11 +8,8 @@ import java.util.Random
 /**
  * Provides an implementation of GenerateXmlDataClasses using GSON as an engine.
  */
-
-object JacksonGenerateXmlDataClasses {
+object JacksonXmlGenerateXmlDataClasses {
     operator fun invoke(out: PrintStream = System.out,
                         idGenerator: () -> Int = { Math.abs(Random().nextInt()) }) =
-        GenerateXmlDataClasses(Jackson, out, {
-            Jackson.asJsonObject(JacksonXml.asA(it, Map::class))
-        }, idGenerator)
+        GenerateXmlDataClasses(Jackson, JacksonXml, out, idGenerator)
 }

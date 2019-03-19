@@ -4,7 +4,8 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.format.Json
+import org.http4k.format.AutoMarshallingXml
+import org.http4k.format.JsonLibAutoMarshallingJson
 import java.io.PrintStream
 
 /**
@@ -13,13 +14,13 @@ import java.io.PrintStream
  * have different fields).
  */
 class GenerateXmlDataClasses<NODE : Any>(
-    json: Json<NODE>,
+    json: JsonLibAutoMarshallingJson<NODE>,
+    xml: AutoMarshallingXml,
     out: PrintStream = System.out,
-    jsonGenerator: (String) -> NODE,
     idGenerator: () -> Int = { Math.abs(java.util.Random().nextInt()) }) : Filter {
     private val chains = GenerateDataClasses(json, out, idGenerator).then(Filter { next ->
         {
-            next(it).run { with(json.body().toLens() of jsonGenerator(bodyString())) }
+            next(it).run { with(json.body().toLens() of json.asJsonObject(xml.asA(bodyString(), Map::class))) }
         }
     })
 
