@@ -3,7 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.122.0
-- Add `GenerateDataClasses` filter to `http4k-format-jackson-xml`.
+- Generified `GenerateXmlDataClasses` filter, and added default implementations for 
+ `http4k-format-jackson-xml` and `http4k-format-xml` modules.
+- (Rename) Break: `GenerateXmlDataClasses` filter in `http4k-format-xml` is now `GsonGenerateXmlDataClasses`
+- Removed superfluous `CatchLensFailure` filter from `http4k-contracts` module. This is not required 
+as lens failures are already handled by the main contract handler.
 
 ### v3.121.0
 - Moved Jackson XML support to new module `http4k-format-jackson-xml`. Note that this is for 

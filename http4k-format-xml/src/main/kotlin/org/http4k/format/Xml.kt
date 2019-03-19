@@ -29,6 +29,9 @@ object Xml : AutoMarshallingXml() {
 
     fun String.asXmlToJsonElement(): JsonElement = Gson.parse(XML.toJSONObject(this, true).toString())
 
+    @JvmName("stringAsXmlToJsonElement")
+    fun asXmlToJsonElement(input: String): JsonElement = input.asXmlToJsonElement()
+
     fun String.asXmlDocument(): Document =
         DocumentBuilderFactory
             .newInstance()
