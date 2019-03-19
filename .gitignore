@@ -1,6 +1,5 @@
 .idea/
 *.iml
-.java-version
 .gradle/
 build/
 gradle.properties
