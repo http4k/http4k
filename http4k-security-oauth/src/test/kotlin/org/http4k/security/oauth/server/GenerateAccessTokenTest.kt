@@ -3,13 +3,10 @@ package org.http4k.security.oauth.server
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.ContentType
-import org.http4k.core.Method
-import org.http4k.core.Request
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
-import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
@@ -26,7 +23,7 @@ class GenerateAccessTokenTest {
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val request = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
-    private val code = codes.create(request)
+    private val code = codes.create(request, Response(OK))
     private val handler = GenerateAccessToken(HardcodedClientValidator(request.client, request.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock)
 
     @Test
@@ -76,7 +73,7 @@ class GenerateAccessTokenTest {
     fun `handles expired code`() {
         handlerClock.advance(1, SECONDS)
 
-        val expiredCode = codes.create(request)
+        val expiredCode = codes.create(request, Response(OK))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -92,7 +89,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles client id different from one in authorization code`(){
-        val storedCode = codes.create(request.copy(client = ClientId("different client")))
+        val storedCode = codes.create(request.copy(client = ClientId("different client")), Response(OK))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -108,7 +105,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles redirectUri different from one in authorization code`(){
-        val storedCode = codes.create(request.copy(redirectUri = Uri.of("somethingelse")))
+        val storedCode = codes.create(request.copy(redirectUri = Uri.of("somethingelse")), Response(OK))
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)

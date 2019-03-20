@@ -8,8 +8,9 @@ import java.time.Clock
 import java.time.Instant
 import java.util.*
 
-class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
-    override fun create(authRequest: AuthRequest): AuthorizationCode = AuthorizationCode("dummy-token")
+open class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
+    override fun create(authRequest: AuthRequest, response: Response): AuthorizationCode =
+            AuthorizationCode("dummy-token-for-" + (response.header("user") ?: "unknown"))
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH)
     override fun destroy(authorizationCode: AuthorizationCode) = Unit
 }
@@ -46,7 +47,7 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
 
-    override fun create(authRequest: AuthRequest): AuthorizationCode {
+    override fun create(authRequest: AuthRequest, response: Response): AuthorizationCode {
         return AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant())
         }

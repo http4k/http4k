@@ -2,16 +2,9 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
-import org.http4k.core.Uri
-import org.http4k.core.query
-import org.http4k.core.then
-import org.http4k.core.with
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
@@ -21,7 +14,7 @@ class AuthenticationCompleteFilterTest {
     private val loginAction = { request: Request ->
         if (request.query("fail") == "true")
             Response(UNAUTHORIZED)
-        else Response(Status.OK)
+        else Response(Status.OK).header("user", "jdoe")
     }
 
     private val authorizationRequest =
@@ -43,7 +36,7 @@ class AuthenticationCompleteFilterTest {
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
             authorizationRequest.redirectUri
-                .query("code", "dummy-token")
+                .query("code", "dummy-token-for-jdoe")
                 .query("state", "some state").toString()))
     }
 

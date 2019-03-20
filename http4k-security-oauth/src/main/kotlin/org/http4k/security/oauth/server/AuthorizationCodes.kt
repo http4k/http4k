@@ -1,5 +1,6 @@
 package org.http4k.security.oauth.server
 
+import org.http4k.core.Response
 import org.http4k.core.Uri
 import java.time.Instant
 
@@ -12,7 +13,7 @@ interface AuthorizationCodes {
      * The generated authorization code needs to be associated with the clientId and redirectUri for later verification.
      * It should also be associated with a given expire date (recommended to be shorter than 10 minutes)
      */
-    fun create(authRequest: AuthRequest): AuthorizationCode
+    fun create(authRequest: AuthRequest, response: Response): AuthorizationCode
 
     /**
      * Retrieve the details of an authorization code

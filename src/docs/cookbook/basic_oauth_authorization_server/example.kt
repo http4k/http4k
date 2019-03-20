@@ -1,13 +1,8 @@
 import org.http4k.client.OkHttp
-import org.http4k.core.Credentials
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.then
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -15,20 +10,12 @@ import org.http4k.security.AccessTokenContainer
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.oauth.server.AccessTokens
-import org.http4k.security.oauth.server.AuthRequest
-import org.http4k.security.oauth.server.AuthorizationCode
-import org.http4k.security.oauth.server.AuthorizationCodeDetails
-import org.http4k.security.oauth.server.AuthorizationCodes
-import org.http4k.security.oauth.server.ClientId
-import org.http4k.security.oauth.server.ClientValidator
-import org.http4k.security.oauth.server.InsecureCookieBasedAuthRequestPersistence
-import org.http4k.security.oauth.server.OAuthServer
+import org.http4k.security.oauth.server.*
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.UUID
+import java.util.*
 
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {
@@ -94,9 +81,9 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
 
-    // Authorization codes should be associated to a particular request, so they can be checked
-    // in various stages of the authorization flow
-    override fun create(authRequest: AuthRequest) =
+    // Authorization codes should be associated to a particular user (who can be identified in the Response)
+    // so they can be checked in various stages of the authorization flow
+    override fun create(authRequest: AuthRequest, response: Response) =
         AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS))
         }
