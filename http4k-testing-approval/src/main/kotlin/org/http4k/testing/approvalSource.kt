@@ -18,25 +18,20 @@ interface ApprovalSource {
 }
 
 class FileSystemApprovalSource(private val base: File) : ApprovalSource {
-    override fun actualFor(testName: String) = with(File(base, "$testName.actual")) {
-        object : ReadWriteResource {
-            override fun input() = if (exists()) inputStream() else null
+    override fun actualFor(testName: String): ReadWriteResource = FileReadWriteResource(File(base, "$testName.actual"))
 
-            override fun output(): OutputStream {
-                if (exists()) delete()
-                if (!parentFile.mkdirs()) throw IllegalAccessException("Could not create ${parentFile.absolutePath}")
-                return outputStream()
-            }
+    override fun approvedFor(testName: String): ReadResource = FileReadWriteResource(File(base, "$testName.approved"))
+}
 
-            override fun toString() = absolutePath
+internal class FileReadWriteResource(private val target: File) : ReadWriteResource {
+    override fun input() = if (target.exists()) target.inputStream() else null
+
+    override fun output(): OutputStream =
+        with(target) {
+            if (!parentFile.exists() && !parentFile.mkdirs()) throw IllegalAccessException("Could not create dir ${parentFile.absolutePath}")
+            if (exists() && !delete()) throw IllegalAccessException("Could not delete $absolutePath")
+            outputStream()
         }
-    }
 
-    override fun approvedFor(testName: String): ReadResource =
-        with(File(base, "$testName.approved")) {
-            object : ReadResource {
-                override fun input() = if (exists()) inputStream() else null
-                override fun toString() = absolutePath
-            }
-        }
+    override fun toString() = target.absolutePath
 }
