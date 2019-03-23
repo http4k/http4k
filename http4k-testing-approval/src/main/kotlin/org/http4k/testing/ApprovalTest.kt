@@ -12,7 +12,8 @@ class ApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
 
     override fun beforeTestExecution(context: ExtensionContext) =
         store(context).put(STORE_KEY, Approver(
-            SimpleTestNamer().nameFor(context.requiredTestClass, context.requiredTestMethod),
+            TestNamer.Simple.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            ApprovalContent.BodyOnly,
             FileSystemApprovalSource(File("src/test/resources"))
         ))
 

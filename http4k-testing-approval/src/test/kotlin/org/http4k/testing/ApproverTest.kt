@@ -57,5 +57,5 @@ class ApproverTest {
     }
 
     private fun approverExpecting(baseMatcher: Matcher<Response>) =
-        Approver(testName, approvalSource)(baseMatcher) { Response(OK).body("content") }
+        Approver(testName, ApprovalContent.BodyOnly, approvalSource)(baseMatcher) { Response(OK).body("content") }
 }
