@@ -8,6 +8,6 @@ class TestNamerTests {
 
     @Test
     fun `names files correctly`() {
-        assertThat(TestNamer.Simple.nameFor(javaClass, javaClass.getMethod("names files correctly")), equalTo("SimpleTestNamerTest.names files correctly"))
+        assertThat(TestNamer.Simple.nameFor(javaClass, javaClass.getMethod("names files correctly")), equalTo("TestNamerTests.names files correctly"))
     }
 }
