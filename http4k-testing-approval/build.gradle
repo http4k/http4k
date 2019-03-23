@@ -1,0 +1,10 @@
+description = 'Http4k support for chaos testing'
+
+dependencies {
+    provided Libs.kotlin_stdlib_jdk8
+    provided project(":http4k-core")
+    provided project(":http4k-testing-hamkrest")
+    provided Libs.junit_jupiter_api
+
+    testCompile Config.TestDependencies
+}
