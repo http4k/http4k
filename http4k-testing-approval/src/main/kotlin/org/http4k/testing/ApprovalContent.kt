@@ -1,6 +1,7 @@
 package org.http4k.testing
 
 import org.http4k.core.HttpMessage
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 interface ApprovalContent {
@@ -17,7 +18,7 @@ interface ApprovalContent {
         val BodyOnly = object : ApprovalContent {
             override fun invoke(input: InputStream) = input
 
-            override fun invoke(input: HttpMessage) = input.body.stream
+            override fun invoke(input: HttpMessage) = ByteArrayInputStream(input.body.payload.array())
         }
     }
 }

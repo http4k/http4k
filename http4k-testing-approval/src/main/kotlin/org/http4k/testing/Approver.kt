@@ -1,38 +1,30 @@
 package org.http4k.testing
 
-import com.natpryce.hamkrest.Matcher
-import com.natpryce.hamkrest.assertion.assertThat
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.hamkrest.hasStatus
+import org.http4k.core.HttpMessage
 import org.junit.jupiter.api.Assertions.assertEquals
 
 class Approver(private val name: String,
                private val approvalContent: ApprovalContent,
                private val approvalSource: ApprovalSource) {
 
-    operator fun invoke(baseMatcher: Matcher<Response> = hasStatus(OK), fn: () -> Response): Response {
+    operator fun <T : HttpMessage> invoke(fn: () -> T): T {
         val approved = approvalSource.approvedFor(name)
 
-        val response = fn()
-
-        assertThat(response, baseMatcher)
+        val message = fn()
 
         return with(approved.input()) {
             val actual = approvalSource.actualFor(name)
 
-            val content = approvalContent(response)
-
             when (this) {
                 null -> {
-                    content.copyTo(actual.output())
+                    approvalContent(message).copyTo(actual.output())
                     throw ApprovalFailed("No approved content found", actual, approved)
                 }
                 else -> try {
-                    assertEquals(approvalContent(this).reader().readText(), content.reader().readText())
-                    response
+                    assertEquals(approvalContent(this).reader().readText(), approvalContent(message).reader().readText())
+                    message
                 } catch (e: AssertionError) {
-                    content.copyTo(actual.output())
+                    approvalContent(message).copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
                 }
             }
