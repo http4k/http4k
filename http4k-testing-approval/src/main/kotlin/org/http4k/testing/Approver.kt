@@ -1,5 +1,7 @@
 package org.http4k.testing
 
+import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.HttpMessage
 import org.junit.jupiter.api.Assertions.assertEquals
 
@@ -36,3 +38,7 @@ class Approver(private val name: String,
 }
 
 class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\ncp '$actual' '$expected'")
+
+operator fun <T : HttpMessage> Approver.invoke(baseMatcher: Matcher<T>, fn: () -> T): T = invoke {
+    fn().apply { assertThat(this, baseMatcher) }
+}

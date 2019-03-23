@@ -4,7 +4,9 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
+import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Files
@@ -43,4 +45,12 @@ class ApproverTest {
         assertThat(actualFile.exists(), equalTo(false))
         assertThat(approvedFile.readText(), equalTo(body))
     }
+
+    @Test
+    fun `when base matcher fails, don't even create actual`() {
+        assertThat({ approver(hasStatus(I_M_A_TEAPOT)) { Response(OK).body(body) } }, throws<AssertionError>())
+        assertThat(actualFile.exists(), equalTo(false))
+        assertThat(approvedFile.exists(), equalTo(false))
+    }
+
 }

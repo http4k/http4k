@@ -4,6 +4,7 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
     provided Libs.junit_jupiter_api
+    provided Libs.hamkrest
 
     testCompile project(":http4k-testing-hamkrest")
     testCompile Config.TestDependencies
