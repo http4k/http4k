@@ -58,6 +58,7 @@ echo "Attempting to release $LOCAL_VERSION (old version $BINTRAY_VERSION)"
     :http4k-template-handlebars:bintrayUpload \
     :http4k-template-pebble:bintrayUpload \
     :http4k-template-thymeleaf:bintrayUpload \
+    :http4k-testing-approval:bintrayUpload \
     :http4k-testing-chaos:bintrayUpload \
     :http4k-testing-hamkrest:bintrayUpload \
     :http4k-testing-webdriver:bintrayUpload
