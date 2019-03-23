@@ -21,23 +21,23 @@ class Approver(private val name: String,
         return with(approved.input()) {
             val actual = approvalSource.actualFor(name)
 
+            val content = approvalContent(response)
+
             when (this) {
                 null -> {
-                    actual.write(response)
+                    content.copyTo(actual.output())
                     throw ApprovalFailed("No approved content found", actual, approved)
                 }
                 else -> try {
-                    assertEquals(approvalContent(this).reader().readText(), approvalContent(response).reader().readText())
+                    assertEquals(approvalContent(this).reader().readText(), content.reader().readText())
                     response
                 } catch (e: AssertionError) {
-                    actual.write(response)
+                    content.copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)
                 }
             }
         }
     }
-
-    private fun ReadWriteResource.write(actual: Response) = actual.body.stream.copyTo(output())
 }
 
 class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\ncp '$actual' '$expected'")
