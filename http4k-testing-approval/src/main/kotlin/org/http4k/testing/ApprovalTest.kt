@@ -1,5 +1,6 @@
 package org.http4k.testing
 
+import org.http4k.testing.TestNamer.Companion.Simple
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace.create
@@ -15,7 +16,7 @@ class ApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
 
     override fun beforeTestExecution(context: ExtensionContext) =
         store(context).put(STORE_KEY, Approver(
-            TestNamer.Simple.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            Simple.nameFor(context.requiredTestClass, context.requiredTestMethod),
             ApprovalContent.BodyOnly(),
             FileSystemApprovalSource(File("src/test/resources"))
         ))
