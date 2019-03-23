@@ -12,6 +12,9 @@ interface ReadWriteResource : ReadResource {
     fun output(): OutputStream
 }
 
+/**
+ * The backing store where the approved and actual content will be stored.
+ */
 interface ApprovalSource {
     fun actualFor(testName: String): ReadWriteResource
     fun approvedFor(testName: String): ReadResource

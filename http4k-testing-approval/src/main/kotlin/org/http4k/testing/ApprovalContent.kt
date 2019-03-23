@@ -4,6 +4,9 @@ import org.http4k.core.HttpMessage
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
+/**
+ * Determines which parts of the HttpMessage will be compared.
+ */
 interface ApprovalContent {
     operator fun invoke(input: InputStream): InputStream
     operator fun invoke(input: HttpMessage): InputStream

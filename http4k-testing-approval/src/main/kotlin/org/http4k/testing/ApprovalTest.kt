@@ -7,6 +7,9 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
 
+/**
+ * JUnit extension for injecting an Approver into a JUnit5 test-case
+ */
 class ApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
     private val STORE_KEY = "approver"
 

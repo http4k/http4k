@@ -3,6 +3,9 @@ package org.http4k.testing
 import org.http4k.core.HttpMessage
 import org.junit.jupiter.api.Assertions.assertEquals
 
+/**
+ * This coordinates the comparison of the content for a test.
+ */
 class Approver(private val name: String,
                private val approvalContent: ApprovalContent,
                private val approvalSource: ApprovalSource) {
