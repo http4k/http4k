@@ -2,7 +2,7 @@ title: http4k Extended Example
 description: A step-by-step guide to TDDing a simple http4k application
 
 ## Application Design
-What follows is a guide to *how* we build **http4k** applications test first to provide excellent test coverage driven by decoupled tests. 
+What follows is a guide to *how* we build [http4k] applications test first to provide excellent test coverage driven by decoupled tests. 
 
 For this example, we will use an example of a Maths app with the following requirements:
 
@@ -16,3 +16,4 @@ Apps can generally be split into 3 tiers:
 2. Application: Builder function which takes the transport-level dependencies, and converts them into business-level dependencies. All routes are constructed and collected in this tier.
 3. Server: Builder function which takes the configuration for environmental concerns such as ports and downstream urls.
 
+[http4k]: https://http4k.org

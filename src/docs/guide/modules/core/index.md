@@ -18,7 +18,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - APIs to **record and replay** HTTP traffic to disk or memory
 
 #### HttpHandlers 
-In **http4k**, an HTTP service is just a typealias of a simple function:
+In [[http4k]], an HTTP service is just a typealias of a simple function:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
@@ -38,7 +38,7 @@ println(response.bodyString())
 To mount the `HttpHandler` in a container, the can simply be converted to a Servlet by calling ```handler.asServlet()```
 
 ### Filters
-Filters add extra processing to either the Request or Response. In **http4k**, they are modelled as:
+Filters add extra processing to either the Request or Response. In [http4k], they are modelled as:
 ```kotlin
 interface Filter : (HttpHandler) -> HttpHandler
 ``` 
@@ -74,7 +74,7 @@ The `http4k-core` module comes with a set of handy Filters for application to bo
 Check out the `org.http4k.filter` package for the exact list.
 
 ### Routers - Nestable, path-based Routing
-Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and **http4k** will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
+Create a Router using routes() to bind a static or dynamic path to either an HttpHandler, or to another sub-Router. These Routers can be nested infinitely deep and [http4k] will search for a matching route using a depth-first search algorithm, before falling back finally to a 404:
 ```kotlin
 routes(
     "/hello" bind routes(
@@ -90,7 +90,7 @@ Note that the `http4k-contract` module contains a more typesafe implementation o
 Getting values from HTTP messages is one thing, but we want to ensure that those values are both present and valid. 
 For this purpose, we can use a [Lens](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/basic-lensing). 
 
-A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. **http4k** provides a DSL 
+A Lens is a bi-directional entity which can be used to either **get** or **set** a particular value from/onto an HTTP message. [http4k] provides a DSL 
 to configure these lenses to target particular parts of the message, whilst at the same time specifying the requirement for those parts (i.e. mandatory or optional). 
 
 To utilise a lens, first you have to declare it with the form `<Location>.<configuration and mapping operations>.<terminator>`.
@@ -128,7 +128,7 @@ Websockets have been modeled using the same methodology as standard HTTP endpoin
 
 1. `WsHandler` - represented as a typealias: `WsHandler =  (Request) -> WsConsumer?`. This is responsible for matching an HTTP request to a websocket.
 1. `WsConsumer` - represented as a typealias: `WsConsumer = (WebSocket) -> Unit`. This function is called on connection of a websocket and allow the API user to react to events coming from the connected websocket.
-1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the [**http4k**](https://github.com/http4k/http4k) HTTP message model, WsMessages are immutable data classes.
+1. `WsMessage` - a message which is sent or received on a websocket. This message can take advantage of the typesafety accorded to other entities in http4k by using the Lens API. Just like the [http4k](https://github.com/http4k/http4k) HTTP message model, WsMessages are immutable data classes.
 
 The routing aspect of Websockets is done using a very similar API to the standard HTTP routing for HTTP messages and dynamic parts of the upgrade request are available when constructing a websocket instance:
 
@@ -180,7 +180,7 @@ client.received.take(2).forEach(::println)
 ```
 
 ### Request and Response toString()
-The HttpMessages used by **http4k** toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
+The HttpMessages used by [http4k] toString in the HTTP wire format, which it simple to capture and replay HTTP message streams later in a similar way to tools like [Mountebank](http://www.mbtest.org/).
 
 ### CURL format
 Creates `curl` command for a given request - this is useful to include in audit logs so exact requests can be replayed if required:
@@ -189,3 +189,5 @@ Creates `curl` command for a given request - this is useful to include in audit 
 val curl = Request(POST, "http://httpbin.org/post").body(listOf("foo" to "bar").toBody()).toCurl()
 // curl -X POST --data "foo=bar" "http://httpbin.org/post"
 ```
+
+[http4k]: https://http4k.org

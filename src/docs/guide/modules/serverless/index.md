@@ -8,7 +8,7 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 These modules provide integration with Serverless deployment environments, such as AWS Lambda. 
 
 #### AWS Lambda integration
-Since [**http4k**](https://http4k.org) is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
+Since [http4k] is server independent, it turns out to be fairly trivial to deploy full applications to [AWS Lambda](https://aws.amazon.com/lambda), and then call them by setting up the [API Gateway](https://aws.amazon.com/api-gateway) to proxy requests to the function. Effectively, the combination of these two services become just another Server back-end supported by the library. This has the added bonus that you can test your applications in a local environment and then simply deploy them to AWS Lambda via S3 upload.
 
 In order to achieve this, only a single interface `AppLoader` needs to be implemented.
 
@@ -30,3 +30,5 @@ We hope to soon provide some tools to automate at least some of the above proces
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_lambda.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/serverless/example_lambda.kt"></script>
+
+[http4k]: https://http4k.org

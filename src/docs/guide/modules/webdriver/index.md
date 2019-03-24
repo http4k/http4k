@@ -6,7 +6,7 @@ description: Feature overview of the http4k-webdriver module
 
 ### About
 
-A basic Selenium WebDriver API implementation for **http4k** HttpHandlers, which runs completely out of container (no network) for ultra fast tests.
+A basic Selenium WebDriver API implementation for [http4k] HttpHandlers, which runs completely out of container (no network) for ultra fast tests.
 
 | Feature | Supported | Notes |
 |---------|-----------|-------|
@@ -26,3 +26,5 @@ Use the API like any other WebDriver implementation, by simply passing your app 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/webdriver/example.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/webdriver/example.kt"></script>
+
+[http4k]: https://http4k.org

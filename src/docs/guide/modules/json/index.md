@@ -25,7 +25,7 @@ objects, including custom Lens methods for each library so that JSON node object
 Some of the message libraries (eg. GSON, Jackson, Moshi, XML) provide the mechanism to automatically marshall data objects 
 to/from JSON and XML using reflection.
 
-We can use this facility in **http4k** to automatically marshall objects to/from HTTP message bodies using **Lenses**:
+We can use this facility in [http4k] to automatically marshall objects to/from HTTP message bodies using **Lenses**:
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/autoJson.kt)
 
@@ -55,3 +55,4 @@ As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLen
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/json/list_gotcha.kt"></script>
 
+[http4k]: https://http4k.org

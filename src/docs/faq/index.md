@@ -1,25 +1,25 @@
 title: http4k FAQ
 description: Find answers to frequently asked questions about http4k
 
-Find here answers to the most common questions that we get asked about **http4k**
+Find here answers to the most common questions that we get asked about [http4k]
 
 ### General
-**Q. Is http4k a library or a framework?**
+**Q. Is [http4k] a library or a framework?**
 
-**A.** Although it has many of the features of a framework, we consider http4k to be a library which adds a common HTTP routing layer. It is incredibly unopinionated and has been designed to not enforce design decisions on the API user. We use http4k for applications both large and small, using no DI framework.
+**A.** Although it has many of the features of a framework, we consider [http4k] to be a library which adds a common HTTP routing layer. It is incredibly unopinionated and has been designed to not enforce design decisions on the API user. We use [http4k] for applications both large and small, using no DI framework.
 
-**Q. Is http4k currently used in production?**
+**Q. Is [http4k] currently used in production?**
 
-**A.** Absolutely! The library is currently in use serving the global traffic for a large academic publisher (easily serving 10s of millions of requests per day on a few nodes) and is also being used in production in at least 2 global Investment Banks (that we know of). If you're running http4k in production and would like to be listed on the site as an adopter, please get in touch.
+**A.** Absolutely! The library is currently in use serving the global traffic for a large academic publisher (easily serving 10s of millions of requests per day on a few nodes) and is also being used in production in at least 2 global Investment Banks (that we know of). If you're running [http4k] in production and would like to be listed on the site as an adopter, please get in touch.
 
-**Q. Does http4k support an Async model? I need webscale!**
+**Q. Does [http4k] support an Async model? I need webscale!**
 
 **A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll probably use co-routines and they're still marked as experimental which is another reason we are holding off. As for the scaling arguments, see the above answer relating to production usage.
 
 ### API
 **Q. I'm attempting to build HTTP messages using the API, but changes don't affect the object (e.g. calling `request.body("hello")`)?**
 
-**A.** **http4k** HTTP message objects are *immutable*, so you need to chain or reassign the value from the method call to get the updated version.
+**A.** [http4k] HTTP message objects are *immutable*, so you need to chain or reassign the value from the method call to get the updated version.
 
 **Q. Where are all the useful Filters defined?**
 
@@ -48,8 +48,10 @@ Find here answers to the most common questions that we get asked about **http4k*
 
 **Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
 
-**A.** This happens because http4k uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
+**A.** This happens because [http4k] uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
 
 **Q. My application uses Lenses, but when they fail I get an HTTP 500 instead of the promised 400.**
 
 **A.** You forgot to add the `ServerFilters.CatchLensFailure` filter to your Server stack.
+
+[http4k]: https://http4k.org
