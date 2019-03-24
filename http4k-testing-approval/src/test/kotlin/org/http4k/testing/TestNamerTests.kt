@@ -8,6 +8,9 @@ class TestNamerTests {
 
     @Test
     fun `class and method`() {
-        assertThat(TestNamer.ClassAndMethod.nameFor(javaClass, javaClass.getMethod("class and method")), equalTo("TestNamerTests.class and method"))
+        assertThat(
+            TestNamer.ClassAndMethod.nameFor(javaClass, javaClass.getMethod("class and method")),
+            equalTo("org/http4k/testing/TestNamerTests.class and method")
+        )
     }
 }
