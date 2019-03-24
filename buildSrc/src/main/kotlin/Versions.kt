@@ -69,7 +69,7 @@ object Versions {
 
     const val java_websocket: String = "1.4.0"
 
-    const val dokka_gradle_plugin: String = "0.9.17"
+    const val dokka_gradle_plugin: String = "0.9.18"
 
     const val org_jetbrains_kotlin: String = "1.3.21"
 
@@ -77,7 +77,7 @@ object Versions {
 
     const val jsoup: String = "1.11.3"
 
-    const val org_junit_jupiter: String = "5.4.0"
+    const val org_junit_jupiter: String = "5.4.1"
 
     const val coveralls_gradle_plugin: String = "2.8.2"
 
@@ -95,10 +95,10 @@ object Versions {
     object Gradle {
         const val runningVersion: String = "5.0"
 
-        const val currentVersion: String = "5.2.1"
+        const val currentVersion: String = "5.3"
 
-        const val nightlyVersion: String = "5.4-20190315000123+0000"
+        const val nightlyVersion: String = "5.4-20190324000026+0000"
 
-        const val releaseCandidate: String = "5.3-rc-3"
+        const val releaseCandidate: String = ""
     }
 }
