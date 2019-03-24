@@ -1,5 +1,6 @@
 package org.http4k.testing
 
+import argo.saj.InvalidSyntaxException
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.format.Argo
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace.create
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
+import org.opentest4j.AssertionFailedError
 import java.io.File
 
 /**
@@ -53,7 +55,13 @@ class JsonApprovalTest : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext) = object : Approver {
         private val delegate = NamedResourceApprover(
             ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
-            HttpBodyOnly(Argo::prettify),
+            HttpBodyOnly {
+                try {
+                    Argo.prettify(it)
+                } catch (e: InvalidSyntaxException) {
+                    throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", it)
+                }
+            },
             FileSystemApprovalSource(File("src/test/resources"))
         )
 

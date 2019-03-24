@@ -47,6 +47,15 @@ class ExampleJsonApprovalTest {
     }
 
     @Test
+    fun `check response content with badly-formatted JSON`(approver: Approver) {
+        assertThat({
+            approver {
+                Response(OK).with(CONTENT_TYPE of APPLICATION_JSON).body("foobar")
+            }
+        }, throws<AssertionError>())
+    }
+
+    @Test
     fun `check request content`(approver: Approver) {
         approver {
             Request(GET, "/url").with(CONTENT_TYPE of APPLICATION_JSON).body("""{"message":"value"}""")

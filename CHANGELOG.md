@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.125.0
-- Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and is compatible with 
-the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and IntelliJ plugin.
+- Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and integrates with 
+the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and IntelliJ plugin. H/T to 
+@jshiell for the inspiration Gist containing the base Junit5 Extension.
 
 ### v3.124.0
 - Make authentication response available when creating AuthorizationCode .
