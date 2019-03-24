@@ -1,7 +1,7 @@
 package org.http4k.testing
 
 import com.github.underscore.lodash.Json
-import com.github.underscore.lodash.Json.JsonStringBuilder.Step.FOUR_SPACES
+import com.github.underscore.lodash.Json.JsonStringBuilder.Step.TWO_SPACES
 import com.github.underscore.lodash.U.formatJson
 import com.github.underscore.lodash.U.formatXml
 import org.http4k.core.ContentType
@@ -82,7 +82,7 @@ abstract class ContentTypeAwareApprovalTest(
  */
 class JsonApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_JSON) {
     override fun format(input: String) = try {
-        formatJson(input, FOUR_SPACES)
+        formatJson(input, TWO_SPACES)
     } catch (e: Json.ParseException) {
         throw AssertionFailedError("Invalid JSON generated", "<valid JSON>", input)
     }

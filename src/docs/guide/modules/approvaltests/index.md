@@ -38,14 +38,17 @@ By using the `ApprovalTest` extension, an instance of an `Approver` is injected 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_standard.kt"></script>
 
-## JSON specific Approval tests
-Because so many APIs are based around JSON messaging, the module also provides `JsonApprovalTest` that 
-will:
-1. Check for the presence of the `application/json` on the `HttpMessage` under test and fail if it is not 
-valid.
+## Content-type specific Approval tests
+Because so many APIs are based around messages with a particular content type, the 
+module also provides Junit 5 extensions that will:
+1. Check for the presence of the a partocular `content-type` on the `HttpMessage` under test and fail if it is not valid.
 1. Validate that the `HttpMessage` actually contains valid JSON.
-1. Format and compare the approval output as pretty-printed JSON. Note that by default the [http4k] 
-JSON modules use compact-printed JSON to conserve message space.
+1. Format and compare the approval output as pretty-printed version. Note that by default the [http4k] format modules use compact printing to conserve message space.
+
+The module also provides the following built-in extensions:
+- `HtmlApprovalTest`
+- `JsonApprovalTest`
+- `XmlApprovalTest`
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/approvaltests/example_json.kt)
 
