@@ -4,13 +4,13 @@ This list is not currently intended to be all-encompassing - it will document ma
 
 ### v3.125.0
 - Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and is compatible with 
-the `OkeyDoke` approval testing files and IntelliJ plugin.
+the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and IntelliJ plugin.
 
 ### v3.124.0
-- Make authentication response available when creating AuthorizationCode 
+- Make authentication response available when creating AuthorizationCode .
 
 ### v3.123.0
-- Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers
+- Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
 
 ### v3.122.0
 - Generified `GenerateXmlDataClasses` filter, and added default implementations for 
