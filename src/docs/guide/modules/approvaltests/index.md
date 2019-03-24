@@ -2,7 +2,7 @@ title: http4k Approval Testing Module
 description: Feature overview of the http4k-testing-approval module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-approval", version: "3.124.0"```
+```compile group: "org.http4k", name: "http4k-testing-approval", version: "3.125.0"```
 
 ### About
 JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
