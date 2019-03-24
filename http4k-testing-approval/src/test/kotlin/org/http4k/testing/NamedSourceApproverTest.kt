@@ -12,14 +12,14 @@ import java.io.File
 import java.nio.file.Files
 import kotlin.random.Random
 
-class ApproverTest {
+class NamedSourceApproverTest {
 
     private val body = "content"
     private val baseFile = Files.createTempDirectory(javaClass.name).toFile()
     private val testName = "somename" + Random.nextLong()
     private val actualFile = File(baseFile, "$testName.actual")
     private val approvedFile = File(baseFile, "$testName.approved")
-    private val approver = Approver(testName, ApprovalContent.HttpBodyOnly(), FileSystemApprovalSource(baseFile))
+    private val approver = NamedResourceApprover(testName, ApprovalContent.HttpBodyOnly(), FileSystemApprovalSource(baseFile))
 
     @Test
     fun `when no approval recorded, create actual and throw`() {

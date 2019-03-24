@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class TestNamerTests {
 
     @Test
-    fun `names files correctly`() {
-        assertThat(TestNamer.Simple.nameFor(javaClass, javaClass.getMethod("names files correctly")), equalTo("TestNamerTests.names files correctly"))
+    fun `class and method`() {
+        assertThat(TestNamer.ClassAndMethod.nameFor(javaClass, javaClass.getMethod("class and method")), equalTo("TestNamerTests.class and method"))
     }
 }

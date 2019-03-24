@@ -2,17 +2,24 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
 import org.http4k.core.HttpMessage
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.junit.jupiter.api.Assertions.assertEquals
 
 /**
- * This coordinates the comparison of the content for a test.
+ * Coordinates the comparison of the content for a test.
  */
-class Approver(private val name: String,
-               private val approvalContent: ApprovalContent,
-               private val approvalSource: ApprovalSource) {
+interface Approver {
+    operator fun <T : HttpMessage> invoke(fn: () -> T): T
+}
 
-    operator fun <T : HttpMessage> invoke(fn: () -> T): T {
+class NamedResourceApprover(private val name: String,
+                            private val approvalContent: ApprovalContent,
+                            private val approvalSource: ApprovalSource) : Approver {
+
+    override operator fun <T : HttpMessage> invoke(fn: () -> T): T {
         val approved = approvalSource.approvedFor(name)
 
         val message = fn()
@@ -41,4 +48,8 @@ class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResourc
 
 operator fun <T : HttpMessage> Approver.invoke(baseMatcher: Matcher<T>, fn: () -> T): T = invoke {
     fn().apply { assertThat(this, baseMatcher) }
+}
+
+operator fun Approver.invoke(status: Status, fn: () -> Response): Response = invoke {
+    fn().apply { assertThat(this.status, equalTo(status)) }
 }

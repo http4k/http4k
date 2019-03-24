@@ -1,8 +1,12 @@
 package org.http4k.testing
 
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.HttpMessage
 import org.http4k.format.Argo
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.ApprovalContent.Companion.HttpBodyOnly
-import org.http4k.testing.TestNamer.Companion.Simple
+import org.http4k.testing.TestNamer.Companion.ClassAndMethod
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace.create
@@ -15,25 +19,16 @@ import java.io.File
  * to provide custom approval behaviours, or
  */
 interface BaseApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
-    val namer: TestNamer
-    val approvalContent: ApprovalContent
-    val approvalSource: ApprovalSource
 
-    private val STORE_KEY get() = "approver"
+    fun approverFor(context: ExtensionContext): Approver
 
-    override fun beforeTestExecution(context: ExtensionContext) {
-        store(context).put(STORE_KEY, Approver(
-            namer.nameFor(context.requiredTestClass, context.requiredTestMethod),
-            approvalContent,
-            approvalSource
-        ))
-    }
+    override fun beforeTestExecution(context: ExtensionContext) = store(context).put("approver", approverFor(context))
 
     override fun supportsParameter(parameterContext: ParameterContext, context: ExtensionContext) =
         parameterContext.parameter.type == Approver::class.java
 
     override fun resolveParameter(parameterContext: ParameterContext, context: ExtensionContext) =
-        if (supportsParameter(parameterContext, context)) store(context)[STORE_KEY] else null
+        if (supportsParameter(parameterContext, context)) store(context)["approver"] else null
 
     private fun store(context: ExtensionContext) = with(context) {
         getStore(create(requiredTestClass.name, requiredTestMethod.name))
@@ -44,16 +39,27 @@ interface BaseApprovalTest : BeforeTestExecutionCallback, ParameterResolver {
  * Standard Approval JUnit5 extension. Can be used to compare any HttpMessages.
  */
 class ApprovalTest : BaseApprovalTest {
-    override val namer = Simple
-    override val approvalContent = HttpBodyOnly()
-    override val approvalSource = FileSystemApprovalSource(File("src/test/resources"))
+    override fun approverFor(context: ExtensionContext): Approver = NamedResourceApprover(
+        ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
+        HttpBodyOnly(),
+        FileSystemApprovalSource(File("src/test/resources"))
+    )
 }
 
 /**
- * Approval JUnit5 extension configured to compare prettified-JSON content.
+ * Approval JUnit5 extension configured to compare prettified-JSON messages.
  */
 class JsonApprovalTest : BaseApprovalTest {
-    override val namer = Simple
-    override val approvalContent = HttpBodyOnly(Argo::prettify)
-    override val approvalSource = FileSystemApprovalSource(File("src/test/resources"))
+    override fun approverFor(context: ExtensionContext) = object : Approver {
+        private val delegate = NamedResourceApprover(
+            ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            HttpBodyOnly(Argo::prettify),
+            FileSystemApprovalSource(File("src/test/resources"))
+        )
+
+        override fun <T : HttpMessage> invoke(fn: () -> T) =
+            delegate {
+                fn().apply { assertEquals(APPLICATION_JSON, CONTENT_TYPE(this)) }
+            }
+    }
 }
