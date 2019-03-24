@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.126.0 (uncut)
+- Add support for XML and HTML approval tests in `http4k-testing-approval` module.
+
 ### v3.125.0
 - Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and integrates with 
 the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and IntelliJ plugin. H/T to 

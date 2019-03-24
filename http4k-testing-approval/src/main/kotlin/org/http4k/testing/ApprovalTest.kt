@@ -55,18 +55,22 @@ class ApprovalTest : BaseApprovalTest {
 }
 
 /**
- * Content-type aware Approval JUnit5 extension.
+ * Approval testing JUnit5 extension that checks the expected content type is present in the
  */
-abstract class ContentTypeApprovalTest(private val contentType: ContentType) : BaseApprovalTest {
+abstract class ContentTypeAwareApprovalTest(
+    private val contentType: ContentType,
+    private val testNamer: TestNamer = ClassAndMethod,
+    private val approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext) = object : Approver {
         override fun <T : HttpMessage> invoke(fn: () -> T) = delegate {
             fn().apply { assertEquals(contentType, CONTENT_TYPE(this)) }
         }
 
         private val delegate = NamedResourceApprover(
-            ClassAndMethod.nameFor(context.requiredTestClass, context.requiredTestMethod),
+            testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
             HttpBodyOnly(::format),
-            FileSystemApprovalSource(File("src/test/resources"))
+            approvalSource
         )
     }
 
@@ -76,7 +80,7 @@ abstract class ContentTypeApprovalTest(private val contentType: ContentType) : B
 /**
  * Approval JUnit5 extension configured to compare prettified-JSON messages.
  */
-class JsonApprovalTest : ContentTypeApprovalTest(APPLICATION_JSON) {
+class JsonApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_JSON) {
     override fun format(input: String) = try {
         formatJson(input, FOUR_SPACES)
     } catch (e: Json.ParseException) {
@@ -85,9 +89,10 @@ class JsonApprovalTest : ContentTypeApprovalTest(APPLICATION_JSON) {
 }
 
 /**
- * Approval JUnit5 extension configured to compare prettified-HTML messages.
+ * Approval JUnit5 extension configured to compare prettified-HTML messages. Note that this strips
+ * <!DOCTYPE tags from the start of the document.
  */
-class HtmlApprovalTest : ContentTypeApprovalTest(TEXT_HTML) {
+class HtmlApprovalTest : ContentTypeAwareApprovalTest(TEXT_HTML) {
     override fun format(input: String) = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
@@ -98,10 +103,10 @@ class HtmlApprovalTest : ContentTypeApprovalTest(TEXT_HTML) {
 /**
  * Approval JUnit5 extension configured to compare prettified-XML messages.
  */
-class XmlApprovalTest : ContentTypeApprovalTest(APPLICATION_XML) {
+class XmlApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_XML) {
     override fun format(input: String) = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
-        throw AssertionFailedError("Invalid HTML generated", "<valid HTML>", input)
+        throw AssertionFailedError("Invalid XML generated", "<valid XML>", input)
     }
 }
