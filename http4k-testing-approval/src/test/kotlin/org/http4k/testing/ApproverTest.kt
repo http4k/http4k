@@ -19,7 +19,7 @@ class ApproverTest {
     private val testName = "somename" + Random.nextLong()
     private val actualFile = File(baseFile, "$testName.actual")
     private val approvedFile = File(baseFile, "$testName.approved")
-    private val approver = Approver(testName, ApprovalContent.BodyOnly(), FileSystemApprovalSource(baseFile))
+    private val approver = Approver(testName, ApprovalContent.HttpBodyOnly(), FileSystemApprovalSource(baseFile))
 
     @Test
     fun `when no approval recorded, create actual and throw`() {

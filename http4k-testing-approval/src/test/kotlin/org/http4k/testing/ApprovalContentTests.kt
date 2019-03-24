@@ -4,8 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.testing.ApprovalContent.Companion.BodyOnly
-import org.http4k.testing.ApprovalContent.Companion.EntireMessage
+import org.http4k.testing.ApprovalContent.Companion.EntireHttpMessage
+import org.http4k.testing.ApprovalContent.Companion.HttpBodyOnly
 import org.junit.jupiter.api.Test
 
 class ApprovalContentTests {
@@ -16,17 +16,17 @@ class ApprovalContentTests {
 
     @Test
     fun `body only`() {
-        assertThat(BodyOnly()(input).reader().readText(), equalTo("hello"))
+        assertThat(HttpBodyOnly()(input).reader().readText(), equalTo("hello"))
     }
 
     @Test
     fun `body only with formatter`() {
-        assertThat(BodyOnly { it.reversed() }(input).reader().readText(), equalTo("olleh"))
+        assertThat(HttpBodyOnly { it.reversed() }(input).reader().readText(), equalTo("olleh"))
     }
 
     @Test
     fun `entire message`() {
-        assertThat(EntireMessage()(input).reader().readText(), equalTo(("HTTP/1.1 200 OK\r\n" +
+        assertThat(EntireHttpMessage()(input).reader().readText(), equalTo(("HTTP/1.1 200 OK\r\n" +
             "some-header: some header value\r\n" +
             "\r\n" +
             "hello")))

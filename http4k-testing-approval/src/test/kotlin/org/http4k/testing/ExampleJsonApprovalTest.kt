@@ -9,10 +9,10 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(ApprovalTest::class)
-class ExampleTest {
+@ExtendWith(JsonApprovalTest::class)
+class ExampleJsonApprovalTest {
 
-    private val app: HttpHandler = { Response(OK).body("hello world") }
+    private val app: HttpHandler = { Response(OK).body("""{"message":"value"}""") }
 
     @Test
     fun `check response content`(approver: Approver) {
@@ -31,7 +31,7 @@ class ExampleTest {
     @Test
     fun `check request content`(approver: Approver) {
         approver {
-            Request(GET, "/url").body("foobar")
+            Request(GET, "/url").body("""{"message":"value"}""")
         }
     }
 }
