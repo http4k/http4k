@@ -5,6 +5,7 @@ package org.http4k.core
 import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
+import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -144,7 +145,8 @@ interface Request : HttpMessage {
 
     companion object {
         operator fun invoke(method: Method, uri: Uri, version: String = HTTP_1_1): Request = MemoryRequest(method, uri, listOf(), EMPTY, version)
-        operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = MemoryRequest(method, Uri.of(uri), listOf(), EMPTY, version)
+        operator fun invoke(method: Method, uri: String, version: String = HTTP_1_1): Request = Request(method, Uri.of(uri), version)
+        operator fun invoke(method: Method, template: UriTemplate, version: String = HTTP_1_1): Request = RoutedRequest(Request(method, template.toString(), version), template)
     }
 }
 

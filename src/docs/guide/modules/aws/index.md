@@ -10,5 +10,5 @@ This module provides super-simple AWS request signing functionality for talking 
 
 http4k provides a `Filter` which does this request signing process. Just decorate a standard HTTP client and then make the relevant calls:
  
-#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/aws/example_aws.kt)
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/aws/example_aws.kt"></script>
+#### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/aws/example.kt)
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/aws/example.kt"></script>
