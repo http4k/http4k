@@ -3,9 +3,9 @@ description = 'Http4k support for chaos testing'
 dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
-    compile project(":http4k-format-argo")
     provided Libs.junit_jupiter_api
     provided Libs.hamkrest
+    compile 'com.github.javadev:underscore:1.42'
 
     testCompile project(":http4k-testing-hamkrest")
     testCompile Config.TestDependencies
