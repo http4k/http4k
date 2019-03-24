@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.126.0 (uncut)
+### v3.126.0
 - Add support for XML and HTML approval tests in `http4k-testing-approval` module.
 
 ### v3.125.0
