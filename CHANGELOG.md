@@ -2,6 +2,12 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.127.0
+- `http4k-testing-approval`: Improved `Approver` interface to more closely match the traditional 
+`assert<XYZ>` approach - this results in a more discoverable/obvious API.
+- Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
+with other relevant matchers.
+
 ### v3.126.0
 - Add support for XML and HTML approval tests in `http4k-testing-approval` module.
 

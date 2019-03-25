@@ -1,5 +1,7 @@
 package org.http4k.testing
 
+import com.natpryce.hamkrest.and
+import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -16,22 +18,16 @@ class ExampleApprovalTest {
 
     @Test
     fun `check response content`(approver: Approver) {
-        approver {
-            app(Request(GET, "/url"))
-        }
-    }
-
-    @Test
-    fun `check response content with matcher`(approver: Approver) {
-        approver(hasStatus(OK)) {
-            app(Request(GET, "/url"))
-        }
+        approver.assertApproved(app(Request(GET, "/url")))
     }
 
     @Test
     fun `check request content`(approver: Approver) {
-        approver {
-            Request(GET, "/url").body("foobar")
-        }
+        approver.assertApproved(Request(GET, "/url").body("foobar"))
+    }
+
+    @Test
+    fun `create hamkrest matcher`(approver: Approver) {
+        assertThat(app(Request(GET, "/url")), hasStatus(OK).and(approver.hasApprovedContent()))
     }
 }

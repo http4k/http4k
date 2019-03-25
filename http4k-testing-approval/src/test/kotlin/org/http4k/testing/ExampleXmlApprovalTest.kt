@@ -9,7 +9,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
-import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,40 +24,29 @@ class ExampleXmlApprovalTest {
 
     @Test
     fun `check response content`(approver: Approver) {
-        approver {
-            app(Request(GET, "/url"))
-        }
-    }
-
-    @Test
-    fun `check response content with matcher`(approver: Approver) {
-        approver(hasStatus(OK)) {
-            app(Request(GET, "/url"))
-        }
+        approver.assertApproved(app(Request(GET, "/url")))
     }
 
     @Test
     fun `check response content with mismatching content type`(approver: Approver) {
         assertThat({
-            approver {
-                Response(OK)
-            }
+            approver.assertApproved(Response(OK))
         }, throws<AssertionError>())
     }
 
     @Test
     fun `check response content with badly-formatted XML`(approver: Approver) {
         assertThat({
-            approver {
+            approver.assertApproved(
                 Response(OK).with(CONTENT_TYPE of APPLICATION_XML).body("""<this is not really XML""")
-            }
+            )
         }, throws<AssertionError>())
     }
 
     @Test
     fun `check request content`(approver: Approver) {
-        approver {
+        approver.assertApproved(
             Request(GET, "/url").with(CONTENT_TYPE of APPLICATION_XML).body("""<UriContainer><field>foo.bar</field></UriContainer>""")
-        }
+        )
     }
 }
