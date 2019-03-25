@@ -42,7 +42,7 @@ By using the `ApprovalTest` extension, an instance of an `Approver` is injected 
 Because so many APIs are based around messages with a particular content type, the 
 module also provides Junit 5 extensions that will:
 
-1. Check for the presence of the a partocular `content-type` on the `HttpMessage` under test and fail if it is not valid.
+1. Check for the presence of the a particular `content-type` on the `HttpMessage` under test and fail if it is not valid.
 1. Validate that the `HttpMessage` actually contains valid JSON.
 1. Format and compare the approval output as pretty-printed version. Note that by default the [http4k] format modules use compact printing to conserve message space.
 
