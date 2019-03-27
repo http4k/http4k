@@ -32,13 +32,14 @@ class NamedResourceApprover(private val name: String,
             val actual = approvalSource.actualFor(name)
 
             when (this) {
-                null -> {
-                    approvalContent(httpMessage).copyTo(actual.output())
-                    throw ApprovalFailed("No approved content found", actual, approved)
+                null -> with(approvalContent(httpMessage)) {
+                    if (available() > 0) {
+                        copyTo(actual.output())
+                        throw ApprovalFailed("No approved content found", actual, approved)
+                    }
                 }
                 else -> try {
                     assertEquals(approvalContent(this).reader().readText(), approvalContent(httpMessage).reader().readText())
-                    httpMessage
                 } catch (e: AssertionError) {
                     approvalContent(httpMessage).copyTo(actual.output())
                     throw AssertionError(ApprovalFailed("Mismatch", actual, approved).message + "\n" + e.message)

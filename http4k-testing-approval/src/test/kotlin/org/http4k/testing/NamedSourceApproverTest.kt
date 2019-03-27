@@ -37,6 +37,13 @@ class NamedSourceApproverTest {
     }
 
     @Test
+    fun `when no approval recorded and no actual content, don't write actual or approved`() {
+        approver.assertApproved(Response(OK))
+        assertThat(actualFile.exists(), equalTo(false))
+        assertThat(approvedFile.exists(), equalTo(false))
+    }
+
+    @Test
     fun `when match, don't write actual`() {
         approvedFile.writeText(body)
         approver.assertApproved(Response(OK).body(body))
