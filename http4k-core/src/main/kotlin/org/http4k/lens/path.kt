@@ -72,20 +72,20 @@ open class BiDiPathLensSpec<OUT>(paramMeta: ParamMeta,
 
         val meta = Meta(true, "path", paramMeta, name, description)
         return BiDiPathLens(meta,
-                { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
-                { it: OUT, target: Request -> setLens(listOf(it), target) })
+            { getLens(it).firstOrNull() ?: throw LensFailure(Missing(meta), target = it) },
+            { it: OUT, target: Request -> setLens(listOf(it), target) })
     }
 }
 
 object Path : BiDiPathLensSpec<String>(StringParam,
-        LensGet { _, target -> listOf(target.fromFormEncoded()) },
-        LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
+    LensGet { _, target -> listOf(target.fromFormEncoded()) },
+    LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
 
     fun fixed(name: String): PathLens<String> {
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name)
         return object : PathLens<String>(meta,
-                { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
+            { getLens(it).find { it == name } ?: throw LensFailure(Missing(meta), target = it) }) {
             override fun toString(): String = name
 
             override fun iterator(): Iterator<Meta> = emptyList<Meta>().iterator()
@@ -102,6 +102,7 @@ fun Path.float() = mapWithNewMeta(StringBiDiMappings.float(), NumberParam)
 fun Path.bigInteger() = mapWithNewMeta(StringBiDiMappings.bigInteger(), IntegerParam)
 fun Path.bigDecimal() = mapWithNewMeta(StringBiDiMappings.bigDecimal(), NumberParam)
 fun Path.boolean() = mapWithNewMeta(StringBiDiMappings.boolean(), BooleanParam)
+fun Path.base64() = map(StringBiDiMappings.base64())
 fun Path.uuid() = map(StringBiDiMappings.uuid())
 fun Path.uri() = map(StringBiDiMappings.uri())
 fun Path.regex(pattern: String, group: Int = 1) = map(StringBiDiMappings.regex(pattern, group))
@@ -116,4 +117,4 @@ fun Path.localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = map(StringBi
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.map(mapping: BiDiMapping<IN, NEXT>) = map(mapping::invoke, mapping::invoke)
 
 internal fun <IN, NEXT> BiDiPathLensSpec<IN>.mapWithNewMeta(mapping: BiDiMapping<IN, NEXT>, paramMeta: ParamMeta) = mapWithNewMeta(
-        mapping::invoke, mapping::invoke, paramMeta)
+    mapping::invoke, mapping::invoke, paramMeta)

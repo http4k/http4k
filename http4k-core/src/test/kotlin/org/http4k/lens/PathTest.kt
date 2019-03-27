@@ -3,6 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.base64Encode
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -19,7 +20,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 
 class PathTest {
@@ -118,6 +119,9 @@ class PathTest {
 
     @Test
     fun datetime() = checkContract(Path.dateTime(), "2001-01-01T02:03:04", LocalDateTime.of(2001, 1, 1, 2, 3, 4))
+
+    @Test
+    fun base64() = checkContract(Path.base64(), "unencoded".base64Encode(), "unencoded")
 
     @Test
     fun instant() = checkContract(Path.instant(), "1970-01-01T00:00:00Z", Instant.EPOCH)

@@ -1,5 +1,7 @@
 package org.http4k.lens
 
+import org.http4k.base64Decoded
+import org.http4k.base64Encode
 import org.http4k.core.Uri
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -60,6 +62,7 @@ object StringBiDiMappings {
     fun uri() = BiDiMapping(Uri.Companion::of, Uri::toString)
     fun url() = BiDiMapping(::URL, URL::toExternalForm)
     fun uuid() = BiDiMapping(UUID::fromString, UUID::toString)
+    fun base64() = BiDiMapping(String::base64Decoded, String::base64Encode)
 
     fun instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
     fun localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)

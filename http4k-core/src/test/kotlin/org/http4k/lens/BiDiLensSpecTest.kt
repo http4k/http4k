@@ -3,6 +3,7 @@ package org.http4k.lens
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.base64Encode
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
@@ -19,7 +20,7 @@ import java.time.OffsetTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 
 class BiDiLensSpecTest {
@@ -53,6 +54,11 @@ class BiDiLensSpecTest {
 
     @Test
     fun bigDecimal() = checkContract(spec.bigDecimal(), BigDecimal("123.0"), "123.0", "", "invalid", "o", "o123.0", "o123.0123.0")
+
+    @Test
+    fun base64() {
+        checkContract(spec.base64(), "unencoded", "unencoded".base64Encode(), "", "hello", "unencoded", "unencodeddW5lbmNvZGVk", "unencodeddW5lbmNvZGVkdW5lbmNvZGVk")
+    }
 
     @Test
     fun bigInteger() = checkContract(spec.bigInteger(), BigInteger("123"), "123", "", "invalid", "o", "o123", "o123123")
