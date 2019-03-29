@@ -1,20 +1,13 @@
 package org.http4k.filter
 
-import org.http4k.cloudnative.BadGateway
-import org.http4k.cloudnative.BadRequest
 import org.http4k.cloudnative.ClientTimeout
-import org.http4k.cloudnative.Conflict
-import org.http4k.cloudnative.InternalServerError
+import org.http4k.cloudnative.GatewayTimeout
 import org.http4k.cloudnative.NotFound
-import org.http4k.cloudnative.ServiceUnavailable
 import org.http4k.cloudnative.UpstreamRequestFailed
 import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Status.Companion.BAD_GATEWAY
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
-import org.http4k.core.Status.Companion.CONFLICT
 import org.http4k.core.Status.Companion.GATEWAY_TIMEOUT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
@@ -32,12 +25,12 @@ fun ServerFilters.HandleUpstreamRequestFailed(
         {
             try {
                 next(it)
-            } catch (e: ClientTimeout) {
-                GATEWAY_TIMEOUT.toResponse(e)
-            } catch (e: NotFound) {
-                NOT_FOUND.toResponse(e)
             } catch (e: UpstreamRequestFailed) {
-                SERVICE_UNAVAILABLE.toResponse(e)
+                when (e.status) {
+                    GATEWAY_TIMEOUT, CLIENT_TIMEOUT -> GATEWAY_TIMEOUT.toResponse(e)
+                    NOT_FOUND -> NOT_FOUND.toResponse(e)
+                    else -> SERVICE_UNAVAILABLE.toResponse(e)
+                }
             }
         }
     }
@@ -56,13 +49,9 @@ fun ClientFilters.HandleUpstreamRequestFailed(
             if (!status.successful)
                 when (status) {
                     NOT_FOUND -> if (!notFoundIsAcceptable) throw NotFound(responseToMessage())
-                    BAD_GATEWAY -> throw BadGateway(responseToMessage())
-                    BAD_REQUEST -> throw BadRequest(responseToMessage())
-                    CONFLICT -> throw Conflict(responseToMessage())
                     CLIENT_TIMEOUT -> throw ClientTimeout(responseToMessage())
-                    GATEWAY_TIMEOUT -> throw ClientTimeout(responseToMessage())
-                    SERVICE_UNAVAILABLE -> throw ServiceUnavailable(responseToMessage())
-                    else -> throw InternalServerError(responseToMessage())
+                    GATEWAY_TIMEOUT -> throw GatewayTimeout(responseToMessage())
+                    else -> throw UpstreamRequestFailed(status, responseToMessage())
                 }
         }
     }

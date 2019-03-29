@@ -3,8 +3,9 @@ package org.http4k.filter
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
-import org.http4k.cloudnative.NotFound
 import org.http4k.cloudnative.UpstreamRequestFailed
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -47,7 +48,7 @@ class HandleUpstreamRequestFailedTest {
     fun `client throws or passes not found`() {
         assertThat({
             ClientFilters.HandleUpstreamRequestFailed(false).then { Response(NOT_FOUND) }(Request(GET, ""))
-        }, throws<NotFound>())
+        }, throws(has(UpstreamRequestFailed::status, equalTo(NOT_FOUND))))
         assertThat(ClientFilters.HandleUpstreamRequestFailed().then { Response(NOT_FOUND) }(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 
@@ -64,5 +65,5 @@ class HandleUpstreamRequestFailedTest {
             .then { Response(input).body(input.code.toString()) }
     }
 
-    private object CustomUpstreamFailure : UpstreamRequestFailed("foo")
+    private object CustomUpstreamFailure : UpstreamRequestFailed(I_M_A_TEAPOT, "foo")
 }

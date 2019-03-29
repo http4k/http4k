@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.129.0 (uncut)
+- Collapsed `UpstreamRequestFailed` exceptions to contain the status.
+
 ### v3.128.0
 - Added base64 to the supported mappings for Query/Headers etc...
 - Approver does not write actual output if there is none to write and there is no approved content
