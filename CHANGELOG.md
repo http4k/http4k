@@ -2,7 +2,7 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
-### v3.129.0 (uncut)
+### v3.129.0
 - (Slight) Break: Collapsed `UpstreamRequestFailed` exceptions to contain the status.
 - Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
 - Upgrade deps.
