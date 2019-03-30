@@ -13,7 +13,7 @@ import org.http4k.lens.Header
 import org.http4k.lens.Lens
 import org.http4k.util.Appendable
 
-sealed class HttpMessageMeta<out T : HttpMessage>(val message: T, val definitionId: String? = null)
+open class HttpMessageMeta<out T : HttpMessage>(val message: T, val definitionId: String? = null)
 class RequestMeta(request: Request, definitionId: String? = null) : HttpMessageMeta<Request>(request, definitionId)
 class ResponseMeta(val description: String, response: Response, definitionId: String? = null) : HttpMessageMeta<Response>(response, definitionId)
 
