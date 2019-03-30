@@ -112,7 +112,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
 
     }
 
-    private fun render(responses: List<ResponseMeta>) = json {
+    private fun render(responses: List<HttpMessageMeta<Response>>) = json {
         responses.fold(FieldsAndDefinitions<NODE>()) { memo, meta ->
             val (node, definitions) = meta.asSchema()
             val newField = meta.message.status.code.toString() to obj(

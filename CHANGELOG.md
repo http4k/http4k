@@ -2,6 +2,9 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.130.0
+- Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
+
 ### v3.129.0
 - (Slight) Break: Collapsed `UpstreamRequestFailed` exceptions to contain the status, and thus removing non-special 
 cases like `BadRequest` and `BadGateway`. This makes them much easier to use in practice as users have access 
