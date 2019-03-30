@@ -14,16 +14,16 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
 
-class ContractRoute internal constructor(internal val method: Method,
-                                         internal val spec: ContractRouteSpec,
-                                         internal val meta: RouteMeta,
+class ContractRoute internal constructor(val method: Method,
+                                         val spec: ContractRouteSpec,
+                                         val meta: RouteMeta,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) {
 
-    internal val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
+    val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 
-    internal val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
+    val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
-    internal val tags = meta.tags.toSet().sortedBy { it.name }
+    val tags = meta.tags.toSet().sortedBy { it.name }
 
     fun newRequest(baseUri: Uri) = Request(method, "").uri(baseUri.path(spec.describe(Root)))
 
@@ -46,7 +46,7 @@ class ContractRoute internal constructor(internal val method: Method,
             } else null
     }
 
-    internal fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
+    fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }
