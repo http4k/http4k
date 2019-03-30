@@ -77,7 +77,10 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
         requestBody = body.first
-        request = RequestMeta(Request(GET, "").with(body.first of body.second), definitionId)
+        with(Request(GET, "").with(body.first of body.second)) {
+            consumes += Header.CONTENT_TYPE(this)?.let { listOf(it) } ?: emptyList()
+            request = RequestMeta(this, definitionId)
+        }
     }
 
     /**
@@ -86,6 +89,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
         requestBody = bodyLens
+        consumes += bodyLens.contentType
     }
 }
 
