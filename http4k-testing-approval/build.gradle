@@ -5,7 +5,7 @@ dependencies {
     provided project(":http4k-core")
     provided Libs.junit_jupiter_api
     provided Libs.hamkrest
-    compile 'com.github.javadev:underscore:1.42'
+    compile Libs.underscore
 
     testCompile project(":http4k-testing-hamkrest")
     testCompile Config.TestDependencies

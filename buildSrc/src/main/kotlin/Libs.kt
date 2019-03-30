@@ -16,6 +16,10 @@ object Libs {
             "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
 
     /**
+     * [underscore website](https://github.com/javadev/underscore-java) */
+    const val underscore: String = "com.github.javadev:underscore:" + Versions.underscore
+
+    /**
      * [handlebars website](https://github.com/jknack/handlebars.java) */
     const val handlebars: String = "com.github.jknack:handlebars:" + Versions.handlebars
 

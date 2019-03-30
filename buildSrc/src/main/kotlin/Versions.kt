@@ -9,6 +9,8 @@ object Versions {
 
     const val jackson_module_kotlin: String = "2.9.8"
 
+    const val underscore: String = "1.42"
+
     const val handlebars: String = "4.1.2"
 
     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.2"
@@ -41,7 +43,7 @@ object Versions {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.0"
+    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.2"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.6.0"
 
@@ -55,7 +57,7 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val httpclient: String = "4.5.7"
+    const val httpclient: String = "4.5.8"
 
     const val httpcore: String = "4.4.11"
 
@@ -95,9 +97,9 @@ object Versions {
     object Gradle {
         const val runningVersion: String = "5.0"
 
-        const val currentVersion: String = "5.3"
+        const val currentVersion: String = "5.3.1"
 
-        const val nightlyVersion: String = "5.4-20190324000026+0000"
+        const val nightlyVersion: String = "5.5-20190330000116+0000"
 
         const val releaseCandidate: String = ""
     }
