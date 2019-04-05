@@ -33,6 +33,16 @@ class MultipartFormFieldTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = MultipartFormField.required("world")
+        assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
+
+        val multi = MultipartFormField.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
+            equalTo(form + ("world" to "value3") + ("world" to "value4")))
+    }
+
+    @Test
     fun `invalid value`() {
         val requiredFormField = MultipartFormField.map(String::toInt).required("hello")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))

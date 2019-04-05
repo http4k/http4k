@@ -109,6 +109,20 @@ class CookieTest {
     }
 
     @Test
+    fun `cookies can be removed from the request`() {
+        val request = Request(Method.GET, "")
+            .header("Cookie", "other-cookie=\"other-value\"")
+            .header("Cookie", "a-cookie=\"a-value\"")
+            .header("Other-Header", "other-value")
+            .removeCookie("a-cookie")
+
+        assertThat(request.headers, equalTo(listOf(
+            "Other-Header" to "other-value",
+            "Cookie" to "other-cookie=\"other-value\""
+        ) as Parameters))
+    }
+
+    @Test
     fun `cookies can be replaced in the response`() {
         val cookie = Cookie("my-cookie", "my value")
         val replacement = Cookie("my-cookie", "my second value")

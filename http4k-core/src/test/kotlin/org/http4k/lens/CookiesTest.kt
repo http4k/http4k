@@ -41,6 +41,18 @@ class CookiesTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = Cookies.required("world")
+        val target = single(Cookie("world", "value1"), request)
+        val actual = single(Cookie("world", "value2"), target)
+        assertThat(actual, equalTo(request.cookie(Cookie("world", "value2"))))
+
+        val multi = Cookies.multi.required("world")
+        assertThat(multi(listOf(Cookie("world", "value3"), Cookie("world", "value4")), multi(listOf(Cookie("world", "value1"), Cookie("world", "value2")), request)),
+            equalTo(request.cookie(Cookie("world", "value3")).cookie(Cookie("world", "value4"))))
+    }
+
+    @Test
     fun `invalid value`() {
         val asInt = Cookies.map { it.value.toInt() }
 

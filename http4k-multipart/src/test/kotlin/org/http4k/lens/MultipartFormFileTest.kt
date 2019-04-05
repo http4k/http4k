@@ -39,6 +39,16 @@ class MultipartFormFileTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = MultipartFormFile.required("world")
+        assertThat(single(file2(), single(file1(), MultipartForm())), equalTo(MultipartForm() + ("world" to file2())))
+
+        val multi = MultipartFormFile.multi.required("world")
+        assertThat(multi(listOf(file2(), file2()), multi(listOf(file1(), file1()), MultipartForm())),
+            equalTo(MultipartForm() + ("world" to file2()) + ("world" to file2())))
+    }
+
+    @Test
     fun `invalid value`() {
         val requiredFormFile = MultipartFormFile.map(Any::toString).map(String::toInt).required("hello")
         assertThat({ requiredFormFile(form()) }, throws(lensFailureWith<MultipartForm>(Invalid(requiredFormFile.meta), overallType = Failure.Type.Invalid)))

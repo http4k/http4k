@@ -127,6 +127,8 @@ interface Request : HttpMessage {
 
     fun queries(name: String): List<String?>
 
+    fun removeQuery(name: String): Request
+
     override fun header(name: String, value: String?): Request
 
     override fun headers(headers: Headers): Request
@@ -169,6 +171,8 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
+
+    override fun removeQuery(name: String) = copy(uri = uri.removeQuery(name))
 
     override fun body(body: Body) = copy(body = body)
 

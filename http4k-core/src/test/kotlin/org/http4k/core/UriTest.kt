@@ -76,6 +76,15 @@ class UriTest {
     }
 
     @Test
+    fun can_remove_parameter() {
+        assertThat(Uri.of(value = "http://ignore")
+            .query("a", "b")
+            .query("c", "d")
+            .query("a", "c")
+            .removeQuery("a").toString(), equalTo("http://ignore?c=d"))
+    }
+
+    @Test
     fun parameters_can_be_defined_in_value() {
         assertThat(Uri.of("http://www.google.com?a=b"), equalTo(Uri.of("http://www.google.com").query("a", "b")))
     }

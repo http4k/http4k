@@ -9,7 +9,7 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.int
 import java.io.File
 import java.io.Reader
-import java.util.*
+import java.util.Properties
 
 
 /**
@@ -22,6 +22,7 @@ interface Environment {
     operator fun <T> get(key: Lens<Environment, T>): T
 
     operator fun get(key: String): String?
+    operator fun minus(key: String): Environment
 
     operator fun set(key: String, value: String): Environment
     /**
@@ -75,12 +76,14 @@ internal class OverridingEnvironment(
     override fun <T> get(key: Lens<Environment, T>): T = environment[key] ?: fallback[key]
     override fun get(key: String): String? = environment[key] ?: fallback[key]
     override fun set(key: String, value: String): Environment = environment.set(key, value)
+    override fun minus(key: String): Environment = OverridingEnvironment(environment - key, fallback - key)
 }
 
 internal class MapEnvironment internal constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key] ?: contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
+    override fun minus(key: String): Environment = MapEnvironment(contents - key, separator)
 }
 
 /**
@@ -91,7 +94,7 @@ internal class MapEnvironment internal constructor(private val contents: Map<Str
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
     LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
     LensSet { name, values, target ->
-        values.fold(target) { acc, next ->
+        values.fold(target - name) { acc, next ->
             val existing = acc[name]?.let { listOf(it) } ?: emptyList()
             acc.set(name, (existing + next).joinToString(target.separator))
         }

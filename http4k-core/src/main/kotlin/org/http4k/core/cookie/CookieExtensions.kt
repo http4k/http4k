@@ -8,6 +8,9 @@ import java.time.ZoneOffset
 
 fun Response.cookie(cookie: Cookie): Response = header("Set-Cookie", cookie.fullCookieString())
 
+fun Request.removeCookie(name: String) =
+    cookies().filterNot { it.name == name }.fold(removeHeader("Cookie")) { acc, c -> acc.cookie(c) }
+
 fun Response.removeCookie(name: String): Response {
     val oldCookies = headerValues("Set-Cookie")
     val next = removeHeader("Set-Cookie")

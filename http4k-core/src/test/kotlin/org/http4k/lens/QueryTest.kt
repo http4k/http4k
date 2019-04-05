@@ -39,6 +39,16 @@ class QueryTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = Query.required("world")
+        assertThat(single("value2", single("value1", request)), equalTo(request.query("world", "value2")))
+
+        val multi = Query.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.query("world", "value3").query("world", "value4")))
+    }
+
+    @Test
     fun `invalid value`() {
         val requiredQuery = Query.map(String::toInt).required("hello")
         assertThat({ requiredQuery(request) }, throws(lensFailureWith<Request>(Invalid(requiredQuery.meta), overallType = Failure.Type.Invalid)))

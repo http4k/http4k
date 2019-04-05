@@ -2,6 +2,13 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.131.0
+- (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
+appending. This leads to a more consistent behaviour. In order to be able to set multiple values on an object 
+using a lense, use the `multi` form instead - eg. `Header.required("foo")` -> `Header.multi.required("foo")`. We 
+envisage the impact of this change is limited as it's only Queries that generally can have multiple possible 
+values, and in the vast majority of cases a replace rather than append is expected.
+
 ### v3.130.0
 - Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
 

@@ -33,6 +33,16 @@ class FormFieldTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = FormField.required("world")
+        assertThat(single("value2", single("value1", form)), equalTo(form + ("world" to "value2")))
+
+        val multi = FormField.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), form)),
+            equalTo(form + ("world" to "value3") + ("world" to "value4")))
+    }
+
+    @Test
     fun `invalid value`() {
         val requiredFormField = FormField.map(String::toInt).required("hello")
         assertThat({ requiredFormField(form) }, throws(lensFailureWith<WebForm>(Invalid(requiredFormField.meta), overallType = Failure.Type.Invalid)))

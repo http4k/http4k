@@ -45,6 +45,18 @@ class EnvironmentKeyTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = EnvironmentKey.int().required("value")
+
+        val original = env.with(HEALTH_PORT of 81)
+        assertThat(single(single(2, single(1, original))), equalTo(2))
+
+        val multi = EnvironmentKey.int().multi.required("value")
+        assertThat(multi(multi(listOf(3, 4), multi(listOf(1, 2), original))),
+            equalTo(listOf(3, 4)))
+    }
+
+    @Test
     fun `can get ports from env`() {
         val withPorts = env.with(SERVICE_PORT of 80, HEALTH_PORT of 81)
         assertThat(SERVICE_PORT(withPorts), equalTo(80))

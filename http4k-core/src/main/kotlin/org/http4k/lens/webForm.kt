@@ -11,12 +11,14 @@ import java.net.URLDecoder.decode
 object FormField : BiDiLensSpec<WebForm, String>("formData",
     StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-    LensSet { name, values, target -> values.fold(target) { m, next -> m.plus(name to next) } }
+    LensSet { name, values, target -> values.fold(target - name) { m, next -> m + (name to next) } }
 )
 
 data class WebForm constructor(val fields: Map<String, List<String>> = emptyMap(), val errors: List<Failure> = emptyList()) {
     operator fun plus(kv: Pair<String, String>): WebForm =
-        copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+
+    operator fun minus(name: String): WebForm = copy(fields = fields.filterKeys { it != name })
 }
 
 fun Body.Companion.webForm(validator: Validator, vararg formFields: Lens<WebForm, *>): BiDiBodyLensSpec<WebForm> =

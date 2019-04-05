@@ -31,6 +31,16 @@ class HeaderTest {
     }
 
     @Test
+    fun `value replaced`() {
+        val single = Header.required("world")
+        assertThat(single("value2", single("value1", request)), equalTo(request.header("world", "value2")))
+
+        val multi = Header.multi.required("world")
+        assertThat(multi(listOf("value3", "value4"), multi(listOf("value1", "value2"), request)),
+            equalTo(request.header("world", "value3").header("world", "value4")))
+    }
+
+    @Test
     fun `value missing`() {
         assertThat(Header.optional("world")(request), absent())
         val requiredHeader = Header.required("world")
