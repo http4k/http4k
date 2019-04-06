@@ -21,7 +21,7 @@ object By {
         override fun findElements(context: SearchContext) = when (context) {
             is JSoupElementFinder -> context.findElementsByCssQuery(cssSelector)
             else -> throw UnsupportedOperationException(
-                    "This By implementation only supports the http4k JSoupElementFinder SearchContext")
+                "This By implementation only supports the http4k JSoupElementFinder SearchContext")
         }
     }
 }

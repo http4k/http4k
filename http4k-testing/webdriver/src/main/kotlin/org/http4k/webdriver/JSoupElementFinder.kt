@@ -6,9 +6,9 @@ import org.openqa.selenium.SearchContext
 import org.openqa.selenium.WebElement
 
 internal class JSoupElementFinder(
-        private val navigate: Navigate,
-        private val getURL: GetURL,
-        private val element: Element
+    private val navigate: Navigate,
+    private val getURL: GetURL,
+    private val element: Element
 ) : SearchContext {
     internal fun findElementsByCssQuery(query: String) = element.select(query).map { JSoupWebElement(navigate, getURL, it) }
 
