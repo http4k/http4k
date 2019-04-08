@@ -12,10 +12,13 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.toHttpHandler
@@ -50,6 +53,23 @@ class ResponseFiltersTest {
             assertThat(req, equalTo(request))
             assertThat(resp, equalTo(response))
             assertThat(duration, equalTo(ofSeconds(1)))
+        }.then { response }(request)
+
+        assertTrue(called)
+    }
+
+    @Test
+    fun `prioritises routed request over routed response when reporting a transaction`() {
+        var called = false
+        val request = RoutedRequest(Request(GET, ""), UriTemplate.from("foo"))
+        val response = RoutedResponse(Response(OK), UriTemplate.from("bar"))
+
+        ReportHttpTransaction(TickingClock) { tx ->
+            called = true
+            assertThat(tx.request, equalTo(request as Request))
+            assertThat(tx.response, equalTo(response as Response))
+            assertThat(tx.routingGroup, equalTo("foo"))
+            assertThat(tx.duration, equalTo(ofSeconds(1)))
         }.then { response }(request)
 
         assertTrue(called)

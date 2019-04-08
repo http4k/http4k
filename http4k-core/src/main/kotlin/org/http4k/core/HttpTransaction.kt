@@ -6,8 +6,8 @@ import java.time.Duration
 
 data class HttpTransaction(val request: Request, val response: Response, val duration: Duration, val labels: Map<String, String> =
     when {
-        response is RoutedResponse -> mapOf(ROUTING_GROUP_LABEL to response.xUriTemplate.toString())
         request is RoutedRequest -> mapOf(ROUTING_GROUP_LABEL to request.xUriTemplate.toString())
+        response is RoutedResponse -> mapOf(ROUTING_GROUP_LABEL to response.xUriTemplate.toString())
         else -> emptyMap()
     }) {
     fun label(name: String, value: String) = copy(labels = labels + (name to value))
