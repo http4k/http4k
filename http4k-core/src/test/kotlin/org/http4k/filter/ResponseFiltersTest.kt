@@ -59,7 +59,7 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `prioritises routed request over routed response when reporting a transaction`() {
+    fun `prioritises routed response when reporting a transaction`() {
         var called = false
         val request = RoutedRequest(Request(GET, ""), UriTemplate.from("foo"))
         val response = RoutedResponse(Response(OK), UriTemplate.from("bar"))
@@ -68,7 +68,7 @@ class ResponseFiltersTest {
             called = true
             assertThat(tx.request, equalTo(request as Request))
             assertThat(tx.response, equalTo(response as Response))
-            assertThat(tx.routingGroup, equalTo("foo"))
+            assertThat(tx.routingGroup, equalTo("bar"))
             assertThat(tx.duration, equalTo(ofSeconds(1)))
         }.then { response }(request)
 
