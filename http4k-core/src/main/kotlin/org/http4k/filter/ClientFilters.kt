@@ -141,4 +141,15 @@ object ClientFilters {
         operator fun invoke(): Filter = RequestFilters.GZip().then(ResponseFilters.GunZip())
     }
 
+    /**
+     * This Filter is used to clean the Request and Response when proxying directly to another system. The purpose
+     * of this is to remove any routing metadata that we may have attached to it before sending it onwards.
+     */
+    object CleanProxy {
+        operator fun invoke() = Filter { next ->
+            {
+                next(it.run { Request(method, uri).body(body).headers(headers) }).run { Response(status).body(body).headers(headers) }
+            }
+        }
+    }
 }

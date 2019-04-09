@@ -62,7 +62,7 @@ open class ConfigurableJackson(private val mapper: ObjectMapper) : JsonLibAutoMa
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
 
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
-    override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.convertValue(input.asJsonObject(), target.java)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
     override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()

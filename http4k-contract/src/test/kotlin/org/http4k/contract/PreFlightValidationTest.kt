@@ -9,7 +9,7 @@ import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.lens.Header
 import org.http4k.lens.Query
 import org.http4k.lens.string
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class PreFlightValidationTest {
 

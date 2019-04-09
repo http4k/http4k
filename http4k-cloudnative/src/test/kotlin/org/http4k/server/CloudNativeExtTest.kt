@@ -6,7 +6,7 @@ import org.http4k.cloudnative.env.Port
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class CloudNativeExtTest {
 

@@ -5,11 +5,10 @@ import org.http4k.core.Request
 import org.http4k.core.body.form
 import org.http4k.core.getFirst
 import org.http4k.core.toParametersMap
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 
 fun main() {
-
     val request = Request(Method.GET, "/").form("name", "rita").form("age", "55")
 
     // reparses body every invocation

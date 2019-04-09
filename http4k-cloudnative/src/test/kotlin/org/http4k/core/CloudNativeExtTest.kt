@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.cloudnative.env.Authority
 import org.http4k.cloudnative.env.Host
 import org.http4k.cloudnative.env.Port
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class CloudNativeExtTest {
 

@@ -3,7 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
 ### v3.132.0
-- Slight fix to `ReportHttpTransaction` so it prioritises taking the routingGroup from the request rather than the response.
+- Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
+- Added Timetam
 
 ### v3.131.0
 - (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 

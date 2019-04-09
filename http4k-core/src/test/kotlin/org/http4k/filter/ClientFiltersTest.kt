@@ -3,8 +3,11 @@ package org.http4k.filter
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import org.http4k.core.Body
+import org.http4k.core.MemoryRequest
+import org.http4k.core.MemoryResponse
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -13,13 +16,17 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.routing.RoutedRequest
+import org.http4k.routing.RoutedResponse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import java.util.concurrent.atomic.AtomicReference
 
 class ClientFiltersTest {
     val server = { request: Request ->
@@ -172,5 +179,25 @@ class ClientFiltersTest {
         }
 
         assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
+    }
+
+    @Test
+    fun `clean proxy cleans request and response by reconstructing it on the way in and out`() {
+
+        val captured = AtomicReference<Request>()
+
+        val req = Request(GET, "")
+
+        val resp = Response(OK)
+
+        val app = ClientFilters.CleanProxy().then { r: Request ->
+            captured.set(r)
+            RoutedResponse(resp, UriTemplate.from("foo"))
+        }
+
+        val output = app(RoutedRequest(req, UriTemplate.from("foo")))
+
+        assertThat(captured.get(), equalTo(req).and(isA<MemoryRequest>()))
+        assertThat(output, equalTo(resp).and(isA<MemoryResponse>()))
     }
 }

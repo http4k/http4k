@@ -2,7 +2,6 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -138,7 +137,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
         assertThat(json.asJsonString(StringHolder("hello")), equalTo("""{"value":"hello"}"""))
 
-        assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws(isA<IllegalArgumentException>()))
+        assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws<Exception>())
     }
 
     abstract fun customJson(): AutoMarshallingJson
