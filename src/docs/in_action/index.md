@@ -12,8 +12,14 @@ Each project is tagged with the http4k features it demonstrates:
 
 ### ["Hello World"](https://start.http4k.org)
 <span class="pill">CD pipeline</span>
-### [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
-<span class="pill">Templates</span> <span class="pill">Testing</span> <span class="pill">JSON / Lenses</span> <span class="pill">CD pipeline</span> <span class="pill">OpenApi</span> <span class="pill">Static resources</span>
+### [TDD'd example application](https://github.com/http4k/http4k-by-example)
+<span class="pill">Templates</span> 
+<span class="pill">Testing</span> 
+<span class="pill">JSON / Lenses</span> 
+<span class="pill">CD pipeline</span> 
+<span class="pill">Approval Testing</span> 
+<span class="pill">OpenApi</span> 
+<span class="pill">Static resources</span>
 ### [Dropbox clone in 70 lines of Kotlin](https://github.com/daviddenton/http4kbox)
 <span class="pill">Templates</span> <span class="pill">Testing</span> <span class="pill">Http Client</span> <span class="pill">Multipart</span> <span class="pill">AWS</span> <span class="pill">CD pipeline</span> <span class="pill">Serverless</span> <span class="pill">GraalVM</span>
 ### [Simple websocket driven chat-server in 30 lines of Kotlin](https://github.com/daviddenton/http4k-demo-irc)

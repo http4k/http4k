@@ -27,4 +27,4 @@ When launched, OpenApi/Swagger format documentation (including JSON schema model
 For a more extended example, see the following example apps: 
 
 - [Todo backend (typesafe contract version)](https://github.com/http4k/http4k-contract-todo-backend)
-- [TDD'd example application](https://github.com/http4k/http4k-contract-example-app)
+- [TDD'd example application](https://github.com/http4k/http4k-by-example)
