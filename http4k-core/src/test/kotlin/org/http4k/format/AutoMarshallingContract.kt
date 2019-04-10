@@ -140,6 +140,11 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         assertThat({ json.asA("""{"value":"hello"}""", StringHolder::class) }, throws<Exception>())
     }
 
+    @Test
+    fun `convert to inputstream`() {
+        assertThat(j.asInputStream(StringHolder("hello")).reader().readText(), equalTo("""{"value":"hello"}"""))
+    }
+
     abstract fun customJson(): AutoMarshallingJson
 
 }

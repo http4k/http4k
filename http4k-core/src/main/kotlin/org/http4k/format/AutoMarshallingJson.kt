@@ -5,6 +5,7 @@ import org.http4k.lens.BiDiBodyLensSpec
 import org.http4k.lens.BiDiWsMessageLensSpec
 import org.http4k.lens.ContentNegotiation
 import org.http4k.websocket.WsMessage
+import java.io.InputStream
 import kotlin.reflect.KClass
 
 abstract class AutoMarshallingJson {
@@ -14,6 +15,8 @@ abstract class AutoMarshallingJson {
 
     @JvmName("stringAsA")
     fun <T : Any> String.asA(target: KClass<T>): T = asA(this, target)
+
+    fun asInputStream(input: Any): InputStream = asJsonString(input).byteInputStream()
 }
 
 abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), Json<NODE> {
