@@ -43,12 +43,12 @@ fun ServerFilters.HandleUpstreamRequestFailed(
  * 2. a function to format the exception message from the response.
  */
 fun ClientFilters.HandleUpstreamRequestFailed(
-    statusIsAcceptable: Response.() -> Boolean = { status.successful },
+    responseWasSuccessful: Response.() -> Boolean = { status.successful },
     responseToMessage: Response.() -> String = Response::bodyString
 ) = Filter { next ->
     {
         next(it).apply {
-            if (!statusIsAcceptable())
+            if (!responseWasSuccessful())
                 when (status) {
                     NOT_FOUND -> throw NotFound(responseToMessage())
                     CLIENT_TIMEOUT -> throw ClientTimeout(responseToMessage())
