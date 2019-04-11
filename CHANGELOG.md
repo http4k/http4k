@@ -1,10 +1,12 @@
 <h2 class="github">Changelog</h2>
 
-This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
+This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
+rationale when appropriate:
 
 ### v3.133.0
-- `HandleUpstreamRequestFailed` client filter now takes a function instead of a boolean. This allows for more fine 
-grained custom control of which Responses are acceptable.
+- `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
+allows for more fine grained custom control of which Responses are acceptable.
+- Upgrade Kotlin to 1.3.30
 
 ### v3.132.0
 - Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
@@ -82,8 +84,10 @@ and brings the view lens construction into line with the rest of the extension f
 - Added new templating module `http4k-templates-freemarker`. H/T @amcghie for the PR implementing this
 - `http4k-contract` has a new DSL for construction of the contract which replaces the old one (now 
 deprecated). This is consistent with the `meta` DSL used to construct individual contract routes 
-and avoids repetition of the old API. We attempted to implement the standard replace-with deprecation, but IntelliJ didn't like it (too complex maybe), so we've hard coded the warning instead which code which should work.
-- Added `PreFlightExtraction` to contract module, which adds the ability to disable body-checking for contract routes. This will allow refining of routes or entire contracts to be more efficient.
+and avoids repetition of the old API. We attempted to implement the standard replace-with deprecation, but IntelliJ 
+didn't like it (too complex maybe), so we've hard coded the warning instead which code which should work.
+- Added `PreFlightExtraction` to contract module, which adds the ability to disable body-checking for contract routes. 
+This will allow refining of routes or entire contracts to be more efficient.
 - Upgrade deps.
 
 ### v3.115.1
@@ -118,13 +122,15 @@ that field, but we don't blow up silently (which was the previous behaviour). H/
 
 ### v3.112.0
 - Add support for prohibiting String unmarshalling in JSON auto-marshalling configuration.
-- HTTP Contracts now use the underlying `ContractRenderer` to produce the BadRequest and NotFound responses. Made `OpenAPI` open so that these responses can be customised.
+- HTTP Contracts now use the underlying `ContractRenderer` to produce the BadRequest and NotFound responses. Made `OpenAPI` 
+open so that these responses can be customised.
 
 ### v3.111.0
 - Add support for JSON views in `Jackson` module. H/T @xhanin for the donkey work.
 
 ### v3.110.0
-- Breaking: slight rearrangement of RouteMeta `receiving/returning` methods to provide consistency when defining route contracts.
+- Breaking: slight rearrangement of RouteMeta `receiving/returning` methods to provide consistency when defining route 
+contracts.
 
 ### v3.109.0
 - Moved the set of predefined String `BiDiMapping` instances to their own class. Bulked out the 

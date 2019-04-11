@@ -73,7 +73,7 @@ object Versions {
 
     const val dokka_gradle_plugin: String = "0.9.18"
 
-    const val org_jetbrains_kotlin: String = "1.3.21"
+    const val org_jetbrains_kotlin: String = "1.3.30"
 
     const val json: String = "20180813"
 
