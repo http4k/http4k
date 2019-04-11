@@ -9,7 +9,7 @@ object Versions {
 
     const val jackson_module_kotlin: String = "2.9.8"
 
-    const val underscore: String = "1.42"
+    const val underscore: String = "1.43"
 
     const val handlebars: String = "4.1.2"
 
@@ -23,21 +23,19 @@ object Versions {
 
     const val com_squareup_moshi: String = "1.8.0"
 
-    const val okhttp: String = "3.14.0"
+    const val okhttp: String = "3.14.1"
 
-    const val rerunner_jupiter: String = "1.1.1"
-
-    const val io_github_resilience4j: String = "0.13.2"
+    const val io_github_resilience4j: String = "0.14.1"
 
     const val ktor_server_cio: String = "1.1.3"
 
-    const val micrometer_core: String = "1.1.3"
+    const val micrometer_core: String = "1.1.4"
 
     const val netty_codec_http2: String = "4.1.34.Final"
 
     const val pebble: String = "3.0.8"
 
-    const val io_undertow: String = "2.0.19.Final"
+    const val io_undertow: String = "2.0.20.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -45,15 +43,15 @@ object Versions {
 
     const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.2"
 
-    const val net_saliman_cobertura_gradle_plugin: String = "2.6.0"
+    const val net_saliman_cobertura_gradle_plugin: String = "2.6.1"
 
-    const val gradle_cobertura_plugin: String = "2.6.0"
+    const val gradle_cobertura_plugin: String = "2.6.1"
 
     const val argo: String = "5.5"
 
     const val cobertura: String = "2.1.1"
 
-    const val commons_pool2: String = "2.6.1"
+    const val commons_pool2: String = "2.6.2"
 
     const val httpasyncclient: String = "4.1.4"
 
@@ -79,7 +77,7 @@ object Versions {
 
     const val jsoup: String = "1.11.3"
 
-    const val org_junit_jupiter: String = "5.4.1"
+    const val org_junit_jupiter: String = "5.4.2"
 
     const val coveralls_gradle_plugin: String = "2.8.2"
 
@@ -99,8 +97,8 @@ object Versions {
 
         const val currentVersion: String = "5.3.1"
 
-        const val nightlyVersion: String = "5.5-20190330000116+0000"
+        const val nightlyVersion: String = "5.5-20190410000104+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.4-rc-1"
     }
 }

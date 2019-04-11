@@ -26,6 +26,11 @@ import java.util.UUID
 class PathTest {
 
     @Test
+    fun `fixed value cannot contain slash characters`() {
+        assertThat({ Path.fixed("hel/lo") }, throws<IllegalArgumentException>())
+    }
+
+    @Test
     fun `fixed value present`() {
         assertThat(Path.fixed("hello")("hello"), equalTo("hello"))
     }

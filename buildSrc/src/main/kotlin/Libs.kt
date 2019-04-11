@@ -51,11 +51,6 @@ object Libs {
     const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
 
     /**
-     * [rerunner-jupiter website](https://github.com/artsok/rerunner-jupiter) */
-    const val rerunner_jupiter: String =
-            "io.github.artsok:rerunner-jupiter:" + Versions.rerunner_jupiter
-
-    /**
      * [resilience4j-bulkhead website](https://github.com/resilience4j/resilience4j) */
     const val resilience4j_bulkhead: String =
             "io.github.resilience4j:resilience4j-bulkhead:" + Versions.io_github_resilience4j

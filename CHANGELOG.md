@@ -6,7 +6,8 @@ rationale when appropriate:
 ### v3.133.0
 - `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
 allows for more fine grained custom control of which Responses are acceptable.
-- Upgrade Kotlin to 1.3.30
+- Upgrade deps, including Kotlin to `1.3.30`.
+- Fix #221 - Contract path fixed segments cannot contain slash characters.
 
 ### v3.132.0
 - Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.

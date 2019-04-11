@@ -82,6 +82,7 @@ object Path : BiDiPathLensSpec<String>(StringParam,
     LensSet { name, values, target -> target.uri(target.uri.path(target.uri.path.replaceFirst("{$name}", values.first().toPathEncoded()))) }) {
 
     fun fixed(name: String): PathLens<String> {
+        if (name.contains('/')) throw IllegalArgumentException("""Fixed path segments cannot contain /. Use the "a / b" form.""")
         val getLens = get(name)
         val meta = Meta(true, "path", StringParam, name)
         return object : PathLens<String>(meta,
