@@ -38,17 +38,19 @@ fun ServerFilters.HandleUpstreamRequestFailed(
 
 /**
  * Convert upstream errors from upstream into exceptions which can be handled at a higher level.
- * Optionally pass in a function to format the exception message from the response.
+ * Optionally pass in:
+ * 1. a function to determine which responses are successful - defaults to status 200.299
+ * 2. a function to format the exception message from the response.
  */
 fun ClientFilters.HandleUpstreamRequestFailed(
-    notFoundIsAcceptable: Boolean = true,
+    statusIsAcceptable: Response.() -> Boolean = { status.successful },
     responseToMessage: Response.() -> String = Response::bodyString
 ) = Filter { next ->
     {
         next(it).apply {
-            if (!status.successful)
+            if (!statusIsAcceptable())
                 when (status) {
-                    NOT_FOUND -> if (!notFoundIsAcceptable) throw NotFound(responseToMessage())
+                    NOT_FOUND -> throw NotFound(responseToMessage())
                     CLIENT_TIMEOUT -> throw ClientTimeout(responseToMessage())
                     GATEWAY_TIMEOUT -> throw GatewayTimeout(responseToMessage())
                     else -> throw UpstreamRequestFailed(status, responseToMessage())

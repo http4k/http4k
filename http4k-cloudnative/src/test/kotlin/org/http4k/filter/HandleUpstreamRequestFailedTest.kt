@@ -41,15 +41,13 @@ class HandleUpstreamRequestFailedTest {
         assertServerResponseForClientStatus(I_M_A_TEAPOT, hasStatus(SERVICE_UNAVAILABLE))
 
         assertServerResponseForClientStatus(NOT_FOUND, hasStatus(NOT_FOUND).and(hasBody("404")))
-        assertServerResponseForClientStatus(NOT_FOUND, hasStatus(NOT_FOUND), false)
     }
 
     @Test
-    fun `client throws or passes not found`() {
+    fun `client throws when filter fails`() {
         assertThat({
-            ClientFilters.HandleUpstreamRequestFailed(false).then { Response(NOT_FOUND) }(Request(GET, ""))
+            ClientFilters.HandleUpstreamRequestFailed({ false }).then { Response(NOT_FOUND) }(Request(GET, ""))
         }, throws(has(UpstreamRequestFailed::status, equalTo(NOT_FOUND))))
-        assertThat(ClientFilters.HandleUpstreamRequestFailed().then { Response(NOT_FOUND) }(Request(GET, "")), hasStatus(NOT_FOUND))
     }
 
     @Test
@@ -57,9 +55,9 @@ class HandleUpstreamRequestFailedTest {
         assertThat(ServerFilters.HandleUpstreamRequestFailed().then { throw CustomUpstreamFailure }(Request(GET, "")), hasStatus(SERVICE_UNAVAILABLE).and(hasBody(CustomUpstreamFailure.localizedMessage)))
     }
 
-    private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>, acceptNotFound: Boolean = true) = assertThat(stackWith(acceptNotFound, input)(Request(GET, "")), responseMatcher)
+    private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>) = assertThat(stackWith({ status.successful || status == NOT_FOUND }, input)(Request(GET, "")), responseMatcher)
 
-    private fun stackWith(acceptNotFound: Boolean, input: Status): HttpHandler {
+    private fun stackWith(acceptNotFound: Response.() -> Boolean, input: Status): HttpHandler {
         return ServerFilters.HandleUpstreamRequestFailed()
             .then(ClientFilters.HandleUpstreamRequestFailed(acceptNotFound))
             .then { Response(input).body(input.code.toString()) }

@@ -2,6 +2,10 @@
 
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their rationale when appropriate:
 
+### v3.133.0
+- `HandleUpstreamRequestFailed` client filter now takes a function instead of a boolean. This allows for more fine 
+grained custom control of which Responses are acceptable.
+
 ### v3.132.0
 - Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
 
