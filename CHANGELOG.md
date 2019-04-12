@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
+### v3.134.0 (uncut)
+- Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests.
+
 ### v3.133.0
 - `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
 allows for more fine grained custom control of which Responses are acceptable.

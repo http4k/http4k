@@ -63,8 +63,10 @@ abstract class ContentTypeAwareApprovalTest(
     private val approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
 ) : BaseApprovalTest {
     override fun approverFor(context: ExtensionContext) = object : Approver {
-        override fun <T : HttpMessage> assertApproved(httpMessage: T) =
-            delegate.assertApproved(httpMessage.apply { assertEquals(contentType, CONTENT_TYPE(this)) })
+        override fun <T : HttpMessage> assertApproved(httpMessage: T) {
+            delegate.assertApproved(httpMessage)
+            assertEquals(contentType, CONTENT_TYPE(httpMessage))
+        }
 
         private val delegate = NamedResourceApprover(
             testNamer.nameFor(context.requiredTestClass, context.requiredTestMethod),
