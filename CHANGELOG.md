@@ -3,6 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
+### v3.135.0 (uncut)
+- Added `SnipRequestBody` behaviour to `http4k-testing-chaos` module.
+- (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This 
+will require reimporting the new location into your source if you were using the imports.
+
 ### v3.134.0
 - Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
 it is more important that the content is correct than the content-type (and often errors don't have content type set so you 

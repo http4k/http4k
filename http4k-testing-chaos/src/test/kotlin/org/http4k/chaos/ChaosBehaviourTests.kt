@@ -3,6 +3,7 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.matches
 import com.natpryce.hamkrest.throws
 import org.http4k.chaos.ChaosBehaviours.KillProcess
 import org.http4k.chaos.ChaosBehaviours.Latency
@@ -22,17 +23,19 @@ import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasMethod
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration.ofMillis
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlin.concurrent.thread
+import kotlin.random.Random
 
-private val request = Request(GET, "")
+private val request = Request(GET, "").body("hello")
 private val response = Response(OK).body("hello")
 
 abstract class ChaosBehaviourContract {
@@ -41,7 +44,7 @@ abstract class ChaosBehaviourContract {
 }
 
 class ThrowExceptionBehaviourTest : ChaosBehaviourContract() {
-    val description = "ThrowException RuntimeException foo"
+    private val description = "ThrowException RuntimeException foo"
 
     @Test
     fun `exception throwing behaviour should throw exception`() {
@@ -62,7 +65,7 @@ class ThrowExceptionBehaviourTest : ChaosBehaviourContract() {
 }
 
 class LatencyBehaviourTest : ChaosBehaviourContract() {
-    val description = "Latency (range = PT0.1S to PT0.3S)"
+    private val description = "Latency (range = PT0.1S to PT0.3S)"
 
     @Test
     fun `latency from env`() {
@@ -78,8 +81,8 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
-                description,
-                hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
+            description,
+            hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
     }
 
     @Test
@@ -98,7 +101,7 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
 }
 
 class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
-    val description = "ReturnStatus (404)"
+    private val description = "ReturnStatus (404)"
 
     @Test
     fun `should return response with internal server error status`() {
@@ -112,32 +115,73 @@ class ReturnStatusBehaviourTest : ChaosBehaviourContract() {
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"status","status":404}""",
-                description,
-                hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
+            description,
+            hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
 }
 
 class NoBodyBehaviourTest : ChaosBehaviourContract() {
-    val description = "NoBody"
+    private val description = "SnipBody"
 
     @Test
     fun `should return no body`() {
         val noBody = NoBody()
         assertThat(noBody.toString(), equalTo(description))
 
-        assertThat(noBody.then { response }(request), hasHeader("x-http4k-chaos", "No body").and(hasBody("")))
+        assertThat(noBody.then { response }(request), hasHeader("x-http4k-chaos", "Snip body (0b)").and(hasBody("")))
     }
 
     @Test
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"body"}""",
-                description,
-                hasStatus(OK).and(hasHeader("x-http4k-chaos", "No body")))
+            description,
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", "Snip body (0b)")))
+    }
+}
+
+class SnipBodyBehaviourTest : ChaosBehaviourContract() {
+    private val description = "SnipBody"
+
+    @Test
+    fun `should return snipped body`() {
+        val snipBody = ChaosBehaviours.SnipBody(Random(1)) { 3 }
+        assertThat(snipBody.toString(), equalTo(description))
+
+        assertThat(snipBody.then { response }(request), hasHeader("x-http4k-chaos", "Snip body (1b)").and(hasBody("h")))
+    }
+
+    @Test
+    override fun `deserialises from JSON`() {
+        assertBehaviour("""{"type":"snip"}""",
+            description,
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", matches("""Snip body \(\db\)""".toRegex()))))
+    }
+}
+
+class SnipRequestBodyBehaviourTest : ChaosBehaviourContract() {
+    private val description = "SnipRequestBody"
+
+    @Test
+    fun `should snip request body`() {
+        val snipBody = ChaosBehaviours.SnipRequestBody(Random(1)) { 3 }
+        assertThat(snipBody.toString(), equalTo(description))
+
+        assertThat(snipBody.then {
+            assertThat(it, hasBody("h"))
+            response
+        }(request), equalTo(response))
+    }
+
+    @Test
+    override fun `deserialises from JSON`() {
+        assertBehaviour("""{"type":"sniprequest"}""",
+            description,
+            hasMethod(GET).and(hasHeader("x-http4k-chaos", matches("""Snip request body \(\db\)""".toRegex()))))
     }
 }
 
 class BlockThreadBehaviourTest : ChaosBehaviourContract() {
-    val description = "BlockThread"
+    private val description = "BlockThread"
 
     @Test
     fun `should block thread`() {
@@ -160,7 +204,7 @@ class BlockThreadBehaviourTest : ChaosBehaviourContract() {
 }
 
 class EatMemoryBehaviourTest : ChaosBehaviourContract() {
-    val description = "EatMemory"
+    private val description = "EatMemory"
 
     @Test
     fun `should eat memory`() {
@@ -238,7 +282,7 @@ class VariableBehaviourTest {
         assertThat(variable.toString(), equalTo(("None")))
         assertThat(variable.then { response }(request), equalTo(response))
         variable.current = NoBody()
-        assertThat(variable.toString(), equalTo(("NoBody")))
-        assertThat(variable.then { response }(request), hasHeader("x-http4k-chaos", "No body").and(hasBody("")))
+        assertThat(variable.toString(), equalTo(("SnipBody")))
+        assertThat(variable.then { response }(request), hasHeader("x-http4k-chaos", "Snip body (0b)").and(hasBody("")))
     }
 }

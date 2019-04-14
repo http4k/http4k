@@ -1,4 +1,4 @@
-package org.http4k
+package org.http4k.filter
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -6,7 +6,6 @@ import org.http4k.core.Filter
 import org.http4k.core.MultipartEntity
 import org.http4k.core.body.form
 import org.http4k.core.multipartIterator
-import org.http4k.filter.ServerFilters
 
 /**
  * Process files on upload using the passed consumer, which returns a reference.

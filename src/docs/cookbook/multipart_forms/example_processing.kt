@@ -1,6 +1,5 @@
 package cookbook.multipart_forms
 
-import org.http4k.ProcessFiles
 import org.http4k.client.ApacheClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType
@@ -12,6 +11,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ProcessFiles
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.FormField
 import org.http4k.lens.MultipartForm

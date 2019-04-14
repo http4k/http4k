@@ -1,6 +1,7 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.chaos.*
 import org.http4k.chaos.ChaosBehaviours.BlockThread
 import org.http4k.chaos.ChaosBehaviours.EatMemory
 import org.http4k.chaos.ChaosBehaviours.KillProcess
@@ -8,9 +9,11 @@ import org.http4k.chaos.ChaosBehaviours.Latency
 import org.http4k.chaos.ChaosBehaviours.NoBody
 import org.http4k.chaos.ChaosBehaviours.None
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
+import org.http4k.chaos.ChaosBehaviours.SnipBody
+import org.http4k.chaos.ChaosBehaviours.SnipRequestBody
 import org.http4k.chaos.ChaosBehaviours.StackOverflow
 import org.http4k.chaos.ChaosBehaviours.ThrowException
-import org.http4k.core.Body.Companion.EMPTY
+import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -19,13 +22,14 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.lens.CHAOS
 import org.http4k.lens.Header
+import java.io.InputStream
 import java.lang.Thread.sleep
 import java.time.Duration
 import java.time.Duration.ofMillis
 import java.util.concurrent.ThreadLocalRandom
-
-val Header.CHAOS; get() = Header.required("x-http4k-chaos")
+import kotlin.random.Random
 
 /**
  * Encapsulates the type of bad behaviour to apply to the response.
@@ -45,7 +49,7 @@ object ChaosBehaviours {
         operator fun invoke(min: Duration = ofMillis(100), max: Duration = ofMillis(500)) = object : Behaviour {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 val delay = ThreadLocalRandom.current()
-                        .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
+                    .nextInt(min.toMillis().toInt(), max.toMillis().toInt())
                 sleep(delay.toLong())
                 next(it).with(Header.CHAOS of "Latency (${delay}ms)")
             }
@@ -90,12 +94,44 @@ object ChaosBehaviours {
     }
 
     /**
-     * Strips the body from a response.
+     * Strips the entire body from a response.
      */
     object NoBody {
-        operator fun invoke() = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = { next(it).body(EMPTY).with(Header.CHAOS of "No body") }
-            override fun toString() = "NoBody"
+        operator fun invoke() = SnipBody { 0L }
+    }
+
+    /**
+     * Strips the body from a response to a particular length.
+     */
+    object SnipBody {
+        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                with(next(it)) {
+                    val max = limitFn(body.length ?: 0)
+                    val limit = if (max == 0L) 0L else random.nextLong(max)
+                    body(body.snipTo(limit)).with(Header.CHAOS of "Snip body (${limit}b)")
+                }
+            }
+
+            override fun toString() = "SnipBody"
+        }
+    }
+
+    /**
+     * Strips the body from a request to a particular length.
+     */
+    object SnipRequestBody {
+        operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
+            override fun invoke(next: HttpHandler): HttpHandler = {
+                next(with(it) {
+                    val max = limitFn(body.length ?: 0)
+                    val limit = if (max == 0L) 0L else random.nextLong(max)
+                    println(limit)
+                    body(body.snipTo(limit)).with(Header.CHAOS of "Snip request body (${limit}b)")
+                })
+            }
+
+            override fun toString() = "SnipRequestBody"
         }
     }
 
@@ -182,10 +218,20 @@ internal fun JsonNode.asBehaviour() = when (nonNullable<String>("type")) {
     "throw" -> ThrowException(RuntimeException(nonNullable<String>("message")))
     "status" -> ReturnStatus(Status(nonNullable("status"), "x-http4k-chaos"))
     "body" -> NoBody()
+    "snip" -> SnipBody { it }
+    "sniprequest" -> SnipRequestBody { it }
     "memory" -> EatMemory()
     "kill" -> KillProcess()
     "overflow" -> StackOverflow()
     "block" -> BlockThread()
     "none" -> None()
     else -> throw IllegalArgumentException("unknown behaviour")
+}
+
+private fun Body.snipTo(limit: Long): Body {
+    var left = limit
+    val original = stream
+    return Body(object : InputStream() {
+        override fun read() = if (left-- > 0) original.read() else -1
+    }, limit)
 }

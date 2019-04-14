@@ -21,10 +21,9 @@ import org.http4k.hamkrest.hasUriPath
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.util.*
-import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
 
 typealias Trigger = (req: Request) -> Boolean
 
@@ -72,7 +71,7 @@ object ChaosTriggers {
      * Applies n% of the time, based on result of a Random.
      */
     object PercentageBased {
-        operator fun invoke(injectionFrequency: Int, selector: Random = ThreadLocalRandom.current()) = object : Trigger {
+        operator fun invoke(injectionFrequency: Int, selector: Random = Random) = object : Trigger {
             override fun invoke(request: Request) = selector.nextInt(100) <= injectionFrequency
             override fun toString() = "PercentageBased ($injectionFrequency%)"
         }

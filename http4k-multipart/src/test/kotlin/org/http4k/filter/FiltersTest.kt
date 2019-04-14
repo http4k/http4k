@@ -2,7 +2,6 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.ProcessFiles
 import org.http4k.core.ContentType
 import org.http4k.core.FormFile
 import org.http4k.core.Method

@@ -59,7 +59,7 @@ class WaitTest : ChaosStageContract() {
 
 class TriggeredTest : ChaosStageContract() {
     override val asJson = """{"type":"trigger","trigger":{"type":"always"},"behaviour":{"type":"body"}}"""
-    override val expectedDescription = "Always NoBody"
+    override val expectedDescription = "Always SnipBody"
 }
 
 class RepeatTest : ChaosStageContract() {
