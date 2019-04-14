@@ -58,12 +58,12 @@ object ChaosBehaviours {
          * Defaults to CHAOS_LATENCY_MS_MIN/MAX and a value of 100ms -> 500ms
          */
         fun fromEnv(env: (String) -> String? = System::getenv,
-                    defaultMin: Duration = Duration.ofMillis(100),
-                    defaultMax: Duration = Duration.ofMillis(500),
+                    defaultMin: Duration = ofMillis(100),
+                    defaultMax: Duration = ofMillis(500),
                     minName: String = "CHAOS_LATENCY_MS_MIN",
                     maxName: String = "CHAOS_LATENCY_MS_MAX"
-        ) = Latency(env(minName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMin,
-                env(maxName)?.let { Duration.ofMillis(it.toLong()) } ?: defaultMax)
+        ) = Latency(env(minName)?.let { ofMillis(it.toLong()) } ?: defaultMin,
+            env(maxName)?.let { ofMillis(it.toLong()) } ?: defaultMax)
     }
 
     /**
@@ -118,11 +118,10 @@ object ChaosBehaviours {
      */
     object StackOverflow {
         operator fun invoke() = object : Behaviour {
-            fun overflow(): Unit = overflow()
+            fun overflow(): Nothing = overflow()
 
             override fun invoke(next: HttpHandler): HttpHandler = {
                 overflow()
-                next(it)
             }
 
             override fun toString() = "StackOverflow"
@@ -136,7 +135,7 @@ object ChaosBehaviours {
         operator fun invoke() = object : Behaviour {
             override fun invoke(next: HttpHandler): HttpHandler = {
                 System.exit(1)
-                next(it)
+                throw NotImplementedError()
             }
 
             override fun toString() = "KillProcess"
