@@ -15,11 +15,11 @@ data class MimeTypes private constructor(private val map: Map<String, ContentTyp
         private val standardTypes: MimeTypes by lazy { MimeTypes(loadStandard()) }
 
         private fun loadStandard(): Map<String, ContentType> =
-            MimeTypes::class.java.getResourceAsStream("/META-INF/mime.types").reader().readLines().flatMap {
-                it.split('\t')
+            MimeTypes::class.java.getResourceAsStream("/META-INF/org/http4k/core/mime.types").reader().readLines().flatMap { line ->
+                line.split('\t')
                     .filter { it.trim().isNotBlank() }
                     .run {
-                        if (size != 2) throw RuntimeException("mime.types file is malformed [$it]")
+                        if (size != 2) throw RuntimeException("mime.types file is malformed [$line]")
                         this[1].split(" ").map(String::trim).map { it.toLowerCase() to ContentType(this[0]) }
                     }
             }.toMap()
