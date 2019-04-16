@@ -3,7 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
-### v3.135.0 (uncut)
+### v3.135.0
+- Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
 - Added `SnipRequestBody` behaviour to `http4k-testing-chaos` module.
 - (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This 
 will require reimporting the new location into your source if you were using the imports.
