@@ -18,7 +18,7 @@ class AuthenticationCompleteFilter(
                 val authorizationRequest = requestPersistence.retrieveAuthRequest(request)
                     ?: error("Authorization request could not be found.")
 
-                val code = authorizationCodes.create(authorizationRequest, response)
+                val code = authorizationCodes.create(request, authorizationRequest, response)
 
                 Response(SEE_OTHER)
                     .header("location", authorizationRequest.redirectUri

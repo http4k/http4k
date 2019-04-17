@@ -83,7 +83,7 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 
     // Authorization codes should be associated to a particular user (who can be identified in the Response)
     // so they can be checked in various stages of the authorization flow
-    override fun create(authRequest: AuthRequest, response: Response) =
+    override fun create(request: Request, authRequest: AuthRequest, response: Response) =
         AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS))
         }
