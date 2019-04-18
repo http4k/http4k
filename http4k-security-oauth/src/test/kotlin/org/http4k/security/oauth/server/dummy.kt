@@ -24,9 +24,9 @@ class DummyClientValidator : ClientValidator {
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
 }
 
-class DummyOAuthAuthRequestPersistence : AuthRequestPersistence {
-    override fun storeAuthRequest(authRequest: AuthRequest, response: Response): Response = response
-    override fun retrieveAuthRequest(request: Request): AuthRequest? = request.authorizationRequest()
+class DummyOAuthAuthRequestTracking : AuthRequestTracking {
+    override fun trackAuthRequest(authRequest: AuthRequest, response: Response): Response = response
+    override fun resolveAuthRequest(request: Request): AuthRequest? = request.authorizationRequest()
 }
 
 class HardcodedClientValidator(

@@ -8,14 +8,14 @@ import org.http4k.core.query
 
 class AuthenticationCompleteFilter(
     private val authorizationCodes: AuthorizationCodes,
-    private val requestPersistence: AuthRequestPersistence
+    private val requestTracking: AuthRequestTracking
 ) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
          { request ->
             val response = next(request)
             if (response.status.successful) {
-                val authorizationRequest = requestPersistence.retrieveAuthRequest(request)
+                val authorizationRequest = requestTracking.resolveAuthRequest(request)
                     ?: error("Authorization request could not be found.")
 
                 val code = authorizationCodes.create(request, authorizationRequest, response)

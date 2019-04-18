@@ -17,22 +17,22 @@ import java.time.Clock
  *  - OAuth 2 Security Best Current Practices: https://tools.ietf.org/html/draft-ietf-oauth-security-topics-11
  */
 class OAuthServer(
-    tokenPath: String,
-    authRequestPersistence: AuthRequestPersistence,
-    clientValidator: ClientValidator,
-    authorizationCodes: AuthorizationCodes,
-    accessTokens: AccessTokens,
-    clock: Clock
+        tokenPath: String,
+        authRequestTracking: AuthRequestTracking,
+        clientValidator: ClientValidator,
+        authorizationCodes: AuthorizationCodes,
+        accessTokens: AccessTokens,
+        clock: Clock
 ) {
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock))
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(clientValidator)
-        .then(AuthRequestPersistenceFilter(authRequestPersistence))
+        .then(AuthRequestTrackingFilter(authRequestTracking))
 
     // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestPersistence)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestTracking)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

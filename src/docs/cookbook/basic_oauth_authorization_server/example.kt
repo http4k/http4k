@@ -21,7 +21,7 @@ fun main() {
     fun authorizationServer(): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
-            authRequestPersistence = InsecureCookieBasedAuthRequestPersistence(),
+            authRequestTracking = InsecureCookieBasedAuthRequestTracking(),
             clientValidator = InsecureClientValidator(),
             authorizationCodes = InsecureAuthorizationCodes(),
             accessTokens = InsecureAccessTokens(),

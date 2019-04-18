@@ -27,7 +27,7 @@ class AuthenticationCompleteFilterTest {
 
     val filter = AuthenticationCompleteFilter(
         DummyAuthorizationCodes(authorizationRequest),
-        DummyOAuthAuthRequestPersistence()).then(loginAction)
+        DummyOAuthAuthRequestTracking()).then(loginAction)
 
     @Test
     fun `redirects on successful login`() {

@@ -2,20 +2,12 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import org.http4k.core.Credentials
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.NoOp
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
-import org.http4k.core.Uri
 import org.http4k.core.body.form
-import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.DebuggingFilters
 import org.http4k.hamkrest.hasBody
@@ -87,7 +79,7 @@ class OAuthServerTest {
     private fun customOauthAuthorizationServer(): RoutingHttpHandler {
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
-            authRequestPersistence = DummyOAuthAuthRequestPersistence(),
+            authRequestTracking = DummyOAuthAuthRequestTracking(),
             clientValidator = DummyClientValidator(),
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
@@ -102,11 +94,11 @@ class OAuthServerTest {
     }
 
     private fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
-        val requestPersistence = InsecureCookieBasedAuthRequestPersistence()
+        val requestPersistence = InsecureCookieBasedAuthRequestTracking()
 
         val server = OAuthServer(
             tokenPath = "/oauth2/token",
-            authRequestPersistence = requestPersistence,
+            authRequestTracking = requestPersistence,
             clientValidator = DummyClientValidator(),
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
@@ -118,7 +110,7 @@ class OAuthServerTest {
             "/my-login-page" bind GET to server.authenticationStart.then { Response(OK).body("Please authenticate") },
             "/my-login-page" bind POST to { Response(TEMPORARY_REDIRECT).header("location", "/verify-scope") },
             "/verify-scope" bind GET to {
-                val flow = requestPersistence.retrieveAuthRequest(it) ?: error("flow was not persisted")
+                val flow = requestPersistence.resolveAuthRequest(it) ?: error("flow was not persisted")
                 Response(OK).body("Allow ${flow.client.value} to access ${flow.scopes.joinToString(" and ")}?")
             },
             "/verify-scope" bind POST to server.authenticationComplete.then { Response(OK) }
