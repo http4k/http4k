@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
+### v3.137.0
+- Rename AuthRequestPersistence to AuthRequestTracking
+
 ### v3.136.0
 - Allow the http request to be referenced when generating OAuth authorization codes. H/T @andymoody
 
