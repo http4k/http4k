@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
+### v3.137.1
+- Allow invocation of serverless functions locally. H/T @Charlyzzz
+- Fix #226 - ResourceLoadingHandler not close stream
+
 ### v3.137.0
 - Rename AuthRequestPersistence to AuthRequestTracking
 
