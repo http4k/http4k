@@ -17,7 +17,6 @@ import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsConsumer
-import java.nio.ByteBuffer
 
 internal class ResourceLoadingHandler(private val pathSegments: String,
                                       private val resourceLoader: ResourceLoader,
@@ -31,7 +30,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
             if (p1.method == GET && lookupType != OCTET_STREAM) {
                 Response(OK)
                     .header("Content-Type", lookupType.value)
-                    .body(Body(ByteBuffer.wrap(url.openStream().readBytes())))
+                    .body(Body(url.openStream()))
             } else Response(NOT_FOUND)
         } ?: Response(NOT_FOUND)
     } else Response(NOT_FOUND)
