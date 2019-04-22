@@ -5,13 +5,14 @@ import org.http4k.core.Method.POST
 import org.http4k.core.body.form
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.security.openid.IdTokenContainer
 
 class AccessTokenFetcher(
     private val api: HttpHandler,
     private val callbackUri: Uri,
     private val providerConfig: OAuthProviderConfig
 ) {
-    fun fetch(code: String): AccessTokenContainer? = api(Request(POST, providerConfig.tokenPath)
+    fun fetch(code: String): AccessTokenDetails? = api(Request(POST, providerConfig.tokenPath)
         .with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
         .form("grant_type", "authorization_code")
         .form("redirect_uri", callbackUri.toString())
@@ -21,8 +22,10 @@ class AccessTokenFetcher(
         .let { if (it.status != Status.OK) null else it }
         ?.let {
             if (CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) {
-                accessTokenResponseBody(it).accessToken
+                with(accessTokenResponseBody(it)) {
+                    AccessTokenDetails(AccessTokenContainer(accessToken), idToken?.let(::IdTokenContainer))
+                }
             } else
-                it.bodyString()
-        }?.let(::AccessTokenContainer)
+                AccessTokenDetails(AccessTokenContainer(it.bodyString()))
+        }
 }

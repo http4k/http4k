@@ -19,10 +19,12 @@ class OAuthCallback(
         val crsfInState = state.find { it.first == "csrf" }?.second?.let(::CrossSiteRequestForgeryToken)
         return request.query("code")?.let { code ->
             if (crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(request)) {
-                request.query("id_token")?.let { idTokenConsumer.consume(IdTokenContainer(it)) }
-                accessTokenFetcher.fetch(code)?.let {
+                request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdTokenContainer(it)) }
+                accessTokenFetcher.fetch(code)?.let { tokenDetails ->
+                    tokenDetails.idToken?.also { idTokenConsumer.consumeFromAccessTokenResponse(it) }
+
                     val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT).header("Location", originalUri), it)
+                    oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT).header("Location", originalUri), tokenDetails.accessToken)
                 }
             } else null
         } ?: oAuthPersistence.authFailureResponse()

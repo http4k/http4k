@@ -17,7 +17,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenContainer("some-access-token")))
+        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessTokenContainer("some-access-token"))))
     }
 
 
@@ -28,7 +28,7 @@ internal class AccessTokenFetcherTest {
 
         val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
 
-        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenContainer("some-access-token")))
+        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessTokenContainer("some-access-token"))))
     }
 
     @Test
