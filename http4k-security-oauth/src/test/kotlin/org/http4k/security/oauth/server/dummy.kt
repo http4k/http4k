@@ -4,6 +4,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
+import org.http4k.security.openid.IdTokenConsumer
+import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -13,6 +15,11 @@ open class DummyAuthorizationCodes(private val request: AuthRequest) : Authoriza
             AuthorizationCode("dummy-token-for-" + (response.header("user") ?: "unknown"))
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH)
     override fun destroy(authorizationCode: AuthorizationCode) = Unit
+}
+
+open class DummyIdtokens :IdTokens{
+    override fun create(request: Request, authRequest: AuthRequest, response: Response) =
+        IdTokenContainer("dummy-id-token-for-" + (response.header("user") ?: "unknown"))
 }
 
 class DummyAccessTokens : AccessTokens {
@@ -58,4 +65,11 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     }
 
     fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode)
+}
+
+class InMemoryIdTokenConsumer : IdTokenConsumer {
+    var consumed: IdTokenContainer? = null
+    override fun consume(idToken: IdTokenContainer) {
+        consumed = idToken
+    }
 }

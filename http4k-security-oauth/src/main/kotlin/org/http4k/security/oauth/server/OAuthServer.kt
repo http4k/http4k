@@ -23,7 +23,8 @@ class OAuthServer(
         clientValidator: ClientValidator,
         authorizationCodes: AuthorizationCodes,
         accessTokens: AccessTokens,
-        clock: Clock
+        clock: Clock,
+        idTokens: IdTokens = IdTokens.Unsupported
 ) {
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock))
@@ -33,7 +34,7 @@ class OAuthServer(
         .then(AuthRequestTrackingFilter(authRequestTracking))
 
     // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestTracking)
+    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestTracking, idTokens)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

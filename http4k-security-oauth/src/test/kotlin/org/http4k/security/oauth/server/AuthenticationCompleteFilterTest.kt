@@ -7,7 +7,9 @@ import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
+import org.http4k.security.ResponseType.CodeIdToken
 import org.junit.jupiter.api.Test
 
 class AuthenticationCompleteFilterTest {
@@ -28,7 +30,9 @@ class AuthenticationCompleteFilterTest {
 
     val filter = AuthenticationCompleteFilter(
         DummyAuthorizationCodes(authorizationRequest),
-        DummyOAuthAuthRequestTracking()).then(loginAction)
+        DummyOAuthAuthRequestTracking(),
+        DummyIdtokens()
+    ).then(loginAction)
 
     @Test
     fun `redirects on successful login`() {
@@ -42,6 +46,18 @@ class AuthenticationCompleteFilterTest {
     }
 
     @Test
+    fun `includes id_token if response_type requires it`() {
+        val response = filter(Request(Method.POST, "/login").withAuthorization(authorizationRequest, CodeIdToken))
+
+        assertThat(response, hasStatus(SEE_OTHER)
+            and hasHeader("location",
+            authorizationRequest.redirectUri
+                .query("code", "dummy-token-for-jdoe")
+                .query("id_token", "dummy-id-token-for-jdoe")
+                .query("state", "some state").toString()))
+    }
+
+    @Test
     fun `does not redirect if login is not successful`() {
         val response = filter(Request(Method.POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
 
@@ -49,9 +65,9 @@ class AuthenticationCompleteFilterTest {
     }
 }
 
-private fun Request.withAuthorization(authorizationRequest: AuthRequest) =
+private fun Request.withAuthorization(authorizationRequest: AuthRequest, responseType: ResponseType = Code) =
     with(OAuthServer.clientId of authorizationRequest.client)
         .with(OAuthServer.scopes of authorizationRequest.scopes)
         .with(OAuthServer.redirectUri of authorizationRequest.redirectUri)
         .with(OAuthServer.state of authorizationRequest.state)
-        .with(OAuthServer.responseType of Code)
+        .with(OAuthServer.responseType of responseType)

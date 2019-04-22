@@ -6,6 +6,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
+import org.http4k.security.openid.IdTokenConsumer
 
 /**
  * Provides a configured set of objects for use with an OAuth2 provider.
@@ -18,7 +19,8 @@ class OAuthProvider(
         oAuthPersistence: OAuthPersistence,
         modifyAuthState: (Uri) -> Uri = { it },
         generateCrsf: CsrfGenerator = SECURE_CSRF,
-        responseType: ResponseType = ResponseType.Code
+        responseType: ResponseType = ResponseType.Code,
+        idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
 ) {
 
     // pre-configured API client for this provider

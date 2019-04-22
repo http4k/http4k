@@ -8,6 +8,8 @@ import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.ResponseType
+import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.util.FixedClock
 
 fun customOauthAuthorizationServer(): RoutingHttpHandler {
@@ -51,7 +53,12 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
     )
 }
 
-fun oauthClientApp(tokenClient: HttpHandler, debug: Boolean): RoutingHttpHandler {
+fun oauthClientApp(
+        tokenClient: HttpHandler,
+        debug: Boolean,
+        responseType: ResponseType = ResponseType.Code,
+        idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
+): RoutingHttpHandler {
     val persistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 
     val oauthProvider = OAuthProvider(
@@ -62,7 +69,9 @@ fun oauthClientApp(tokenClient: HttpHandler, debug: Boolean): RoutingHttpHandler
             debugFilter(debug).then(tokenClient),
             Uri.of("/my-callback"),
             listOf("name", "age"),
-            persistence
+            persistence,
+            responseType = responseType,
+            idTokenConsumer = idTokenConsumer
     )
 
     return routes(
