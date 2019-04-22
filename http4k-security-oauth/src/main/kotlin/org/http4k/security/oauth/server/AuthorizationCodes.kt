@@ -3,6 +3,8 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
+import org.http4k.security.ResponseType
+import org.http4k.security.ResponseType.Code
 import java.time.Instant
 
 /**
@@ -30,5 +32,6 @@ interface AuthorizationCodes {
 data class AuthorizationCodeDetails(
     val clientId: ClientId,
     val redirectUri: Uri,
-    val expiresAt: Instant
+    val expiresAt: Instant,
+    val responseType: ResponseType = Code
 )

@@ -13,7 +13,7 @@ import java.util.*
 open class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode =
             AuthorizationCode("dummy-token-for-" + (response.header("user") ?: "unknown"))
-    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH)
+    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
     override fun destroy(authorizationCode: AuthorizationCode) = Unit
 }
 
@@ -56,7 +56,7 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
 
     override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode {
         return AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant())
+            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.responseType)
         }
     }
 
