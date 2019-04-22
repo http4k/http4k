@@ -27,7 +27,7 @@ class OAuthServer(
         idTokens: IdTokens = IdTokens.Unsupported
 ) {
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock))
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock, idTokens))
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(clientValidator)

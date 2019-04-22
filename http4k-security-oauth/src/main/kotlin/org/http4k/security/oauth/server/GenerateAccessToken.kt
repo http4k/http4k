@@ -19,7 +19,8 @@ class GenerateAccessToken(
     private val clientValidator: ClientValidator,
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
-    private val clock: Clock
+    private val clock: Clock,
+    private val idTokens: IdTokens
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
@@ -34,7 +35,8 @@ class GenerateAccessToken(
             return Response(UNAUTHORIZED).body("Invalid client credentials")
         }
 
-        val codeDetails = authorizationCodes.detailsFor(accessTokenRequest.authorizationCode)
+        val code = accessTokenRequest.authorizationCode
+        val codeDetails = authorizationCodes.detailsFor(code)
 
         if (codeDetails.expiresAt.isBefore(clock.instant())) {
             return Response(BAD_REQUEST).body("Authorization code has expired")
@@ -48,14 +50,17 @@ class GenerateAccessToken(
             return Response(BAD_REQUEST).body("Invalid redirect_uri")
         }
 
-        val accessToken = accessTokens.create(accessTokenRequest.authorizationCode)
+        val accessToken = accessTokens.create(code)
 
         return Response(OK).let {
             when (codeDetails.responseType) {
                 Code -> it.body(accessToken.value)
-                CodeIdToken -> it.with(accessTokenResponseBody of AccessTokenResponse(accessToken.value))
+                CodeIdToken -> {
+                    val idToken = idTokens.createForAccessToken(code)
+                    it.with(accessTokenResponseBody of AccessTokenResponse(accessToken.value, idToken.value))
+                }
             }
-        }.also { authorizationCodes.destroy(accessTokenRequest.authorizationCode) }
+        }.also { authorizationCodes.destroy(code) }
     }
 
     companion object {

@@ -6,6 +6,9 @@ import org.http4k.format.Jackson.auto
 
 data class AccessTokenContainer(val value: String)
 
-data class AccessTokenResponse(@JsonProperty("access_token") val accessToken: String)
+data class AccessTokenResponse(
+    @JsonProperty("access_token") val accessToken: String,
+    @JsonProperty("id_token") val idToken: String? = null
+)
 
 val accessTokenResponseBody = Body.auto<AccessTokenResponse>().toLens()

@@ -28,7 +28,7 @@ class GenerateAccessTokenTest {
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val request = Request(Method.GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK))
-    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock)
+    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens())
 
     @Test
     fun `generates a dummy token`() {
@@ -60,7 +60,7 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token")))
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "dummy-id-token-for-access-token")))
     }
 
     @Test
