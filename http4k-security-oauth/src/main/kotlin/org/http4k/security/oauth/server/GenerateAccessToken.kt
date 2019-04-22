@@ -1,18 +1,14 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.core.Body
-import org.http4k.core.HttpHandler
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
-import org.http4k.core.Uri
-import org.http4k.lens.FormField
-import org.http4k.lens.Validator
-import org.http4k.lens.WebForm
-import org.http4k.lens.uri
-import org.http4k.lens.webForm
+import org.http4k.lens.*
+import org.http4k.security.AccessTokenResponse
+import org.http4k.security.ResponseType.Code
+import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.authorizationCode
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientId
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientSecret
@@ -52,8 +48,14 @@ class GenerateAccessToken(
             return Response(BAD_REQUEST).body("Invalid redirect_uri")
         }
 
-        return Response(OK).body(accessTokens.create(accessTokenRequest.authorizationCode).value)
-            .also { authorizationCodes.destroy(accessTokenRequest.authorizationCode) }
+        val accessToken = accessTokens.create(accessTokenRequest.authorizationCode)
+
+        return Response(OK).let {
+            when (codeDetails.responseType) {
+                Code -> it.body(accessToken.value)
+                CodeIdToken -> it.with(accessTokenResponseBody of AccessTokenResponse(accessToken.value))
+            }
+        }.also { authorizationCodes.destroy(accessTokenRequest.authorizationCode) }
     }
 
     companion object {

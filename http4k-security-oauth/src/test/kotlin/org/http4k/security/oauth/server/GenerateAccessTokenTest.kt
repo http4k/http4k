@@ -10,6 +10,9 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.body.form
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.AccessTokenResponse
+import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.accessTokenResponseBody
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -40,6 +43,24 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK) and hasBody("dummy-access-token"))
         assertThat(codes.available(code), equalTo(false))
+    }
+
+    @Test
+    fun `generates dummy access_token and id_token`() {
+        val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken), Response(OK))
+
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", codeForIdTokenRequest.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
+        )
+
+        assertThat(response, hasStatus(OK))
+
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token")))
     }
 
     @Test

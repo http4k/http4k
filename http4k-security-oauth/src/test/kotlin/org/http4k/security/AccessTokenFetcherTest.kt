@@ -6,7 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
-import org.http4k.security.AccessTokenFetcher.Companion.accessTokenResponseBody
 import org.junit.jupiter.api.Test
 
 internal class AccessTokenFetcherTest {
