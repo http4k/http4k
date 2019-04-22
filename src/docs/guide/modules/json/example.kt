@@ -51,4 +51,4 @@ val response = Response(Status.OK).with(
 
 val xmlLens = Body.xml().toLens()
 
-val xmlNode: Node = xmlLens.extract(Request(GET, "").body("<xml/>"))
+val xmlNode: Node = xmlLens(Request(GET, "").body("<xml/>"))

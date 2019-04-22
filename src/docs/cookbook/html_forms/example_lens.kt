@@ -30,13 +30,13 @@ fun main() {
 
     // the "strict" form rejects (throws a LensFailure) because "age" is required
     try {
-        strictFormBody.extract(invalidRequest)
+        strictFormBody(invalidRequest)
     } catch (e: LensFailure) {
         println(e.message)
     }
 
     // the "feedback" form doesn't throw, but collects errors to be reported later
-    val invalidForm = feedbackFormBody.extract(invalidRequest)
+    val invalidForm = feedbackFormBody(invalidRequest)
     println(invalidForm.errors)
 
     // creating valid form using "with()" and setting it onto the request
@@ -44,8 +44,8 @@ fun main() {
     val validRequest = Request(Method.GET, "/").with(strictFormBody of webForm)
 
     // to extract the contents, we first extract the form and then extract the fields from it using the lenses
-    val validForm = strictFormBody.extract(validRequest)
-    val age = ageField.extract(validForm)
+    val validForm = strictFormBody(validRequest)
+    val age = ageField(validForm)
     println(age)
 
 }

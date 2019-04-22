@@ -42,7 +42,7 @@ private fun calculate(recorder: Recorder, fn: (List<Int>) -> Int): (Request) -> 
     val values = Query.int().multi.defaulted("value", listOf())
 
     return { request: Request ->
-        val valuesToCalc = values.extract(request)
+        val valuesToCalc = values(request)
         val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
         recorder.record(answer)
         Response(OK).body(answer.toString())

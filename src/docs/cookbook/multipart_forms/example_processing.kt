@@ -39,7 +39,7 @@ fun main() {
             val imageFile = FormField.optional("image")
             val body = Body.webForm(Validator.Strict, nameField, imageFile).toLens()
 
-            println(body.extract(req))
+            println(body(req))
 
             Response(Status.OK)
         }.asServer(SunHttp(8000)).start()

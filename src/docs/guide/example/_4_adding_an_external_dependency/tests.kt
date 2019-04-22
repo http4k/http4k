@@ -56,7 +56,7 @@ class FakeRecorderHttp : HttpHandler {
 
     private val app = CatchLensFailure.then(
         routes(
-            "/{answer}" bind POST to { request -> calls.add(answer.extract(request)); Response(ACCEPTED) }
+            "/{answer}" bind POST to { request -> calls.add(answer(request)); Response(ACCEPTED) }
         )
     )
 

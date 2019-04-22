@@ -30,11 +30,11 @@ fun <IN, OUT> LensExtractor<IN, OUT>.toResult(): LensExtractor<IN, Result<OUT>> 
 fun main() {
 
     val queryResultLens = Query.int().required("foo").toResult()
-    val intResult: Result<Int> = queryResultLens.extract(Request(Method.GET, "/?foo=123"))
+    val intResult: Result<Int> = queryResultLens(Request(Method.GET, "/?foo=123"))
 
     println(intResult)
     val jsonResultLens = Body.json().toLens().toResult()
-    val jsonResult: Result<JsonNode> = jsonResultLens.extract(Request(Method.GET, "/foo"))
+    val jsonResult: Result<JsonNode> = jsonResultLens(Request(Method.GET, "/foo"))
 
     println(jsonResult)
 

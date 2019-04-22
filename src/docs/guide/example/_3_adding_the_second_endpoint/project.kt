@@ -29,7 +29,7 @@ private fun calculate(fn: (List<Int>) -> Int): (Request) -> Response {
     val values = Query.int().multi.defaulted("value", listOf())
 
     return { request: Request ->
-        val valuesToCalc = values.extract(request)
+        val valuesToCalc = values(request)
         val answer = if (valuesToCalc.isEmpty()) 0 else fn(valuesToCalc)
         Response(OK).body(answer.toString())
     }

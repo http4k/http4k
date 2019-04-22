@@ -13,7 +13,7 @@ fun main() {
 
     val req = Request(Method.GET, "/").body(""" [ {"value":1}, {"value":2} ] """)
 
-    val extractedList = aListLens.extract(req)
+    val extractedList = aListLens(req)
 
     val nativeList = listOf(MyIntWrapper(1), MyIntWrapper(2))
 
@@ -24,7 +24,7 @@ fun main() {
     //solution:
     val anArrayLens = Body.auto<Array<MyIntWrapper>>().toLens()
 
-    println(Arrays.equals(anArrayLens.extract(req), arrayOf(MyIntWrapper(1), MyIntWrapper(2))))
+    println(Arrays.equals(anArrayLens(req), arrayOf(MyIntWrapper(1), MyIntWrapper(2))))
 
 // produces:
 //    [MyIntWrapper(value=1), MyIntWrapper(value=2)]

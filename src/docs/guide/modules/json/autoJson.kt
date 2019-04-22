@@ -16,7 +16,7 @@ fun main() {
     val myMessage = Message("hello", Email("bob@git.com"), Email("sue@git.com"))
 
     // to inject the body into the message - this also works with Response
-    val requestWithEmail = messageLens.inject(myMessage, Request(GET, "/"))
+    val requestWithEmail = messageLens(myMessage, Request(GET, "/"))
 
     println(requestWithEmail)
 
@@ -27,7 +27,7 @@ fun main() {
 //    {"subject":"hello","from":{"value":"bob@git.com"},"to":{"value":"sue@git.com"}}
 
     // to extract the body from the message - this also works with Response
-    val extractedMessage = messageLens.extract(requestWithEmail)
+    val extractedMessage = messageLens(requestWithEmail)
 
     println(extractedMessage)
     println(extractedMessage == myMessage)

@@ -33,9 +33,9 @@ fun main() {
 
         // to extract the contents, we first extract the form and then extract the fields from it using the lenses
         // NOTE: we are "using" the form body here because we want to close the underlying file streams
-        strictFormBody.extract(r).use {
-            println(nameField.extract(it))
-            println(imageFile.extract(it))
+        strictFormBody(r).use {
+            println(nameField(it))
+            println(imageFile(it))
         }
 
         Response(Status.OK)
