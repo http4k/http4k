@@ -18,7 +18,7 @@ open class DummyAuthorizationCodes(private val request: AuthRequest) : Authoriza
 }
 
 open class DummyIdtokens :IdTokens{
-    override fun create(request: Request, authRequest: AuthRequest, response: Response) =
+    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
         IdTokenContainer("dummy-id-token-for-" + (response.header("user") ?: "unknown"))
 }
 

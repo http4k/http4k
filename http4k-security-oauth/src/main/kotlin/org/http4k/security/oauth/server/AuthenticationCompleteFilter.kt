@@ -31,7 +31,7 @@ class AuthenticationCompleteFilter(
             when (authorizationRequest.responseType) {
                 Code -> query("code", value)
                 CodeIdToken -> query("code", value)
-                    .query("id_token", idTokens.create(request, authorizationRequest, response).value)
+                    .query("id_token", idTokens.createForAuthorization(request, authorizationRequest, response).value)
             }
         }
 }
