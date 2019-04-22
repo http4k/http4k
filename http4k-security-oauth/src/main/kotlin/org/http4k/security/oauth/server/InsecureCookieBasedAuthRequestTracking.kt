@@ -20,5 +20,6 @@ class InsecureCookieBasedAuthRequestTracking : AuthRequestTracking {
         .with(OAuthServer.redirectUri of redirectUri)
         .with(OAuthServer.scopes of scopes)
         .with(OAuthServer.state of state)
+        .with(OAuthServer.responseType of responseType)
         .uri.query
 }

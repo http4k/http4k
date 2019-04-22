@@ -7,6 +7,7 @@ import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.ResponseType.Code
 import org.junit.jupiter.api.Test
 
 class AuthenticationCompleteFilterTest {
@@ -53,3 +54,4 @@ private fun Request.withAuthorization(authorizationRequest: AuthRequest) =
         .with(OAuthServer.scopes of authorizationRequest.scopes)
         .with(OAuthServer.redirectUri of authorizationRequest.redirectUri)
         .with(OAuthServer.state of authorizationRequest.state)
+        .with(OAuthServer.responseType of Code)

@@ -12,6 +12,7 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.ResponseType.Code
 import org.junit.jupiter.api.Test
 
 internal class ClientAndRedirectionValidationFilterTest {
@@ -29,6 +30,7 @@ internal class ClientAndRedirectionValidationFilterTest {
     @Test
     fun `allow accessing the login page`() {
         val response = filter(Request(GET, "/auth")
+            .query("response_type", Code.queryParameterValue)
             .query("client_id", validClientId.value)
             .query("redirect_uri", validRedirectUri.toString())
         )
@@ -56,6 +58,7 @@ internal class ClientAndRedirectionValidationFilterTest {
     @Test
     fun `validates client_id and redirect_uri values`() {
         val response = filter(Request(GET, "/auth")
+            .query("response_type", Code.queryParameterValue)
             .query("client_id", "invalid-client")
             .query("redirect_uri", "invalid-redirect")
         )

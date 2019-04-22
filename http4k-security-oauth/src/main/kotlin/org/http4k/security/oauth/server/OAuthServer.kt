@@ -7,6 +7,7 @@ import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.ResponseType
 import java.time.Clock
 
 /**
@@ -39,6 +40,7 @@ class OAuthServer(
         val scopes = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val redirectUri = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
+        val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
     }
 }
 
@@ -51,5 +53,6 @@ internal fun Request.authorizationRequest() =
         OAuthServer.clientId(this),
         OAuthServer.scopes(this) ?: listOf(),
         OAuthServer.redirectUri(this),
-        OAuthServer.state(this)
+        OAuthServer.state(this),
+        OAuthServer.responseType(this)
     )
