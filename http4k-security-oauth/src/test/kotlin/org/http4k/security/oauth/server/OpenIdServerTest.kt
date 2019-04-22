@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 
 class OpenIdServerTest {
 
-    private val debug = false
+    private val debug = true
 
     @Test
     fun `can follow authorization code id_token flow`() {
@@ -45,7 +45,8 @@ class OpenIdServerTest {
         val postAuthResponse = browserWithRedirection(Request(POST, loginPage).form("some", "credentials"))
         assertThat(postAuthResponse, hasStatus(OK) and hasBody("user resource"))
 
-        assertThat(tokenConsumer.consumed, equalTo(IdTokenContainer("dummy-id-token-for-unknown")))
+        assertThat(tokenConsumer.consumedFromAuthorizationResponse, equalTo(IdTokenContainer("dummy-id-token-for-unknown")))
+        assertThat(tokenConsumer.consumedFromAccessTokenResponse, equalTo(IdTokenContainer("dummy-id-token-for-access-token")))
     }
 
 }

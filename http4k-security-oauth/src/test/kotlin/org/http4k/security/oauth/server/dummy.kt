@@ -71,8 +71,14 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
 }
 
 class InMemoryIdTokenConsumer : IdTokenConsumer {
-    var consumed: IdTokenContainer? = null
-    override fun consume(idToken: IdTokenContainer) {
-        consumed = idToken
+    var consumedFromAuthorizationResponse: IdTokenContainer? = null
+    var consumedFromAccessTokenResponse: IdTokenContainer? = null
+
+    override fun consumeFromAuthorizationResponse(idToken: IdTokenContainer) {
+        consumedFromAuthorizationResponse = idToken
+    }
+
+    override fun consumeFromAccessTokenResponse(idToken: IdTokenContainer) {
+        consumedFromAccessTokenResponse = idToken
     }
 }
