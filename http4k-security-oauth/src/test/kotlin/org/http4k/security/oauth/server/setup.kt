@@ -19,7 +19,8 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
             clientValidator = DummyClientValidator(),
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
-            clock = FixedClock
+            clock = FixedClock,
+            idTokens = DummyIdtokens()
     )
 
     return routes(

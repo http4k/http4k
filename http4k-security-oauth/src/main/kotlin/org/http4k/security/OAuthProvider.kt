@@ -30,7 +30,7 @@ class OAuthProvider(
     val authFilter: Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, modifyAuthState, oAuthPersistence, responseType)
 
     // this HttpHandler should exist at the callback URI registered with the OAuth Provider
-    val callback: HttpHandler = OAuthCallback(providerConfig, api, callbackUri, oAuthPersistence)
+    val callback: HttpHandler = OAuthCallback(providerConfig, api, callbackUri, oAuthPersistence, idTokenConsumer)
 
     companion object
 }
