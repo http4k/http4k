@@ -29,8 +29,10 @@ class OAuthProvider(
     // use this filter to protect endpoints
     val authFilter: Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, modifyAuthState, oAuthPersistence, responseType)
 
+    private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig)
+
     // this HttpHandler should exist at the callback URI registered with the OAuth Provider
-    val callback: HttpHandler = OAuthCallback(providerConfig, api, callbackUri, oAuthPersistence, idTokenConsumer)
+    val callback: HttpHandler = OAuthCallback(oAuthPersistence, idTokenConsumer, accessTokenFetcher)
 
     companion object
 }
