@@ -14,7 +14,6 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.Random
 
 object Matchers {
     fun Response.answerShouldBe(expected: Int) {
@@ -23,9 +22,8 @@ object Matchers {
 }
 
 class EndToEndTest {
-    private val port = Random().nextInt(1000) + 8000
     private val client = OkHttp()
-    private val server = MyMathServer(port)
+    private val server = MyMathServer(0)
 
     @BeforeEach
     fun setup() {
@@ -39,8 +37,8 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        assertThat(client(Request(GET, "http://localhost:$port/ping")), hasStatus(OK))
-        client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
+        assertThat(client(Request(GET, "http://localhost:${server.port()}/ping")), hasStatus(OK))
+        client(Request(GET, "http://localhost:${server.port()}/add?value=1&value=2")).answerShouldBe(3)
     }
 }
 

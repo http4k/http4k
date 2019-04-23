@@ -81,7 +81,7 @@ class EndToEndTest {
     private val recorderPort = port + 1
     private val client = OkHttp()
     private val recorder = FakeRecorderHttp()
-    private val server = MyMathServer(port, Uri.of("http://localhost:$recorderPort"))
+    private val server = MyMathServer(0, Uri.of("http://localhost:$recorderPort"))
     private val recorderServer = recorder.asServer(Jetty(recorderPort))
 
     @BeforeEach
@@ -98,9 +98,9 @@ class EndToEndTest {
 
     @Test
     fun `all endpoints are mounted correctly`() {
-        assertThat(client(Request(GET, "http://localhost:$port/ping")), hasStatus(OK))
-        client(Request(GET, "http://localhost:$port/add?value=1&value=2")).answerShouldBe(3)
-        client(Request(GET, "http://localhost:$port/multiply?value=2&value=4")).answerShouldBe(8)
+        assertThat(client(Request(GET, "http://localhost:${server.port()}/ping")), hasStatus(OK))
+        client(Request(GET, "http://localhost:${server.port()}/add?value=1&value=2")).answerShouldBe(3)
+        client(Request(GET, "http://localhost:${server.port()}/multiply?value=2&value=4")).answerShouldBe(8)
     }
 }
 
