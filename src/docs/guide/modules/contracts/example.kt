@@ -1,7 +1,7 @@
 package guide.modules.contracts
 
 import org.http4k.contract.ApiInfo
-import org.http4k.contract.ApiKey
+import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
@@ -81,7 +81,7 @@ fun echoRoute(): ContractRoute {
 }
 
 // use another Lens to set up the API-key - the answer is 42!
-val mySecurity = ApiKey(Query.int().required("api"), { it == 42 })
+val mySecurity = ApiKeySecurity(Query.int().required("api"), { it == 42 })
 
 // Combine the Routes into a contract and bind to a context, defining a renderer (in this example
 // OpenApi/Swagger) and a security model (in this case an API-Key):

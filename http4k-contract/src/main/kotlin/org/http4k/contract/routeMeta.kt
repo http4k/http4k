@@ -29,6 +29,7 @@ class RouteMetaDsl internal constructor() {
     var queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
+    var security: Security? = null
     var preFlightExtraction: PreFlightExtraction? = null
 
     /**
@@ -100,7 +101,7 @@ class RouteMetaDsl internal constructor() {
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightExtraction, operationId
+        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightExtraction, security, operationId
     )
 }
 
@@ -116,6 +117,7 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val requestParams: List<Lens<Request, *>> = emptyList(),
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
+                     val security: Security? = null,
                      val operationId: String? = null) {
 
     constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)

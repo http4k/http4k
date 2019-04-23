@@ -8,7 +8,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
-import org.http4k.core.Method
+import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -59,7 +59,7 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
 
         val router = "/basepath" bind contract {
             renderer = rendererToUse
-            security = ApiKey(Query.required("the_api_key"), { true })
+            security = ApiKeySecurity(Query.required("the_api_key"), { true })
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
@@ -90,6 +90,9 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
                 }, "someDefinitionId")
             } bindContract POST to { Response(OK) }
+            routes += "/security" meta {
+                security = BasicAuthSecurity("realm", Credentials("user", "password"))
+            } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
                 receiving(Body.webForm(Validator.Strict,
                     FormField.boolean().required("b", "booleanField"),
@@ -110,7 +113,7 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
         }
 
         val expected = String(javaClass.getResourceAsStream("${javaClass.simpleName}.json").readBytes())
-        val actual = router(Request(Method.GET, "/basepath?the_api_key=somevalue")).bodyString()
+        val actual = router(Request(GET, "/basepath?the_api_key=somevalue")).bodyString()
 //        println(actual)
         assertThat("no match", prettify(actual), equalTo(prettify(expected)))
     }

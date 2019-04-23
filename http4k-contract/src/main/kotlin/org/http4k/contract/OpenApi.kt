@@ -76,7 +76,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
 
     private fun renderTags(routes: List<ContractRoute>) = routes.flatMap(ContractRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
 
-    private fun render(pathSegments: PathSegments, security: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
+    private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
         val schema = route.jsonRequest?.asSchema()
@@ -89,6 +89,8 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
         val consumes = route.meta.consumes.plus(route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
+        val routeSecurity = route.meta.security ?: contractSecurity
+
         return json {
             val fields =
                 listOf(
@@ -99,7 +101,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes.plus(bodyParamNodes)),
                     "responses" to obj(responses),
-                    "security" to array(when (security) {
+                    "security" to array(when (routeSecurity) {
                         is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
                         is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
                         else -> emptyList()

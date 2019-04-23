@@ -3,8 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
-### v3.138.0 (uncut)
-- Tweaks to Security model for `http4k-contracts`. `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`.
+### v3.138.0
+- Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
+- Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
+set on a contract-level basis.
 
 ### v3.137.1
 - Allow invocation of serverless functions locally. H/T @Charlyzzz

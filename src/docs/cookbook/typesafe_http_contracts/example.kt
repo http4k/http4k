@@ -1,7 +1,7 @@
 package cookbook.typesafe_http_contracts
 
 import org.http4k.contract.ApiInfo
-import org.http4k.contract.ApiKey
+import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
 import org.http4k.contract.contract
@@ -53,7 +53,7 @@ fun main() {
         println(tx.labels.toString() + " took " + tx.duration)
     }
 
-    val mySecurity = ApiKey(Query.int().required("apiKey"), { it == 42 })
+    val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
     val contract = contract {
         renderer = OpenApi(ApiInfo("my great api", "v1.0"), Argo)

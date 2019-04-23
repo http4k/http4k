@@ -11,7 +11,7 @@ import org.http4k.lens.Query
 
 val app = contract {
     renderer = OpenApi(ApiInfo("foo", "bar", "boring"), Jackson)
-    security = ApiKey(Query.required("the_api_key"), { true })
+    security = ApiKeySecurity(Query.required("the_api_key"), { true })
 
     routes += "/echo" / Path.of("message") meta {
         summary = "summary of this route"

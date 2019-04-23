@@ -7,7 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.ChaosTriggers.Always
-import org.http4k.contract.ApiKey
+import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.NoSecurity
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -71,7 +71,7 @@ class ChaosEngineTest {
 
         val appWithChaos = app.withChaosEngine(
                 Wait,
-                ApiKey(Header.required("secret"), { true }),
+            ApiKeySecurity(Header.required("secret"), { true }),
                 "/context"
         )
 

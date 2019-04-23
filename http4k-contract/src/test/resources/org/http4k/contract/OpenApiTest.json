@@ -260,6 +260,23 @@
         ]
       }
     },
+    "/basepath/security": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [],
+        "consumes": [],
+        "parameters": [],
+        "responses": {},
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "tags": [

@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.core.Body
+import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -17,6 +18,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.ClientFilters
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
 import org.http4k.hamkrest.hasBody
@@ -58,7 +60,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         Request(GET, "/root")
         val response = ("/root" bind contract {
             renderer = SimpleJson(Jackson)
-            security = ApiKey(Query.required("goo"), { false })
+            security = ApiKeySecurity(Query.required("goo"), { false })
         }).invoke(Request(GET, "/root"))
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("""{"resources":{}}"""))
@@ -133,7 +135,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `applies security and responds with a 401 to unauthorized requests`() {
         val root = "/root" bind contract {
-            security = ApiKey(Query.required("key"), { it == "bob" })
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
         }
         val response = root(Request(GET, "/root/bob?key=sue"))
@@ -141,9 +143,26 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
+    fun `override security for one endpoint only`() {
+        val credentials = Credentials("bill", "password")
+        val root = "/root" bind contract {
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
+            routes += "/bob" bindContract GET to { Response(OK) }
+            routes += "/bill" meta {
+                security = BasicAuthSecurity("realm", credentials)
+            } bindContract GET to { Response(OK) }
+        }
+
+        assertThat(root(Request(GET, "/root/bill?key=sue")).status, equalTo(UNAUTHORIZED))
+
+        assertThat(ClientFilters.BasicAuth(credentials)
+            .then(root)(Request(GET, "/root/bill?key=sue")).status, equalTo(OK))
+    }
+
+    @Test
     fun `pre-security filter is applied before security`() {
         val root = "/root" bind contract {
-            security = ApiKey(Query.required("key"), { it == "bob" })
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
         }.withFilter(Filter { next ->
             {
@@ -157,7 +176,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `post-security filter is applied after security`() {
         val root = "/root" bind contract {
-            security = ApiKey(Query.required("key"), { it == "bob" })
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK).body(it.body) }
         }.withPostSecurityFilter(Filter { next ->
             {
@@ -171,7 +190,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     @Test
     fun `applies security and responds with a 200 to authorized requests`() {
         val root = "/root" bind contract {
-            security = ApiKey(Query.required("key"), { it == "bob" })
+            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
             routes += "/bob" bindContract GET to { Response(OK) }
         }
 

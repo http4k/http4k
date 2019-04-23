@@ -36,9 +36,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val standardFilters = preSecurityFilter.then(security.filter).then(postSecurityFilter)
+    private val notFound = preSecurityFilter.then(security.filter).then(postSecurityFilter).then { renderer.notFound() }
 
-    private val handler: HttpHandler = { match(it)?.invoke(it) ?: standardFilters.then { renderer.notFound() }(it) }
+    private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
 
     override fun invoke(request: Request): Response = handler(request)
 
@@ -48,23 +48,25 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val routers = routes
         .map {
+            val securityFilterForRoute = (it.meta.security ?: security).filter
             catchLensFailure
                 .then(identify(it))
-                .then(standardFilters)
+                .then(preSecurityFilter.then(securityFilterForRoute).then(postSecurityFilter))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
-        }
-        .plus(identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
+        } +
+        (identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
 
-    private val noMatch: HttpHandler? = null
+    override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
-    override fun toString(): String = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
+    override fun match(request: Request): HttpHandler? {
+        val noMatch: HttpHandler? = null
 
-    override fun match(request: Request) =
-        if (request.isIn(contractRoot)) {
+        return if (request.isIn(contractRoot)) {
             routers.fold(noMatch) { memo, (routeFilter, router) ->
                 memo ?: router.match(request)?.let { routeFilter.then(it) }
             }
         } else null
+    }
 
     private fun identify(route: ContractRoute) =
         route.describeFor(contractRoot).let { routeIdentity ->
