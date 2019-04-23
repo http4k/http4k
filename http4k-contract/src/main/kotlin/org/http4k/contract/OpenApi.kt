@@ -100,7 +100,8 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     "parameters" to array(nonBodyParamNodes.plus(bodyParamNodes)),
                     "responses" to obj(responses),
                     "security" to array(when (security) {
-                        is ApiKey<*> -> listOf(obj("api_key" to array(emptyList())))
+                        is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
+                        is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
                         else -> emptyList()
                     })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
@@ -124,7 +125,12 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
 
     private fun Security.asJson() = json {
         when (this@asJson) {
-            is ApiKey<*> -> obj(
+            is BasicAuthSecurity -> obj(
+                "basicAuth" to obj(
+                    "type" to string("basic")
+                )
+            )
+            is ApiKeySecurity<*> -> obj(
                 "api_key" to obj(
                     "type" to string("apiKey"),
                     "in" to string(param.meta.location),
