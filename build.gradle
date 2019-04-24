@@ -251,7 +251,7 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
 
             def relativePath = rootDir.toPath().relativize(path.toPath()).toString()
             linkMapping {
-                dir = path
+                dir = path.toString().replace(File.separator, "/")
                 url = "https://github.com/http4k/http4k/blob/master/$relativePath"
                 suffix = "#L"
             }
