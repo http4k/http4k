@@ -2,12 +2,15 @@ package org.http4k.security.oauth.server
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.body.form
+import org.http4k.format.AutoMarshallingJson
+import org.http4k.format.Jackson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.AccessTokenResponse
@@ -23,12 +26,13 @@ import java.time.temporal.TemporalUnit
 
 class GenerateAccessTokenTest {
 
+    private val json: AutoMarshallingJson = Jackson
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val request = Request(Method.GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK))
-    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens())
+    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), json)
 
     @Test
     fun `generates a dummy token`() {
@@ -74,7 +78,7 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Invalid grant type"))
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("unsupported_grant_type")))
     }
 
     @Test
@@ -88,7 +92,7 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(UNAUTHORIZED) and hasBody("Invalid client credentials"))
+        assertThat(response, hasStatus(UNAUTHORIZED) and hasBody(withErrorType("invalid_client")))
     }
 
     @Test
@@ -106,7 +110,7 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Authorization code has expired"))
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }
 
     @Test
@@ -122,7 +126,7 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Invalid client_id"))
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }
 
     @Test
@@ -138,8 +142,11 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(BAD_REQUEST) and hasBody("Invalid redirect_uri"))
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }
+
+    private fun withErrorType(errorType: String) = containsSubstring("\"error\":\"$errorType\"")
+            .and(containsSubstring("\"error_description\":"))
 }
 
 class SettableClock : Clock() {
