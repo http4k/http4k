@@ -55,8 +55,8 @@ class GenerateAccessToken(
 
         val accessTokenResult = accessTokens.create(code)
 
-        if(accessTokenResult.isSuccess()) {
-            return Response(OK).let {
+        return if (accessTokenResult.isSuccess()) {
+            Response(OK).let {
                 val token = accessTokenResult.token!!.value
                 when (codeDetails.responseType) {
                     Code -> it.body(token)
@@ -67,7 +67,7 @@ class GenerateAccessToken(
                 }
             }.also { authorizationCodes.destroy(code) }
         } else {
-            return Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has already been used"))
+            Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has already been used"))
         }
     }
 
