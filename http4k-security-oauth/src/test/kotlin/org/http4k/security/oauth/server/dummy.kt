@@ -4,6 +4,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
+import org.http4k.security.oauth.server.AccessTokenCreationError.AUTHORIZATION_CODE_ALREADY_USED
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
@@ -26,7 +27,11 @@ open class DummyIdtokens :IdTokens{
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create(authorizationCode: AuthorizationCode) = AccessTokenContainer("dummy-access-token")
+    override fun create(authorizationCode: AuthorizationCode) = AccessTokenResult(AccessTokenContainer("dummy-access-token"))
+}
+
+class ErroringAccessTokens(val error : AccessTokenCreationError) : AccessTokens {
+    override fun create(authorizationCode: AuthorizationCode) = AccessTokenResult(error = error)
 }
 
 class DummyClientValidator : ClientValidator {
@@ -53,6 +58,7 @@ class HardcodedClientValidator(
 
 class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {
     private val codes = mutableMapOf<AuthorizationCode, AuthorizationCodeDetails>()
+    private val usedCodes = mutableSetOf<AuthorizationCode>()
 
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
@@ -64,10 +70,10 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     }
 
     override fun destroy(authorizationCode: AuthorizationCode) {
-        codes.remove(authorizationCode)
+        usedCodes.add(authorizationCode)
     }
 
-    fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode)
+    fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode) && !usedCodes.contains(authorizationCode)
 }
 
 class InMemoryIdTokenConsumer : IdTokenConsumer {

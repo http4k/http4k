@@ -99,5 +99,5 @@ class InsecureAccessTokens : AccessTokens {
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(authorizationCode: AuthorizationCode) =
-        AccessTokenContainer(UUID.randomUUID().toString())
+        AccessTokenResult(AccessTokenContainer(UUID.randomUUID().toString()))
 }
