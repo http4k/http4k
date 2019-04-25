@@ -4,6 +4,7 @@ import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.*
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
@@ -20,7 +21,9 @@ class GenerateAccessToken(
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
     private val clock: Clock,
-    private val idTokens: IdTokens
+    private val idTokens: IdTokens,
+    private val json : AutoMarshallingJson,
+    private val documentationUri : String = ""
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
@@ -28,26 +31,26 @@ class GenerateAccessToken(
         val accessTokenRequest = form.accessTokenRequest()
 
         if (grantType(form) != "authorization_code") {
-            return Response(BAD_REQUEST).body("Invalid grant type")
+            return Response(BAD_REQUEST).body(errorResponse("unsupported_grant_type", "${grantType(form)} is not supported"))
         }
 
         if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
-            return Response(UNAUTHORIZED).body("Invalid client credentials")
+            return Response(UNAUTHORIZED).body(errorResponse("invalid_client", "Client id and secret unrecognised"))
         }
 
         val code = accessTokenRequest.authorizationCode
         val codeDetails = authorizationCodes.detailsFor(code)
 
         if (codeDetails.expiresAt.isBefore(clock.instant())) {
-            return Response(BAD_REQUEST).body("Authorization code has expired")
+            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The authorization code has expired"))
         }
 
         if (codeDetails.clientId != accessTokenRequest.clientId) {
-            return Response(BAD_REQUEST).body("Invalid client_id")
+            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The 'client_id' parameter does not match the authorization request"))
         }
 
         if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
-            return Response(BAD_REQUEST).body("Invalid redirect_uri")
+            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The 'redirect_uri' parameter does not match the authorization request"))
         }
 
         val accessToken = accessTokens.create(code)
@@ -63,6 +66,8 @@ class GenerateAccessToken(
         }.also { authorizationCodes.destroy(code) }
     }
 
+    private fun errorResponse(errorCode: String, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))
+
     companion object {
         internal val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")
         internal val redirectUri = FormField.uri().required("redirect_uri")
@@ -75,6 +80,8 @@ class GenerateAccessToken(
         ).toLens()
     }
 }
+
+data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
 
 private fun WebForm.accessTokenRequest() =
     AccessTokenRequest(

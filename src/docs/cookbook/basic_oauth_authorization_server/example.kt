@@ -3,6 +3,7 @@ import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.format.Jackson
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -25,7 +26,8 @@ fun main() {
             clientValidator = InsecureClientValidator(),
             authorizationCodes = InsecureAuthorizationCodes(),
             accessTokens = InsecureAccessTokens(),
-            clock = Clock.systemUTC()
+            clock = Clock.systemUTC(),
+            json = Jackson
         )
 
         return routes(

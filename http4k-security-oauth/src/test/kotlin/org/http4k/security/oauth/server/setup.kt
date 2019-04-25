@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.*
 import org.http4k.filter.DebuggingFilters
+import org.http4k.format.Jackson
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -20,7 +21,8 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
             clock = FixedClock,
-            idTokens = DummyIdtokens()
+            idTokens = DummyIdtokens(),
+            json = Jackson
     )
 
     return routes(
@@ -39,7 +41,8 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
             clientValidator = DummyClientValidator(),
             authorizationCodes = InMemoryAuthorizationCodes(FixedClock),
             accessTokens = DummyAccessTokens(),
-            clock = FixedClock
+            clock = FixedClock,
+            json = Jackson
     )
 
     return routes(
