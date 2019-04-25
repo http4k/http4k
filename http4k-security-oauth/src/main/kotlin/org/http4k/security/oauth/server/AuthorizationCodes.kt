@@ -22,11 +22,6 @@ interface AuthorizationCodes {
      * Retrieve the details of an authorization code
      */
     fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails
-
-    /**
-     * Destroys an authorization token after it's been used to generate an access token
-     */
-    fun destroy(authorizationCode: AuthorizationCode)
 }
 
 data class AuthorizationCodeDetails(

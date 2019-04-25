@@ -65,7 +65,7 @@ class GenerateAccessToken(
                         it.with(accessTokenResponseBody of AccessTokenResponse(token, idToken.value))
                     }
                 }
-            }.also { authorizationCodes.destroy(code) }
+            }
         } else {
             Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has already been used"))
         }

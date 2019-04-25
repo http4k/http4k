@@ -4,7 +4,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessTokenContainer
-import org.http4k.security.oauth.server.AccessTokenCreationError.AUTHORIZATION_CODE_ALREADY_USED
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
@@ -15,7 +14,6 @@ open class DummyAuthorizationCodes(private val request: AuthRequest) : Authoriza
     override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode =
             AuthorizationCode("dummy-token-for-" + (response.header("user") ?: "unknown"))
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
-    override fun destroy(authorizationCode: AuthorizationCode) = Unit
 }
 
 open class DummyIdtokens :IdTokens{
@@ -67,10 +65,6 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
         return AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.responseType)
         }
-    }
-
-    override fun destroy(authorizationCode: AuthorizationCode) {
-        usedCodes.add(authorizationCode)
     }
 
     fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode) && !usedCodes.contains(authorizationCode)

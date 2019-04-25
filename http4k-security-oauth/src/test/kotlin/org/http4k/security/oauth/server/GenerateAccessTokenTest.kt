@@ -47,7 +47,6 @@ class GenerateAccessTokenTest {
         )
 
         assertThat(response, hasStatus(OK) and hasBody("dummy-access-token"))
-        assertThat(codes.available(code), equalTo(false))
     }
 
     @Test

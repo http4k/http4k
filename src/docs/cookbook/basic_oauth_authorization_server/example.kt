@@ -90,9 +90,6 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS))
         }
 
-    override fun destroy(authorizationCode: AuthorizationCode) {
-        codes.remove(authorizationCode)
-    }
 }
 
 class InsecureAccessTokens : AccessTokens {
