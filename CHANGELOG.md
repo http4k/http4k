@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
+### v3.138.1
+- Amend error responses from access token generation. H/T @andymoody
+
 ### v3.138.0
 - Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
 - Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
