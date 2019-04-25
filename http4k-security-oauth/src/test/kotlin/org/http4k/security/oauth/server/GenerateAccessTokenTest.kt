@@ -16,6 +16,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.server.AccessTokenCreationError.AUTHORIZATION_CODE_ALREADY_USED
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -141,6 +142,21 @@ class GenerateAccessTokenTest {
             .form("client_secret", "a-secret")
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
+    }
+
+    @Test
+    fun `handles already used authentication code`(){
+        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AUTHORIZATION_CODE_ALREADY_USED), handlerClock, DummyIdtokens(), json)
+        val request = Request(Method.POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", code.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(request)
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }

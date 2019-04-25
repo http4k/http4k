@@ -31,42 +31,47 @@ class GenerateAccessToken(
         val accessTokenRequest = form.accessTokenRequest()
 
         if (grantType(form) != "authorization_code") {
-            return Response(BAD_REQUEST).body(errorResponse("unsupported_grant_type", "${grantType(form)} is not supported"))
+            return Response(BAD_REQUEST).body(errorResponse(Error.unsupported_grant_type, "${grantType(form)} is not supported"))
         }
 
         if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
-            return Response(UNAUTHORIZED).body(errorResponse("invalid_client", "Client id and secret unrecognised"))
+            return Response(UNAUTHORIZED).body(errorResponse(Error.invalid_client, "Client id and secret unrecognised"))
         }
 
         val code = accessTokenRequest.authorizationCode
         val codeDetails = authorizationCodes.detailsFor(code)
 
         if (codeDetails.expiresAt.isBefore(clock.instant())) {
-            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The authorization code has expired"))
+            return Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has expired"))
         }
 
         if (codeDetails.clientId != accessTokenRequest.clientId) {
-            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The 'client_id' parameter does not match the authorization request"))
+            return Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The 'client_id' parameter does not match the authorization request"))
         }
 
         if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
-            return Response(BAD_REQUEST).body(errorResponse("invalid_grant", "The 'redirect_uri' parameter does not match the authorization request"))
+            return Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The 'redirect_uri' parameter does not match the authorization request"))
         }
 
-        val accessToken = accessTokens.create(code)
+        val accessTokenResult = accessTokens.create(code)
 
-        return Response(OK).let {
-            when (codeDetails.responseType) {
-                Code -> it.body(accessToken.value)
-                CodeIdToken -> {
-                    val idToken = idTokens.createForAccessToken(code)
-                    it.with(accessTokenResponseBody of AccessTokenResponse(accessToken.value, idToken.value))
+        if(accessTokenResult.isSuccess()) {
+            return Response(OK).let {
+                val token = accessTokenResult.token!!.value
+                when (codeDetails.responseType) {
+                    Code -> it.body(token)
+                    CodeIdToken -> {
+                        val idToken = idTokens.createForAccessToken(code)
+                        it.with(accessTokenResponseBody of AccessTokenResponse(token, idToken.value))
+                    }
                 }
-            }
-        }.also { authorizationCodes.destroy(code) }
+            }.also { authorizationCodes.destroy(code) }
+        } else {
+            return Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has already been used"))
+        }
     }
 
-    private fun errorResponse(errorCode: String, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))
+    private fun errorResponse(errorCode: Error, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))
 
     companion object {
         internal val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")
@@ -81,7 +86,16 @@ class GenerateAccessToken(
     }
 }
 
-data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
+enum class Error {
+    invalid_grant,
+    unsupported_grant_type,
+    invalid_client,
+    invalid_request,
+    unauthorized_client
+
+}
+
+data class ErrorResponse(val error: Error, val error_description: String, val error_uri: String)
 
 private fun WebForm.accessTokenRequest() =
     AccessTokenRequest(
