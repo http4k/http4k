@@ -3,30 +3,18 @@ package org.http4k.security.oauth.server
 import com.natpryce.get
 import com.natpryce.map
 import com.natpryce.mapFailure
-import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
-import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.lens.FormField
-import org.http4k.lens.Validator
-import org.http4k.lens.WebForm
-import org.http4k.lens.uri
-import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
-import org.http4k.security.oauth.server.GenerateAccessToken.Companion.authorizationCode
-import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientId
-import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientSecret
-import org.http4k.security.oauth.server.GenerateAccessToken.Companion.grantType
-import org.http4k.security.oauth.server.GenerateAccessToken.Companion.redirectUri
 import java.time.Clock
 
 class GenerateAccessToken(
@@ -40,8 +28,7 @@ class GenerateAccessToken(
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
-        val form = accessTokenForm(request)
-        val accessTokenRequest = form.accessTokenRequest()
+        val accessTokenRequest = request.accessTokenRequest()
 
         if (accessTokenRequest.grantType != "authorization_code") {
             return Response(BAD_REQUEST).body(errorResponse(Error.unsupported_grant_type, "${accessTokenRequest.grantType} is not supported"))
@@ -86,15 +73,7 @@ class GenerateAccessToken(
     private fun errorResponse(errorCode: Error, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))
 
     companion object {
-        internal val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")
-        internal val redirectUri = FormField.uri().required("redirect_uri")
-        internal val grantType = FormField.required("grant_type")
-        internal val clientSecret = FormField.required("client_secret")
-        internal val clientId = FormField.map(::ClientId, ClientId::value).required("client_id")
 
-        val accessTokenForm = Body.webForm(Validator.Strict,
-            authorizationCode, redirectUri, grantType, clientId, clientSecret
-        ).toLens()
     }
 }
 
@@ -104,24 +83,6 @@ enum class Error {
     invalid_client,
     invalid_request,
     unauthorized_client
-
 }
 
 private data class ErrorResponse(val error: Error, val error_description: String, val error_uri: String)
-
-private fun WebForm.accessTokenRequest() =
-    AccessTokenRequest(
-        grantType(this),
-        clientId(this),
-        clientSecret(this),
-        redirectUri(this),
-        authorizationCode(this)
-    )
-
-private data class AccessTokenRequest(
-    val grantType: String,
-    val clientId: ClientId,
-    val clientSecret: String,
-    val redirectUri: Uri,
-    val authorizationCode: AuthorizationCode
-)
