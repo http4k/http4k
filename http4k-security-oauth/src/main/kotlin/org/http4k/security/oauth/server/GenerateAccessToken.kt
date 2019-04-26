@@ -7,7 +7,6 @@ import com.natpryce.mapFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
@@ -44,8 +43,8 @@ class GenerateAccessToken(
                 }
             }.mapFailure { error ->
                 when (error) {
-                    is InvalidClientCredentials -> errorRenderer.render(Response(UNAUTHORIZED), error)
-                    else -> errorRenderer.render(Response(BAD_REQUEST), error)
+                    is InvalidClientCredentials -> errorRenderer.render(error, Response(UNAUTHORIZED))
+                    else -> errorRenderer.render(error)
                 }
             }.get()
     }

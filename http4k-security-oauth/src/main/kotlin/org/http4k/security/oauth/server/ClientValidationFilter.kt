@@ -2,8 +2,6 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
@@ -15,9 +13,9 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
             .then {
                 val authorizationRequest = it.authorizationRequest()
                 if(!clientValidator.validateClientId(authorizationRequest.client)) {
-                    errorRenderer.render(Response(Status.BAD_REQUEST), InvalidClient)
+                    errorRenderer.render(InvalidClient)
                 } else if (!clientValidator.validateRedirection(authorizationRequest.client, authorizationRequest.redirectUri)) {
-                    errorRenderer.render(Response(Status.BAD_REQUEST), InvalidRedirect)
+                    errorRenderer.render(InvalidRedirect)
                 } else {
                     next(it)
                 }
