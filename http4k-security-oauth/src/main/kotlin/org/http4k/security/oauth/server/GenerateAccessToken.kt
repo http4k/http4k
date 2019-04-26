@@ -1,5 +1,7 @@
 package org.http4k.security.oauth.server
 
+import com.natpryce.Failure
+import com.natpryce.Result
 import com.natpryce.get
 import com.natpryce.map
 import com.natpryce.mapFailure
@@ -26,66 +28,67 @@ class GenerateAccessToken(
     private val accessTokens: AccessTokens,
     private val clock: Clock,
     private val idTokens: IdTokens,
-    private val json : AutoMarshallingJson,
-    private val documentationUri : String = ""
+    private val json: AutoMarshallingJson,
+    private val documentationUri: String = ""
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
         val accessTokenRequest = request.accessTokenRequest()
 
+        val accessTokenResult = generateAccessToken(accessTokenRequest)
+
+        return accessTokenResult
+            .map { token ->
+                Response(OK).let {
+                    when {
+                        token.idToken == null -> it.body(token.accessToken.value)
+                        else -> it.with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken.value))
+                    }
+                }
+            }.mapFailure { error ->
+                when (error) {
+                    is InvalidClientCredentials -> Response(UNAUTHORIZED).withError(error.rfcError, error.description)
+                    else -> Response(BAD_REQUEST).withError(error.rfcError, error.description)
+                }
+            }.get()
+    }
+
+    private fun generateAccessToken(accessTokenRequest: AccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
         if (accessTokenRequest.grantType != "authorization_code") {
-            return UnsupportedGrantType(accessTokenRequest.grantType).toResponse()
+            return Failure(UnsupportedGrantType(accessTokenRequest.grantType))
         }
 
         if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
-            return InvalidClientCredentials.toResponse()
+            return Failure(InvalidClientCredentials)
         }
 
         val code = accessTokenRequest.authorizationCode
         val codeDetails = authorizationCodes.detailsFor(code)
 
         if (codeDetails.expiresAt.isBefore(clock.instant())) {
-            return AuthorizationCodeExpired.toResponse()
+            return Failure(AuthorizationCodeExpired)
         }
 
         if (codeDetails.clientId != accessTokenRequest.clientId) {
-            return InvalidClientId.toResponse()
+            return Failure(InvalidClientId)
         }
 
         if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
-            return InvalidRedirectUri.toResponse()
+            return Failure(InvalidRedirectUri)
         }
 
-        val accessTokenResult = accessTokens.create(code)
+        return accessTokens.create(code)
             .map { token ->
                 when (codeDetails.responseType) {
                     Code -> AccessTokenDetails(token)
                     CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
                 }
             }
-
-        return accessTokenResult.map { token ->
-            Response(OK).let {
-                when {
-                    token.idToken == null -> it.body(token.accessToken.value)
-                    else -> it.with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken.value))
-                }
-            }
-        }.mapFailure {
-            AuthorizationCodeAlreadyUsed.toResponse()
-        }.get()
     }
 
     private fun Response.withError(error: String, errorDescription: String) =
         with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
             .body(json.asJsonString(ErrorResponse(error, errorDescription, documentationUri)))
-
-    private fun AccessTokenError.toResponse(): Response {
-        return when (this) {
-            is InvalidClientCredentials -> Response(UNAUTHORIZED).withError(rfcError, description)
-            else -> Response(BAD_REQUEST).withError(rfcError, description)
-        }
-    }
 }
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
