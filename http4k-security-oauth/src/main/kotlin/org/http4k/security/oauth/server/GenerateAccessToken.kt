@@ -25,6 +25,7 @@ import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.authorizationCode
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientId
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.clientSecret
+import org.http4k.security.oauth.server.GenerateAccessToken.Companion.grantType
 import org.http4k.security.oauth.server.GenerateAccessToken.Companion.redirectUri
 import java.time.Clock
 
@@ -42,8 +43,8 @@ class GenerateAccessToken(
         val form = accessTokenForm(request)
         val accessTokenRequest = form.accessTokenRequest()
 
-        if (grantType(form) != "authorization_code") {
-            return Response(BAD_REQUEST).body(errorResponse(Error.unsupported_grant_type, "${grantType(form)} is not supported"))
+        if (accessTokenRequest.grantType != "authorization_code") {
+            return Response(BAD_REQUEST).body(errorResponse(Error.unsupported_grant_type, "${accessTokenRequest.grantType} is not supported"))
         }
 
         if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
@@ -87,7 +88,7 @@ class GenerateAccessToken(
     companion object {
         internal val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")
         internal val redirectUri = FormField.uri().required("redirect_uri")
-        private val grantType = FormField.required("grant_type")
+        internal val grantType = FormField.required("grant_type")
         internal val clientSecret = FormField.required("client_secret")
         internal val clientId = FormField.map(::ClientId, ClientId::value).required("client_id")
 
@@ -106,18 +107,21 @@ enum class Error {
 
 }
 
-data class ErrorResponse(val error: Error, val error_description: String, val error_uri: String)
+private data class ErrorResponse(val error: Error, val error_description: String, val error_uri: String)
 
 private fun WebForm.accessTokenRequest() =
     AccessTokenRequest(
+        grantType(this),
         clientId(this),
         clientSecret(this),
         redirectUri(this),
         authorizationCode(this)
     )
 
-data class AccessTokenRequest(
+private data class AccessTokenRequest(
+    val grantType: String,
     val clientId: ClientId,
     val clientSecret: String,
     val redirectUri: Uri,
-    val authorizationCode: AuthorizationCode)
+    val authorizationCode: AuthorizationCode
+)
