@@ -9,6 +9,7 @@ import org.http4k.lens.Header
 import org.http4k.security.oauth.server.RfcError.InvalidClient
 import org.http4k.security.oauth.server.RfcError.InvalidGrant
 import org.http4k.security.oauth.server.RfcError.UnsupportedGrantType
+import org.http4k.security.oauth.server.RfcError.UnsupportedResponseType
 
 
 class ErrorRenderer(
@@ -25,6 +26,7 @@ class ErrorRenderer(
             InvalidClient -> "invalid_client"
             InvalidGrant -> "invalid_grant"
             UnsupportedGrantType -> "unsupported_grant_type"
+            UnsupportedResponseType -> "unsupported_response_type"
         }
 
     private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)

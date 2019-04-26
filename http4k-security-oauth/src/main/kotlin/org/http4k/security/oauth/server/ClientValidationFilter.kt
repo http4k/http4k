@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
+import org.http4k.security.ResponseType
 
 class ClientValidationFilter(private val clientValidator: ClientValidator,
                              private val errorRenderer: ErrorRenderer) : Filter {
@@ -11,6 +12,9 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
     override fun invoke(next: HttpHandler): HttpHandler =
         ServerFilters.CatchLensFailure
             .then {
+                if (!validResponseTypes.contains(it.query("response_type"))) {
+                    return@then errorRenderer.render(UnsupportedResponseType(it.query("response_type").orEmpty()))
+                }
                 val authorizationRequest = it.authorizationRequest()
                 if(!clientValidator.validateClientId(authorizationRequest.client)) {
                     errorRenderer.render(InvalidClientId)
@@ -20,4 +24,8 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                     next(it)
                 }
             }
+
+    companion object {
+        val validResponseTypes = ResponseType.values().map { it.queryParameterValue }
+    }
 }

@@ -9,7 +9,8 @@ abstract class OAuthError(val rfcError: RfcError, val description: String)
 enum class RfcError {
     InvalidClient,
     InvalidGrant,
-    UnsupportedGrantType
+    UnsupportedGrantType,
+    UnsupportedResponseType
 }
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
@@ -27,3 +28,4 @@ sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuth
 
 object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
+data class UnsupportedResponseType(val requestedResponseType: String): AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")

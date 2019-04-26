@@ -43,6 +43,7 @@ internal class ClientValidationFilterTest {
     @Test
     fun `validates presence of client_id`() {
         val response = filter(Request(GET, "/auth")
+            .query("response_type", Code.queryParameterValue)
             .query("redirect_uri", validRedirectUri.toString())
         )
         assertThat(response, hasStatus(BAD_REQUEST))
@@ -52,6 +53,7 @@ internal class ClientValidationFilterTest {
     @Test
     fun `validates presence of redirect_uri`() {
         val response = filter(Request(GET, "/auth")
+            .query("response_type", Code.queryParameterValue)
             .query("client_id", validClientId.value)
         )
         assertThat(response, hasStatus(BAD_REQUEST))
@@ -78,6 +80,17 @@ internal class ClientValidationFilterTest {
         )
         assertThat(response, hasStatus(BAD_REQUEST))
         assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_client\",\"error_description\":\"The specified redirect uri is not registered\",\"error_uri\":\"SomeUri\"}"))
+    }
+
+    @Test
+    fun `validates response_type`(){
+        val response = filter(Request(GET, "/auth")
+            .query("response_type", "invalid")
+            .query("client_id", validClientId.value)
+            .query("redirect_uri", validRedirectUri.toString())
+        )
+        assertThat(response, hasStatus(BAD_REQUEST))
+        assertThat(response.bodyString(), equalTo("{\"error\":\"unsupported_response_type\",\"error_description\":\"The specified response_type 'invalid' is not supported\",\"error_uri\":\"SomeUri\"}"))
     }
 }
 
