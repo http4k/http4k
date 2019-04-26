@@ -24,7 +24,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler = StaticRoutingHttpHandler(
         pathSegments = validPath,
         resourceLoader = ResourceLoader.Classpath(),
-        extraPairs = emptyMap()
+        extraFileExtensionToContentTypes = emptyMap()
     )
 
     private val pkg = javaClass.`package`.name.replace('.', '/')

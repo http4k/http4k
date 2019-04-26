@@ -20,8 +20,8 @@ import org.http4k.websocket.WsConsumer
 
 internal class ResourceLoadingHandler(private val pathSegments: String,
                                       private val resourceLoader: ResourceLoader,
-                                      extraPairs: Map<String, ContentType>) : HttpHandler {
-    private val extMap = MimeTypes(extraPairs)
+                                      extraFileExtensionToContentTypes: Map<String, ContentType>) : HttpHandler {
+    private val extMap = MimeTypes(extraFileExtensionToContentTypes)
 
     override fun invoke(p1: Request): Response = if (p1.uri.path.startsWith(pathSegments)) {
         val path = convertPath(p1.uri.path)
@@ -44,7 +44,7 @@ internal class ResourceLoadingHandler(private val pathSegments: String,
 
 internal data class StaticRoutingHttpHandler(private val pathSegments: String,
                                              private val resourceLoader: ResourceLoader,
-                                             private val extraPairs: Map<String, ContentType>,
+                                             private val extraFileExtensionToContentTypes: Map<String, ContentType>,
                                              private val filter: Filter = Filter.NoOp
 ) : RoutingHttpHandler {
 
@@ -52,7 +52,7 @@ internal data class StaticRoutingHttpHandler(private val pathSegments: String,
 
     override fun withBasePath(new: String): RoutingHttpHandler = copy(pathSegments = new + pathSegments)
 
-    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraPairs)
+    private val handlerNoFilter = ResourceLoadingHandler(pathSegments, resourceLoader, extraFileExtensionToContentTypes)
     private val handlerWithFilter = filter.then(handlerNoFilter)
 
     override fun match(request: Request): HttpHandler? = handlerNoFilter(request).let {
