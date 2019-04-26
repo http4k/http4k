@@ -17,9 +17,6 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
-import org.http4k.security.oauth.server.AccessTokenError.InvalidClient
-import org.http4k.security.oauth.server.AccessTokenError.InvalidGrant
-import org.http4k.security.oauth.server.AccessTokenError.UnsupportedGrantType
 import java.time.Clock
 
 class GenerateAccessToken(
@@ -36,26 +33,26 @@ class GenerateAccessToken(
         val accessTokenRequest = request.accessTokenRequest()
 
         if (accessTokenRequest.grantType != "authorization_code") {
-            return Response(BAD_REQUEST).withError(UnsupportedGrantType, "${accessTokenRequest.grantType} is not supported")
+            return UnsupportedGrantType(accessTokenRequest.grantType).toResponse()
         }
 
         if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
-            return Response(UNAUTHORIZED).withError(InvalidClient, "Client id and secret unrecognised")
+            return InvalidClientCredentials.toResponse()
         }
 
         val code = accessTokenRequest.authorizationCode
         val codeDetails = authorizationCodes.detailsFor(code)
 
         if (codeDetails.expiresAt.isBefore(clock.instant())) {
-            return Response(BAD_REQUEST).withError(InvalidGrant, "The authorization code has expired")
+            return AuthorizationCodeExpired.toResponse()
         }
 
         if (codeDetails.clientId != accessTokenRequest.clientId) {
-            return Response(BAD_REQUEST).withError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
+            return InvalidClientId.toResponse()
         }
 
         if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
-            return Response(BAD_REQUEST).withError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
+            return InvalidRedirectUri.toResponse()
         }
 
         val accessTokenResult = accessTokens.create(code)
@@ -71,23 +68,30 @@ class GenerateAccessToken(
                 }
             }
         }.mapFailure {
-            Response(BAD_REQUEST).withError(InvalidGrant, "The authorization code has already been used")
+            AuthorizationCodeAlreadyUsed.toResponse()
         }.get()
     }
 
-    private fun Response.withError(error: AccessTokenError, errorDescription: String) =
+    private fun Response.withError(error: String, errorDescription: String) =
         with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(json.asJsonString(ErrorResponse(error.rfcValue, errorDescription, documentationUri)))
+            .body(json.asJsonString(ErrorResponse(error, errorDescription, documentationUri)))
 
+    private fun AccessTokenError.toResponse(): Response {
+        return when (this) {
+            is InvalidClientCredentials -> Response(UNAUTHORIZED).withError(rfcError, description)
+            else -> Response(BAD_REQUEST).withError(rfcError, description)
+        }
+    }
 }
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
-private enum class AccessTokenError(val rfcValue: String) {
-    InvalidGrant("invalid_grant"),
-    UnsupportedGrantType("unsupported_grant_type"),
-    InvalidClient("invalid_client"),
-    InvalidRequest("invalid_request"),
-    UnauthorizedClient("unauthorized_client")
-}
+sealed class AccessTokenError(val rfcError: String, val description: String)
+
+private data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError("unsupported_grant_type", "$requestedGrantType is not supported")
+private object InvalidClientCredentials : AccessTokenError("invalid_client", "The 'client_id' parameter does not match the authorization request")
+private object AuthorizationCodeExpired : AccessTokenError("invalid_grant", "The authorization code has expired")
+private object InvalidClientId : AccessTokenError("invalid_grant", "The 'client_id' parameter does not match the authorization request")
+private object InvalidRedirectUri : AccessTokenError("invalid_grant", "The 'redirect_uri' parameter does not match the authorization request")
+object AuthorizationCodeAlreadyUsed : AccessTokenError("invalid_grant", "The authorization code has already been used")
 
 private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)

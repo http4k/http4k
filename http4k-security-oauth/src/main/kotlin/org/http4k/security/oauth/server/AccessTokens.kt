@@ -12,5 +12,3 @@ interface AccessTokens {
      */
     fun create(authorizationCode: AuthorizationCode): Result<AccessTokenContainer, AuthorizationCodeAlreadyUsed>
 }
-
-object AuthorizationCodeAlreadyUsed
