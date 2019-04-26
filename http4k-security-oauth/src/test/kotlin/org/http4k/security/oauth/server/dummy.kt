@@ -35,6 +35,7 @@ class ErroringAccessTokens(private val error : AuthorizationCodeAlreadyUsed) : A
 }
 
 class DummyClientValidator : ClientValidator {
+    override fun validateClientId(clientId: ClientId): Boolean = true
     override fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean = true
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
 }
@@ -49,8 +50,10 @@ class HardcodedClientValidator(
     private val expectedRedirectionUri: Uri,
     private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
 ) : ClientValidator {
+    override fun validateClientId(clientId: ClientId): Boolean = clientId == this.expectedClientId
+
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri) =
-        clientId == this.expectedClientId && redirectionUri == this.expectedRedirectionUri
+         redirectionUri == this.expectedRedirectionUri
 
     override fun validateCredentials(clientId: ClientId, clientSecret: String) =
         clientId == expectedClientId && clientSecret == expectedClientSecret

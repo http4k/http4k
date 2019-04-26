@@ -89,4 +89,4 @@ private object InvalidClientId : AccessTokenError("invalid_grant", "The 'client_
 private object InvalidRedirectUri : AccessTokenError("invalid_grant", "The 'redirect_uri' parameter does not match the authorization request")
 object AuthorizationCodeAlreadyUsed : AccessTokenError("invalid_grant", "The authorization code has already been used")
 
-private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
+data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
