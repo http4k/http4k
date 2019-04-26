@@ -22,5 +22,8 @@ object ClientIdMismatch : AccessTokenError(InvalidGrant, "The 'client_id' parame
 object RedirectUriMismatch : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
 object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
 
-object InvalidClientId : OAuthError(InvalidClient, "The specified client id is invalid")
-object InvalidRedirectUri : OAuthError(InvalidClient, "The specified redirect uri is not registered")
+// represents errors according to https://tools.ietf.org/html/rfc6749#section-4.1.2.1
+sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)
+
+object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
+object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
