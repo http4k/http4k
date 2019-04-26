@@ -1,7 +1,6 @@
 package org.http4k.security.oauth.server
 
 import com.natpryce.Failure
-import com.natpryce.Result
 import com.natpryce.get
 import com.natpryce.map
 import com.natpryce.mapFailure
@@ -53,38 +52,28 @@ class GenerateAccessToken(
             }.get()
     }
 
-    private fun generateAccessToken(accessTokenRequest: AccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
-        if (accessTokenRequest.grantType != "authorization_code") {
-            return Failure(UnsupportedGrantType(accessTokenRequest.grantType))
-        }
+    private fun generateAccessToken(accessTokenRequest: AccessTokenRequest) =
+        when {
+            accessTokenRequest.grantType != "authorization_code" -> Failure(UnsupportedGrantType(accessTokenRequest.grantType))
+            !clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret) -> Failure(InvalidClientCredentials)
+            else -> {
+                val code = accessTokenRequest.authorizationCode
+                val codeDetails = authorizationCodes.detailsFor(code)
 
-        if (!clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret)) {
-            return Failure(InvalidClientCredentials)
-        }
-
-        val code = accessTokenRequest.authorizationCode
-        val codeDetails = authorizationCodes.detailsFor(code)
-
-        if (codeDetails.expiresAt.isBefore(clock.instant())) {
-            return Failure(AuthorizationCodeExpired)
-        }
-
-        if (codeDetails.clientId != accessTokenRequest.clientId) {
-            return Failure(InvalidClientId)
-        }
-
-        if (codeDetails.redirectUri != accessTokenRequest.redirectUri) {
-            return Failure(InvalidRedirectUri)
-        }
-
-        return accessTokens.create(code)
-            .map { token ->
-                when (codeDetails.responseType) {
-                    Code -> AccessTokenDetails(token)
-                    CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
+                when {
+                    codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
+                    codeDetails.clientId != accessTokenRequest.clientId -> Failure(InvalidClientId)
+                    codeDetails.redirectUri != accessTokenRequest.redirectUri -> Failure(InvalidRedirectUri)
+                    else -> accessTokens.create(code)
+                        .map { token ->
+                            when (codeDetails.responseType) {
+                                Code -> AccessTokenDetails(token)
+                                CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
+                            }
+                        }
                 }
             }
-    }
+        }
 
     private fun Response.withError(error: String, errorDescription: String) =
         with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
@@ -93,7 +82,6 @@ class GenerateAccessToken(
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
 sealed class AccessTokenError(val rfcError: String, val description: String)
-
 private data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError("unsupported_grant_type", "$requestedGrantType is not supported")
 private object InvalidClientCredentials : AccessTokenError("invalid_client", "The 'client_id' parameter does not match the authorization request")
 private object AuthorizationCodeExpired : AccessTokenError("invalid_grant", "The authorization code has expired")
