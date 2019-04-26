@@ -4,7 +4,6 @@ import com.natpryce.Failure
 import com.natpryce.get
 import com.natpryce.map
 import com.natpryce.mapFailure
-import org.http4k.core.ContentType
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,8 +11,6 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
-import org.http4k.format.AutoMarshallingJson
-import org.http4k.lens.Header
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
@@ -27,8 +24,7 @@ class GenerateAccessToken(
     private val accessTokens: AccessTokens,
     private val clock: Clock,
     private val idTokens: IdTokens,
-    private val json: AutoMarshallingJson,
-    private val documentationUri: String = ""
+    private val errorRenderer: ErrorRenderer
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
@@ -46,8 +42,8 @@ class GenerateAccessToken(
                 }
             }.mapFailure { error ->
                 when (error) {
-                    is InvalidClientCredentials -> Response(UNAUTHORIZED).withError(error.rfcError, error.description)
-                    else -> Response(BAD_REQUEST).withError(error.rfcError, error.description)
+                    is InvalidClientCredentials -> errorRenderer.render(Response(UNAUTHORIZED), error.rfcError, error.description)
+                    else -> errorRenderer.render(Response(BAD_REQUEST), error.rfcError, error.description)
                 }
             }.get()
     }
@@ -74,10 +70,6 @@ class GenerateAccessToken(
                 }
             }
         }
-
-    private fun Response.withError(error: String, errorDescription: String) =
-        with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(json.asJsonString(ErrorResponse(error, errorDescription, documentationUri)))
 }
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2

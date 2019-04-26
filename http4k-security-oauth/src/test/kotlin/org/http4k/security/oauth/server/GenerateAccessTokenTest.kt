@@ -36,7 +36,7 @@ class GenerateAccessTokenTest {
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val request = Request(Method.GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK))
-    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), json)
+    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), ErrorRenderer(json))
 
     @Test
     fun `generates a dummy token`() {
@@ -150,7 +150,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles already used authentication code`(){
-        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), json)
+        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json))
         val request = Request(Method.POST, "/token")
                 .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
                 .form("grant_type", "authorization_code")
