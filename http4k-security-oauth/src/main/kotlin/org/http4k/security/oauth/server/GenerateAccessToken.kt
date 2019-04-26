@@ -15,8 +15,6 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
-import org.http4k.security.oauth.server.RfcError.InvalidClient
-import org.http4k.security.oauth.server.RfcError.InvalidGrant
 import java.time.Clock
 
 class GenerateAccessToken(
@@ -30,7 +28,6 @@ class GenerateAccessToken(
 
     override fun invoke(request: Request): Response {
         val accessTokenRequest = request.accessTokenRequest()
-
         val accessTokenResult = generateAccessToken(accessTokenRequest)
 
         return accessTokenResult
@@ -59,8 +56,8 @@ class GenerateAccessToken(
 
                 when {
                     codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
-                    codeDetails.clientId != accessTokenRequest.clientId -> Failure(InvalidClientId)
-                    codeDetails.redirectUri != accessTokenRequest.redirectUri -> Failure(InvalidRedirectUri)
+                    codeDetails.clientId != accessTokenRequest.clientId -> Failure(ClientIdMismatch)
+                    codeDetails.redirectUri != accessTokenRequest.redirectUri -> Failure(RedirectUriMismatch)
                     else -> accessTokens.create(code)
                         .map { token ->
                             when (codeDetails.responseType) {
@@ -71,25 +68,4 @@ class GenerateAccessToken(
                 }
             }
         }
-}
-
-interface OAuthError {
-    val rfcError: RfcError
-    val description: String
-}
-
-// represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
-sealed class AccessTokenError(override val rfcError: RfcError, override val description: String) : OAuthError
-
-private data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError(RfcError.UnsupportedGrantType, "$requestedGrantType is not supported")
-private object InvalidClientCredentials : AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
-private object AuthorizationCodeExpired : AccessTokenError(InvalidGrant, "The authorization code has expired")
-private object InvalidClientId : AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
-private object InvalidRedirectUri : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
-object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
-
-enum class RfcError {
-    InvalidClient,
-    InvalidGrant,
-    UnsupportedGrantType
 }

@@ -13,21 +13,11 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
             .then {
                 val authorizationRequest = it.authorizationRequest()
                 if(!clientValidator.validateClientId(authorizationRequest.client)) {
-                    errorRenderer.render(InvalidClient)
+                    errorRenderer.render(InvalidClientId)
                 } else if (!clientValidator.validateRedirection(authorizationRequest.client, authorizationRequest.redirectUri)) {
-                    errorRenderer.render(InvalidRedirect)
+                    errorRenderer.render(InvalidRedirectUri)
                 } else {
                     next(it)
                 }
             }
-}
-
-private object InvalidClient : OAuthError {
-    override val rfcError = RfcError.InvalidClient
-    override val description = "The specified client id is invalid"
-}
-
-private object InvalidRedirect : OAuthError {
-    override val rfcError = RfcError.InvalidClient
-    override val description: String = "The specified redirect uri is not registered"
 }
