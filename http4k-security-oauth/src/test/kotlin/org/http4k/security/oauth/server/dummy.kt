@@ -1,5 +1,7 @@
 package org.http4k.security.oauth.server
 
+import com.natpryce.Failure
+import com.natpryce.Success
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -8,7 +10,7 @@ import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 open class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode =
@@ -25,11 +27,11 @@ open class DummyIdtokens :IdTokens{
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create(authorizationCode: AuthorizationCode) = AccessTokenResult(AccessTokenContainer("dummy-access-token"))
+    override fun create(authorizationCode: AuthorizationCode) = Success(AccessTokenContainer("dummy-access-token"))
 }
 
-class ErroringAccessTokens(val error : AccessTokenCreationError) : AccessTokens {
-    override fun create(authorizationCode: AuthorizationCode) = AccessTokenResult(error = error)
+class ErroringAccessTokens(private val error : AuthorizationCodeAlreadyUsed) : AccessTokens {
+    override fun create(authorizationCode: AuthorizationCode) = Failure(error)
 }
 
 class DummyClientValidator : ClientValidator {

@@ -1,11 +1,23 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.core.*
+import com.natpryce.get
+import com.natpryce.map
+import com.natpryce.mapFailure
+import org.http4k.core.Body
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
+import org.http4k.core.Uri
+import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
-import org.http4k.lens.*
+import org.http4k.lens.FormField
+import org.http4k.lens.Validator
+import org.http4k.lens.WebForm
+import org.http4k.lens.uri
+import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
@@ -55,20 +67,19 @@ class GenerateAccessToken(
 
         val accessTokenResult = accessTokens.create(code)
 
-        return if (accessTokenResult.isSuccess()) {
+        return accessTokenResult.map { token ->
             Response(OK).let {
-                val token = accessTokenResult.token!!.value
                 when (codeDetails.responseType) {
-                    Code -> it.body(token)
+                    Code -> it.body(token.value)
                     CodeIdToken -> {
                         val idToken = idTokens.createForAccessToken(code)
-                        it.with(accessTokenResponseBody of AccessTokenResponse(token, idToken.value))
+                        it.with(accessTokenResponseBody of AccessTokenResponse(token.value, idToken.value))
                     }
                 }
             }
-        } else {
+        }.mapFailure {
             Response(BAD_REQUEST).body(errorResponse(Error.invalid_grant, "The authorization code has already been used"))
-        }
+        }.get()
     }
 
     private fun errorResponse(errorCode: Error, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))

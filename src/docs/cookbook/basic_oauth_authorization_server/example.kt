@@ -1,8 +1,15 @@
+import com.natpryce.Success
 import org.http4k.client.OkHttp
-import org.http4k.core.*
+import org.http4k.core.Credentials
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.format.Jackson
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
@@ -11,12 +18,20 @@ import org.http4k.security.AccessTokenContainer
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
-import org.http4k.security.oauth.server.*
+import org.http4k.security.oauth.server.AccessTokens
+import org.http4k.security.oauth.server.AuthRequest
+import org.http4k.security.oauth.server.AuthorizationCode
+import org.http4k.security.oauth.server.AuthorizationCodeDetails
+import org.http4k.security.oauth.server.AuthorizationCodes
+import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.server.ClientValidator
+import org.http4k.security.oauth.server.InsecureCookieBasedAuthRequestTracking
+import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.*
+import java.util.UUID
 
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {
@@ -96,5 +111,5 @@ class InsecureAccessTokens : AccessTokens {
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(authorizationCode: AuthorizationCode) =
-        AccessTokenResult(AccessTokenContainer(UUID.randomUUID().toString()))
+        Success(AccessTokenContainer(UUID.randomUUID().toString()))
 }
