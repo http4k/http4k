@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
+import org.http4k.security.AccessTokenDetails
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
@@ -56,15 +57,18 @@ class GenerateAccessToken(
         }
 
         val accessTokenResult = accessTokens.create(code)
+            .map { token ->
+                when (codeDetails.responseType) {
+                    Code -> AccessTokenDetails(token)
+                    CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
+                }
+            }
 
         return accessTokenResult.map { token ->
             Response(OK).let {
-                when (codeDetails.responseType) {
-                    Code -> it.body(token.value)
-                    CodeIdToken -> {
-                        val idToken = idTokens.createForAccessToken(code)
-                        it.with(accessTokenResponseBody of AccessTokenResponse(token.value, idToken.value))
-                    }
+                when {
+                    token.idToken == null -> it.body(token.accessToken.value)
+                    else -> it.with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken.value))
                 }
             }
         }.mapFailure {
