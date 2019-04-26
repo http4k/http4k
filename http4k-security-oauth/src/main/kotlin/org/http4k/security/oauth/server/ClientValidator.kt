@@ -7,9 +7,12 @@ import org.http4k.core.Uri
  */
 interface ClientValidator {
     /**
-     * Client validation must include:
      * - check that client_id is a valid, registered app
-     * - redirection URI is one of the allowed ones for that app
+     */
+    fun validateClientId(clientId: ClientId): Boolean
+
+    /**
+     * - redirection URI is one of the allowed ones for that client
      */
     fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean
 

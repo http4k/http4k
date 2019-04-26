@@ -42,7 +42,8 @@ fun main() {
             authorizationCodes = InsecureAuthorizationCodes(),
             accessTokens = InsecureAccessTokens(),
             clock = Clock.systemUTC(),
-            json = Jackson
+            json = Jackson,
+            documentationUri = "See the full API docs at https://example.com/docs/access_token"
         )
 
         return routes(
@@ -84,6 +85,8 @@ fun main() {
 
 // This class allow you to make extra checks about the oauth client during the flow
 class InsecureClientValidator : ClientValidator {
+    // the client id should be a registered one
+    override fun validateClientId(clientId: ClientId): Boolean = true
     // one should only redirect to URLs registered against a particular client
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
 
