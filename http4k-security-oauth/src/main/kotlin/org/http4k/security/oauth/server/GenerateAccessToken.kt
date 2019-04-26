@@ -71,10 +71,6 @@ class GenerateAccessToken(
     }
 
     private fun errorResponse(errorCode: Error, errorDescription: String) = json.asJsonString(ErrorResponse(errorCode, errorDescription, documentationUri))
-
-    companion object {
-
-    }
 }
 
 enum class Error {
