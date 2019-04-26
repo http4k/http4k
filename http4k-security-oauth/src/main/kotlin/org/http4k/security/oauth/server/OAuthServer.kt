@@ -29,11 +29,12 @@ class OAuthServer(
         idTokens: IdTokens = IdTokens.Unsupported,
         documentationUri: String = ""
 ) {
+    private val errorRenderer = ErrorRenderer(json, documentationUri)
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock, idTokens, ErrorRenderer(json, documentationUri)))
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock, idTokens, errorRenderer))
 
     // use this filter to protect your authentication/authorization pages
-    val authenticationStart = ClientValidationFilter(clientValidator, json, documentationUri)
+    val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer)
         .then(AuthRequestTrackingFilter(authRequestTracking))
 
     // use this filter to handle authorization code generation and redirection back to client
