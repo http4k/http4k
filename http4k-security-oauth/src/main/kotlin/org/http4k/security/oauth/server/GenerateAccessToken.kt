@@ -16,6 +16,8 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.server.RfcError.InvalidClient
+import org.http4k.security.oauth.server.RfcError.InvalidGrant
 import java.time.Clock
 
 class GenerateAccessToken(
@@ -42,8 +44,8 @@ class GenerateAccessToken(
                 }
             }.mapFailure { error ->
                 when (error) {
-                    is InvalidClientCredentials -> errorRenderer.render(Response(UNAUTHORIZED), error.rfcError, error.description)
-                    else -> errorRenderer.render(Response(BAD_REQUEST), error.rfcError, error.description)
+                    is InvalidClientCredentials -> errorRenderer.render(Response(UNAUTHORIZED), error)
+                    else -> errorRenderer.render(Response(BAD_REQUEST), error)
                 }
             }.get()
     }
@@ -72,13 +74,23 @@ class GenerateAccessToken(
         }
 }
 
-// represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
-sealed class AccessTokenError(val rfcError: String, val description: String)
-private data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError("unsupported_grant_type", "$requestedGrantType is not supported")
-private object InvalidClientCredentials : AccessTokenError("invalid_client", "The 'client_id' parameter does not match the authorization request")
-private object AuthorizationCodeExpired : AccessTokenError("invalid_grant", "The authorization code has expired")
-private object InvalidClientId : AccessTokenError("invalid_grant", "The 'client_id' parameter does not match the authorization request")
-private object InvalidRedirectUri : AccessTokenError("invalid_grant", "The 'redirect_uri' parameter does not match the authorization request")
-object AuthorizationCodeAlreadyUsed : AccessTokenError("invalid_grant", "The authorization code has already been used")
+interface OAuthError {
+    val rfcError: RfcError
+    val description: String
+}
 
-data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
+// represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
+sealed class AccessTokenError(override val rfcError: RfcError, override val description: String) : OAuthError
+
+private data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError(RfcError.UnsupportedGrantType, "$requestedGrantType is not supported")
+private object InvalidClientCredentials : AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
+private object AuthorizationCodeExpired : AccessTokenError(InvalidGrant, "The authorization code has expired")
+private object InvalidClientId : AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
+private object InvalidRedirectUri : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
+object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
+
+enum class RfcError {
+    InvalidClient,
+    InvalidGrant,
+    UnsupportedGrantType
+}
