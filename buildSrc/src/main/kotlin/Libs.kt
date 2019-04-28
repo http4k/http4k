@@ -38,6 +38,10 @@ object Libs {
     const val hamkrest: String = "com.natpryce:hamkrest:" + Versions.hamkrest
 
     /**
+     * [result4k website](https://github.com/npryce/result4k) */
+    const val result4k: String = "com.natpryce:result4k:" + Versions.result4k
+
+    /**
      * [moshi-kotlin website](https://github.com/square/moshi) */
     const val moshi_kotlin: String =
             "com.squareup.moshi:moshi-kotlin:" + Versions.com_squareup_moshi

@@ -21,17 +21,19 @@ object Versions {
 
     const val hamkrest: String = "1.7.0.0"
 
+    const val result4k: String = "2.0.0"
+
     const val com_squareup_moshi: String = "1.8.0"
 
     const val okhttp: String = "3.14.1"
 
     const val io_github_resilience4j: String = "0.14.1"
 
-    const val ktor_server_cio: String = "1.1.3"
+    const val ktor_server_cio: String = "1.1.4"
 
     const val micrometer_core: String = "1.1.4"
 
-    const val netty_codec_http2: String = "4.1.34.Final"
+    const val netty_codec_http2: String = "4.1.35.Final"
 
     const val pebble: String = "3.0.8"
 
@@ -41,7 +43,7 @@ object Versions {
 
     const val jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin: String = "0.2.6"
 
-    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.2"
+    const val nebula_provided_base_gradle_plugin: String = "3.0.3" //available: "5.0.3"
 
     const val net_saliman_cobertura_gradle_plugin: String = "2.6.1"
 
@@ -59,11 +61,11 @@ object Versions {
 
     const val httpcore: String = "4.4.11"
 
-    const val http2_server: String = "9.4.15.v20190215"
+    const val http2_server: String = "9.4.17.v20190418"
 
-    const val javax_websocket_server_impl: String = "9.4.15.v20190215"
+    const val javax_websocket_server_impl: String = "9.4.17.v20190418"
 
-    const val org_eclipse_jetty: String = "9.4.15.v20190215"
+    const val org_eclipse_jetty: String = "9.4.17.v20190418"
 
     const val freemarker: String = "2.3.28"
 
@@ -71,7 +73,7 @@ object Versions {
 
     const val dokka_gradle_plugin: String = "0.9.18"
 
-    const val org_jetbrains_kotlin: String = "1.3.30"
+    const val org_jetbrains_kotlin: String = "1.3.31"
 
     const val json: String = "20180813"
 
@@ -95,10 +97,10 @@ object Versions {
     object Gradle {
         const val runningVersion: String = "5.0"
 
-        const val currentVersion: String = "5.3.1"
+        const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190410000104+0000"
+        const val nightlyVersion: String = "5.5-20190428000050+0000"
 
-        const val releaseCandidate: String = "5.4-rc-1"
+        const val releaseCandidate: String = ""
     }
 }
