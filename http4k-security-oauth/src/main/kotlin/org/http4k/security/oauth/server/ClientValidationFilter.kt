@@ -13,13 +13,13 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
         ServerFilters.CatchLensFailure
             .then {
                 if (!validResponseTypes.contains(it.query("response_type"))) {
-                    return@then errorRenderer.render(UnsupportedResponseType(it.query("response_type").orEmpty()))
+                    return@then errorRenderer.response(UnsupportedResponseType(it.query("response_type").orEmpty()))
                 }
                 val authorizationRequest = it.authorizationRequest()
                 if(!clientValidator.validateClientId(authorizationRequest.client)) {
-                    errorRenderer.render(InvalidClientId)
+                    errorRenderer.response(InvalidClientId)
                 } else if (!clientValidator.validateRedirection(authorizationRequest.client, authorizationRequest.redirectUri)) {
-                    errorRenderer.render(InvalidRedirectUri)
+                    errorRenderer.response(InvalidRedirectUri)
                 } else {
                     next(it)
                 }

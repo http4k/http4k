@@ -3,6 +3,7 @@ package org.http4k.security.oauth.server
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
@@ -17,9 +18,18 @@ class ErrorRenderer(
     private val documentationUri: String = ""
 ) {
 
-    fun render(error: OAuthError, response: Response = Response(BAD_REQUEST)) =
+    fun response(error: OAuthError) = when (error) {
+        is InvalidClientCredentials -> createResponse(error, Response(UNAUTHORIZED))
+        else -> createResponse(error, Response(BAD_REQUEST))
+    }
+
+    private fun createResponse(error: OAuthError, response: Response) =
         response.with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
-            .body(json.asJsonString(ErrorResponse(error.rfcError.rfcValue, error.description, documentationUri)))
+            .body(json.asJsonString(ErrorResponse(
+                error.rfcError.rfcValue,
+                error.description,
+                documentationUri
+            )))
 
     private val RfcError.rfcValue
         get() = when (this) {
