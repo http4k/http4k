@@ -36,5 +36,8 @@ abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), J
 
     inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = Body.json(description, contentNegotiation).map({ it.asA(T::class) }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = autoBody(description, contentNegotiation)
+
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None) =
+        body(description, contentNegotiation).map({ it.asA(T::class) }, { it.asJsonObject() })
 }

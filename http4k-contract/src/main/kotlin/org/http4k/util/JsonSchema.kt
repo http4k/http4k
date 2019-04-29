@@ -8,12 +8,8 @@ import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 
-class IllegalSchemaException(message: String) : Exception(message)
-
-data class JsonSchema<out NODE>(val node: NODE, val definitions: Set<Pair<String, NODE>>)
-
-class JsonToJsonSchema<NODE>(private val json: Json<NODE>) {
-    fun toSchema(node: NODE, overrideDefinitionId: String? = null) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
+class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<NODE, NODE> {
+    override fun toSchema(node: NODE, overrideDefinitionId: String?) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
         when (json.typeOf(node)) {
