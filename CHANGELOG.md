@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
 rationale when appropriate:
 
-### v3.139.0 (uncut)
-- Update dependencies (including Kotlin bump to 1.3.31)
+### v3.140.0
+- [all] Update dependencies (including Kotlin bump to 1.3.31)
+- [http4k-security-oauth] Handle user rejecting/failing authentication. H/T @andymoody 
 
 ### v3.139.0
 - Allow access token generation to explicitly reject an authorization code already used. H/T @andymoody 
