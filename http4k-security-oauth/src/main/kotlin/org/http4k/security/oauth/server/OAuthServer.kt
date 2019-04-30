@@ -27,7 +27,7 @@ class OAuthServer(
         json: AutoMarshallingJson,
         clock: Clock,
         idTokens: IdTokens = IdTokens.Unsupported,
-        documentationUri: String = ""
+        documentationUri: String? = null
 ) {
     private val errorRenderer = ErrorRenderer(json, documentationUri)
     // endpoint to retrieve access token for a given authorization code
@@ -37,8 +37,8 @@ class OAuthServer(
     val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer)
         .then(AuthRequestTrackingFilter(authRequestTracking))
 
-    // use this filter to handle authorization code generation and redirection back to client
-    val authenticationComplete = AuthenticationCompleteFilter(authorizationCodes, authRequestTracking, idTokens)
+    // endpoint to handle authorization code generation and redirection back to client
+    val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

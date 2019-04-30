@@ -28,7 +28,7 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
     return routes(
             server.tokenRoute,
             "/my-login-page" bind Method.GET to server.authenticationStart.then { Response(Status.OK).body("Please authenticate") },
-            "/my-login-page" bind Method.POST to server.authenticationComplete.then { Response(Status.OK) }
+            "/my-login-page" bind Method.POST to server.authenticationComplete
     )
 }
 
@@ -53,7 +53,7 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
                 val flow = requestPersistence.resolveAuthRequest(it) ?: error("flow was not persisted")
                 Response(Status.OK).body("Allow ${flow.client.value} to access ${flow.scopes.joinToString(" and ")}?")
             },
-            "/verify-scope" bind Method.POST to server.authenticationComplete.then { Response(Status.OK) }
+            "/verify-scope" bind Method.POST to server.authenticationComplete
     )
 }
 

@@ -1,5 +1,6 @@
 package org.http4k.security.oauth.server
 
+import com.natpryce.get
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -35,7 +36,7 @@ class GenerateAccessTokenTest {
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val request = Request(Method.GET, "http://some-thing")
-    private val code = codes.create(request, authRequest, Response(OK))
+    private val code = codes.create(request, authRequest, Response(OK)).get() as AuthorizationCode
     private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), ErrorRenderer(json))
 
     @Test
@@ -54,7 +55,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates dummy access_token and id_token`() {
-        val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken), Response(OK))
+        val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken), Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -102,7 +103,7 @@ class GenerateAccessTokenTest {
     fun `handles expired code`() {
         handlerClock.advance(1, SECONDS)
 
-        val expiredCode = codes.create(request, authRequest, Response(OK))
+        val expiredCode = codes.create(request, authRequest, Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -118,7 +119,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles client id different from one in authorization code`(){
-        val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK))
+        val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -134,7 +135,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles redirectUri different from one in authorization code`(){
-        val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK))
+        val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
@@ -163,8 +164,30 @@ class GenerateAccessTokenTest {
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }
 
-    private fun withErrorType(errorType: String) = containsSubstring("\"error\":\"$errorType\"")
+    @Test
+    fun `correctly returns documentation uri if provided`(){
+        val documentationUri = "SomeUri"
+        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json, documentationUri))
+        val request = Request(Method.POST, "/token")
+                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+                .form("grant_type", "authorization_code")
+                .form("code", code.value)
+                .form("client_id", authRequest.client.value)
+                .form("client_secret", "a-secret")
+                .form("redirect_uri", authRequest.redirectUri.toString())
+        val response = handler(request)
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorTypeAndUri("invalid_grant", documentationUri)))
+    }
+
+    private fun withErrorType(errorType: String) =
+            containsSubstring("\"error\":\"$errorType\"")
             .and(containsSubstring("\"error_description\":"))
+            .and(containsSubstring("\"error_uri\":null"))
+
+    private fun withErrorTypeAndUri(errorType: String, errorUri: String) = containsSubstring("\"error\":\"$errorType\"")
+            .and(containsSubstring("\"error_description\":"))
+            .and(containsSubstring("\"error_uri\":\"${errorUri}\""))
 }
 
 class SettableClock : Clock() {
