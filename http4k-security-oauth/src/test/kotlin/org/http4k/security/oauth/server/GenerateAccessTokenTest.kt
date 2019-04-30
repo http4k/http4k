@@ -118,7 +118,7 @@ class GenerateAccessTokenTest {
     }
 
     @Test
-    fun `handles client id different from one in authorization code`(){
+    fun `handles client id different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
@@ -134,7 +134,7 @@ class GenerateAccessTokenTest {
     }
 
     @Test
-    fun `handles redirectUri different from one in authorization code`(){
+    fun `handles redirectUri different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).get() as AuthorizationCode
 
         val response = handler(Request(Method.POST, "/token")
@@ -150,44 +150,44 @@ class GenerateAccessTokenTest {
     }
 
     @Test
-    fun `handles already used authentication code`(){
+    fun `handles already used authentication code`() {
         val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json))
         val request = Request(Method.POST, "/token")
-                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-                .form("grant_type", "authorization_code")
-                .form("code", code.value)
-                .form("client_id", authRequest.client.value)
-                .form("client_secret", "a-secret")
-                .form("redirect_uri", authRequest.redirectUri.toString())
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", code.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
         val response = handler(request)
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("invalid_grant")))
     }
 
     @Test
-    fun `correctly returns documentation uri if provided`(){
+    fun `correctly returns documentation uri if provided`() {
         val documentationUri = "SomeUri"
         val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json, documentationUri))
         val request = Request(Method.POST, "/token")
-                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-                .form("grant_type", "authorization_code")
-                .form("code", code.value)
-                .form("client_id", authRequest.client.value)
-                .form("client_secret", "a-secret")
-                .form("redirect_uri", authRequest.redirectUri.toString())
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", code.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
         val response = handler(request)
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorTypeAndUri("invalid_grant", documentationUri)))
     }
 
     private fun withErrorType(errorType: String) =
-            containsSubstring("\"error\":\"$errorType\"")
+        containsSubstring("\"error\":\"$errorType\"")
             .and(containsSubstring("\"error_description\":"))
             .and(containsSubstring("\"error_uri\":null"))
 
     private fun withErrorTypeAndUri(errorType: String, errorUri: String) = containsSubstring("\"error\":\"$errorType\"")
-            .and(containsSubstring("\"error_description\":"))
-            .and(containsSubstring("\"error_uri\":\"${errorUri}\""))
+        .and(containsSubstring("\"error_description\":"))
+        .and(containsSubstring("\"error_uri\":\"${errorUri}\""))
 }
 
 class SettableClock : Clock() {

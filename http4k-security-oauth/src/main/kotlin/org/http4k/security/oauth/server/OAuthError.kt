@@ -39,4 +39,4 @@ sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuth
 object UserRejectedRequest : AuthorizationError(RfcError.AccessDenied, "The user declined the authorization request")
 object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
-data class UnsupportedResponseType(val requestedResponseType: String): AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")
+data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")

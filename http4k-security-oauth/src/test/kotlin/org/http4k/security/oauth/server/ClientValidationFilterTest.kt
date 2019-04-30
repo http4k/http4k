@@ -27,7 +27,7 @@ internal class ClientValidationFilterTest {
 
     private val filter =
         ClientValidationFilter(HardcodedClientValidator(validClientId, validRedirectUri), ErrorRenderer(json, documentationUri))
-        .then(loginPage)
+            .then(loginPage)
 
 
     @Test
@@ -83,7 +83,7 @@ internal class ClientValidationFilterTest {
     }
 
     @Test
-    fun `validates response_type`(){
+    fun `validates response_type`() {
         val response = filter(Request(GET, "/auth")
             .query("response_type", "invalid")
             .query("client_id", validClientId.value)

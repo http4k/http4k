@@ -3,13 +3,20 @@ package org.http4k.security
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.*
+import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Uri
 import org.http4k.core.cookie.cookie
+import org.http4k.core.query
+import org.http4k.core.then
+import org.http4k.core.toUrlFormEncoded
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -33,8 +40,8 @@ class OAuthProviderTest {
         listOf("scope1", "scope2"),
         persistence,
         { it.query("nonce", "randomNonce") },
-            { CrossSiteRequestForgeryToken("randomCsrf") },
-            responseType
+        { CrossSiteRequestForgeryToken("randomCsrf") },
+        responseType
     )
 
     @Test
@@ -54,7 +61,7 @@ class OAuthProviderTest {
     fun `filter - request redirecttion may use other response_type`() {
         Request(GET, "/")
         assertThat(oAuth(oAuthPersistence, OK, ResponseType.CodeIdToken)
-                .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
+            .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
     }
 
     private val base = Request(GET, "/")

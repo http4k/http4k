@@ -4,7 +4,6 @@ import com.natpryce.Result
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
-import org.http4k.security.AccessTokenContainer
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
 import java.time.Instant

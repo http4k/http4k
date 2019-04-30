@@ -7,9 +7,6 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
-import org.http4k.security.oauth.server.RfcError.*
-import org.http4k.security.oauth.server.RfcError.UnsupportedGrantType
-import org.http4k.security.oauth.server.RfcError.UnsupportedResponseType
 
 
 class ErrorRenderer(

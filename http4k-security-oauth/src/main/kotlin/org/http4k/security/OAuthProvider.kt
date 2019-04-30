@@ -12,15 +12,15 @@ import org.http4k.security.openid.IdTokenConsumer
  * Provides a configured set of objects for use with an OAuth2 provider.
  */
 class OAuthProvider(
-        providerConfig: OAuthProviderConfig,
-        client: HttpHandler,
-        callbackUri: Uri,
-        scopes: List<String>,
-        oAuthPersistence: OAuthPersistence,
-        modifyAuthState: (Uri) -> Uri = { it },
-        generateCrsf: CsrfGenerator = SECURE_CSRF,
-        responseType: ResponseType = ResponseType.Code,
-        idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
+    providerConfig: OAuthProviderConfig,
+    client: HttpHandler,
+    callbackUri: Uri,
+    scopes: List<String>,
+    oAuthPersistence: OAuthPersistence,
+    modifyAuthState: (Uri) -> Uri = { it },
+    generateCrsf: CsrfGenerator = SECURE_CSRF,
+    responseType: ResponseType = ResponseType.Code,
+    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
 ) {
 
     // pre-configured API client for this provider

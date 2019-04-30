@@ -19,15 +19,15 @@ import java.time.Clock
  *  - OAuth 2 Security Best Current Practices: https://tools.ietf.org/html/draft-ietf-oauth-security-topics-11
  */
 class OAuthServer(
-        tokenPath: String,
-        authRequestTracking: AuthRequestTracking,
-        clientValidator: ClientValidator,
-        authorizationCodes: AuthorizationCodes,
-        accessTokens: AccessTokens,
-        json: AutoMarshallingJson,
-        clock: Clock,
-        idTokens: IdTokens = IdTokens.Unsupported,
-        documentationUri: String? = null
+    tokenPath: String,
+    authRequestTracking: AuthRequestTracking,
+    clientValidator: ClientValidator,
+    authorizationCodes: AuthorizationCodes,
+    accessTokens: AccessTokens,
+    json: AutoMarshallingJson,
+    clock: Clock,
+    idTokens: IdTokens = IdTokens.Unsupported,
+    documentationUri: String? = null
 ) {
     private val errorRenderer = ErrorRenderer(json, documentationUri)
     // endpoint to retrieve access token for a given authorization code

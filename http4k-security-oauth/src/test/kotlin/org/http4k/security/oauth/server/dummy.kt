@@ -13,16 +13,16 @@ import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username : String? = null) : AuthorizationCodes {
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest>
-            = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username?:"unknown")))
+open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
+    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
+        ?: "unknown")))
 
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
 }
 
-open class DummyIdtokens(private val username: String? = null) :IdTokens{
+open class DummyIdtokens(private val username: String? = null) : IdTokens {
     override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
-        IdTokenContainer("dummy-id-token-for-" + (username?:"unknown"))
+        IdTokenContainer("dummy-id-token-for-" + (username ?: "unknown"))
 
     override fun createForAccessToken(code: AuthorizationCode): IdTokenContainer =
         IdTokenContainer("dummy-id-token-for-access-token")
@@ -32,7 +32,7 @@ class DummyAccessTokens : AccessTokens {
     override fun create(authorizationCode: AuthorizationCode) = Success(AccessTokenContainer("dummy-access-token"))
 }
 
-class ErroringAccessTokens(private val error : AuthorizationCodeAlreadyUsed) : AccessTokens {
+class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
     override fun create(authorizationCode: AuthorizationCode) = Failure(error)
 }
 
@@ -55,7 +55,7 @@ class HardcodedClientValidator(
     override fun validateClientId(clientId: ClientId): Boolean = clientId == this.expectedClientId
 
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri) =
-         redirectionUri == this.expectedRedirectionUri
+        redirectionUri == this.expectedRedirectionUri
 
     override fun validateCredentials(clientId: ClientId, clientSecret: String) =
         clientId == expectedClientId && clientSecret == expectedClientSecret
