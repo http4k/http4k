@@ -9,6 +9,8 @@ object Versions {
 
     const val jackson_module_kotlin: String = "2.9.8"
 
+    const val jackson_module_jsonSchema: String = "2.9.8"
+
     const val underscore: String = "1.43"
 
     const val handlebars: String = "4.1.2"
