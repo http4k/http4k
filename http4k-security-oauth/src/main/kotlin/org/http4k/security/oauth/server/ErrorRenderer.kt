@@ -7,15 +7,14 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.with
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
-import org.http4k.security.oauth.server.RfcError.InvalidClient
-import org.http4k.security.oauth.server.RfcError.InvalidGrant
+import org.http4k.security.oauth.server.RfcError.*
 import org.http4k.security.oauth.server.RfcError.UnsupportedGrantType
 import org.http4k.security.oauth.server.RfcError.UnsupportedResponseType
 
 
 class ErrorRenderer(
     private val json: AutoMarshallingJson,
-    private val documentationUri: String = ""
+    private val documentationUri: String? = null
 ) {
 
     fun response(error: OAuthError) = when (error) {
@@ -31,14 +30,6 @@ class ErrorRenderer(
                 documentationUri
             )))
 
-    private val RfcError.rfcValue
-        get() = when (this) {
-            InvalidClient -> "invalid_client"
-            InvalidGrant -> "invalid_grant"
-            UnsupportedGrantType -> "unsupported_grant_type"
-            UnsupportedResponseType -> "unsupported_response_type"
-        }
-
-    private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String)
+    private data class ErrorResponse(val error: String, val error_description: String, val error_uri: String?)
 }
 

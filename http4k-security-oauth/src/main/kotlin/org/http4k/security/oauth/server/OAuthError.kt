@@ -7,10 +7,20 @@ import org.http4k.security.oauth.server.RfcError.InvalidGrant
 abstract class OAuthError(val rfcError: RfcError, val description: String)
 
 enum class RfcError {
+    AccessDenied,
     InvalidClient,
     InvalidGrant,
     UnsupportedGrantType,
-    UnsupportedResponseType
+    UnsupportedResponseType;
+
+    val rfcValue
+        get() = when (this) {
+            InvalidClient -> "invalid_client"
+            InvalidGrant -> "invalid_grant"
+            UnsupportedGrantType -> "unsupported_grant_type"
+            UnsupportedResponseType -> "unsupported_response_type"
+            AccessDenied -> "access_denied"
+        }
 }
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-5.2
@@ -26,6 +36,7 @@ object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The author
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-4.1.2.1
 sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)
 
+object UserRejectedRequest : AuthorizationError(RfcError.AccessDenied, "The user declined the authorization request")
 object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
 data class UnsupportedResponseType(val requestedResponseType: String): AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")

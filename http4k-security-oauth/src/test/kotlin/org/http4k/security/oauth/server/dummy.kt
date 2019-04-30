@@ -1,6 +1,7 @@
 package org.http4k.security.oauth.server
 
 import com.natpryce.Failure
+import com.natpryce.Result
 import com.natpryce.Success
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -12,15 +13,16 @@ import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-open class DummyAuthorizationCodes(private val request: AuthRequest) : AuthorizationCodes {
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode =
-            AuthorizationCode("dummy-token-for-" + (response.header("user") ?: "unknown"))
+open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username : String? = null) : AuthorizationCodes {
+    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest>
+            = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username?:"unknown")))
+
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
 }
 
-open class DummyIdtokens :IdTokens{
+open class DummyIdtokens(private val username: String? = null) :IdTokens{
     override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
-        IdTokenContainer("dummy-id-token-for-" + (response.header("user") ?: "unknown"))
+        IdTokenContainer("dummy-id-token-for-" + (username?:"unknown"))
 
     override fun createForAccessToken(code: AuthorizationCode): IdTokenContainer =
         IdTokenContainer("dummy-id-token-for-access-token")
@@ -66,10 +68,10 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     override fun detailsFor(code: AuthorizationCode) =
         codes[code] ?: error("code not stored")
 
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): AuthorizationCode {
-        return AuthorizationCode(UUID.randomUUID().toString()).also {
+    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> {
+        return Success(AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.responseType)
-        }
+        })
     }
 
     fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode) && !usedCodes.contains(authorizationCode)

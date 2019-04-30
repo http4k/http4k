@@ -52,7 +52,7 @@ fun main() {
                 Response(OK)
                     .body("""<html>Please <form method="POST"><button type="submit">authenticate</button></form></html>""")
             },
-            "/my-login-page" bind POST to server.authenticationComplete.then { Response(Status.OK) }
+            "/my-login-page" bind POST to server.authenticationComplete
         )
     }
 
@@ -104,10 +104,9 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
     // Authorization codes should be associated to a particular user (who can be identified in the Response)
     // so they can be checked in various stages of the authorization flow
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
-        AuthorizationCode(UUID.randomUUID().toString()).also {
+        Success(AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS))
-        }
-
+        })
 }
 
 class InsecureAccessTokens : AccessTokens {
