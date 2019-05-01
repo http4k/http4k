@@ -18,7 +18,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.json
-import org.http4k.format.Jackson.prettify
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
@@ -34,8 +33,12 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(JsonApprovalTest::class)
 abstract class ContractRendererContract(private val rendererToUse: ContractRenderer) {
     @Test
     fun `can build 400`() {
@@ -54,7 +57,7 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
     }
 
     @Test
-    fun `renders as expected`() {
+    fun `renders as expected`(approver: Approver) {
         val customBody = Body.json("the body of the message").toLens()
 
         val router = "/basepath" bind contract {
@@ -112,9 +115,6 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
             } bindContract POST to { Response(OK) }
         }
 
-        val expected = String(javaClass.getResourceAsStream("${javaClass.simpleName}.json").readBytes())
-        val actual = router(Request(GET, "/basepath?the_api_key=somevalue")).bodyString()
-//        println(actual)
-        assertThat("no match", prettify(actual), equalTo(prettify(expected)))
+        approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 }

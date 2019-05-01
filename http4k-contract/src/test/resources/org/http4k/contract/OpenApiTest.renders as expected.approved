@@ -21,13 +21,18 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
-        "consumes": [],
-        "parameters": [],
-        "responses": {},
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -40,13 +45,18 @@
         ],
         "summary": "endpoint",
         "operationId": "echoMessage",
-        "produces": [],
-        "consumes": [],
-        "parameters": [],
-        "responses": {},
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ],
         "description": "some rambling description of what this thing actually does"
@@ -58,8 +68,10 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
-        "consumes": [],
+        "produces": [
+        ],
+        "consumes": [
+        ],
         "parameters": [
           {
             "in": "path",
@@ -74,10 +86,12 @@
             "type": "boolean"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -88,8 +102,10 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
-        "consumes": [],
+        "produces": [
+        ],
+        "consumes": [
+        ],
         "parameters": [
           {
             "in": "query",
@@ -120,10 +136,12 @@
             "description": "jsonQuery"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -134,8 +152,10 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
-        "consumes": [],
+        "produces": [
+        ],
+        "consumes": [
+        ],
         "parameters": [
           {
             "in": "header",
@@ -166,10 +186,12 @@
             "description": "jsonHeader"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -180,7 +202,8 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
+        "produces": [
+        ],
         "consumes": [
           "text/plain"
         ],
@@ -194,10 +217,12 @@
             }
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -208,7 +233,8 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
+        "produces": [
+        ],
         "consumes": [
           "application/json"
         ],
@@ -223,10 +249,12 @@
             "description": "json"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -237,7 +265,8 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
+        "produces": [
+        ],
         "consumes": [
           "application/json"
         ],
@@ -252,10 +281,12 @@
             "description": "json"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -266,13 +297,18 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
-        "consumes": [],
-        "parameters": [],
-        "responses": {},
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
         "security": [
           {
-            "basicAuth": []
+            "basicAuth": [
+            ]
           }
         ]
       }
@@ -283,7 +319,8 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "produces": [],
+        "produces": [
+        ],
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -317,10 +354,12 @@
             "description": "jsonField"
           }
         ],
-        "responses": {},
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -339,11 +378,14 @@
           "application/octet-stream",
           "application/x-www-form-urlencoded"
         ],
-        "parameters": [],
-        "responses": {},
+        "parameters": [
+        ],
+        "responses": {
+        },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
@@ -357,8 +399,10 @@
         "produces": [
           "application/json"
         ],
-        "consumes": [],
-        "parameters": [],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
         "responses": {
           "403": {
             "description": "no way jose",
@@ -369,7 +413,8 @@
         },
         "security": [
           {
-            "api_key": []
+            "api_key": [
+            ]
           }
         ]
       }
