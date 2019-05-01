@@ -9,7 +9,7 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 
 class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<NODE, NODE> {
-    override fun toSchema(node: NODE, overrideDefinitionId: String?) = JsonSchema(node, emptySet()).toSchema(overrideDefinitionId)
+    override fun toSchema(obj: NODE, overrideDefinitionId: String?) = JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
         when (json.typeOf(node)) {
