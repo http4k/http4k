@@ -43,7 +43,8 @@ private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, m
 open class AutoOpenApi<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val jsonSchemaCreator: JsonSchemaCreator<*, NODE> = JsonToJsonSchema(json)
+    private val jsonSchemaCreator: JsonSchemaCreator<*, NODE> = JsonToJsonSchema(json),
+    private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json)
 ) : ContractRenderer {
     private val lens = json.autoBody<OpenApiDefinition<NODE>>().toLens()
 
@@ -56,7 +57,7 @@ open class AutoOpenApi<out NODE : Any>(
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.renderTags(),
-                security.asJson(),
+                securityRenderer.full(security),
                 routes.map { it.asPath(security) }
             ))
 
@@ -67,34 +68,9 @@ open class AutoOpenApi<out NODE : Any>(
         meta.consumes.map { it.value }.toSet().sorted(),
         asOpenApiParameters(),
         meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-        json {
-            array(
-                when (meta.security ?: contractSecurity) {
-                    is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
-                    is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
-                    else -> emptyList()
-                }
-            )
-        },
+        securityRenderer.ref(meta.security ?: contractSecurity),
         meta.operationId
     )
-
-    private fun Security.asJson() = json {
-        when (this@asJson) {
-            is BasicAuthSecurity -> obj(
-                "basicAuth" to obj(
-                    "type" to string("basic")
-                )
-            )
-            is ApiKeySecurity<*> -> obj(
-                "api_key" to obj(
-                    "type" to string("apiKey"),
-                    "in" to string(param.meta.location),
-                    "name" to string(param.meta.name)
-                ))
-            else -> obj(listOf())
-        }
-    }
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
         val bodyParamNodes = meta.body?.metas?.map { it.asBodyOpenApiParameter() } ?: emptyList()

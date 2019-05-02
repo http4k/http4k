@@ -17,6 +17,7 @@ data class ApiInfo(val title: String, val version: String, val description: Stri
 
 open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NODE>) : ContractRenderer {
 
+    private val securityRenderer = SecurityRenderer.OpenApi(json)
     private val schemaGenerator = JsonToJsonSchema(json)
 
     override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
@@ -34,7 +35,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     "basePath" to string("/"),
                     "tags" to array(renderTags(routes)),
                     "paths" to obj(paths.fields),
-                    "securityDefinitions" to security.asJson(),
+                    "securityDefinitions" to securityRenderer.full(security),
                     "definitions" to obj(paths.definitions)
                 ))
             })
@@ -91,8 +92,6 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
-        val routeSecurity = route.meta.security ?: contractSecurity
-
         return json {
             val fields =
                 listOf(
@@ -103,16 +102,12 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    "security" to array(when (routeSecurity) {
-                        is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
-                        is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
-                        else -> emptyList()
-                    })
+                    "security" to securityRenderer.ref(route.meta.security ?: contractSecurity)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
-            val definitions = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).toSet()
 
+            val defs = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).toSet()
             FieldAndDefinitions(route.method.toString().toLowerCase() to
-                obj(*fields.filterNotNull().toTypedArray()), definitions)
+                obj(*fields.filterNotNull().toTypedArray()), defs)
         }
 
     }
@@ -124,23 +119,6 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                 listOf("description" to string(meta.description)) +
                     if (node == nullNode()) emptyList() else listOf("schema" to node))
             memo.add(newField, definitions)
-        }
-    }
-
-    private fun Security.asJson() = json {
-        when (this@asJson) {
-            is BasicAuthSecurity -> obj(
-                "basicAuth" to obj(
-                    "type" to string("basic")
-                )
-            )
-            is ApiKeySecurity<*> -> obj(
-                "api_key" to obj(
-                    "type" to string("apiKey"),
-                    "in" to string(param.meta.location),
-                    "name" to string(param.meta.name)
-                ))
-            else -> obj(listOf())
         }
     }
 
