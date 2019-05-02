@@ -11,18 +11,21 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
+import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
 data class ApiInfo(val title: String, val version: String, val description: String? = null)
 
-open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Json<NODE>) : ContractRenderer {
+open class OpenApi<out NODE>(
+    private val apiInfo: ApiInfo,
+    private val json: Json<NODE>,
+    private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json),
+    private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
+    private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
+) : ContractRenderer {
+    override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
-    private val securityRenderer = SecurityRenderer.OpenApi(json)
-    private val schemaGenerator = JsonToJsonSchema(json)
-
-    override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
-
-    override fun notFound() = JsonErrorResponseRenderer(json).notFound()
+    override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val paths = renderPaths(routes, contractRoot, security)

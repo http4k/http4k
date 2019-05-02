@@ -44,19 +44,20 @@ open class AutoOpenApi<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: JsonLibAutoMarshallingJson<NODE>,
     private val jsonSchemaCreator: JsonSchemaCreator<*, NODE> = JsonToJsonSchema(json),
-    private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json)
+    private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json),
+    private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
     private val lens = json.autoBody<OpenApiDefinition<NODE>>().toLens()
 
-    override fun badRequest(failures: List<Failure>) = JsonErrorResponseRenderer(json).badRequest(failures)
+    override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
-    override fun notFound() = JsonErrorResponseRenderer(json).notFound()
+    override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         Response(OK)
             .with(lens of OpenApiDefinition(
                 apiInfo,
-                routes.renderTags(),
+                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 securityRenderer.full(security),
                 routes.map { it.asPath(security) }
             ))
@@ -90,7 +91,6 @@ open class AutoOpenApi<out NODE : Any>(
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse<NODE>(description, null)
 
-    private fun List<ContractRoute>.renderTags() = flatMap(ContractRoute::tags).toSet().sortedBy { it.name }
 }
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
