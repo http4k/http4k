@@ -1,0 +1,474 @@
+{
+  "apiInfo": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+    {
+      "name": "tag1",
+      "description": null
+    },
+    {
+      "name": "tag3",
+      "description": null
+    }
+  ],
+  "securityDefinitions": {
+    "param": {
+      "meta": {
+        "required": true,
+        "location": "query",
+        "paramMeta": "StringParam",
+        "name": "the_api_key",
+        "description": null
+      }
+    },
+    "filter": {
+    }
+  },
+  "paths": [
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "endpoint",
+      "tags": [
+        {
+          "name": "tag1",
+          "description": null
+        },
+        {
+          "name": "tag3",
+          "description": null
+        }
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": "echoMessage"
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "firstName",
+          "required": true,
+          "description": null
+        },
+        {
+          "in": "path",
+          "name": "age",
+          "required": true,
+          "description": null
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+        {
+          "in": "query",
+          "name": "b",
+          "required": true,
+          "description": "booleanQuery"
+        },
+        {
+          "in": "query",
+          "name": "s",
+          "required": false,
+          "description": "stringQuery"
+        },
+        {
+          "in": "query",
+          "name": "i",
+          "required": false,
+          "description": "intQuery"
+        },
+        {
+          "in": "query",
+          "name": "j",
+          "required": false,
+          "description": "jsonQuery"
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+        {
+          "in": "header",
+          "name": "b",
+          "required": true,
+          "description": "booleanHeader"
+        },
+        {
+          "in": "header",
+          "name": "s",
+          "required": false,
+          "description": "stringHeader"
+        },
+        {
+          "in": "header",
+          "name": "i",
+          "required": false,
+          "description": "intHeader"
+        },
+        {
+          "in": "header",
+          "name": "j",
+          "required": false,
+          "description": "jsonHeader"
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+        "text/plain"
+      ],
+      "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "description": null
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "schema": null,
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "description": "json"
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "schema": null,
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "description": "json"
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+      ],
+      "responses": {
+      },
+      "security": {
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+      ],
+      "consumes": [
+        "application/x-www-form-urlencoded"
+      ],
+      "parameters": [
+        {
+          "in": "formData",
+          "name": "b",
+          "required": true,
+          "description": "booleanField"
+        },
+        {
+          "in": "formData",
+          "name": "i",
+          "required": false,
+          "description": "intField"
+        },
+        {
+          "in": "formData",
+          "name": "s",
+          "required": false,
+          "description": "stringField"
+        },
+        {
+          "in": "formData",
+          "name": "j",
+          "required": true,
+          "description": "jsonField"
+        }
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+        "application/json",
+        "application/xml"
+      ],
+      "consumes": [
+        "application/octet-stream",
+        "application/x-www-form-urlencoded"
+      ],
+      "parameters": [
+      ],
+      "responses": {
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    },
+    {
+      "summary": "<unknown>",
+      "tags": [
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "consumes": [
+      ],
+      "parameters": [
+      ],
+      "responses": {
+        "403": {
+          "description": "no way jose",
+          "schema": null
+        }
+      },
+      "security": {
+        "param": {
+          "meta": {
+            "required": true,
+            "location": "query",
+            "paramMeta": "StringParam",
+            "name": "the_api_key",
+            "description": null
+          }
+        },
+        "filter": {
+        }
+      },
+      "operationId": null
+    }
+  ],
+  "swagger": "2.0",
+  "basePath": "/"
+}

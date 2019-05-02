@@ -23,8 +23,9 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
 
     override fun notFound() = JsonErrorResponseRenderer(json).notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
-        Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
+        val paths = renderPaths(routes, contractRoot, security)
+        return Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(json {
                 pretty(obj(
@@ -32,11 +33,12 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     "info" to apiInfo.asJson(),
                     "basePath" to string("/"),
                     "tags" to array(renderTags(routes)),
-                    "paths" to obj(renderPaths(routes, contractRoot, security).fields),
+                    "paths" to obj(paths.fields),
                     "securityDefinitions" to security.asJson(),
-                    "definitions" to obj(renderPaths(routes, contractRoot, security).definitions)
+                    "definitions" to obj(paths.definitions)
                 ))
             })
+    }
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
@@ -86,7 +88,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
-        val consumes = route.meta.consumes.plus(route.spec.routeMeta.body?.let { listOf(it.contentType) }
+        val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
         val routeSecurity = route.meta.security ?: contractSecurity
@@ -99,7 +101,7 @@ open class OpenApi<out NODE>(private val apiInfo: ApiInfo, private val json: Jso
                     route.meta.operationId?.let { "operationId" to string(it) },
                     "produces" to array(route.meta.produces.map { string(it.value) }),
                     "consumes" to array(consumes.map { string(it.value) }),
-                    "parameters" to array(nonBodyParamNodes.plus(bodyParamNodes)),
+                    "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(when (routeSecurity) {
                         is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
