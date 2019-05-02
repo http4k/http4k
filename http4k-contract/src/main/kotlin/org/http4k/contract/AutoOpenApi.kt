@@ -8,7 +8,6 @@ import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
@@ -29,7 +28,7 @@ private data class OpenApiPath<NODE>(
     val consumes: List<String>,
     val parameters: List<OpenApiParameter>,
     val responses: Map<String, OpenApiResponse<NODE>>,
-    val security: Security?,
+    val security: NODE,
     val operationId: String?
 )
 
@@ -68,13 +67,30 @@ open class AutoOpenApi<out NODE : Any>(
         meta.consumes.map { it.value }.toSet().sorted(),
         asOpenApiParameters(),
         meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-        meta.security ?: contractSecurity,
+        (meta.security ?: contractSecurity).asJson(),
         meta.operationId
     )
 
+    private fun Security.asJson() = json {
+        when (this@asJson) {
+            is BasicAuthSecurity -> obj(
+                "basicAuth" to obj(
+                    "type" to string("basic")
+                )
+            )
+            is ApiKeySecurity<*> -> obj(
+                "api_key" to obj(
+                    "type" to string("apiKey"),
+                    "in" to string(param.meta.location),
+                    "name" to string(param.meta.name)
+                ))
+            else -> obj(listOf())
+        }
+    }
+
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
         val bodyParamNodes = meta.body?.metas?.map { it.asBodyOpenApiParameter() } ?: emptyList()
-        val nonBodyParamNodes = nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
+        val nonBodyParamNodes = nonBodyParams.flatMap { it.asList() }.map { it.asOpenApiParameter() }
         return nonBodyParamNodes + bodyParamNodes
     }
 
@@ -89,12 +105,6 @@ open class AutoOpenApi<out NODE : Any>(
     }
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse<NODE>(description, null)
-
-    private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) =
-        when {
-            paramMeta == ObjectParam && (schema?.node != null) -> SchemaParameter(this, schema.node)
-            else -> PrimitiveParameter(this)
-        }
 
     private fun List<ContractRoute>.renderTags() = flatMap(ContractRoute::tags).toSet().sortedBy { it.name }
 }

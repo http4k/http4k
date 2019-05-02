@@ -41,16 +41,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -76,16 +70,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": "echoMessage"
@@ -115,16 +103,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -166,16 +148,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -217,16 +193,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -251,16 +221,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -286,16 +250,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -321,16 +279,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -348,7 +300,8 @@
       "responses": {
       },
       "security": {
-        "filter": {
+        "basicAuth": {
+          "type": "basic"
         }
       },
       "operationId": null
@@ -391,16 +344,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -422,16 +369,10 @@
       "responses": {
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
@@ -454,16 +395,10 @@
         }
       },
       "security": {
-        "param": {
-          "meta": {
-            "required": true,
-            "location": "query",
-            "paramMeta": "StringParam",
-            "name": "the_api_key",
-            "description": null
-          }
-        },
-        "filter": {
+        "api_key": {
+          "type": "apiKey",
+          "in": "query",
+          "name": "the_api_key"
         }
       },
       "operationId": null
