@@ -14,7 +14,7 @@ import org.http4k.util.JsonToJsonSchema
 private data class OpenApiDefinition<NODE>(
     val apiInfo: ApiInfo,
     val tags: List<Tag>,
-    val securityDefinitions: Security?,
+    val securityDefinitions: NODE,
     val paths: List<OpenApiPath<NODE>>
 ) {
     val swagger = "2.0"
@@ -56,7 +56,7 @@ open class AutoOpenApi<out NODE : Any>(
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.renderTags(),
-                security,
+                security.asJson(),
                 routes.map { it.asPath(security) }
             ))
 
@@ -67,7 +67,15 @@ open class AutoOpenApi<out NODE : Any>(
         meta.consumes.map { it.value }.toSet().sorted(),
         asOpenApiParameters(),
         meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-        (meta.security ?: contractSecurity).asJson(),
+        json {
+            array(
+                when (meta.security ?: contractSecurity) {
+                    is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
+                    is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
+                    else -> emptyList()
+                }
+            )
+        },
         meta.operationId
     )
 

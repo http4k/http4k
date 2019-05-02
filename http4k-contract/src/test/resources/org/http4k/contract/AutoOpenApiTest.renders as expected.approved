@@ -15,16 +15,10 @@
     }
   ],
   "securityDefinitions": {
-    "param": {
-      "meta": {
-        "required": true,
-        "location": "query",
-        "paramMeta": "StringParam",
-        "name": "the_api_key",
-        "description": null
-      }
-    },
-    "filter": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "the_api_key"
     }
   },
   "paths": [
@@ -40,13 +34,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -69,13 +62,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": "echoMessage"
     },
     {
@@ -102,13 +94,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -147,13 +138,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -192,13 +182,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -220,13 +209,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -249,13 +237,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -278,13 +265,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -299,11 +285,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "basicAuth": {
-          "type": "basic"
+      "security": [
+        {
+          "basicAuth": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -343,13 +330,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -368,13 +354,12 @@
       ],
       "responses": {
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     },
     {
@@ -394,13 +379,12 @@
           "schema": null
         }
       },
-      "security": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "query",
-          "name": "the_api_key"
+      "security": [
+        {
+          "api_key": [
+          ]
         }
-      },
+      ],
       "operationId": null
     }
   ],
