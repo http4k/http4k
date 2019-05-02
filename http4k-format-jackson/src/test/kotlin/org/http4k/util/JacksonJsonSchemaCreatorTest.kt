@@ -12,15 +12,14 @@ class JacksonJsonSchemaCreatorTest {
 
     @Test
     fun `generates schema`() {
-        val message = JacksonJsonSchemaCreator(Jackson).toSchema(
-            Nested(Duration.ofMillis(1000))
-//            Root(
-//                Uri.of("http://uri:8000"),
-//                1234,
-//                false,
-//                Nested(Duration.ofMillis(1000))
-//            )
-        ).node
-        println(Jackson.pretty(message))
+        println(
+            JacksonJsonSchemaCreator(Jackson).toSchema(
+                Root(
+                    Uri.of("http://uri:8000"),
+                    1234,
+                    false,
+                    Nested(Duration.ofMillis(1000))
+                ), "override")
+        )
     }
 }

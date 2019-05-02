@@ -7,11 +7,14 @@ import org.http4k.format.ConfigurableJackson
 class JacksonJsonSchemaCreator(private val json: ConfigurableJackson) : JsonSchemaCreator<Any, JsonNode> {
     private val jsonSchemaGenerator = JsonSchemaGenerator(json.mapper)
 
-    override fun toSchema(obj: Any, overrideDefinitionId: String?) =
-        with(json.asJsonString(jsonSchemaGenerator.generateSchema(obj::class.java))) {
+    override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<JsonNode> {
+        val node = jsonSchemaGenerator.generateSchema(obj::class.java)
+        return with(json.asJsonString(node)) {
             JsonSchema(
-                json.parse(this
-                    .replace("\"type\":\"any\"", "\"type\":\"string\"")
-                ), emptySet())
+                json {
+                    obj("\$ref" to string("#/definitions/${node.id}"))
+                },
+                setOf("" to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
         }
+    }
 }

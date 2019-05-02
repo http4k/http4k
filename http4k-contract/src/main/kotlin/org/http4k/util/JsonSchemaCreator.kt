@@ -1,6 +1,6 @@
 package org.http4k.util
 
-interface JsonSchemaCreator<in IN, OUT> {
+interface JsonSchemaCreator<IN, OUT> {
     fun toSchema(obj: IN, overrideDefinitionId: String? = null): JsonSchema<OUT>
 }
 

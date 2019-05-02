@@ -9,7 +9,6 @@ import org.http4k.lens.Failure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchemaCreator
-import org.http4k.util.JsonToJsonSchema
 
 private data class OpenApiDefinition<NODE>(
     val apiInfo: ApiInfo,
@@ -43,7 +42,7 @@ private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, m
 open class AutoOpenApi<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val jsonSchemaCreator: JsonSchemaCreator<*, NODE> = JsonToJsonSchema(json),
+    private val jsonSchemaCreator: JsonSchemaCreator<Any, NODE>,
     private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json),
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
@@ -89,8 +88,13 @@ open class AutoOpenApi<out NODE : Any>(
         else -> PrimitiveParameter(this)
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse<NODE>(description, null)
+    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description,
+        example?.let {
+            val toSchema = jsonSchemaCreator.toSchema(it, definitionId)
+            toSchema.node
+        })
 
+    companion object
 }
 
 private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
