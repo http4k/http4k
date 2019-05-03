@@ -80,8 +80,6 @@ open class OpenApi<out NODE>(
         )
     }
 
-    private fun renderTags(routes: List<ContractRoute>) = routes.flatMap(ContractRoute::tags).toSet().sortedBy { it.name }.map { it.asJson() }
-
     private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
@@ -91,7 +89,7 @@ open class OpenApi<out NODE>(
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
-        val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagsAsJson()
+        val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
@@ -112,7 +110,12 @@ open class OpenApi<out NODE>(
             FieldAndDefinitions(route.method.toString().toLowerCase() to
                 obj(*fields.filterNotNull().toTypedArray()), defs)
         }
+    }
 
+    private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
+        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
+    } catch (e: Exception) {
+        JsonSchema(json.nullNode(), emptySet())
     }
 
     private fun render(responses: List<HttpMessageMeta<Response>>) = json {
@@ -125,20 +128,20 @@ open class OpenApi<out NODE>(
         }
     }
 
-    private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
-        schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
-    } catch (e: Exception) {
-        JsonSchema(json.nullNode(), emptySet())
-    }
-
-    private fun ContractRoute.tagsAsJson() = tags.map(Tag::name).map(json::string)
+    private fun ContractRoute.tagNames() = tags.map(Tag::name).map(json::string)
 
     private fun ApiInfo.asJson() = json {
-        obj("title" to string(title), "version" to string(version), "description" to string(description
-            ?: ""))
+        obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
     }
 
-    private fun Tag.asJson() = json { obj(listOf("name" to string(name)) + description?.let { "description" to string(it) }.asList()) }
+    private fun renderTags(routes: List<ContractRoute>) = routes
+        .flatMap(ContractRoute::tags).toSet()
+        .sortedBy { it.name }
+        .map {
+            json {
+                obj(listOf("name" to string(it.name)) + it.description?.let { "description" to string(it) }.asList())
+            }
+        }
 }
 
 private data class FieldsAndDefinitions<NODE>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
