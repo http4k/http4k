@@ -73,16 +73,17 @@ open class AutoOpenApi<out NODE : Any>(
             ))
 
     private fun ContractRoute.asPath(contractSecurity: Security) =
-        PathAndMethod(toString(), method, OpenApiPath(
-            meta.summary,
-            tags.toSet().sortedBy { it.name },
-            meta.produces.map { it.value }.toSet().sorted(),
-            meta.consumes.map { it.value }.toSet().sorted(),
-            asOpenApiParameters(),
-            meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-            securityRenderer.ref(meta.security ?: contractSecurity),
-            meta.operationId
-        )
+        PathAndMethod(describeFor(Root), method,
+            OpenApiPath(
+                meta.summary,
+                tags.toSet().sortedBy { it.name },
+                meta.produces.map { it.value }.toSet().sorted(),
+                meta.consumes.map { it.value }.toSet().sorted(),
+                asOpenApiParameters(),
+                meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
+                securityRenderer.ref(meta.security ?: contractSecurity),
+                meta.operationId
+            )
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
