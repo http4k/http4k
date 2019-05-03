@@ -12,7 +12,7 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchemaCreator
 
 private data class OpenApiDefinition<NODE>(
-    val apiInfo: ApiInfo,
+    val info: ApiInfo,
     val tags: List<Tag>,
     val securityDefinitions: NODE,
     val paths: Map<String, Map<String, OpenApiPath<NODE>>>
