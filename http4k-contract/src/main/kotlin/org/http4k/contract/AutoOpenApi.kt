@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -46,6 +47,9 @@ open class AutoOpenApi<out NODE : Any>(
     private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json),
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
+
+    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: OpenApiPath<NODE>)
+
     private val lens = json.autoBody<OpenApiDefinition<NODE>>().toLens()
 
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
@@ -59,21 +63,27 @@ open class AutoOpenApi<out NODE : Any>(
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 securityRenderer.full(security),
                 routes.map { it.asPath(security) }
-                    .groupBy { it.first }
-                    .mapValues { it.value.toMap() }
+                    .groupBy { it.path }
+                    .mapValues { it: Map.Entry<String, List<PathAndMethod<NODE>>> ->
+                        it.value
+                            .map { it.method.name.toLowerCase() to it.pathSpec }
+                            .toMap()
+                    }
                     .toMap()
             ))
 
-    private fun ContractRoute.asPath(contractSecurity: Security) = method.toString().toLowerCase() to OpenApiPath(
-        meta.summary,
-        tags.toSet().sortedBy { it.name },
-        meta.produces.map { it.value }.toSet().sorted(),
-        meta.consumes.map { it.value }.toSet().sorted(),
-        asOpenApiParameters(),
-        meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-        securityRenderer.ref(meta.security ?: contractSecurity),
-        meta.operationId
-    )
+    private fun ContractRoute.asPath(contractSecurity: Security) =
+        PathAndMethod(toString(), method, OpenApiPath(
+            meta.summary,
+            tags.toSet().sortedBy { it.name },
+            meta.produces.map { it.value }.toSet().sorted(),
+            meta.consumes.map { it.value }.toSet().sorted(),
+            asOpenApiParameters(),
+            meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
+            securityRenderer.ref(meta.security ?: contractSecurity),
+            meta.operationId
+        )
+        )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
         val bodyParamNodes = meta.body?.metas?.map { it.asBodyOpenApiParameter() } ?: emptyList()

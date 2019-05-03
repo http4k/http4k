@@ -22,7 +22,343 @@
     }
   },
   "paths": {
-    "get": {
+    "GET: /nometa": {
+      "get": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "GET: /descriptions": {
+      "get": {
+        "summary": "endpoint",
+        "tags": [
+          {
+            "name": "tag1",
+            "description": null
+          },
+          {
+            "name": "tag3",
+            "description": null
+          }
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "echoMessage"
+      }
+    },
+    "POST: /paths/{firstName}/bertrand/{age}": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "firstName",
+            "required": true,
+            "description": null
+          },
+          {
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /queries": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "description": "booleanQuery"
+          },
+          {
+            "in": "query",
+            "name": "s",
+            "required": false,
+            "description": "stringQuery"
+          },
+          {
+            "in": "query",
+            "name": "i",
+            "required": false,
+            "description": "intQuery"
+          },
+          {
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "description": "jsonQuery"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /headers": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "b",
+            "required": true,
+            "description": "booleanHeader"
+          },
+          {
+            "in": "header",
+            "name": "s",
+            "required": false,
+            "description": "stringHeader"
+          },
+          {
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "description": "intHeader"
+          },
+          {
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "description": "jsonHeader"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /body_string": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /body_json_noschema": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "schema": null,
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "json"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /body_json_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "schema": null,
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "json"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /security": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "POST: /body_form": {
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "b",
+            "required": true,
+            "description": "booleanField"
+          },
+          {
+            "in": "formData",
+            "name": "i",
+            "required": false,
+            "description": "intField"
+          },
+          {
+            "in": "formData",
+            "name": "s",
+            "required": false,
+            "description": "stringField"
+          },
+          {
+            "in": "formData",
+            "name": "j",
+            "required": true,
+            "description": "jsonField"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "GET: /produces_and_consumes": {
       "get": {
         "summary": "<unknown>",
         "tags": [
@@ -48,7 +384,7 @@
         "operationId": null
       }
     },
-    "post": {
+    "POST: /returning": {
       "post": {
         "summary": "<unknown>",
         "tags": [
