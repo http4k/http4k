@@ -27,22 +27,22 @@ open class OpenApi<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-        val paths = renderPaths(routes, contractRoot, security)
-        return Response(OK)
-            .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(json {
-                pretty(obj(
-                    "swagger" to string("2.0"),
-                    "info" to apiInfo.asJson(),
-                    "basePath" to string("/"),
-                    "tags" to array(renderTags(routes)),
-                    "paths" to obj(paths.fields),
-                    "securityDefinitions" to securityRenderer.full(security),
-                    "definitions" to obj(paths.definitions)
-                ))
-            })
-    }
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
+        with(renderPaths(routes, contractRoot, security)) {
+            Response(OK)
+                .with(CONTENT_TYPE of APPLICATION_JSON)
+                .body(json {
+                    pretty(obj(
+                        "swagger" to string("2.0"),
+                        "info" to apiInfo.asJson(),
+                        "basePath" to string("/"),
+                        "tags" to array(renderTags(routes)),
+                        "paths" to obj(fields),
+                        "securityDefinitions" to securityRenderer.full(security),
+                        "definitions" to obj(definitions)
+                    ))
+                })
+        }
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
