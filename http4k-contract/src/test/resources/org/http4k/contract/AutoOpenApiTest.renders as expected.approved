@@ -25,6 +25,7 @@
     "/basepath/nometa": {
       "get": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -47,6 +48,7 @@
     "/basepath/descriptions": {
       "get": {
         "summary": "endpoint",
+        "description": "some rambling description of what this thing actually does",
         "tags": [
           {
             "name": "tag1",
@@ -77,6 +79,7 @@
     "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -113,6 +116,7 @@
     "/basepath/queries": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -163,6 +167,7 @@
     "/basepath/headers": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -213,6 +218,7 @@
     "/basepath/body_string": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -243,6 +249,7 @@
     "/basepath/body_json_noschema": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -274,6 +281,7 @@
     "/basepath/body_json_schema": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -305,6 +313,7 @@
     "/basepath/security": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -327,6 +336,7 @@
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -378,6 +388,7 @@
     "/basepath/produces_and_consumes": {
       "get": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
@@ -404,6 +415,7 @@
     "/basepath/returning": {
       "post": {
         "summary": "<unknown>",
+        "description": null,
         "tags": [
         ],
         "produces": [
