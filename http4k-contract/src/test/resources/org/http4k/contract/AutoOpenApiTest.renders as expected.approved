@@ -433,7 +433,9 @@
         "responses": {
           "403": {
             "description": "no way jose",
-            "schema": null
+            "schema": {
+              "$ref": "#/definitions/object-1662053258"
+            }
           }
         },
         "security": [

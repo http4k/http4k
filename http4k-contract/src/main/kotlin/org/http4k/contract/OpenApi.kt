@@ -48,9 +48,11 @@ open class OpenApi<out NODE>(
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
-                memoFields.add(render(contractRoot, security, route))
+                memoFields + render(contractRoot, security, route)
             }
-            memo.add(path to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions)
+            memo + FieldAndDefinitions(
+                path to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
+            )
         }
 
     private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
@@ -124,7 +126,7 @@ open class OpenApi<out NODE>(
             val newField = meta.message.status.code.toString() to obj(
                 listOf("description" to string(meta.description)) +
                     if (node == nullNode()) emptyList() else listOf("schema" to node))
-            memo.add(newField, definitions)
+            memo + FieldAndDefinitions(newField, definitions)
         }
     }
 
@@ -145,9 +147,7 @@ open class OpenApi<out NODE>(
 }
 
 private data class FieldsAndDefinitions<NODE>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
-    fun add(newField: Pair<String, NODE>, newDefinitions: Set<Pair<String, NODE>>) = FieldsAndDefinitions(fields + newField, newDefinitions + definitions)
-
-    fun add(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields + fieldAndDefinitions.field,
+    operator fun plus(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields + fieldAndDefinitions.field,
         fieldAndDefinitions.definitions + definitions)
 }
 

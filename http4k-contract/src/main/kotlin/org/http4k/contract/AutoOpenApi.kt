@@ -10,6 +10,7 @@ import org.http4k.lens.Failure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchemaCreator
+import org.http4k.util.JsonToJsonSchema
 
 private data class OpenApiDefinition<NODE>(
     val info: ApiInfo,
@@ -57,8 +58,9 @@ open class AutoOpenApi<out NODE : Any>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
-        Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
+
+        return Response(OK)
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
@@ -72,6 +74,7 @@ open class AutoOpenApi<out NODE : Any>(
                     }
                     .toMap()
             ))
+    }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
@@ -105,10 +108,11 @@ open class AutoOpenApi<out NODE : Any>(
     }
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description,
-        example?.let {
-            val toSchema = jsonSchemaCreator.toSchema(it, definitionId)
-            toSchema.node
-        })
+        (example
+            ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+            ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+            ).node
+    )
 
     companion object
 }
