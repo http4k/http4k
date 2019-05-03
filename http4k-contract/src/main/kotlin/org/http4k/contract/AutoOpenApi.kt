@@ -14,7 +14,7 @@ private data class OpenApiDefinition<NODE>(
     val apiInfo: ApiInfo,
     val tags: List<Tag>,
     val securityDefinitions: NODE,
-    val paths: List<OpenApiPath<NODE>>
+    val paths: Map<String, OpenApiPath<NODE>>
 ) {
     val swagger = "2.0"
     val basePath = "/"
@@ -58,10 +58,10 @@ open class AutoOpenApi<out NODE : Any>(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 securityRenderer.full(security),
-                routes.map { it.asPath(security) }
+                routes.map { it.asPath(security) }.toMap()
             ))
 
-    private fun ContractRoute.asPath(contractSecurity: Security) = OpenApiPath(
+    private fun ContractRoute.asPath(contractSecurity: Security) = method.toString().toLowerCase() to OpenApiPath(
         meta.summary,
         tags.toSet().sortedBy { it.name },
         meta.produces.map { it.value }.toSet().sorted(),
