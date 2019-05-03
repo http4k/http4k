@@ -138,14 +138,14 @@ open class OpenApi<out NODE>(
             ?: ""))
     }
 
-    private fun Tag.asJson() = json { obj(listOf("name" to string(name)).plus(description?.let { "description" to string(it) }.asList())) }
+    private fun Tag.asJson() = json { obj(listOf("name" to string(name)) + description?.let { "description" to string(it) }.asList()) }
 }
 
 private data class FieldsAndDefinitions<NODE>(val fields: List<Pair<String, NODE>> = emptyList(), val definitions: Set<Pair<String, NODE>> = emptySet()) {
-    fun add(newField: Pair<String, NODE>, newDefinitions: Set<Pair<String, NODE>>) = FieldsAndDefinitions(fields.plus(newField), newDefinitions.plus(definitions))
+    fun add(newField: Pair<String, NODE>, newDefinitions: Set<Pair<String, NODE>>) = FieldsAndDefinitions(fields + newField, newDefinitions + definitions)
 
-    fun add(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields.plus(fieldAndDefinitions.field),
-        fieldAndDefinitions.definitions.plus(definitions))
+    fun add(fieldAndDefinitions: FieldAndDefinitions<NODE>) = FieldsAndDefinitions(fields + fieldAndDefinitions.field,
+        fieldAndDefinitions.definitions + definitions)
 }
 
 private data class FieldAndDefinitions<out NODE>(val field: Pair<String, NODE>, val definitions: Set<Pair<String, NODE>>)
