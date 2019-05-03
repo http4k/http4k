@@ -108,9 +108,17 @@ open class OpenApi<out NODE>(
                     "security" to securityRenderer.ref(route.meta.security ?: contractSecurity)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
-            val defs = route.meta.request.asList().flatMap { it.asSchema().definitions }.plus(responseDefinitions).toSet()
-            FieldAndDefinitions(route.method.toString().toLowerCase() to
-                obj(*fields.filterNotNull().toTypedArray()), defs)
+            FieldAndDefinitions(
+                route.method.toString().toLowerCase() to obj(fields.filterNotNull()),
+                (
+                    (
+                        route.meta.request
+                            .asList().flatMap {
+                                it.asSchema().definitions
+                            }
+                        ) + responseDefinitions
+                    )
+                    .toSet<Pair<String, NODE>>())
         }
     }
 
@@ -123,10 +131,12 @@ open class OpenApi<out NODE>(
     private fun render(responses: List<HttpMessageMeta<Response>>) = json {
         responses.fold(FieldsAndDefinitions<NODE>()) { memo, meta ->
             val (node, definitions) = meta.asSchema()
-            val newField = meta.message.status.code.toString() to obj(
-                listOf("description" to string(meta.description)) +
-                    if (node == nullNode()) emptyList() else listOf("schema" to node))
-            memo + FieldAndDefinitions(newField, definitions)
+
+            memo + FieldAndDefinitions(
+                meta.message.status.code.toString() to obj(
+                    listOf("description" to string(meta.description)) +
+                        if (node == nullNode()) emptyList() else listOf("schema" to node)),
+                definitions)
         }
     }
 
