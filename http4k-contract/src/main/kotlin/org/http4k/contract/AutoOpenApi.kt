@@ -78,7 +78,7 @@ open class AutoOpenApi<out NODE : Any>(
             OpenApiPath(
                 meta.summary,
                 meta.description,
-                tags.map { it.name }.toSet().sorted(),
+                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
                 meta.produces.map { it.value }.toSet().sorted(),
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),

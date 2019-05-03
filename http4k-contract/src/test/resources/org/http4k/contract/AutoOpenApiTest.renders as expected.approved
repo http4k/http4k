@@ -27,6 +27,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -75,6 +76,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -112,6 +114,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -163,6 +166,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -214,6 +218,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -245,6 +250,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -277,6 +283,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -309,6 +316,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -332,6 +340,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
         ],
@@ -384,6 +393,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
           "application/json",
@@ -411,6 +421,7 @@
         "summary": "<unknown>",
         "description": null,
         "tags": [
+          "/basepath"
         ],
         "produces": [
           "application/json"
