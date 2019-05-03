@@ -62,7 +62,7 @@ open class AutoOpenApi<out NODE : Any>(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 securityRenderer.full(security),
-                routes.map { it.asPath(security) }
+                routes.map { it.asPath(security, contractRoot) }
                     .groupBy { it.path }
                     .mapValues { it: Map.Entry<String, List<PathAndMethod<NODE>>> ->
                         it.value
@@ -72,8 +72,8 @@ open class AutoOpenApi<out NODE : Any>(
                     .toMap()
             ))
 
-    private fun ContractRoute.asPath(contractSecurity: Security) =
-        PathAndMethod(describeFor(Root), method,
+    private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
+        PathAndMethod(describeFor(contractRoot), method,
             OpenApiPath(
                 meta.summary,
                 tags.toSet().sortedBy { it.name },

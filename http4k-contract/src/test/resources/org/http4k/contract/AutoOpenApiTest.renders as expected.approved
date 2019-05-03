@@ -22,7 +22,7 @@
     }
   },
   "paths": {
-    "/nometa": {
+    "/basepath/nometa": {
       "get": {
         "summary": "<unknown>",
         "tags": [
@@ -44,7 +44,7 @@
         "operationId": null
       }
     },
-    "/descriptions": {
+    "/basepath/descriptions": {
       "get": {
         "summary": "endpoint",
         "tags": [
@@ -74,7 +74,7 @@
         "operationId": "echoMessage"
       }
     },
-    "/paths/{firstName}/bertrand/{age}": {
+    "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -108,7 +108,7 @@
         "operationId": null
       }
     },
-    "/queries": {
+    "/basepath/queries": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -154,7 +154,7 @@
         "operationId": null
       }
     },
-    "/headers": {
+    "/basepath/headers": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -200,7 +200,7 @@
         "operationId": null
       }
     },
-    "/body_string": {
+    "/basepath/body_string": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -229,7 +229,7 @@
         "operationId": null
       }
     },
-    "/body_json_noschema": {
+    "/basepath/body_json_noschema": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -259,7 +259,7 @@
         "operationId": null
       }
     },
-    "/body_json_schema": {
+    "/basepath/body_json_schema": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -289,7 +289,7 @@
         "operationId": null
       }
     },
-    "/security": {
+    "/basepath/security": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -311,7 +311,7 @@
         "operationId": null
       }
     },
-    "/body_form": {
+    "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
         "tags": [
@@ -358,7 +358,7 @@
         "operationId": null
       }
     },
-    "/produces_and_consumes": {
+    "/basepath/produces_and_consumes": {
       "get": {
         "summary": "<unknown>",
         "tags": [
@@ -384,7 +384,7 @@
         "operationId": null
       }
     },
-    "/returning": {
+    "/basepath/returning": {
       "post": {
         "summary": "<unknown>",
         "tags": [
