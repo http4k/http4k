@@ -23,53 +23,57 @@
   },
   "paths": {
     "get": {
-      "summary": "<unknown>",
-      "tags": [
-      ],
-      "produces": [
-        "application/json",
-        "application/xml"
-      ],
-      "consumes": [
-        "application/octet-stream",
-        "application/x-www-form-urlencoded"
-      ],
-      "parameters": [
-      ],
-      "responses": {
-      },
-      "security": [
-        {
-          "api_key": [
-          ]
-        }
-      ],
-      "operationId": null
+      "get": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "consumes": [
+          "application/octet-stream",
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
     },
     "post": {
-      "summary": "<unknown>",
-      "tags": [
-      ],
-      "produces": [
-        "application/json"
-      ],
-      "consumes": [
-      ],
-      "parameters": [
-      ],
-      "responses": {
-        "403": {
-          "description": "no way jose",
-          "schema": null
-        }
-      },
-      "security": [
-        {
-          "api_key": [
-          ]
-        }
-      ],
-      "operationId": null
+      "post": {
+        "summary": "<unknown>",
+        "tags": [
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "schema": null
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
     }
   },
   "swagger": "2.0",
