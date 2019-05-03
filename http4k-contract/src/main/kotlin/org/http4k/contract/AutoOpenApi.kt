@@ -24,7 +24,7 @@ private data class OpenApiDefinition<NODE>(
 private data class OpenApiPath<NODE>(
     val summary: String,
     val description: String?,
-    val tags: List<Tag>,
+    val tags: List<String>,
     val produces: List<String>,
     val consumes: List<String>,
     val parameters: List<OpenApiParameter>,
@@ -78,7 +78,7 @@ open class AutoOpenApi<out NODE : Any>(
             OpenApiPath(
                 meta.summary,
                 meta.description,
-                tags.toSet().sortedBy { it.name },
+                tags.map { it.name }.toSet().sorted(),
                 meta.produces.map { it.value }.toSet().sorted(),
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),

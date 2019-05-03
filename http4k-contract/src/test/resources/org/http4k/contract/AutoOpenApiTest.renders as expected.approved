@@ -50,14 +50,8 @@
         "summary": "endpoint",
         "description": "some rambling description of what this thing actually does",
         "tags": [
-          {
-            "name": "tag1",
-            "description": null
-          },
-          {
-            "name": "tag3",
-            "description": null
-          }
+          "tag1",
+          "tag3"
         ],
         "produces": [
         ],
