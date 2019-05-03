@@ -85,12 +85,14 @@
         ],
         "parameters": [
           {
+            "type": "string",
             "in": "path",
             "name": "firstName",
             "required": true,
             "description": null
           },
           {
+            "type": "boolean",
             "in": "path",
             "name": "age",
             "required": true,
@@ -119,24 +121,28 @@
         ],
         "parameters": [
           {
+            "type": "boolean",
             "in": "query",
             "name": "b",
             "required": true,
             "description": "booleanQuery"
           },
           {
+            "type": "string",
             "in": "query",
             "name": "s",
             "required": false,
             "description": "stringQuery"
           },
           {
+            "type": "integer",
             "in": "query",
             "name": "i",
             "required": false,
             "description": "intQuery"
           },
           {
+            "type": "string",
             "in": "query",
             "name": "j",
             "required": false,
@@ -165,24 +171,28 @@
         ],
         "parameters": [
           {
+            "type": "boolean",
             "in": "header",
             "name": "b",
             "required": true,
             "description": "booleanHeader"
           },
           {
+            "type": "string",
             "in": "header",
             "name": "s",
             "required": false,
             "description": "stringHeader"
           },
           {
+            "type": "integer",
             "in": "header",
             "name": "i",
             "required": false,
             "description": "intHeader"
           },
           {
+            "type": "string",
             "in": "header",
             "name": "j",
             "required": false,
@@ -212,6 +222,7 @@
         ],
         "parameters": [
           {
+            "type": "string",
             "in": "body",
             "name": "body",
             "required": true,
@@ -242,6 +253,7 @@
         "parameters": [
           {
             "schema": null,
+            "type": "object",
             "in": "body",
             "name": "body",
             "required": true,
@@ -272,6 +284,7 @@
         "parameters": [
           {
             "schema": null,
+            "type": "object",
             "in": "body",
             "name": "body",
             "required": true,
@@ -323,24 +336,28 @@
         ],
         "parameters": [
           {
+            "type": "boolean",
             "in": "formData",
             "name": "b",
             "required": true,
             "description": "booleanField"
           },
           {
+            "type": "integer",
             "in": "formData",
             "name": "i",
             "required": false,
             "description": "intField"
           },
           {
+            "type": "string",
             "in": "formData",
             "name": "s",
             "required": false,
             "description": "stringField"
           },
           {
+            "type": "string",
             "in": "formData",
             "name": "j",
             "required": true,
