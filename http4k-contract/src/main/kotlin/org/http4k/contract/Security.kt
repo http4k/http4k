@@ -33,7 +33,8 @@ object NoSecurity : Security {
  */
 class ApiKeySecurity<out T>(val param: Lens<Request, T>,
                             validateKey: (T) -> Boolean,
-                            authorizeOptionsRequests: Boolean = true) : Security {
+                            authorizeOptionsRequests: Boolean = true,
+                            val name: String = "api_key") : Security {
     override val filter = Filter { next ->
         {
             if (!authorizeOptionsRequests && it.method == OPTIONS) {
@@ -53,7 +54,7 @@ class ApiKeySecurity<out T>(val param: Lens<Request, T>,
 /**
  * Checks the presence of basic auth credentials
  */
-class BasicAuthSecurity(realm: String, credentials: Credentials) : Security {
+class BasicAuthSecurity(realm: String, credentials: Credentials, val name: String = "basicAuth") : Security {
     override val filter: Filter = ServerFilters.BasicAuth(realm, credentials)
 }
 

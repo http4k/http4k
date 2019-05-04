@@ -64,8 +64,11 @@ open class AutoOpenApi<out NODE : Any>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
-        Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
+
+        val allSecurities = routes.mapNotNull { it.meta.security } + security
+
+        return Response(OK)
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
@@ -75,9 +78,10 @@ open class AutoOpenApi<out NODE : Any>(
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
                     .toMap(),
-                securityRenderer.full(security),
+                allSecurities.combine(),
                 json.nullNode()
             ))
+    }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
@@ -119,6 +123,11 @@ open class AutoOpenApi<out NODE : Any>(
     private fun HttpMessageMeta<HttpMessage>.toSchema() = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
         ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+
+    private fun List<Security>.combine(): NODE =
+        json {
+            obj(flatMap { fields(securityRenderer.full(it)) })
+        }
 
     companion object
 }

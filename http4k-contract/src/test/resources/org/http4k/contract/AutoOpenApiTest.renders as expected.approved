@@ -505,6 +505,9 @@
     }
   },
   "securityDefinitions": {
+    "basicAuth": {
+      "type": "basic"
+    },
     "api_key": {
       "type": "apiKey",
       "in": "query",

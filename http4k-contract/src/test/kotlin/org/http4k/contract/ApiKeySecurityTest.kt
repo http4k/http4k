@@ -12,14 +12,14 @@ import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
 
-class SecurityTest {
+class ApiKeySecurityTest {
 
     @Test
     fun `valid API key is granted access and result carried through`() {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, "?name=1"))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=1"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
@@ -30,7 +30,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }, false).filter(next)(Request(Method.OPTIONS, "/"))
+        val response = ApiKeySecurity(param, { true }, false).filter(next)(Request(Method.OPTIONS, "/"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
@@ -41,7 +41,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, ""))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, ""))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
@@ -51,7 +51,7 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { true }).filter(next)(Request(Method.GET, "?name=asdasd"))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=asdasd"))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
@@ -61,18 +61,8 @@ class SecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKey(param, { false }).filter(next)(Request(Method.GET, "?name=1"))
+        val response = ApiKeySecurity(param, { false }).filter(next)(Request(Method.GET, "?name=1"))
 
         assertThat(response.status, equalTo(Status.UNAUTHORIZED))
     }
-
-    @Test
-    fun `no security is rather lax`() {
-        val response = (NoSecurity.filter({ Response(OK).body("hello") }))(Request(Method.GET, ""))
-
-        assertThat(response.status, equalTo(OK))
-        assertThat(response.bodyString(), equalTo("hello"))
-    }
-
 }
-

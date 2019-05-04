@@ -13,12 +13,12 @@ fun <NODE> SecurityRenderer.Companion.OpenApi(json: Json<NODE>): SecurityRendere
     override fun full(security: Security) = json {
         when (security) {
             is BasicAuthSecurity -> obj(
-                "basicAuth" to obj(
+                security.name to obj(
                     "type" to string("basic")
                 )
             )
             is ApiKeySecurity<*> -> obj(
-                "api_key" to obj(
+                security.name to obj(
                     "type" to string("apiKey"),
                     "in" to string(security.param.meta.location),
                     "name" to string(security.param.meta.name)
