@@ -285,7 +285,7 @@
         "parameters": [
           {
             "schema": {
-              "$ref": "#/definitions/object-1476590753"
+              "$ref": "#/definitions/someDefinitionId"
             },
             "in": "body",
             "name": "body",

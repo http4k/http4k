@@ -116,10 +116,13 @@ open class AutoOpenApi<out NODE : Any>(
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, exampleToSchema())
 
-    private fun HttpMessageMeta<HttpMessage>.exampleToSchema(): NODE = (example
-        ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-        ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
-        ).node
+    private fun HttpMessageMeta<HttpMessage>.exampleToSchema(): NODE {
+        println(this)
+        return (example
+            ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+            ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+            ).node
+    }
 
     companion object
 }

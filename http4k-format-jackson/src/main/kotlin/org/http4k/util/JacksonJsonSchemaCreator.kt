@@ -10,10 +10,11 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson) 
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<JsonNode> {
         val node = jsonSchemaGenerator.generateSchema(obj::class.java)
+        println(node)
         return with(json.asJsonString(node)) {
             JsonSchema(
                 json {
-                    obj("\$ref" to string("#/definitions/${node.id}"))
+                    obj("\$ref" to string("#/definitions/${overrideDefinitionId ?: node.id}"))
                 },
                 setOf("" to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
         }
