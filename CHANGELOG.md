@@ -1,38 +1,40 @@
 <h2 class="github">Changelog</h2>
 
-This list is not currently intended to be all-encompassing - it will document major and breaking API changes with their 
-rationale when appropriate:
+This list is not currently intended to be all-encompassing - it will document major and breaking API 
+changes with their rationale when appropriate:
+
+### v3.141.0
+- [http4k-core] - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
 
 ### v3.140.0
 - [all] Update dependencies (including Kotlin bump to 1.3.31)
 - [http4k-security-oauth] Handle user rejecting/failing authentication. H/T @andymoody 
 
 ### v3.139.0
-- Allow access token generation to explicitly reject an authorization code already used. H/T @andymoody 
+- [http4k-security-oauth] Allow access token generation to explicitly reject an authorization code already used. H/T @andymoody 
 
 ### v3.138.1
-- Amend error responses from access token generation. H/T @andymoody
+- [http4k-security-oauth] Amend error responses from access token generation. H/T @andymoody
 
 ### v3.138.0
-- Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
-- Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
+- [http4k-contracts] Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
+- [http4k-contracts] Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
 set on a contract-level basis.
 
 ### v3.137.1
-- Allow invocation of serverless functions locally. H/T @Charlyzzz
-- Fix #226 - ResourceLoadingHandler not close stream
+- [http4k-serverless] Allow invocation of serverless functions locally. H/T @Charlyzzz
+- [http4k-core] Fix #226 - ResourceLoadingHandler not close stream
 
 ### v3.137.0
-- Rename AuthRequestPersistence to AuthRequestTracking
+- [http4k-security-oauth] Rename AuthRequestPersistence to AuthRequestTracking
 
 ### v3.136.0
-- Allow the http request to be referenced when generating OAuth authorization codes. H/T @andymoody
+- [http4k-security-oauth] Allow the http request to be referenced when generating OAuth authorization codes. H/T @andymoody
 
 ### v3.135.0
-- Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
-- Added `SnipRequestBody` behaviour to `http4k-testing-chaos` module.
-- (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This 
-will require reimporting the new location into your source if you were using the imports.
+- [http4k-core] Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
+- [http4k-testing-chaos] Added `SnipRequestBody` behaviour.
+- [http4k-core]  (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
 
 ### v3.134.0
 - Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 

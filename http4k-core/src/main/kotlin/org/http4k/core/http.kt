@@ -6,9 +6,11 @@ import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.routing.RoutedRequest
+import org.http4k.util.ByteBufferBackedInputStream
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
+
 
 typealias Headers = Parameters
 
@@ -27,7 +29,11 @@ interface Body : Closeable {
 
     companion object {
         operator fun invoke(body: String): Body = MemoryBody(body)
-        operator fun invoke(body: ByteBuffer): Body = MemoryBody(body)
+        operator fun invoke(body: ByteBuffer): Body = when {
+            body.hasArray() -> MemoryBody(body)
+            else -> StreamBody(ByteBufferBackedInputStream(body))
+        }
+
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
         val EMPTY: Body = MemoryBody("")
@@ -40,10 +46,10 @@ interface Body : Closeable {
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
 
-    override val length: Long by lazy { payload.array().size.toLong() }
+    override val length by lazy { payload.array().size.toLong() }
     override fun close() {}
-    override val stream: InputStream get() = payload.array().inputStream()
-    override fun toString(): String = payload.asString()
+    override val stream get() = payload.array().inputStream()
+    override fun toString() = payload.asString()
 }
 
 /**
@@ -61,16 +67,16 @@ class StreamBody(override val stream: InputStream, override val length: Long? = 
         stream.close()
     }
 
-    override fun toString(): String = "<<stream>>"
+    override fun toString() = "<<stream>>"
 
-    override fun equals(other: Any?): Boolean =
+    override fun equals(other: Any?) =
         when {
             this === other -> true
             other !is Body? -> false
             else -> payload == other?.payload
         }
 
-    override fun hashCode(): Int = payload.hashCode()
+    override fun hashCode() = payload.hashCode()
 }
 
 interface HttpMessage : Closeable {
@@ -166,7 +172,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
 
-    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
+    override fun headers(headers: Headers) = copy(headers = headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
@@ -218,7 +224,7 @@ interface Response : HttpMessage {
 data class MemoryResponse(override val status: Status, override val headers: Headers = listOf(), override val body: Body = EMPTY, override val version: String = HTTP_1_1) : Response {
     override fun header(name: String, value: String?) = copy(headers = headers + (name to value))
 
-    override fun headers(headers: Headers) = copy(headers = this.headers + headers)
+    override fun headers(headers: Headers) = copy(headers = headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
 
