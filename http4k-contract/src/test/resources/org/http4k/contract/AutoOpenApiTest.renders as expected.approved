@@ -84,18 +84,18 @@
         ],
         "parameters": [
           {
-            "type": "string",
             "in": "path",
             "name": "firstName",
             "required": true,
-            "description": null
+            "description": null,
+            "type": "string"
           },
           {
-            "type": "boolean",
             "in": "path",
             "name": "age",
             "required": true,
-            "description": null
+            "description": null,
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -122,32 +122,32 @@
         ],
         "parameters": [
           {
-            "type": "boolean",
             "in": "query",
             "name": "b",
             "required": true,
-            "description": "booleanQuery"
+            "description": "booleanQuery",
+            "type": "boolean"
           },
           {
-            "type": "string",
             "in": "query",
             "name": "s",
             "required": false,
-            "description": "stringQuery"
+            "description": "stringQuery",
+            "type": "string"
           },
           {
-            "type": "integer",
             "in": "query",
             "name": "i",
             "required": false,
-            "description": "intQuery"
+            "description": "intQuery",
+            "type": "integer"
           },
           {
-            "type": "string",
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery"
+            "description": "jsonQuery",
+            "type": "string"
           }
         ],
         "responses": {
@@ -174,32 +174,32 @@
         ],
         "parameters": [
           {
-            "type": "boolean",
             "in": "header",
             "name": "b",
             "required": true,
-            "description": "booleanHeader"
+            "description": "booleanHeader",
+            "type": "boolean"
           },
           {
-            "type": "string",
             "in": "header",
             "name": "s",
             "required": false,
-            "description": "stringHeader"
+            "description": "stringHeader",
+            "type": "string"
           },
           {
-            "type": "integer",
             "in": "header",
             "name": "i",
             "required": false,
-            "description": "intHeader"
+            "description": "intHeader",
+            "type": "integer"
           },
           {
-            "type": "string",
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader"
+            "description": "jsonHeader",
+            "type": "string"
           }
         ],
         "responses": {
@@ -227,11 +227,11 @@
         ],
         "parameters": [
           {
-            "type": "string",
             "in": "body",
             "name": "body",
             "required": true,
-            "description": null
+            "description": null,
+            "type": "string"
           }
         ],
         "responses": {
@@ -260,7 +260,6 @@
         "parameters": [
           {
             "schema": null,
-            "type": "object",
             "in": "body",
             "name": "body",
             "required": true,
@@ -293,7 +292,6 @@
         "parameters": [
           {
             "schema": null,
-            "type": "object",
             "in": "body",
             "name": "body",
             "required": true,
@@ -349,32 +347,32 @@
         ],
         "parameters": [
           {
-            "type": "boolean",
             "in": "formData",
             "name": "b",
             "required": true,
-            "description": "booleanField"
+            "description": "booleanField",
+            "type": "boolean"
           },
           {
-            "type": "integer",
             "in": "formData",
             "name": "i",
             "required": false,
-            "description": "intField"
+            "description": "intField",
+            "type": "integer"
           },
           {
-            "type": "string",
             "in": "formData",
             "name": "s",
             "required": false,
-            "description": "stringField"
+            "description": "stringField",
+            "type": "string"
           },
           {
-            "type": "string",
             "in": "formData",
             "name": "j",
             "required": true,
-            "description": "jsonField"
+            "description": "jsonField",
+            "type": "string"
           }
         ],
         "responses": {

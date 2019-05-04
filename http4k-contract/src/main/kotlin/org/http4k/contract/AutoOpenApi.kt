@@ -36,11 +36,13 @@ private data class OpenApiPath<NODE>(
 
 private data class OpenApiResponse<NODE>(val description: String?, val schema: NODE?)
 
-private sealed class OpenApiParameter(val type: String, val `in`: String, val name: String, val required: Boolean, val description: String?)
+private sealed class OpenApiParameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
 
-private class SchemaParameter<NODE>(meta: Meta, val schema: NODE) : OpenApiParameter(meta.paramMeta.value, meta.location, meta.name, meta.required, meta.description)
+private class SchemaParameter<NODE>(meta: Meta, val schema: NODE) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description)
 
-private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.paramMeta.value, meta.location, meta.name, meta.required, meta.description)
+private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description) {
+    val type = meta.paramMeta.value
+}
 
 open class AutoOpenApi<out NODE : Any>(
     private val apiInfo: ApiInfo,
