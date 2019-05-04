@@ -124,10 +124,7 @@ open class AutoOpenApi<out NODE : Any>(
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
         ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
 
-    private fun List<Security>.combine(): NODE =
-        json {
-            obj(flatMap { fields(securityRenderer.full(it)) })
-        }
+    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(it)) }) }
 
     companion object
 }

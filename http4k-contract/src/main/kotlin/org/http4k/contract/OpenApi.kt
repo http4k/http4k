@@ -39,11 +39,13 @@ open class OpenApi<out NODE>(
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
                         "paths" to obj(fields),
-                        "securityDefinitions" to securityRenderer.full(security),
+                        "securityDefinitions" to (listOf(security) + routes.mapNotNull { it.meta.security }).combine(),
                         "definitions" to obj(definitions)
                     ))
                 })
         }
+
+    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(it)) }) }
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries

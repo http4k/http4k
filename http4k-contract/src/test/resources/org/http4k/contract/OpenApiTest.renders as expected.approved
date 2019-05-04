@@ -425,6 +425,9 @@
       "type": "apiKey",
       "in": "query",
       "name": "the_api_key"
+    },
+    "basicAuth": {
+      "type": "basic"
     }
   },
   "definitions": {
