@@ -439,6 +439,69 @@
         ],
         "operationId": null
       }
+    },
+    "/basepath/body_auto_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject2"
+            },
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      },
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "303": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject1"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
     }
   },
   "securityDefinitions": {

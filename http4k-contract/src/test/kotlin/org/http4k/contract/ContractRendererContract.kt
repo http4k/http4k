@@ -113,8 +113,12 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of Jackson { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { Response(OK) }
+
+            routes += specificRoutes()
         }
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
+
+    open fun specificRoutes(): List<ContractRoute> = emptyList()
 }
