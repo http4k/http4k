@@ -55,7 +55,7 @@ open class OpenApi<out NODE>(
             )
         }
 
-    private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
+    private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
                 "in" to string(meta.location),
@@ -69,25 +69,26 @@ open class OpenApi<out NODE>(
         )
     }
 
-    private fun renderBodyMeta(meta: Meta, schema: JsonSchema<NODE>? = null): NODE = json {
+    private fun Meta.renderBodyMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
-                "in" to string(meta.location),
-                "name" to string(meta.name),
-                "required" to boolean(meta.required),
-                if (meta.location != "formData") {
-                    "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
-                } else "type" to string(meta.paramMeta.value)
-            ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
+                "in" to string(location),
+                "name" to string(name),
+                "required" to boolean(required),
+                if (location != "formData") {
+                    "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
+                } else "type" to string(paramMeta.value)
+            ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
-    private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute): FieldAndDefinitions<NODE> {
+    private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute)
+        : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
         val schema = route.jsonRequest?.asSchema()
 
-        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { renderBodyMeta(it, schema) } ?: emptyList()
+        val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
         val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
 
