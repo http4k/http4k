@@ -78,7 +78,7 @@ class RouteMetaDsl internal constructor() {
      */
     @JvmName("returningStatus")
     fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String = "", definitionId: String? = null) {
-        returning(ResponseMeta(description, Response(status).with(body.first of body.second), definitionId))
+        returning(ResponseMeta(description, Response(status).with(body.first of body.second), definitionId, body.second))
     }
 
     /**
@@ -87,7 +87,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
         requestBody = body.first
-        receiving(RequestMeta(Request(GET, "").with(body.first of body.second), definitionId))
+        receiving(RequestMeta(Request(GET, "").with(body.first of body.second), definitionId, body.second))
     }
 
     /**
