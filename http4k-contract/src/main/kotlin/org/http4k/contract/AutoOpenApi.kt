@@ -1,5 +1,7 @@
 package org.http4k.contract
 
+import org.http4k.core.ContentType
+import org.http4k.core.HttpMessage
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -7,6 +9,7 @@ import org.http4k.core.with
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
+import org.http4k.lens.Header
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchemaCreator
@@ -94,9 +97,12 @@ open class AutoOpenApi<out NODE : Any>(
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
+        val jsonRequest =
+            meta.request?.let { if (Header.CONTENT_TYPE(it.message) == ContentType.APPLICATION_JSON) it else null }
+
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
-                ObjectParam -> SchemaParameter(it, null)
+                ObjectParam -> SchemaParameter(it, jsonRequest?.exampleToSchema())
                 else -> PrimitiveParameter(it)
             }
         } ?: emptyList()
@@ -110,12 +116,12 @@ open class AutoOpenApi<out NODE : Any>(
         return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description,
-        (example
-            ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-            ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
-            ).node
-    )
+    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, exampleToSchema())
+
+    private fun HttpMessageMeta<HttpMessage>.exampleToSchema(): NODE = (example
+        ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+        ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+        ).node
 
     companion object
 }

@@ -7,6 +7,7 @@ import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
+import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -86,7 +87,7 @@ open class OpenApi<out NODE>(
         : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
-        val schema = route.jsonRequest?.asSchema()
+        val schema = route.meta.request?.takeIf { Header.CONTENT_TYPE(it.message) == APPLICATION_JSON }?.asSchema()
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
@@ -119,7 +120,7 @@ open class OpenApi<out NODE>(
                             }
                         ) + responseDefinitions
                     )
-                    .toSet<Pair<String, NODE>>())
+                    .toSet())
         }
     }
 
