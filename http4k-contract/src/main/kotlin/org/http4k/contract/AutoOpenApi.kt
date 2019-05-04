@@ -92,19 +92,20 @@ open class AutoOpenApi<out NODE : Any>(
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
-        val bodyParamNodes = meta.body?.metas?.map { it.asBodyOpenApiParameter() } ?: emptyList()
-        val nonBodyParamNodes = nonBodyParams.flatMap { it.asList() }.map { it.asOpenApiParameter() }
+        val bodyParamNodes = meta.body?.metas?.map {
+            when (it.paramMeta) {
+                ObjectParam -> SchemaParameter(it, null)
+                else -> PrimitiveParameter(it)
+            }
+        } ?: emptyList()
+
+        val nonBodyParamNodes = nonBodyParams.map {
+            when (it.paramMeta) {
+                ObjectParam -> SchemaParameter(it, null)
+                else -> PrimitiveParameter(it)
+            }
+        }
         return nonBodyParamNodes + bodyParamNodes
-    }
-
-    private fun Meta.asBodyOpenApiParameter() = when (paramMeta) {
-        ObjectParam -> SchemaParameter(this, null)
-        else -> PrimitiveParameter(this)
-    }
-
-    private fun Meta.asOpenApiParameter() = when (paramMeta) {
-        ObjectParam -> SchemaParameter(this, null)
-        else -> PrimitiveParameter(this)
     }
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description,
@@ -116,5 +117,3 @@ open class AutoOpenApi<out NODE : Any>(
 
     companion object
 }
-
-private fun <T> T?.asList() = this?.let(::listOf) ?: listOf()
