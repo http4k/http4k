@@ -18,8 +18,9 @@ import org.http4k.util.JsonToJsonSchema
 private data class OpenApiDefinition<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
+    val paths: Map<String, Map<String, OpenApiPath<NODE>>>,
     val securityDefinitions: NODE,
-    val paths: Map<String, Map<String, OpenApiPath<NODE>>>
+    val definitions: NODE
 ) {
     val swagger = "2.0"
     val basePath = "/"
@@ -68,13 +69,14 @@ open class AutoOpenApi<out NODE : Any>(
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                securityRenderer.full(security),
                 routes.map { it.asPath(security, contractRoot) }
                     .groupBy { it.path }
                     .mapValues {
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
-                    .toMap()
+                    .toMap(),
+                securityRenderer.full(security),
+                json.nullNode()
             ))
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =

@@ -14,13 +14,6 @@
       "description": null
     }
   ],
-  "securityDefinitions": {
-    "api_key": {
-      "type": "apiKey",
-      "in": "query",
-      "name": "the_api_key"
-    }
-  },
   "paths": {
     "/basepath/nometa": {
       "get": {
@@ -448,6 +441,14 @@
       }
     }
   },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "the_api_key"
+    }
+  },
+  "definitions": null,
   "swagger": "2.0",
   "basePath": "/"
 }
