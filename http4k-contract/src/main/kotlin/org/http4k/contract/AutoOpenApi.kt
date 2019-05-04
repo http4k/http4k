@@ -100,7 +100,7 @@ open class AutoOpenApi<out NODE : Any>(
 
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
-                ObjectParam -> SchemaParameter(it, jsonRequest?.exampleToSchema())
+                ObjectParam -> SchemaParameter(it, jsonRequest?.toSchema()?.node)
                 else -> PrimitiveParameter(it)
             }
         } ?: emptyList()
@@ -114,15 +114,11 @@ open class AutoOpenApi<out NODE : Any>(
         return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, exampleToSchema())
+    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema().node)
 
-    private fun HttpMessageMeta<HttpMessage>.exampleToSchema(): NODE {
-        println(this)
-        return (example
-            ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-            ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
-            ).node
-    }
+    private fun HttpMessageMeta<HttpMessage>.toSchema() = example
+        ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+        ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
 
     companion object
 }
