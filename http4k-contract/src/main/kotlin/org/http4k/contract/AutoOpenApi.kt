@@ -63,23 +63,19 @@ open class AutoOpenApi<out NODE : Any>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-
-        return Response(OK)
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
+        Response(OK)
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 securityRenderer.full(security),
                 routes.map { it.asPath(security, contractRoot) }
                     .groupBy { it.path }
-                    .mapValues { it: Map.Entry<String, List<PathAndMethod<NODE>>> ->
-                        it.value
-                            .map { it.method.name.toLowerCase() to it.pathSpec }
-                            .toMap()
+                    .mapValues {
+                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
                     .toMap()
             ))
-    }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
