@@ -1,6 +1,6 @@
 package org.http4k.contract
 
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
 import org.http4k.core.Response
@@ -9,7 +9,7 @@ import org.http4k.core.with
 import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchemaCreator
@@ -98,7 +98,7 @@ open class AutoOpenApi<out NODE : Any>(
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
         val jsonRequest =
-            meta.request?.let { if (Header.CONTENT_TYPE(it.message) == ContentType.APPLICATION_JSON) it else null }
+            meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
