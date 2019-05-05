@@ -8,7 +8,10 @@ import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 
-class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<NODE, NODE> {
+class JsonToJsonSchema<NODE>(
+    private val json: Json<NODE>,
+    private val refPrefix: String = "definitions"
+) : JsonSchemaCreator<NODE, NODE> {
     override fun toSchema(obj: NODE, overrideDefinitionId: String?) = JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId)
 
     private fun JsonSchema<NODE>.toSchema(overrideDefinitionId: String? = null): JsonSchema<NODE> =
@@ -48,7 +51,7 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<N
         val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
         val definitionId = overrideDefinitionId ?: "object"+newDefinition!!.hashCode()
         val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
-        return JsonSchema(json { obj("\$ref" to string("#/definitions/$definitionId")) }, allDefinitions)
+        return JsonSchema(json { obj("\$ref" to string("#/$refPrefix/$definitionId")) }, allDefinitions)
     }
 
     private fun ParamMeta.schema(example: NODE): NODE = json { obj("type" to string(value), "example" to example) }

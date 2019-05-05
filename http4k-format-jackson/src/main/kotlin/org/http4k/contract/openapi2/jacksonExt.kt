@@ -13,4 +13,4 @@ operator fun OpenApi2.Companion.invoke(
     json: ConfigurableJackson = Jackson,
     securityRenderer: SecurityRenderer<JsonNode> = OpenApi2SecurityRenderer(json),
     errorResponseRenderer: JsonErrorResponseRenderer<JsonNode> = JsonErrorResponseRenderer(json)
-) = OpenApi2(apiInfo, Jackson, JacksonJsonSchemaCreator(json), securityRenderer, errorResponseRenderer)
+) = OpenApi2(apiInfo, Jackson, JacksonJsonSchemaCreator(json, "definitions"), securityRenderer, errorResponseRenderer)

@@ -5,8 +5,10 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 
-class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson) : JsonSchemaCreator<Any, JsonNode> {
-    private val jsonToJsonSchema = JsonToJsonSchema(json)
+class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
+                               private val refPrefix: String = "components/schemas"
+) : JsonSchemaCreator<Any, JsonNode> {
+    private val jsonToJsonSchema = JsonToJsonSchema(json, refPrefix)
     private val jsonSchemaGenerator = JsonSchemaGenerator(json.mapper)
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?) =
@@ -17,7 +19,7 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson) 
                 val id = overrideDefinitionId ?: node.id
                 with(json.asJsonString(node)) {
                     JsonSchema(
-                        json { obj("\$ref" to string("#/definitions/$id")) },
+                        json { obj("\$ref" to string("#/$refPrefix/$id")) },
                         setOf(id to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
                 }
             }
