@@ -57,7 +57,7 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
     }
 
     @Test
-    fun `renders as expected`(approver: Approver) {
+    open fun `renders as expected`(approver: Approver) {
         val customBody = Body.json("the body of the message").toLens()
 
         val router = "/basepath" bind contract {

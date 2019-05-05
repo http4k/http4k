@@ -1,5 +1,8 @@
-package org.http4k.contract
+package org.http4k.contract.openapi2
 
+import org.http4k.contract.ApiInfo
+import org.http4k.contract.ContractRendererContract
+import org.http4k.contract.meta
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -11,7 +14,7 @@ import org.http4k.format.Jackson.auto
 data class ArbObject1(val anotherString: String)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 
-class AutoOpenApiTest : ContractRendererContract(AutoOpenApi(ApiInfo("title", "1.2", "module description"))) {
+class OpenApi2Test : ContractRendererContract(OpenApi2(ApiInfo("title", "1.2", "module description"))) {
     override fun specificRoutes() = listOf(
         "/body_auto_schema" meta {
             receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(

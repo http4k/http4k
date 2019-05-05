@@ -1,5 +1,13 @@
-package org.http4k.contract
+package org.http4k.contract.openapi3
 
+import org.http4k.contract.ContractRenderer
+import org.http4k.contract.ContractRoute
+import org.http4k.contract.HttpMessageMeta
+import org.http4k.contract.OpenApi
+import org.http4k.contract.PathSegments
+import org.http4k.contract.Security
+import org.http4k.contract.SecurityRenderer
+import org.http4k.contract.Tag
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -15,6 +23,8 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
+
+private typealias ApiInfo = org.http4k.contract.ApiInfo
 
 private data class OpenApiDefinition<NODE>(
     val info: ApiInfo,
@@ -63,7 +73,7 @@ private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, m
     val type = meta.paramMeta.value
 }
 
-open class AutoOpenApi<out NODE : Any>(
+class OpenApi3<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: JsonLibAutoMarshallingJson<NODE>,
     private val jsonSchemaCreator: JsonSchemaCreator<Any, NODE>,
