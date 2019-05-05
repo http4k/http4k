@@ -3,7 +3,6 @@ package org.http4k.contract.openapi3
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
-import org.http4k.contract.OpenApi
 import org.http4k.contract.PathSegments
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
@@ -80,7 +79,7 @@ class OpenApi3<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: JsonLibAutoMarshallingJson<NODE>,
     private val jsonSchemaCreator: JsonSchemaCreator<Any, NODE>,
-    private val securityRenderer: SecurityRenderer<NODE> = SecurityRenderer.OpenApi(json),
+    private val securityRenderer: SecurityRenderer<NODE> = OpenApi3SecurityRenderer(json),
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 
