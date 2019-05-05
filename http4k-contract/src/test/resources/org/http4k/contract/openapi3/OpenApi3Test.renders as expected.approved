@@ -18,6 +18,197 @@
     }
   ],
   "paths": {
+      "/basepath/nometa": {
+        "get": {
+          "responses": {},
+          "security": [
+            {
+              "api_key": []
+            }
+          ],
+          "tags": [
+            "/basepath"
+          ],
+          "summary": "<unknown>"
+        }
+      },
+    "/basepath/descriptions": {
+      "get": {
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "description": "some rambling description of what this thing actually does",
+        "operationId": "echoMessage",
+        "summary": "endpoint"
+      }
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "firstName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>"
+      }
+    },
+    "/basepath/queries": {
+      "post": {
+        "parameters": [
+          {
+            "description": "booleanQuery",
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "stringQuery",
+            "in": "query",
+            "name": "s",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "intQuery",
+            "in": "query",
+            "name": "i",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "jsonQuery",
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>"
+      }
+    },
+    "/basepath/headers": {
+      "post": {
+        "parameters": [
+          {
+            "description": "booleanHeader",
+            "in": "header",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "stringHeader",
+            "in": "header",
+            "name": "s",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "intHeader",
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "jsonHeader",
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>"
+      }
+    },
+    "/basepath/body_string": {
+      "post": {
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "summary": "<unknown>"
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "responses": {},
@@ -112,199 +303,8 @@
         "summary": "<unknown>"
       }
     },
-    "/basepath/body_string": {
-      "post": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/descriptions": {
-      "get": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "tag1",
-          "tag3"
-        ],
-        "description": "some rambling description of what this thing actually does",
-        "operationId": "echoMessage",
-        "summary": "endpoint"
-      }
-    },
-    "/basepath/headers": {
-      "post": {
-        "parameters": [
-          {
-            "description": "booleanHeader",
-            "in": "header",
-            "name": "b",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "description": "stringHeader",
-            "in": "header",
-            "name": "s",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "intHeader",
-            "in": "header",
-            "name": "i",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "jsonHeader",
-            "in": "header",
-            "name": "j",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/nometa": {
-      "get": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/paths/{firstName}/bertrand/{age}": {
-      "post": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "firstName",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "age",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>"
-      }
-    },
     "/basepath/produces_and_consumes": {
       "get": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/queries": {
-      "post": {
-        "parameters": [
-          {
-            "description": "booleanQuery",
-            "in": "query",
-            "name": "b",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "description": "stringQuery",
-            "in": "query",
-            "name": "s",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "intQuery",
-            "in": "query",
-            "name": "i",
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "jsonQuery",
-            "in": "query",
-            "name": "j",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {},
         "security": [
           {
