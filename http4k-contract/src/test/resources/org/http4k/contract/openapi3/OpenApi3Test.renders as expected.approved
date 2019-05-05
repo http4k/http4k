@@ -20,33 +20,47 @@
   "paths": {
       "/basepath/nometa": {
         "get": {
-          "responses": {},
-          "security": [
-            {
-              "api_key": []
-            }
-          ],
-          "tags": [
-            "/basepath"
-          ],
-          "summary": "<unknown>"
-        }
+         "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "produces": null,
+        "consumes": null,
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+                }
       },
     "/basepath/descriptions": {
       "get": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "summary": "endpoint",
+        "description": "some rambling description of what this thing actually does",
         "tags": [
           "tag1",
           "tag3"
         ],
-        "description": "some rambling description of what this thing actually does",
-        "operationId": "echoMessage",
-        "summary": "endpoint"
+        "produces": null,
+        "consumes": null,
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "echoMessage"
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {

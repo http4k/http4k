@@ -42,9 +42,9 @@ private data class OpenApiComponents<NODE>(
 private data class OpenApi3Path<NODE>(
     val summary: String,
     val description: String?,
-    val tags: List<String>,
-    val produces: List<String>,
-    val consumes: List<String>,
+    val tags: List<String>?,
+    val produces: List<String>?,
+    val consumes: List<String>?,
     val parameters: List<OpenApiParameter>,
     val responses: Map<String, OpenApiResponse<NODE>>,
     val security: NODE,
@@ -114,9 +114,9 @@ class OpenApi3<out NODE : Any>(
             OpenApi3Path(
                 meta.summary,
                 meta.description,
-                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
-                meta.produces.map { it.value }.toSet().sorted(),
-                meta.consumes.map { it.value }.toSet().sorted(),
+                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
+                meta.produces.map { it.value }.toSet().sorted().nullIfEmpty(),
+                meta.consumes.map { it.value }.toSet().sorted().nullIfEmpty(),
                 asOpenApiParameters(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
                 securityRenderer.ref(meta.security ?: contractSecurity),
@@ -153,3 +153,5 @@ class OpenApi3<out NODE : Any>(
 
     companion object
 }
+
+private fun <E : Iterable<T>, T> E.nullIfEmpty() = if (iterator().hasNext()) this else null
