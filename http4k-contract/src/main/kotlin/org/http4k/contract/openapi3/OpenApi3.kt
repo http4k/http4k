@@ -59,6 +59,7 @@ private data class OpenApi3Path<NODE>(
 }
 
 private class OpenApiRequestContent<NODE>()
+
 private class OpenApiResponseContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
 
@@ -110,7 +111,7 @@ class OpenApi3<out NODE : Any>(
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
+                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
                     }
                     .toSortedMap(),
                 OpenApiComponents(json.obj(paths.flatMap { it.pathSpec.definitions() }), allSecurities.combine())

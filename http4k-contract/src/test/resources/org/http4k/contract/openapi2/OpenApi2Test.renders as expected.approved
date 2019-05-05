@@ -16,6 +16,35 @@
   ],
   "paths": {
     "/basepath/body_auto_schema": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "303": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi2:ArbObject1"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      },
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -39,35 +68,6 @@
           }
         ],
         "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": null
-      },
-      "get": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "303": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi2:ArbObject1"
-            }
-          }
         },
         "security": [
           {

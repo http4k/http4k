@@ -101,7 +101,7 @@ class OpenApi2<out NODE : Any>(
                 paths
                     .groupBy { it.path }
                     .mapValues {
-                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
+                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
                     }
                     .toSortedMap(),
                 allSecurities.combine(),
