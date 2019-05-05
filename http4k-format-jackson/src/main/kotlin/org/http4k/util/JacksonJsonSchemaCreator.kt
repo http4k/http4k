@@ -17,7 +17,7 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson) 
                 val id = overrideDefinitionId ?: node.id
                 with(json.asJsonString(node)) {
                     JsonSchema(
-                        json { obj("\$ref" to string(id)) },
+                        json { obj("\$ref" to string("#/definitions/$id")) },
                         setOf(id to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
                 }
             }

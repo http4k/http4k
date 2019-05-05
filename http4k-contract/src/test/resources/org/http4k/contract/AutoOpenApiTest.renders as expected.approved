@@ -532,7 +532,7 @@
         }
       }
     },
-    "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject2": {
+    "urn:jsonschema:org:http4k:contract:ArbObject2": {
       "type": "object",
       "id": "urn:jsonschema:org:http4k:contract:ArbObject2",
       "properties": {
