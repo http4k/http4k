@@ -5,6 +5,7 @@ import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.NoSecurity
+import org.http4k.contract.OpenApi
 import org.http4k.contract.Security
 import org.http4k.contract.contract
 import org.http4k.contract.meta

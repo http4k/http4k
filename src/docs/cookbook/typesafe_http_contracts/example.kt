@@ -2,6 +2,7 @@ package cookbook.typesafe_http_contracts
 
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKeySecurity
+import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
 import org.http4k.contract.contract
 import org.http4k.contract.div
