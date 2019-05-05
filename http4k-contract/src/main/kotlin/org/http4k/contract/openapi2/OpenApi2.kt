@@ -47,7 +47,10 @@ private data class OpenApiPath<NODE>(
     val operationId: String?
 ) {
     fun definitions() =
-        (parameters + responses.values).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+        (parameters + responses.values)
+            .filterIsInstance<HasSchema<NODE>>()
+            .flatMap { it.definitions() }
+            .sortedBy { it.first }
 }
 
 private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
@@ -100,7 +103,7 @@ class OpenApi2<out NODE : Any>(
                     .mapValues {
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
-                    .toMap(),
+                    .toSortedMap(),
                 allSecurities.combine(),
                 json.obj(paths.flatMap { it.pathSpec.definitions() })
             ))

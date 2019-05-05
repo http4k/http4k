@@ -52,7 +52,10 @@ private data class OpenApi3Path<NODE>(
     val operationId: String?
 ) {
     fun definitions() =
-        (parameters + responses.values).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+        (parameters + responses.values)
+            .filterIsInstance<HasSchema<NODE>>()
+            .flatMap { it.definitions() }
+            .sortedBy { it.first }
 }
 
 private class OpenApiRequestContent<NODE>()
@@ -109,7 +112,7 @@ class OpenApi3<out NODE : Any>(
                     .mapValues {
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
-                    .toMap(),
+                    .toSortedMap(),
                 OpenApiComponents(json.obj(paths.flatMap { it.pathSpec.definitions() }), allSecurities.combine())
             ))
     }
