@@ -1,10 +1,17 @@
 {
-  "openapi": "3.0.0",
   "info": {
-    "description": "module description",
     "title": "title",
-    "version": "1.2"
+    "version": "1.2",
+    "description": "module description"
   },
+  "tags": [
+    {
+      "name": "tag1"
+    },
+    {
+      "name": "tag3"
+    }
+  ],
   "servers": [
     {
       "url": "https://raw.githubusercontent.com/"
@@ -391,12 +398,5 @@
       }
     }
   },
-  "tags": [
-    {
-      "name": "tag1"
-    },
-    {
-      "name": "tag3"
-    }
-  ]
+  "openapi": "3.0.0"
 }

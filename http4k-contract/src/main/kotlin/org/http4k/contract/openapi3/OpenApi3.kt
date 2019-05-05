@@ -33,7 +33,6 @@ private data class OpenApi3Definition<NODE>(
     val components: OpenApiComponents<NODE>
 ) {
     val openapi = "3.0.0"
-    val basePath = "/"
 }
 
 private data class OpenApiComponents<NODE>(
@@ -107,7 +106,7 @@ class OpenApi3<out NODE : Any>(
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
                     .toMap(),
-                OpenApiComponents(allSecurities.combine(), json.obj(paths.flatMap { it.pathSpec.definitions() }))
+                OpenApiComponents(json.obj(paths.flatMap { it.pathSpec.definitions() }), allSecurities.combine())
             ))
     }
 
