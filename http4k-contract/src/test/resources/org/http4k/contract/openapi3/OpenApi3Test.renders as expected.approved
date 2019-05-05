@@ -22,7 +22,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/urn_jsonschema_org_http4k_contract_openapi2_ArbObject1"
+                  "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi3:ArbObject1"
                 }
               }
             },
@@ -57,7 +57,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/urn_jsonschema_org_http4k_contract_openapi2_ArbObject2"
+                "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi3:ArbObject2"
               }
             }
           },
@@ -455,7 +455,7 @@
         },
         "type": "object"
       },
-      "urn_jsonschema_org_http4k_contract_openapi2_ArbObject1": {
+      "urn:jsonschema:org:http4k:contract:openapi3:ArbObject1": {
         "properties": {
           "anotherString": {
             "type": "string"
@@ -463,7 +463,7 @@
         },
         "type": "object"
       },
-      "urn_jsonschema_org_http4k_contract_openapi2_ArbObject2": {
+      "urn:jsonschema:org:http4k:contract:openapi3:ArbObject2": {
         "properties": {
           "bool": {
             "type": "boolean"
