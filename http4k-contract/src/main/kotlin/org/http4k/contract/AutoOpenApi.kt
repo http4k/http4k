@@ -38,13 +38,14 @@ private data class OpenApiPath<NODE>(
     val security: NODE,
     val operationId: String?
 ) {
-    fun definitions() = (parameters + responses).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+    fun definitions() =
+        (parameters + responses.values).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
 }
 
-private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) {
+private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
 
-    fun definitions() = jsonSchema?.definitions ?: emptySet()
+    override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
 interface HasSchema<NODE> {

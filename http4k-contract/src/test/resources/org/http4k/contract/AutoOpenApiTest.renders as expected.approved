@@ -532,6 +532,15 @@
         }
       }
     },
+    "object-1662053258": {
+      "type": "object",
+      "properties": {
+        "aString": {
+          "type": "string",
+          "example": "a message of some kind"
+        }
+      }
+    },
     "urn:jsonschema:org:http4k:contract:ArbObject2": {
       "type": "object",
       "id": "urn:jsonschema:org:http4k:contract:ArbObject2",
@@ -559,6 +568,16 @@
         },
         "bool": {
           "type": "boolean",
+          "required": true
+        }
+      }
+    },
+    "urn:jsonschema:org:http4k:contract:ArbObject1": {
+      "type": "object",
+      "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
+      "properties": {
+        "anotherString": {
+          "type": "string",
           "required": true
         }
       }
