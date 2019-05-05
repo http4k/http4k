@@ -24,7 +24,10 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<N
 
     private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> {
         val text = json.text(node)
-        val schema = if (text.contains(".")) NumberParam.schema(json.number(text.toBigDecimal())) else IntegerParam.schema(json.number(text.toBigInteger()))
+        val schema = when {
+            text.contains(".") -> NumberParam.schema(json.number(text.toBigDecimal()))
+            else -> IntegerParam.schema(json.number(text.toBigInteger()))
+        }
         return JsonSchema(schema, definitions)
     }
 
@@ -39,7 +42,7 @@ class JsonToJsonSchema<NODE>(private val json: Json<NODE>) : JsonSchemaCreator<N
         val (fields, subDefinitions) = json.fields(node)
                 .filter { json.typeOf(it.second) != JsonType.Null } // filter out null fields for which type can't be inferred
                 .fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
-            JsonSchema(second, memoDefinitions).toSchema().let { memoFields.plus(first to it.node) to it.definitions }
+                    JsonSchema(second, memoDefinitions).toSchema().let { memoFields + (first to it.node) to it.definitions }
         }
 
         val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
