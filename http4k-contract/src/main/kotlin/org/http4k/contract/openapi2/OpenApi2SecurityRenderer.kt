@@ -6,7 +6,7 @@ import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.format.Json
 
-fun <NODE> OpenApi2SecurityRenderer(json: Json<NODE>): SecurityRenderer<NODE> = object : SecurityRenderer<NODE> {
+class OpenApi2SecurityRenderer<NODE>(private val json: Json<NODE>) : SecurityRenderer<NODE> {
     override fun full(security: Security) = json {
         when (security) {
             is BasicAuthSecurity -> obj(
