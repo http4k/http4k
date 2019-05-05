@@ -57,7 +57,7 @@ private class OpenApiResponse<NODE>(val description: String?, private val jsonSc
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-interface HasSchema<NODE> {
+private interface HasSchema<NODE> {
     fun definitions(): Set<Pair<String, NODE>>
 }
 

@@ -26,18 +26,22 @@ import org.http4k.util.JsonToJsonSchema
 
 private typealias ApiInfo = org.http4k.contract.ApiInfo
 
-private data class OpenApiDefinition<NODE>(
+private data class OpenApi3Definition<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
-    val paths: Map<String, Map<String, OpenApiPath<NODE>>>,
-    val securityDefinitions: NODE,
-    val definitions: NODE
+    val paths: Map<String, Map<String, OpenApi3Path<NODE>>>,
+    val components: OpenApiComponents<NODE>
 ) {
-    val swagger = "2.0"
+    val openapi = "3.0.0"
     val basePath = "/"
 }
 
-private data class OpenApiPath<NODE>(
+private data class OpenApiComponents<NODE>(
+    val schemas: NODE,
+    val securitySchemes: NODE
+)
+
+private data class OpenApi3Path<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>,
@@ -81,9 +85,9 @@ class OpenApi3<out NODE : Any>(
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 
-    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: OpenApiPath<NODE>)
+    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: OpenApi3Path<NODE>)
 
-    private val lens = json.autoBody<OpenApiDefinition<NODE>>().toLens()
+    private val lens = json.autoBody<OpenApi3Definition<NODE>>().toLens()
 
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
@@ -94,7 +98,7 @@ class OpenApi3<out NODE : Any>(
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         return Response(OK)
-            .with(lens of OpenApiDefinition(
+            .with(lens of OpenApi3Definition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 paths
@@ -103,14 +107,13 @@ class OpenApi3<out NODE : Any>(
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
                     .toMap(),
-                allSecurities.combine(),
-                json.obj(paths.flatMap { it.pathSpec.definitions() })
+                OpenApiComponents(allSecurities.combine(), json.obj(paths.flatMap { it.pathSpec.definitions() }))
             ))
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
-            OpenApiPath(
+            OpenApi3Path(
                 meta.summary,
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
