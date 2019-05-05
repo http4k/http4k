@@ -252,11 +252,11 @@
         ],
         "parameters": [
           {
-            "schema": null,
             "in": "body",
             "name": "body",
             "required": true,
-            "description": "json"
+            "description": "json",
+            "schema": null
           }
         ],
         "responses": {
@@ -284,13 +284,13 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "$ref": "#/definitions/someDefinitionId"
-            },
             "in": "body",
             "name": "body",
             "required": true,
-            "description": "json"
+            "description": "json",
+            "schema": {
+              "$ref": "#/definitions/someDefinitionId"
+            }
           }
         ],
         "responses": {
@@ -454,13 +454,13 @@
         ],
         "parameters": [
           {
-            "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject2"
-            },
             "in": "body",
             "name": "body",
             "required": true,
-            "description": null
+            "description": null,
+            "schema": {
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject2"
+            }
           }
         ],
         "responses": {
@@ -514,7 +514,56 @@
       "name": "the_api_key"
     }
   },
-  "definitions": null,
+  "definitions": {
+    "object1482787387": {
+      "type": "object",
+      "properties": {
+        "aNumberField": {
+          "type": "integer",
+          "example": 123
+        }
+      }
+    },
+    "someDefinitionId": {
+      "type": "object",
+      "properties": {
+        "anAnotherObject": {
+          "$ref": "#/definitions/object1482787387"
+        }
+      }
+    },
+    "#/definitions/urn:jsonschema:org:http4k:contract:ArbObject2": {
+      "type": "object",
+      "id": "urn:jsonschema:org:http4k:contract:ArbObject2",
+      "properties": {
+        "string": {
+          "type": "string",
+          "required": true
+        },
+        "child": {
+          "type": "object",
+          "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
+          "properties": {
+            "anotherString": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "numbers": {
+          "type": "array",
+          "required": true,
+          "items": {
+            "type": "integer"
+          }
+        },
+        "bool": {
+          "type": "boolean",
+          "required": true
+        }
+      }
+    }
+  },
   "swagger": "2.0",
   "basePath": "/"
 }

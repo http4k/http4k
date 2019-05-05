@@ -12,6 +12,7 @@ import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
@@ -36,13 +37,26 @@ private data class OpenApiPath<NODE>(
     val responses: Map<String, OpenApiResponse<NODE>>,
     val security: NODE,
     val operationId: String?
-)
+) {
+    fun definitions() = (parameters + responses).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
+}
 
-private data class OpenApiResponse<NODE>(val description: String?, val schema: NODE?)
+private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) {
+    val schema: NODE? = jsonSchema?.node
+
+    fun definitions() = jsonSchema?.definitions ?: emptySet()
+}
+
+interface HasSchema<NODE> {
+    fun definitions(): Set<Pair<String, NODE>>
+}
 
 private sealed class OpenApiParameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
 
-private class SchemaParameter<NODE>(meta: Meta, val schema: NODE) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description)
+private class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+    val schema: NODE? = jsonSchema?.node
+    override fun definitions() = jsonSchema?.definitions ?: emptySet()
+}
 
 private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description) {
     val type = meta.paramMeta.value
@@ -65,21 +79,21 @@ open class AutoOpenApi<out NODE : Any>(
     override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-
         val allSecurities = routes.mapNotNull { it.meta.security } + security
+        val paths = routes.map { it.asPath(security, contractRoot) }
 
         return Response(OK)
             .with(lens of OpenApiDefinition(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                routes.map { it.asPath(security, contractRoot) }
+                paths
                     .groupBy { it.path }
                     .mapValues {
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap()
                     }
                     .toMap(),
                 allSecurities.combine(),
-                json.nullNode()
+                json.obj(paths.flatMap { it.pathSpec.definitions() })
             ))
     }
 
@@ -99,26 +113,25 @@ open class AutoOpenApi<out NODE : Any>(
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
-        val jsonRequest =
-            meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
+        val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
-                ObjectParam -> SchemaParameter(it, jsonRequest?.toSchema()?.node)
+                ObjectParam -> SchemaParameter(it, jsonRequest?.toSchema())
                 else -> PrimitiveParameter(it)
             }
         } ?: emptyList()
 
         val nonBodyParamNodes = nonBodyParams.map {
             when (it.paramMeta) {
-                ObjectParam -> SchemaParameter(it, null)
+                ObjectParam -> SchemaParameter<NODE>(it, null)
                 else -> PrimitiveParameter(it)
             }
         }
         return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema().node)
+    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema())
 
     private fun HttpMessageMeta<HttpMessage>.toSchema() = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
