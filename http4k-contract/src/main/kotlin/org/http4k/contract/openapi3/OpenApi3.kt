@@ -46,6 +46,7 @@ private data class OpenApi3Path<NODE>(
     val produces: List<String>?,
     val consumes: List<String>?,
     val parameters: List<OpenApiParameter>,
+    val requestBody: OpenApiRequest<NODE>?,
     val responses: Map<String, OpenApiResponse<NODE>>,
     val security: NODE,
     val operationId: String?
@@ -54,11 +55,15 @@ private data class OpenApi3Path<NODE>(
         (parameters + responses.values).filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
 }
 
-private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
+private class OpenApiRequestContent<NODE>()
+private class OpenApiResponseContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
 
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
+
+private class OpenApiRequest<NODE>(val content: Map<String, OpenApiRequestContent<NODE>>)
+private class OpenApiResponse<NODE>(val description: String?, val content: Map<String, OpenApiResponseContent<NODE>>)
 
 interface HasSchema<NODE> {
     fun definitions(): Set<Pair<String, NODE>>
@@ -118,6 +123,7 @@ class OpenApi3<out NODE : Any>(
                 meta.produces.map { it.value }.toSet().sorted().nullIfEmpty(),
                 meta.consumes.map { it.value }.toSet().sorted().nullIfEmpty(),
                 asOpenApiParameters(),
+                asOpenApiRequest(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
                 securityRenderer.ref(meta.security ?: contractSecurity),
                 meta.operationId
@@ -125,8 +131,16 @@ class OpenApi3<out NODE : Any>(
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
-        val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
+        return nonBodyParams.map {
+            when (it.paramMeta) {
+                ObjectParam -> SchemaParameter<NODE>(it, null)
+                else -> PrimitiveParameter(it)
+            }
+        }
+    }
 
+    private fun ContractRoute.asOpenApiRequest(): OpenApiRequest<NODE>? {
+        val jsonRequest = meta.request?.takeIf { CONTENT_TYPE(it.message) == APPLICATION_JSON }
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
                 ObjectParam -> SchemaParameter(it, jsonRequest?.toSchema())
@@ -134,16 +148,19 @@ class OpenApi3<out NODE : Any>(
             }
         } ?: emptyList()
 
-        val nonBodyParamNodes = nonBodyParams.map {
-            when (it.paramMeta) {
-                ObjectParam -> SchemaParameter<NODE>(it, null)
-                else -> PrimitiveParameter(it)
-            }
+        return meta.request?.let {
+            OpenApiRequest(emptyMap())
         }
-        return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema())
+    private fun HttpMessageMeta<Response>.asOpenApiResponse(): OpenApiResponse<NODE> {
+        val type = CONTENT_TYPE(message)
+            ?.takeIf { it == APPLICATION_JSON }
+            ?.let { type ->
+                mapOf(type.value to OpenApiResponseContent(toSchema()))
+            }
+        return OpenApiResponse(description, type ?: emptyMap())
+    }
 
     private fun HttpMessageMeta<HttpMessage>.toSchema() = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }

@@ -223,50 +223,6 @@
         "summary": "<unknown>"
       }
     },
-    "/basepath/body_form": {
-      "post": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "properties": {
-                  "b": {
-                    "description": "booleanField",
-                    "type": "boolean"
-                  },
-                  "i": {
-                    "description": "intField",
-                    "type": "integer"
-                  },
-                  "j": {
-                    "description": "jsonField",
-                    "type": "string"
-                  },
-                  "s": {
-                    "description": "stringField",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "b"
-                ],
-                "type": "object"
-              }
-            }
-          }
-        },
-        "summary": "<unknown>"
-      }
-    },
     "/basepath/body_json_noschema": {
       "post": {
         "responses": {},
@@ -317,6 +273,64 @@
         "summary": "<unknown>"
       }
     },
+    "/basepath/security": {
+      "post": {
+        "responses": {},
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>"
+      }
+    },
+    "/basepath/body_form": {
+      "post": {
+        "responses": {},
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "b": {
+                    "description": "booleanField",
+                    "type": "boolean"
+                  },
+                  "i": {
+                    "description": "intField",
+                    "type": "integer"
+                  },
+                  "j": {
+                    "description": "jsonField",
+                    "type": "string"
+                  },
+                  "s": {
+                    "description": "stringField",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "b"
+                ],
+                "type": "object"
+              }
+            }
+          }
+        },
+        "summary": "<unknown>"
+      }
+    },
     "/basepath/produces_and_consumes": {
       "get": {
         "responses": {},
@@ -335,33 +349,19 @@
       "post": {
         "responses": {
           "403": {
+            "description": "no way jose",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/object-1662053258"
                 }
               }
-            },
-            "description": "no way jose"
+            }
           }
         },
         "security": [
           {
             "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/security": {
-      "post": {
-        "responses": {},
-        "security": [
-          {
-            "basicAuth": []
           }
         ],
         "tags": [
