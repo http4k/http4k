@@ -11,7 +11,8 @@ fun <NODE> OpenApi3SecurityRenderer(json: Json<NODE>): SecurityRenderer<NODE> = 
         when (security) {
             is BasicAuthSecurity -> obj(
                 security.name to obj(
-                    "type" to string("basic")
+                    "scheme" to string("basic"),
+                    "type" to string("http")
                 )
             )
             is ApiKeySecurity<*> -> obj(
@@ -27,8 +28,8 @@ fun <NODE> OpenApi3SecurityRenderer(json: Json<NODE>): SecurityRenderer<NODE> = 
     override fun ref(security: Security) = json {
         array(
             when (security) {
-                is ApiKeySecurity<*> -> listOf(obj("api_key" to array(emptyList())))
-                is BasicAuthSecurity -> listOf(obj("basicAuth" to array(emptyList())))
+                is ApiKeySecurity<*> -> listOf(obj(security.name to array(emptyList())))
+                is BasicAuthSecurity -> listOf(obj(security.name to array(emptyList())))
                 else -> emptyList()
             }
         )
