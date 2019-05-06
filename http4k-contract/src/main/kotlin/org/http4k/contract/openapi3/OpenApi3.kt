@@ -45,8 +45,6 @@ private data class OpenApi3Path<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>?,
-    val produces: List<String>?,
-    val consumes: List<String>?,
     val parameters: List<OpenApiParameter>,
     val requestBody: OpenApiRequest<NODE>?,
     val responses: Map<String, OpenApiResponse<NODE>>,
@@ -66,7 +64,10 @@ private class OpenApiMessageContent<NODE>(private val jsonSchema: JsonSchema<NOD
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private class OpenApiRequest<NODE>(val content: Map<String, OpenApiMessageContent<NODE>>)
+private class OpenApiRequest<NODE>(val content: Map<String, OpenApiMessageContent<NODE>>) {
+    val required = true
+}
+
 private class OpenApiResponse<NODE>(val description: String?, val content: Map<String, OpenApiMessageContent<NODE>>)
 
 interface HasSchema<NODE> {
@@ -124,8 +125,6 @@ class OpenApi3<out NODE : Any>(
                 meta.summary,
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
-                meta.produces.map { it.value }.toSet().sorted().nullIfEmpty(),
-                meta.consumes.map { it.value }.toSet().sorted().nullIfEmpty(),
                 asOpenApiParameters(),
                 meta.request?.asOpenApiRequest(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
