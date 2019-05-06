@@ -11,8 +11,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.format.Jackson.auto
-import org.http4k.testing.Approver
-import org.junit.jupiter.api.Disabled
 
 data class ArbObject1(val anotherString: String)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)

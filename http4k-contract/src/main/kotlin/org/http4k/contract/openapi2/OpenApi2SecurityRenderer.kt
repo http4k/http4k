@@ -7,7 +7,7 @@ import org.http4k.contract.SecurityRenderer
 import org.http4k.format.Json
 
 object OpenApi2SecurityRenderer : SecurityRenderer {
-    override fun <NODE> full(json: Json<NODE>, security: Security) = json {
+    override fun <NODE> full(security: Security): Json<NODE>.() -> NODE = {
         when (security) {
             is BasicAuthSecurity -> obj(
                 security.name to obj(
@@ -24,7 +24,7 @@ object OpenApi2SecurityRenderer : SecurityRenderer {
         }
     }
 
-    override fun <NODE> ref(json: Json<NODE>, security: Security) = json {
+    override fun <NODE> ref(security: Security): Json<NODE>.() -> NODE = {
         array(
             when (security) {
                 is ApiKeySecurity<*> -> listOf(obj(security.name to array(emptyList())))

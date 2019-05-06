@@ -119,7 +119,7 @@ class OpenApi2<out NODE : Any>(
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-                securityRenderer.ref(json, meta.security ?: contractSecurity),
+                json(securityRenderer.ref(meta.security ?: contractSecurity)),
                 meta.operationId
             )
         )
@@ -149,7 +149,7 @@ class OpenApi2<out NODE : Any>(
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
         ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(json, it)) }) }
+    private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
 
     companion object
 }

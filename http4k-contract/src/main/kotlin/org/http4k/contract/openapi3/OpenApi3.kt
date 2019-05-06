@@ -133,7 +133,7 @@ class OpenApi3<out NODE : Any>(
                     else -> meta.requestBody().takeIf { it.required }
                 },
                 meta.responses(),
-                securityRenderer.ref(json, meta.security ?: contractSecurity),
+                json(securityRenderer.ref(meta.security ?: contractSecurity)),
                 meta.operationId
             )
         )
@@ -171,7 +171,7 @@ class OpenApi3<out NODE : Any>(
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
         ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(json, it)) }) }
+    private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
 
     companion object
 }
