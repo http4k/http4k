@@ -126,7 +126,7 @@ class OpenApi3<out NODE : Any>(
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
                 asOpenApiParameters(),
-                meta.request?.asOpenApiRequest(),
+                null,
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
                 securityRenderer.ref(meta.security ?: contractSecurity),
                 meta.operationId

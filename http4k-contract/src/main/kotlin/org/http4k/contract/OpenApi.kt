@@ -90,7 +90,7 @@ open class OpenApi<out NODE>(
         : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
-        val schema = route.meta.request?.takeIf { Header.CONTENT_TYPE(it.message) == APPLICATION_JSON }?.asSchema()
+        val schema = route.meta.requests.find { Header.CONTENT_TYPE(it.message) == APPLICATION_JSON }?.asSchema()
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
@@ -115,15 +115,7 @@ open class OpenApi<out NODE>(
 
             FieldAndDefinitions(
                 route.method.toString().toLowerCase() to obj(fields.filterNotNull()),
-                (
-                    (
-                        route.meta.request
-                            .asList().flatMap {
-                                it.asSchema().definitions
-                            }
-                        ) + responseDefinitions
-                    )
-                    .toSet())
+                ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet())
         }
     }
 

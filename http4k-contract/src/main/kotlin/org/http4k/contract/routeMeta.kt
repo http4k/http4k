@@ -29,10 +29,10 @@ class ResponseMeta(description: String, response: Response, definitionId: String
 class RouteMetaDsl internal constructor() {
     var summary: String = "<unknown>"
     var description: String? = null
-    internal var request: HttpMessageMeta<Request>? = null
     val tags = Appendable<Tag>()
     val produces = Appendable<ContentType>()
     val consumes = Appendable<ContentType>()
+    internal var requests = Appendable<HttpMessageMeta<Request>>()
     internal val responses = Appendable<HttpMessageMeta<Response>>()
     var headers = Appendable<Lens<Request, *>>()
     var queries = Appendable<Lens<Request, *>>()
@@ -94,7 +94,7 @@ class RouteMetaDsl internal constructor() {
      * Add request metadata to this Route. A route only supports a single possible request.
      */
     fun receiving(requestMeta: HttpMessageMeta<Request>) {
-        request = requestMeta
+        requests += requestMeta
         consumes += Header.CONTENT_TYPE(requestMeta.message)?.let { listOf(it) } ?: emptyList()
     }
 
@@ -110,7 +110,7 @@ class RouteMetaDsl internal constructor() {
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightExtraction, security, operationId
+        summary, description, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, requests.all, responses.all, preFlightExtraction, security, operationId
     )
 }
 
@@ -118,16 +118,14 @@ data class Tag(val name: String, val description: String? = null)
 
 data class RouteMeta(val summary: String = "<unknown>",
                      val description: String? = null,
-                     val request: HttpMessageMeta<Request>? = null,
                      val tags: Set<Tag> = emptySet(),
                      val body: BodyLens<*>? = null,
                      val produces: Set<ContentType> = emptySet(),
                      val consumes: Set<ContentType> = emptySet(),
                      val requestParams: List<Lens<Request, *>> = emptyList(),
+                     val requests: List<HttpMessageMeta<Request>> = emptyList(),
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
                      val security: Security? = null,
                      val operationId: String? = null) {
-
-    constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
 }

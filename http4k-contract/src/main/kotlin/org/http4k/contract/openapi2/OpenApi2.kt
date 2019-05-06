@@ -125,7 +125,7 @@ class OpenApi2<out NODE : Any>(
         )
 
     private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
-        val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
+        val jsonRequest = meta.requests.firstOrNull()?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
         val bodyParamNodes = meta.body?.metas?.map {
             when (it.paramMeta) {
