@@ -17,6 +17,17 @@
   "paths": {
     "/basepath/body_auto_schema": {
       "get": {
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "/basepath"
+        ],
+        "description": null,
+        "operationId": null,
+        "summary": "<unknown>",
         "responses": {
           "303": {
             "content": {
@@ -28,18 +39,7 @@
             },
             "description": "See Other"
           }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        }
       },
       "post": {
         "responses": {},
