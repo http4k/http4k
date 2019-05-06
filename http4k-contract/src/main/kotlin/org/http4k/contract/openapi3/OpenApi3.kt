@@ -64,6 +64,10 @@ private data class Path<NODE>(
             .sortedBy { it.first }
 }
 
+interface HasSchema<NODE> {
+    fun definitions(): Set<Pair<String, NODE>>
+}
+
 private class MessageContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
 
@@ -75,10 +79,6 @@ private class RequestContents<NODE>(val content: Map<String, MessageContent<NODE
 }
 
 private class ResponseContents<NODE>(val description: String?, val content: Map<String, MessageContent<NODE>>)
-
-interface HasSchema<NODE> {
-    fun definitions(): Set<Pair<String, NODE>>
-}
 
 private sealed class Parameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
 
