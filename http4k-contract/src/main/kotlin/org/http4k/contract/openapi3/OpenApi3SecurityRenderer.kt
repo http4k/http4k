@@ -37,6 +37,7 @@ class OpenApi3SecurityRenderer<NODE>(private val json: Json<NODE>) : SecurityRen
             when (security) {
                 is ApiKeySecurity<*> -> listOf(obj(security.name to array(emptyList())))
                 is BasicAuthSecurity -> listOf(obj(security.name to array(emptyList())))
+                is BearerAuthSecurity -> listOf(obj(security.name to array(emptyList())))
                 else -> emptyList()
             }
         )
