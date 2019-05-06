@@ -21,7 +21,7 @@ data class ApiInfo(val title: String, val version: String, val description: Stri
 open class OpenApi<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val securityRenderer: SecurityRenderer<NODE> = OpenApi2SecurityRenderer(json),
+    private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
@@ -46,7 +46,7 @@ open class OpenApi<out NODE>(
                 })
         }
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(it)) }) }
+    private fun List<Security>.combine() = json { obj(flatMap { fields(securityRenderer.full(json, it)) }) }
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
@@ -110,7 +110,7 @@ open class OpenApi<out NODE>(
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    "security" to securityRenderer.ref(route.meta.security ?: contractSecurity)
+                    "security" to securityRenderer.ref(json, route.meta.security ?: contractSecurity)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

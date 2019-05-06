@@ -1,6 +1,8 @@
 package org.http4k.contract
 
-interface SecurityRenderer<NODE> {
-    fun full(security: Security): NODE
-    fun ref(security: Security): NODE
+import org.http4k.format.Json
+
+interface SecurityRenderer {
+    fun <NODE> full(json: Json<NODE>, security: Security): NODE
+    fun <NODE> ref(json: Json<NODE>, security: Security): NODE
 }

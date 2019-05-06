@@ -11,6 +11,6 @@ import org.http4k.util.JacksonJsonSchemaCreator
 operator fun OpenApi2.Companion.invoke(
     apiInfo: ApiInfo,
     json: ConfigurableJackson = Jackson,
-    securityRenderer: SecurityRenderer<JsonNode> = OpenApi2SecurityRenderer(json),
+    securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     errorResponseRenderer: JsonErrorResponseRenderer<JsonNode> = JsonErrorResponseRenderer(json)
 ) = OpenApi2(apiInfo, Jackson, JacksonJsonSchemaCreator(json, "definitions"), securityRenderer, errorResponseRenderer)
