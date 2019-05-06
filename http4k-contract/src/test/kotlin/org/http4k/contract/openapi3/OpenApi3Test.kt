@@ -1,6 +1,7 @@
 package org.http4k.contract.openapi3
 
 import org.http4k.contract.ApiInfo
+import org.http4k.contract.BearerAuthSecurity
 import org.http4k.contract.ContractRendererContract
 import org.http4k.contract.meta
 import org.http4k.core.Body
@@ -33,6 +34,9 @@ class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "
         } bindContract POST to { Response(OK) },
         "/body_auto_schema" meta {
             returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1("s2"))
-        } bindContract GET to { Response(OK) }
+        } bindContract GET to { Response(OK) },
+        "/bearer_auth" meta {
+            security = BearerAuthSecurity("foo")
+        } bindContract POST to { Response(OK) }
     )
 }

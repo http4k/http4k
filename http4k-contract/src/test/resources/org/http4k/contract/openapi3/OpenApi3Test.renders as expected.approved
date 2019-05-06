@@ -15,6 +15,25 @@
     }
   ],
   "paths": {
+    "/basepath/bearer_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "operationId": null
+      }
+    },
     "/basepath/body_auto_schema": {
       "get": {
         "summary": "<unknown>",
@@ -491,14 +510,18 @@
       }
     },
     "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "bearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      },
       "api_key": {
         "in": "query",
         "name": "the_api_key",
         "type": "apiKey"
-      },
-      "basicAuth": {
-        "scheme": "basic",
-        "type": "http"
       }
     }
   },

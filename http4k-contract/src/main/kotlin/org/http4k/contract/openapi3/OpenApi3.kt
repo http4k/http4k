@@ -49,12 +49,12 @@ private data class OpenApi3Path<NODE>(
     val tags: List<String>?,
     val parameters: List<OpenApiParameter>?,
     val requestBody: OpenApiRequest<NODE>?,
-    val responses: Map<String, OpenApiResponse<NODE>>?,
+    val responses: Map<String, OpenApiResponse<NODE>>,
     val security: NODE,
     val operationId: String?
 ) {
     fun definitions() =
-        ((parameters ?: emptyList()) + (responses?.values ?: emptyList()))
+        ((parameters ?: emptyList()) + responses.values)
             .filterIsInstance<HasSchema<NODE>>()
             .flatMap { it.definitions() }
             .sortedBy { it.first }
@@ -130,7 +130,7 @@ class OpenApi3<out NODE : Any>(
                 asOpenApiParameters().nullIfEmpty(),
                 when (method) {
                     in setOf(GET, DELETE, HEAD) -> null
-                    else -> meta.requestBody()
+                    else -> meta.requestBody().takeIf { it.required }
                 },
                 meta.responses(),
                 securityRenderer.ref(meta.security ?: contractSecurity),

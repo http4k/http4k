@@ -9,6 +9,7 @@ import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.filter.ServerFilters
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
+import org.http4k.lens.RequestContextLens
 
 
 /**
@@ -56,6 +57,15 @@ class ApiKeySecurity<out T>(val param: Lens<Request, T>,
  */
 class BasicAuthSecurity(realm: String, credentials: Credentials, val name: String = "basicAuth") : Security {
     override val filter: Filter = ServerFilters.BasicAuth(realm, credentials)
+}
+
+/**
+ * Checks the presence of bearer auth credentials
+ */
+class BearerAuthSecurity private constructor(override val filter: Filter, val name: String = "bearerAuth") : Security {
+    constructor(token: String) : this(ServerFilters.BearerAuth(token))
+    constructor(token: (String) -> Boolean) : this(ServerFilters.BearerAuth(token))
+    constructor(key: RequestContextLens<Any>, lookup: (String) -> Any?) : this(ServerFilters.BearerAuth(key, lookup))
 }
 
 @Deprecated("Renamed", ReplaceWith("ApiKeySecurity<T>"))
