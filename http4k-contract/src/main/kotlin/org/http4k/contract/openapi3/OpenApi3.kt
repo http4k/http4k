@@ -176,12 +176,10 @@ class OpenApi3<out NODE : Any>(
 //        }
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse(): OpenApiResponse<NODE> {
-        val type = CONTENT_TYPE(message)
+        val contentTypes = CONTENT_TYPE(message)
             ?.takeIf { it == APPLICATION_JSON }
-            ?.let { type ->
-                mapOf(type.value to OpenApiMessageContent(toSchema()))
-            }
-        return OpenApiResponse(description, type ?: emptyMap())
+            ?.let { mapOf(it.value to OpenApiMessageContent(toSchema())) }
+        return OpenApiResponse(description, contentTypes ?: emptyMap())
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchema() = example
