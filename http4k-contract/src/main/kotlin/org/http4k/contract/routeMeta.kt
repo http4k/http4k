@@ -32,10 +32,10 @@ class RouteMetaDsl internal constructor() {
     val tags = Appendable<Tag>()
     val produces = Appendable<ContentType>()
     val consumes = Appendable<ContentType>()
-    internal var requests = Appendable<HttpMessageMeta<Request>>()
+    internal val requests = Appendable<HttpMessageMeta<Request>>()
     internal val responses = Appendable<HttpMessageMeta<Response>>()
-    var headers = Appendable<Lens<Request, *>>()
-    var queries = Appendable<Lens<Request, *>>()
+    val headers = Appendable<Lens<Request, *>>()
+    val queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
     var security: Security? = null
