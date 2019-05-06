@@ -17,17 +17,11 @@
   "paths": {
     "/basepath/body_auto_schema": {
       "get": {
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "summary": "<unknown>",
+        "description": null,
         "tags": [
           "/basepath"
         ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>",
         "responses": {
           "303": {
             "content": {
@@ -39,20 +33,21 @@
             },
             "description": "See Other"
           }
-        }
-      },
-      "post": {
-        "responses": {},
+        },
         "security": [
           {
             "api_key": []
           }
         ],
+        "operationId": null
+      },
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
         "tags": [
           "/basepath"
         ],
-        "description": null,
-        "operationId": null,
+        "responses": {},
         "requestBody": {
           "content": {
             "application/json": {
@@ -63,22 +58,22 @@
           },
           "required": true
         },
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/body_form": {
-      "post": {
-        "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_form": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
         "tags": [
           "/basepath"
         ],
-        "description": null,
-        "operationId": null,
+        "responses": {},
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -109,21 +104,27 @@
             }
           }
         },
-        "summary": "<unknown>"
-      }
-    },
-    "/basepath/body_json_noschema": {
-      "post": {
-        "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_noschema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "responses": {},
         "tags": [
           "/basepath"
         ],
-        "description": null,
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "operationId": null,
         "requestBody": {
           "content": {
@@ -133,22 +134,22 @@
           },
           "description": "json",
           "required": true
-        },
-        "summary": "<unknown>"
+        }
       }
     },
     "/basepath/body_json_schema": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
         "operationId": null,
         "requestBody": {
           "content": {
@@ -160,23 +161,17 @@
           },
           "description": "json",
           "required": true
-        },
-        "summary": "<unknown>"
+        }
       }
     },
     "/basepath/body_string": {
       "post": {
-        "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
+        "summary": "<unknown>",
+        "description": null,
         "tags": [
           "/basepath"
         ],
-        "description": null,
-        "operationId": null,
+        "responses": {},
         "requestBody": {
           "content": {
             "text/plain": {
@@ -187,28 +182,38 @@
           },
           "required": true
         },
-        "summary": "<unknown>"
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "operationId": null
       }
     },
     "/basepath/descriptions": {
       "get": {
+        "summary": "endpoint",
+        "description": "some rambling description of what this thing actually does",
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
         "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
-        "tags": [
-          "tag1",
-          "tag3"
-        ],
-        "description": "some rambling description of what this thing actually does",
-        "operationId": "echoMessage",
-        "summary": "endpoint"
+        "operationId": "echoMessage"
       }
     },
     "/basepath/headers": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "parameters": [
           {
             "description": "booleanHeader",
@@ -253,32 +258,32 @@
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/nometa": {
       "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "parameters": [
           {
             "description": null,
@@ -305,32 +310,32 @@
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/produces_and_consumes": {
       "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "responses": {},
         "security": [
           {
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/queries": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "parameters": [
           {
             "description": "booleanQuery",
@@ -375,16 +380,16 @@
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/returning": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "responses": {
           "403": {
             "content": {
@@ -402,28 +407,23 @@
             "api_key": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     },
     "/basepath/security": {
       "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
         "responses": {},
         "security": [
           {
             "basicAuth": []
           }
         ],
-        "tags": [
-          "/basepath"
-        ],
-        "description": null,
-        "operationId": null,
-        "summary": "<unknown>"
+        "operationId": null
       }
     }
   },

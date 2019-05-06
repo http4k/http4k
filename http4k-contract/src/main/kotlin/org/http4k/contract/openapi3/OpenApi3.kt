@@ -4,14 +4,16 @@ import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.PathSegments
+import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
-import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
-import org.http4k.core.Request
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.HEAD
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
@@ -45,14 +47,14 @@ private data class OpenApi3Path<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>?,
-    val parameters: List<OpenApiParameter>,
+    val parameters: List<OpenApiParameter>?,
     val requestBody: OpenApiRequest<NODE>?,
-    val responses: Map<String, OpenApiResponse<NODE>>,
+    val responses: Map<String, OpenApiResponse<NODE>>?,
     val security: NODE,
     val operationId: String?
 ) {
     fun definitions() =
-        (parameters + responses.values)
+        ((parameters ?: emptyList()) + (responses?.values ?: emptyList()))
             .filterIsInstance<HasSchema<NODE>>()
             .flatMap { it.definitions() }
             .sortedBy { it.first }
@@ -64,8 +66,8 @@ private class OpenApiMessageContent<NODE>(private val jsonSchema: JsonSchema<NOD
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private class OpenApiRequest<NODE>(val content: Map<String, OpenApiMessageContent<NODE>>) {
-    val required = true
+private class OpenApiRequest<NODE>(val content: Map<String, OpenApiMessageContent<NODE>>?) {
+    val required = content != null
 }
 
 private class OpenApiResponse<NODE>(val description: String?, val content: Map<String, OpenApiMessageContent<NODE>>)
@@ -125,13 +127,19 @@ class OpenApi3<out NODE : Any>(
                 meta.summary,
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
-                asOpenApiParameters(),
-                null,
-                meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
+                asOpenApiParameters().nullIfEmpty(),
+                when (method) {
+                    in setOf(GET, DELETE, HEAD) -> null
+                    else -> meta.requestBody()
+                },
+                meta.responses(),
                 securityRenderer.ref(meta.security ?: contractSecurity),
                 meta.operationId
             )
         )
+
+    private fun RouteMeta.responses() =
+        responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap()
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
@@ -140,47 +148,26 @@ class OpenApi3<out NODE : Any>(
         }
     }
 
-    private fun HttpMessageMeta<Request>.asOpenApiRequest() = with(CONTENT_TYPE(message)) {
-        when (this) {
-            APPLICATION_JSON -> OpenApiRequest(mapOf(value to OpenApiMessageContent(toSchema())))
-            APPLICATION_FORM_URLENCODED -> {
-                OpenApiRequest(mapOf(value to OpenApiMessageContent(toSchema())))
+    private fun RouteMeta.requestBody(): OpenApiRequest<NODE> {
+        val noSchema = consumes.map { it.value to OpenApiMessageContent<NODE>(null) }
+        val withSchema = requests.mapNotNull {
+            when (CONTENT_TYPE(it.message)) {
+                APPLICATION_JSON -> APPLICATION_JSON.value to OpenApiMessageContent(it.toSchema())
+                else -> null
             }
-            else -> null
         }
+
+        return OpenApiRequest((noSchema + withSchema).nullIfEmpty()?.toMap())
     }
-//
-//        val type = CONTENT_TYPE(message)
-//            ?.takeIf { it == APPLICATION_JSON }
-//            ?.let { type ->
-//                mapOf(type.value to OpenApiMessageContent(toSchema()))
-//            }
-//
-//        val jsonRequest = message?.takeIf { CONTENT_TYPE(it.message) == APPLICATION_JSON }
-//
-//        val bodyParamNodes = meta.body
-//            ?.let {
-//                val a: List<OpenApiParameter> = it.metas.map {
-//                    when (it.paramMeta) {
-//                        ObjectParam -> SchemaParameter(it, jsonRequest?.toSchema())
-//                        else -> PrimitiveParameter(it)
-//                    }
-//                }
-//
-//                mapOf(it.contentType.value to OpenApiMessageContent())
-//            } ?: emptyMap()
-//        return meta.request?.let {
-//            OpenApiRequest(bodyParamNodes)
-//        }
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse(): OpenApiResponse<NODE> {
         val contentTypes = CONTENT_TYPE(message)
             ?.takeIf { it == APPLICATION_JSON }
-            ?.let { mapOf(it.value to OpenApiMessageContent(toSchema())) }
+            ?.let { mapOf(it.value to OpenApiMessageContent(this.toSchema())) }
         return OpenApiResponse(description, contentTypes ?: emptyMap())
     }
 
-    private fun HttpMessageMeta<HttpMessage>.toSchema() = example
+    private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
         ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
 
@@ -189,4 +176,4 @@ class OpenApi3<out NODE : Any>(
     companion object
 }
 
-private fun <E : Iterable<T>, T> E.nullIfEmpty() = if (iterator().hasNext()) this else null
+private fun <E : Iterable<T>, T> E.nullIfEmpty(): E? = if (iterator().hasNext()) this else null
