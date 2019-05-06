@@ -133,12 +133,10 @@ class OpenApi3<out NODE : Any>(
             )
         )
 
-    private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
-        return nonBodyParams.map {
-            when (it.paramMeta) {
-                ObjectParam -> SchemaParameter<NODE>(it, null)
-                else -> PrimitiveParameter(it)
-            }
+    private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
+        when (it.paramMeta) {
+            ObjectParam -> SchemaParameter<NODE>(it, null)
+            else -> PrimitiveParameter(it)
         }
     }
 
