@@ -120,12 +120,6 @@
         "tags": [
           "/basepath"
         ],
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "operationId": null,
         "requestBody": {
           "content": {
             "application/json": {
@@ -135,7 +129,13 @@
           "description": "json",
           "required": true
         }
-      }
+      },
+      "security": [
+        {
+          "api_key": []
+        }
+      ],
+      "operationId": null
     },
     "/basepath/body_json_schema": {
       "post": {
@@ -145,12 +145,6 @@
           "/basepath"
         ],
         "responses": {},
-        "security": [
-          {
-            "api_key": []
-          }
-        ],
-        "operationId": null,
         "requestBody": {
           "content": {
             "application/json": {
@@ -161,7 +155,13 @@
           },
           "description": "json",
           "required": true
-        }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "operationId": null
       }
     },
     "/basepath/body_string": {
