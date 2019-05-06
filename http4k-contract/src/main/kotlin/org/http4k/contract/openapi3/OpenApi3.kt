@@ -54,7 +54,11 @@ private data class Path<NODE>(
     val operationId: String?
 ) {
     fun definitions() =
-        ((parameters ?: emptyList()) + responses.values)
+        (
+            responses.values.map { it.content.values }
+                + (parameters ?: emptyList())
+                + (requestBody?.content?.values ?: emptyList())
+            )
             .filterIsInstance<HasSchema<NODE>>()
             .flatMap { it.definitions() }
             .sortedBy { it.first }
