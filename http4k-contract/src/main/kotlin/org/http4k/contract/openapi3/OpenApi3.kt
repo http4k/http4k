@@ -12,8 +12,8 @@ import org.http4k.contract.openapi3.BodyContent.FormContent
 import org.http4k.contract.openapi3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi3.BodyContent.NoContent
 import org.http4k.contract.openapi3.BodyContent.SchemaContent
-import org.http4k.contract.openapi3.PathParameter.PrimitiveParameter
-import org.http4k.contract.openapi3.PathParameter.SchemaParameter
+import org.http4k.contract.openapi3.RequestParameter.PrimitiveParameter
+import org.http4k.contract.openapi3.RequestParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
@@ -54,7 +54,7 @@ private data class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>?,
-    val parameters: List<PathParameter>?,
+    val parameters: List<RequestParameter>?,
     val requestBody: RequestContents<NODE>?,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE,
@@ -104,14 +104,16 @@ private class ResponseContents<NODE>(val description: String?, val content: Map<
         .flatMap { it.definitions() }.toSet()
 }
 
-private sealed class PathParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
-    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : PathParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+private sealed class RequestParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
 
-    class PrimitiveParameter(meta: Meta) : PathParameter(meta.location, meta.name, meta.required, meta.description) {
-        val type = meta.paramMeta.value
+    class PrimitiveParameter(meta: Meta) : RequestParameter(meta.location, meta.name, meta.required, meta.description) {
+        class Schema(val type: String)
+
+        val schema = Schema(meta.paramMeta.value)
     }
 }
 
@@ -204,7 +206,7 @@ class OpenApi3<out NODE : Any>(
         ?: message.bodyString().toSchema(definitionId)
 
     private fun String.toSchema(definitionId: String? = null): JsonSchema<NODE> = try {
-        JsonToJsonSchema(json).toSchema(json.parse(this), definitionId)
+        JsonToJsonSchema(json, "components/schemas").toSchema(json.parse(this), definitionId)
     } catch (e: Exception) {
         JsonSchema(json.obj(), emptySet())
     }
@@ -215,4 +217,3 @@ class OpenApi3<out NODE : Any>(
 }
 
 private fun <E : Iterable<T>, T> E.nullIfEmpty(): E? = if (iterator().hasNext()) this else null
-
