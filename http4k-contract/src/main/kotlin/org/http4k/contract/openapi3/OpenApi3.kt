@@ -84,12 +84,8 @@ private sealed class BodyContent {
 
     class FormContent(val schema: FormSchema) : BodyContent() {
         class FormSchema(metas: List<Meta>) {
-            class FormField(paramMeta: ParamMeta, val description: String? = null) {
-                val type = paramMeta.value
-            }
-
             val type = "object"
-            val properties = metas.map { it.name to FormField(it.paramMeta, it.description) }.toMap()
+            val properties = metas.map { it.name to mapOf("type" to it.paramMeta.value, "description" to it.description) }.toMap()
             val required = metas.filter(Meta::required).map { it.name }
         }
     }

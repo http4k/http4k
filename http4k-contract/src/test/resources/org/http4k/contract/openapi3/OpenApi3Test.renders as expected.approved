@@ -107,20 +107,20 @@
                 "type": "object",
                 "properties": {
                   "b": {
-                    "description": "booleanField",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "booleanField"
                   },
                   "i": {
-                    "description": "intField",
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "intField"
                   },
                   "s": {
-                    "description": "stringField",
-                    "type": "string"
+                    "type": "string",
+                    "description": "stringField"
                   },
                   "j": {
-                    "description": "jsonField",
-                    "type": "string"
+                    "type": "string",
+                    "description": "jsonField"
                   }
                 },
                 "required": [
