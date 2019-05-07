@@ -1,6 +1,5 @@
 package org.http4k.contract.openapi2
 
-import org.http4k.contract.ApiInfo
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
@@ -8,6 +7,8 @@ import org.http4k.contract.PathSegments
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.contract.openapi2.RequestParameter.PrimitiveParameter
+import org.http4k.contract.openapi2.RequestParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -24,10 +25,12 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
-private data class OpenApiDefinition<NODE>(
+private typealias ApiInfo = org.http4k.contract.ApiInfo
+
+private data class Api<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
-    val paths: Map<String, Map<String, OpenApiPath<NODE>>>,
+    val paths: Map<String, Map<String, ApiPath<NODE>>>,
     val securityDefinitions: NODE,
     val definitions: NODE
 ) {
@@ -35,14 +38,14 @@ private data class OpenApiDefinition<NODE>(
     val basePath = "/"
 }
 
-private data class OpenApiPath<NODE>(
+private data class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>,
     val produces: List<String>,
     val consumes: List<String>,
-    val parameters: List<OpenApiParameter>,
-    val responses: Map<String, OpenApiResponse<NODE>>,
+    val parameters: List<RequestParameter>,
+    val responses: Map<String, ResponseContent<NODE>>,
     val security: NODE,
     val operationId: String?
 ) {
@@ -53,25 +56,24 @@ private data class OpenApiPath<NODE>(
             .sortedBy { it.first }
 }
 
-private class OpenApiResponse<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
-    val schema: NODE? = jsonSchema?.node
-
-    override fun definitions() = jsonSchema?.definitions ?: emptySet()
-}
-
 private interface HasSchema<NODE> {
     fun definitions(): Set<Pair<String, NODE>>
 }
 
-private sealed class OpenApiParameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
-
-private class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+private class ResponseContent<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private class PrimitiveParameter(meta: Meta) : OpenApiParameter(meta.location, meta.name, meta.required, meta.description) {
-    val type = meta.paramMeta.value
+private sealed class RequestParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+        val schema: NODE? = jsonSchema?.node
+        override fun definitions() = jsonSchema?.definitions ?: emptySet()
+    }
+
+    class PrimitiveParameter(meta: Meta) : RequestParameter(meta.location, meta.name, meta.required, meta.description) {
+        val type = meta.paramMeta.value
+    }
 }
 
 class OpenApi2<out NODE : Any>(
@@ -82,9 +84,9 @@ class OpenApi2<out NODE : Any>(
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 
-    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: OpenApiPath<NODE>)
+    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
-    private val lens = json.autoBody<OpenApiDefinition<NODE>>().toLens()
+    private val lens = json.autoBody<Api<NODE>>().toLens()
 
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
@@ -95,7 +97,7 @@ class OpenApi2<out NODE : Any>(
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         return Response(OK)
-            .with(lens of OpenApiDefinition(
+            .with(lens of Api(
                 apiInfo,
                 routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
                 paths
@@ -111,7 +113,7 @@ class OpenApi2<out NODE : Any>(
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
-            OpenApiPath(
+            ApiPath(
                 meta.summary,
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
@@ -124,7 +126,7 @@ class OpenApi2<out NODE : Any>(
             )
         )
 
-    private fun ContractRoute.asOpenApiParameters(): List<OpenApiParameter> {
+    private fun ContractRoute.asOpenApiParameters(): List<RequestParameter> {
         val jsonRequest = meta.requests.firstOrNull()?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
         val bodyParamNodes = meta.body?.metas?.map {
@@ -143,7 +145,7 @@ class OpenApi2<out NODE : Any>(
         return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema())
+    private fun HttpMessageMeta<Response>.asOpenApiResponse() = ResponseContent(description, toSchema())
 
     private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }

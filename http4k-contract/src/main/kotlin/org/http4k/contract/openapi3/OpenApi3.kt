@@ -8,6 +8,12 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.contract.openapi3.BodyContent.FormContent
+import org.http4k.contract.openapi3.BodyContent.FormContent.FormSchema
+import org.http4k.contract.openapi3.BodyContent.NoContent
+import org.http4k.contract.openapi3.BodyContent.SchemaContent
+import org.http4k.contract.openapi3.PathParameter.PrimitiveParameter
+import org.http4k.contract.openapi3.PathParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
@@ -33,7 +39,7 @@ private typealias ApiInfo = org.http4k.contract.ApiInfo
 private data class Api<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
-    val paths: Map<String, Map<String, Path<NODE>>>,
+    val paths: Map<String, Map<String, ApiPath<NODE>>>,
     val components: Components<NODE>
 ) {
     val openapi = "3.0.0"
@@ -44,11 +50,11 @@ private data class Components<NODE>(
     val securitySchemes: NODE
 )
 
-private data class Path<NODE>(
+private data class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>?,
-    val parameters: List<Parameter>?,
+    val parameters: List<PathParameter>?,
     val requestBody: RequestContents<NODE>?,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE,
@@ -65,20 +71,23 @@ private interface HasSchema<NODE> {
     fun definitions(): Iterable<Pair<String, NODE>>
 }
 
-private interface BodyContent
-private object NoContent : BodyContent
+private sealed class BodyContent {
+    object NoContent : BodyContent()
 
-private class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent, HasSchema<NODE> {
-    val schema = jsonSchema?.node
-    override fun definitions() = jsonSchema?.definitions ?: emptySet()
-}
+    class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent(), HasSchema<NODE> {
+        val schema = jsonSchema?.node
+        override fun definitions() = jsonSchema?.definitions ?: emptySet()
+    }
 
-private class FormContent(metas: List<Meta>) : BodyContent {
-    private class FormField(val type: String, val description: String?)
+    class FormContent(val schema: FormSchema) : BodyContent() {
+        class FormSchema(metas: List<Meta>) {
+            class FormField(val type: String, val description: String?)
 
-    val type = "object"
-    val properties = metas.map { it.name to FormField(it.paramMeta.value, it.description) }.toMap()
-    val required = metas.filter(Meta::required).map { it.name }
+            val type = "object"
+            val properties = metas.map { it.name to FormField(it.paramMeta.value, it.description) }.toMap()
+            val required = metas.filter(Meta::required).map { it.name }
+        }
+    }
 }
 
 private class RequestContents<NODE>(val content: Map<String, BodyContent>?) : HasSchema<NODE> {
@@ -95,15 +104,15 @@ private class ResponseContents<NODE>(val description: String?, val content: Map<
         .flatMap { it.definitions() }.toSet()
 }
 
-private sealed class Parameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
+private sealed class PathParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : PathParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+        val schema: NODE? = jsonSchema?.node
+        override fun definitions() = jsonSchema?.definitions ?: emptySet()
+    }
 
-private class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : Parameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
-    val schema: NODE? = jsonSchema?.node
-    override fun definitions() = jsonSchema?.definitions ?: emptySet()
-}
-
-private class PrimitiveParameter(meta: Meta) : Parameter(meta.location, meta.name, meta.required, meta.description) {
-    val type = meta.paramMeta.value
+    class PrimitiveParameter(meta: Meta) : PathParameter(meta.location, meta.name, meta.required, meta.description) {
+        val type = meta.paramMeta.value
+    }
 }
 
 class OpenApi3<out NODE : Any>(
@@ -114,7 +123,7 @@ class OpenApi3<out NODE : Any>(
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 
-    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: Path<NODE>)
+    private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
     private val lens = json.autoBody<Api<NODE>>().toLens()
 
@@ -142,7 +151,7 @@ class OpenApi3<out NODE : Any>(
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method,
-            Path(
+            ApiPath(
                 meta.summary,
                 meta.description,
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
@@ -174,7 +183,7 @@ class OpenApi3<out NODE : Any>(
                 APPLICATION_JSON -> APPLICATION_JSON.value to SchemaContent(it.toSchema())
                 APPLICATION_FORM_URLENCODED -> {
                     APPLICATION_FORM_URLENCODED.value to
-                        (body?.metas?.let(::FormContent) ?: NoContent)
+                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: NoContent)
                 }
                 else -> null
             }
