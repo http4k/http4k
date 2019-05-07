@@ -10,7 +10,6 @@ import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi3.BodyContent.FormContent
 import org.http4k.contract.openapi3.BodyContent.FormContent.FormSchema
-import org.http4k.contract.openapi3.BodyContent.NoContent
 import org.http4k.contract.openapi3.BodyContent.SchemaContent
 import org.http4k.contract.openapi3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi3.RequestParameter.SchemaParameter
@@ -29,6 +28,7 @@ import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
@@ -72,8 +72,6 @@ private interface HasSchema<NODE> {
 }
 
 private sealed class BodyContent {
-    object NoContent : BodyContent()
-
     class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
@@ -81,10 +79,12 @@ private sealed class BodyContent {
 
     class FormContent(val schema: FormSchema) : BodyContent() {
         class FormSchema(metas: List<Meta>) {
-            class FormField(val type: String, val description: String?)
+            class FormField(paramMeta: ParamMeta, val description: String? = null) {
+                val type = paramMeta.value
+            }
 
             val type = "object"
-            val properties = metas.map { it.name to FormField(it.paramMeta.value, it.description) }.toMap()
+            val properties = metas.map { it.name to FormField(it.paramMeta, it.description) }.toMap()
             val required = metas.filter(Meta::required).map { it.name }
         }
     }
@@ -110,11 +110,7 @@ private sealed class RequestParameter(val `in`: String, val name: String, val re
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
 
-    class PrimitiveParameter(meta: Meta) : RequestParameter(meta.location, meta.name, meta.required, meta.description) {
-        class Schema(val type: String)
-
-        val schema = Schema(meta.paramMeta.value)
-    }
+    class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) : RequestParameter(meta.location, meta.name, meta.required, meta.description)
 }
 
 class OpenApi3<out NODE : Any>(
@@ -173,19 +169,25 @@ class OpenApi3<out NODE : Any>(
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
-            ObjectParam -> SchemaParameter(it, "".toSchema())
-            else -> PrimitiveParameter(it)
+            ObjectParam -> SchemaParameter(it, "{}".toSchema())
+            else -> PrimitiveParameter(it, json {
+                obj("type" to string(it.paramMeta.value))
+            })
         }
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE> {
-        val noSchema = consumes.map { it.value to NoContent }
+        val noSchema = consumes.map {
+            it.value to SchemaContent(jsonSchemaCreator.toSchema(json {
+                obj("type" to string("string"))
+            }))
+        }
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
                 APPLICATION_JSON -> APPLICATION_JSON.value to SchemaContent(it.toSchema())
                 APPLICATION_FORM_URLENCODED -> {
                     APPLICATION_FORM_URLENCODED.value to
-                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: NoContent)
+                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema()))
                 }
                 else -> null
             }

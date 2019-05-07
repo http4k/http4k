@@ -107,20 +107,20 @@
                 "type": "object",
                 "properties": {
                   "b": {
-                    "type": "boolean",
-                    "description": "booleanField"
+                    "description": "booleanField",
+                    "type": "boolean"
                   },
                   "i": {
-                    "type": "integer",
-                    "description": "intField"
+                    "description": "intField",
+                    "type": "integer"
                   },
                   "s": {
-                    "type": "string",
-                    "description": "stringField"
+                    "description": "stringField",
+                    "type": "string"
                   },
                   "j": {
-                    "type": "string",
-                    "description": "jsonField"
+                    "description": "jsonField",
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -211,6 +211,9 @@
         "requestBody": {
           "content": {
             "text/plain": {
+              "schema": {
+                "$ref": "#/components/schemas/object1365610164"
+              }
             }
           },
           "required": true
@@ -256,40 +259,40 @@
         ],
         "parameters": [
           {
+            "schema": {
+              "type": "boolean"
+            },
             "in": "header",
             "name": "b",
             "required": true,
-            "description": "booleanHeader",
-            "schema": {
-              "type": "boolean"
-            }
+            "description": "booleanHeader"
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "header",
             "name": "s",
             "required": false,
-            "description": "stringHeader",
-            "schema": {
-              "type": "string"
-            }
+            "description": "stringHeader"
           },
           {
+            "schema": {
+              "type": "integer"
+            },
             "in": "header",
             "name": "i",
             "required": false,
-            "description": "intHeader",
-            "schema": {
-              "type": "integer"
-            }
+            "description": "intHeader"
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader",
-            "schema": {
-              "type": "string"
-            }
+            "description": "jsonHeader"
           }
         ],
         "requestBody": null,
@@ -333,22 +336,22 @@
         ],
         "parameters": [
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "path",
             "name": "firstName",
             "required": true,
-            "description": null,
-            "schema": {
-              "type": "string"
-            }
+            "description": null
           },
           {
+            "schema": {
+              "type": "boolean"
+            },
             "in": "path",
             "name": "age",
             "required": true,
-            "description": null,
-            "schema": {
-              "type": "boolean"
-            }
+            "description": null
           }
         ],
         "requestBody": null,
@@ -392,40 +395,40 @@
         ],
         "parameters": [
           {
+            "schema": {
+              "type": "boolean"
+            },
             "in": "query",
             "name": "b",
             "required": true,
-            "description": "booleanQuery",
-            "schema": {
-              "type": "boolean"
-            }
+            "description": "booleanQuery"
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "query",
             "name": "s",
             "required": false,
-            "description": "stringQuery",
-            "schema": {
-              "type": "string"
-            }
+            "description": "stringQuery"
           },
           {
+            "schema": {
+              "type": "integer"
+            },
             "in": "query",
             "name": "i",
             "required": false,
-            "description": "intQuery",
-            "schema": {
-              "type": "integer"
-            }
+            "description": "intQuery"
           },
           {
+            "schema": {
+              "type": "string"
+            },
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery",
-            "schema": {
-              "type": "string"
-            }
+            "description": "jsonQuery"
           }
         ],
         "requestBody": null,
@@ -493,6 +496,15 @@
   },
   "components": {
     "schemas": {
+      "object1365610164": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "string"
+          }
+        }
+      },
       "object1482787387": {
         "type": "object",
         "properties": {

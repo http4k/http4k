@@ -13,13 +13,7 @@ class JacksonJsonSchemaCreatorTest {
     @Test
     fun `generates schema`() {
         println(
-            JacksonJsonSchemaCreator(Jackson).toSchema(
-                Root(
-                    Uri.of("http://uri:8000"),
-                    1234,
-                    false,
-                    Nested(Duration.ofMillis(1000))
-                ), "override")
+            Jackson.asJsonString(JacksonJsonSchemaCreator(Jackson).toSchema(mapOf("string" to "value")))
         )
     }
 }
