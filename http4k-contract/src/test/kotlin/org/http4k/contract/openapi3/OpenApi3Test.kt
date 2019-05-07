@@ -12,7 +12,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.format.Jackson.auto
 
-data class ArbObject1(val anotherString: String)
+enum class Foo {
+    bar, bing
+}
+
+data class ArbObject1(val anotherString: Foo)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 
 class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "module description"))) {
@@ -21,13 +25,13 @@ class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "
         "/body_auto_schema" meta {
             receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
                 "s",
-                ArbObject1("s2"),
+                ArbObject1(Foo.bar),
                 listOf(1),
                 true
             ))
         } bindContract POST to { Response(OK) },
         "/body_auto_schema" meta {
-            returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1("s2"))
+            returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
         } bindContract GET to { Response(OK) },
         "/bearer_auth" meta {
             security = BearerAuthSecurity("foo")

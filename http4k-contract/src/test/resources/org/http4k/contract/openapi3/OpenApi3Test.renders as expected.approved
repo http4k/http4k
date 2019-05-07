@@ -536,7 +536,11 @@
             "properties": {
               "anotherString": {
                 "type": "string",
-                "required": true
+                "required": true,
+                "enum": [
+                  "bar",
+                  "bing"
+                ]
               }
             }
           },
@@ -559,7 +563,11 @@
         "properties": {
           "anotherString": {
             "type": "string",
-            "required": true
+            "required": true,
+            "enum": [
+              "bar",
+              "bing"
+            ]
           }
         }
       }
