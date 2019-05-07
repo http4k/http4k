@@ -145,9 +145,15 @@ class OpenApi2<out NODE : Any>(
 
     private fun HttpMessageMeta<Response>.asOpenApiResponse() = OpenApiResponse(description, toSchema())
 
-    private fun HttpMessageMeta<HttpMessage>.toSchema() = example
+    private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-        ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+        ?: message.bodyString().toSchema(definitionId)
+
+    private fun String.toSchema(definitionId: String? = null): JsonSchema<NODE> = try {
+        JsonToJsonSchema(json).toSchema(json.parse(this), definitionId)
+    } catch (e: Exception) {
+        JsonSchema(json.obj(), emptySet())
+    }
 
     private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
 

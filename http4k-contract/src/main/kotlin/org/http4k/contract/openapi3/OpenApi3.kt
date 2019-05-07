@@ -8,6 +8,7 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
@@ -60,24 +61,38 @@ private data class Path<NODE>(
     ).flatten()
 }
 
-interface HasSchema<NODE> {
+private interface HasSchema<NODE> {
     fun definitions(): Iterable<Pair<String, NODE>>
 }
 
-private class MessageContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
-    val schema: NODE? = jsonSchema?.node
+private interface BodyContent
+private object NoContent : BodyContent
 
+private class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent, HasSchema<NODE> {
+    val schema = jsonSchema?.node
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private class RequestContents<NODE>(val content: Map<String, MessageContent<NODE>>?) : HasSchema<NODE> {
-    override fun definitions() = content?.values?.flatMap { it.definitions() } ?: emptySet<Pair<String, NODE>>()
+private class FormContent(metas: List<Meta>) : BodyContent {
+    private class FormField(val type: String, val description: String?)
+
+    val type = "object"
+    val properties = metas.map { it.name to FormField(it.paramMeta.value, it.description) }.toMap()
+    val required = metas.filter(Meta::required).map { it.name }
+}
+
+private class RequestContents<NODE>(val content: Map<String, BodyContent>?) : HasSchema<NODE> {
+    override fun definitions() = content?.values
+        ?.filterIsInstance<HasSchema<NODE>>()
+        ?.flatMap { it.definitions() } ?: emptySet<Pair<String, NODE>>()
 
     val required = content != null
 }
 
-private class ResponseContents<NODE>(val description: String?, val content: Map<String, MessageContent<NODE>>) : HasSchema<NODE> {
-    override fun definitions() = content.values.flatMap { it.definitions() }.toSet()
+private class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent>) : HasSchema<NODE> {
+    override fun definitions() = content.values
+        .filterIsInstance<HasSchema<NODE>>()
+        .flatMap { it.definitions() }.toSet()
 }
 
 private sealed class Parameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
@@ -147,16 +162,20 @@ class OpenApi3<out NODE : Any>(
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
-            ObjectParam -> SchemaParameter<NODE>(it, null)
+            ObjectParam -> SchemaParameter(it, "".toSchema())
             else -> PrimitiveParameter(it)
         }
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE> {
-        val noSchema = consumes.map { it.value to MessageContent<NODE>(null) }
+        val noSchema = consumes.map { it.value to NoContent }
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
-                APPLICATION_JSON -> APPLICATION_JSON.value to MessageContent(it.toSchema())
+                APPLICATION_JSON -> APPLICATION_JSON.value to SchemaContent(it.toSchema())
+                APPLICATION_FORM_URLENCODED -> {
+                    APPLICATION_FORM_URLENCODED.value to
+                        (body?.metas?.let(::FormContent) ?: NoContent)
+                }
                 else -> null
             }
         }
@@ -167,13 +186,19 @@ class OpenApi3<out NODE : Any>(
     private fun HttpMessageMeta<Response>.asOpenApiResponse(): ResponseContents<NODE> {
         val contentTypes = CONTENT_TYPE(message)
             ?.takeIf { it == APPLICATION_JSON }
-            ?.let { mapOf(it.value to MessageContent(this.toSchema())) }
+            ?.let { mapOf(it.value to SchemaContent(toSchema())) }
         return ResponseContents(description, contentTypes ?: emptyMap())
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
         ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-        ?: JsonToJsonSchema(json).toSchema(json.parse(message.bodyString()))
+        ?: message.bodyString().toSchema(definitionId)
+
+    private fun String.toSchema(definitionId: String? = null): JsonSchema<NODE> = try {
+        JsonToJsonSchema(json).toSchema(json.parse(this), definitionId)
+    } catch (e: Exception) {
+        JsonSchema(json.obj(), emptySet())
+    }
 
     private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
 
@@ -181,3 +206,4 @@ class OpenApi3<out NODE : Any>(
 }
 
 private fun <E : Iterable<T>, T> E.nullIfEmpty(): E? = if (iterator().hasNext()) this else null
+

@@ -2,7 +2,7 @@ package org.http4k.contract
 
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -77,8 +77,9 @@ class RouteMetaDsl internal constructor() {
      * for this response body which will override the naturally generated one.
      */
     @JvmName("returningStatus")
-    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String = "", definitionId: String? = null) {
-        returning(ResponseMeta(description, Response(status).with(body.first of body.second), definitionId, body.second))
+    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String? = null, definitionId: String? = null) {
+        returning(ResponseMeta(description
+            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second))
     }
 
     /**
@@ -87,7 +88,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
         requestBody = body.first
-        receiving(RequestMeta(Request(GET, "").with(body.first of body.second), definitionId, body.second))
+        receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second))
     }
 
     /**
@@ -104,7 +105,7 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
         requestBody = bodyLens
-        consumes += bodyLens.contentType
+        receiving(RequestMeta(Request(POST, "").with(Header.CONTENT_TYPE of bodyLens.contentType)))
     }
 }
 

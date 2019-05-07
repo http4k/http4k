@@ -3,11 +3,11 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
-import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
+import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -84,7 +84,9 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
                 headers += Header.int().optional("i", "intHeader")
                 headers += Header.json().optional("j", "jsonHeader")
             } bindContract POST to { Response(OK).body("hello") }
-            routes += "/body_string" meta { receiving(Body.string(ContentType.TEXT_PLAIN).toLens()) } bindContract POST to { Response(OK) }
+            routes += "/body_string" meta {
+                receiving(Body.string(TEXT_PLAIN).toLens())
+            } bindContract POST to { Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(Body.json("json").toLens())
             } bindContract POST to { Response(OK) }

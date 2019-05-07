@@ -31,7 +31,7 @@
         ],
         "responses": {
           "303": {
-            "description": "",
+            "description": "See Other",
             "schema": {
               "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi2:ArbObject1"
             }
@@ -149,7 +149,8 @@
             "name": "body",
             "required": true,
             "description": "json",
-            "schema": null
+            "schema": {
+            }
           }
         ],
         "responses": {

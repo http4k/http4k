@@ -243,9 +243,7 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "schema": {
-              "type": "object"
-            },
+            "schema": null,
             "description": "json"
           }
         ],
