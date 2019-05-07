@@ -10,6 +10,7 @@ import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi3.BodyContent.FormContent
 import org.http4k.contract.openapi3.BodyContent.FormContent.FormSchema
+import org.http4k.contract.openapi3.BodyContent.NoSchema
 import org.http4k.contract.openapi3.BodyContent.SchemaContent
 import org.http4k.contract.openapi3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi3.RequestParameter.SchemaParameter
@@ -72,6 +73,10 @@ private interface HasSchema<NODE> {
 }
 
 private sealed class BodyContent {
+    class NoSchema(paramMeta: ParamMeta) : BodyContent() {
+        val schema = mapOf("type" to paramMeta.value)
+    }
+
     class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
@@ -178,9 +183,7 @@ class OpenApi3<out NODE : Any>(
 
     private fun RouteMeta.requestBody(): RequestContents<NODE> {
         val noSchema = consumes.map {
-            it.value to SchemaContent(jsonSchemaCreator.toSchema(json {
-                obj("type" to string("string"))
-            }))
+            it.value to NoSchema(ParamMeta.StringParam)
         }
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
