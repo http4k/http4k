@@ -53,19 +53,15 @@ private data class Path<NODE>(
     val security: NODE,
     val operationId: String?
 ) {
-    fun definitions() =
-        (
-            responses.values.map { it.content.values }
-                + (parameters ?: emptyList())
-                + (requestBody?.content?.values ?: emptyList())
-            )
-            .filterIsInstance<HasSchema<NODE>>()
-            .flatMap { it.definitions() }
-            .sortedBy { it.first }
+    fun definitions() = listOfNotNull(
+        responses.flatMap { it.value.definitions() },
+        parameters?.filterIsInstance<HasSchema<NODE>>()?.flatMap { it.definitions() },
+        requestBody?.definitions()?.toList()
+    ).flatten()
 }
 
 interface HasSchema<NODE> {
-    fun definitions(): Set<Pair<String, NODE>>
+    fun definitions(): Iterable<Pair<String, NODE>>
 }
 
 private class MessageContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
@@ -74,11 +70,15 @@ private class MessageContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : 
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private class RequestContents<NODE>(val content: Map<String, MessageContent<NODE>>?) {
+private class RequestContents<NODE>(val content: Map<String, MessageContent<NODE>>?) : HasSchema<NODE> {
+    override fun definitions() = content?.values?.flatMap { it.definitions() } ?: emptySet<Pair<String, NODE>>()
+
     val required = content != null
 }
 
-private class ResponseContents<NODE>(val description: String?, val content: Map<String, MessageContent<NODE>>)
+private class ResponseContents<NODE>(val description: String?, val content: Map<String, MessageContent<NODE>>) : HasSchema<NODE> {
+    override fun definitions() = content.values.flatMap { it.definitions() }.toSet()
+}
 
 private sealed class Parameter(val `in`: String, val name: String, val required: Boolean, val description: String?)
 
