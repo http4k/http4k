@@ -11,17 +11,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.format.Jackson.auto
-import org.http4k.testing.Approver
-import org.junit.jupiter.api.Disabled
 
 data class ArbObject1(val anotherString: String)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 
 class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "module description"))) {
-
-    @Disabled
-    override fun `renders as expected`(approver: Approver) {
-    }
 
     override fun specificRoutes() = listOf(
         "/body_auto_schema" meta {
