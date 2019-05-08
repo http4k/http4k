@@ -19,7 +19,7 @@ class BodyTest {
 
     @Test
     fun `body stream`() {
-        assertThat(Response(Status.OK).body(Body("abc".byteInputStream())).let { String(it.body.stream.readBytes()) },
+        assertThat(String(Response(Status.OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
             equalTo("abc"))
     }
 
@@ -52,4 +52,19 @@ class BodyTest {
         assertThat(Body("abc".byteInputStream()).hashCode(), equalTo(Body("abc".byteInputStream()).hashCode()))
     }
 
+    @Test
+    fun `can construct with array backed ByteBuffer`() {
+        val body = Body(ByteBuffer.wrap("abc".toByteArray()))
+        assertThat(body.length, equalTo(3L))
+        assertThat(body.toString(), equalTo("abc"))
+        assertThat(body.stream.bufferedReader().readText(), equalTo("abc"))
+    }
+
+    @Test
+    fun `can construct with non-array backed ByteBuffer`() {
+        val body = Body(ByteBuffer.wrap("abc".toByteArray()).asReadOnlyBuffer())
+        assertThat(body.length, equalTo(3L))
+        assertThat(body.toString(), equalTo("abc"))
+        assertThat(body.stream.bufferedReader().readText(), equalTo("abc"))
+    }
 }

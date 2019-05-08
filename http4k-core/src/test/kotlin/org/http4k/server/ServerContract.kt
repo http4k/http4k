@@ -30,7 +30,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                               private val requiredMethods: Array<Method> = Method.values()) {
     private lateinit var server: Http4kServer
 
-    protected val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
+    private val baseUrl by lazy { "http://0.0.0.0:${server.port()}" }
 
     private val size = 1000 * 1024
     private val random = (0 until size).map { '.' }.joinToString("")
@@ -40,8 +40,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
             "/" + m.name bind m to { Response(OK).body(m.name) }
         } + listOf(
             "/headers" bind GET to {
-                Response(ACCEPTED)
-                    .header("content-type", "text/plain")
+                Response(ACCEPTED).header("content-type", "text/plain")
             },
             "/large" bind GET to { Response(OK).body((0..size).map { '.' }.joinToString("")) },
             "/large" bind POST to { Response(OK).body((0..size).map { '.' }.joinToString("")) },

@@ -10,6 +10,7 @@ import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
 
+
 typealias Headers = Parameters
 
 /**
@@ -27,7 +28,11 @@ interface Body : Closeable {
 
     companion object {
         operator fun invoke(body: String): Body = MemoryBody(body)
-        operator fun invoke(body: ByteBuffer): Body = MemoryBody(body)
+        operator fun invoke(body: ByteBuffer): Body = when {
+            body.hasArray() -> MemoryBody(body)
+            else -> MemoryBody(ByteArray(body.remaining()).also { body.get(it) })
+        }
+
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
 
         val EMPTY: Body = MemoryBody("")
@@ -39,11 +44,12 @@ interface Body : Closeable {
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+    constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
-    override val length: Long by lazy { payload.array().size.toLong() }
+    override val length by lazy { payload.array().size.toLong() }
     override fun close() {}
-    override val stream: InputStream get() = payload.array().inputStream()
-    override fun toString(): String = payload.asString()
+    override val stream get() = payload.array().inputStream()
+    override fun toString() = payload.asString()
 }
 
 /**
@@ -61,16 +67,16 @@ class StreamBody(override val stream: InputStream, override val length: Long? = 
         stream.close()
     }
 
-    override fun toString(): String = "<<stream>>"
+    override fun toString() = "<<stream>>"
 
-    override fun equals(other: Any?): Boolean =
+    override fun equals(other: Any?) =
         when {
             this === other -> true
             other !is Body? -> false
             else -> payload == other?.payload
         }
 
-    override fun hashCode(): Int = payload.hashCode()
+    override fun hashCode() = payload.hashCode()
 }
 
 interface HttpMessage : Closeable {
