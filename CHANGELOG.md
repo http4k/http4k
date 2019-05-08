@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.141.0
+### v3.141.0 (uncut)
 - [http4k-core] - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
 
 ### v3.140.0
@@ -18,7 +18,7 @@ changes with their rationale when appropriate:
 
 ### v3.138.0
 - [http4k-contracts] Tweaks to Security model for `http4k-contracts`. (Renamed) `ApiKeySecurity` is now a proper class, and added `BasicAuthSecurity`. You can now also override the security model on a per-route basis.
-- [http4k-contracts] Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
+- [http4k-contract] Added ability to set the `Security` on each individual contract route. This overrides any `Security` 
 set on a contract-level basis.
 
 ### v3.137.1
@@ -34,51 +34,51 @@ set on a contract-level basis.
 ### v3.135.0
 - [http4k-core] Change `mime.types` location so it doesn't conflic with other libraries. H/T @benusher and @dgliosca
 - [http4k-testing-chaos] Added `SnipRequestBody` behaviour.
-- [http4k-core]  (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
+- [http4k-core] (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
 
 ### v3.134.0
-- Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
+- [http4-testing-approval] Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
 it is more important that the content is correct than the content-type (and often errors don't have content type set so you 
 get an erroneous error message which masks the fact that the content was wrong).
 
 ### v3.133.0
-- `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
+- [http4-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
 allows for more fine grained custom control of which Responses are acceptable.
-- Upgrade deps, including Kotlin to `1.3.30`.
-- Fix #221 - Contract path fixed segments cannot contain slash characters.
+- [all] Upgrade deps, including Kotlin to `1.3.30`.
+- [http4-contract] Fix #221 - Contract path fixed segments cannot contain slash characters.
 
 ### v3.132.0
-- Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
+- [http4-format-jackson] Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
 
 ### v3.131.0
-- (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
+- [http4k-core]  (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
 appending. This leads to a more consistent behaviour. In order to be able to set multiple values on an object 
 using a lense, use the `multi` form instead - eg. `Header.required("foo")` -> `Header.multi.required("foo")`. We 
 envisage the impact of this change is limited as it's only Queries that generally can have multiple possible 
 values, and in the vast majority of cases a replace rather than append is expected.
 
 ### v3.130.0
-- Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
+- [http4-contract] Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
 
 ### v3.129.0
 - (Slight) Break: Collapsed `UpstreamRequestFailed` exceptions to contain the status, and thus removing non-special 
 cases like `BadRequest` and `BadGateway`. This makes them much easier to use in practice as users have access 
 to the the status. To migrate, simply replace previous classes with `UpstreamRequestFailed(Status.XYZ, message)`. 
-- Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
-- Upgrade deps.
+- [http4-contract] Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
+- [all] Upgrade deps.
 
 ### v3.128.0
-- Added base64 to the supported mappings for Query/Headers etc...
-- Approver does not write actual output if there is none to write and there is no approved content
+- [http4-core] Added base64 to the supported mappings for Query/Headers etc...
+- [http4-testing-approval] Approver does not write actual output if there is none to write and there is no approved content
 
 ### v3.127.0
-- `http4k-testing-approval`: Improved `Approver` interface to more closely match the traditional 
+- [http4-testing-approval] Improved `Approver` interface to more closely match the traditional 
 `assert<XYZ>` approach - this results in a more discoverable/obvious API.
-- Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
+- [http4-testing-hamkrest] Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
 with other relevant matchers.
 
 ### v3.126.0
-- Add support for XML and HTML approval tests in `http4k-testing-approval` module.
+- [http4-testing-approval] Add support for XML and HTML approval tests.
 
 ### v3.125.0
 - Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and integrates with 
@@ -86,10 +86,10 @@ the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and Int
 @jshiell for the inspiration Gist containing the base Junit5 Extension.
 
 ### v3.124.0
-- Make authentication response available when creating AuthorizationCode .
+- [http4-security-oauth] Make authentication response available when creating AuthorizationCode.
 
 ### v3.123.0
-- Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
+- [http4-security-oauth] Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
 
 ### v3.122.0
 - Generified `GenerateXmlDataClasses` filter, and added default implementations for 
