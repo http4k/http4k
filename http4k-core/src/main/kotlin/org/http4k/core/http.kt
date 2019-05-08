@@ -6,7 +6,6 @@ import org.http4k.asString
 import org.http4k.core.Body.Companion.EMPTY
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.routing.RoutedRequest
-import org.http4k.util.ByteBufferBackedInputStream
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -31,7 +30,7 @@ interface Body : Closeable {
         operator fun invoke(body: String): Body = MemoryBody(body)
         operator fun invoke(body: ByteBuffer): Body = when {
             body.hasArray() -> MemoryBody(body)
-            else -> StreamBody(ByteBufferBackedInputStream(body))
+            else -> MemoryBody(ByteArray(body.remaining()).also { body.get(it) })
         }
 
         operator fun invoke(body: InputStream, length: Long? = null): Body = StreamBody(body, length)
@@ -45,6 +44,7 @@ interface Body : Closeable {
  **/
 data class MemoryBody(override val payload: ByteBuffer) : Body {
     constructor(payload: String) : this(ByteBuffer.wrap(payload.toByteArray()))
+    constructor(payload: ByteArray) : this(ByteBuffer.wrap(payload))
 
     override val length by lazy { payload.array().size.toLong() }
     override fun close() {}
