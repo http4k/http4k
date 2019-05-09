@@ -77,7 +77,7 @@ private sealed class BodyContent {
         val schema = mapOf("type" to paramMeta.value)
     }
 
-    class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?) : BodyContent(), HasSchema<NODE> {
+    class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
@@ -178,15 +178,14 @@ class OpenApi3<out NODE : Any>(
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE> {
-        val noSchema = consumes.map {
-            it.value to NoSchema(ParamMeta.StringParam)
-        }
+        val noSchema = consumes.map { it.value to NoSchema(ParamMeta.StringParam) }
+
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
-                APPLICATION_JSON -> APPLICATION_JSON.value to SchemaContent(it.toSchema())
+                APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
                 APPLICATION_FORM_URLENCODED -> {
                     APPLICATION_FORM_URLENCODED.value to
-                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema()))
+                        (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
                 }
                 else -> null
             }
@@ -195,24 +194,32 @@ class OpenApi3<out NODE : Any>(
         return RequestContents((noSchema + withSchema).nullIfEmpty()?.toMap())
     }
 
+    private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
+        val bodyString = message.bodyString()
+        val jsonSchema = example?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+            ?: bodyString.toSchema(definitionId)
+        return SchemaContent(jsonSchema, bodyString.safeParse())
+    }
+
     private fun HttpMessageMeta<Response>.asOpenApiResponse(): ResponseContents<NODE> {
         val contentTypes = CONTENT_TYPE(message)
             ?.takeIf { it == APPLICATION_JSON }
-            ?.let { mapOf(it.value to SchemaContent(toSchema())) }
-        return ResponseContents(description, contentTypes ?: emptyMap())
+            ?.let { mapOf(it.value to toSchemaContent()) }
+            ?: emptyMap()
+        return ResponseContents(description, contentTypes)
     }
 
-    private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
-        ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
-        ?: message.bodyString().toSchema(definitionId)
-
-    private fun String.toSchema(definitionId: String? = null): JsonSchema<NODE> = try {
-        JsonToJsonSchema(json, "components/schemas").toSchema(json.parse(this), definitionId)
-    } catch (e: Exception) {
-        JsonSchema(json.obj(), emptySet())
-    }
+    private fun String.toSchema(definitionId: String? = null) = safeParse()
+        ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId) }
+        ?: JsonSchema(json.obj(), emptySet())
 
     private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
+
+    private fun String.safeParse(): NODE? = try {
+        json.parse(this)
+    } catch (e: Exception) {
+        null
+    }
 
     companion object
 }

@@ -49,6 +49,9 @@
             "description": "See Other",
             "content": {
               "application/json": {
+                "example": {
+                  "anotherString": "bing"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi3:ArbObject1"
                 }
@@ -74,6 +77,16 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "example": {
+                "string": "s",
+                "child": {
+                  "anotherString": "bar"
+                },
+                "numbers": [
+                  1
+                ],
+                "bool": true
+              },
               "schema": {
                 "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi3:ArbObject2"
               }
@@ -154,6 +167,7 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "example": null,
               "schema": {
               }
             }
@@ -182,6 +196,12 @@
         "requestBody": {
           "content": {
             "application/json": {
+              "example": {
+                "anAnotherObject": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                }
+              },
               "schema": {
                 "$ref": "#/components/schemas/someDefinitionId"
               }
@@ -457,6 +477,9 @@
             "description": "no way jose",
             "content": {
               "application/json": {
+                "example": {
+                  "aString": "a message of some kind"
+                },
                 "schema": {
                   "$ref": "#/components/schemas/object-1662053258"
                 }
