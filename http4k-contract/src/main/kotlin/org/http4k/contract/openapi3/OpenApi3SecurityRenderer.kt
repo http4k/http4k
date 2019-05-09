@@ -28,7 +28,7 @@ object OpenApi3SecurityRenderer : SecurityRenderer {
                     "in" to string(security.param.meta.location),
                     "name" to string(security.param.meta.name)
                 ))
-            else -> obj(listOf())
+            else -> obj()
         }
     }
 
