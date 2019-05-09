@@ -307,6 +307,25 @@
         "operationId": null
       }
     },
+    "/basepath/no_security": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": null,
+        "operationId": null
+      }
+    },
     "/basepath/nometa": {
       "get": {
         "summary": "<unknown>",

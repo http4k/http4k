@@ -11,6 +11,7 @@
     "POST:/basepath/security": "<unknown>",
     "POST:/basepath/body_form": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",
-    "POST:/basepath/returning": "<unknown>"
+    "POST:/basepath/returning": "<unknown>",
+    "POST:/basepath/no_security": "<unknown>"
   }
 }

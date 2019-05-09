@@ -46,7 +46,8 @@ open class OpenApi<out NODE>(
                 })
         }
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
+    private fun List<Security>.combine() =
+        json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
@@ -102,7 +103,7 @@ open class OpenApi<out NODE>(
 
         return json {
             val fields =
-                listOf(
+                listOfNotNull(
                     "tags" to array(routeTags),
                     "summary" to string(route.meta.summary),
                     route.meta.operationId?.let { "operationId" to string(it) },
@@ -110,7 +111,7 @@ open class OpenApi<out NODE>(
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    "security" to json(securityRenderer.ref(route.meta.security ?: contractSecurity))
+                    securityRenderer.ref<NODE>(route.meta.security ?: contractSecurity)?.let { "security" to json(it) }
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

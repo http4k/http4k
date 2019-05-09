@@ -416,6 +416,22 @@
           }
         ]
       }
+    },
+    "/basepath/no_security": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        }
+      }
     }
   },
   "securityDefinitions": {

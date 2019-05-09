@@ -58,7 +58,7 @@ private data class ApiPath<NODE>(
     val parameters: List<RequestParameter>?,
     val requestBody: RequestContents<NODE>?,
     val responses: Map<String, ResponseContents<NODE>>,
-    val security: NODE,
+    val security: NODE?,
     val operationId: String?
 ) {
     fun definitions() = listOfNotNull(
@@ -160,7 +160,7 @@ class OpenApi3<out NODE : Any>(
                     else -> meta.requestBody().takeIf { it.required }
                 },
                 meta.responses(),
-                json(securityRenderer.ref(meta.security ?: contractSecurity)),
+                securityRenderer.ref<NODE>(meta.security ?: contractSecurity)?.let { json(it) },
                 meta.operationId
             )
         )
@@ -213,7 +213,8 @@ class OpenApi3<out NODE : Any>(
         ?.let { JsonToJsonSchema(json, "components/schemas").toSchema(it, definitionId) }
         ?: JsonSchema(json.obj(), emptySet())
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
+    private fun List<Security>.combine() =
+        json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
     private fun String.safeParse(): NODE? = try {
         json.parse(this)

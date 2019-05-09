@@ -46,7 +46,7 @@ private data class ApiPath<NODE>(
     val consumes: List<String>,
     val parameters: List<RequestParameter>,
     val responses: Map<String, ResponseContent<NODE>>,
-    val security: NODE,
+    val security: NODE?,
     val operationId: String?
 ) {
     fun definitions() =
@@ -121,7 +121,7 @@ class OpenApi2<out NODE : Any>(
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-                json(securityRenderer.ref(meta.security ?: contractSecurity)),
+                securityRenderer.ref<NODE>(meta.security ?: contractSecurity)?.let { json(it) },
                 meta.operationId
             )
         )
@@ -157,7 +157,8 @@ class OpenApi2<out NODE : Any>(
         JsonSchema(json.obj(), emptySet())
     }
 
-    private fun List<Security>.combine() = json { obj(flatMap { fields(json(securityRenderer.full(it))) }) }
+    private fun List<Security>.combine() =
+        json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
     companion object
 }
