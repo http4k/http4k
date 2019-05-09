@@ -99,13 +99,16 @@ plugging together of services without HTTP container being required.
         * **Pebble**
         * **Thymeleaf**
     * Caching and **Hot-Reload** template support
-* [Message formats:](https://http4k.org/guide/modules/message_formats) 
+* **Message formats:** 
     * Consistent API provides first class support for marshalling formats to/from HTTP messages for:
-        * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes into JSON/XML**)
-        * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes into JSON**)
-        * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classes into JSON**)
-        * **Argo** - lightweight Java JSON API with zero dependencies.
-        * **Xml** - includes support for **one way [automatic marshalling](https://http4k.org/guide/modules/message_formats/#auto-marshalling-capabilities) of Data classe into XML**)
+        * **[JSON](https://www.http4k.org/guide/modules/json/)** - with support for: 
+            * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
+            * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
+            * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
+            * **Argo** - lightweight Java JSON API with zero dependencies.            
+        * **[XML](https://www.http4k.org/guide/modules/xml/)** - includes support for:
+            * **Jackson** - includes support for **fully automatic marshalling of Data classes**
+            * **Xml** - includes support for **one way automatic marshalling of Data classes**
 * [Resilience:](https://http4k.org/guide/modules/resilience) 
     * Support for Circuits, Retrying, Rate-Limiting, Bulkheading via Resilience4J integration.
 * [Metrics:](https://http4k.org/guide/modules/metrics) 
