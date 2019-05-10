@@ -16,6 +16,15 @@ import org.http4k.lens.RequestContextKey
 import org.junit.jupiter.api.Test
 
 class BearerAuthenticationTest {
+
+    @Test
+    fun wrong_token_type() {
+        val handler = ServerFilters.BearerAuth("Basic dXNlcjpwYXNzd29yZA==").then { Response(OK) }
+        val response = ClientFilters.BasicAuth("user", "password")
+            .then(handler)(Request(GET, "/"))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
+    }
+
     @Test
     fun fails_to_authenticate() {
         val handler = ServerFilters.BearerAuth("token").then { Response(OK) }
