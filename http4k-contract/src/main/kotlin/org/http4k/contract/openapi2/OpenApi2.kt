@@ -4,7 +4,6 @@ import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.PathSegments
-import org.http4k.contract.Render
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
@@ -87,8 +86,6 @@ class OpenApi2<out NODE : Any>(
 
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
-    private val lens = json.autoBody<Api<NODE>>().toLens()
-
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
     override fun notFound() = errorResponseRenderer.notFound()
@@ -97,19 +94,21 @@ class OpenApi2<out NODE : Any>(
         val allSecurities = routes.map { it.meta.security } + security
         val paths = routes.map { it.asPath(security, contractRoot) }
 
-        return Response(OK)
-            .with(lens of Api(
-                apiInfo,
-                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                paths
-                    .groupBy { it.path }
-                    .mapValues {
-                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
-                    }
-                    .toSortedMap(),
-                json(allSecurities.combineFull()),
-                json.obj(paths.flatMap { it.pathSpec.definitions() })
-            ))
+        return with(json) {
+            Response(OK)
+                .with(autoBody<Api<NODE>>().toLens() of Api(
+                    apiInfo,
+                    routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
+                    paths
+                        .groupBy { it.path }
+                        .mapValues {
+                            it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
+                        }
+                        .toSortedMap(),
+                    obj(allSecurities.mapNotNull(::full).flatMap { fields(this(it)) }),
+                    obj(paths.flatMap { it.pathSpec.definitions() })
+                ))
+        }
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
@@ -122,7 +121,7 @@ class OpenApi2<out NODE : Any>(
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-                json(listOf(meta.security, contractSecurity).combineRef()),
+                json { array(listOf(meta.security, contractSecurity).mapNotNull(::ref).map { this(it) }) },
                 meta.operationId
             )
         )
@@ -158,13 +157,9 @@ class OpenApi2<out NODE : Any>(
         JsonSchema(json.obj(), emptySet())
     }
 
-    private fun List<Security>.combineFull(): Render<NODE> = {
-        obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) })
-    }
+    private fun full(security: Security) = securityRenderer.full<NODE>(security)
 
-    private fun List<Security>.combineRef(): Render<NODE> = {
-        array(mapNotNull { securityRenderer.ref<NODE>(it) }.map { this(it) })
-    }
+    private fun ref(security: Security) = securityRenderer.ref<NODE>(security)
 
     companion object
 }
