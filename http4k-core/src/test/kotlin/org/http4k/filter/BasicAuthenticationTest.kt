@@ -39,6 +39,13 @@ class BasicAuthenticationTest {
     }
 
     @Test
+    fun fails_to_authenticate_with_non_basic_token() {
+        val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
+        val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
+    }
+
+    @Test
     fun fails_to_authenticate_if_credentials_do_not_match() {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = ClientFilters.BasicAuth("user", "wrong").then(handler)(Request(GET, "/"))

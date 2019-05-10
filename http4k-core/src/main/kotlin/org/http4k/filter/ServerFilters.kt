@@ -129,8 +129,11 @@ object ServerFilters {
         }
 
         private fun Request.basicAuthenticationCredentials(): Credentials? = header("Authorization")
-            ?.takeIf { it.startsWith("Basic ") }
-            ?.replace("Basic ", "")?.toCredentials()
+            ?.trim()
+            ?.takeIf { it.startsWith("Basic") }
+            ?.substringAfter("Basic")
+            ?.trim()
+            ?.toCredentials()
 
         private fun String.toCredentials(): Credentials? = base64Decoded().split(":").let { Credentials(it.getOrElse(0) { "" }, it.getOrElse(1) { "" }) }
     }
@@ -166,8 +169,10 @@ object ServerFilters {
         }
 
         private fun Request.bearerToken(): String? = header("Authorization")
-            ?.takeIf { it.startsWith("Bearer ") }
-            ?.replace("Bearer ", "")
+            ?.trim()
+            ?.takeIf { it.startsWith("Bearer") }
+            ?.substringAfter("Bearer")
+            ?.trim()
     }
 
     /**

@@ -3,11 +3,13 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.AccessTokenContainer
 import org.http4k.security.ResponseType
 import java.time.Clock
 
@@ -39,6 +41,9 @@ class OAuthServer(
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
+
+    //use this filter to protect endpoints which should only be accessed with a valid access token
+    val accessFilter = AccessTokenValidationFilter(accessTokens)
 
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")

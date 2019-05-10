@@ -11,4 +11,6 @@ interface AccessTokens {
      * Creates a new access token for a valid authorization code
      */
     fun create(authorizationCode: AuthorizationCode): Result<AccessTokenContainer, AuthorizationCodeAlreadyUsed>
+
+    fun isValid(accessToken : AccessTokenContainer) : Boolean
 }

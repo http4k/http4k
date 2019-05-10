@@ -40,6 +40,13 @@ class BearerAuthenticationTest {
     }
 
     @Test
+    fun fails_to_authentic_with_non_bearer_token() {
+        val handler = ServerFilters.BearerAuth("Basic YmFkZ2VyOm1vbmtleQ==").then { Response(OK) }
+        val response = ClientFilters.BasicAuth("badger", "monkey").then(handler)(Request(GET, "/"))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
+    }
+
+    @Test
     fun fails_to_authenticate_if_credentials_do_not_match() {
         val handler = ServerFilters.BearerAuth("token").then { Response(OK) }
         val response = ClientFilters.BearerAuth("not token").then(handler)(Request(GET, "/"))
