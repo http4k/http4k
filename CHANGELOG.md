@@ -3,8 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.141.0 (uncut)
+### v3.141.0
 - [http4k-core] - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
+- [http4k-core] - Tighten up security on  Basic and Bearer auth server filters.  H/T @andymoody
+- [http4k-security-oauth] - Add filter to check bearer token is valid access token. H/T @andymoody
 
 ### v3.140.0
 - [all] Update dependencies (including Kotlin bump to 1.3.31)
