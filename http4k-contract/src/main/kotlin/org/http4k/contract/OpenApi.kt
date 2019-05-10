@@ -40,7 +40,7 @@ open class OpenApi<out NODE>(
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
                         "paths" to obj(fields),
-                        "securityDefinitions" to (listOf(security) + routes.mapNotNull { it.meta.security }).combine(),
+                        "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
                         "definitions" to obj(definitions)
                     ))
                 })
@@ -111,11 +111,15 @@ open class OpenApi<out NODE>(
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    securityRenderer.ref<NODE>(route.meta.security ?: contractSecurity)?.let { "security" to json(it) }
+                    "security" to array(
+                        listOf(route.meta.security, contractSecurity).mapNotNull {
+
+                            securityRenderer.ref<NODE>(it)
+                        }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(
-                route.method.toString().toLowerCase() to obj(fields.filterNotNull()),
+                route.method.toString().toLowerCase() to obj(fields),
                 ((route.meta.requests.flatMap { it.asSchema().definitions }) + responseDefinitions).toSet())
         }
     }

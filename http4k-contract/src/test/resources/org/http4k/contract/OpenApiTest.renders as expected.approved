@@ -289,7 +289,7 @@
         ]
       }
     },
-    "/basepath/security": {
+    "/basepath/extra_security": {
       "post": {
         "tags": [
           "/basepath"
@@ -306,6 +306,10 @@
         "security": [
           {
             "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
             ]
           }
         ]
@@ -415,22 +419,6 @@
             ]
           }
         ]
-      }
-    },
-    "/basepath/no_security": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "produces": [
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-        }
       }
     }
   },

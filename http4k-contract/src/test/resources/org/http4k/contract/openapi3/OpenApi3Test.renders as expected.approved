@@ -30,6 +30,10 @@
           {
             "bearerAuth": [
             ]
+          },
+          {
+            "api_key": [
+            ]
           }
         ],
         "operationId": null
@@ -270,6 +274,30 @@
         "operationId": "echoMessage"
       }
     },
+    "/basepath/extra_security": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
     "/basepath/headers": {
       "post": {
         "summary": "<unknown>",
@@ -324,21 +352,6 @@
             ]
           }
         ],
-        "operationId": null
-      }
-    },
-    "/basepath/no_security": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": null,
         "operationId": null
       }
     },
@@ -505,26 +518,6 @@
         "security": [
           {
             "api_key": [
-            ]
-          }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/security": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-          {
-            "basicAuth": [
             ]
           }
         ],

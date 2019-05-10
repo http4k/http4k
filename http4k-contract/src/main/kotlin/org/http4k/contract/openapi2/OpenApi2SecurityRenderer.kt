@@ -35,10 +35,10 @@ object OpenApi2SecurityRenderer : SecurityRenderer {
     override fun <NODE> ref(security: Security): Render<NODE>? =
         when (security) {
             is ApiKeySecurity<*> -> {
-                { array(listOf(obj(security.name to array(emptyList())))) }
+                { obj(security.name to array(emptyList())) }
             }
             is BasicAuthSecurity -> {
-                { array(listOf(obj(security.name to array(emptyList())))) }
+                { obj(security.name to array(emptyList())) }
             }
             else -> null
         }

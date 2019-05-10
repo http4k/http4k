@@ -38,7 +38,7 @@ class RouteMetaDsl internal constructor() {
     val queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
-    var security: Security? = null
+    var security: Security = NoSecurity
     var preFlightExtraction: PreFlightExtraction? = null
 
     /**
@@ -127,6 +127,5 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val requests: List<HttpMessageMeta<Request>> = emptyList(),
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
-                     val security: Security? = null,
-                     val operationId: String? = null) {
-}
+                     val security: Security = NoSecurity,
+                     val operationId: String? = null)

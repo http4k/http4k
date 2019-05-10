@@ -95,7 +95,7 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
                 }, "someDefinitionId")
             } bindContract POST to { Response(OK) }
-            routes += "/security" meta {
+            routes += "/extra_security" meta {
                 security = BasicAuthSecurity("realm", Credentials("user", "password"))
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
@@ -114,9 +114,6 @@ abstract class ContractRendererContract(private val rendererToUse: ContractRende
             } bindContract GET to { Response(OK) }
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of Jackson { obj("aString" to string("a message of some kind")) }))
-            } bindContract POST to { Response(OK) }
-            routes += "/no_security" meta {
-                security = NoSecurity
             } bindContract POST to { Response(OK) }
 
             routes += specificRoutes()

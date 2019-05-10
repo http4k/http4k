@@ -4,6 +4,7 @@ import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.PathSegments
+import org.http4k.contract.Render
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
@@ -93,7 +94,7 @@ class OpenApi2<out NODE : Any>(
     override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-        val allSecurities = routes.mapNotNull { it.meta.security } + security
+        val allSecurities = routes.map { it.meta.security } + security
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         return Response(OK)
@@ -106,7 +107,7 @@ class OpenApi2<out NODE : Any>(
                         it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
                     }
                     .toSortedMap(),
-                allSecurities.combine(),
+                json(allSecurities.combineFull()),
                 json.obj(paths.flatMap { it.pathSpec.definitions() })
             ))
     }
@@ -121,7 +122,7 @@ class OpenApi2<out NODE : Any>(
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),
                 meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
-                securityRenderer.ref<NODE>(meta.security ?: contractSecurity)?.let { json(it) },
+                json(listOf(meta.security, contractSecurity).combineRef()),
                 meta.operationId
             )
         )
@@ -157,8 +158,13 @@ class OpenApi2<out NODE : Any>(
         JsonSchema(json.obj(), emptySet())
     }
 
-    private fun List<Security>.combine() =
-        json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
+    private fun List<Security>.combineFull(): Render<NODE> = {
+        obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) })
+    }
+
+    private fun List<Security>.combineRef(): Render<NODE> = {
+        array(mapNotNull { securityRenderer.ref<NODE>(it) }.map { this(it) })
+    }
 
     companion object
 }
