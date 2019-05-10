@@ -4,12 +4,13 @@ import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.PathSegments
-import org.http4k.contract.Render
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
-import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.Render
+import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -35,8 +36,6 @@ import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
-
-private typealias ApiInfo = org.http4k.contract.ApiInfo
 
 private data class Api<NODE>(
     val info: ApiInfo,
@@ -119,7 +118,7 @@ class OpenApi3<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val apiRenderer: ApiRenderer<Any, NODE>,
-    private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v3.SecurityRenderer,
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 

@@ -1,12 +1,12 @@
 package cookbook.typesafe_http_contracts
 
-import org.http4k.contract.ApiInfo
 import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
+import org.http4k.contract.openapi.ApiInfo
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter

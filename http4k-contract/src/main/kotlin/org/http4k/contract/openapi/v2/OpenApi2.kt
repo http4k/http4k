@@ -5,9 +5,10 @@ import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.PathSegments
 import org.http4k.contract.Security
-import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.v2.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v2.RequestParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -24,8 +25,6 @@ import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
-
-typealias ApiInfo = org.http4k.contract.ApiInfo
 
 data class Api<NODE>(
     val info: ApiInfo,
@@ -81,7 +80,7 @@ class OpenApi2<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val apiRenderer: ApiRenderer<Any, NODE>,
-    private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v2.SecurityRenderer,
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 

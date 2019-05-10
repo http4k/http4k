@@ -1,9 +1,9 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.contract.ApiInfo
 import org.http4k.contract.BearerAuthSecurity
 import org.http4k.contract.ContractRendererContract
 import org.http4k.contract.meta
+import org.http4k.contract.openapi.ApiInfo
 import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST

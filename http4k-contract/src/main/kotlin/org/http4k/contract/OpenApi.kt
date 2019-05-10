@@ -1,6 +1,7 @@
 package org.http4k.contract
 
-import org.http4k.contract.openapi.v2.OpenApi2SecurityRenderer
+import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -16,12 +17,12 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
-data class ApiInfo(val title: String, val version: String, val description: String? = null)
+typealias ApiInfo = ApiInfo
 
 open class OpenApi<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v2.SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {

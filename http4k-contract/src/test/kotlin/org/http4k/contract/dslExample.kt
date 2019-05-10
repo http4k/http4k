@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.openapi.ApiInfo
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Method.GET
 import org.http4k.core.Response

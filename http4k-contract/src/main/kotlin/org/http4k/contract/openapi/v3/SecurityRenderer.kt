@@ -4,11 +4,10 @@ import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.BasicAuthSecurity
 import org.http4k.contract.BearerAuthSecurity
 import org.http4k.contract.NoSecurity
-import org.http4k.contract.Render
 import org.http4k.contract.Security
-import org.http4k.contract.SecurityRenderer
+import org.http4k.contract.openapi.Render
 
-object OpenApi3SecurityRenderer : SecurityRenderer {
+object SecurityRenderer : org.http4k.contract.openapi.SecurityRenderer {
     override fun <NODE> full(security: Security): Render<NODE>? =
         when (security) {
             is BasicAuthSecurity -> {
