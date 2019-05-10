@@ -50,7 +50,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
         .map {
             catchLensFailure
                 .then(identify(it))
-                .then(preSecurityFilter.then(it.meta.security.filter).then(security.filter).then(postSecurityFilter))
+                .then(preSecurityFilter.then(security.filter).then(it.meta.security.filter).then(postSecurityFilter))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } +
         (identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))
