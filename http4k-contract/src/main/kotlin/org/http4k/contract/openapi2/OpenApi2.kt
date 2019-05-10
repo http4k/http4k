@@ -1,5 +1,6 @@
 package org.http4k.contract.openapi2
 
+import org.http4k.contract.ApiRenderer
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
@@ -15,19 +16,18 @@ import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
-import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
-import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
-private typealias ApiInfo = org.http4k.contract.ApiInfo
+typealias ApiInfo = org.http4k.contract.ApiInfo
 
-private data class Api<NODE>(
+data class Api<NODE>(
     val info: ApiInfo,
     val tags: List<Tag>,
     val paths: Map<String, Map<String, ApiPath<NODE>>>,
@@ -38,7 +38,7 @@ private data class Api<NODE>(
     val basePath = "/"
 }
 
-private data class ApiPath<NODE>(
+data class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>,
@@ -56,17 +56,18 @@ private data class ApiPath<NODE>(
             .sortedBy { it.first }
 }
 
-private interface HasSchema<NODE> {
+interface HasSchema<NODE> {
     fun definitions(): Set<Pair<String, NODE>>
 }
 
-private class ResponseContent<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
+class ResponseContent<NODE>(val description: String?, private val jsonSchema: JsonSchema<NODE>?) : HasSchema<NODE> {
     val schema: NODE? = jsonSchema?.node
     override fun definitions() = jsonSchema?.definitions ?: emptySet()
 }
 
-private sealed class RequestParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
-    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+sealed class RequestParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?)
+        : RequestParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
@@ -78,8 +79,8 @@ private sealed class RequestParameter(val `in`: String, val name: String, val re
 
 class OpenApi2<out NODE : Any>(
     private val apiInfo: ApiInfo,
-    private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val jsonSchemaCreator: JsonSchemaCreator<Any, NODE>,
+    private val json: Json<NODE>,
+    private val apiRenderer: ApiRenderer<Any, NODE>,
     private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
@@ -95,19 +96,18 @@ class OpenApi2<out NODE : Any>(
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         return with(json) {
-            Response(OK)
-                .with(autoBody<Api<NODE>>().toLens() of Api(
-                    apiInfo,
-                    routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                    paths
-                        .groupBy { it.path }
-                        .mapValues {
-                            it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
-                        }
-                        .toSortedMap(),
-                    obj(allSecurities.mapNotNull(::full).flatMap { fields(this(it)) }),
-                    obj(paths.flatMap { it.pathSpec.definitions() })
-                ))
+            Response(OK).with(json.body().toLens() of apiRenderer.api(Api(
+                apiInfo,
+                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
+                paths
+                    .groupBy { it.path }
+                    .mapValues {
+                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
+                    }
+                    .toSortedMap(),
+                obj(allSecurities.mapNotNull(::full).flatMap { fields(this(it)) }),
+                obj(paths.flatMap { it.pathSpec.definitions() })
+            )))
         }
     }
 
@@ -120,7 +120,7 @@ class OpenApi2<out NODE : Any>(
                 meta.produces.map { it.value }.toSet().sorted(),
                 meta.consumes.map { it.value }.toSet().sorted(),
                 asOpenApiParameters(),
-                meta.responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap(),
+                meta.responses.map { it.message.status.code.toString() to ResponseContent(it.description, it.toSchema()) }.toMap(),
                 json { array(listOf(meta.security, contractSecurity).mapNotNull(::ref).map { this(it) }) },
                 meta.operationId
             )
@@ -145,10 +145,8 @@ class OpenApi2<out NODE : Any>(
         return nonBodyParamNodes + bodyParamNodes
     }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse() = ResponseContent(description, toSchema())
-
     private fun HttpMessageMeta<HttpMessage>.toSchema(): JsonSchema<NODE> = example
-        ?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+        ?.let { apiRenderer.toSchema(it, definitionId) }
         ?: message.bodyString().toSchema(definitionId)
 
     private fun String.toSchema(definitionId: String? = null): JsonSchema<NODE> = try {
