@@ -1,6 +1,5 @@
-package org.http4k.contract.openapi2
+package org.http4k.contract.openapi.v2
 
-import org.http4k.contract.ApiRenderer
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.HttpMessageMeta
@@ -8,8 +7,9 @@ import org.http4k.contract.PathSegments
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
-import org.http4k.contract.openapi2.RequestParameter.PrimitiveParameter
-import org.http4k.contract.openapi2.RequestParameter.SchemaParameter
+import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.v2.RequestParameter.PrimitiveParameter
+import org.http4k.contract.openapi.v2.RequestParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method

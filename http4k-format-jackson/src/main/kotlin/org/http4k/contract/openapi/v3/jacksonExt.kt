@@ -1,4 +1,4 @@
-package org.http4k.contract.openapi3
+package org.http4k.contract.openapi.v3
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.ApiInfo

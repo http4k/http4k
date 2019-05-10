@@ -1,4 +1,4 @@
-package org.http4k.contract
+package org.http4k.contract.openapi
 
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.util.JsonSchemaCreator

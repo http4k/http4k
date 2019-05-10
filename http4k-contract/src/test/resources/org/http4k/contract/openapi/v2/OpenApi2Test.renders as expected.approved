@@ -33,7 +33,7 @@
           "303": {
             "description": "See Other",
             "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi2:ArbObject1"
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1"
             }
           }
         },
@@ -63,7 +63,7 @@
             "required": true,
             "description": null,
             "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi2:ArbObject2"
+              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2"
             }
           }
         ],
@@ -546,9 +546,9 @@
         }
       }
     },
-    "urn:jsonschema:org:http4k:contract:openapi2:ArbObject2": {
+    "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2": {
       "type": "object",
-      "id": "urn:jsonschema:org:http4k:contract:openapi2:ArbObject2",
+      "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2",
       "properties": {
         "string": {
           "type": "string",
@@ -556,7 +556,7 @@
         },
         "child": {
           "type": "object",
-          "id": "urn:jsonschema:org:http4k:contract:openapi2:ArbObject1",
+          "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1",
           "properties": {
             "anotherString": {
               "type": "string",
@@ -577,9 +577,9 @@
         }
       }
     },
-    "urn:jsonschema:org:http4k:contract:openapi2:ArbObject1": {
+    "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1": {
       "type": "object",
-      "id": "urn:jsonschema:org:http4k:contract:openapi2:ArbObject1",
+      "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1",
       "properties": {
         "anotherString": {
           "type": "string",

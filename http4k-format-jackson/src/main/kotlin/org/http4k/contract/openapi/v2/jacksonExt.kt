@@ -1,9 +1,9 @@
-package org.http4k.contract.openapi2
+package org.http4k.contract.openapi.v2
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.ApiInfo
-import org.http4k.contract.ApiRenderer.Companion.Auto
 import org.http4k.contract.SecurityRenderer
+import org.http4k.contract.openapi.ApiRenderer.Companion.Auto
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.JsonErrorResponseRenderer

@@ -1,4 +1,4 @@
-package org.http4k.contract.openapi3
+package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
@@ -9,12 +9,12 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
-import org.http4k.contract.openapi3.BodyContent.FormContent
-import org.http4k.contract.openapi3.BodyContent.FormContent.FormSchema
-import org.http4k.contract.openapi3.BodyContent.NoSchema
-import org.http4k.contract.openapi3.BodyContent.SchemaContent
-import org.http4k.contract.openapi3.RequestParameter.PrimitiveParameter
-import org.http4k.contract.openapi3.RequestParameter.SchemaParameter
+import org.http4k.contract.openapi.v3.BodyContent.FormContent
+import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
+import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
+import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
+import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage
