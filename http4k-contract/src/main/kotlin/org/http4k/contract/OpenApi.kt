@@ -39,7 +39,7 @@ open class OpenApi<out NODE>(
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
-                        "paths" to obj(fields),
+                        "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
                         "definitions" to obj(definitions)
                     ))
