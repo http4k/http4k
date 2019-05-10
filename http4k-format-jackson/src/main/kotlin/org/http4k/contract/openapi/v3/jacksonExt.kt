@@ -3,6 +3,7 @@ package org.http4k.contract.openapi.v3
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.ApiInfo
 import org.http4k.contract.SecurityRenderer
+import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 import org.http4k.format.JsonErrorResponseRenderer
@@ -13,4 +14,6 @@ operator fun OpenApi3.Companion.invoke(
     json: ConfigurableJackson = Jackson,
     securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     errorResponseRenderer: JsonErrorResponseRenderer<JsonNode> = JsonErrorResponseRenderer(json)
-) = OpenApi3(apiInfo, json, JacksonJsonSchemaCreator(json), securityRenderer, errorResponseRenderer)
+) = OpenApi3(apiInfo, json,
+    ApiRenderer.Auto(json, JacksonJsonSchemaCreator(json, "components/schemas")),
+    securityRenderer, errorResponseRenderer)

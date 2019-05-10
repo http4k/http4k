@@ -9,6 +9,7 @@ import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
 import org.http4k.contract.SecurityRenderer
 import org.http4k.contract.Tag
+import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -25,15 +26,14 @@ import org.http4k.core.Method.HEAD
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.format.Json
 import org.http4k.format.JsonErrorResponseRenderer
-import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
-import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
 private typealias ApiInfo = org.http4k.contract.ApiInfo
@@ -117,15 +117,13 @@ private sealed class RequestParameter(val `in`: String, val name: String, val re
 
 class OpenApi3<out NODE : Any>(
     private val apiInfo: ApiInfo,
-    private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val jsonSchemaCreator: JsonSchemaCreator<Any, NODE>,
+    private val json: Json<NODE>,
+    private val apiRenderer: ApiRenderer<Any, NODE>,
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
 ) : ContractRenderer {
 
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
-
-    private val lens = json.autoBody<Api<NODE>>().toLens()
 
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
@@ -136,16 +134,18 @@ class OpenApi3<out NODE : Any>(
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         return Response(OK)
-            .with(lens of Api(
-                apiInfo,
-                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                paths
-                    .groupBy { it.path }
-                    .mapValues {
-                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
-                    }
-                    .toSortedMap(),
-                Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.combineFull()))
+            .with(json.body().toLens() of apiRenderer.api(
+                Api(
+                    apiInfo,
+                    routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
+                    paths
+                        .groupBy { it.path }
+                        .mapValues {
+                            it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
+                        }
+                        .toSortedMap(),
+                    Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.combineFull()))
+                )
             ))
     }
 
@@ -197,7 +197,7 @@ class OpenApi3<out NODE : Any>(
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
         val bodyString = message.bodyString()
-        val jsonSchema = example?.let { jsonSchemaCreator.toSchema(it, definitionId) }
+        val jsonSchema = example?.let { apiRenderer.toSchema(it, definitionId) }
             ?: bodyString.toSchema(definitionId)
         return SchemaContent(jsonSchema, bodyString.safeParse())
     }
