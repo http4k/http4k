@@ -23,8 +23,8 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@4aac85fa",
+        "parameters": null,
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6079cf5",
         "responses": "{}",
         "security": [
           {
@@ -42,8 +42,8 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6079cf5",
+        "parameters": null,
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@30cecdca",
         "responses": "{}",
         "security": [
           {
@@ -61,8 +61,8 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@1e6308a9",
+        "parameters": null,
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6edc4161",
         "responses": "{}",
         "security": [
           {
@@ -80,8 +80,8 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@30cecdca",
+        "parameters": null,
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@5486887b",
         "responses": "{}",
         "security": [
           {
@@ -100,7 +100,7 @@
           "tag1",
           "tag3"
         ],
-        "parameters": "null",
+        "parameters": null,
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -119,7 +119,7 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
+        "parameters": null,
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -142,7 +142,12 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@6edc4161, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5486887b, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5226e402, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1440c311]",
+        "parameters": [
+          null,
+          null,
+          null,
+          null
+        ],
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -161,7 +166,7 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
+        "parameters": null,
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -180,7 +185,10 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@189b5fb1, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@783ec989]",
+        "parameters": [
+          null,
+          null
+        ],
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -199,7 +207,7 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
+        "parameters": null,
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -218,7 +226,12 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1ddd3478, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@f973499, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@4d33940d, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@43cf6ea3]",
+        "parameters": [
+          null,
+          null,
+          null,
+          null
+        ],
         "requestBody": "null",
         "responses": "{}",
         "security": [
@@ -237,9 +250,9 @@
         "tags": [
           "/basepath"
         ],
-        "parameters": "null",
+        "parameters": null,
         "requestBody": "null",
-        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@37c5fc56}",
+        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@1440c311}",
         "security": [
           {
             "api_key": [

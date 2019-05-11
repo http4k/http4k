@@ -49,13 +49,34 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                 "summary" to string(summary),
                 "description" to (description?.let { string(it) } ?: nullNode()),
                 "tags" to (tags?.map { string(it) }?.let { array(it) } ?: nullNode()),
-                "parameters" to string(parameters.toString()),
+                "parameters" to (parameters?.map { it.asJson() }?.let { array(it) } ?: nullNode()),
                 "requestBody" to string(requestBody.toString()),
                 "responses" to string(responses.toString()),
                 "security" to (security ?: nullNode()),
                 "operationId" to (operationId?.let { string(it) } ?: nullNode())
             )
         }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun RequestParameter.asJson(): NODE = json {
+        when (this) {
+            is RequestParameter.SchemaParameter<*> -> obj(
+                "in" to string(`in`),
+                "name" to string(name),
+                "required" to boolean(required),
+                "description" to (description?.let { string(it) } ?: nullNode()),
+                "schema" to (schema as NODE ?: nullNode())
+            )
+            is RequestParameter.PrimitiveParameter<*> -> obj(
+                "in" to string(`in`),
+                "name" to string(name),
+                "required" to boolean(required),
+                "description" to (description?.let { string(it) } ?: nullNode()),
+                "schema" to schema as NODE
+            )
+            else -> nullNode()
+        }
+    }
 
     private fun Tag.asJson(): NODE =
         json {
