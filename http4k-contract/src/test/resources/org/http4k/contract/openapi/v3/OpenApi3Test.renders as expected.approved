@@ -16,6 +16,81 @@
     }
   ],
   "paths": {
+    "/basepath/bearer_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "bearerAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_auto_schema": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "content": {
+              "application/json": {
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      },
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/json": {
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
@@ -413,11 +488,20 @@
             "example": "a message of some kind"
           }
         }
+      },
+      "object-1945913032": {
+        "type": "object",
+        "properties": {
+        }
       }
     },
     "securitySchemes": {
       "basicAuth": {
         "scheme": "basic",
+        "type": "http"
+      },
+      "bearerAuth": {
+        "scheme": "bearer",
         "type": "http"
       },
       "api_key": {

@@ -12,13 +12,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.format.Jackson.auto
 
-enum class Foo {
-    bar, bing
-}
-
-data class ArbObject1(val anotherString: Foo)
-data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
-
 class OpenApi3AutoTest : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "module description"))) {
 
     override fun specificRoutes() = listOf(

@@ -162,5 +162,9 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     @Suppress("UNCHECKED_CAST")
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
-        jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId)
+        try {
+            jsonToJsonSchema.toSchema(obj as NODE, overrideDefinitionId)
+        } catch (e: ClassCastException) {
+            jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId)
+        }
 }
