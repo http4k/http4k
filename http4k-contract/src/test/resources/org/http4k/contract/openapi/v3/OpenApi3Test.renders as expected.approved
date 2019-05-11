@@ -24,7 +24,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6079cf5",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@1fb669c3",
         "responses": "{}",
         "security": [
           {
@@ -43,7 +43,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@30cecdca",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6239aba6",
         "responses": "{}",
         "security": [
           {
@@ -62,7 +62,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6edc4161",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@3e6104fc",
         "responses": "{}",
         "security": [
           {
@@ -81,7 +81,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@5486887b",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@12359a82",
         "responses": "{}",
         "security": [
           {
@@ -143,10 +143,42 @@
           "/basepath"
         ],
         "parameters": [
-          null,
-          null,
-          null,
-          null
+          {
+            "in": "header",
+            "name": "b",
+            "required": true,
+            "description": "booleanHeader",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "s",
+            "required": false,
+            "description": "stringHeader",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "description": "intHeader",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "description": "jsonHeader",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": "null",
         "responses": "{}",
@@ -186,8 +218,24 @@
           "/basepath"
         ],
         "parameters": [
-          null,
-          null
+          {
+            "in": "path",
+            "name": "firstName",
+            "required": true,
+            "description": null,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "description": null,
+            "schema": {
+              "type": "boolean"
+            }
+          }
         ],
         "requestBody": "null",
         "responses": "{}",
@@ -227,10 +275,42 @@
           "/basepath"
         ],
         "parameters": [
-          null,
-          null,
-          null,
-          null
+          {
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "description": "booleanQuery",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "s",
+            "required": false,
+            "description": "stringQuery",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "i",
+            "required": false,
+            "description": "intQuery",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "description": "jsonQuery",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": "null",
         "responses": "{}",
@@ -252,7 +332,7 @@
         ],
         "parameters": null,
         "requestBody": "null",
-        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@1440c311}",
+        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@4f3bbf68}",
         "security": [
           {
             "api_key": [

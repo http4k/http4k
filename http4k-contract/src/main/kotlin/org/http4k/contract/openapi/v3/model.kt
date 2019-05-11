@@ -24,7 +24,7 @@ data class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>?,
-    val parameters: List<RequestParameter>?,
+    val parameters: List<RequestParameter<NODE>>?,
     val requestBody: RequestContents<NODE>?,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE?,
@@ -74,11 +74,11 @@ class ResponseContents<NODE>(val description: String?, val content: Map<String, 
         .flatMap { it.definitions() }.toSet()
 }
 
-sealed class RequestParameter(val `in`: String, val name: String, val required: Boolean, val description: String?) {
-    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
+sealed class RequestParameter<NODE>(val `in`: String, val name: String, val required: Boolean, val description: String?) {
+    class SchemaParameter<NODE>(meta: Meta, private val jsonSchema: JsonSchema<NODE>?) : RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description), HasSchema<NODE> {
         val schema: NODE? = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
     }
 
-    class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) : RequestParameter(meta.location, meta.name, meta.required, meta.description)
+    class PrimitiveParameter<NODE>(meta: Meta, val schema: NODE) : RequestParameter<NODE>(meta.location, meta.name, meta.required, meta.description)
 }

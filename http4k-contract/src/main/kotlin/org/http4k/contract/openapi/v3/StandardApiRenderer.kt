@@ -3,6 +3,8 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
+import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
@@ -49,7 +51,7 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                 "summary" to string(summary),
                 "description" to (description?.let { string(it) } ?: nullNode()),
                 "tags" to (tags?.map { string(it) }?.let { array(it) } ?: nullNode()),
-                "parameters" to (parameters?.map { it.asJson() }?.let { array(it) } ?: nullNode()),
+                "parameters" to (parameters?.asJson() ?: nullNode()),
                 "requestBody" to string(requestBody.toString()),
                 "responses" to string(responses.toString()),
                 "security" to (security ?: nullNode()),
@@ -57,25 +59,31 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             )
         }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun RequestParameter.asJson(): NODE = json {
-        when (this) {
-            is RequestParameter.SchemaParameter<*> -> obj(
-                "in" to string(`in`),
-                "name" to string(name),
-                "required" to boolean(required),
-                "description" to (description?.let { string(it) } ?: nullNode()),
-                "schema" to (schema as NODE ?: nullNode())
-            )
-            is RequestParameter.PrimitiveParameter<*> -> obj(
-                "in" to string(`in`),
-                "name" to string(name),
-                "required" to boolean(required),
-                "description" to (description?.let { string(it) } ?: nullNode()),
-                "schema" to schema as NODE
-            )
-            else -> nullNode()
-        }
+    private fun List<RequestParameter<NODE>>.asJson(): NODE = json {
+        array(
+            filterIsInstance<SchemaParameter<NODE>>().map { it.asJson() }
+                + filterIsInstance<PrimitiveParameter<NODE>>().map { it.asJson() }
+        )
+    }
+
+    private fun SchemaParameter<NODE>.asJson(): NODE = json {
+        obj(
+            "in" to string(`in`),
+            "name" to string(name),
+            "required" to boolean(required),
+            "description" to (description?.let { string(it) } ?: nullNode()),
+            "schema" to (schema ?: nullNode())
+        )
+    }
+
+    private fun PrimitiveParameter<NODE>.asJson(): NODE = json {
+        obj(
+            "in" to string(`in`),
+            "name" to string(name),
+            "required" to boolean(required),
+            "description" to (description?.let { string(it) } ?: nullNode()),
+            "schema" to schema
+        )
     }
 
     private fun Tag.asJson(): NODE =
