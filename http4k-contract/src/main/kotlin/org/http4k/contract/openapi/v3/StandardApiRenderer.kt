@@ -3,6 +3,9 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.v3.BodyContent.FormContent
+import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
@@ -10,7 +13,7 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
 class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
-    private val jsonToJsonSchema = JsonToJsonSchema(json)
+    private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
 
     override fun api(api: Api<NODE>): NODE =
         with(api) {
@@ -59,17 +62,41 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             )
         }
 
-
     private fun RequestContents<NODE>.asJson(): NODE = json {
         obj("contents" to (content
             ?.map { it.key to it.value.asJson() }
             ?.let { obj(it) }.orNullNode()))
     }
 
+    @JvmName("contentAsJson")
+    private fun Map<String, BodyContent>.asJson(): NODE = json {
+        obj(
+            map {
+                it.key to (
+                    listOf(it.value).filterIsInstance<NoSchema>().map { it.toJson() } +
+                        listOf(it.value).filterIsInstance<SchemaContent<NODE>>().map { it.toJson() } +
+                        listOf(it.value).filterIsInstance<FormContent>().map { it.toJson() }
+                    ).firstOrNull().orNullNode()
+            }
+        )
+    }
+
+    private fun NoSchema.toJson(): NODE = json {
+        obj()
+    }
+
+    private fun SchemaContent<NODE>.toJson(): NODE = json {
+        obj()
+    }
+
+    private fun FormContent.toJson(): NODE = json {
+        obj()
+    }
+
     private fun ResponseContents<NODE>.asJson(): NODE = json {
         obj(
             "description" to description.asJson(),
-            "contents" to (obj(content.map { it.key to it.value.asJson() }).orNullNode()))
+            "contents" to content.asJson().orNullNode())
     }
 
     private fun BodyContent.asJson(): NODE = json {
@@ -78,7 +105,12 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     @JvmName("responseAsJson")
     private fun Map<String, ResponseContents<NODE>>.asJson(): NODE = json {
-        obj(map { it.key to it.value.asJson() })
+        obj(map {
+            it.key to
+                obj(
+                    "description" to it.value.description.asJson(),
+                    "contents" to it.value.content.asJson().orNullNode())
+        })
     }
 
     private fun List<RequestParameter<NODE>>.asJson(): NODE = json {
@@ -90,21 +122,21 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun SchemaParameter<NODE>.asJson(): NODE = json {
         obj(
+            "schema" to (schema.orNullNode()),
             "in" to string(`in`),
             "name" to string(name),
             "required" to boolean(required),
-            "description" to (description.asJson()),
-            "schema" to (schema.orNullNode())
+            "description" to (description.asJson())
         )
     }
 
     private fun PrimitiveParameter<NODE>.asJson(): NODE = json {
         obj(
+            "schema" to schema,
             "in" to string(`in`),
             "name" to string(name),
             "required" to boolean(required),
-            "description" to (description?.let { string(it) }.orNullNode()),
-            "schema" to schema
+            "description" to (description?.let { string(it) }.orNullNode())
         )
     }
 
