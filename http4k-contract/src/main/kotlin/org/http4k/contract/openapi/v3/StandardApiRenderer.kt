@@ -47,7 +47,6 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             )
         }
 
-
     private fun ApiPath<NODE>.toJson(): NODE =
         json {
             obj(
