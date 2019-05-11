@@ -14,6 +14,8 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
         with(api) {
             json {
                 obj(
+                    "openapi" to string(openapi),
+                    "info" to info.asJson()
                 )
             }
         }

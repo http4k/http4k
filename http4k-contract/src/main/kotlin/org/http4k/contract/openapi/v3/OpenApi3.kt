@@ -35,12 +35,11 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
-
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val apiRenderer: ApiRenderer<Api<NODE>, NODE>,
-    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v3.SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
 

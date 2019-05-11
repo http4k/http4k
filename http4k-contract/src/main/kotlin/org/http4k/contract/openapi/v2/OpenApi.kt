@@ -9,6 +9,7 @@ import org.http4k.contract.PathSegments
 import org.http4k.contract.Security
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -25,7 +26,7 @@ import org.http4k.util.JsonToJsonSchema
 open class OpenApi<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val securityRenderer: org.http4k.contract.openapi.SecurityRenderer = SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {

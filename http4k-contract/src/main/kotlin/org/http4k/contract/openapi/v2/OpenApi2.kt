@@ -80,7 +80,7 @@ class OpenApi2<out NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val apiRenderer: ApiRenderer<Any, NODE>,
-    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v2.SecurityRenderer,
+    private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
 
