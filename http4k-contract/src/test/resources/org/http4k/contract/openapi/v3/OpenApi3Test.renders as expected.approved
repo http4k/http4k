@@ -14,5 +14,32 @@
       "description": null,
       "name": "tag3"
     }
-  ]
+  ],
+  "paths": {
+    "/basepath/body_form": {
+    },
+    "/basepath/body_json_noschema": {
+    },
+    "/basepath/body_json_schema": {
+    },
+    "/basepath/body_string": {
+    },
+    "/basepath/descriptions": {
+    },
+    "/basepath/extra_security": {
+    },
+    "/basepath/headers": {
+    },
+    "/basepath/nometa": {
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}": {
+    },
+    "/basepath/produces_and_consumes": {
+    },
+    "/basepath/queries": {
+    },
+    "/basepath/returning": {
+    }
+  },
+  "components": "Components(schemas={\"object1482787387\":{\"type\":\"object\",\"properties\":{\"aNumberField\":{\"type\":\"integer\",\"example\":123}}},\"someDefinitionId\":{\"type\":\"object\",\"properties\":{\"anAnotherObject\":{\"$ref\":\"#/definitions/object1482787387\"}}},\"object-1662053258\":{\"type\":\"object\",\"properties\":{\"aString\":{\"type\":\"string\",\"example\":\"a message of some kind\"}}}}, securitySchemes={\"basicAuth\":{\"scheme\":\"basic\",\"type\":\"http\"},\"api_key\":{\"type\":\"apiKey\",\"in\":\"query\",\"name\":\"the_api_key\"}})"
 }

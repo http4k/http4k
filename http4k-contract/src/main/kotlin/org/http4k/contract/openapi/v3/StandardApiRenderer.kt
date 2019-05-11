@@ -16,10 +16,22 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                 obj(
                     "openapi" to string(openapi),
                     "info" to info.asJson(),
-                    "tags" to array(api.tags.map { it.asJson() })
+                    "tags" to array(tags.map { it.asJson() }),
+                    "paths" to paths.asJson(),
+                    "components" to string(components.toString())
                 )
             }
         }
+
+    private fun Map<String, Map<String, ApiPath<NODE>>>.asJson(): NODE =
+        json {
+            obj(map { it.key to obj() }.sortedBy { it.first })
+        }
+
+//    private fun Map<String, ApiPath<NODE>>.asJson(): NODE =
+//        json {
+//            obj(map { it.key to obj() }.sortedBy { it.first })
+//        }
 
     private fun Tag.asJson(): NODE =
         json {
@@ -34,11 +46,6 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
     private fun ApiInfo.asJson() = json {
         obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
     }
-
-    private fun Map<String, ApiPath<NODE>>.asJson(): NODE =
-        json {
-            obj(map { it.key to obj() }.sortedBy { it.first })
-        }
 
     @Suppress("UNCHECKED_CAST")
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
