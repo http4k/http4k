@@ -28,7 +28,8 @@
           "content": {
             "application/x-www-form-urlencoded": {
             }
-          }
+          },
+          "required": true
         },
         "responses": {
         },
@@ -53,7 +54,8 @@
           "content": {
             "application/json": {
             }
-          }
+          },
+          "required": true
         },
         "responses": {
         },
@@ -78,7 +80,8 @@
           "content": {
             "application/json": {
             }
-          }
+          },
+          "required": true
         },
         "responses": {
         },
@@ -103,7 +106,8 @@
           "content": {
             "text/plain": {
             }
-          }
+          },
+          "required": true
         },
         "responses": {
         },
