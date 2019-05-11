@@ -102,19 +102,9 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                         it.key to obj(it.value.map { it.key to it.value.asJson() })
                     }
                 ),
-                "required" to boolean(true) // fix this
+                "required" to array(schema.required.map { it.asJson() })
             )
         )
-    }
-
-    private fun ResponseContents<NODE>.asJson(): NODE = json {
-        obj(
-            "description" to description.asJson(),
-            "contents" to content.asJson().orNullNode())
-    }
-
-    private fun BodyContent.asJson(): NODE = json {
-        obj()
     }
 
     @JvmName("responseAsJson")

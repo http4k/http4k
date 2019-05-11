@@ -141,7 +141,10 @@
                     "description": "jsonField"
                   }
                 },
-                "required": true
+                "required": [
+                  "b",
+                  "j"
+                ]
               }
             }
           },
