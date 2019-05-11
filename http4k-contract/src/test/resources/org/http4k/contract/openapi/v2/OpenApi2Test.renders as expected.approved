@@ -1,90 +1,26 @@
 {
+  "swagger": "2.0",
   "info": {
     "title": "title",
     "version": "1.2",
     "description": "module description"
   },
+  "basePath": "/",
   "tags": [
     {
-      "name": "tag1",
-      "description": null
+      "name": "tag1"
     },
     {
-      "name": "tag3",
-      "description": null
+      "name": "tag3"
     }
   ],
   "paths": {
-    "/basepath/body_auto_schema": {
-      "get": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "303": {
-            "description": "See Other",
-            "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1"
-            }
-          }
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": null
-      },
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "produces": [
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "description": null,
-            "schema": {
-              "$ref": "#/definitions/urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2"
-            }
-          }
-        ],
-        "responses": {
-        },
-        "security": [
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": null
-      }
-    },
     "/basepath/body_form": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -95,29 +31,29 @@
             "in": "formData",
             "name": "b",
             "required": true,
-            "description": "booleanField",
-            "type": "boolean"
+            "type": "boolean",
+            "description": "booleanField"
           },
           {
             "in": "formData",
             "name": "i",
             "required": false,
-            "description": "intField",
-            "type": "integer"
+            "type": "integer",
+            "description": "intField"
           },
           {
             "in": "formData",
             "name": "s",
             "required": false,
-            "description": "stringField",
-            "type": "string"
+            "type": "string",
+            "description": "stringField"
           },
           {
             "in": "formData",
             "name": "j",
             "required": true,
-            "description": "jsonField",
-            "type": "string"
+            "type": "string",
+            "description": "jsonField"
           }
         ],
         "responses": {
@@ -127,17 +63,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/body_json_noschema": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -148,9 +82,8 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "description": "json",
-            "schema": {
-            }
+            "schema": null,
+            "description": "json"
           }
         ],
         "responses": {
@@ -160,17 +93,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/body_json_schema": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -181,10 +112,10 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "description": "json",
             "schema": {
               "$ref": "#/definitions/someDefinitionId"
-            }
+            },
+            "description": "json"
           }
         ],
         "responses": {
@@ -194,17 +125,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/body_string": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -215,8 +144,9 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "description": null,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -226,18 +156,17 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/descriptions": {
       "get": {
-        "summary": "endpoint",
-        "description": "some rambling description of what this thing actually does",
         "tags": [
           "tag1",
           "tag3"
         ],
+        "summary": "endpoint",
+        "operationId": "echoMessage",
         "produces": [
         ],
         "consumes": [
@@ -252,16 +181,15 @@
             ]
           }
         ],
-        "operationId": "echoMessage"
+        "description": "some rambling description of what this thing actually does"
       }
     },
     "/basepath/extra_security": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -279,17 +207,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/headers": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -299,29 +225,29 @@
             "in": "header",
             "name": "b",
             "required": true,
-            "description": "booleanHeader",
-            "type": "boolean"
+            "type": "boolean",
+            "description": "booleanHeader"
           },
           {
             "in": "header",
             "name": "s",
             "required": false,
-            "description": "stringHeader",
-            "type": "string"
+            "type": "string",
+            "description": "stringHeader"
           },
           {
             "in": "header",
             "name": "i",
             "required": false,
-            "description": "intHeader",
-            "type": "integer"
+            "type": "integer",
+            "description": "intHeader"
           },
           {
             "in": "header",
             "name": "j",
             "required": false,
-            "description": "jsonHeader",
-            "type": "string"
+            "type": "string",
+            "description": "jsonHeader"
           }
         ],
         "responses": {
@@ -331,17 +257,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/nometa": {
       "get": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -355,17 +279,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -375,14 +297,12 @@
             "in": "path",
             "name": "firstName",
             "required": true,
-            "description": null,
             "type": "string"
           },
           {
             "in": "path",
             "name": "age",
             "required": true,
-            "description": null,
             "type": "boolean"
           }
         ],
@@ -393,17 +313,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/produces_and_consumes": {
       "get": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
           "application/json",
           "application/xml"
@@ -421,17 +339,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/queries": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
         ],
         "consumes": [
@@ -441,29 +357,29 @@
             "in": "query",
             "name": "b",
             "required": true,
-            "description": "booleanQuery",
-            "type": "boolean"
+            "type": "boolean",
+            "description": "booleanQuery"
           },
           {
             "in": "query",
             "name": "s",
             "required": false,
-            "description": "stringQuery",
-            "type": "string"
+            "type": "string",
+            "description": "stringQuery"
           },
           {
             "in": "query",
             "name": "i",
             "required": false,
-            "description": "intQuery",
-            "type": "integer"
+            "type": "integer",
+            "description": "intQuery"
           },
           {
             "in": "query",
             "name": "j",
             "required": false,
-            "description": "jsonQuery",
-            "type": "string"
+            "type": "string",
+            "description": "jsonQuery"
           }
         ],
         "responses": {
@@ -473,17 +389,15 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     },
     "/basepath/returning": {
       "post": {
-        "summary": "<unknown>",
-        "description": null,
         "tags": [
           "/basepath"
         ],
+        "summary": "<unknown>",
         "produces": [
           "application/json"
         ],
@@ -504,22 +418,30 @@
             "api_key": [
             ]
           }
-        ],
-        "operationId": null
+        ]
       }
     }
   },
   "securityDefinitions": {
-    "basicAuth": {
-      "type": "basic"
-    },
     "api_key": {
       "type": "apiKey",
       "in": "query",
       "name": "the_api_key"
+    },
+    "basicAuth": {
+      "type": "basic"
     }
   },
   "definitions": {
+    "object-1662053258": {
+      "type": "object",
+      "properties": {
+        "aString": {
+          "type": "string",
+          "example": "a message of some kind"
+        }
+      }
+    },
     "object1482787387": {
       "type": "object",
       "properties": {
@@ -536,58 +458,6 @@
           "$ref": "#/definitions/object1482787387"
         }
       }
-    },
-    "object-1662053258": {
-      "type": "object",
-      "properties": {
-        "aString": {
-          "type": "string",
-          "example": "a message of some kind"
-        }
-      }
-    },
-    "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2": {
-      "type": "object",
-      "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject2",
-      "properties": {
-        "string": {
-          "type": "string",
-          "required": true
-        },
-        "child": {
-          "type": "object",
-          "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1",
-          "properties": {
-            "anotherString": {
-              "type": "string",
-              "required": true
-            }
-          }
-        },
-        "numbers": {
-          "type": "array",
-          "required": true,
-          "items": {
-            "type": "integer"
-          }
-        },
-        "bool": {
-          "type": "boolean",
-          "required": true
-        }
-      }
-    },
-    "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1": {
-      "type": "object",
-      "id": "urn:jsonschema:org:http4k:contract:openapi:v2:ArbObject1",
-      "properties": {
-        "anotherString": {
-          "type": "string",
-          "required": true
-        }
-      }
     }
-  },
-  "swagger": "2.0",
-  "basePath": "/"
+  }
 }

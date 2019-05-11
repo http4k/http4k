@@ -10,7 +10,7 @@ import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.v2.OpenApi
+import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
@@ -85,7 +85,7 @@ val mySecurity = ApiKeySecurity(Query.int().required("api"), { it == 42 })
 // Combine the Routes into a contract and bind to a context, defining a renderer (in this example
 // OpenApi/Swagger) and a security model (in this case an API-Key):
 val contract = contract {
-    renderer = OpenApi(ApiInfo("My great API", "v1.0"), Jackson)
+    renderer = OpenApi3(ApiInfo("My great API", "v1.0"), Jackson)
     descriptionPath = "/swagger.json"
     security = mySecurity
     routes += greetRoute()

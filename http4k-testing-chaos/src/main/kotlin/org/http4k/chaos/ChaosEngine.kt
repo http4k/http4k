@@ -8,7 +8,7 @@ import org.http4k.contract.Security
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.v2.OpenApi
+import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -90,7 +90,7 @@ object ChaosEngine {
             Cors(corsPolicy)
                 .then(
                     contract {
-                        renderer = OpenApi(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
+                        renderer = OpenApi3(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {

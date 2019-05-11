@@ -1,7 +1,7 @@
 package org.http4k.contract
 
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.v2.OpenApi
+import org.http4k.contract.openapi.v2.OpenApi2
 import org.http4k.contract.simple.SimpleJson
 
 @Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.simple.SimpleJson"))
@@ -11,7 +11,7 @@ typealias SimpleJson<NODE> = SimpleJson<NODE>
 typealias ApiInfo = ApiInfo
 
 @Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.openapi.v2.OpenApi"))
-typealias OpenApi<NODE> = OpenApi<NODE>
+typealias OpenApi<NODE> = OpenApi2<NODE>
 
 @Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList() }", ReplaceWith("BROKEN! use example"))
 fun contract(vararg serverRoutes: ContractRoute) = contract {
