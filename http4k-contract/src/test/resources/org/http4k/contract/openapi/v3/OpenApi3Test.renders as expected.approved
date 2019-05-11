@@ -54,6 +54,12 @@
             "description": "See Other",
             "content": {
               "application/json": {
+                "example": {
+                  "anotherString": "bing"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-1945913032"
+                }
               }
             }
           }
@@ -447,6 +453,12 @@
             "description": "no way jose",
             "content": {
               "application/json": {
+                "example": {
+                  "aString": "a message of some kind"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-1662053258"
+                }
               }
             }
           }

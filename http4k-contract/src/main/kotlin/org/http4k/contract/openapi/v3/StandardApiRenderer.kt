@@ -65,7 +65,7 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
     private fun RequestContents<NODE>.asJson(): NODE = json {
         obj(
             "content" to (content
-            ?.map { it.key to it.value.asJson() }
+                ?.map { it.key to it.value.asJson() }
                 ?.let { obj(it) }.orNullNode()),
             "required" to boolean(true)
         )
@@ -85,15 +85,28 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
     }
 
     private fun NoSchema.toJson(): NODE = json {
-        obj()
+        obj("schema" to obj(schema.map { it.key to string(it.value) }))
     }
 
     private fun SchemaContent<NODE>.toJson(): NODE = json {
-        obj()
+        obj(
+            "example" to example.orNullNode(),
+            "schema" to schema.orNullNode()
+        )
     }
 
     private fun FormContent.toJson(): NODE = json {
-        obj()
+        obj("schema" to
+            obj(
+                "type" to string("object"),
+                "properties" to obj(
+                    schema.properties.map {
+                        it.key to obj(it.value.map { it.key to it.value.asJson() })
+                    }
+                ),
+                "required" to boolean(true) // fix this
+            )
+        )
     }
 
     private fun ResponseContents<NODE>.asJson(): NODE = json {
