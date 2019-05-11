@@ -32,13 +32,21 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun Map<String, Map<String, ApiPath<NODE>>>.asJson(): NODE =
         json {
-            obj(map { it.key to obj() }.sortedBy { it.first })
+            obj(
+                map {
+                    it.key to obj(
+                        it.value
+                            .map { it.key to it.value.toJson() }.sortedBy { it.first }
+                    )
+                }.sortedBy { it.first }
+            )
         }
 
-//    private fun Map<String, ApiPath<NODE>>.asJson(): NODE =
-//        json {
-//            obj(map { it.key to obj() }.sortedBy { it.first })
-//        }
+
+    private fun ApiPath<NODE>.toJson(): NODE =
+        json {
+            nullNode()
+        }
 
     private fun Tag.asJson(): NODE =
         json {
