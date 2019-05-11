@@ -5,12 +5,12 @@ package guide.modules.contracts
 
 import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.ContractRoute
-import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v2.OpenApi
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler

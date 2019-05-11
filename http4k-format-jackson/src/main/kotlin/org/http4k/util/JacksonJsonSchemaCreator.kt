@@ -8,6 +8,7 @@ import org.http4k.format.Jackson
 class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
                                private val refPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<Any, JsonNode> {
+
     private val jsonToJsonSchema = JsonToJsonSchema(json, refPrefix)
     private val jsonSchemaGenerator = JsonSchemaGenerator(json.mapper)
 

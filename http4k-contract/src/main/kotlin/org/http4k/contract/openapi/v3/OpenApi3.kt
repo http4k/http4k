@@ -2,7 +2,9 @@ package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.ContractRenderer
 import org.http4k.contract.ContractRoute
+import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.HttpMessageMeta
+import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.Security
@@ -27,8 +29,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.format.JsonErrorResponseRenderer
-import org.http4k.lens.Failure
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -41,16 +41,12 @@ class OpenApi3<NODE : Any>(
     private val json: Json<NODE>,
     private val apiRenderer: ApiRenderer<Api<NODE>, NODE>,
     private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v3.SecurityRenderer,
-    private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
-) : ContractRenderer {
+    private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
+) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
 
     constructor(apiInfo: ApiInfo, json: Json<NODE>) : this(apiInfo, json, StandardApiRenderer<NODE>(json))
 
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
-
-    override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
-
-    override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + security

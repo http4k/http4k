@@ -13,8 +13,6 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
-import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
-import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings
 import org.http4k.websocket.WsMessage
@@ -85,8 +83,5 @@ class JacksonTest : JsonContract<JsonNode>(Jackson) {
 }"""
 }
 
-class JacksonJsonErrorResponseRendererTest : JsonErrorResponseRendererContract<JsonNode>(Jackson)
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode>(Jackson)
-class JacksonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonNode>(Jackson)
-class JacksonManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonNode>(Jackson)
 

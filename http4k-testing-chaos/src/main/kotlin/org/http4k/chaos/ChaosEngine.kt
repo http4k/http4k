@@ -4,11 +4,11 @@ import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.contract.NoSecurity
-import org.http4k.contract.OpenApi
 import org.http4k.contract.Security
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v2.OpenApi
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -140,19 +140,3 @@ fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
     return routes(ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
 }
-
-@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
-fun RoutingHttpHandler.withChaosControls(stage: Stage = Wait,
-                                         security: Security = NoSecurity,
-                                         controlsPath: String = "/chaos",
-                                         openApiPath: String = "",
-                                         corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
-
-@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
-fun HttpHandler.withChaosControls(stage: Stage = Wait,
-                                  security: Security = NoSecurity,
-                                  controlsPath: String = "/chaos",
-                                  openApiPath: String = "",
-                                  corsPolicy: CorsPolicy = UnsafeGlobalPermissive) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
-

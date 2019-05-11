@@ -1,39 +1,42 @@
-package org.http4k.contract
+package org.http4k.contract.openapi.v2
 
+import org.http4k.contract.ContractRenderer
+import org.http4k.contract.ContractRoute
+import org.http4k.contract.ErrorResponseRenderer
+import org.http4k.contract.HttpMessageMeta
+import org.http4k.contract.JsonErrorResponseRenderer
+import org.http4k.contract.PathSegments
+import org.http4k.contract.Security
+import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
-import org.http4k.contract.openapi.SecurityRenderer
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.format.JsonErrorResponseRenderer
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
-import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
-typealias ApiInfo = ApiInfo
-
 open class OpenApi<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val securityRenderer: SecurityRenderer = org.http4k.contract.openapi.v2.SecurityRenderer,
+    private val securityRenderer: org.http4k.contract.openapi.SecurityRenderer = SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
-    private val errorResponseRenderer: JsonErrorResponseRenderer<NODE> = JsonErrorResponseRenderer(json)
-) : ContractRenderer {
+    private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
+) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {
     override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
 
     override fun notFound() = errorResponseRenderer.notFound()
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
-            Response(OK)
-                .with(CONTENT_TYPE of APPLICATION_JSON)
+            Response(Status.OK)
+                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
                     pretty(obj(
                         "swagger" to string("2.0"),
@@ -67,7 +70,7 @@ open class OpenApi<out NODE>(
                 "in" to string(meta.location),
                 "name" to string(meta.name),
                 "required" to boolean(meta.required),
-                when (ObjectParam) {
+                when (ParamMeta.ObjectParam) {
                     meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
                     else -> "type" to string(meta.paramMeta.value)
                 }
@@ -92,7 +95,7 @@ open class OpenApi<out NODE>(
         : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
-        val schema = route.meta.requests.find { Header.CONTENT_TYPE(it.message) == APPLICATION_JSON }?.asSchema()
+        val schema = route.meta.requests.find { Header.CONTENT_TYPE(it.message) == ContentType.APPLICATION_JSON }?.asSchema()
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 

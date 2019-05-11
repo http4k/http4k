@@ -1,17 +1,23 @@
-package org.http4k.format
+package org.http4k.contract
 
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
+import org.http4k.format.Json
 import org.http4k.lens.Failure
-import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Header
 
-class JsonErrorResponseRenderer<out NODE>(private val json: Json<NODE>) {
-    fun badRequest(failures: List<Failure>) =
+interface ErrorResponseRenderer {
+    fun badRequest(failures: List<Failure>) = Response(BAD_REQUEST)
+    fun notFound() = Response(NOT_FOUND)
+}
+
+class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorResponseRenderer {
+    override fun badRequest(failures: List<Failure>) =
         Response(BAD_REQUEST)
-            .with(CONTENT_TYPE of APPLICATION_JSON)
+            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
             .body(
                 json {
                     compact(
@@ -26,7 +32,7 @@ class JsonErrorResponseRenderer<out NODE>(private val json: Json<NODE>) {
                             })))
                 })
 
-    fun notFound(): Response = Response(NOT_FOUND)
+    override fun notFound(): Response = Response(NOT_FOUND)
         .body(json {
             compact(
                 obj("message" to string("No route found on this path. Have you used the correct HTTP verb?")))
