@@ -64,9 +64,7 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun RequestContents<NODE>.asJson(): NODE = json {
         obj(
-            "content" to (content
-                ?.map { it.key to it.value.asJson() }
-                ?.let { obj(it) }.orNullNode()),
+            "content" to content?.asJson().orNullNode(),
             "required" to boolean(true)
         )
     }
