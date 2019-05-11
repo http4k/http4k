@@ -25,7 +25,7 @@
         ],
         "parameters": null,
         "requestBody": {
-          "contents": {
+          "content": {
             "application/x-www-form-urlencoded": {
             }
           }
@@ -50,7 +50,7 @@
         ],
         "parameters": null,
         "requestBody": {
-          "contents": {
+          "content": {
             "application/json": {
             }
           }
@@ -75,7 +75,7 @@
         ],
         "parameters": null,
         "requestBody": {
-          "contents": {
+          "content": {
             "application/json": {
             }
           }
@@ -100,7 +100,7 @@
         ],
         "parameters": null,
         "requestBody": {
-          "contents": {
+          "content": {
             "text/plain": {
             }
           }
@@ -366,7 +366,7 @@
         "responses": {
           "403": {
             "description": "no way jose",
-            "contents": {
+            "content": {
               "application/json": {
               }
             }
