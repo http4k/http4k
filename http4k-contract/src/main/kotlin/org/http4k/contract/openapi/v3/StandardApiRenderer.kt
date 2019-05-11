@@ -45,7 +45,16 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun ApiPath<NODE>.toJson(): NODE =
         json {
-            nullNode()
+            obj(
+                "summary" to string(summary),
+                "description" to (description?.let { string(it) } ?: nullNode()),
+                "tags" to (tags?.map { string(it) }?.let { array(it) } ?: nullNode()),
+                "parameters" to string(parameters.toString()),
+                "requestBody" to string(requestBody.toString()),
+                "responses" to string(responses.toString()),
+                "security" to (security ?: nullNode()),
+                "operationId" to (operationId?.let { string(it) } ?: nullNode())
+            )
         }
 
     private fun Tag.asJson(): NODE =

@@ -16,18 +16,239 @@
     }
   ],
   "paths": {
-    "/basepath/body_form": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=org.http4k.contract.openapi.v3.RequestContents@1917d90f, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/body_json_noschema": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=org.http4k.contract.openapi.v3.RequestContents@66bfd864, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/body_json_schema": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=org.http4k.contract.openapi.v3.RequestContents@4aac85fa, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/body_string": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=org.http4k.contract.openapi.v3.RequestContents@21fff664, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/descriptions": "{get=ApiPath(summary=endpoint, description=some rambling description of what this thing actually does, tags=[tag1, tag3], parameters=null, requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=echoMessage)}",
-    "/basepath/extra_security": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=null, responses={}, security=[{\"basicAuth\":[]},{\"api_key\":[]}], operationId=null)}",
-    "/basepath/headers": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@6079cf5, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1e6308a9, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@30cecdca, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@6edc4161], requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/nometa": "{get=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/paths/{firstName}/bertrand/{age}": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5486887b, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5226e402], requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/produces_and_consumes": "{get=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/queries": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1440c311, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@189b5fb1, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@783ec989, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1ddd3478], requestBody=null, responses={}, security=[{\"api_key\":[]}], operationId=null)}",
-    "/basepath/returning": "{post=ApiPath(summary=<unknown>, description=null, tags=[/basepath], parameters=null, requestBody=null, responses={403=org.http4k.contract.openapi.v3.ResponseContents@f973499}, security=[{\"api_key\":[]}], operationId=null)}"
+    "/basepath/body_form": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@4aac85fa",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_noschema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6079cf5",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@1e6308a9",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_string": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@30cecdca",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/descriptions": {
+      "get": {
+        "summary": "endpoint",
+        "description": "some rambling description of what this thing actually does",
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "parameters": "null",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "echoMessage"
+      }
+    },
+    "/basepath/extra_security": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/headers": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@6edc4161, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5486887b, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@5226e402, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1440c311]",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/nometa": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@189b5fb1, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@783ec989]",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/produces_and_consumes": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/queries": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "[org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@1ddd3478, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@f973499, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@4d33940d, org.http4k.contract.openapi.v3.RequestParameter$PrimitiveParameter@43cf6ea3]",
+        "requestBody": "null",
+        "responses": "{}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/returning": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": "null",
+        "requestBody": "null",
+        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@37c5fc56}",
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    }
   },
   "components": {
     "schemas": {
