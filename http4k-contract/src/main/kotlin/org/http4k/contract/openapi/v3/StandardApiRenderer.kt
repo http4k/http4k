@@ -18,10 +18,16 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                     "info" to info.asJson(),
                     "tags" to array(tags.map { it.asJson() }),
                     "paths" to paths.asJson(),
-                    "components" to string(components.toString())
+                    "components" to components.asJson()
                 )
             }
         }
+
+    private fun Components<NODE>.asJson() = json {
+        obj(
+            "securitySchemes" to securitySchemes
+        )
+    }
 
     private fun Map<String, Map<String, ApiPath<NODE>>>.asJson(): NODE =
         json {
