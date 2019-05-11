@@ -15,7 +15,8 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             json {
                 obj(
                     "openapi" to string(openapi),
-                    "info" to info.asJson()
+                    "info" to info.asJson(),
+                    "tags" to array(api.tags.map { it.asJson() })
                 )
             }
         }
@@ -24,7 +25,7 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
         json {
             obj(
                 listOf(
-                    "description" to (description!!.let { json.string(it) }),
+                    "description" to (description?.let { json.string(it) } ?: nullNode()),
                     "name" to string(name)
                 )
             )

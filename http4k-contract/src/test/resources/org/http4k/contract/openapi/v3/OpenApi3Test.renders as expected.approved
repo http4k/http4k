@@ -4,5 +4,15 @@
     "title": "title",
     "version": "1.2",
     "description": "module description"
-  }
+  },
+  "tags": [
+    {
+      "description": null,
+      "name": "tag1"
+    },
+    {
+      "description": null,
+      "name": "tag3"
+    }
+  ]
 }
