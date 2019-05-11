@@ -42,6 +42,34 @@
     }
   },
   "components": {
+    "schemas": {
+      "object1482787387": {
+        "type": "object",
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
+      "someDefinitionId": {
+        "type": "object",
+        "properties": {
+          "anAnotherObject": {
+            "$ref": "#/definitions/object1482787387"
+          }
+        }
+      },
+      "object-1662053258": {
+        "type": "object",
+        "properties": {
+          "aString": {
+            "type": "string",
+            "example": "a message of some kind"
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "basicAuth": {
         "scheme": "basic",

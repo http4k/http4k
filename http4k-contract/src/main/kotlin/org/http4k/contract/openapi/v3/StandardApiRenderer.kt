@@ -25,6 +25,7 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun Components<NODE>.asJson() = json {
         obj(
+            "schemas" to schemas,
             "securitySchemes" to securitySchemes
         )
     }
