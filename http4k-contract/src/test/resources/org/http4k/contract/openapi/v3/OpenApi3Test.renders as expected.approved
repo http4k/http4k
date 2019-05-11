@@ -7,12 +7,12 @@
   },
   "tags": [
     {
-      "description": null,
-      "name": "tag1"
+      "name": "tag1",
+      "description": null
     },
     {
-      "description": null,
-      "name": "tag3"
+      "name": "tag3",
+      "description": null
     }
   ],
   "paths": {
@@ -24,7 +24,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@1fb669c3",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@338c99c8",
         "responses": "{}",
         "security": [
           {
@@ -43,7 +43,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@6239aba6",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@58ce9668",
         "responses": "{}",
         "security": [
           {
@@ -62,7 +62,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@3e6104fc",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@172b013",
         "responses": "{}",
         "security": [
           {
@@ -81,7 +81,7 @@
           "/basepath"
         ],
         "parameters": null,
-        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@12359a82",
+        "requestBody": "org.http4k.contract.openapi.v3.RequestContents@56673b2c",
         "responses": "{}",
         "security": [
           {
@@ -332,7 +332,7 @@
         ],
         "parameters": null,
         "requestBody": "null",
-        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@4f3bbf68}",
+        "responses": "{403=org.http4k.contract.openapi.v3.ResponseContents@70f02c32}",
         "security": [
           {
             "api_key": [

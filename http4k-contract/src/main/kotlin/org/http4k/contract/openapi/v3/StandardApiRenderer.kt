@@ -90,8 +90,8 @@ class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
         json {
             obj(
                 listOf(
-                    "description" to (description?.let { json.string(it) } ?: nullNode()),
-                    "name" to string(name)
+                    "name" to string(name),
+                    "description" to (description?.let { json.string(it) } ?: nullNode())
                 )
             )
         }
