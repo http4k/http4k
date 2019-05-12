@@ -38,8 +38,8 @@ import org.http4k.util.JsonToJsonSchema
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = StandardApiRenderer(json),
-    private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
+    private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = OpenApi3ApiRenderer(json),
+    private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
 

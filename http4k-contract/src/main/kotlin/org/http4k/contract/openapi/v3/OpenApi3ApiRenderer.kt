@@ -12,7 +12,7 @@ import org.http4k.format.Json
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
-class StandardApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
+class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
     private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
 
     override fun api(api: Api<NODE>): NODE =

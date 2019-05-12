@@ -26,7 +26,7 @@ import org.http4k.util.JsonToJsonSchema
 open class OpenApi2<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
+    private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {
