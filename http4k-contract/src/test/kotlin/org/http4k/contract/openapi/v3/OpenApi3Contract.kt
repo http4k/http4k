@@ -1,5 +1,6 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.BearerAuthSecurity
 import org.http4k.contract.ContractRendererContract
 import org.http4k.contract.meta
@@ -9,9 +10,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.format.Jackson
 import org.http4k.format.Jackson.auto
 
-abstract class OpenApi3Contract<NODE : Any>(openApi3: OpenApi3<NODE>) : ContractRendererContract(openApi3) {
+abstract class OpenApi3Contract<NODE : Any>(openApi3: OpenApi3<NODE>) : ContractRendererContract<JsonNode>(Jackson, openApi3) {
     override fun specificRoutes() = listOf(
         "/body_auto_schema" meta {
             receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
