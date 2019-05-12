@@ -3,7 +3,6 @@ package guide.modules.contracts
 // for this example we're using Jackson - note that the auto method imported is an extension
 // function that is defined on the Jackson instance
 
-import org.http4k.contract.ApiKeySecurity
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bind
 import org.http4k.contract.contract
@@ -11,6 +10,7 @@ import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
+import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler

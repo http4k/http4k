@@ -1,6 +1,8 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion.All
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.NoOp

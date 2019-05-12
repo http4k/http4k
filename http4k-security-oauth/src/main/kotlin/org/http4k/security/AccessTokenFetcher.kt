@@ -8,7 +8,6 @@ import org.http4k.core.Status
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.with
-import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.security.openid.IdTokenContainer
 
@@ -18,7 +17,7 @@ class AccessTokenFetcher(
     private val providerConfig: OAuthProviderConfig
 ) {
     fun fetch(code: String): AccessTokenDetails? = api(Request(POST, providerConfig.tokenPath)
-        .with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
+        .with(CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
         .form("grant_type", "authorization_code")
         .form("redirect_uri", callbackUri.toString())
         .form("client_id", providerConfig.credentials.user)

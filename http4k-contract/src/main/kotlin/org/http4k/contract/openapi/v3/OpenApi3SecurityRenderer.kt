@@ -1,12 +1,12 @@
 package org.http4k.contract.openapi.v3
 
-import org.http4k.contract.ApiKeySecurity
-import org.http4k.contract.BasicAuthSecurity
-import org.http4k.contract.BearerAuthSecurity
-import org.http4k.contract.NoSecurity
-import org.http4k.contract.Security
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 
 object OpenApi3SecurityRenderer : SecurityRenderer {
     override fun <NODE> full(security: Security): Render<NODE>? =

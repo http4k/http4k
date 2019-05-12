@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.Security
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND

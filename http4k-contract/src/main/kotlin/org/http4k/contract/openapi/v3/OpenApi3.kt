@@ -7,7 +7,6 @@ import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.RouteMeta
-import org.http4k.contract.Security
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.Render
@@ -18,6 +17,7 @@ import org.http4k.contract.openapi.v3.BodyContent.NoSchema
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
+import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpMessage

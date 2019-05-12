@@ -2,6 +2,7 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request

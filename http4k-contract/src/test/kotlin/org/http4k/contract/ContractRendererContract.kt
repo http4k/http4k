@@ -2,6 +2,8 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON

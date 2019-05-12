@@ -2,6 +2,10 @@ package org.http4k.contract
 
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v2.OpenApi2
+import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.contract.simple.SimpleJson
 
 @Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.simple.SimpleJson"))
@@ -42,5 +46,11 @@ fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = 
     this.routes += serverRoutes.toList()
 }
 
-@Deprecated("Renamed", ReplaceWith("ApiKeySecurity<T>"))
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.ApiKeySecurity<T>"))
 typealias ApiKey<T> = ApiKeySecurity<T>
+
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.Security"))
+typealias Security = Security
+
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.BasicAuthSecurity"))
+typealias BasicAuthSecurity = BasicAuthSecurity

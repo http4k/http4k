@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET

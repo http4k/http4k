@@ -1,7 +1,7 @@
 package org.http4k.chaos
 
-import org.http4k.contract.NoSecurity
-import org.http4k.contract.Security
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.HttpHandler
 import org.http4k.filter.CorsPolicy
 import org.http4k.routing.RoutingHttpHandler

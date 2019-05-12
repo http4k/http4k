@@ -6,10 +6,10 @@ import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
-import org.http4k.contract.Security
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status

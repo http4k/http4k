@@ -5,7 +5,7 @@ import org.http4k.contract.ContractRoute
 import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
-import org.http4k.contract.Security
+import org.http4k.contract.security.Security
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with

@@ -3,12 +3,12 @@ package org.http4k.chaos
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.contract.NoSecurity
-import org.http4k.contract.Security
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.v3.OpenApi3
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
