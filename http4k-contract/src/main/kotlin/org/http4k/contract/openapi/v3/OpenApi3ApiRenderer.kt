@@ -3,7 +3,6 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
-import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
@@ -27,6 +26,16 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                     "components" to components.asJson()
                 )
             }
+        }
+
+    private fun Tag.asJson(): NODE =
+        json {
+            obj(
+                listOf(
+                    "name" to string(name),
+                    "description" to (description?.let { json.string(it) }.orNullNode())
+                )
+            )
         }
 
     private fun Components<NODE>.asJson() = json {
@@ -159,14 +168,4 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             jsonToJsonSchema.toSchema(json.obj(), overrideDefinitionId)
         }
 
-    private val Tag.asJson
-        get(): Render<NODE> =
-            {
-                obj(
-                    listOf(
-                        "name" to string(name),
-                        "description" to (description?.let { string(it) }.orNullNode())
-                    )
-                )
-            }
 }
