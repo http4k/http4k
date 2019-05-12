@@ -9,8 +9,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Gson.auto
-import org.http4k.jsonrpc.AutoMappingJsonRpcServiceContract
-import org.http4k.jsonrpc.ManualMappingJsonRpcServiceContract
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Disabled
@@ -57,7 +55,4 @@ class GsonTest : JsonContract<JsonElement>(Gson) {
 }"""
 }
 
-class GsonJsonErrorResponseRendererContractTest : JsonErrorResponseRendererContract<JsonElement>(Gson)
 class GsonGenerateDataClassesTest : GenerateDataClassesContract<JsonElement>(Gson)
-class GsonAutoMappingJsonRpcServiceTest : AutoMappingJsonRpcServiceContract<JsonElement>(Gson)
-class GsonManualMappingJsonRpcServiceTest : ManualMappingJsonRpcServiceContract<JsonElement>(Gson)

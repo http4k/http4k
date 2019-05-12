@@ -21,7 +21,7 @@ interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
          * Check the entire contract, including the body.
          */
         object All : PreFlightExtraction {
-            override fun invoke(meta: RouteMeta) = IgnoreBody(meta) + (meta.body?.let { listOf(it) }
+            override fun invoke(meta: RouteMeta) = meta.requestParams + (meta.body?.let { listOf(it) }
                 ?: emptyList<BodyLens<*>>())
         }
 

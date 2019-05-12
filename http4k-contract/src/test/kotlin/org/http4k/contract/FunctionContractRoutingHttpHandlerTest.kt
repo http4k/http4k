@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.simple.SimpleJson
 import org.http4k.format.Jackson
 
 class FunctionContractRoutingHttpHandlerTest : ContractRoutingHttpHandlerContract() {

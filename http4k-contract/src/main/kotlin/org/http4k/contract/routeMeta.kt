@@ -1,8 +1,10 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -13,23 +15,32 @@ import org.http4k.lens.Header
 import org.http4k.lens.Lens
 import org.http4k.util.Appendable
 
-open class HttpMessageMeta<out T : HttpMessage>(val message: T, val description: String, val definitionId: String? = null)
-class RequestMeta(request: Request, definitionId: String? = null) : HttpMessageMeta<Request>(request, "request", definitionId)
-class ResponseMeta(description: String, response: Response, definitionId: String? = null) : HttpMessageMeta<Response>(response, description, definitionId)
+open class HttpMessageMeta<out T : HttpMessage>(
+    val message: T,
+    val description: String,
+    val definitionId: String?,
+    val example: Any?
+)
+
+class RequestMeta(request: Request, definitionId: String? = null, example: Any? = null)
+    : HttpMessageMeta<Request>(request, "request", definitionId, example)
+
+class ResponseMeta(description: String, response: Response, definitionId: String? = null, example: Any? = null)
+    : HttpMessageMeta<Response>(response, description, definitionId, example)
 
 class RouteMetaDsl internal constructor() {
     var summary: String = "<unknown>"
     var description: String? = null
-    internal var request: HttpMessageMeta<Request>? = null
     val tags = Appendable<Tag>()
     val produces = Appendable<ContentType>()
     val consumes = Appendable<ContentType>()
+    internal val requests = Appendable<HttpMessageMeta<Request>>()
     internal val responses = Appendable<HttpMessageMeta<Response>>()
-    var headers = Appendable<Lens<Request, *>>()
-    var queries = Appendable<Lens<Request, *>>()
+    val headers = Appendable<Lens<Request, *>>()
+    val queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
-    var security: Security? = null
+    var security: Security = NoSecurity
     var preFlightExtraction: PreFlightExtraction? = null
 
     /**
@@ -68,8 +79,9 @@ class RouteMetaDsl internal constructor() {
      * for this response body which will override the naturally generated one.
      */
     @JvmName("returningStatus")
-    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String = "", definitionId: String? = null) {
-        returning(ResponseMeta(description, Response(status).with(body.first of body.second), definitionId))
+    fun <T> returning(status: Status, body: Pair<BiDiBodyLens<T>, T>, description: String? = null, definitionId: String? = null) {
+        returning(ResponseMeta(description
+            ?: status.description, Response(status).with(body.first of body.second), definitionId, body.second))
     }
 
     /**
@@ -78,14 +90,14 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(body: Pair<BiDiBodyLens<T>, T>, definitionId: String? = null) {
         requestBody = body.first
-        receiving(RequestMeta(Request(GET, "").with(body.first of body.second), definitionId))
+        receiving(RequestMeta(Request(POST, "").with(body.first of body.second), definitionId, body.second))
     }
 
     /**
      * Add request metadata to this Route. A route only supports a single possible request.
      */
     fun receiving(requestMeta: HttpMessageMeta<Request>) {
-        request = requestMeta
+        requests += requestMeta
         consumes += Header.CONTENT_TYPE(requestMeta.message)?.let { listOf(it) } ?: emptyList()
     }
 
@@ -95,13 +107,13 @@ class RouteMetaDsl internal constructor() {
      */
     fun <T> receiving(bodyLens: BiDiBodyLens<T>) {
         requestBody = bodyLens
-        consumes += bodyLens.contentType
+        receiving(RequestMeta(Request(POST, "").with(Header.CONTENT_TYPE of bodyLens.contentType)))
     }
 }
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, request, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, responses.all, preFlightExtraction, security, operationId
+        summary, description, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all, requests.all, responses.all, preFlightExtraction, security, operationId
     )
 }
 
@@ -109,16 +121,13 @@ data class Tag(val name: String, val description: String? = null)
 
 data class RouteMeta(val summary: String = "<unknown>",
                      val description: String? = null,
-                     val request: HttpMessageMeta<Request>? = null,
                      val tags: Set<Tag> = emptySet(),
                      val body: BodyLens<*>? = null,
                      val produces: Set<ContentType> = emptySet(),
                      val consumes: Set<ContentType> = emptySet(),
                      val requestParams: List<Lens<Request, *>> = emptyList(),
+                     val requests: List<HttpMessageMeta<Request>> = emptyList(),
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
-                     val security: Security? = null,
-                     val operationId: String? = null) {
-
-    constructor(summary: String = "<unknown>", description: String? = null) : this(summary, description, null)
-}
+                     val security: Security = NoSecurity,
+                     val operationId: String? = null)

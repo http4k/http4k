@@ -3,12 +3,12 @@ package org.http4k.chaos
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.contract.ApiInfo
-import org.http4k.contract.NoSecurity
-import org.http4k.contract.OpenApi
-import org.http4k.contract.Security
 import org.http4k.contract.contract
 import org.http4k.contract.meta
+import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v3.OpenApi3
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -90,7 +90,7 @@ object ChaosEngine {
             Cors(corsPolicy)
                 .then(
                     contract {
-                        renderer = OpenApi(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
+                        renderer = OpenApi3(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {
@@ -140,19 +140,3 @@ fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
     return routes(ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
 }
-
-@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
-fun RoutingHttpHandler.withChaosControls(stage: Stage = Wait,
-                                         security: Security = NoSecurity,
-                                         controlsPath: String = "/chaos",
-                                         openApiPath: String = "",
-                                         corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
-
-@Deprecated("Rename", ReplaceWith("withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy"))
-fun HttpHandler.withChaosControls(stage: Stage = Wait,
-                                  security: Security = NoSecurity,
-                                  controlsPath: String = "/chaos",
-                                  openApiPath: String = "",
-                                  corsPolicy: CorsPolicy = UnsafeGlobalPermissive) = withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
-

@@ -1,12 +1,12 @@
 package cookbook.typesafe_http_contracts
 
-import org.http4k.contract.ApiInfo
-import org.http4k.contract.ApiKeySecurity
-import org.http4k.contract.OpenApi
 import org.http4k.contract.bind
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.contract.meta
+import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.v3.OpenApi3
+import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Filter
@@ -22,6 +22,7 @@ import org.http4k.filter.CorsPolicy
 import org.http4k.filter.ResponseFilters
 import org.http4k.filter.ServerFilters
 import org.http4k.format.Argo
+import org.http4k.format.Jackson
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
@@ -56,7 +57,7 @@ fun main() {
     val mySecurity = ApiKeySecurity(Query.int().required("apiKey"), { it == 42 })
 
     val contract = contract {
-        renderer = OpenApi(ApiInfo("my great api", "v1.0"), Argo)
+        renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Argo)
         descriptionPath = "/docs/swagger.json"
         security = mySecurity
 
@@ -89,7 +90,7 @@ fun main() {
         "/context" bind filter.then(contract),
         "/static" bind NoCache().then(static(Classpath("cookbook/nestable_routes"))),
         "/" bind contract {
-            renderer = OpenApi(ApiInfo("my great super api", "v1.0"), Argo)
+            renderer = OpenApi3(ApiInfo("my great super api", "v1.0"), Jackson)
             routes += "/echo" / Path.of("name") meta {
                 summary = "echo"
                 queries += ageQuery

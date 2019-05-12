@@ -4,6 +4,9 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
+import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.simple.SimpleJson
 import org.http4k.core.Body
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
@@ -143,7 +146,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
-    fun `override security for one endpoint only`() {
+    fun `combine security for one endpoint only`() {
         val credentials = Credentials("bill", "password")
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
@@ -153,10 +156,13 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
             } bindContract GET to { Response(OK) }
         }
 
-        assertThat(root(Request(GET, "/root/bill?key=sue")).status, equalTo(UNAUTHORIZED))
+        assertThat(root(Request(GET, "/root/bill?key=bob")).status, equalTo(UNAUTHORIZED))
 
         assertThat(ClientFilters.BasicAuth(credentials)
-            .then(root)(Request(GET, "/root/bill?key=sue")).status, equalTo(OK))
+            .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(UNAUTHORIZED))
+
+        assertThat(ClientFilters.BasicAuth(credentials)
+            .then(root)(Request(GET, "/root/bill?key=bob")).status, equalTo(OK))
     }
 
     @Test

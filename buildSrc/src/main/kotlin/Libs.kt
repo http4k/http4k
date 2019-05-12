@@ -15,6 +15,9 @@ object Libs {
     const val jackson_module_kotlin: String =
             "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
 
+    const val jackson_module_jsonSchema: String =
+        "com.fasterxml.jackson.module:jackson-module-jsonSchema:" + Versions.jackson_module_jsonSchema
+
     /**
      * [underscore website](https://github.com/javadev/underscore-java) */
     const val underscore: String = "com.github.javadev:underscore:" + Versions.underscore

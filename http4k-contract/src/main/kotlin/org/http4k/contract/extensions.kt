@@ -1,6 +1,8 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion.All
+import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.NoOp
@@ -49,32 +51,3 @@ infix fun <A, B, C, D, E, F, G, H, I> ContractRouteSpec9<A, B, C, D, E, F, G, H,
 infix fun <A, B, C, D, E, F, G, H, I, J> ContractRouteSpec10<A, B, C, D, E, F, G, H, I, J>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec10(pathFn, routeMetaDsl(new), a, b, c, d, e, f, g, h, i, j)
 
 internal fun toBaseFn(path: String): (PathSegments) -> PathSegments = PathSegments(path).let { { old: PathSegments -> old / it } }
-
-@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList() }", ReplaceWith("BROKEN! use example"))
-fun contract(vararg serverRoutes: ContractRoute) = contract {
-    routes += serverRoutes.toList()
-}
-
-@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer }",
-    ReplaceWith("BROKEN! use example"))
-fun contract(renderer: ContractRenderer, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.routes += serverRoutes.toList()
-}
-
-@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer }",
-    ReplaceWith("BROKEN! use example"))
-fun contract(renderer: ContractRenderer, descriptionPath: String, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.descriptionPath = descriptionPath
-    this.routes += serverRoutes.toList()
-}
-
-@Deprecated("Replaced with DSL version using contract { routes += serverRoutes.toList(); this.renderer = renderer; this.descriptionPath = descriptionPath; this.security = security }",
-    ReplaceWith("BROKEN! use example"))
-fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = "", security: Security = NoSecurity, vararg serverRoutes: ContractRoute) = contract {
-    this.renderer = renderer
-    this.security = security
-    this.descriptionPath = descriptionPath
-    this.routes += serverRoutes.toList()
-}

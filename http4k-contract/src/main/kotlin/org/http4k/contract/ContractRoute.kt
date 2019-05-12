@@ -1,7 +1,6 @@
 package org.http4k.contract
 
 
-import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
@@ -9,7 +8,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
-import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
@@ -20,8 +18,6 @@ class ContractRoute internal constructor(val method: Method,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) {
 
     val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
-
-    val jsonRequest = meta.request?.let { if (CONTENT_TYPE(it.message) == APPLICATION_JSON) it else null }
 
     val tags = meta.tags.toSet().sortedBy { it.name }
 

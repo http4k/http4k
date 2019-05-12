@@ -3,6 +3,12 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.142.0 (uncut)
+- [http4k-contract] Both OpenApi v2 and v3 are now supported, including automatic schema generation. Some classes for 
+OpenApi2 have moved to a new package. See module docs for details. Optionally include `http4k-format-jackson` to get 
+JSON schema models based on JVM objects.
+- [http4k-format-jackson] Added reflective JSON schema creator, to be used for generating named models from JVM objects.  
+
 ### v3.141.0
 - [http4k-core] - Fix #233 - MemoryBody blows up with "java.nio.ReadOnlyBufferException"
 - [http4k-core] - Tighten up security on  Basic and Bearer auth server filters.  H/T @andymoody
@@ -53,7 +59,7 @@ allows for more fine grained custom control of which Responses are acceptable.
 - [http4-format-jackson] Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
 
 ### v3.131.0
-- [http4k-core]  (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
+- [http4k-core] (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
 appending. This leads to a more consistent behaviour. In order to be able to set multiple values on an object 
 using a lense, use the `multi` form instead - eg. `Header.required("foo")` -> `Header.multi.required("foo")`. We 
 envisage the impact of this change is limited as it's only Queries that generally can have multiple possible 

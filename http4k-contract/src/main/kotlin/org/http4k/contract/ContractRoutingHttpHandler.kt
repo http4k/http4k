@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -48,10 +49,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val routers = routes
         .map {
-            val securityFilterForRoute = (it.meta.security ?: security).filter
             catchLensFailure
                 .then(identify(it))
-                .then(preSecurityFilter.then(securityFilterForRoute).then(postSecurityFilter))
+                .then(preSecurityFilter.then(security.filter).then(it.meta.security.filter).then(postSecurityFilter))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } +
         (identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))

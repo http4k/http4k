@@ -3,8 +3,10 @@ description = 'Http4k Jackson JSON/XML support'
 dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
+    provided project(":http4k-contract")
 
     compile Libs.jackson_module_kotlin
+    compile Libs.jackson_module_jsonSchema
     compile Libs.jackson_dataformat_xml
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

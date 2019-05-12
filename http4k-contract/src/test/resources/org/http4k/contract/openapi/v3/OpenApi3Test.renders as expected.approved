@@ -1,0 +1,579 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "title",
+    "version": "1.2",
+    "description": "module description"
+  },
+  "tags": [
+    {
+      "name": "tag1",
+      "description": null
+    },
+    {
+      "name": "tag3",
+      "description": null
+    }
+  ],
+  "paths": {
+    "/basepath/bearer_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "bearerAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_auto_schema": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "content": {
+              "application/json": {
+                "example": {
+                  "anotherString": "bing"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-1161328054"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      },
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "string": "s",
+                "child": {
+                  "anotherString": "bar"
+                },
+                "numbers": [
+                  1
+                ],
+                "bool": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/object-1161328054"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_form": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "b": {
+                    "type": "boolean",
+                    "description": "booleanField"
+                  },
+                  "i": {
+                    "type": "integer",
+                    "description": "intField"
+                  },
+                  "s": {
+                    "type": "string",
+                    "description": "stringField"
+                  },
+                  "j": {
+                    "type": "string",
+                    "description": "jsonField"
+                  }
+                },
+                "required": [
+                  "b",
+                  "j"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_noschema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": null,
+              "schema": {
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "anAnotherObject": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/someDefinitionId"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_string": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/descriptions": {
+      "get": {
+        "summary": "endpoint",
+        "description": "some rambling description of what this thing actually does",
+        "tags": [
+          "tag1",
+          "tag3"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "echoMessage"
+      }
+    },
+    "/basepath/extra_security": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/headers": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "header",
+            "name": "b",
+            "required": true,
+            "description": "booleanHeader"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "s",
+            "required": false,
+            "description": "stringHeader"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "header",
+            "name": "i",
+            "required": false,
+            "description": "intHeader"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "j",
+            "required": false,
+            "description": "jsonHeader"
+          }
+        ],
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/nometa": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/paths/{firstName}/bertrand/{age}": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "firstName",
+            "required": true,
+            "description": null
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "description": null
+          }
+        ],
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/produces_and_consumes": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/queries": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "b",
+            "required": true,
+            "description": "booleanQuery"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "s",
+            "required": false,
+            "description": "stringQuery"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "i",
+            "required": false,
+            "description": "intQuery"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "j",
+            "required": false,
+            "description": "jsonQuery"
+          }
+        ],
+        "requestBody": null,
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/returning": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": null,
+        "responses": {
+          "403": {
+            "description": "no way jose",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aString": "a message of some kind"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object1283926341"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "object-1365611171": {
+        "type": "object",
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
+      "someDefinitionId": {
+        "type": "object",
+        "properties": {
+          "anAnotherObject": {
+            "$ref": "#/components/schemas/object-1365611171"
+          }
+        }
+      },
+      "object1283926341": {
+        "type": "object",
+        "properties": {
+          "aString": {
+            "type": "string",
+            "example": "a message of some kind"
+          }
+        }
+      },
+      "object-1161328054": {
+        "type": "object",
+        "properties": {
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "bearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "api_key": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "the_api_key"
+      }
+    }
+  }
+}

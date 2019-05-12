@@ -1,7 +1,8 @@
-package org.http4k.format
+package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.format.Json
 import org.http4k.lens.Invalid
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
