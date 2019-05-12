@@ -528,9 +528,21 @@
   },
   "components": {
     "schemas": {
+      "object-1365611171": {
+        "type": "object",
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
       "someDefinitionId": {
         "type": "object",
         "properties": {
+          "anAnotherObject": {
+            "$ref": "#/components/schemas/object-1365611171"
+          }
         }
       },
       "object1283926341": {
