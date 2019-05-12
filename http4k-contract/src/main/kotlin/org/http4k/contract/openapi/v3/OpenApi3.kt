@@ -38,12 +38,10 @@ import org.http4k.util.JsonToJsonSchema
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
-    private val apiRenderer: ApiRenderer<Api<NODE>, NODE>,
+    private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = StandardApiRenderer(json),
     private val securityRenderer: SecurityRenderer = SupportedSecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
-
-    constructor(apiInfo: ApiInfo, json: Json<NODE>) : this(apiInfo, json, StandardApiRenderer<NODE>(json))
 
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
