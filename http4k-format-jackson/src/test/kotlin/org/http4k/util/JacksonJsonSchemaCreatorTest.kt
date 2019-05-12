@@ -1,19 +1,26 @@
 package org.http4k.util
 
-import org.http4k.core.Uri
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Jackson
+import org.http4k.format.Jackson.asJsonString
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
-import java.time.Duration
+import org.junit.jupiter.api.extension.ExtendWith
 
-data class Nested(val duration: Duration)
-data class Root(val uri: Uri?, val num: Int, val boolean: Boolean, val nested: Nested)
+data class Simple(val nested: List<Nested>)
+data class Nested(val int: Int)
 
+@ExtendWith(ApprovalTest::class)
 class JacksonJsonSchemaCreatorTest {
 
     @Test
-    fun `generates schema`() {
-        println(
-            Jackson.asJsonString(JacksonJsonSchemaCreator(Jackson).toSchema(mapOf("string" to "value")))
-        )
+    fun `generates schema for simple object`(approver: Approver) {
+        assertApproved(approver, Simple(listOf(Nested(123))))
+    }
+
+    private fun assertApproved(approver: Approver, obj: Simple) {
+        approver.assertApproved(Response(OK).body(asJsonString(JacksonJsonSchemaCreator(Jackson).toSchema(obj))))
     }
 }

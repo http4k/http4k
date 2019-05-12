@@ -11,5 +11,6 @@ dependencies {
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
+    testCompile project(":http4k-testing-approval")
     testCompile Config.TestDependencies
 }
