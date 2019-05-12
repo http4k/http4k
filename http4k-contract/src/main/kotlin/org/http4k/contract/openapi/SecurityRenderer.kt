@@ -5,6 +5,9 @@ import org.http4k.format.Json
 
 typealias Render<NODE> = Json<NODE>.() -> NODE
 
+/**
+ * Provides rendering of Security models in to OpenApi specs.
+ */
 interface SecurityRenderer {
     fun <NODE> full(security: Security): Render<NODE>?
     fun <NODE> ref(security: Security): Render<NODE>?
