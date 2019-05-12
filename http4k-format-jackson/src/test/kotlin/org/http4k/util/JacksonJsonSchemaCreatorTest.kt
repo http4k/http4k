@@ -30,6 +30,11 @@ class JacksonJsonSchemaCreatorTest {
     }
 
     @Test
+    fun `generates schema for nested list`(approver: Approver) {
+        approver.assertApproved(listOf(listOf(Simple(listOf(Nested(123))))))
+    }
+
+    @Test
     fun `generates schema for array`(approver: Approver) {
         approver.assertApproved(arrayOf(Simple(listOf(Nested(123)))))
     }

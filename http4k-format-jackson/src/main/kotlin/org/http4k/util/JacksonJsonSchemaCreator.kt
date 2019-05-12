@@ -31,12 +31,10 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
         obj.firstOrNull()?.let {
             val item = toSchema(it, overrideDefinitionId)
             JsonSchema(json {
-                obj("schema" to
-                    obj(
-                        "type" to string("array"),
-                        "required" to boolean(true),
-                        "items" to obj("\$ref" to string(toSchema(it, overrideDefinitionId).definitions.first().first))
-                    )
+                obj(
+                    "type" to string("array"),
+                    "required" to boolean(true),
+                    "items" to obj("\$ref" to string(toSchema(it, overrideDefinitionId).definitions.first().first))
                 )
             }, item.definitions)
         } ?: jsonToJsonSchema.toSchema(json.array(emptyList()), overrideDefinitionId)

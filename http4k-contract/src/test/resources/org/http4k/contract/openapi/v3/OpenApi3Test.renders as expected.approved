@@ -54,9 +54,11 @@
             "description": "See Other",
             "content": {
               "application/json": {
-                "example": {
-                  "anotherString": "bing"
-                },
+                "example": [
+                  {
+                    "anotherString": "bing"
+                  }
+                ],
                 "schema": {
                   "$ref": "#/components/schemas/object-1161328054"
                 }

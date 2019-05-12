@@ -1,11 +1,9 @@
 {
   "node": {
-    "schema": {
-      "type": "array",
-      "required": true,
-      "items": {
-        "$ref": "urn:jsonschema:org:http4k:util:Simple"
-      }
+    "type": "array",
+    "required": true,
+    "items": {
+      "$ref": "urn:jsonschema:org:http4k:util:Simple"
     }
   },
   "definitions": [
