@@ -9,7 +9,6 @@ import org.http4k.format.Jackson.asJsonString
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -26,9 +25,13 @@ class JacksonJsonSchemaCreatorTest {
     }
 
     @Test
-    @Disabled
     fun `generates schema for list`(approver: Approver) {
-        approver.assertApproved(listOf(Nested(123)))
+        approver.assertApproved(listOf(Simple(listOf(Nested(123)))))
+    }
+
+    @Test
+    fun `generates schema for array`(approver: Approver) {
+        approver.assertApproved(arrayOf(Simple(listOf(Nested(123)))))
     }
 
     private fun Approver.assertApproved(obj: Any) {

@@ -12,17 +12,32 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
     private val jsonToJsonSchema = JsonToJsonSchema(json, refPrefix)
     private val jsonSchemaGenerator = JsonSchemaGenerator(json.mapper)
 
-    override fun toSchema(obj: Any, overrideDefinitionId: String?) =
-        when (obj) {
-            is JsonNode -> jsonToJsonSchema.toSchema(obj, overrideDefinitionId)
-            else -> {
-                val node = jsonSchemaGenerator.generateSchema(obj::class.java)
-                val id = overrideDefinitionId ?: node.id
-                with(json.asJsonString(node)) {
-                    JsonSchema(
-                        json { obj("\$ref" to string("#/$refPrefix/$id")) },
-                        setOf(id to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
-                }
+    override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<JsonNode> = when (obj) {
+        is JsonNode -> jsonToJsonSchema.toSchema(obj, overrideDefinitionId)
+        is Iterable<*> -> handleIterable(obj, overrideDefinitionId)
+        is Array<*> -> handleIterable(obj.asIterable(), overrideDefinitionId)
+        else -> {
+            val node = jsonSchemaGenerator.generateSchema(obj::class.java)
+            val id = overrideDefinitionId ?: node.id
+            with(json.asJsonString(node)) {
+                JsonSchema(
+                    json { obj("\$ref" to string("#/$refPrefix/$id")) },
+                    setOf(id to json.parse(replace("\"type\":\"any\"", "\"type\":\"string\""))))
             }
         }
+    }
+
+    private fun handleIterable(obj: Iterable<*>, overrideDefinitionId: String?): JsonSchema<JsonNode> =
+        obj.firstOrNull()?.let {
+            val item = toSchema(it, overrideDefinitionId)
+            JsonSchema(json {
+                obj("schema" to
+                    obj(
+                        "type" to string("array"),
+                        "required" to boolean(true),
+                        "items" to obj("\$ref" to string(toSchema(it, overrideDefinitionId).definitions.first().first))
+                    )
+                )
+            }, item.definitions)
+        } ?: jsonToJsonSchema.toSchema(json.array(emptyList()), overrideDefinitionId)
 }
