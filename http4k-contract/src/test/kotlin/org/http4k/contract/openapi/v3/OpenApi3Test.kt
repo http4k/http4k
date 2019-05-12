@@ -10,10 +10,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.format.Jackson
+import org.http4k.format.Argo
 import org.http4k.format.Jackson.auto
 
-class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "module description"), Jackson)) {
+class OpenApi3Test : ContractRendererContract(OpenApi3(ApiInfo("title", "1.2", "module description"), Argo)) {
     override fun specificRoutes() = listOf(
         "/body_auto_schema" meta {
             receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
