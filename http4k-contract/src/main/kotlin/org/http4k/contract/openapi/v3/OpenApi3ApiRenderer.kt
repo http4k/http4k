@@ -13,8 +13,7 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
 /**
- * Renders the API in OpenApi3 format JSON. Note that for the JSON schema generation, auto-naming of
- * object models is used as the input relies on JSON objects and not JVM classees.
+ * Converts a API to OpenApi3 format JSON.
  */
 class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
     private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")

@@ -23,6 +23,10 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import org.http4k.util.JsonToJsonSchema
 
+/**
+ * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of
+ * object models is used as the input relies on JSON objects and not JVM classees.
+ */
 open class OpenApi2<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,

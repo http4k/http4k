@@ -35,6 +35,10 @@ import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
+/**
+ * Contract renderer for OpenApi3 format JSON. By default, for the JSON schema generation, auto-naming of
+ * object models is used as the input relies on JSON objects and not JVM classees.
+ */
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
