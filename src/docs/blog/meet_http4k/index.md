@@ -255,7 +255,7 @@ and consistency:
 * Popular JSON/XML (Gson, Jackson, Moshi, etc) library support for HTTP bodies.
 * Typesafe HTML Form and Multipart Forms processing, with support for Streaming uploads to a storage service. Forms can 
 also be configured to collect errors instead of just rejecting outright.
-* Typesafe contract module, providing live [OpenApi/Swagger] documentation.
+* Typesafe contract module, providing live [OpenApi v2 & v3] documentation.
 * [AWS] request signing.
 * [Resilience4j] integration, including Circuit Breakers & Rate Limiting.
 * Testing support via [Hamkrest] matchers and an in-memory 

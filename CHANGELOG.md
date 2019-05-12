@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.142.0 (uncut)
+### v3.142.0
 - [http4k-contract] Both OpenApi v2 and v3 are now supported, including automatic schema generation. Some classes for 
 OpenApi2 have moved to a new package. See module docs for details. Optionally include `http4k-format-jackson` to get 
 JSON schema models based on JVM objects.

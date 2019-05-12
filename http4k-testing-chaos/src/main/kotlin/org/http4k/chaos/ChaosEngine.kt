@@ -21,7 +21,6 @@ import org.http4k.core.with
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.ServerFilters.Cors
-import org.http4k.format.Jackson
 import org.http4k.format.Jackson.json
 import org.http4k.format.Jackson.obj
 import org.http4k.format.Jackson.string
@@ -90,7 +89,7 @@ object ChaosEngine {
             Cors(corsPolicy)
                 .then(
                     contract {
-                        renderer = OpenApi3(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
+                        renderer = OpenApi3(ApiInfo("Http4k Chaos controls", "1.0", description))
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {

@@ -7,7 +7,7 @@ Code for connecting http4k applications to AWS services, including request signi
 Common code relevant to HTTP client implementations.
 
 # Package org.http4k.contract
-Code for defining typesafe contracts which generate OpenAPI documentation.
+Code for defining typesafe HTTP contracts. Contains subpackages for OpenAPI v2 and v3
 
 # Package org.http4k.core
 The core abstractions for the http4k library.

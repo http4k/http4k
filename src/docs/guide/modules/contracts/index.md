@@ -14,7 +14,7 @@ combined into `RouteModules`, which have the following features:
 
 - **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement  for any validation code to be written by the API user. Invalid calls result in a `HTTP 400
  (BAD_REQUEST)` response.     
-- **Self-describing:** - a generated endpoint is provided which describes all of the `Routes` in that module. Implementations include [OpenApi/Swagger](http://swagger.io/) documentation, including generation of [JSON schema]
+- **Self-describing:** - a generated endpoint is provided which describes all of the `Routes` in that module. Implementations include [OpenApi v2 & v3/Swagger](http://swagger.io/) documentation, including generation of [JSON schema]
 (http://json-schema.org/) models for messages.
 - **Security:** to secure the `Routes`  against unauthorised access. Current implementations include `ApiKey`.
 
