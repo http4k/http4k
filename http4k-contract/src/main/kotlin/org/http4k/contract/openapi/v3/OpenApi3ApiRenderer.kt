@@ -65,19 +65,19 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             obj(
                 "summary" to summary.asJson(),
                 "description" to (description.asJson()),
-                "tags" to (tags?.map { string(it) }?.let { array(it) }.orNullNode()),
-                "parameters" to (parameters?.asJson().orNullNode()),
-                "requestBody" to (requestBody?.asJson().orNullNode()),
+                "tags" to (array(tags.map { string(it) })),
+                "parameters" to parameters.asJson(),
+                "requestBody" to (requestBody.asJson()),
                 "responses" to responses.asJson(),
-                "security" to (security.orNullNode()),
+                "security" to (security),
                 "operationId" to operationId.asJson()
             )
         }
 
     private fun RequestContents<NODE>.asJson(): NODE = json {
         obj(
-            "content" to content?.asJson().orNullNode(),
-            "required" to boolean(true)
+            "content" to content.asJson(),
+            "required" to boolean(content.isNotEmpty())
         )
     }
 
