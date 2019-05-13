@@ -1,22 +1,28 @@
 package org.http4k.util
 
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.equalTo
+import com.fasterxml.jackson.databind.JsonNode
+import org.http4k.core.ContentType
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.with
 import org.http4k.format.Jackson
-import org.http4k.format.Jackson.obj
+import org.http4k.lens.Header
+import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
-import java.io.InputStream
+import org.junit.jupiter.api.extension.ExtendWith
 import java.math.BigDecimal
 
+@ExtendWith(JsonApprovalTest::class)
 class JsonToJsonSchemaTest {
     private val json = Jackson
 
-    private fun String.readResource(): InputStream = JsonToJsonSchemaTest::class.java.getResourceAsStream(this)
-    private fun InputStream.asJsonValue() = json.parse(String(readBytes()))
+    private val creator = JsonToJsonSchema(json)
 
     @Test
-    fun `renders object contents of different types of json value as expected`() {
-        val model = json {
+    fun `renders object contents of different types of json value as expected`(approver: Approver) {
+
+        approver.assertApproved(json {
             obj(
                 "aString" to string("aStringValue"),
                 "aNumber" to number(BigDecimal("1.9")),
@@ -26,27 +32,26 @@ class JsonToJsonSchemaTest {
                 "anObject" to obj("anInteger" to number(1)),
                 "anotherObject" to obj("anInteger" to number(1))
             )
-        }
-
-        val actual = JsonToJsonSchema(json).toSchema(model, "bob")
-        val expected = "JsonSchema_object_main.json".readResource().asJsonValue()
-        assertThat(actual.node, equalTo(expected))
-        val expectedDefs = "JsonSchema_object_definitions.json".readResource().asJsonValue()
-//        println(json.pretty(obj(actual.definitions)))
-        assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
+        }, "bob")
     }
 
     @Test
-    fun `renders array contents of different types of json value as expected`() {
-        val model = json {
+    fun `renders array contents of different types of json value as expected`(approver: Approver) {
+        approver.assertApproved(json {
             array(listOf(obj("anotherString" to string("yetAnotherString"))))
-        }
+        }, "bob")
+    }
 
-        val actual = JsonToJsonSchema(json).toSchema(model, "bob")
-        val expected = "JsonSchema_array_main.json".readResource().asJsonValue()
-        assertThat(actual.node, equalTo(expected))
-        val expectedDefs = "JsonSchema_array_definitions.json".readResource().asJsonValue()
-//        println(json.pretty(obj(actual.definitions)))
-        assertThat(json.pretty(obj(actual.definitions)), equalTo(json.pretty(expectedDefs)))
+    @Test
+    fun `renders nested  array contents of different types of json value as expected`(approver: Approver) {
+        approver.assertApproved(json {
+            array(listOf(array(listOf(obj("anotherString" to string("yetAnotherString"))))))
+        }, "bob")
+    }
+
+    private fun Approver.assertApproved(obj: JsonNode, name: String) {
+        assertApproved(Response(Status.OK)
+            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+            .body(Jackson.asJsonString(creator.toSchema(obj, name))))
     }
 }

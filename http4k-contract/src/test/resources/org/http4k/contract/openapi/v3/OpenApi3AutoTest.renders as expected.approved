@@ -53,11 +53,17 @@
             "description": "See Other",
             "content": {
               "application/json": {
-                "example": {
-                  "anotherString": "bing"
-                },
+                "example": [
+                  {
+                    "anotherString": "bing"
+                  }
+                ],
                 "schema": {
-                  "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1"
+                  "type": "array",
+                  "required": true,
+                  "items": {
+                    "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1"
+                  }
                 }
               }
             }
@@ -144,6 +150,43 @@
                   "b",
                   "j"
                 ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": null
+      }
+    },
+    "/basepath/body_json_list_schema": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": null,
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "aNumberField": 123
+                }
+              ],
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/object1482787387"
+                }
               }
             }
           },

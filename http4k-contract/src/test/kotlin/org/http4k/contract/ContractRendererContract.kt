@@ -96,6 +96,11 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
                 }, "someDefinitionId")
             } bindContract POST to { Response(OK) }
+            routes += "/body_json_list_schema" meta {
+                receiving(json.body("json").toLens() to json {
+                    array(obj("aNumberField" to number(123)))
+                })
+            } bindContract POST to { Response(OK) }
             routes += "/extra_security" meta {
                 security = BasicAuthSecurity("realm", Credentials("user", "password"))
             } bindContract POST to { Response(OK) }

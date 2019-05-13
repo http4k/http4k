@@ -24,7 +24,7 @@ abstract class OpenApi3Contract<NODE : Any>(json: Json<NODE>, openApi3: OpenApi3
             ))
         } bindContract POST to { Response(OK) },
         "/body_auto_schema" meta {
-            returning(Status.SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
+            returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
         } bindContract GET to { Response(OK) },
         "/bearer_auth" meta {
             security = BearerAuthSecurity("foo")
