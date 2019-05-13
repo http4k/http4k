@@ -1,666 +1,239 @@
 {
+  "openapi": "3.0.0",
   "info": {
-    "title": "title",
-    "version": "1.2",
-    "description": "module description"
+    "version": "1.0.0",
+    "title": "Swagger Petstore",
+    "description": "A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Swagger API Team",
+      "email": "apiteam@swagger.io",
+      "url": "http://swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
   },
-  "tags": [
+  "servers": [
   {
-    "name": "tag1",
-    "description": null
-  },
-  {
-    "name": "tag3",
-    "description": null
+    "url": "http://petstore.swagger.io/api"
   }
   ],
   "paths": {
-    "/basepath/bearer_auth": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
+    "/pets": {
+      "get": {
+        "description": "Returns all pets from the system that the user has access to\nNam sed condimentum est. Maecenas tempor sagittis sapien, nec rhoncus sem sagittis sit amet. Aenean at gravida augue, ac iaculis sem. Curabitur odio lorem, ornare eget elementum nec, cursus id lectus. Duis mi turpis, pulvinar ac eros ac, tincidunt varius justo. In hac habitasse platea dictumst. Integer at adipiscing ante, a sagittis ligula. Aenean pharetra tempor ante molestie imperdiet. Vivamus id aliquam diam. Cras quis velit non tortor eleifend sagittis. Praesent at enim pharetra urna volutpat venenatis eget eget mauris. In eleifend fermentum facilisis. Praesent enim enim, gravida ac sodales sed, placerat id erat. Suspendisse lacus dolor, consectetur non augue vel, vehicula interdum libero. Morbi euismod sagittis libero sed lacinia.\n\nSed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.\n",
+        "operationId": "findPets",
+        "parameters": [
         {
-          "bearerAuth": [
-          ]
+          "name": "tags",
+          "in": "query",
+          "description": "tags to filter by",
+          "required": false,
+          "style": "form",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         {
-          "api_key": [
-          ]
+          "name": "limit",
+          "in": "query",
+          "description": "maximum number of results to return",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          }
         }
         ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_auto_schema": {
-      "get": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
         "responses": {
-          "303": {
-            "description": "See Other",
+          "200": {
+            "description": "pet response",
             "content": {
               "application/json": {
-                "example": [
-                {
-                  "anotherString": "bing"
-                }
-                ],
                 "schema": {
                   "type": "array",
-                  "required": true,
                   "items": {
-                    "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 }
               }
             }
-          }
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      },
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "string": "s",
-                "child": {
-                  "anotherString": "bar"
-                },
-                "numbers": [
-                  1
-                ],
-                "bool": true
-              },
-              "schema": {
-                "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject2"
-              }
-            }
           },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_form": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "b": {
-                    "type": "boolean",
-                    "description": "booleanField"
-                  },
-                  "i": {
-                    "type": "integer",
-                    "description": "intField"
-                  },
-                  "s": {
-                    "type": "string",
-                    "description": "stringField"
-                  },
-                  "j": {
-                    "type": "string",
-                    "description": "jsonField"
-                  }
-                },
-                "required": [
-                  "b",
-                  "j"
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_json_list_schema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": [
-              {
-                "aNumberField": 123
-              }
-              ],
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/object1482787387"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_json_noschema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": null,
-              "schema": {
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_json_schema": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "anAnotherObject": {
-                  "aNullField": null,
-                  "aNumberField": 123
-                }
-              },
-              "schema": {
-                "$ref": "#/components/schemas/someDefinitionId"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/body_string": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": {
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/descriptions": {
-      "get": {
-        "summary": "endpoint",
-        "description": "some rambling description of what this thing actually does",
-        "tags": [
-          "tag1",
-          "tag3"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": "echoMessage"
-      }
-    },
-    "/basepath/extra_security": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "basicAuth": [
-          ]
-        },
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/headers": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        {
-          "schema": {
-            "type": "boolean"
-          },
-          "in": "header",
-          "name": "b",
-          "required": true,
-          "description": "booleanHeader"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "in": "header",
-          "name": "s",
-          "required": false,
-          "description": "stringHeader"
-        },
-        {
-          "schema": {
-            "type": "integer"
-          },
-          "in": "header",
-          "name": "i",
-          "required": false,
-          "description": "intHeader"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "in": "header",
-          "name": "j",
-          "required": false,
-          "description": "jsonHeader"
-        }
-        ],
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/nometa": {
-      "get": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/paths/{firstName}/bertrand/{age}": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "in": "path",
-          "name": "firstName",
-          "required": true,
-          "description": null
-        },
-        {
-          "schema": {
-            "type": "boolean"
-          },
-          "in": "path",
-          "name": "age",
-          "required": true,
-          "description": null
-        }
-        ],
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/produces_and_consumes": {
-      "get": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/queries": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        {
-          "schema": {
-            "type": "boolean"
-          },
-          "in": "query",
-          "name": "b",
-          "required": true,
-          "description": "booleanQuery"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "in": "query",
-          "name": "s",
-          "required": false,
-          "description": "stringQuery"
-        },
-        {
-          "schema": {
-            "type": "integer"
-          },
-          "in": "query",
-          "name": "i",
-          "required": false,
-          "description": "intQuery"
-        },
-        {
-          "schema": {
-            "type": "string"
-          },
-          "in": "query",
-          "name": "j",
-          "required": false,
-          "description": "jsonQuery"
-        }
-        ],
-        "requestBody": null,
-        "responses": {
-        },
-        "security": [
-        {
-          "api_key": [
-          ]
-        }
-        ],
-        "operationId": null
-      }
-    },
-    "/basepath/returning": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": null,
-        "requestBody": null,
-        "responses": {
-          "403": {
-            "description": "no way jose",
+          "default": {
+            "description": "unexpected error",
             "content": {
               "application/json": {
-                "example": {
-                  "aString": "a message of some kind"
-                },
                 "schema": {
-                  "$ref": "#/components/schemas/object-1662053258"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           }
+        }
+      },
+      "post": {
+        "description": "Creates a new pet in the store.  Duplicates are allowed",
+        "operationId": "addPet",
+        "requestBody": {
+          "description": "Pet to add to the store",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPet"
+              }
+            }
+          }
         },
-        "security": [
+        "responses": {
+          "200": {
+            "description": "pet response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{id}": {
+      "get": {
+        "description": "Returns a user based on a single ID, if the user does not have access to the pet",
+        "operationId": "find pet by id",
+        "parameters": [
         {
-          "api_key": [
-          ]
+          "name": "id",
+          "in": "path",
+          "description": "ID of pet to fetch",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
         ],
-        "operationId": null
+        "responses": {
+          "200": {
+            "description": "pet response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "deletes a single pet based on the ID supplied",
+        "operationId": "deletePet",
+        "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of pet to delete",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+        ],
+        "responses": {
+          "204": {
+            "description": "pet deleted"
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "object1482787387": {
-        "type": "object",
+      "Pet": {
+        "allOf": [
+        {
+          "$ref": "#/components/schemas/NewPet"
+        },
+        {
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+        ]
+      },
+      "NewPet": {
+        "required": [
+          "name"
+        ],
         "properties": {
-          "aNumberField": {
+          "name": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
             "type": "integer",
-            "example": 123
-          }
-        }
-      },
-      "someDefinitionId": {
-        "type": "object",
-        "properties": {
-          "anAnotherObject": {
-            "$ref": "#/components/schemas/object1482787387"
-          }
-        }
-      },
-      "object-1662053258": {
-        "type": "object",
-        "properties": {
-          "aString": {
-            "type": "string",
-            "example": "a message of some kind"
-          }
-        }
-      },
-      "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject2": {
-        "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject2",
-        "properties": {
-          "string": {
-            "type": "string",
-            "required": true
+            "format": "int32"
           },
-          "child": {
-            "type": "object",
-            "id": "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1",
-            "properties": {
-              "anotherString": {
-                "type": "string",
-                "required": true,
-                "enum": [
-                  "bar",
-                  "bing"
-                ]
-              }
-            }
-          },
-          "numbers": {
-            "type": "array",
-            "required": true,
-            "items": {
-              "type": "integer"
-            }
-          },
-          "bool": {
-            "type": "boolean",
-            "required": true
+          "message": {
+            "type": "string"
           }
         }
-      },
-      "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1": {
-        "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1",
-        "properties": {
-          "anotherString": {
-            "type": "string",
-            "required": true,
-            "enum": [
-              "bar",
-              "bing"
-            ]
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "basicAuth": {
-        "scheme": "basic",
-        "type": "http"
-      },
-      "bearerAuth": {
-        "scheme": "bearer",
-        "type": "http"
-      },
-      "api_key": {
-        "type": "apiKey",
-        "in": "query",
-        "name": "the_api_key"
       }
     }
-  },
-  "openapi": "3.0.0"
+  }
 }
