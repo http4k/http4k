@@ -60,12 +60,10 @@
                   }
                 ],
                 "schema": {
-                  "schema": {
-                    "type": "array",
-                    "required": true,
-                    "items": {
-                      "$ref": "#/components/schemas/object-1161328054"
-                    }
+                  "type": "array",
+                  "required": true,
+                  "items": {
+                    "$ref": "#/components/schemas/object-1161328054"
                   }
                 }
               }

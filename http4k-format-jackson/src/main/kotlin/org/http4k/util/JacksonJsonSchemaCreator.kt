@@ -27,15 +27,17 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
         }
     }
 
-    private fun handleIterable(obj: Iterable<*>, overrideDefinitionId: String?): JsonSchema<JsonNode> =
-        obj.firstOrNull()?.let {
-            val item = toSchema(it, overrideDefinitionId)
+    private fun handleIterable(obj: Iterable<*>, overrideDefinitionId: String?): JsonSchema<JsonNode> {
+        return obj.firstOrNull()?.let {
+            val message = toSchema(it)
+
             JsonSchema(json {
                 obj(
                     "type" to string("array"),
                     "required" to boolean(true),
-                    "items" to obj("\$ref" to string(toSchema(it, overrideDefinitionId).definitions.first().first))
+                    "items" to message.node
                 )
-            }, item.definitions)
+            }, message.definitions)
         } ?: jsonToJsonSchema.toSchema(json.array(emptyList()), overrideDefinitionId)
+    }
 }

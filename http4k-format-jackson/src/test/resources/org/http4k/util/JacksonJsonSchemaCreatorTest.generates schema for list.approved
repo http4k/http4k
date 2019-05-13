@@ -3,7 +3,7 @@
     "type": "array",
     "required": true,
     "items": {
-      "$ref": "urn:jsonschema:org:http4k:util:Simple"
+      "$ref": "#/components/schemas/urn:jsonschema:org:http4k:util:Simple"
     }
   },
   "definitions": [
