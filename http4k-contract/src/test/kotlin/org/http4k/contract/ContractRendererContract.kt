@@ -2,9 +2,6 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.openapi.v3.ArbObject1
-import org.http4k.contract.openapi.v3.ArbObject2
-import org.http4k.contract.openapi.v3.Foo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
@@ -133,7 +130,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     ArbObject1(Foo.bar),
                     listOf(1),
                     true
-                ))
+                ), "someOtherId")
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
                 returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
@@ -146,3 +143,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 }
+
+enum class Foo {
+    bar, bing
+}
+
+data class ArbObject1(val anotherString: Foo)
+data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)

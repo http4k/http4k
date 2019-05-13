@@ -54,7 +54,7 @@
             "name": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/object1821014191"
+              "$ref": "#/definitions/someOtherId"
             }
           }
         ],
@@ -569,7 +569,7 @@
         }
       }
     },
-    "object1821014191": {
+    "someOtherId": {
       "type": "object",
       "properties": {
         "string": {

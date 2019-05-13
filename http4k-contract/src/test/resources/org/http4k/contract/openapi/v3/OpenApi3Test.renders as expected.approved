@@ -109,7 +109,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/object-1161328054"
+                "$ref": "#/components/schemas/someOtherId"
               }
             }
           },
@@ -648,7 +648,7 @@
           }
         }
       },
-      "object-1161328054": {
+      "someOtherId": {
         "type": "object",
         "properties": {
         }

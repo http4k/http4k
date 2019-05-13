@@ -43,13 +43,13 @@ class JsonToJsonSchema<NODE>(
 
     private fun JsonSchema<NODE>.objectSchema(overrideDefinitionId: String?): JsonSchema<NODE> {
         val (fields, subDefinitions) = json.fields(node)
-                .filter { json.typeOf(it.second) != JsonType.Null } // filter out null fields for which type can't be inferred
-                .fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
-                    JsonSchema(second, memoDefinitions).toSchema().let { memoFields + (first to it.node) to it.definitions }
-        }
+            .filter { json.typeOf(it.second) != JsonType.Null } // filter out null fields for which type can't be inferred
+            .fold(listOf<Pair<String, NODE>>() to definitions) { (memoFields, memoDefinitions), (first, second) ->
+                JsonSchema(second, memoDefinitions).toSchema().let { memoFields + (first to it.node) to it.definitions }
+            }
 
         val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
-        val definitionId = overrideDefinitionId ?: "object"+newDefinition!!.hashCode()
+        val definitionId = overrideDefinitionId ?: "object" + newDefinition!!.hashCode()
         val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
         return JsonSchema(json { obj("\$ref" to string("#/$refPrefix/$definitionId")) }, allDefinitions)
     }
