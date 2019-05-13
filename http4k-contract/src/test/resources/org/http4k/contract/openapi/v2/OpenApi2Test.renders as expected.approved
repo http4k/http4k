@@ -67,7 +67,7 @@
           }
         ]
       },
-      "get": {
+      "put": {
         "tags": [
           "/basepath"
         ],
@@ -76,8 +76,17 @@
           "application/json"
         ],
         "consumes": [
+          "application/json"
         ],
         "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object2083284563"
+            }
+          }
         ],
         "responses": {
           "303": {
@@ -551,6 +560,15 @@
     }
   },
   "definitions": {
+    "object2083284563": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "example": "http://foowang"
+        }
+      }
+    },
     "object1547825812": {
       "type": "object",
       "properties": {

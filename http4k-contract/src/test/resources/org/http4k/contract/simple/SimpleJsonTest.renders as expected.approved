@@ -14,7 +14,7 @@
     "GET:/basepath/produces_and_consumes": "<unknown>",
     "POST:/basepath/returning": "<unknown>",
     "POST:/basepath/body_auto_schema": "<unknown>",
-    "GET:/basepath/body_auto_schema": "<unknown>",
+    "PUT:/basepath/body_auto_schema": "<unknown>",
     "POST:/basepath/bearer_auth": "<unknown>"
   }
 }

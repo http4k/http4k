@@ -14,11 +14,13 @@ import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
@@ -133,8 +135,9 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 ), "someOtherId")
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
+                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang")))
                 returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
-            } bindContract GET to { Response(OK) }
+            } bindContract PUT to { Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
             } bindContract POST to { Response(OK) }
@@ -150,3 +153,4 @@ enum class Foo {
 
 data class ArbObject1(val anotherString: Foo)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
+data class ArbObject3(val uri: Uri)
