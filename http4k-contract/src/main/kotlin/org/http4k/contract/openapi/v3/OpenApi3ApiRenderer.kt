@@ -36,7 +36,7 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             obj(
                 listOf(
                     "name" to string(name),
-                    "description" to (description?.let { json.string(it) }.orNullNode())
+                    "description" to description.asJson()
                 )
             )
         }
@@ -65,19 +65,19 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             obj(
                 "summary" to summary.asJson(),
                 "description" to (description.asJson()),
-                "tags" to (tags?.map { string(it) }?.let { array(it) }.orNullNode()),
-                "parameters" to (parameters?.asJson().orNullNode()),
-                "requestBody" to (requestBody?.asJson().orNullNode()),
+                "tags" to (array(tags.map { string(it) })),
+                "parameters" to parameters.asJson(),
+                "requestBody" to (requestBody.asJson()),
                 "responses" to responses.asJson(),
-                "security" to (security.orNullNode()),
+                "security" to (security),
                 "operationId" to operationId.asJson()
             )
         }
 
     private fun RequestContents<NODE>.asJson(): NODE = json {
         obj(
-            "content" to content?.asJson().orNullNode(),
-            "required" to boolean(true)
+            "content" to content.asJson(),
+            "required" to boolean(content.isNotEmpty())
         )
     }
 
@@ -100,8 +100,10 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun SchemaContent<NODE>.toJson(): NODE = json {
         obj(
-            "example" to example.orNullNode(),
-            "schema" to schema.orNullNode()
+            listOfNotNull(
+                example?.let { "example" to it },
+                schema?.let { "schema" to it }
+            )
         )
     }
 
@@ -125,7 +127,7 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             it.key to
                 obj(
                     "description" to it.value.description.asJson(),
-                    "content" to it.value.content.asJson().orNullNode())
+                    "content" to it.value.content.asJson())
         })
     }
 
@@ -138,11 +140,13 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
 
     private fun SchemaParameter<NODE>.asJson(): NODE = json {
         obj(
-            "schema" to (schema.orNullNode()),
-            "in" to string(`in`),
-            "name" to string(name),
-            "required" to boolean(required),
-            "description" to (description.asJson())
+            listOfNotNull(
+                schema?.let { "schema" to it },
+                "in" to string(`in`),
+                "name" to string(name),
+                "required" to boolean(required),
+                "description" to description.asJson()
+            )
         )
     }
 
@@ -152,7 +156,7 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             "in" to string(`in`),
             "name" to string(name),
             "required" to boolean(required),
-            "description" to (description?.let { string(it) }.orNullNode())
+            "description" to description.asJson()
         )
     }
 

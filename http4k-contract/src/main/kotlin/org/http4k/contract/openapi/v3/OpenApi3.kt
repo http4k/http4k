@@ -74,11 +74,11 @@ class OpenApi3<NODE : Any>(
             ApiPath(
                 meta.summary,
                 meta.description,
-                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted().nullIfEmpty(),
-                asOpenApiParameters().nullIfEmpty(),
+                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
+                asOpenApiParameters(),
                 when (method) {
-                    in setOf(GET, DELETE, HEAD) -> null
-                    else -> meta.requestBody().takeIf { it.required }
+                    in setOf(GET, DELETE, HEAD) -> RequestContents()
+                    else -> meta.requestBody().takeIf { it.required } ?: RequestContents()
                 },
                 meta.responses(),
                 json(listOf(meta.security, contractSecurity).combineRef()),
@@ -112,7 +112,7 @@ class OpenApi3<NODE : Any>(
             }
         }
 
-        return RequestContents((noSchema + withSchema).nullIfEmpty()?.toMap())
+        return RequestContents((noSchema + withSchema).toMap())
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {

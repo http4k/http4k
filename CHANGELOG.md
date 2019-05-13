@@ -3,9 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.143.1 (uncut)
+### v3.143.1
 - [http4k-core] - Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
-- [http4k-contract] - Added some missing deprecations
+- [http4k-contract] - Added some missing deprecations.
+- [http4k-contract] - Fix #243 - Nulls not allowed in OpenApi V3 JSON models.
 
 ### v3.143.0
 - [http4k-contract] Fix #239 - OpenApi v3 schemas for raw lists blow up when rendering.
