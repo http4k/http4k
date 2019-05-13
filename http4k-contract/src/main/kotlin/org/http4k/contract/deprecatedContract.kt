@@ -46,11 +46,17 @@ fun contract(renderer: ContractRenderer = NoRenderer, descriptionPath: String = 
     this.routes += serverRoutes.toList()
 }
 
-@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.ApiKeySecurity<T>"))
-typealias ApiKey<T> = ApiKeySecurity<T>
-
 @Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.Security"))
 typealias Security = Security
 
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.ApiKeySecurity<T>"))
+typealias ApiKey<T> = ApiKeySecurity<T>
+
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.ApiKeySecurity<T>"))
+typealias ApiKeySecurity<T> = ApiKeySecurity<T>
+
 @Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.BasicAuthSecurity"))
 typealias BasicAuthSecurity = BasicAuthSecurity
+
+@Deprecated("use repackaged version", ReplaceWith("org.http4k.contract.security.NoSecurity"))
+typealias NoSecurity = NoSecurity
