@@ -10,20 +10,20 @@ import java.util.UUID
 typealias RequestContextLens<T> = BiDiLens<Request, T>
 
 object RequestContextKey {
-    fun <T> required(contexts: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
+    fun <T> required(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()): RequestContextLens<T> {
         val meta = Meta(true, "context", ObjectParam, name)
         return BiDiLens(meta, { target ->
-            contexts[target].let { it[name] ?: throw LensFailure(Missing(meta), target = it) }
-        }, { value: T, target: Request -> contexts[target][name] = value; target })
+            store[target].let { it[name] ?: throw LensFailure(Missing(meta), target = it) }
+        }, { value: T, target: Request -> store[target][name] = value; target })
     }
 
-    fun <T : Any?> optional(contexts: Store<RequestContext>, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> contexts[target][name] },
-            { value: T?, target: Request -> contexts[target][name] = value; target }
+    fun <T : Any?> optional(store: Store<RequestContext>, name: String = UUID.randomUUID().toString()) =
+        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] },
+            { value: T?, target: Request -> store[target][name] = value; target }
         )
 
-    fun <T : Any?> defaulted(contexts: Store<RequestContext>, default: T, name: String = UUID.randomUUID().toString()) =
-        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> contexts[target][name] ?: default },
-            { value: T, target: Request -> contexts[target][name] = value; target }
+    fun <T : Any?> defaulted(store: Store<RequestContext>, default: T, name: String = UUID.randomUUID().toString()) =
+        BiDiLens(Meta(false, "context", ObjectParam, name), { target -> store[target][name] ?: default },
+            { value: T, target: Request -> store[target][name] = value; target }
         )
 }

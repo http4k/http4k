@@ -15,13 +15,14 @@ fun main() {
 
     fun AddState(contexts: RequestContexts) = Filter { next ->
         {
-            contexts[it].set("myKey", SharedState("hello there"))
+            contexts[it]["myKey"] = SharedState("hello there")
             next(it)
         }
     }
 
     fun PrintState(contexts: RequestContexts): HttpHandler = { request ->
-        println(contexts[request].get<SharedState>("myKey"))
+        val message: SharedState? = contexts[request]["myKey"]
+        println(message)
         Response(Status.OK)
     }
 
