@@ -7,11 +7,9 @@
 object Versions {
     const val jackson_dataformat_xml: String = "2.9.8"
 
-    const val jackson_module_kotlin: String = "2.9.8"
+    const val com_fasterxml_jackson_module: String = "2.9.8"
 
-    const val jackson_module_jsonSchema: String = "2.9.8"
-
-    const val underscore: String = "1.43"
+    const val underscore: String = "1.44"
 
     const val handlebars: String = "4.1.2"
 
@@ -35,9 +33,9 @@ object Versions {
 
     const val micrometer_core: String = "1.1.4"
 
-    const val netty_codec_http2: String = "4.1.35.Final"
+    const val netty_codec_http2: String = "4.1.36.Final"
 
-    const val pebble: String = "3.0.8"
+    const val pebble: String = "3.0.8" //available: "3.0.9"
 
     const val io_undertow: String = "2.0.20.Final"
 
@@ -63,11 +61,11 @@ object Versions {
 
     const val httpcore: String = "4.4.11"
 
-    const val http2_server: String = "9.4.17.v20190418"
+    const val http2_server: String = "9.4.18.v20190429"
 
-    const val javax_websocket_server_impl: String = "9.4.17.v20190418"
+    const val javax_websocket_server_impl: String = "9.4.18.v20190429"
 
-    const val org_eclipse_jetty: String = "9.4.17.v20190418"
+    const val org_eclipse_jetty: String = "9.4.18.v20190429"
 
     const val freemarker: String = "2.3.28"
 
@@ -79,7 +77,7 @@ object Versions {
 
     const val json: String = "20180813"
 
-    const val jsoup: String = "1.11.3"
+    const val jsoup: String = "1.12.1"
 
     const val org_junit_jupiter: String = "5.4.2"
 
@@ -101,7 +99,7 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190428000050+0000"
+        const val nightlyVersion: String = "5.5-20190513000041+0000"
 
         const val releaseCandidate: String = ""
     }
