@@ -62,7 +62,7 @@
                   "type": "array",
                   "required": true,
                   "items": {
-                    "$ref": "urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1"
+                    "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:openapi:v3:ArbObject1"
                   }
                 }
               }
