@@ -228,7 +228,6 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "example": null,
               "schema": {
               }
             }
