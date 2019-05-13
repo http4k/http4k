@@ -9,7 +9,7 @@ changes with their rationale when appropriate:
 
 ### v3.142.0
 - [http4k-contract] Both OpenApi v2 and v3 are now supported, including automatic schema generation. Some classes for 
-OpenApi2 have moved to a new package. See module docs for details. For OpenApi v3, optionally include `http4k-format-jackson` to get JSON schema models based on JVM objects.
+OpenApi2 have moved to a new package - Deprecations should provide most alternatives. See module docs for details. For OpenApi v3, optionally include `http4k-format-jackson` to get JSON schema models based on JVM objects.
 - [http4k-format-jackson] Added reflective JSON schema creator, to be used for generating named models from JVM objects.  
 
 ### v3.141.0
