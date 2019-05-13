@@ -2,8 +2,12 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.openapi.v3.ArbObject1
+import org.http4k.contract.openapi.v3.ArbObject2
+import org.http4k.contract.openapi.v3.Foo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -15,9 +19,11 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
+import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
@@ -121,12 +127,22 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
             } bindContract POST to { Response(OK) }
-
-            routes += specificRoutes()
+            routes += "/body_auto_schema" meta {
+                receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
+                    "s",
+                    ArbObject1(Foo.bar),
+                    listOf(1),
+                    true
+                ))
+            } bindContract POST to { Response(OK) }
+            routes += "/body_auto_schema" meta {
+                returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
+            } bindContract GET to { Response(OK) }
+            routes += "/bearer_auth" meta {
+                security = BearerAuthSecurity("foo")
+            } bindContract POST to { Response(OK) }
         }
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
-
-    open fun specificRoutes(): List<ContractRoute> = emptyList()
 }

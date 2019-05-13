@@ -15,6 +15,89 @@
     }
   ],
   "paths": {
+    "/basepath/bearer_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_auto_schema": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object1821014191"
+            }
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/object1547825812"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "tags": [
@@ -468,6 +551,47 @@
     }
   },
   "definitions": {
+    "object1547825812": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bing"
+        }
+      }
+    },
+    "object1544899175": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bar"
+        }
+      }
+    },
+    "object1821014191": {
+      "type": "object",
+      "properties": {
+        "string": {
+          "type": "string",
+          "example": "s"
+        },
+        "child": {
+          "$ref": "#/definitions/object1544899175"
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "bool": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
     "object1283926341": {
       "type": "object",
       "properties": {

@@ -12,6 +12,9 @@
     "POST:/basepath/extra_security": "<unknown>",
     "POST:/basepath/body_form": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",
-    "POST:/basepath/returning": "<unknown>"
+    "POST:/basepath/returning": "<unknown>",
+    "POST:/basepath/body_auto_schema": "<unknown>",
+    "GET:/basepath/body_auto_schema": "<unknown>",
+    "POST:/basepath/bearer_auth": "<unknown>"
   }
 }
