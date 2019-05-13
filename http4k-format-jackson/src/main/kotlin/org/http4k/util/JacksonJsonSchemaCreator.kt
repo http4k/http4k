@@ -35,7 +35,10 @@ class JacksonJsonSchemaCreator(private val json: ConfigurableJackson = Jackson,
                 obj(
                     "type" to string("array"),
                     "required" to boolean(true),
-                    "items" to message.node
+                    "items" to when {
+                        message.node.has("type") -> json.obj("schema" to message.node)
+                        else -> message.node
+                    }
                 )
             }, message.definitions)
         } ?: jsonToJsonSchema.toSchema(json.array(emptyList()), overrideDefinitionId)

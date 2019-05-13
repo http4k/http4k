@@ -7,7 +7,13 @@
         "type": "array",
         "required": true,
         "items": {
-          "$ref": "#/components/schemas/urn:jsonschema:org:http4k:util:Simple"
+          "schema": {
+            "type": "array",
+            "required": true,
+            "items": {
+              "$ref": "#/components/schemas/urn:jsonschema:org:http4k:util:Simple"
+            }
+          }
         }
       }
     }
