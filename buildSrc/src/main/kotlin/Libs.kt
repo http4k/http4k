@@ -12,7 +12,7 @@ object Libs {
 
     /**
      * [jackson-module-jsonSchema website](https://github.com/FasterXML/jackson-module-jsonSchema) */
-    const val jackson_module_jsonSchema: String =
+    const val jackson_module_jsonschema: String =
         "com.fasterxml.jackson.module:jackson-module-jsonSchema:" + Versions.com_fasterxml_jackson_module
 
     /**

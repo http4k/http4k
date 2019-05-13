@@ -35,7 +35,7 @@ object Versions {
 
     const val netty_codec_http2: String = "4.1.36.Final"
 
-    const val pebble: String = "3.0.8" //available: "3.0.9"
+    const val pebble: String = "3.0.9"
 
     const val io_undertow: String = "2.0.20.Final"
 
