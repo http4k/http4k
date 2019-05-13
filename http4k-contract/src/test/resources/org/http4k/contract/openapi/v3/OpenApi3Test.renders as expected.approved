@@ -61,9 +61,8 @@
                 ],
                 "schema": {
                   "type": "array",
-                  "required": true,
                   "items": {
-                    "$ref": "#/components/schemas/object-1161328054"
+                    "$ref": "#/components/schemas/object1547825812"
                   }
                 }
               }
@@ -600,6 +599,15 @@
       "object-1161328054": {
         "type": "object",
         "properties": {
+        }
+      },
+      "object1547825812": {
+        "type": "object",
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "bing"
+          }
         }
       }
     },
