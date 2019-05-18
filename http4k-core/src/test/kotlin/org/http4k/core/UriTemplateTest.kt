@@ -108,6 +108,12 @@ class UriTemplateTest {
     }
 
     @Test
+    fun matchedValuesAreUrlDecoded() {
+        val extracted = from("path/{band}").extract("path/Earth%2C%20Wind%20%26%20Fire")
+        assertThat(extracted.getValue("band"), equalTo("Earth, Wind & Fire"))
+    }
+
+    @Test
     fun capturingPathVariableWithSlashes() {
         val template = from("/{anything:.*}")
         assertThat(template.matches("/foo/bar"), equalTo(true))
