@@ -10,11 +10,13 @@ Find here answers to the most common questions that we get asked about [http4k]
 
 **Q. Is [http4k] currently used in production?**
 
-**A.** Absolutely! The library is currently in use serving the global traffic for a large academic publisher (easily serving 10s of millions of requests per day on a few nodes) and is also being used in production in at least 2 global Investment Banks (that we know of). If you're running [http4k] in production and would like to be listed on the site as an adopter, please get in touch.
+**A.** Absolutely! Whilst overall stats are obviously hard to come by, the biggest known usage of the library is serving the global site traffic (rank ~700 globally) for a large academic publisher, easily serving 10s of millions of requests per day on a few nodes. Additionally judging from the download stats and interest in the Slack channel indicate that take-up is increasing nicely. [http4k] also appears in the [Thoughtworks Tech Radar](https://www.thoughtworks.com/radar/languages-and-frameworks/http4k), which covers useful and upcoming technologies used in Thoughtworks-delivered projects.
+
+If you're running [http4k] in production and would like to be listed on the site as an adopter, please get in touch.
 
 **Q. Does [http4k] support an Async model? I need webscale!**
 
-**A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll probably use co-routines and they're still marked as experimental which is another reason we are holding off. As for the scaling arguments, see the above answer relating to production usage.
+**A.** Not at the moment. Adding Async support is a decision that we are thinking about carefully so that we don't end up complicating the API. When we do add it, it'll use co-routines model so we also want to ensure that the integrations with the various backends and clients are solid, as well as supporting essential features that currently rely on Threads, such as Zipkin Request Tracing and Resilience4j support. As for the scaling arguments, see the above answer relating to production usage, or checkout the [benchmark results](/performance/) to see how [http4k] compares to other JVM-based sync and async web libraries.
 
 ### API
 **Q. I'm attempting to build HTTP messages using the API, but changes don't affect the object (e.g. calling `request.body("hello")`)?**
@@ -44,7 +46,7 @@ Find here answers to the most common questions that we get asked about [http4k]
 
 **Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
 
-**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class fields with `@JsonAlias` to get the deserialisation to work correctly.
+**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class with `@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)` or the fields with `@JsonAlias` or to get it work correctly.
 
 **Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
 
