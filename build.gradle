@@ -9,12 +9,15 @@ buildscript {
         classpath Libs.gradle_cobertura_plugin
         classpath Libs.coveralls_gradle_plugin
         classpath Libs.dokka_gradle_plugin
+        classpath Libs.com_jfrog_bintray_gradle_plugin
+        classpath Libs.nebula_provided_base_gradle_plugin
+        classpath Libs.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
     }
 }
 
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
-    id 'net.saliman.cobertura' version '2.5.4'
+    id 'net.saliman.cobertura' version '2.6.1'
     id 'nebula.provided-base' version '3.0.3'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'jmfayard.github.io.gradle-kotlin-dsl-libs' version "0.2.6"
