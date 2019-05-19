@@ -25,11 +25,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -329,11 +324,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -354,11 +344,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -419,11 +404,6 @@
             "description": "jsonHeader"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -444,11 +424,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -487,11 +462,6 @@
             "description": null
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -512,11 +482,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -573,11 +538,6 @@
             "description": "jsonQuery"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -598,11 +558,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
           "403": {
             "description": "no way jose",

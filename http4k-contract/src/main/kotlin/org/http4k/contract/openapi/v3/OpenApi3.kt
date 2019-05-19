@@ -78,7 +78,7 @@ class OpenApi3<NODE : Any>(
                 asOpenApiParameters(),
                 when (method) {
                     in setOf(GET, DELETE, HEAD) -> RequestContents()
-                    else -> meta.requestBody().takeIf { it.required } ?: RequestContents()
+                    else -> meta.requestBody()?.takeIf { it.required }
                 },
                 meta.responses(),
                 json(listOf(meta.security, contractSecurity).combineRef()),
@@ -99,7 +99,7 @@ class OpenApi3<NODE : Any>(
         }
     }
 
-    private fun RouteMeta.requestBody(): RequestContents<NODE> {
+    private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(ParamMeta.StringParam) }
 
         val withSchema = requests.mapNotNull {
@@ -113,7 +113,9 @@ class OpenApi3<NODE : Any>(
             }
         }
 
-        return RequestContents((noSchema + withSchema).toMap())
+        return (noSchema + withSchema)
+            .takeIf { it.isNotEmpty() }
+            ?.let { RequestContents(it.toMap()) }
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
