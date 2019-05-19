@@ -24,11 +24,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -330,11 +326,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -355,11 +347,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -420,11 +408,7 @@
             "description": "jsonHeader"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -445,11 +429,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -488,11 +468,7 @@
             "description": null
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -513,11 +489,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -574,11 +546,7 @@
             "description": "jsonQuery"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -599,11 +567,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
           "403": {
             "description": "no way jose",

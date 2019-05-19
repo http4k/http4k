@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.144.0 (uncut)
 - Update various dependencies.
+- [http4k-contract] - Improvements to better adhere to OA3 spec.
 
 ### v3.143.1
 - [http4k-core] - Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
