@@ -63,22 +63,28 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
     private fun ApiPath<NODE>.toJson(): NODE =
         json {
             obj(
-                "summary" to summary.asJson(),
-                "description" to (description.asJson()),
-                "tags" to (array(tags.map { string(it) })),
-                "parameters" to parameters.asJson(),
-                "requestBody" to (requestBody.asJson()),
-                "responses" to responses.asJson(),
-                "security" to (security),
-                "operationId" to operationId.asJson()
+                listOfNotNull(
+                    "summary" to summary.asJson(),
+                    "description" to description.asJson(),
+                    "tags" to array(tags.map { string(it) }),
+                    "parameters" to parameters.asJson(),
+                    requestBody?.asJson(),
+                    "responses" to responses.asJson(),
+                    "security" to security,
+                    "operationId" to operationId.asJson()
+                )
             )
         }
 
-    private fun RequestContents<NODE>.asJson(): NODE = json {
-        obj(
-            "content" to content.asJson(),
-            "required" to boolean(content.isNotEmpty())
-        )
+    private fun RequestContents<NODE>.asJson() = json {
+        content?.let {
+            "requestBody" to obj(
+                listOfNotNull(
+                    "content" to it.asJson(),
+                    "required" to boolean(content.isNotEmpty())
+                )
+            )
+        }
     }
 
     @JvmName("contentAsJson")
