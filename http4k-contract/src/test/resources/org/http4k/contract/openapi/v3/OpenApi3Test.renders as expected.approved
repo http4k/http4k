@@ -26,7 +26,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -329,7 +330,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -353,7 +355,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -417,7 +420,8 @@
           }
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -441,7 +445,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -483,7 +488,8 @@
           }
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -507,7 +513,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -567,7 +574,8 @@
           }
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {
@@ -591,7 +599,8 @@
         "parameters": [
         ],
         "requestBody": {
-          "content": null,
+          "content": {
+          },
           "required": false
         },
         "responses": {

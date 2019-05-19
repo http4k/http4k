@@ -60,13 +60,12 @@ sealed class BodyContent {
     }
 }
 
-class RequestContents<NODE>(val content: Map<String, BodyContent>? = null) : HasSchema<NODE> {
-    override fun definitions() = content?.values
-        ?.filterIsInstance<HasSchema<NODE>>()
-        ?.flatMap { it.definitions() }
-        ?: emptyList()
+class RequestContents<NODE>(val content: Map<String, BodyContent> = emptyMap()) : HasSchema<NODE> {
+    override fun definitions() = content.values
+        .filterIsInstance<HasSchema<NODE>>()
+        .flatMap { it.definitions() }
 
-    val required = content != null
+    val required = content.isNotEmpty()
 }
 
 class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent> = emptyMap()) : HasSchema<NODE> {
