@@ -326,10 +326,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": null,
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -432,10 +429,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": null,
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -495,10 +489,7 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": null,
-          "required": false
-        },
+        "requestBody": null,
         "responses": {
         },
         "security": [

@@ -77,7 +77,7 @@ class OpenApi3<NODE : Any>(
                 if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
                 asOpenApiParameters(),
                 when (method) {
-                    in setOf(GET, DELETE, HEAD) -> RequestContents()
+                    in setOf(GET, DELETE, HEAD) -> null
                     else -> meta.requestBody()?.takeIf { it.required }
                 },
                 meta.responses(),
