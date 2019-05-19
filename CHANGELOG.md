@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.144.0 (uncut)
+- Update various dependencies.
+
 ### v3.143.1
 - [http4k-core] - Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
 - [http4k-contract] - Added some missing deprecations.

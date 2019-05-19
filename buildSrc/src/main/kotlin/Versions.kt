@@ -5,9 +5,9 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val jackson_dataformat_xml: String = "2.9.8"
+    const val jackson_dataformat_xml: String = "2.9.9"
 
-    const val com_fasterxml_jackson_module: String = "2.9.8"
+    const val com_fasterxml_jackson_module: String = "2.9.9"
 
     const val underscore: String = "1.44"
 
@@ -27,9 +27,9 @@ object Versions {
 
     const val okhttp: String = "3.14.1"
 
-    const val io_github_resilience4j: String = "0.14.1"
+    const val io_github_resilience4j: String = "0.15.0"
 
-    const val ktor_server_cio: String = "1.1.4"
+    const val ktor_server_cio: String = "1.2.0"
 
     const val micrometer_core: String = "1.1.4"
 
@@ -95,11 +95,11 @@ object Versions {
      *      ./gradle/wrapper/gradle-wrapper.properties
      */
     object Gradle {
-        const val runningVersion: String = "5.0"
+        const val runningVersion: String = "5.4.1"
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.5-20190513000041+0000"
+        const val nightlyVersion: String = "5.6-20190519000207+0000"
 
         const val releaseCandidate: String = ""
     }
