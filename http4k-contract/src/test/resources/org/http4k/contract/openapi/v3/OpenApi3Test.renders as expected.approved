@@ -25,6 +25,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -324,6 +328,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -344,6 +352,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -404,6 +416,10 @@
             "description": "jsonHeader"
           }
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -424,6 +440,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -462,6 +482,10 @@
             "description": null
           }
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -482,6 +506,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -538,6 +566,10 @@
             "description": "jsonQuery"
           }
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
         },
         "security": [
@@ -558,6 +590,10 @@
         ],
         "parameters": [
         ],
+        "requestBody": {
+          "content": null,
+          "required": false
+        },
         "responses": {
           "403": {
             "description": "no way jose",
