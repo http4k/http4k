@@ -82,7 +82,8 @@ class OpenApi3<NODE : Any>(
                 },
                 meta.responses(),
                 json(listOf(meta.security, contractSecurity).combineRef()),
-                meta.operationId
+                meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
+                    .split('/').joinToString("") { it.capitalize() }
             )
         )
 

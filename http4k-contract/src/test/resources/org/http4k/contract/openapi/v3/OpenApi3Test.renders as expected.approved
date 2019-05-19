@@ -42,7 +42,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBearer_auth"
       }
     },
     "/basepath/body_auto_schema": {
@@ -82,7 +82,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_auto_schema"
       },
       "put": {
         "summary": "<unknown>",
@@ -131,7 +131,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "putBasepathBody_auto_schema"
       }
     },
     "/basepath/body_form": {
@@ -183,7 +183,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_form"
       }
     },
     "/basepath/body_json_list_schema": {
@@ -221,7 +221,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_json_list_schema"
       }
     },
     "/basepath/body_json_noschema": {
@@ -250,7 +250,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_json_noschema"
       }
     },
     "/basepath/body_json_schema": {
@@ -286,7 +286,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_json_schema"
       }
     },
     "/basepath/body_string": {
@@ -316,7 +316,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathBody_string"
       }
     },
     "/basepath/descriptions": {
@@ -371,7 +371,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathExtra_security"
       }
     },
     "/basepath/headers": {
@@ -432,7 +432,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathHeaders"
       }
     },
     "/basepath/nometa": {
@@ -457,7 +457,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "getBasepathNometa"
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
@@ -500,7 +500,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathPaths{firstName}Bertrand{age}"
       }
     },
     "/basepath/produces_and_consumes": {
@@ -525,7 +525,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "getBasepathProduces_and_consumes"
       }
     },
     "/basepath/queries": {
@@ -586,7 +586,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathQueries"
       }
     },
     "/basepath/returning": {
@@ -624,7 +624,7 @@
             ]
           }
         ],
-        "operationId": null
+        "operationId": "postBasepathReturning"
       }
     }
   },

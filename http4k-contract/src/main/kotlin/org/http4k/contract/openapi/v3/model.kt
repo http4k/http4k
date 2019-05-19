@@ -28,7 +28,7 @@ data class ApiPath<NODE>(
     val requestBody: RequestContents<NODE>,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE,
-    val operationId: String?
+    val operationId: String
 ) {
     fun definitions() = listOfNotNull(
         responses.flatMap { it.value.definitions() },
