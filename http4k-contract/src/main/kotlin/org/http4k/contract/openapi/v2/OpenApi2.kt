@@ -6,6 +6,7 @@ import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
+import org.http4k.contract.ResponseMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.SecurityRenderer
@@ -13,6 +14,7 @@ import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.lens.Failure
@@ -140,7 +142,9 @@ open class OpenApi2<out NODE>(
     }
 
     private fun render(responses: List<HttpMessageMeta<Response>>) = json {
-        responses.fold(FieldsAndDefinitions<NODE>()) { memo, meta ->
+        (responses.takeIf { it.isNotEmpty() } ?: listOf(
+            ResponseMeta(OK.description, Response(OK))
+        )).fold(FieldsAndDefinitions<NODE>()) { memo, meta ->
             val (node, definitions) = meta.asSchema()
 
             memo + FieldAndDefinitions(
