@@ -23,7 +23,7 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
 }
 
 /**
- * Cache the result of the API render, in case it was expensive
+ * Cache the result of the API render, in case it is expensive to calculate.
  */
 fun <API : Any, NODE : Any> ApiRenderer<API, NODE>.cached(): ApiRenderer<API, NODE> = object : ApiRenderer<API, NODE> by this {
     private val cached = AtomicReference<NODE>()
