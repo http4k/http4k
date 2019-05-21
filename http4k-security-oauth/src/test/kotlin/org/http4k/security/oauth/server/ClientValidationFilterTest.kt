@@ -26,7 +26,7 @@ internal class ClientValidationFilterTest {
     private val json = Jackson
 
     private val filter =
-        ClientValidationFilter(HardcodedClientValidator(validClientId, validRedirectUri), ErrorRenderer(json, documentationUri))
+        ClientValidationFilter(HardcodedClientValidator(validClientId, validRedirectUri), ErrorRenderer(json, documentationUri), BasicAuthRequestExtractor)
             .then(loginPage)
 
 

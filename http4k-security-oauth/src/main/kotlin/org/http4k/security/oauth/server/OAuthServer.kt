@@ -36,8 +36,8 @@ class OAuthServer(
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock, idTokens, errorRenderer))
 
     // use this filter to protect your authentication/authorization pages
-    val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer)
-        .then(AuthRequestTrackingFilter(authRequestTracking))
+    val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer, BasicAuthRequestExtractor)
+        .then(AuthRequestTrackingFilter(authRequestTracking, BasicAuthRequestExtractor, errorRenderer))
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
