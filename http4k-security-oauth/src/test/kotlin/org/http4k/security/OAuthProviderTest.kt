@@ -49,14 +49,12 @@ class OAuthProviderTest {
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
-        Request(GET, "/")
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&nonce=randomNonce"""
-        Request(GET, "/")
 
         val jwts = object : RequestJwts {
             override fun create(authRequest: AuthRequest, state: String) = RequestJwtContainer("myCustomJwt")
@@ -67,7 +65,6 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - request redirecttion may use other response_type`() {
-        Request(GET, "/")
         assertThat(oAuth(oAuthPersistence, OK, ResponseType.CodeIdToken)
             .authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", ".*response_type=code\\+id_token.*".toRegex())))
     }
