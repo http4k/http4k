@@ -11,7 +11,7 @@ interface AuthRequestTracking {
     /**
      * Assign a reference of AuthRequest to the response
      */
-    fun trackAuthRequest(authRequest: AuthRequest, response: Response): Response
+    fun trackAuthRequest(request: Request, authRequest: AuthRequest, response: Response): Response
 
     /**
      * Resolves a particular AuthRequest related to the particular request

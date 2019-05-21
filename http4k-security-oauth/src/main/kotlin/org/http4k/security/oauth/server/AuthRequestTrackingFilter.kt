@@ -16,7 +16,7 @@ class AuthRequestTrackingFilter(
             extractor.extract(request)
                 .map {
                     val response = next(request)
-                    tracking.trackAuthRequest(it, response)
+                    tracking.trackAuthRequest(request, it, response)
                 }.mapFailure(errorRenderer::response).get()
         }
     }

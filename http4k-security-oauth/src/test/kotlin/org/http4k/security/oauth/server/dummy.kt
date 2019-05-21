@@ -11,7 +11,7 @@ import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
@@ -47,7 +47,7 @@ class DummyClientValidator : ClientValidator {
 }
 
 class DummyOAuthAuthRequestTracking : AuthRequestTracking {
-    override fun trackAuthRequest(authRequest: AuthRequest, response: Response): Response = response
+    override fun trackAuthRequest(request: Request, authRequest: AuthRequest, response: Response): Response = response
     override fun resolveAuthRequest(request: Request): AuthRequest? = request.authorizationRequest()
 }
 
