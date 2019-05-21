@@ -7,19 +7,20 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.security.CrossSiteRequestForgeryToken.Companion.SECURE_CSRF
 import org.http4k.security.openid.IdTokenConsumer
+import org.http4k.security.openid.RequestJwts
 
 /**
  * Provides a configured set of objects for use with an OAuth2 provider.
  */
 class OAuthProvider(
-    providerConfig: OAuthProviderConfig,
+    private val providerConfig: OAuthProviderConfig,
     client: HttpHandler,
-    callbackUri: Uri,
-    scopes: List<String>,
-    oAuthPersistence: OAuthPersistence,
-    modifyAuthState: (Uri) -> Uri = { it },
-    generateCrsf: CsrfGenerator = SECURE_CSRF,
-    responseType: ResponseType = ResponseType.Code,
+    private val callbackUri: Uri,
+    private val scopes: List<String>,
+    private val oAuthPersistence: OAuthPersistence,
+    private val modifyAuthState: (Uri) -> Uri = { it },
+    private val generateCrsf: CsrfGenerator = SECURE_CSRF,
+    private val responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
 ) {
 
@@ -28,6 +29,9 @@ class OAuthProvider(
 
     // use this filter to protect endpoints
     val authFilter: Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, modifyAuthState, oAuthPersistence, responseType)
+
+    // protect endpoint and provide custom request JWT creation mechanism
+    fun authFilter(requestJwts: RequestJwts): Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, modifyAuthState, oAuthPersistence, responseType, uriBuilderWithRequestJwt(requestJwts))
 
     private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig)
 
