@@ -59,7 +59,7 @@ data class NameAndMessage(val name: String, val message: String)
 // this route uses auto-marshalling to convert the JSON body directly to/from a data class instance
 fun echoRoute(): ContractRoute {
 
-    // the body lens here is imported as an extension function from the Jacskson instance
+    // the body lens here is imported as an extension function from the Jackson instance
     val body = Body.auto<NameAndMessage>().toLens()
 
     // this specifies the route contract, including examples of the input and output body objects - they will
@@ -70,7 +70,7 @@ fun echoRoute(): ContractRoute {
         returning(OK, body to NameAndMessage("jim", "hello!"))
     } bindContract POST
 
-    // note that because we don't have any dynamic parameters, we can use a HttpHandler instance instad of a function
+    // note that because we don't have any dynamic parameters, we can use a HttpHandler instance instead of a function
     val echo: HttpHandler = { request: Request ->
         val received: NameAndMessage = body(request)
         Response(OK).with(body of received)
