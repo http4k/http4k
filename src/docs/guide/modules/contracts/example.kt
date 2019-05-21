@@ -54,10 +54,10 @@ fun greetRoute(): ContractRoute {
     return spec to ::greet
 }
 
+data class NameAndMessage(val name: String, val message: String)
+
 // this route uses auto-marshalling to convert the JSON body directly to/from a data class instance
 fun echoRoute(): ContractRoute {
-
-    data class NameAndMessage(val name: String, val message: String)
 
     // the body lens here is imported as an extension function from the Jacskson instance
     val body = Body.auto<NameAndMessage>().toLens()
@@ -94,10 +94,13 @@ val contract = contract {
 
 val handler: HttpHandler = routes("/api/v1" bind contract)
 
-
 // by default, the OpenAPI docs live at the root of the contract context, but we can override it..
 fun main() {
     println(handler(Request(GET, "/api/v1/swagger.json")))
+
+    println(handler(Request(POST, "/api/v1/echo")
+        .query("api", "42")
+        .body("""{"name":"Bob","message":"Hello"}""")))
 }
 
 
