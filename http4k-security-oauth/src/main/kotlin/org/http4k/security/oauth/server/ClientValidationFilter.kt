@@ -5,8 +5,6 @@ import com.natpryce.map
 import com.natpryce.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.security.ResponseType
 
 class ClientValidationFilter(private val clientValidator: ClientValidator,
@@ -14,11 +12,10 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                              private val extractor: AuthRequestExtractor) : Filter {
 
     override fun invoke(next: HttpHandler): HttpHandler =
-        ServerFilters.CatchLensFailure
-            .then {
-                if (!validResponseTypes.contains(it.query("response_type"))) {
-                    return@then errorRenderer.response(UnsupportedResponseType(it.query("response_type").orEmpty()))
-                }
+        {
+            if (!validResponseTypes.contains(it.query("response_type"))) {
+                errorRenderer.response(UnsupportedResponseType(it.query("response_type").orEmpty()))
+            } else {
                 extractor.extract(it).map { authorizationRequest ->
                     if (!clientValidator.validateClientId(authorizationRequest.client)) {
                         errorRenderer.response(InvalidClientId)
@@ -29,6 +26,7 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                     }
                 }.mapFailure(errorRenderer::response).get()
             }
+        }
 
     companion object {
         val validResponseTypes = ResponseType.values().map { it.queryParameterValue }

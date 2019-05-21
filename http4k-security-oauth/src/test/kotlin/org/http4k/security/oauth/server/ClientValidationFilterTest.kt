@@ -47,7 +47,7 @@ internal class ClientValidationFilterTest {
             .query("redirect_uri", validRedirectUri.toString())
         )
         assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.status.description, equalTo("query 'client_id' is required"))
+        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request\",\"error_description\":\"query 'client_id' is required\",\"error_uri\":\"SomeUri\"}"))
     }
 
     @Test
@@ -57,7 +57,7 @@ internal class ClientValidationFilterTest {
             .query("client_id", validClientId.value)
         )
         assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.status.description, equalTo("query 'redirect_uri' is required"))
+        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request\",\"error_description\":\"query 'redirect_uri' is required\",\"error_uri\":\"SomeUri\"}"))
     }
 
     @Test
