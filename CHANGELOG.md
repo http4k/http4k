@@ -3,9 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.144.0 (uncut)
+### v3.144.0
 - Update various dependencies.
 - [http4k-contract] - Improvements to better adhere to OA3 spec.
+- [http4k-security-oauth] - Allow injecting OpenID's `request` parameter into the authorization request.
+- [http4k-security-oauth] - Expose request to AuthRequestTracking. 
 
 ### v3.143.1
 - [http4k-core] - Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
