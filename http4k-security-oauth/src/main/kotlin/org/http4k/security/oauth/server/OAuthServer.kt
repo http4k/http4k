@@ -28,7 +28,7 @@ class OAuthServer(
     accessTokens: AccessTokens,
     json: AutoMarshallingJson,
     clock: Clock,
-    authRequestExtractor: AuthRequestExtractor = BasicAuthRequestExtractor,
+    authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     idTokens: IdTokens = IdTokens.Unsupported,
     documentationUri: String? = null
 ) {
@@ -38,7 +38,7 @@ class OAuthServer(
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer, authRequestExtractor)
-        .then(AuthRequestTrackingFilter(authRequestTracking, BasicAuthRequestExtractor, errorRenderer))
+        .then(AuthRequestTrackingFilter(authRequestTracking, AuthRequestFromQueryParameters, errorRenderer))
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)

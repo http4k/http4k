@@ -10,7 +10,7 @@ interface AuthRequestExtractor {
     fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest>
 }
 
-object BasicAuthRequestExtractor : AuthRequestExtractor {
+object AuthRequestFromQueryParameters : AuthRequestExtractor {
     override fun extract(request: Request): Result<AuthRequest, InvalidAuthorizationRequest> =
         try {
             Success(request.authorizationRequest())

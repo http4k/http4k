@@ -22,7 +22,7 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
         accessTokens = DummyAccessTokens(),
         json = Jackson,
         clock = FixedClock,
-        authRequestExtractor = BasicAuthRequestExtractor,
+        authRequestExtractor = AuthRequestFromQueryParameters,
         idTokens = DummyIdtokens()
     )
 
@@ -44,7 +44,7 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
         accessTokens = DummyAccessTokens(),
         json = Jackson,
         clock = FixedClock,
-        authRequestExtractor = BasicAuthRequestExtractor
+        authRequestExtractor = AuthRequestFromQueryParameters
     )
 
     return routes(
