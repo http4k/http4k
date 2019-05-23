@@ -19,6 +19,7 @@ class JsonToJsonSchema<NODE>(
             JsonType.Object -> objectSchema(overrideDefinitionId)
             JsonType.Array -> arraySchema(overrideDefinitionId)
             JsonType.String -> JsonSchema(StringParam.schema(json.string(json.text(node))), definitions)
+            JsonType.Integer -> numberSchema()
             JsonType.Number -> numberSchema()
             JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")

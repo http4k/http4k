@@ -60,6 +60,8 @@ open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoM
     override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
+    override fun integer(value: JsonNode) = value.asLong()
+    override fun decimal(value: JsonNode) = BigDecimal(value.toString())
 
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)

@@ -80,9 +80,12 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `get text`() {
+    fun `get values`() {
         j {
             assertThat(text(string("world")), equalTo("world"))
+            assertThat(integer(number(1)), equalTo(1L))
+            assertThat(decimal(number(BigDecimal("1.0567"))), equalTo(BigDecimal("1.0567")))
+            assertThat(bool(boolean(true)), equalTo(true))
         }
     }
 
@@ -92,13 +95,6 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
             assertThat(textValueOf(obj("value" to string("world")), "value"), equalTo("world"))
             assertThat(textValueOf(obj("value" to number(1)), "value"), equalTo("1"))
             assertThat(textValueOf(obj("value" to boolean(true)), "value"), equalTo("true"))
-        }
-    }
-
-    @Test
-    fun `get boolean`() {
-        j {
-            assertThat(bool(boolean(true)), equalTo(true))
         }
     }
 

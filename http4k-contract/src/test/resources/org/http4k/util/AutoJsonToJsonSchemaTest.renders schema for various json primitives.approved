@@ -1,0 +1,42 @@
+{
+  "node": {
+    "bob": {
+      "properties": {
+        "string": {
+          "type": "string",
+          "example": "string"
+        },
+        "boolean": {
+          "type": "boolean",
+          "example": false
+        },
+        "int": {
+          "type": "number",
+          "example": 2147483647
+        },
+        "long": {
+          "type": "number",
+          "example": -9223372036854775808
+        },
+        "double": {
+          "type": "number",
+          "example": 9.9999999999
+        },
+        "float": {
+          "type": "number",
+          "example": -10.0
+        },
+        "bigInt": {
+          "type": "number",
+          "example": 92233720368547758079223372036854775807
+        },
+        "bigDecimal": {
+          "type": "number",
+          "example": 1.7976931348623157E+308111
+        }
+      }
+    }
+  },
+  "definitions": [
+  ]
+}
