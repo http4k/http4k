@@ -18,30 +18,27 @@ class AutoJsonToJsonSchema<NODE : Any>(
         JsonSchema(
             obj(
                 (overrideDefinitionId ?: obj.javaClass.simpleName) to
-                    json.asJsonObject(json.asJsonObject(obj).toObjectSchema())
+                    json.asJsonObject(json.asJsonObject(obj).toObjectSchema(obj))
             ), emptySet())
     }
 
-    private fun NODE.fieldsToSchema(): List<Pair<String, SchemaNode>> =
-        json.fields(this).map { (name, field) ->
+    private fun NODE.toSchema(paramMeta: ParamMeta) = SchemaNode.Primitive(paramMeta, this)
+
+    private fun NODE.toArraySchema() = SchemaNode.Array(this)
+
+    private fun NODE.toObjectSchema(obj: Any): SchemaNode.Object {
+        val properties = json.fields(this).map { (name, field) ->
             name to when (json.typeOf(field)) {
                 JsonType.String -> field.toSchema(StringParam)
                 JsonType.Integer -> field.toSchema(IntegerParam)
                 JsonType.Number -> field.toSchema(NumberParam)
                 JsonType.Boolean -> field.toSchema(BooleanParam)
                 JsonType.Array -> field.toArraySchema()
-                JsonType.Object -> field.toObjectSchema()
+                JsonType.Object -> field.toObjectSchema(obj)
                 JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
                 else -> throw IllegalSchemaException("unknown type")
             }
-        }
-
-    private fun NODE.toSchema(paramMeta: ParamMeta) = SchemaNode.Primitive(paramMeta, this)
-
-    private fun NODE.toArraySchema() = SchemaNode.Array(this)
-
-    private fun NODE.toObjectSchema(): SchemaNode.Object {
-        val properties = fieldsToSchema().map { it.first to it.second }.toMap()
+        }.map { it.first to it.second }.toMap()
         return SchemaNode.Object(properties, properties.keys, this)
     }
 }

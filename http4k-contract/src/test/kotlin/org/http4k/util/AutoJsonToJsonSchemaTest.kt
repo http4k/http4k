@@ -13,37 +13,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.net.URL
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.OffsetTime
-import java.time.ZonedDateTime
-import java.util.UUID
+
+data class ArbObject2(val uri: Uri = Uri.of("foobar"))
 
 data class ArbObject(
-    val string: String,
-    val child: ArbObject?,
-    val numbers: List<Int>,
-    val bool: Boolean?,
-    val long: Long?
-)
-
-data class SupportedStringPrimitives(
-    val duration: Duration,
-    val localDate: LocalDate,
-    val localTime: LocalTime,
-    val localDateTime: LocalDateTime,
-    val zonedDateTime: ZonedDateTime,
-    val offsetTime: OffsetTime,
-    val offsetDateTime: OffsetDateTime,
-    val instant: Instant,
-    val uuid: UUID,
-    val uri: Uri,
-    val url: URL
+    val nullableChild: ArbObject2? = ArbObject2(),
+    val child: ArbObject2 = ArbObject2(),
+    val list: List<ArbObject2> = listOf(ArbObject2()),
+    val nestedList: List<List<ArbObject2>> = listOf(listOf(ArbObject2()))
 )
 
 data class JsonPrimitives(
@@ -66,6 +43,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
         approver.assertApproved(JsonPrimitives(), "bob")
+    }
+
+    @Test
+    fun `renders schema for nested arbitrary objects`(approver: Approver) {
+        approver.assertApproved(ArbObject(), "bob")
     }
 
     private fun Approver.assertApproved(obj: Any, name: String) {

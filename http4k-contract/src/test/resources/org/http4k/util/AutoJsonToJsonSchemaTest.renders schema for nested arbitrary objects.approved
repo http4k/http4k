@@ -1,0 +1,82 @@
+{
+  "node": {
+    "bob": {
+      "properties": {
+        "nullableChild": {
+          "properties": {
+            "uri": {
+              "example": "foobar",
+              "type": "string"
+            }
+          },
+          "required": [
+            "uri"
+          ],
+          "example": {
+            "uri": "foobar"
+          }
+        },
+        "child": {
+          "properties": {
+            "uri": {
+              "example": "foobar",
+              "type": "string"
+            }
+          },
+          "required": [
+            "uri"
+          ],
+          "example": {
+            "uri": "foobar"
+          }
+        },
+        "list": {
+          "example": [
+            {
+              "uri": "foobar"
+            }
+          ],
+          "type": "array"
+        },
+        "nestedList": {
+          "example": [
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "type": "array"
+        }
+      },
+      "required": [
+        "child",
+        "list",
+        "nestedList",
+        "nullableChild"
+      ],
+      "example": {
+        "nullableChild": {
+          "uri": "foobar"
+        },
+        "child": {
+          "uri": "foobar"
+        },
+        "list": [
+          {
+            "uri": "foobar"
+          }
+        ],
+        "nestedList": [
+          [
+            {
+              "uri": "foobar"
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "definitions": [
+  ]
+}
