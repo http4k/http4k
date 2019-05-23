@@ -17,6 +17,22 @@
           ]
         },
         "list": {
+          "items": [
+            {
+              "properties": {
+                "uri": {
+                  "example": "foobar",
+                  "type": "string"
+                }
+              },
+              "example": {
+                "uri": "foobar"
+              },
+              "required": [
+                "uri"
+              ]
+            }
+          ],
           "example": [
             {
               "uri": "foobar"
@@ -25,6 +41,19 @@
           "type": "array"
         },
         "nestedList": {
+          "items": [
+            {
+              "properties": {
+              },
+              "example": [
+                {
+                  "uri": "foobar"
+                }
+              ],
+              "required": [
+              ]
+            }
+          ],
           "example": [
             [
               {

@@ -26,7 +26,18 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toSchema(paramMeta: ParamMeta, isNullable: Boolean) = SchemaNode.Primitive(paramMeta, isNullable, this)
 
-    private fun NODE.toArraySchema(obj: Any, isNullable: Boolean) = SchemaNode.Array(isNullable, this)
+    private fun NODE.toArraySchema(obj: Any, isNullable: Boolean): SchemaNode.Array {
+        val items = when (obj) {
+            is Array<*> -> obj.asList()
+            is Iterable<*> -> obj.toList()
+            else -> throw IllegalArgumentException()
+        }.filterNotNull()
+
+        val schemas = json.elements(this).mapIndexed { index, node ->
+            node.toObjectSchema(items[index], false)
+        }
+        return SchemaNode.Array(isNullable, schemas, this)
+    }
 
     private fun NODE.toObjectSchema(obj: Any, isNullable: Boolean): SchemaNode {
         val fields = obj::class.memberProperties.toList()
@@ -55,7 +66,7 @@ private sealed class SchemaNode(private val isNullable: Boolean, val example: An
         val type = paramMeta.value
     }
 
-    class Array(isNullable: Boolean, example: Any?) : SchemaNode(isNullable, example) {
+    class Array(isNullable: Boolean, val items: List<SchemaNode>, example: Any?) : SchemaNode(isNullable, example) {
         val type = ArrayParam.value
     }
 
