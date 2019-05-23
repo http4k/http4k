@@ -3,36 +3,36 @@
     "bob": {
       "properties": {
         "string": {
-          "type": "string",
-          "example": "string"
+          "example": "string",
+          "type": "string"
         },
         "boolean": {
-          "type": "boolean",
-          "example": false
+          "example": false,
+          "type": "boolean"
         },
         "int": {
-          "type": "number",
-          "example": 2147483647
+          "example": 2147483647,
+          "type": "number"
         },
         "long": {
-          "type": "number",
-          "example": -9223372036854775808
+          "example": -9223372036854775808,
+          "type": "number"
         },
         "double": {
-          "type": "number",
-          "example": 9.9999999999
+          "example": 9.9999999999,
+          "type": "number"
         },
         "float": {
-          "type": "number",
-          "example": -10.0
+          "example": -10.0,
+          "type": "number"
         },
         "bigInt": {
-          "type": "number",
-          "example": 92233720368547758079223372036854775807
+          "example": 92233720368547758079223372036854775807,
+          "type": "number"
         },
         "bigDecimal": {
-          "type": "number",
-          "example": 1.7976931348623157E+308111
+          "example": 1.7976931348623157E+308111,
+          "type": "number"
         }
       }
     }

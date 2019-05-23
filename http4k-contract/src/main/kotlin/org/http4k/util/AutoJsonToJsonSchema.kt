@@ -3,6 +3,11 @@ package org.http4k.util
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.ArrayParam
+import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.StringParam
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
@@ -26,42 +31,27 @@ class AutoJsonToJsonSchema<NODE : Any>(
         }
     }
 
-    private fun Pair<String, NODE>.fieldsToSchema() = json.fields(second).map { field ->
-        println(field.toString() + " " + json.typeOf(second))
-        field.first to when (json.typeOf(field.second)) {
-            JsonType.String -> field.toStringSchema()
-            JsonType.Integer -> field.toIntegerSchema()
-            JsonType.Number -> field.toDecimalSchema()
-            JsonType.Boolean -> field.toBooleanSchema()
-            JsonType.Array -> field.toArraySchema()
-            JsonType.Object -> toSchema(field.second, field.first)
-            JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-            else -> throw IllegalSchemaException("unknown type of ${field.first}")
+    private fun Pair<String, NODE>.fieldsToSchema() =
+        json.fields(second).map { field ->
+            field.first to when (json.typeOf(field.second)) {
+                JsonType.String -> field.toSchema(StringParam)
+                JsonType.Integer -> field.toSchema(IntegerParam)
+                JsonType.Number -> field.toSchema(NumberParam)
+                JsonType.Boolean -> field.toSchema(BooleanParam)
+                JsonType.Array -> toArraySchema()
+                JsonType.Object -> toSchema(field.second, field.first)
+                JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
+                else -> throw IllegalSchemaException("unknown type of ${field.first}")
+            }
         }
-    }
 
-    private fun Pair<String, NODE>.toStringSchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ParamMeta.StringParam.value), "example" to second) },
-        emptySet()
-    )
-
-    private fun Pair<String, NODE>.toIntegerSchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ParamMeta.IntegerParam.value), "example" to second) },
-        emptySet()
-    )
-
-    private fun Pair<String, NODE>.toDecimalSchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ParamMeta.NumberParam.value), "example" to second) },
-        emptySet()
-    )
-
-    private fun Pair<String, NODE>.toBooleanSchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ParamMeta.BooleanParam.value), "example" to second) },
-        emptySet()
-    )
+    private fun Pair<String, NODE>.toSchema(paramMeta: ParamMeta) =
+        JsonSchema(json.asJsonObject(PrimitiveSchema(paramMeta, second)))
 
     private fun Pair<String, NODE>.toArraySchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ParamMeta.ArrayParam.value), "example" to second) },
-        emptySet()
-    )
+        json { obj("type" to string(ArrayParam.value), "example" to second) })
+}
+
+private class PrimitiveSchema(paramMeta: ParamMeta, val example: Any?) {
+    val type = paramMeta.value
 }
