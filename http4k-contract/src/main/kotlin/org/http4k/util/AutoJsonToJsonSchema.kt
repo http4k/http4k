@@ -45,13 +45,17 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
         }
 
-    private fun Pair<String, NODE>.toSchema(paramMeta: ParamMeta) =
-        JsonSchema(json.asJsonObject(PrimitiveSchema(paramMeta, second)))
+    private fun Pair<String, NODE>.toSchema(paramMeta: ParamMeta) = SchemaNode.Primitive(paramMeta, second).toSchema()
 
-    private fun Pair<String, NODE>.toArraySchema(): JsonSchema<NODE> = JsonSchema(
-        json { obj("type" to string(ArrayParam.value), "example" to second) })
+    private fun Pair<String, NODE>.toArraySchema() = SchemaNode.Array(second).toSchema()
+
+    private fun SchemaNode.toSchema() = JsonSchema(json.asJsonObject(this))
 }
 
-private class PrimitiveSchema(paramMeta: ParamMeta, val example: Any?) {
+private sealed class SchemaNode(paramMeta: ParamMeta, val example: Any?) {
     val type = paramMeta.value
+
+    class Primitive(paramMeta: ParamMeta, example: Any?) : SchemaNode(paramMeta, example)
+
+    class Array(example: Any?) : SchemaNode(ArrayParam, example)
 }
