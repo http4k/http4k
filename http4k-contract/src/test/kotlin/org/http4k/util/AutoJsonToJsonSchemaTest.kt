@@ -17,10 +17,10 @@ import java.math.BigInteger
 data class ArbObject2(val uri: Uri = Uri.of("foobar"))
 
 data class ArbObject(
-    val nullableChild: ArbObject2? = ArbObject2(),
     val child: ArbObject2 = ArbObject2(),
     val list: List<ArbObject2> = listOf(ArbObject2()),
-    val nestedList: List<List<ArbObject2>> = listOf(listOf(ArbObject2()))
+    val nestedList: List<List<ArbObject2>> = listOf(listOf(ArbObject2())),
+    val nullableChild: ArbObject2? = ArbObject2()
 )
 
 data class JsonPrimitives(

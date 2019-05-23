@@ -51,8 +51,6 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
 private sealed class SchemaNode(private val isNullable: Boolean, val example: Any?) {
 
-    fun nullable() = isNullable
-
     class Primitive(paramMeta: ParamMeta, isNullable: Boolean, example: Any?) : SchemaNode(isNullable, example) {
         val type = paramMeta.value
     }

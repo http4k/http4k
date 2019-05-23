@@ -2,20 +2,6 @@
   "node": {
     "bob": {
       "properties": {
-        "nullableChild": {
-          "properties": {
-            "uri": {
-              "example": "foobar",
-              "type": "string"
-            }
-          },
-          "example": {
-            "uri": "foobar"
-          },
-          "required": [
-            "uri"
-          ]
-        },
         "child": {
           "properties": {
             "uri": {
@@ -47,12 +33,23 @@
             ]
           ],
           "type": "array"
+        },
+        "nullableChild": {
+          "properties": {
+            "uri": {
+              "example": "foobar",
+              "type": "string"
+            }
+          },
+          "example": {
+            "uri": "foobar"
+          },
+          "required": [
+            "uri"
+          ]
         }
       },
       "example": {
-        "nullableChild": {
-          "uri": "foobar"
-        },
         "child": {
           "uri": "foobar"
         },
@@ -67,12 +64,15 @@
               "uri": "foobar"
             }
           ]
-        ]
+        ],
+        "nullableChild": {
+          "uri": "foobar"
+        }
       },
       "required": [
         "child",
         "list",
-        "nullableChild"
+        "nestedList"
       ]
     }
   },
