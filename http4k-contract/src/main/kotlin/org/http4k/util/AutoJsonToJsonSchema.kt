@@ -7,6 +7,7 @@ import org.http4k.lens.ParamMeta.ArrayParam
 import org.http4k.lens.ParamMeta.BooleanParam
 import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
@@ -30,13 +31,16 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val items = when (obj) {
             is Array<*> -> obj.asList()
             is Iterable<*> -> obj.toList()
-            else -> throw IllegalArgumentException()
+            else -> listOf(obj)
         }.filterNotNull()
 
-        val schemas = json.elements(this).mapIndexed { index, node ->
-            node.toObjectSchema(items[index], false)
-        }
-        return SchemaNode.Array(isNullable, schemas, this)
+        println(items)
+        val schemas: List<Pair<JsonType, SchemaNode>> = json.elements(this)
+            .mapIndexed { index, node ->
+                json.typeOf(node) to node.toObjectSchema(items[index], false)
+            }
+
+        return SchemaNode.Array(isNullable, Items(schemas), this)
     }
 
     private fun NODE.toObjectSchema(obj: Any, isNullable: Boolean): SchemaNode {
@@ -60,18 +64,49 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 }
 
-private sealed class SchemaNode(private val isNullable: Boolean, val example: Any?) {
+sealed class ArrayItem {
+    object Object : ArrayItem()
+    data class NonObject(val type: String) : ArrayItem()
+}
 
-    class Primitive(paramMeta: ParamMeta, isNullable: Boolean, example: Any?) : SchemaNode(isNullable, example) {
-        val type = paramMeta.value
+private class Items(schemas: List<Pair<JsonType, SchemaNode>>) {
+    init {
+        println(schemas)
     }
 
-    class Array(isNullable: Boolean, val items: List<SchemaNode>, example: Any?) : SchemaNode(isNullable, example) {
-        val type = ArrayParam.value
+    val oneOf = schemas.map { it.second }.map { it.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
+}
+
+private sealed class SchemaNode(
+    private val paramMeta: ParamMeta,
+    private val isNullable: Boolean, val example: Any?) {
+
+    fun nonDisplayableType() = paramMeta.value
+    abstract fun arrayItem(): ArrayItem
+
+    class Primitive(paramMeta: ParamMeta, isNullable: Boolean, example: Any?) : SchemaNode(paramMeta, isNullable, example) {
+        val type = nonDisplayableType()
+        override fun arrayItem() = ArrayItem.NonObject(type)
+    }
+
+    class Array(isNullable: Boolean, val items: Items, example: Any?) : SchemaNode(ArrayParam, isNullable, example) {
+        override fun arrayItem() = ArrayItem.NonObject(nonDisplayableType())
     }
 
     class Object(isNullable: Boolean, val properties: Map<String, SchemaNode>,
-                 example: Any?) : SchemaNode(isNullable, example) {
+                 example: Any?) : SchemaNode(ObjectParam, isNullable, example) {
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
+        override fun arrayItem() = ArrayItem.Object
     }
+}
+
+private fun JsonType.toParam() = when (this) {
+    JsonType.String -> StringParam
+    JsonType.Integer -> IntegerParam
+    JsonType.Number -> NumberParam
+    JsonType.Boolean -> BooleanParam
+    JsonType.Array -> ArrayParam
+    JsonType.Object -> ObjectParam
+    JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
+    else -> throw IllegalSchemaException("unknown type")
 }

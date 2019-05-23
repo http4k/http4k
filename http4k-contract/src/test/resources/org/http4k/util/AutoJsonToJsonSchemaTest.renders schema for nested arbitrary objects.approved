@@ -17,51 +17,32 @@
           ]
         },
         "list": {
-          "items": [
-            {
-              "properties": {
-                "uri": {
-                  "example": "foobar",
-                  "type": "string"
-                }
-              },
-              "example": {
-                "uri": "foobar"
-              },
-              "required": [
-                "uri"
-              ]
-            }
-          ],
+          "items": {
+            "oneOf": [
+              {
+              }
+            ]
+          },
           "example": [
             {
               "uri": "foobar"
             }
-          ],
-          "type": "array"
+          ]
         },
         "nestedList": {
-          "items": [
-            {
-              "properties": {
-              },
-              "example": [
-                {
-                  "uri": "foobar"
-                }
-              ],
-              "required": [
-              ]
-            }
-          ],
+          "items": {
+            "oneOf": [
+              {
+              }
+            ]
+          },
           "example": [
             [
               {
                 "uri": "foobar"
               }
             ]
-          ],
-          "type": "array"
+          ]
         },
         "nullableChild": {
           "properties": {
@@ -75,6 +56,17 @@
           },
           "required": [
             "uri"
+          ]
+        },
+        "stringList": {
+          "items": {
+            "oneOf": [
+              {
+              }
+            ]
+          },
+          "example": [
+            "hello"
           ]
         }
       },
@@ -96,12 +88,16 @@
         ],
         "nullableChild": {
           "uri": "foobar"
-        }
+        },
+        "stringList": [
+          "hello"
+        ]
       },
       "required": [
         "child",
         "list",
-        "nestedList"
+        "nestedList",
+        "stringList"
       ]
     }
   },
