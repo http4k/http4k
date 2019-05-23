@@ -14,22 +14,17 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private val refPrefix: String = "definitions"
 ) : JsonSchemaCreator<Any, NODE> {
 
-    override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {
-        println(json.asJsonObject(obj))
-        val pair = (overrideDefinitionId ?: "foo") to json.asJsonObject(obj)
-        return json {
-            val properties = pair.fieldsToSchema().map { it.first to it.second }.toMap()
-            val s = SchemaNode.Object(properties, properties.keys, obj)
-            JsonSchema(
-                obj(
-                    (overrideDefinitionId ?: obj.javaClass.simpleName) to json.asJsonObject(s)
-                ), emptySet())
-        }
+    override fun toSchema(obj: Any, overrideDefinitionId: String?) = json {
+        JsonSchema(
+            obj(
+                (overrideDefinitionId ?: obj.javaClass.simpleName) to
+                    json.asJsonObject(json.asJsonObject(obj).toObjectSchema())
+            ), emptySet())
     }
 
-    private fun Pair<String, NODE>.fieldsToSchema(): List<Pair<String, SchemaNode>> =
-        json.fields(second).map { field ->
-            field.first to when (json.typeOf(field.second)) {
+    private fun NODE.fieldsToSchema(): List<Pair<String, SchemaNode>> =
+        json.fields(this).map { (name, field) ->
+            name to when (json.typeOf(field)) {
                 JsonType.String -> field.toSchema(StringParam)
                 JsonType.Integer -> field.toSchema(IntegerParam)
                 JsonType.Number -> field.toSchema(NumberParam)
@@ -37,14 +32,18 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 JsonType.Array -> field.toArraySchema()
                 JsonType.Object -> field.toObjectSchema()
                 JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-                else -> throw IllegalSchemaException("unknown type of ${field.first}")
+                else -> throw IllegalSchemaException("unknown type")
             }
         }
 
-    private fun Pair<String, NODE>.toSchema(paramMeta: ParamMeta) = SchemaNode.Primitive(paramMeta, second)
+    private fun NODE.toSchema(paramMeta: ParamMeta) = SchemaNode.Primitive(paramMeta, this)
 
-    private fun Pair<String, NODE>.toArraySchema() = SchemaNode.Array(second)
-    private fun Pair<String, NODE>.toObjectSchema() = SchemaNode.Object(emptyMap(), emptySet(), second)
+    private fun NODE.toArraySchema() = SchemaNode.Array(this)
+
+    private fun NODE.toObjectSchema(): SchemaNode.Object {
+        val properties = fieldsToSchema().map { it.first to it.second }.toMap()
+        return SchemaNode.Object(properties, properties.keys, this)
+    }
 }
 
 private sealed class SchemaNode(val example: Any?) {
