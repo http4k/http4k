@@ -35,16 +35,6 @@
           "type": "number"
         }
       },
-      "required": [
-        "bigDecimal",
-        "bigInt",
-        "boolean",
-        "double",
-        "float",
-        "int",
-        "long",
-        "string"
-      ],
       "example": {
         "string": "string",
         "boolean": false,
@@ -54,7 +44,17 @@
         "float": -10.0,
         "bigInt": 92233720368547758079223372036854775807,
         "bigDecimal": 1.7976931348623157E+308111
-      }
+      },
+      "required": [
+        "bigDecimal",
+        "bigInt",
+        "boolean",
+        "double",
+        "float",
+        "int",
+        "long",
+        "string"
+      ]
     }
   },
   "definitions": [

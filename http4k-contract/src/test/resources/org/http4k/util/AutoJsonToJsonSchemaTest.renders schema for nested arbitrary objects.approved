@@ -9,12 +9,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "uri"
-          ],
           "example": {
             "uri": "foobar"
-          }
+          },
+          "required": [
+            "uri"
+          ]
         },
         "child": {
           "properties": {
@@ -23,12 +23,12 @@
               "type": "string"
             }
           },
-          "required": [
-            "uri"
-          ],
           "example": {
             "uri": "foobar"
-          }
+          },
+          "required": [
+            "uri"
+          ]
         },
         "list": {
           "example": [
@@ -49,12 +49,6 @@
           "type": "array"
         }
       },
-      "required": [
-        "child",
-        "list",
-        "nestedList",
-        "nullableChild"
-      ],
       "example": {
         "nullableChild": {
           "uri": "foobar"
@@ -74,7 +68,12 @@
             }
           ]
         ]
-      }
+      },
+      "required": [
+        "child",
+        "list",
+        "nullableChild"
+      ]
     }
   },
   "definitions": [

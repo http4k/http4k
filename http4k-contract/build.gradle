@@ -3,6 +3,7 @@ description = 'http4k typesafe HTTP contracts and OpenApi support'
 dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
+    compile Libs.kotlin_reflect
 
     testCompile project(":http4k-format-jackson")
     testCompile project(":http4k-format-argo")
