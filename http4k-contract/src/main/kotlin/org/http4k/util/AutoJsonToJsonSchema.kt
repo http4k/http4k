@@ -34,11 +34,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
             else -> listOf(obj)
         }.filterNotNull()
 
-        println(items)
-        val schemas: List<Pair<JsonType, SchemaNode>> = json.elements(this)
-            .mapIndexed { index, node ->
-                json.typeOf(node) to node.toObjectSchema(null, items[index], false)
-            }
+        val schemas = json.elements(this).mapIndexed { index, node ->
+            json.typeOf(node) to node.toObjectSchema(null, items[index], false)
+        }
 
         return SchemaNode.Array(name, isNullable, Items(schemas), this)
     }
@@ -73,10 +71,6 @@ sealed class ArrayItem {
 }
 
 private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
-    init {
-        println(schemas)
-    }
-
     val oneOf = schemas.map { it.second.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
     fun definitions() = schemas.map { it.second }
 }
