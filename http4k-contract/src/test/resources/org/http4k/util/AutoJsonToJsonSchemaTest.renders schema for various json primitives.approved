@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/components/schema/bob",
+    "$ref": "#/components/schema/JsonPrimitives",
     "example": null
   },
   "definitions": [

@@ -53,13 +53,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 JsonType.Number -> field.toSchema(fieldName, NumberParam, fieldIsNullable)
                 JsonType.Boolean -> field.toSchema(fieldName, BooleanParam, fieldIsNullable)
                 JsonType.Array -> field.toArraySchema(fieldName, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
-                JsonType.Object -> field.toObjectSchema(null, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
+                JsonType.Object -> field.toObjectSchema(fieldName, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
                 JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
                 else -> throw IllegalSchemaException("unknown type")
             }
         }.map { it.name() to it }.toMap()
 
-        return SchemaNode.Reference(name, "#/$refPrefix/$name",
+        return SchemaNode.Reference(name, "#/$refPrefix/${obj.javaClass.simpleName}",
             SchemaNode.Object(name, isNullable, properties, this))
     }
 }
@@ -71,8 +71,8 @@ sealed class ArrayItem {
 }
 
 private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
-    val oneOf = schemas.map { it.second.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
-    fun definitions() = schemas.map { it.second }
+    val oneOf = schemas.map { it.second.arrayItem() }.toSet().sortedBy { it.toString() }
+    fun definitions() = schemas.flatMap { it.second.definitions() }
 }
 
 private sealed class SchemaNode(

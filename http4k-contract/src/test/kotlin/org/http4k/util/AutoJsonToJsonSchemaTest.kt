@@ -51,7 +51,7 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(ArbObject(), "bob")
     }
 
-    private fun Approver.assertApproved(obj: Any, name: String) {
+    private fun Approver.assertApproved(obj: Any, name: String?) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(Jackson.asJsonString(creator.toSchema(obj, name))))

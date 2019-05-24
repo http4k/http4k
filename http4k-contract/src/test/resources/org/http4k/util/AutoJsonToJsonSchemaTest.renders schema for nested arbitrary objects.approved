@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/components/schema/bob",
+    "$ref": "#/components/schema/ArbObject",
     "example": null
   },
   "definitions": [
@@ -8,7 +8,7 @@
       "first": "bob",
       "second": {
         "properties": {
-          "ArbObject2": {
+          "child": {
             "$ref": "#/components/schema/ArbObject2",
             "example": null
           },
@@ -43,6 +43,10 @@
               ]
             ],
             "type": "array"
+          },
+          "nullableChild": {
+            "$ref": "#/components/schema/ArbObject2",
+            "example": null
           },
           "stringList": {
             "items": {
@@ -83,10 +87,29 @@
         },
         "type": "object",
         "required": [
-          "ArbObject2",
+          "child",
           "list",
           "nestedList",
+          "nullableChild",
           "stringList"
+        ]
+      }
+    },
+    {
+      "first": "child",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
         ]
       }
     },
@@ -109,24 +132,47 @@
       }
     },
     {
-      "first": "ArbObject2",
+      "first": "SingletonList",
       "second": {
-        "$ref": "#/components/schema/ArbObject2",
-        "example": null
+        "properties": {
+        },
+        "example": [
+          {
+            "uri": "foobar"
+          }
+        ],
+        "type": "object",
+        "required": [
+        ]
       }
     },
     {
-      "first": "SingletonList",
+      "first": "nullableChild",
       "second": {
-        "$ref": "#/components/schema/SingletonList",
-        "example": null
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
       }
     },
     {
       "first": "String",
       "second": {
-        "$ref": "#/components/schema/String",
-        "example": null
+        "properties": {
+        },
+        "example": "hello",
+        "type": "object",
+        "required": [
+        ]
       }
     }
   ]
