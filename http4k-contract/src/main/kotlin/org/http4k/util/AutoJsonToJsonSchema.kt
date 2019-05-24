@@ -18,9 +18,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?) = json {
-        val schema = json.asJsonObject(obj).toObjectSchema(overrideDefinitionId ?: obj.javaClass.simpleName, obj, false)
+        val schema = json.asJsonObject(obj).toObjectSchema(overrideDefinitionId, obj, false)
         JsonSchema(
-            obj(schema.name() to json.asJsonObject(schema)),
+            json.asJsonObject(schema),
             schema.definitions().map { it.name() to json.asJsonObject(it) }.toSet())
     }
 
@@ -37,18 +37,19 @@ class AutoJsonToJsonSchema<NODE : Any>(
         println(items)
         val schemas: List<Pair<JsonType, SchemaNode>> = json.elements(this)
             .mapIndexed { index, node ->
-                json.typeOf(node) to node.toObjectSchema("", items[index], false)
+                json.typeOf(node) to node.toObjectSchema(null, items[index], false)
             }
 
         return SchemaNode.Array(name, isNullable, Items(schemas), this)
     }
 
-    private fun NODE.toObjectSchema(objName: String, obj: Any, isNullable: Boolean): SchemaNode {
+    private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
         val fields = obj::class.memberProperties.toList()
+        val name = objName ?: obj.javaClass.simpleName
         val properties = json.fields(this).mapIndexed { index, (fieldName, field) ->
             val kfield = fields[index]
             val fieldIsNullable = kfield.returnType.isMarkedNullable
-            objName to when (json.typeOf(field)) {
+            when (json.typeOf(field)) {
                 JsonType.String -> field.toSchema(fieldName, StringParam, fieldIsNullable)
                 JsonType.Integer -> field.toSchema(fieldName, IntegerParam, fieldIsNullable)
                 JsonType.Number -> field.toSchema(fieldName, NumberParam, fieldIsNullable)
@@ -58,9 +59,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
                 else -> throw IllegalSchemaException("unknown type")
             }
-        }.map { it.first to it.second }.toMap()
+        }.map { it.name() to it }.toMap()
 
-        return SchemaNode.Reference("#/$refPrefix/$objName", SchemaNode.Object(objName, isNullable, properties, this))
+        return SchemaNode.Reference(name, "#/$refPrefix/$name",
+            SchemaNode.Object(name, isNullable, properties, this))
     }
 }
 
@@ -74,6 +76,7 @@ private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
     init {
         println(schemas)
     }
+
     val oneOf = schemas.map { it.second.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
     fun definitions() = schemas.map { it.second }
 }
@@ -97,7 +100,8 @@ private sealed class SchemaNode(
 
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?) :
         SchemaNode(name, ArrayParam, isNullable, example) {
-        override fun arrayItem() = ArrayItem.NonObject(nonDisplayableType())
+        val type = nonDisplayableType()
+        override fun arrayItem() = ArrayItem.NonObject(type)
         override fun definitions() = items.definitions()
     }
 
@@ -106,12 +110,13 @@ private sealed class SchemaNode(
         val type = nonDisplayableType()
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
         override fun arrayItem() = ArrayItem.Object
+        override fun definitions() = properties.values.flatMap { it.definitions() }
     }
 
-    class Reference(name: String, private val schemaNode: Object) :
-        SchemaNode(name, ObjectParam, false, null) {
-        val `$ref` = name()
-        override fun arrayItem() = ArrayItem.Ref(name())
+    class Reference(name: String,
+                    val `$ref`: String,
+                    private val schemaNode: Object) : SchemaNode(name, ObjectParam, false, null) {
+        override fun arrayItem() = ArrayItem.Ref(`$ref`)
         override fun definitions() = listOf(schemaNode)
     }
 }
