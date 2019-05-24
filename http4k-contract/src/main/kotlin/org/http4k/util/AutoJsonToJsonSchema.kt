@@ -41,9 +41,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
         val fields = obj::class.memberProperties.map { it.name to it }.toMap()
-        val name = objName ?: obj.javaClass.simpleName
-        val properties = json.fields(this).map { (fieldName, field) ->
-            val kField = fields.getValue(fieldName)
+
+        val properties = json.fields(this)
+            .map { Triple(it.first, it.second, fields.getValue(it.first)) }
+            .map { (fieldName, field, kField) ->
             val fieldIsNullable = kField.returnType.isMarkedNullable
             when (val param = json.typeOf(field).toParam()) {
                 ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
@@ -52,7 +53,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
         }.map { it.name() to it }.toMap()
 
-        return SchemaNode.Reference(name, "#/$refPrefix/${obj.javaClass.simpleName}",
+        return SchemaNode.Reference(objName ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
             SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 }
