@@ -94,6 +94,63 @@
           "stringList"
         ]
       }
+    },
+    {
+      "first": "child",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    },
+    {
+      "first": "ArbObject2",
+      "second": {
+        "$ref": "#/components/schema/ArbObject2",
+        "example": null
+      }
+    },
+    {
+      "first": "SingletonList",
+      "second": {
+        "$ref": "#/components/schema/SingletonList",
+        "example": null
+      }
+    },
+    {
+      "first": "nullableChild",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    },
+    {
+      "first": "String",
+      "second": {
+        "$ref": "#/components/schema/String",
+        "example": null
+      }
     }
   ]
 }

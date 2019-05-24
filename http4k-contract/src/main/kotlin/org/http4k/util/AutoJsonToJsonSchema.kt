@@ -117,7 +117,7 @@ private sealed class SchemaNode(
                     val `$ref`: String,
                     private val schemaNode: Object) : SchemaNode(name, ObjectParam, false, null) {
         override fun arrayItem() = ArrayItem.Ref(`$ref`)
-        override fun definitions() = listOf(schemaNode)
+        override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
     }
 }
 
