@@ -5,7 +5,7 @@
   },
   "definitions": [
     {
-      "first": "bob",
+      "first": "ArbObject",
       "second": {
         "properties": {
           "child": {

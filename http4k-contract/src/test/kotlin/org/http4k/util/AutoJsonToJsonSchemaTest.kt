@@ -43,12 +43,12 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
-        approver.assertApproved(JsonPrimitives(), "bob")
+        approver.assertApproved(JsonPrimitives(), null)
     }
 
     @Test
     fun `renders schema for nested arbitrary objects`(approver: Approver) {
-        approver.assertApproved(ArbObject(), "bob")
+        approver.assertApproved(ArbObject(), null)
     }
 
     private fun Approver.assertApproved(obj: Any, name: String?) {

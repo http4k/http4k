@@ -5,7 +5,7 @@
   },
   "definitions": [
     {
-      "first": "bob",
+      "first": "JsonPrimitives",
       "second": {
         "properties": {
           "string": {
