@@ -1,7 +1,8 @@
 {
   "node": {
     "#/components/schema/bob": {
-      "example": null
+      "example": null,
+      "$ref": "#/components/schema/bob"
     }
   },
   "definitions": [

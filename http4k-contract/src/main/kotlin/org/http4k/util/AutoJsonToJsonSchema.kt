@@ -71,6 +71,9 @@ sealed class ArrayItem {
 }
 
 private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
+    init {
+        println(schemas)
+    }
     val oneOf = schemas.map { it.second.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
     fun definitions() = schemas.map { it.second }
 }
@@ -106,6 +109,7 @@ private sealed class SchemaNode(
 
     class Reference(name: String, private val schemaNode: Object) :
         SchemaNode(name, ObjectParam, false, null) {
+        val `$ref` = name()
         override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = listOf(schemaNode)
     }
