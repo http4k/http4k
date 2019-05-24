@@ -35,8 +35,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
         }.filterNotNull()
 
         val schemas = json.elements(this).mapIndexed { index, node ->
-            val param = json.typeOf(node).toParam()
-            param to when (param) {
+            println(node)
+            println(json.typeOf(node))
+            when (val param = json.typeOf(node).toParam()) {
                 ArrayParam -> node.toArraySchema("", items[index], false)
                 ObjectParam -> node.toObjectSchema(null, items[index], false)
                 else -> node.toSchema("", param, false)
@@ -64,15 +65,21 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 }
 
-sealed class ArrayItem {
-    object Object : ArrayItem()
-    data class NonObject(val type: String) : ArrayItem()
+private sealed class ArrayItem {
+    object Array : ArrayItem() {
+        val type = ArrayParam.value
+    }
+
+    class NonObject(paramMeta: ParamMeta) : ArrayItem() {
+        val type = paramMeta.value
+    }
+
     data class Ref(val `$ref`: String) : ArrayItem()
 }
 
-private class Items(private val schemas: List<Pair<ParamMeta, SchemaNode>>) {
-    val oneOf = schemas.map { it.second.arrayItem() }.toSet().sortedBy { it.toString() }
-    fun definitions() = schemas.flatMap { it.second.definitions() }
+private class Items(private val schemas: List<SchemaNode>) {
+    val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.toString() }
+    fun definitions() = schemas.flatMap { it.definitions() }
 }
 
 private sealed class SchemaNode(
@@ -83,27 +90,32 @@ private sealed class SchemaNode(
 
     fun name() = name
 
-    fun nonDisplayableType() = paramMeta.value
+    fun paramMeta() = paramMeta
     abstract fun arrayItem(): ArrayItem
 
     class Primitive(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?) :
         SchemaNode(name, paramMeta, isNullable, example) {
-        val type = nonDisplayableType()
-        override fun arrayItem() = ArrayItem.NonObject(type)
+        val type = paramMeta().value
+        override fun arrayItem() = ArrayItem.NonObject(paramMeta())
     }
 
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?) :
         SchemaNode(name, ArrayParam, isNullable, example) {
-        val type = nonDisplayableType()
-        override fun arrayItem() = ArrayItem.NonObject(type)
+        val type = paramMeta().value
+        override fun arrayItem() = when (paramMeta()) {
+            ArrayParam -> ArrayItem.Array
+            ObjectParam -> ArrayItem.Ref(name())
+            else -> ArrayItem.NonObject(paramMeta())
+        }
+
         override fun definitions() = items.definitions()
     }
 
     class Object(name: String, isNullable: Boolean, val properties: Map<String, SchemaNode>,
                  example: Any?) : SchemaNode(name, ObjectParam, isNullable, example) {
-        val type = nonDisplayableType()
+        val type = paramMeta().value
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
-        override fun arrayItem() = ArrayItem.Object
+        override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = properties.values.flatMap { it.definitions() }
     }
 
