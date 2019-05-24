@@ -60,6 +60,29 @@
               "hello"
             ],
             "type": "array"
+          },
+          "anyList": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schema/ArbObject2"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "example": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              false
+            ],
+            "type": "array"
           }
         },
         "example": {
@@ -83,10 +106,18 @@
           },
           "stringList": [
             "hello"
+          ],
+          "anyList": [
+            "123",
+            {
+              "uri": "foobar"
+            },
+            false
           ]
         },
         "type": "object",
         "required": [
+          "anyList",
           "child",
           "list",
           "nestedList",

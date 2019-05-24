@@ -30,7 +30,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
         val items = items(obj)
         val schemas = json.elements(this).mapIndexed { index, node ->
-            //            println("" + node + " -> " + items[index])
+            println("" + node + " -> " + items[index])
             when (val param = json.typeOf(node).toParam()) {
                 ArrayParam -> node.toArraySchema("", items[index], false)
                 ObjectParam -> node.toObjectSchema(null, items[index], false)

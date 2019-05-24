@@ -21,9 +21,8 @@ data class ArbObject(
     val list: List<ArbObject2> = listOf(ArbObject2()),
     val nestedList: List<List<ArbObject2>> = listOf(listOf(ArbObject2())),
     val nullableChild: ArbObject2? = ArbObject2(),
-    val stringList: List<String> = listOf("hello")
-//    ,
-//    val anyList: List<Any> = listOf("123", 123, false)
+    val stringList: List<String> = listOf("hello"),
+    val anyList: List<Any> = listOf("123", ArbObject2(), false)
 )
 
 data class JsonPrimitives(
