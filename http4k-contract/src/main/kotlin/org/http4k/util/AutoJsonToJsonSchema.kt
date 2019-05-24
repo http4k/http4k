@@ -103,6 +103,7 @@ private sealed class SchemaNode(
 
     class Object(name: String, isNullable: Boolean, val properties: Map<String, SchemaNode>,
                  example: Any?) : SchemaNode(name, ObjectParam, isNullable, example) {
+        val type = nonDisplayableType()
         val required = properties.filterNot { it.value.isNullable }.keys.sorted()
         override fun arrayItem() = ArrayItem.Object
     }
