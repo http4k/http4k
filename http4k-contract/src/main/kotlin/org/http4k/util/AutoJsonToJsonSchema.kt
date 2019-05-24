@@ -28,24 +28,16 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
-        val items = items(obj)
-        val schemas = json.elements(this).mapIndexed { index, node ->
-            println("" + node + " -> " + items[index])
+        val schemas = json.elements(this).zip(items(obj)) { node: NODE, value: Any ->
             when (val param = json.typeOf(node).toParam()) {
-                ArrayParam -> node.toArraySchema("", items[index], false)
-                ObjectParam -> node.toObjectSchema(null, items[index], false)
+                ArrayParam -> node.toArraySchema("", value, false)
+                ObjectParam -> node.toObjectSchema(null, value, false)
                 else -> node.toSchema("", param, false)
             }
         }
 
         return SchemaNode.Array(name, isNullable, Items.Inner(schemas), this)
     }
-
-    private fun items(obj: Any) = when (obj) {
-        is Array<*> -> obj.asList()
-        is Iterable<*> -> obj.toList()
-        else -> listOf(obj)
-    }.filterNotNull()
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
         val fields = obj::class.memberProperties.map { it.name to it }.toMap()
@@ -134,6 +126,12 @@ private sealed class SchemaNode(
         override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
     }
 }
+
+private fun items(obj: Any) = when (obj) {
+    is Array<*> -> obj.asList()
+    is Iterable<*> -> obj.toList()
+    else -> listOf(obj)
+}.filterNotNull()
 
 private fun JsonType.toParam() = when (this) {
     JsonType.String -> StringParam
