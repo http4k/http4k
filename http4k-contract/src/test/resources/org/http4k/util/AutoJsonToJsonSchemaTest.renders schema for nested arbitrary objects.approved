@@ -1,106 +1,54 @@
 {
   "node": {
-    "bob": {
-      "properties": {
-        "child": {
-          "properties": {
-            "uri": {
-              "example": "foobar",
-              "type": "string"
-            }
-          },
-          "example": {
+    "#/components/schema/bob": {
+      "example": null
+    }
+  },
+  "definitions": [
+    {
+      "first": "bob",
+      "second": {
+        "properties": {
+          "bob": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schema/"
+                }
+              ]
+            },
+            "example": [
+              "hello"
+            ]
+          }
+        },
+        "example": {
+          "child": {
             "uri": "foobar"
           },
-          "required": [
-            "uri"
-          ]
-        },
-        "list": {
-          "items": {
-            "oneOf": [
-              {
-              }
-            ]
-          },
-          "example": [
+          "list": [
             {
               "uri": "foobar"
             }
-          ]
-        },
-        "nestedList": {
-          "items": {
-            "oneOf": [
-              {
-              }
-            ]
-          },
-          "example": [
+          ],
+          "nestedList": [
             [
               {
                 "uri": "foobar"
               }
             ]
-          ]
-        },
-        "nullableChild": {
-          "properties": {
-            "uri": {
-              "example": "foobar",
-              "type": "string"
-            }
-          },
-          "example": {
+          ],
+          "nullableChild": {
             "uri": "foobar"
           },
-          "required": [
-            "uri"
-          ]
-        },
-        "stringList": {
-          "items": {
-            "oneOf": [
-              {
-              }
-            ]
-          },
-          "example": [
+          "stringList": [
             "hello"
           ]
-        }
-      },
-      "example": {
-        "child": {
-          "uri": "foobar"
         },
-        "list": [
-          {
-            "uri": "foobar"
-          }
-        ],
-        "nestedList": [
-          [
-            {
-              "uri": "foobar"
-            }
-          ]
-        ],
-        "nullableChild": {
-          "uri": "foobar"
-        },
-        "stringList": [
-          "hello"
+        "required": [
+          "bob"
         ]
-      },
-      "required": [
-        "child",
-        "list",
-        "nestedList",
-        "stringList"
-      ]
+      }
     }
-  },
-  "definitions": [
   ]
 }
