@@ -28,11 +28,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
-
         val items = items(obj)
         val schemas = json.elements(this).mapIndexed { index, node ->
-            println(node)
-            println(json.typeOf(node))
+            //            println("" + node + " -> " + items[index])
             when (val param = json.typeOf(node).toParam()) {
                 ArrayParam -> node.toArraySchema("", items[index], false)
                 ObjectParam -> node.toObjectSchema(null, items[index], false)
@@ -44,16 +42,17 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 
     private fun items(obj: Any) = when (obj) {
-        is Array<*> -> obj.asList().filterNotNull()
-        is Iterable<*> -> obj.toList().filterNotNull()
+        is Array<*> -> obj.asList()
+        is Iterable<*> -> obj.toList()
         else -> listOf(obj)
-    }
+    }.filterNotNull()
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
-        val fields = obj::class.memberProperties.toList()
+        val fields = obj::class.memberProperties.map { it.name to it }.toMap()
         val name = objName ?: obj.javaClass.simpleName
-        val properties = json.fields(this).mapIndexed { index, (fieldName, field) ->
-            val kField = fields[index]
+        val properties = json.fields(this).map { (fieldName, field) ->
+            val kField = fields.getValue(fieldName)
+            println(fieldName + " -> " + kField.javaGetter!!(obj))
             val fieldIsNullable = kField.returnType.isMarkedNullable
             when (val param = json.typeOf(field).toParam()) {
                 ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
