@@ -50,11 +50,11 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val fields = obj::class.memberProperties.toList()
         val name = objName ?: obj.javaClass.simpleName
         val properties = json.fields(this).mapIndexed { index, (fieldName, field) ->
-            val kfield = fields[index]
-            val fieldIsNullable = kfield.returnType.isMarkedNullable
+            val kField = fields[index]
+            val fieldIsNullable = kField.returnType.isMarkedNullable
             when (val toParam = json.typeOf(field).toParam()) {
-                ArrayParam -> field.toArraySchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
-                ObjectParam -> field.toObjectSchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
+                ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
+                ObjectParam -> field.toObjectSchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
                 else -> field.toSchema(fieldName, toParam, fieldIsNullable)
             }
         }.map { it.name() to it }.toMap()
