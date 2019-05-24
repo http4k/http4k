@@ -8,8 +8,8 @@
       "first": "bob",
       "second": {
         "properties": {
-          "child": {
-            "$ref": "#/components/schema/child",
+          "ArbObject2": {
+            "$ref": "#/components/schema/ArbObject2",
             "example": null
           },
           "list": {
@@ -43,10 +43,6 @@
               ]
             ],
             "type": "array"
-          },
-          "nullableChild": {
-            "$ref": "#/components/schema/nullableChild",
-            "example": null
           },
           "stringList": {
             "items": {
@@ -87,16 +83,15 @@
         },
         "type": "object",
         "required": [
-          "child",
+          "ArbObject2",
           "list",
           "nestedList",
-          "nullableChild",
           "stringList"
         ]
       }
     },
     {
-      "first": "child",
+      "first": "ArbObject2",
       "second": {
         "properties": {
           "uri": {
@@ -125,24 +120,6 @@
       "second": {
         "$ref": "#/components/schema/SingletonList",
         "example": null
-      }
-    },
-    {
-      "first": "nullableChild",
-      "second": {
-        "properties": {
-          "uri": {
-            "example": "foobar",
-            "type": "string"
-          }
-        },
-        "example": {
-          "uri": "foobar"
-        },
-        "type": "object",
-        "required": [
-          "uri"
-        ]
       }
     },
     {

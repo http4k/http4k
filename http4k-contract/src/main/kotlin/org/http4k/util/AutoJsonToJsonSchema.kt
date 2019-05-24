@@ -53,7 +53,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 JsonType.Number -> field.toSchema(fieldName, NumberParam, fieldIsNullable)
                 JsonType.Boolean -> field.toSchema(fieldName, BooleanParam, fieldIsNullable)
                 JsonType.Array -> field.toArraySchema(fieldName, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
-                JsonType.Object -> field.toObjectSchema(fieldName, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
+                JsonType.Object -> field.toObjectSchema(null, kfield.javaGetter!!.invoke(obj), fieldIsNullable)
                 JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
                 else -> throw IllegalSchemaException("unknown type")
             }
