@@ -60,7 +60,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         }.map { it.name() to it }.toMap()
 
         return SchemaNode.Reference(name, "#/$refPrefix/${obj.javaClass.simpleName}",
-            SchemaNode.Object(name, isNullable, properties, this))
+            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 }
 

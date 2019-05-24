@@ -96,24 +96,6 @@
       }
     },
     {
-      "first": "child",
-      "second": {
-        "properties": {
-          "uri": {
-            "example": "foobar",
-            "type": "string"
-          }
-        },
-        "example": {
-          "uri": "foobar"
-        },
-        "type": "object",
-        "required": [
-          "uri"
-        ]
-      }
-    },
-    {
       "first": "ArbObject2",
       "second": {
         "properties": {
@@ -143,24 +125,6 @@
         ],
         "type": "object",
         "required": [
-        ]
-      }
-    },
-    {
-      "first": "nullableChild",
-      "second": {
-        "properties": {
-          "uri": {
-            "example": "foobar",
-            "type": "string"
-          }
-        },
-        "example": {
-          "uri": "foobar"
-        },
-        "type": "object",
-        "required": [
-          "uri"
         ]
       }
     },
