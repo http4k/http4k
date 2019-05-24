@@ -72,7 +72,7 @@ sealed class ArrayItem {
 
 private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
     val oneOf = schemas.map { it.second.arrayItem() }.also { println(it) }.toSet().sortedBy { it.toString() }
-    fun definitions(): Iterable<SchemaNode> = schemas.map { it.second }
+    fun definitions() = schemas.map { it.second }
 }
 
 private sealed class SchemaNode(
