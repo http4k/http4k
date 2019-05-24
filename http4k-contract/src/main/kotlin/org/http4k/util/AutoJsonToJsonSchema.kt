@@ -35,7 +35,12 @@ class AutoJsonToJsonSchema<NODE : Any>(
         }.filterNotNull()
 
         val schemas = json.elements(this).mapIndexed { index, node ->
-            json.typeOf(node) to node.toObjectSchema(null, items[index], false)
+            val toParam = json.typeOf(node).toParam()
+            toParam to when (toParam) {
+                ArrayParam -> node.toArraySchema("", items[index], false)
+                ObjectParam -> node.toObjectSchema(null, items[index], false)
+                else -> node.toSchema("", toParam, false)
+            }
         }
 
         return SchemaNode.Array(name, isNullable, Items(schemas), this)
@@ -47,15 +52,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val properties = json.fields(this).mapIndexed { index, (fieldName, field) ->
             val kfield = fields[index]
             val fieldIsNullable = kfield.returnType.isMarkedNullable
-            when (json.typeOf(field)) {
-                JsonType.String -> field.toSchema(fieldName, StringParam, fieldIsNullable)
-                JsonType.Integer -> field.toSchema(fieldName, IntegerParam, fieldIsNullable)
-                JsonType.Number -> field.toSchema(fieldName, NumberParam, fieldIsNullable)
-                JsonType.Boolean -> field.toSchema(fieldName, BooleanParam, fieldIsNullable)
-                JsonType.Array -> field.toArraySchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
-                JsonType.Object -> field.toObjectSchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
-                JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-                else -> throw IllegalSchemaException("unknown type")
+            when (val toParam = json.typeOf(field).toParam()) {
+                ArrayParam -> field.toArraySchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
+                ObjectParam -> field.toObjectSchema(fieldName, kfield.javaGetter!!(obj), fieldIsNullable)
+                else -> field.toSchema(fieldName, toParam, fieldIsNullable)
             }
         }.map { it.name() to it }.toMap()
 
@@ -70,7 +70,7 @@ sealed class ArrayItem {
     data class Ref(val `$ref`: String) : ArrayItem()
 }
 
-private class Items(private val schemas: List<Pair<JsonType, SchemaNode>>) {
+private class Items(private val schemas: List<Pair<ParamMeta, SchemaNode>>) {
     val oneOf = schemas.map { it.second.arrayItem() }.toSet().sortedBy { it.toString() }
     fun definitions() = schemas.flatMap { it.second.definitions() }
 }

@@ -31,7 +31,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schema/SingletonList"
+                  "type": "array"
                 }
               ]
             },
@@ -52,7 +52,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schema/String"
+                  "type": "string"
                 }
               ]
             },
@@ -110,32 +110,6 @@
         "type": "object",
         "required": [
           "uri"
-        ]
-      }
-    },
-    {
-      "first": "SingletonList",
-      "second": {
-        "properties": {
-        },
-        "example": [
-          {
-            "uri": "foobar"
-          }
-        ],
-        "type": "object",
-        "required": [
-        ]
-      }
-    },
-    {
-      "first": "String",
-      "second": {
-        "properties": {
-        },
-        "example": "hello",
-        "type": "object",
-        "required": [
         ]
       }
     }
