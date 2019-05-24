@@ -28,12 +28,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
-        val items = when (obj) {
-            is Array<*> -> obj.asList()
-            is Iterable<*> -> obj.toList()
-            else -> listOf(obj)
-        }.filterNotNull()
 
+        val items = items(obj)
         val schemas = json.elements(this).mapIndexed { index, node ->
             println(node)
             println(json.typeOf(node))
@@ -44,7 +40,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
         }
 
-        return SchemaNode.Array(name, isNullable, Items(schemas), this)
+        return SchemaNode.Array(name, isNullable, Items.Inner(schemas), this)
+    }
+
+    private fun items(obj: Any) = when (obj) {
+        is Array<*> -> obj.asList().filterNotNull()
+        is Iterable<*> -> obj.toList().filterNotNull()
+        else -> listOf(obj)
     }
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
@@ -77,9 +79,17 @@ private sealed class ArrayItem {
     data class Ref(val `$ref`: String) : ArrayItem()
 }
 
-private class Items(private val schemas: List<SchemaNode>) {
-    val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.toString() }
-    fun definitions() = schemas.flatMap { it.definitions() }
+private sealed class Items {
+    abstract fun definitions(): List<SchemaNode>
+
+    class Nested(val items: Items) : Items() {
+        override fun definitions() = items.definitions()
+    }
+
+    class Inner(private val schemas: List<SchemaNode>) : Items() {
+        val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.toString() }
+        override fun definitions() = schemas.flatMap { it.definitions() }
+    }
 }
 
 private sealed class SchemaNode(
