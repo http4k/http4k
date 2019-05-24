@@ -85,7 +85,7 @@ private sealed class Items {
     }
 
     class Inner(private val schemas: List<SchemaNode>) : Items() {
-        val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.toString() }
+        val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.javaClass.simpleName }
         override fun definitions() = schemas.flatMap { it.definitions() }
     }
 }

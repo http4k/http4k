@@ -65,13 +65,13 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schema/ArbObject2"
+                  "type": "string"
                 },
                 {
                   "type": "boolean"
                 },
                 {
-                  "type": "string"
+                  "$ref": "#/components/schema/ArbObject2"
                 }
               ]
             },
