@@ -68,10 +68,10 @@
                   "$ref": "#/components/schema/ArbObject2"
                 },
                 {
-                  "type": "string"
+                  "type": "boolean"
                 },
                 {
-                  "type": "boolean"
+                  "type": "string"
                 }
               ]
             },
