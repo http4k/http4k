@@ -43,7 +43,7 @@ class JsonToJsonSchemaTest {
     }
 
     @Test
-    fun `renders nested  array contents of different types of json value as expected`(approver: Approver) {
+    fun `renders nested array contents of different types of json value as expected`(approver: Approver) {
         approver.assertApproved(json {
             array(listOf(array(listOf(obj("anotherString" to string("yetAnotherString"))))))
         }, "bob")
