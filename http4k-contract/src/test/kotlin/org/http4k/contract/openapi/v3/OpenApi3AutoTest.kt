@@ -5,4 +5,5 @@ import org.http4k.contract.ContractRendererContract
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.format.Jackson
 
-class OpenApi3AutoTest : ContractRendererContract<JsonNode>(Jackson, OpenApi3(ApiInfo("title", "1.2", "module description")))
+class OpenApi3AutoTest : ContractRendererContract<JsonNode>(Jackson,
+    OpenApi3(ApiInfo("title", "1.2", "module description"), Jackson))

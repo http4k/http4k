@@ -13,7 +13,6 @@ import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
@@ -23,7 +22,6 @@ import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
-import org.http4k.util.JsonToJsonSchema
 
 /**
  * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of
@@ -42,7 +40,7 @@ open class OpenApi2<out NODE>(
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
-            Response(Status.OK)
+            Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
                     pretty(obj(
@@ -71,17 +69,17 @@ open class OpenApi2<out NODE>(
             )
         }
 
-    private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null) = json {
+    private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
-                "in" to string(meta.location),
-                "name" to string(meta.name),
-                "required" to boolean(meta.required),
+                "in" to string(location),
+                "name" to string(name),
+                "required" to boolean(required),
                 when (ParamMeta.ObjectParam) {
-                    meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
-                    else -> "type" to string(meta.paramMeta.value)
+                    paramMeta -> "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
+                    else -> "type" to string(paramMeta.value)
                 }
-            ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
+            ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
@@ -106,27 +104,27 @@ open class OpenApi2<out NODE>(
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
-        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
+        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
+
+        val operationId = route.meta.operationId ?: route.method.name.toLowerCase() + route.describeFor(pathSegments)
+            .split('/').joinToString("") { it.capitalize() }
 
         return json {
             val fields =
                 listOfNotNull(
                     "tags" to array(routeTags),
                     "summary" to string(route.meta.summary),
-                    route.meta.operationId?.let { "operationId" to string(it) },
+                    "operationId" to string(operationId),
                     "produces" to array(route.meta.produces.map { string(it.value) }),
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(
-                        listOf(route.meta.security, contractSecurity).mapNotNull {
-
-                            securityRenderer.ref<NODE>(it)
-                        }.map { json(it) })
+                        listOf(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(
@@ -138,7 +136,7 @@ open class OpenApi2<out NODE>(
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
         schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
     } catch (e: Exception) {
-        JsonSchema(json.nullNode(), emptySet())
+        JsonSchema(json.obj(), emptySet())
     }
 
     private fun render(responses: List<HttpMessageMeta<Response>>) = json {

@@ -1,6 +1,9 @@
 package org.http4k.contract.openapi
 
+import org.http4k.contract.openapi.v3.AutoJsonToJsonSchema
+import org.http4k.contract.openapi.v3.JsonToJsonSchema
 import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import java.util.concurrent.atomic.AtomicReference
 
@@ -14,11 +17,24 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
         /**
          * ApiRenderer which uses auto-marshalling JSON to create JSON schema for message models.
          */
-        fun <T : Any, NODE : Any> Auto(json: JsonLibAutoMarshallingJson<NODE>,
-                                       schema: JsonSchemaCreator<Any, NODE>): ApiRenderer<T, NODE> =
-            object : ApiRenderer<T, NODE>, JsonSchemaCreator<Any, NODE> by schema {
+        fun <T : Any, NODE : Any> Auto(
+            json: JsonLibAutoMarshallingJson<NODE>,
+            schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> {
+            val fallbackSchema = object : JsonSchemaCreator<Any, NODE> {
+                private val jsonNodes = JsonToJsonSchema(json)
+                override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
+                    try {
+                        @Suppress("UNCHECKED_CAST")
+                        jsonNodes.toSchema(obj as NODE, overrideDefinitionId)
+                    } catch (e: ClassCastException) {
+                        schema.toSchema(obj, overrideDefinitionId)
+                    }
+            }
+
+            return object : ApiRenderer<T, NODE>, JsonSchemaCreator<Any, NODE> by fallbackSchema {
                 override fun api(api: T) = json.asJsonObject(api)
             }
+        }
     }
 }
 

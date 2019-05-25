@@ -20,21 +20,42 @@ data class Components<NODE>(
     val securitySchemes: NODE
 )
 
-data class ApiPath<NODE>(
+sealed class ApiPath<NODE>(
     val summary: String,
     val description: String?,
     val tags: List<String>,
     val parameters: List<RequestParameter<NODE>>,
-    val requestBody: RequestContents<NODE>,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE,
     val operationId: String
 ) {
-    fun definitions() = listOfNotNull(
+    open fun definitions() = listOfNotNull(
         responses.flatMap { it.value.definitions() },
-        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() },
-        requestBody.definitions().toList()
+        parameters.filterIsInstance<HasSchema<NODE>>().flatMap { it.definitions() }
     ).flatten()
+
+    class NoBody<NODE>(
+        summary: String,
+        description: String?,
+        tags: List<String>,
+        parameters: List<RequestParameter<NODE>>,
+        responses: Map<String, ResponseContents<NODE>>,
+        security: NODE,
+        operationId: String
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId)
+
+    class WithBody<NODE>(
+        summary: String,
+        description: String?,
+        tags: List<String>,
+        parameters: List<RequestParameter<NODE>>,
+        val requestBody: RequestContents<NODE>,
+        responses: Map<String, ResponseContents<NODE>>,
+        security: NODE,
+        operationId: String
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId) {
+        override fun definitions() = super.definitions() + requestBody.definitions().toList()
+    }
 }
 
 interface HasSchema<NODE> {
@@ -60,12 +81,13 @@ sealed class BodyContent {
     }
 }
 
-class RequestContents<NODE>(val content: Map<String, BodyContent> = emptyMap()) : HasSchema<NODE> {
-    override fun definitions() = content.values
-        .filterIsInstance<HasSchema<NODE>>()
-        .flatMap { it.definitions() }
+class RequestContents<NODE>(val content: Map<String, BodyContent>? = null) : HasSchema<NODE> {
+    override fun definitions() = content?.values
+        ?.filterIsInstance<HasSchema<NODE>>()
+        ?.flatMap { it.definitions() }
+        ?: emptyList()
 
-    val required = content.isNotEmpty()
+    val required = content != null
 }
 
 class ResponseContents<NODE>(val description: String?, val content: Map<String, BodyContent> = emptyMap()) : HasSchema<NODE> {

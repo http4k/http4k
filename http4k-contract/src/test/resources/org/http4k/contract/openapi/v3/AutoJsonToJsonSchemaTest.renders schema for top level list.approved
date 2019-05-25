@@ -1,0 +1,229 @@
+{
+  "node": {
+    "items": {
+      "oneOf": [
+        {
+          "$ref": "#/components/schemas/ArbObject"
+        }
+      ]
+    },
+    "example": [
+      {
+        "child": {
+          "uri": "foobar"
+        },
+        "list": [
+          {
+            "uri": "foobar"
+          }
+        ],
+        "nestedList": [
+          [
+            {
+              "uri": "foobar"
+            }
+          ]
+        ],
+        "nullableChild": {
+          "uri": "foobar"
+        },
+        "stringList": [
+          "hello"
+        ],
+        "anyList": [
+          "123",
+          {
+            "uri": "foobar"
+          },
+          true,
+          [
+            {
+              "uri": "foobar"
+            }
+          ]
+        ],
+        "enumVal": "value2"
+      }
+    ],
+    "type": "array"
+  },
+  "definitions": [
+    {
+      "first": "ArbObject",
+      "second": {
+        "properties": {
+          "child": {
+            "$ref": "#/components/schemas/ArbObject2",
+            "example": null
+          },
+          "list": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ArbObject2"
+                }
+              ]
+            },
+            "example": [
+              {
+                "uri": "foobar"
+              }
+            ],
+            "type": "array"
+          },
+          "nestedList": {
+            "items": {
+              "oneOf": [
+                {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ArbObject2"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "example": [
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "type": "array"
+          },
+          "nullableChild": {
+            "$ref": "#/components/schemas/ArbObject2",
+            "example": null
+          },
+          "stringList": {
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "hello"
+            ],
+            "type": "array"
+          },
+          "anyList": {
+            "items": {
+              "oneOf": [
+                {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ArbObject2"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "#/components/schemas/ArbObject2"
+                }
+              ]
+            },
+            "example": [
+              "123",
+              {
+                "uri": "foobar"
+              },
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
+            ],
+            "type": "array"
+          },
+          "enumVal": {
+            "example": "value2",
+            "enum": [
+              "value1",
+              "value2"
+            ],
+            "type": "string"
+          }
+        },
+        "example": {
+          "child": {
+            "uri": "foobar"
+          },
+          "list": [
+            {
+              "uri": "foobar"
+            }
+          ],
+          "nestedList": [
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "nullableChild": {
+            "uri": "foobar"
+          },
+          "stringList": [
+            "hello"
+          ],
+          "anyList": [
+            "123",
+            {
+              "uri": "foobar"
+            },
+            true,
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
+          ],
+          "enumVal": "value2"
+        },
+        "type": "object",
+        "required": [
+          "anyList",
+          "child",
+          "enumVal",
+          "list",
+          "nestedList",
+          "nullableChild",
+          "stringList"
+        ]
+      }
+    },
+    {
+      "first": "ArbObject2",
+      "second": {
+        "properties": {
+          "uri": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "uri": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
+      }
+    }
+  ]
+}

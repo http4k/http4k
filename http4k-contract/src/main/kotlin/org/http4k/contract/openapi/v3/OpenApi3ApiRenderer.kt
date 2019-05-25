@@ -10,7 +10,6 @@ import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.format.Json
 import org.http4k.util.JsonSchema
-import org.http4k.util.JsonToJsonSchema
 
 /**
  * Converts a API to OpenApi3 format JSON.
@@ -60,25 +59,30 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
             )
         }
 
-    private fun ApiPath<NODE>.toJson(): NODE =
-        json {
-            obj(
+    private fun ApiPath<NODE>.toJson(): NODE = json {
+        obj(
+            listOfNotNull(
                 "summary" to summary.asJson(),
-                "description" to (description.asJson()),
-                "tags" to (array(tags.map { string(it) })),
+                "description" to description.asJson(),
+                "tags" to array(tags.map { string(it) }),
                 "parameters" to parameters.asJson(),
-                "requestBody" to (requestBody.asJson()),
+                if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody.asJson() else null,
                 "responses" to responses.asJson(),
-                "security" to (security),
+                "security" to security,
                 "operationId" to operationId.asJson()
             )
-        }
-
-    private fun RequestContents<NODE>.asJson(): NODE = json {
-        obj(
-            "content" to content.asJson(),
-            "required" to boolean(content.isNotEmpty())
         )
+    }
+
+    private fun RequestContents<NODE>.asJson() = json {
+        content?.let {
+            "requestBody" to obj(
+                listOfNotNull(
+                    "content" to it.asJson(),
+                    "required" to boolean(content.isNotEmpty())
+                )
+            )
+        }
     }
 
     @JvmName("contentAsJson")

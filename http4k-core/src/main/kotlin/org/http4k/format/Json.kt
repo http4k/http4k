@@ -39,6 +39,8 @@ interface Json<NODE> {
     fun elements(value: NODE): Iterable<NODE>
     fun text(value: NODE): String
     fun bool(value: NODE): Boolean
+    fun integer(value: NODE): Long
+    fun decimal(value: NODE): BigDecimal
 
     fun compactify(input: String) = parse(input).asCompactJsonString()
 

@@ -24,12 +24,11 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
             value.isJsonArray -> JsonType.Array
             value.isJsonNull -> JsonType.Null
             value.isJsonObject -> JsonType.Object
-            value.isJsonPrimitive -> {
-                val prim = value.asJsonPrimitive
+            value.isJsonPrimitive -> with(value.asJsonPrimitive) {
                 when {
-                    prim.isBoolean -> JsonType.Boolean
-                    prim.isNumber -> JsonType.Number
-                    prim.isString -> JsonType.String
+                    isBoolean -> JsonType.Boolean
+                    isNumber -> JsonType.Number
+                    isString -> JsonType.String
                     else -> throw IllegalArgumentException("Don't know now to translate $value")
                 }
             }
@@ -74,6 +73,8 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun elements(value: JsonElement): Iterable<JsonElement> = value.asJsonArray
     override fun text(value: JsonElement): String = value.asString
     override fun bool(value: JsonElement): Boolean = value.asBoolean
+    override fun integer(value: JsonElement) = value.asLong
+    override fun decimal(value: JsonElement) = value.asBigDecimal
 
     override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)

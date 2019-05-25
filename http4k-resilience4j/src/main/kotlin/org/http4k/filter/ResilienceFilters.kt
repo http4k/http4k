@@ -2,8 +2,8 @@ package org.http4k.filter
 
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadFullException
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RequestNotPermitted
 import io.github.resilience4j.retry.Retry
@@ -32,7 +32,7 @@ object ResilienceFilters {
                             if (isError(this)) circuitBreaker.onError(0, CircuitError)
                         }
                     }
-                } catch (e: CircuitBreakerOpenException) {
+                } catch (e: CallNotPermittedException) {
                     onError()
                 }
             }

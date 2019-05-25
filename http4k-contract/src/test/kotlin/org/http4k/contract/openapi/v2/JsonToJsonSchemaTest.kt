@@ -1,4 +1,4 @@
-package org.http4k.util
+package org.http4k.contract.openapi.v2
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.ContentType
@@ -43,7 +43,7 @@ class JsonToJsonSchemaTest {
     }
 
     @Test
-    fun `renders nested  array contents of different types of json value as expected`(approver: Approver) {
+    fun `renders nested array contents of different types of json value as expected`(approver: Approver) {
         approver.assertApproved(json {
             array(listOf(array(listOf(obj("anotherString" to string("yetAnotherString"))))))
         }, "bob")

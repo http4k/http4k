@@ -12,9 +12,9 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -96,6 +96,12 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
+            routes += "/body_json_response" meta {
+                returning("normal" to json {
+                    val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                    Response(OK).with(body("json").toLens() of obj)
+                })
+            } bindContract POST to { Response(OK) }
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
@@ -137,7 +143,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
             routes += "/body_auto_schema" meta {
                 receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang")))
                 returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
-            } bindContract PUT to { Response(OK) }
+            } bindContract Method.PUT to { Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
             } bindContract POST to { Response(OK) }

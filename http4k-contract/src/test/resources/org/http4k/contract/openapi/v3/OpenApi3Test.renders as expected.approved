@@ -25,11 +25,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -99,7 +94,7 @@
                 "uri": "http://foowang"
               },
               "schema": {
-                "$ref": "#/components/schemas/object-1161328054"
+                "$ref": "#/components/schemas/object744721296"
               }
             }
           },
@@ -206,7 +201,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object-1365611171"
+                  "$ref": "#/components/schemas/object540438179"
                 }
               }
             }
@@ -251,6 +246,40 @@
           }
         ],
         "operationId": "postBasepathBody_json_noschema"
+      }
+    },
+    "/basepath/body_json_response": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "normal",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-1365611171"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_json_response"
       }
     },
     "/basepath/body_json_schema": {
@@ -329,11 +358,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -354,11 +378,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -419,11 +438,6 @@
             "description": "jsonHeader"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -444,11 +458,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -487,11 +496,6 @@
             "description": null
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -512,11 +516,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -573,11 +572,6 @@
             "description": "jsonQuery"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -598,11 +592,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
           "403": {
             "description": "no way jose",
@@ -639,11 +628,24 @@
           }
         }
       },
+      "object540438179": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
       "someDefinitionId": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/object-1365611171"
+            "$ref": "#/components/schemas/object540438179"
           }
         }
       },
@@ -658,6 +660,8 @@
       },
       "someOtherId": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
         }
       },
@@ -670,8 +674,10 @@
           }
         }
       },
-      "object-1161328054": {
+      "object744721296": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
         }
       }

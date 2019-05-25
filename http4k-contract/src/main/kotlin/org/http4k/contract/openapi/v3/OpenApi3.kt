@@ -11,6 +11,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -29,15 +30,16 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
+import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
-import org.http4k.util.JsonToJsonSchema
 
 /**
- * Contract renderer for OpenApi3 format JSON. By default, for the JSON schema generation, auto-naming of
- * object models is used as the input relies on JSON objects and not JVM classees.
+ * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
+ * object models will default to either reflective or hashcode based depending on if a Auto Json
+ * is passed.
  */
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
@@ -46,8 +48,9 @@ class OpenApi3<NODE : Any>(
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
-
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
+
+    constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>) : this(apiInfo, json, ApiRenderer.Auto(json))
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + security
@@ -70,22 +73,40 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
-        PathAndMethod(describeFor(contractRoot), method,
-            ApiPath(
+        PathAndMethod(describeFor(contractRoot), method, apiPath(contractRoot, contractSecurity))
+
+    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security): ApiPath<NODE> {
+        val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+
+        val operationId = meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
+            .split('/').joinToString("") { it.capitalize() }
+
+        val security = json(listOf(meta.security, contractSecurity).combineRef())
+        val body = meta.requestBody()?.takeIf { it.required }
+
+        return if (method in setOf(GET, DELETE, HEAD) || body == null) {
+            ApiPath.NoBody(
                 meta.summary,
                 meta.description,
-                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
+                tags,
                 asOpenApiParameters(),
-                when (method) {
-                    in setOf(GET, DELETE, HEAD) -> RequestContents()
-                    else -> meta.requestBody().takeIf { it.required } ?: RequestContents()
-                },
                 meta.responses(),
-                json(listOf(meta.security, contractSecurity).combineRef()),
-                meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
-                    .split('/').joinToString("") { it.capitalize() }
+                security,
+                operationId
             )
-        )
+        } else {
+            ApiPath.WithBody(
+                meta.summary,
+                meta.description,
+                tags,
+                asOpenApiParameters(),
+                body,
+                meta.responses(),
+                security,
+                operationId
+            )
+        }
+    }
 
     private fun RouteMeta.responses() =
         responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap()
@@ -99,7 +120,7 @@ class OpenApi3<NODE : Any>(
         }
     }
 
-    private fun RouteMeta.requestBody(): RequestContents<NODE> {
+    private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(ParamMeta.StringParam) }
 
         val withSchema = requests.mapNotNull {
@@ -113,7 +134,9 @@ class OpenApi3<NODE : Any>(
             }
         }
 
-        return RequestContents((noSchema + withSchema).toMap())
+        return (noSchema + withSchema)
+            .takeIf { it.isNotEmpty() }
+            ?.let { RequestContents(it.toMap()) }
     }
 
     private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
@@ -156,5 +179,3 @@ class OpenApi3<NODE : Any>(
 
     companion object
 }
-
-private fun <E : Iterable<T>, T> E.nullIfEmpty(): E? = if (iterator().hasNext()) this else null

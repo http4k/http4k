@@ -24,11 +24,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -67,7 +62,8 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/someOtherId"
+                "$ref": "#/components/schemas/ArbObject2",
+                "example": null
               }
             }
           },
@@ -98,7 +94,8 @@
                 "uri": "http://foowang"
               },
               "schema": {
-                "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:ArbObject3"
+                "$ref": "#/components/schemas/ArbObject3",
+                "example": null
               }
             }
           },
@@ -115,11 +112,19 @@
                   }
                 ],
                 "schema": {
-                  "type": "array",
-                  "required": true,
                   "items": {
-                    "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:ArbObject1"
-                  }
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/ArbObject1"
+                      }
+                    ]
+                  },
+                  "example": [
+                    {
+                      "anotherString": "bing"
+                    }
+                  ],
+                  "type": "array"
                 }
               }
             }
@@ -206,7 +211,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object1482787387"
+                  "$ref": "#/components/schemas/object1089648089"
                 }
               }
             }
@@ -252,6 +257,40 @@
           }
         ],
         "operationId": "postBasepathBody_json_noschema"
+      }
+    },
+    "/basepath/body_json_response": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "normal",
+            "content": {
+              "application/json": {
+                "example": {
+                  "aNullField": null,
+                  "aNumberField": 123
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object1482787387"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_json_response"
       }
     },
     "/basepath/body_json_schema": {
@@ -330,11 +369,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -355,11 +389,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -420,11 +449,6 @@
             "description": "jsonHeader"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -445,11 +469,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -488,11 +507,6 @@
             "description": null
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -513,11 +527,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -574,11 +583,6 @@
             "description": "jsonQuery"
           }
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
         },
         "security": [
@@ -599,11 +603,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-          },
-          "required": false
-        },
         "responses": {
           "403": {
             "description": "no way jose",
@@ -648,6 +647,17 @@
           }
         }
       },
+      "object1089648089": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
       "object-1662053258": {
         "type": "object",
         "properties": {
@@ -657,64 +667,85 @@
           }
         }
       },
-      "someOtherId": {
-        "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject2",
+      "ArbObject2": {
         "properties": {
           "string": {
-            "type": "string",
-            "required": true
+            "example": "s",
+            "type": "string"
           },
           "child": {
-            "type": "object",
-            "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
-            "properties": {
-              "anotherString": {
-                "type": "string",
-                "required": true,
-                "enum": [
-                  "bar",
-                  "bing"
-                ]
-              }
-            }
+            "$ref": "#/components/schemas/ArbObject1",
+            "example": null
           },
           "numbers": {
-            "type": "array",
-            "required": true,
             "items": {
-              "type": "integer"
-            }
+              "oneOf": [
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "example": [
+              1
+            ],
+            "type": "array"
           },
           "bool": {
-            "type": "boolean",
-            "required": true
+            "example": true,
+            "type": "boolean"
           }
-        }
-      },
-      "urn:jsonschema:org:http4k:contract:ArbObject1": {
+        },
+        "example": {
+          "string": "s",
+          "child": {
+            "anotherString": "bar"
+          },
+          "numbers": [
+            1
+          ],
+          "bool": true
+        },
         "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
+        "required": [
+          "bool",
+          "child",
+          "numbers",
+          "string"
+        ]
+      },
+      "ArbObject1": {
         "properties": {
           "anotherString": {
-            "type": "string",
-            "required": true,
+            "example": "bing",
             "enum": [
               "bar",
               "bing"
-            ]
+            ],
+            "type": "string"
           }
-        }
-      },
-      "urn:jsonschema:org:http4k:contract:ArbObject3": {
+        },
+        "example": {
+          "anotherString": "bing"
+        },
         "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject3",
+        "required": [
+          "anotherString"
+        ]
+      },
+      "ArbObject3": {
         "properties": {
           "uri": {
-            "type": "string",
-            "required": true
+            "example": "http://foowang",
+            "type": "string"
           }
-        }
+        },
+        "example": {
+          "uri": "http://foowang"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
       }
     },
     "securitySchemes": {

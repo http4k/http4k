@@ -21,6 +21,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBearer_auth",
         "produces": [
         ],
         "consumes": [
@@ -29,7 +30,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -46,6 +49,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema",
         "produces": [
         ],
         "consumes": [
@@ -63,7 +67,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -78,6 +84,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "putBasepathBody_auto_schema",
         "produces": [
           "application/json"
         ],
@@ -119,6 +126,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_form",
         "produces": [
         ],
         "consumes": [
@@ -156,7 +164,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -173,6 +183,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_list_schema",
         "produces": [
         ],
         "consumes": [
@@ -194,7 +205,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -211,6 +224,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_noschema",
         "produces": [
         ],
         "consumes": [
@@ -221,13 +235,46 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "schema": null,
+            "schema": {
+            },
             "description": "json"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/body_json_response": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_response",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "normal",
+            "schema": {
+              "$ref": "#/definitions/object-1365611171"
+            }
           }
         },
         "security": [
@@ -244,6 +291,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_schema",
         "produces": [
         ],
         "consumes": [
@@ -262,7 +310,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -279,6 +329,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_string",
         "produces": [
         ],
         "consumes": [
@@ -296,7 +347,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -323,7 +376,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -341,6 +396,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathExtra_security",
         "produces": [
         ],
         "consumes": [
@@ -349,7 +405,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -370,6 +428,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathHeaders",
         "produces": [
         ],
         "consumes": [
@@ -406,7 +465,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -423,6 +484,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "getBasepathNometa",
         "produces": [
         ],
         "consumes": [
@@ -431,7 +493,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -448,6 +512,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathPaths{firstName}Bertrand{age}",
         "produces": [
         ],
         "consumes": [
@@ -468,7 +533,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -485,6 +552,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "getBasepathProduces_and_consumes",
         "produces": [
           "application/json",
           "application/xml"
@@ -497,7 +565,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -514,6 +584,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathQueries",
         "produces": [
         ],
         "consumes": [
@@ -550,7 +621,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -567,6 +640,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathReturning",
         "produces": [
           "application/json"
         ],
