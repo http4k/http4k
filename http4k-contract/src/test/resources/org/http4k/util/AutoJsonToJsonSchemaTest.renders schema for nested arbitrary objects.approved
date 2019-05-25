@@ -72,6 +72,16 @@
             "items": {
               "oneOf": [
                 {
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schema/ArbObject2"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                },
+                {
                   "type": "string"
                 },
                 {
@@ -87,7 +97,12 @@
               {
                 "uri": "foobar"
               },
-              false
+              true,
+              [
+                {
+                  "uri": "foobar"
+                }
+              ]
             ],
             "type": "array"
           }
@@ -119,7 +134,12 @@
             {
               "uri": "foobar"
             },
-            false
+            true,
+            [
+              {
+                "uri": "foobar"
+              }
+            ]
           ]
         },
         "type": "object",
