@@ -24,7 +24,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -269,7 +268,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
           "200": {
             "description": "normal",
@@ -371,7 +369,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -392,7 +389,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -453,7 +449,6 @@
             "description": "jsonHeader"
           }
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -474,7 +469,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -513,7 +507,6 @@
             "description": null
           }
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -534,7 +527,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -591,7 +583,6 @@
             "description": "jsonQuery"
           }
         ],
-        "requestBody": null,
         "responses": {
         },
         "security": [
@@ -612,7 +603,6 @@
         ],
         "parameters": [
         ],
-        "requestBody": null,
         "responses": {
           "403": {
             "description": "no way jose",

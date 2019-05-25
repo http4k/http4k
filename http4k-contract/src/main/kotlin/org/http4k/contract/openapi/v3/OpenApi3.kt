@@ -73,22 +73,39 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
-        PathAndMethod(describeFor(contractRoot), method,
-            ApiPath(
+        PathAndMethod(describeFor(contractRoot), method, apiPath(contractRoot, contractSecurity))
+
+    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security): ApiPath<NODE> {
+        val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
+
+        val operationId = meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
+            .split('/').joinToString("") { it.capitalize() }
+
+        val security = json(listOf(meta.security, contractSecurity).combineRef())
+
+        return if (method in setOf(GET, DELETE, HEAD) || meta.requestBody() == null) {
+            ApiPath.NoBody(
                 meta.summary,
                 meta.description,
-                if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted(),
+                tags,
                 asOpenApiParameters(),
-                when (method) {
-                    in setOf(GET, DELETE, HEAD) -> null
-                    else -> meta.requestBody()?.takeIf { it.required }
-                },
                 meta.responses(),
-                json(listOf(meta.security, contractSecurity).combineRef()),
-                meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
-                    .split('/').joinToString("") { it.capitalize() }
+                security,
+                operationId
             )
-        )
+        } else {
+            ApiPath.WithBody(
+                meta.summary,
+                meta.description,
+                tags,
+                asOpenApiParameters(),
+                meta.requestBody()?.takeIf { it.required },
+                meta.responses(),
+                security,
+                operationId
+            )
+        }
+    }
 
     private fun RouteMeta.responses() =
         responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap()
