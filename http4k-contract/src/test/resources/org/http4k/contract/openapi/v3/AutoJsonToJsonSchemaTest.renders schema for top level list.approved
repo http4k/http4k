@@ -41,7 +41,8 @@
               "uri": "foobar"
             }
           ]
-        ]
+        ],
+        "enumVal": "value2"
       }
     ],
     "type": "array"
@@ -148,6 +149,10 @@
               ]
             ],
             "type": "array"
+          },
+          "enumVal": {
+            "example": "value2",
+            "type": "string"
           }
         },
         "example": {
@@ -183,12 +188,14 @@
                 "uri": "foobar"
               }
             ]
-          ]
+          ],
+          "enumVal": "value2"
         },
         "type": "object",
         "required": [
           "anyList",
           "child",
+          "enumVal",
           "list",
           "nestedList",
           "nullableChild",

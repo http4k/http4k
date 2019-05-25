@@ -22,7 +22,8 @@ data class ArbObject(
     val nestedList: List<List<ArbObject2>> = listOf(listOf(ArbObject2())),
     val nullableChild: ArbObject2? = ArbObject2(),
     val stringList: List<String> = listOf("hello"),
-    val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2()))
+    val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
+    val enumVal: Foo = Foo.value2
 )
 
 data class JsonPrimitives(
@@ -35,6 +36,10 @@ data class JsonPrimitives(
     val bigInt: BigInteger = BigInteger("" + Long.MAX_VALUE + "" + Long.MAX_VALUE),
     val bigDecimal: BigDecimal = BigDecimal("" + Double.MAX_VALUE + "" + 111)
 )
+
+enum class Foo {
+    value1, value2
+}
 
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
