@@ -9,6 +9,7 @@ import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 
@@ -19,29 +20,38 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?) = json {
         println(obj::class.simpleName)
-        val schema = json.asJsonObject(obj).toObjectSchema(overrideDefinitionId, obj, false)
+        val node = json.asJsonObject(obj)
+        val objName: String? = overrideDefinitionId
+        val schema = node.toSchema(obj, objName)
         JsonSchema(
             json.asJsonObject(schema),
             schema.definitions().map { it.name() to json.asJsonObject(it) }.toSet())
     }
+
+    private fun NODE.toSchema(value: Any, objName: String?) =
+        when (val param = json.typeOf(this).toParam()) {
+            ArrayParam -> toArraySchema("", value, false)
+            ObjectParam -> toObjectSchema(objName, value, false)
+            else -> toSchema("", param, false)
+        }
 
     private fun NODE.toSchema(name: String, paramMeta: ParamMeta, isNullable: Boolean) =
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
         val schemas = json.elements(this).zip(items(obj)) { node: NODE, value: Any ->
-            when (val param = json.typeOf(node).toParam()) {
-                ArrayParam -> node.toArraySchema("", value, false)
-                ObjectParam -> node.toObjectSchema(null, value, false)
-                else -> node.toSchema("", param, false)
-            }
+            node.toSchema(value, null)
         }
 
         return SchemaNode.Array(name, isNullable, Items(schemas), this)
     }
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
-        val fields = obj::class.memberProperties.map { it.name to it }.toMap()
+        val fields = try {
+            obj::class.memberProperties.map { it.name to it }.toMap()
+        } catch (e: Error) {
+            emptyMap<String, KProperty1<out Any, Any?>>()
+        }
 
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, fields.getValue(it.first)) }

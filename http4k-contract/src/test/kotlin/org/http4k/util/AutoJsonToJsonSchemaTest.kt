@@ -52,6 +52,11 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(ArbObject(), null)
     }
 
+    @Test
+    fun `renders schema for top level list`(approver: Approver) {
+        approver.assertApproved(listOf(ArbObject()), null)
+    }
+
     private fun Approver.assertApproved(obj: Any, name: String?) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
