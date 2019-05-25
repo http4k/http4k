@@ -238,6 +238,35 @@
         ]
       }
     },
+    "/basepath/body_json_response": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "normal",
+            "schema": {
+              "$ref": "#/definitions/object-1365611171"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_json_schema": {
       "post": {
         "tags": [

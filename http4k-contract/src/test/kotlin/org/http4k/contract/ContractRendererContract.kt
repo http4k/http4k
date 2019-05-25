@@ -96,6 +96,12 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
+            routes += "/body_json_response" meta {
+                returning("normal" to json {
+                    val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
+                    Response(OK).with(body("json").toLens() of obj)
+                })
+            } bindContract POST to { Response(OK) }
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
