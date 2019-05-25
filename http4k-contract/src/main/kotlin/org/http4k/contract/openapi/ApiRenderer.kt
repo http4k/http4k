@@ -1,7 +1,9 @@
 package org.http4k.contract.openapi
 
 import org.http4k.contract.openapi.v3.AutoJsonToJsonSchema
+import org.http4k.contract.openapi.v3.JsonToJsonSchema
 import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
 import java.util.concurrent.atomic.AtomicReference
 
@@ -17,10 +19,21 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
          */
         fun <T : Any, NODE : Any> Auto(
             json: JsonLibAutoMarshallingJson<NODE>,
-            schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> =
-            object : ApiRenderer<T, NODE>, JsonSchemaCreator<Any, NODE> by schema {
+            schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> {
+            val fallbackSchema = object : JsonSchemaCreator<Any, NODE> {
+                private val fallback = JsonToJsonSchema(json)
+                override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
+                    try {
+                        fallback.toSchema(obj as NODE, overrideDefinitionId)
+                    } catch (e: ClassCastException) {
+                        schema.toSchema(obj, overrideDefinitionId)
+                    }
+            }
+
+            return object : ApiRenderer<T, NODE>, JsonSchemaCreator<Any, NODE> by fallbackSchema {
                 override fun api(api: T) = json.asJsonObject(api)
             }
+        }
     }
 }
 

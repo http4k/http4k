@@ -202,7 +202,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object1482787387"
+                  "$ref": "#/components/schema/object1089648089"
                 }
               }
             }
@@ -644,6 +644,17 @@
         "properties": {
           "anAnotherObject": {
             "$ref": "#/components/schemas/object1482787387"
+          }
+        }
+      },
+      "object1089648089": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
           }
         }
       },
