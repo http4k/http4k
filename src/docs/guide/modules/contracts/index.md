@@ -57,27 +57,28 @@ anonymous JSON schema definition names that are then listed in the `schema` sect
 the names of the definitions are generated based on the Kotlin class instances provided to the Contract Route DSL. Note that 
 an overloaded OpenApi function automatically provides the default Jackson instance, so we can remove it from the renderer creation:
 ```kotlin
-    OpenApi3(ApiInfo("title", "1.2", "module description"))
+    OpenApi3(ApiInfo("title", "1.2", "module description"), Jackson)
 ```
 ... generates definitions like the following in the schema definitions:
 ```json
 {
    "components":{
       "schemas":{
-         "urn:jsonschema:urn:jsonschema:org:example:AnObject":{
-            "type":"object",
-            "id":"urn:jsonschema:org:example:AnObject",
-            "properties":{
-               "aString":{
-                  "type":"string",
-                  "required":true,
-                  "enum":[
-                     "bar",
-                     "bing"
-                  ]
-               }
-            }
-         }
+          "ArbObject": {
+            "properties": {
+              "uri": {
+                "example": "http://foowang",
+                "type": "string"
+              }
+            },
+            "example": {
+              "uri": "http://foowang"
+            },
+            "type": "object",
+            "required": [
+              "uri"
+            ]
+          }
       }
    }
 }
