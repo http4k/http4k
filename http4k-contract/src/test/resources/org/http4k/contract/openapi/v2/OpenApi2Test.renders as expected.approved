@@ -30,7 +30,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -65,7 +67,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -160,7 +164,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -199,7 +205,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -227,13 +235,16 @@
             "in": "body",
             "name": "body",
             "required": true,
-            "schema": null,
+            "schema": {
+            },
             "description": "json"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -299,7 +310,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -334,7 +347,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -361,7 +376,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -388,7 +405,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -446,7 +465,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -472,7 +493,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -510,7 +533,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -540,7 +565,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [
@@ -594,7 +621,9 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+            }
           }
         },
         "security": [

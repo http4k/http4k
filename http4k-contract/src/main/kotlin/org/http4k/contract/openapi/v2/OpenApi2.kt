@@ -86,7 +86,6 @@ open class OpenApi2<out NODE>(
     private fun Meta.renderBodyMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
-                "in2" to string(location),
                 "in" to string(location),
                 "name" to string(name),
                 "required" to boolean(required),
@@ -137,7 +136,7 @@ open class OpenApi2<out NODE>(
     private fun HttpMessageMeta<*>.asSchema(): JsonSchema<NODE> = try {
         schemaGenerator.toSchema(json.parse(message.bodyString()), definitionId)
     } catch (e: Exception) {
-        JsonSchema(json.nullNode(), emptySet())
+        JsonSchema(json.obj(), emptySet())
     }
 
     private fun render(responses: List<HttpMessageMeta<Response>>) = json {

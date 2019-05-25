@@ -3,6 +3,10 @@ package org.http4k.contract.openapi.v2
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
+import org.http4k.lens.ParamMeta.BooleanParam
+import org.http4k.lens.ParamMeta.IntegerParam
+import org.http4k.lens.ParamMeta.NumberParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
@@ -17,21 +21,21 @@ class JsonToJsonSchema<NODE>(
         when (json.typeOf(node)) {
             JsonType.Object -> objectSchema(overrideDefinitionId)
             JsonType.Array -> arraySchema(overrideDefinitionId)
-            JsonType.String -> JsonSchema(ParamMeta.StringParam.schema(json.string(json.text(node))), definitions)
+            JsonType.String -> JsonSchema(StringParam.schema(json.string(json.text(node))), definitions)
             JsonType.Integer -> numberSchema()
             JsonType.Number -> numberSchema()
-            JsonType.Boolean -> JsonSchema(ParamMeta.BooleanParam.schema(json.boolean(json.bool(node))), definitions)
+            JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
             else -> throw IllegalSchemaException("unknown type")
         }
 
-    private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> {
-        val text = json.text(node)
+    private fun JsonSchema<NODE>.numberSchema() = json {
+        val text = text(node)
         val schema = when {
-            text.contains(".") -> ParamMeta.NumberParam.schema(json.number(text.toBigDecimal()))
-            else -> ParamMeta.IntegerParam.schema(json.number(text.toBigInteger()))
+            text.contains(".") -> NumberParam.schema(number(text.toBigDecimal()))
+            else -> IntegerParam.schema(number(text.toBigInteger()))
         }
-        return JsonSchema(schema, definitions)
+        JsonSchema(schema, definitions)
     }
 
     private fun JsonSchema<NODE>.arraySchema(overrideDefinitionId: String?): JsonSchema<NODE> {
