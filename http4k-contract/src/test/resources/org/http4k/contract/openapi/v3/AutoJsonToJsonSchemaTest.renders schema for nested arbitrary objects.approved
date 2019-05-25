@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/components/schema/ArbObject",
+    "$ref": "#/components/schemas/ArbObject",
     "example": null
   },
   "definitions": [
@@ -9,14 +9,14 @@
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/components/schema/ArbObject2",
+            "$ref": "#/components/schemas/ArbObject2",
             "example": null
           },
           "list": {
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schema/ArbObject2"
+                  "$ref": "#/components/schemas/ArbObject2"
                 }
               ]
             },
@@ -34,7 +34,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schema/ArbObject2"
+                        "$ref": "#/components/schemas/ArbObject2"
                       }
                     ]
                   },
@@ -52,7 +52,7 @@
             "type": "array"
           },
           "nullableChild": {
-            "$ref": "#/components/schema/ArbObject2",
+            "$ref": "#/components/schemas/ArbObject2",
             "example": null
           },
           "stringList": {
@@ -75,7 +75,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schema/ArbObject2"
+                        "$ref": "#/components/schemas/ArbObject2"
                       }
                     ]
                   },
@@ -88,7 +88,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/components/schema/ArbObject2"
+                  "$ref": "#/components/schemas/ArbObject2"
                 }
               ]
             },

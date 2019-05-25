@@ -63,7 +63,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schema/ArbObject2",
+                "$ref": "#/components/schemas/ArbObject2",
                 "example": null
               }
             }
@@ -95,7 +95,7 @@
                 "uri": "http://foowang"
               },
               "schema": {
-                "$ref": "#/components/schema/ArbObject3",
+                "$ref": "#/components/schemas/ArbObject3",
                 "example": null
               }
             }
@@ -116,7 +116,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schema/ArbObject1"
+                        "$ref": "#/components/schemas/ArbObject1"
                       }
                     ]
                   },
@@ -212,7 +212,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schema/object1089648089"
+                  "$ref": "#/components/schemas/object1089648089"
                 }
               }
             }
@@ -684,7 +684,7 @@
             "type": "string"
           },
           "child": {
-            "$ref": "#/components/schema/ArbObject1",
+            "$ref": "#/components/schemas/ArbObject1",
             "example": null
           },
           "numbers": {

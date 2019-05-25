@@ -18,7 +18,7 @@ import kotlin.reflect.jvm.javaGetter
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val refPrefix: String = "components/schema"
+    private val refPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {

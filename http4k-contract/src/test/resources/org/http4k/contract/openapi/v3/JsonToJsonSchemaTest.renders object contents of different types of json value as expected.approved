@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/components/schema/bob"
+    "$ref": "#/components/schemas/bob"
   },
   "definitions": [
     {
@@ -57,14 +57,14 @@
           "anArray": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schema/object1241320217"
+              "$ref": "#/components/schemas/object1241320217"
             }
           },
           "anObject": {
-            "$ref": "#/components/schema/object-239060560"
+            "$ref": "#/components/schemas/object-239060560"
           },
           "anotherObject": {
-            "$ref": "#/components/schema/object-239060560"
+            "$ref": "#/components/schemas/object-239060560"
           }
         }
       }

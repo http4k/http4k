@@ -2,7 +2,7 @@
   "node": {
     "type": "array",
     "items": {
-      "$ref": "#/components/schema/bob"
+      "$ref": "#/components/schemas/bob"
     }
   },
   "definitions": [

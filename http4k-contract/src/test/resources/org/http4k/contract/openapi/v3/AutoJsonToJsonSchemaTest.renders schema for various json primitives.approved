@@ -1,6 +1,6 @@
 {
   "node": {
-    "$ref": "#/components/schema/JsonPrimitives",
+    "$ref": "#/components/schemas/JsonPrimitives",
     "example": null
   },
   "definitions": [

@@ -9,7 +9,7 @@ import org.http4k.util.JsonSchemaCreator
 
 class JsonToJsonSchema<NODE>(
     private val json: Json<NODE>,
-    private val refPrefix: String = "components/schema"
+    private val refPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<NODE, NODE> {
     override fun toSchema(obj: NODE, overrideDefinitionId: String?) = JsonSchema(obj, emptySet()).toSchema(overrideDefinitionId)
 
