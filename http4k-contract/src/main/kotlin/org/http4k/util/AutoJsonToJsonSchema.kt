@@ -59,7 +59,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 }
 
 private sealed class ArrayItem {
-    class Array(val items: Items) : ArrayItem() {
+    data class Array(val items: Items) : ArrayItem() {
         val type = ArrayParam.value
     }
 
@@ -71,7 +71,7 @@ private sealed class ArrayItem {
 }
 
 private class Items(private val schemas: List<SchemaNode>) {
-    val oneOf = schemas.map {}.toSet().sortedBy { it.javaClass.simpleName }
+    val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.javaClass.simpleName }
 
     fun definitions() = schemas.flatMap { it.definitions() }
 }
@@ -136,5 +136,4 @@ private fun JsonType.toParam() = when (this) {
     JsonType.Array -> ArrayParam
     JsonType.Object -> ObjectParam
     JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
-    else -> throw IllegalSchemaException("unknown type")
 }
