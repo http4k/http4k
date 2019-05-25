@@ -69,23 +69,24 @@ open class OpenApi2<out NODE>(
             )
         }
 
-    private fun renderMeta(meta: Meta, schema: JsonSchema<NODE>? = null) = json {
+    private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
-                "in" to string(meta.location),
-                "name" to string(meta.name),
-                "required" to boolean(meta.required),
+                "in" to string(location),
+                "name" to string(name),
+                "required" to boolean(required),
                 when (ParamMeta.ObjectParam) {
-                    meta.paramMeta -> "schema" to (schema?.node ?: obj("type" to string(meta.paramMeta.value)))
-                    else -> "type" to string(meta.paramMeta.value)
+                    paramMeta -> "schema" to (schema?.node ?: obj("type" to string(paramMeta.value)))
+                    else -> "type" to string(paramMeta.value)
                 }
-            ) + (meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
+            ) + (description?.let { listOf("description" to string(it)) } ?: emptyList())
         )
     }
 
     private fun Meta.renderBodyMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
             listOf(
+                "in2" to string(location),
                 "in" to string(location),
                 "name" to string(name),
                 "required" to boolean(required),
@@ -104,7 +105,7 @@ open class OpenApi2<out NODE>(
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 
-        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { renderMeta(it) }
+        val nonBodyParamNodes = route.nonBodyParams.flatMap { it.asList() }.map { it.renderMeta() }
 
         val routeTags = if (route.tags.isEmpty()) listOf(json.string(pathSegments.toString())) else route.tagNames()
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
