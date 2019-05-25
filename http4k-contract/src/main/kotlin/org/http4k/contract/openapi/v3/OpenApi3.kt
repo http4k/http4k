@@ -11,6 +11,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
@@ -34,7 +35,6 @@ import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.util.JsonSchema
-import org.http4k.util.JsonToJsonSchema
 
 /**
  * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of

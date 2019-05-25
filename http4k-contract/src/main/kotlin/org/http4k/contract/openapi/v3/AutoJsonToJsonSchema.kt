@@ -1,4 +1,4 @@
-package org.http4k.util
+package org.http4k.contract.openapi.v3
 
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
@@ -9,6 +9,9 @@ import org.http4k.lens.ParamMeta.IntegerParam
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.util.IllegalSchemaException
+import org.http4k.util.JsonSchema
+import org.http4k.util.JsonSchemaCreator
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
@@ -62,7 +65,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
                 }
             }.map { it.name() to it }.toMap()
 
-        return SchemaNode.Reference(objName ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
+        return SchemaNode.Reference(objName
+            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
             SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 }

@@ -1,12 +1,11 @@
-package org.http4k.util
+package org.http4k.contract.openapi.v2
 
 import org.http4k.format.Json
 import org.http4k.format.JsonType
 import org.http4k.lens.ParamMeta
-import org.http4k.lens.ParamMeta.BooleanParam
-import org.http4k.lens.ParamMeta.IntegerParam
-import org.http4k.lens.ParamMeta.NumberParam
-import org.http4k.lens.ParamMeta.StringParam
+import org.http4k.util.IllegalSchemaException
+import org.http4k.util.JsonSchema
+import org.http4k.util.JsonSchemaCreator
 
 class JsonToJsonSchema<NODE>(
     private val json: Json<NODE>,
@@ -18,10 +17,10 @@ class JsonToJsonSchema<NODE>(
         when (json.typeOf(node)) {
             JsonType.Object -> objectSchema(overrideDefinitionId)
             JsonType.Array -> arraySchema(overrideDefinitionId)
-            JsonType.String -> JsonSchema(StringParam.schema(json.string(json.text(node))), definitions)
+            JsonType.String -> JsonSchema(ParamMeta.StringParam.schema(json.string(json.text(node))), definitions)
             JsonType.Integer -> numberSchema()
             JsonType.Number -> numberSchema()
-            JsonType.Boolean -> JsonSchema(BooleanParam.schema(json.boolean(json.bool(node))), definitions)
+            JsonType.Boolean -> JsonSchema(ParamMeta.BooleanParam.schema(json.boolean(json.bool(node))), definitions)
             JsonType.Null -> throw IllegalSchemaException("Cannot use a null value in a schema!")
             else -> throw IllegalSchemaException("unknown type")
         }
@@ -29,8 +28,8 @@ class JsonToJsonSchema<NODE>(
     private fun JsonSchema<NODE>.numberSchema(): JsonSchema<NODE> {
         val text = json.text(node)
         val schema = when {
-            text.contains(".") -> NumberParam.schema(json.number(text.toBigDecimal()))
-            else -> IntegerParam.schema(json.number(text.toBigInteger()))
+            text.contains(".") -> ParamMeta.NumberParam.schema(json.number(text.toBigDecimal()))
+            else -> ParamMeta.IntegerParam.schema(json.number(text.toBigInteger()))
         }
         return JsonSchema(schema, definitions)
     }
@@ -57,4 +56,3 @@ class JsonToJsonSchema<NODE>(
 
     private fun ParamMeta.schema(example: NODE): NODE = json { obj("type" to string(value), "example" to example) }
 }
-

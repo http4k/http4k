@@ -2,6 +2,7 @@ package org.http4k.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
+import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
 

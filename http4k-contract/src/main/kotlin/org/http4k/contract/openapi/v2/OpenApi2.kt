@@ -23,7 +23,6 @@ import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
-import org.http4k.util.JsonToJsonSchema
 
 /**
  * Contract renderer for OpenApi2 format JSON. Note that for the JSON schema generation, auto-naming of

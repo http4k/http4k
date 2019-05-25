@@ -1,5 +1,6 @@
 package org.http4k.util
 
+import org.http4k.contract.openapi.v3.AutoJsonToJsonSchema
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK

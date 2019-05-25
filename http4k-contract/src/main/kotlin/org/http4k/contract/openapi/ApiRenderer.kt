@@ -1,7 +1,7 @@
 package org.http4k.contract.openapi
 
+import org.http4k.contract.openapi.v3.AutoJsonToJsonSchema
 import org.http4k.format.JsonLibAutoMarshallingJson
-import org.http4k.util.AutoJsonToJsonSchema
 import org.http4k.util.JsonSchemaCreator
 import java.util.concurrent.atomic.AtomicReference
 
