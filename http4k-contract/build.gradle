@@ -29,6 +29,6 @@ task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks
     inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
 }
 
-check.dependsOn(generateOpenApi3AutoClient)
-//check.dependsOn(generateOpenApi3Client)
+check.dependsOn("generateOpenApi3AutoClient")
+check.dependsOn("generateOpenApi3Client")
 //check.dependsOn(generateOpenApi2Client)
