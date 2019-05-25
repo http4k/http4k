@@ -13,7 +13,6 @@ import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
@@ -41,7 +40,7 @@ open class OpenApi2<out NODE>(
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
-            Response(Status.OK)
+            Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
                     pretty(obj(
