@@ -110,21 +110,21 @@ open class OpenApi2<out NODE>(
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
+        val operationId = route.meta.operationId ?: route.method.name.toLowerCase() + route.describeFor(pathSegments)
+            .split('/').joinToString("") { it.capitalize() }
+
         return json {
             val fields =
                 listOfNotNull(
                     "tags" to array(routeTags),
                     "summary" to string(route.meta.summary),
-                    route.meta.operationId?.let { "operationId" to string(it) },
+                    "operationId" to string(operationId),
                     "produces" to array(route.meta.produces.map { string(it.value) }),
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(
-                        listOf(route.meta.security, contractSecurity).mapNotNull {
-
-                            securityRenderer.ref<NODE>(it)
-                        }.map { json(it) })
+                        listOf(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

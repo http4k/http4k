@@ -21,6 +21,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBearer_auth",
         "produces": [
         ],
         "consumes": [
@@ -46,6 +47,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema",
         "produces": [
         ],
         "consumes": [
@@ -78,6 +80,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "putBasepathBody_auto_schema",
         "produces": [
           "application/json"
         ],
@@ -119,6 +122,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_form",
         "produces": [
         ],
         "consumes": [
@@ -173,6 +177,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_list_schema",
         "produces": [
         ],
         "consumes": [
@@ -211,6 +216,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_noschema",
         "produces": [
         ],
         "consumes": [
@@ -244,6 +250,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_response",
         "produces": [
           "application/json"
         ],
@@ -273,6 +280,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_json_schema",
         "produces": [
         ],
         "consumes": [
@@ -308,6 +316,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathBody_string",
         "produces": [
         ],
         "consumes": [
@@ -370,6 +379,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathExtra_security",
         "produces": [
         ],
         "consumes": [
@@ -399,6 +409,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathHeaders",
         "produces": [
         ],
         "consumes": [
@@ -452,6 +463,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "getBasepathNometa",
         "produces": [
         ],
         "consumes": [
@@ -477,6 +489,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathPaths{firstName}Bertrand{age}",
         "produces": [
         ],
         "consumes": [
@@ -514,6 +527,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "getBasepathProduces_and_consumes",
         "produces": [
           "application/json",
           "application/xml"
@@ -543,6 +557,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathQueries",
         "produces": [
         ],
         "consumes": [
@@ -596,6 +611,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
+        "operationId": "postBasepathReturning",
         "produces": [
           "application/json"
         ],
