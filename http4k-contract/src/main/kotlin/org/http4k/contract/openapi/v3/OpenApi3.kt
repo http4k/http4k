@@ -82,8 +82,9 @@ class OpenApi3<NODE : Any>(
             .split('/').joinToString("") { it.capitalize() }
 
         val security = json(listOf(meta.security, contractSecurity).combineRef())
+        val body = meta.requestBody()?.takeIf { it.required }
 
-        return if (method in setOf(GET, DELETE, HEAD) || meta.requestBody() == null) {
+        return if (method in setOf(GET, DELETE, HEAD) || body == null) {
             ApiPath.NoBody(
                 meta.summary,
                 meta.description,
@@ -99,7 +100,7 @@ class OpenApi3<NODE : Any>(
                 meta.description,
                 tags,
                 asOpenApiParameters(),
-                meta.requestBody()?.takeIf { it.required },
+                body,
                 meta.responses(),
                 security,
                 operationId

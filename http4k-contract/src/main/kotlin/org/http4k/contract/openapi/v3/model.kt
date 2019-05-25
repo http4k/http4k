@@ -49,12 +49,12 @@ sealed class ApiPath<NODE>(
         description: String?,
         tags: List<String>,
         parameters: List<RequestParameter<NODE>>,
-        val requestBody: RequestContents<NODE>?,
+        val requestBody: RequestContents<NODE>,
         responses: Map<String, ResponseContents<NODE>>,
         security: NODE,
         operationId: String
     ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId) {
-        override fun definitions() = super.definitions() + (requestBody?.definitions()?.toList() ?: emptyList())
+        override fun definitions() = super.definitions() + requestBody.definitions().toList()
     }
 }
 

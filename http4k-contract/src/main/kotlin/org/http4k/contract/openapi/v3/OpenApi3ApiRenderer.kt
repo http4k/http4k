@@ -66,7 +66,7 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
                 "description" to description.asJson(),
                 "tags" to array(tags.map { string(it) }),
                 "parameters" to parameters.asJson(),
-                if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody?.asJson() else null,
+                if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody.asJson() else null,
                 "responses" to responses.asJson(),
                 "security" to security,
                 "operationId" to operationId.asJson()

@@ -31,4 +31,4 @@ task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks
 
 check.dependsOn("generateOpenApi3AutoClient")
 check.dependsOn("generateOpenApi3Client")
-//check.dependsOn(generateOpenApi2Client)
+//check.dependsOn("generateOpenApi2Client")
