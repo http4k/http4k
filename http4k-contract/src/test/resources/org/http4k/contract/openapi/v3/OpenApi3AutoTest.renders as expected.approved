@@ -63,7 +63,8 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/someOtherId"
+                "$ref": "#/components/schema/ArbObject2",
+                "example": null
               }
             }
           },
@@ -94,7 +95,8 @@
                 "uri": "http://foowang"
               },
               "schema": {
-                "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:ArbObject3"
+                "$ref": "#/components/schema/ArbObject3",
+                "example": null
               }
             }
           },
@@ -111,11 +113,19 @@
                   }
                 ],
                 "schema": {
-                  "type": "array",
-                  "required": true,
                   "items": {
-                    "$ref": "#/components/schemas/urn:jsonschema:org:http4k:contract:ArbObject1"
-                  }
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schema/ArbObject1"
+                      }
+                    ]
+                  },
+                  "example": [
+                    {
+                      "anotherString": "bing"
+                    }
+                  ],
+                  "type": "array"
                 }
               }
             }
@@ -667,64 +677,81 @@
           }
         }
       },
-      "someOtherId": {
-        "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject2",
+      "ArbObject2": {
         "properties": {
           "string": {
-            "type": "string",
-            "required": true
+            "example": "s",
+            "type": "string"
           },
           "child": {
-            "type": "object",
-            "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
-            "properties": {
-              "anotherString": {
-                "type": "string",
-                "required": true,
-                "enum": [
-                  "bar",
-                  "bing"
-                ]
-              }
-            }
+            "$ref": "#/components/schema/ArbObject1",
+            "example": null
           },
           "numbers": {
-            "type": "array",
-            "required": true,
             "items": {
-              "type": "integer"
-            }
+              "oneOf": [
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "example": [
+              1
+            ],
+            "type": "array"
           },
           "bool": {
-            "type": "boolean",
-            "required": true
+            "example": true,
+            "type": "boolean"
           }
-        }
-      },
-      "urn:jsonschema:org:http4k:contract:ArbObject1": {
+        },
+        "example": {
+          "string": "s",
+          "child": {
+            "anotherString": "bar"
+          },
+          "numbers": [
+            1
+          ],
+          "bool": true
+        },
         "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject1",
+        "required": [
+          "bool",
+          "child",
+          "numbers",
+          "string"
+        ]
+      },
+      "ArbObject1": {
         "properties": {
           "anotherString": {
-            "type": "string",
-            "required": true,
-            "enum": [
-              "bar",
-              "bing"
-            ]
+            "example": "bing",
+            "type": "string"
           }
-        }
-      },
-      "urn:jsonschema:org:http4k:contract:ArbObject3": {
+        },
+        "example": {
+          "anotherString": "bing"
+        },
         "type": "object",
-        "id": "urn:jsonschema:org:http4k:contract:ArbObject3",
+        "required": [
+          "anotherString"
+        ]
+      },
+      "ArbObject3": {
         "properties": {
           "uri": {
-            "type": "string",
-            "required": true
+            "example": "http://foowang",
+            "type": "string"
           }
-        }
+        },
+        "example": {
+          "uri": "http://foowang"
+        },
+        "type": "object",
+        "required": [
+          "uri"
+        ]
       }
     },
     "securitySchemes": {

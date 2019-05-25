@@ -21,10 +21,11 @@ interface ApiRenderer<API, NODE> : JsonSchemaCreator<Any, NODE> {
             json: JsonLibAutoMarshallingJson<NODE>,
             schema: JsonSchemaCreator<Any, NODE> = AutoJsonToJsonSchema(json)): ApiRenderer<T, NODE> {
             val fallbackSchema = object : JsonSchemaCreator<Any, NODE> {
-                private val fallback = JsonToJsonSchema(json)
+                private val jsonNodes = JsonToJsonSchema(json)
                 override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> =
                     try {
-                        fallback.toSchema(obj as NODE, overrideDefinitionId)
+                        @Suppress("UNCHECKED_CAST")
+                        jsonNodes.toSchema(obj as NODE, overrideDefinitionId)
                     } catch (e: ClassCastException) {
                         schema.toSchema(obj, overrideDefinitionId)
                     }
