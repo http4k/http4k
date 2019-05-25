@@ -36,7 +36,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
         }
 
-        return SchemaNode.Array(name, isNullable, Items.Inner(schemas), this)
+        return SchemaNode.Array(name, isNullable, Items(schemas), this)
     }
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
@@ -45,13 +45,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val properties = json.fields(this)
             .map { Triple(it.first, it.second, fields.getValue(it.first)) }
             .map { (fieldName, field, kField) ->
-            val fieldIsNullable = kField.returnType.isMarkedNullable
-            when (val param = json.typeOf(field).toParam()) {
-                ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
-                ObjectParam -> field.toObjectSchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
-                else -> field.toSchema(fieldName, param, fieldIsNullable)
-            }
-        }.map { it.name() to it }.toMap()
+                val fieldIsNullable = kField.returnType.isMarkedNullable
+                when (val param = json.typeOf(field).toParam()) {
+                    ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
+                    ObjectParam -> field.toObjectSchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
+                    else -> field.toSchema(fieldName, param, fieldIsNullable)
+                }
+            }.map { it.name() to it }.toMap()
 
         return SchemaNode.Reference(objName ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
             SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
@@ -59,7 +59,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 }
 
 private sealed class ArrayItem {
-    object Array : ArrayItem() {
+    class Array(val items: Items) : ArrayItem() {
         val type = ArrayParam.value
     }
 
@@ -70,17 +70,10 @@ private sealed class ArrayItem {
     data class Ref(val `$ref`: String) : ArrayItem()
 }
 
-private sealed class Items {
-    abstract fun definitions(): List<SchemaNode>
+private class Items(private val schemas: List<SchemaNode>) {
+    val oneOf = schemas.map {}.toSet().sortedBy { it.javaClass.simpleName }
 
-    class Nested(val items: Items) : Items() {
-        override fun definitions() = items.definitions()
-    }
-
-    class Inner(private val schemas: List<SchemaNode>) : Items() {
-        val oneOf = schemas.map { it.arrayItem() }.toSet().sortedBy { it.javaClass.simpleName }
-        override fun definitions() = schemas.flatMap { it.definitions() }
-    }
+    fun definitions() = schemas.flatMap { it.definitions() }
 }
 
 private sealed class SchemaNode(
@@ -103,8 +96,9 @@ private sealed class SchemaNode(
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?) :
         SchemaNode(name, ArrayParam, isNullable, example) {
         val type = paramMeta().value
+
         override fun arrayItem() = when (paramMeta()) {
-            ArrayParam -> ArrayItem.Array
+            ArrayParam -> ArrayItem.Array(items)
             ObjectParam -> ArrayItem.Ref(name())
             else -> ArrayItem.NonObject(paramMeta())
         }
