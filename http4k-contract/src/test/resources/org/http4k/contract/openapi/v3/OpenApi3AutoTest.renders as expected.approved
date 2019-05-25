@@ -727,6 +727,10 @@
         "properties": {
           "anotherString": {
             "example": "bing",
+            "enum": [
+              "bar",
+              "bing"
+            ],
             "type": "string"
           }
         },
