@@ -22,7 +22,6 @@ task generateOpenApi3Client(type: org.openapitools.generator.gradle.plugin.tasks
     modelPackage = "openapi3"
     configOptions = [ dateLibrary: "java8" ]
     logToStderr = true
-    validateSpec = false
 }
 
 task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
@@ -33,5 +32,4 @@ task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks
     modelPackage = "openapi2"
     configOptions = [ dateLibrary: "java8" ]
     logToStderr = true
-    validateSpec = false
 }
