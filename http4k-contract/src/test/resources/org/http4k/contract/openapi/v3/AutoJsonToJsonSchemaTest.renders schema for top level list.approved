@@ -152,6 +152,10 @@
           },
           "enumVal": {
             "example": "value2",
+            "enum": [
+              "value1",
+              "value2"
+            ],
             "type": "string"
           }
         },

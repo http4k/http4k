@@ -21,10 +21,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private val refPrefix: String = "components/schema"
 ) : JsonSchemaCreator<Any, NODE> {
 
-    override fun toSchema(obj: Any, overrideDefinitionId: String?) = json {
-        val node = json.asJsonObject(obj)
-        val schema = node.toSchema(obj, null)
-        JsonSchema(
+    override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {
+        val schema = json.asJsonObject(obj).toSchema(obj, null)
+        return JsonSchema(
             json.asJsonObject(schema),
             schema.definitions().map { it.name() to json.asJsonObject(it) }.toSet())
     }
@@ -47,6 +46,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Array(name, isNullable, Items(schemas), this)
     }
 
+    private fun <NODE> NODE.toEnumSchema(fieldName: String, param: ParamMeta,
+                                         enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
+        SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() })
+
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
         val fields = try {
             obj::class.memberProperties.map { it.name to it }.toMap()
@@ -58,10 +61,15 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { Triple(it.first, it.second, fields.getValue(it.first)) }
             .map { (fieldName, field, kField) ->
                 val fieldIsNullable = kField.returnType.isMarkedNullable
+                val value = kField.javaGetter!!(obj)
                 when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
-                    ObjectParam -> field.toObjectSchema(fieldName, kField.javaGetter!!(obj), fieldIsNullable)
-                    else -> field.toSchema(fieldName, param, fieldIsNullable)
+                    ArrayParam -> field.toArraySchema(fieldName, value, fieldIsNullable)
+                    ObjectParam -> field.toObjectSchema(fieldName, value, fieldIsNullable)
+                    else -> with(field) {
+                        value.javaClass.enumConstants?.let {
+                            toEnumSchema(fieldName, param, it, fieldIsNullable)
+                        } ?: toSchema(fieldName, param, fieldIsNullable)
+                    }
                 }
             }.map { it.name() to it }.toMap()
 
@@ -101,6 +109,12 @@ private sealed class SchemaNode(
     abstract fun arrayItem(): ArrayItem
 
     class Primitive(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?) :
+        SchemaNode(name, paramMeta, isNullable, example) {
+        val type = paramMeta().value
+        override fun arrayItem() = ArrayItem.NonObject(paramMeta())
+    }
+
+    class Enum(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, val enum: List<String>) :
         SchemaNode(name, paramMeta, isNullable, example) {
         val type = paramMeta().value
         override fun arrayItem() = ArrayItem.NonObject(paramMeta())
