@@ -12,10 +12,12 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
+import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
@@ -94,16 +96,16 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
-//            routes += "/body_json_schema" meta {
-//                receiving(json.body("json").toLens() to json {
-//                    obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
-//                }, "someDefinitionId")
-//            } bindContract POST to { Response(OK) }
-//            routes += "/body_json_list_schema" meta {
-//                receiving(json.body("json").toLens() to json {
-//                    array(obj("aNumberField" to number(123)))
-//                })
-//            } bindContract POST to { Response(OK) }
+            routes += "/body_json_schema" meta {
+                receiving(json.body("json").toLens() to json {
+                    obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
+                }, "someDefinitionId")
+            } bindContract POST to { Response(OK) }
+            routes += "/body_json_list_schema" meta {
+                receiving(json.body("json").toLens() to json {
+                    array(obj("aNumberField" to number(123)))
+                })
+            } bindContract POST to { Response(OK) }
             routes += "/extra_security" meta {
                 security = BasicAuthSecurity("realm", Credentials("user", "password"))
             } bindContract POST to { Response(OK) }
@@ -132,10 +134,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     true
                 ), "someOtherId")
             } bindContract POST to { Response(OK) }
-//            routes += "/body_auto_schema" meta {
-//                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang")))
-//                returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
-//            } bindContract PUT to { Response(OK) }
+            routes += "/body_auto_schema" meta {
+                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang")))
+                returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
+            } bindContract Method.PUT to { Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
             } bindContract POST to { Response(OK) }
