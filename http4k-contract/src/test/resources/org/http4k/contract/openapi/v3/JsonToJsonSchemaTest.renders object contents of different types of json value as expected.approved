@@ -4,9 +4,11 @@
   },
   "definitions": [
     {
-      "first": "object1634459515",
+      "first": "object1241320217",
       "second": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anotherString": {
             "type": "string",
@@ -16,9 +18,11 @@
       }
     },
     {
-      "first": "object154078738",
+      "first": "object-239060560",
       "second": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anInteger": {
             "type": "integer",
@@ -31,6 +35,8 @@
       "first": "bob",
       "second": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "aString": {
             "type": "string",
@@ -51,14 +57,14 @@
           "anArray": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schema/object1634459515"
+              "$ref": "#/components/schema/object1241320217"
             }
           },
           "anObject": {
-            "$ref": "#/components/schema/object154078738"
+            "$ref": "#/components/schema/object-239060560"
           },
           "anotherObject": {
-            "$ref": "#/components/schema/object154078738"
+            "$ref": "#/components/schema/object-239060560"
           }
         }
       }

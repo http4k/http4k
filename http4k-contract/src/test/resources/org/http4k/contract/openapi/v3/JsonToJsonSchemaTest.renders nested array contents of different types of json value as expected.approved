@@ -13,6 +13,8 @@
       "first": "bob",
       "second": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anotherString": {
             "type": "string",

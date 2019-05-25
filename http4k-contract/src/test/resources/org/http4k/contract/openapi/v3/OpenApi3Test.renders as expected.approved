@@ -94,7 +94,7 @@
                 "uri": "http://foowang"
               },
               "schema": {
-                "$ref": "#/components/schemas/object-1161328054"
+                "$ref": "#/components/schemas/object744721296"
               }
             }
           },
@@ -201,7 +201,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/object-1365611171"
+                  "$ref": "#/components/schemas/object540438179"
                 }
               }
             }
@@ -628,11 +628,24 @@
           }
         }
       },
+      "object540438179": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "aNumberField": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
       "someDefinitionId": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anAnotherObject": {
-            "$ref": "#/components/schemas/object-1365611171"
+            "$ref": "#/components/schemas/object540438179"
           }
         }
       },
@@ -647,6 +660,8 @@
       },
       "someOtherId": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
         }
       },
@@ -659,8 +674,10 @@
           }
         }
       },
-      "object-1161328054": {
+      "object744721296": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
         }
       }

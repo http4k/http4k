@@ -48,9 +48,14 @@ class JsonToJsonSchema<NODE>(
                 JsonSchema(second, memoDefinitions).toSchema().let { memoFields + (first to it.node) to it.definitions }
             }
 
-        val newDefinition = json { obj("type" to string("object"), "properties" to obj(fields)) }
-        val definitionId = overrideDefinitionId ?: "object" + newDefinition!!.hashCode()
-        val allDefinitions = subDefinitions.plus(definitionId to newDefinition)
+        val newDefinition = json {
+            obj("type" to string("object"),
+                "required" to array(emptyList()),
+                "properties" to obj(fields)
+            )
+        }
+        val definitionId = overrideDefinitionId ?: "object" + newDefinition.hashCode()
+        val allDefinitions = subDefinitions + (definitionId to newDefinition)
         return JsonSchema(json { obj("\$ref" to string("#/$refPrefix/$definitionId")) }, allDefinitions)
     }
 
