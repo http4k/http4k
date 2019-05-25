@@ -1,0 +1,67 @@
+{
+  "node": {
+    "$ref": "#/components/schema/bob"
+  },
+  "definitions": [
+    {
+      "first": "object1634459515",
+      "second": {
+        "type": "object",
+        "properties": {
+          "anotherString": {
+            "type": "string",
+            "example": "yetAnotherString"
+          }
+        }
+      }
+    },
+    {
+      "first": "object154078738",
+      "second": {
+        "type": "object",
+        "properties": {
+          "anInteger": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      }
+    },
+    {
+      "first": "bob",
+      "second": {
+        "type": "object",
+        "properties": {
+          "aString": {
+            "type": "string",
+            "example": "aStringValue"
+          },
+          "aNumber": {
+            "type": "number",
+            "example": 1.9
+          },
+          "aBooleanTrue": {
+            "type": "boolean",
+            "example": true
+          },
+          "aBooleanFalse": {
+            "type": "boolean",
+            "example": false
+          },
+          "anArray": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schema/object1634459515"
+            }
+          },
+          "anObject": {
+            "$ref": "#/components/schema/object154078738"
+          },
+          "anotherObject": {
+            "$ref": "#/components/schema/object154078738"
+          }
+        }
+      }
+    }
+  ]
+}

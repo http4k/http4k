@@ -1,7 +1,6 @@
-package org.http4k.util
+package org.http4k.contract.openapi.v2
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
