@@ -29,6 +29,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
+import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -36,8 +37,9 @@ import org.http4k.util.JsonSchema
 import org.http4k.util.JsonToJsonSchema
 
 /**
- * Contract renderer for OpenApi3 format JSON. By default, for the JSON schema generation, auto-naming of
- * object models is used as the input relies on JSON objects and not JVM classees.
+ * Contract renderer for OpenApi3 format JSON. For the JSON schema generation, naming of
+ * object models will default to either reflective or hashcode based depending on if a Auto Json
+ * is passed.
  */
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
@@ -46,8 +48,9 @@ class OpenApi3<NODE : Any>(
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
-
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
+
+    constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>) : this(apiInfo, json, ApiRenderer.Auto(json))
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + security
@@ -158,5 +161,3 @@ class OpenApi3<NODE : Any>(
 
     companion object
 }
-
-private fun <E : Iterable<T>, T> E.nullIfEmpty(): E? = if (iterator().hasNext()) this else null
