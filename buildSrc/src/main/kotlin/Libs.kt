@@ -234,6 +234,11 @@ object Libs {
     const val alpn_boot: String = "org.mortbay.jetty.alpn:alpn-boot:" + Versions.alpn_boot
 
     /**
+     * [openapi-generator-gradle-plugin website](https://openapi-generator.tech) */
+    const val openapi_generator_gradle_plugin: String =
+        "org.openapitools:openapi-generator-gradle-plugin:" + Versions.openapi_generator_gradle_plugin
+
+    /**
      * [selenium-api website](http://www.seleniumhq.org/) */
     const val selenium_api: String = "org.seleniumhq.selenium:selenium-api:" + Versions.selenium_api
 

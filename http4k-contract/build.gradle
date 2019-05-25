@@ -1,5 +1,7 @@
 description = 'http4k typesafe HTTP contracts and OpenApi support'
 
+apply plugin: 'org.openapi.generator'
+
 dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
@@ -12,4 +14,22 @@ dependencies {
     testCompile Config.TestDependencies
 }
 
+task generateOpenApi3Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v3/OpenApi3AutoTest.renders as expected.approved".toString()
+    outputDir = "$buildDir/kotlin".toString()
+    apiPackage = "openapi3"
+    modelPackage = "openapi3"
+    configOptions = [ dateLibrary: "java8" ]
+    logToStderr = true
+}
 
+task generateOpenApi2Client(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "kotlin"
+    inputSpec = "$projectDir/src/test/resources/org/http4k/contract/openapi/v2/OpenApi2Test.renders as expected.approved".toString()
+    outputDir = "$buildDir/kotlin".toString()
+    apiPackage = "openapi2"
+    modelPackage = "openapi2"
+    configOptions = [ dateLibrary: "java8" ]
+    logToStderr = true
+}

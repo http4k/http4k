@@ -85,6 +85,8 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
+    const val openapi_generator_gradle_plugin: String = "4.0.0"
+
     const val selenium_api: String = "3.141.59"
 
     const val thymeleaf: String = "3.0.11.RELEASE"
