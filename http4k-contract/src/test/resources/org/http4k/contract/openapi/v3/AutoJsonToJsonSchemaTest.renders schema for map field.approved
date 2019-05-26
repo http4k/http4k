@@ -9,7 +9,7 @@
       "second": {
         "properties": {
           "value": {
-            "properties": {
+            "additionalProperties": {
               "key": {
                 "example": "value",
                 "type": "string"
@@ -19,38 +19,18 @@
                 "type": "number"
               },
               "key3": {
-                "properties": {
+                "additionalProperties": {
                   "inner": {
                     "$ref": "#/components/schemas/ArbObject2",
                     "example": null
                   }
                 },
-                "example": {
-                  "inner": {
-                    "uri": "foobar"
-                  }
-                },
-                "type": "object",
-                "required": [
-                  "inner"
-                ]
+                "example": null,
+                "type": "object"
               }
             },
-            "example": {
-              "key": "value",
-              "key2": 123,
-              "key3": {
-                "inner": {
-                  "uri": "foobar"
-                }
-              }
-            },
-            "type": "object",
-            "required": [
-              "key",
-              "key2",
-              "key3"
-            ]
+            "example": null,
+            "type": "object"
           }
         },
         "example": {

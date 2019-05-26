@@ -1,0 +1,29 @@
+{
+  "node": {
+    "$ref": "#/components/schemas/MapHolder",
+    "example": null
+  },
+  "definitions": [
+    {
+      "first": "MapHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "additionalProperties": {
+            },
+            "example": null,
+            "type": "object"
+          }
+        },
+        "example": {
+          "value": {
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    }
+  ]
+}
