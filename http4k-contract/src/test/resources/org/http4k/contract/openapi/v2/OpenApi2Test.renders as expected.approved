@@ -134,7 +134,7 @@
             "name": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/object2083284563"
+              "$ref": "#/definitions/object1366892779"
             }
           }
         ],
@@ -722,12 +722,15 @@
         }
       }
     },
-    "object2083284563": {
+    "object1366892779": {
       "type": "object",
       "properties": {
         "uri": {
           "type": "string",
           "example": "http://foowang"
+        },
+        "additional": {
+          "$ref": "#/definitions/object490718055"
         }
       }
     },

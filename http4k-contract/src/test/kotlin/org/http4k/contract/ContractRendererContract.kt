@@ -141,7 +141,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 ), "someOtherId")
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
-                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang")))
+                receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
                 returning(Status.SEE_OTHER, Body.auto<Array<ArbObject1>>().toLens() to arrayOf(ArbObject1(Foo.bing)))
             } bindContract Method.PUT to { Response(OK) }
             routes += "/body_auto_map" meta {
@@ -162,4 +162,4 @@ enum class Foo {
 
 data class ArbObject1(val anotherString: Foo)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
-data class ArbObject3(val uri: Uri)
+data class ArbObject3(val uri: Uri, val additional: Map<String, *>)

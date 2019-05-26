@@ -101,7 +101,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
             .map { it.name() to it }.toMap()
 
-        return SchemaNode.Object(objName ?: obj.javaClass.simpleName, isNullable, properties, this)
+        return SchemaNode.MapType(objName ?: obj.javaClass.simpleName, isNullable, properties)
     }
 }
 
@@ -126,7 +126,8 @@ private class Items(private val schemas: List<SchemaNode>) {
 private sealed class SchemaNode(
     private val name: String,
     private val paramMeta: ParamMeta,
-    private val isNullable: Boolean, val example: Any?) {
+    private val isNullable: Boolean,
+    val example: Any?) {
     open fun definitions(): Iterable<SchemaNode> = emptyList()
 
     fun name() = name
@@ -172,6 +173,12 @@ private sealed class SchemaNode(
                     private val schemaNode: Object) : SchemaNode(name, ObjectParam, false, null) {
         override fun arrayItem() = ArrayItem.Ref(`$ref`)
         override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
+    }
+
+    class MapType(name: String, isNullable: Boolean, val additionalProperties: Map<String, SchemaNode>) : SchemaNode(name, ObjectParam, isNullable, null) {
+        val type = paramMeta().value
+        override fun arrayItem() = ArrayItem.Ref(name())
+        override fun definitions() = additionalProperties.values.flatMap { it.definitions() }
     }
 }
 

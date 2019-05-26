@@ -55,19 +55,14 @@
                 "foo": 123
               },
               "schema": {
-                "properties": {
+                "additionalProperties": {
                   "foo": {
                     "example": 123,
                     "type": "number"
                   }
                 },
-                "example": {
-                  "foo": 123
-                },
-                "type": "object",
-                "required": [
-                  "foo"
-                ]
+                "example": null,
+                "type": "object"
               }
             }
           },
@@ -136,7 +131,10 @@
           "content": {
             "application/json": {
               "example": {
-                "uri": "http://foowang"
+                "uri": "http://foowang",
+                "additional": {
+                  "foo": 123
+                }
               },
               "schema": {
                 "$ref": "#/components/schemas/ArbObject3",
@@ -782,13 +780,27 @@
           "uri": {
             "example": "http://foowang",
             "type": "string"
+          },
+          "additional": {
+            "additionalProperties": {
+              "foo": {
+                "example": 123,
+                "type": "number"
+              }
+            },
+            "example": null,
+            "type": "object"
           }
         },
         "example": {
-          "uri": "http://foowang"
+          "uri": "http://foowang",
+          "additional": {
+            "foo": 123
+          }
         },
         "type": "object",
         "required": [
+          "additional",
           "uri"
         ]
       }

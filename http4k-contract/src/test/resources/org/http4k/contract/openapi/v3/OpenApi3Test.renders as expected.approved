@@ -124,7 +124,10 @@
           "content": {
             "application/json": {
               "example": {
-                "uri": "http://foowang"
+                "uri": "http://foowang",
+                "additional": {
+                  "foo": 123
+                }
               },
               "schema": {
                 "$ref": "#/components/schemas/object744721296"
