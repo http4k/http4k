@@ -40,6 +40,39 @@
         "operationId": "postBasepathBearer_auth"
       }
     },
+    "/basepath/body_auto_map": {
+      "put": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "foo": 123
+              },
+              "schema": {
+                "$ref": "#/components/schemas/object744721296"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathBody_auto_map"
+      }
+    },
     "/basepath/body_auto_schema": {
       "post": {
         "summary": "<unknown>",

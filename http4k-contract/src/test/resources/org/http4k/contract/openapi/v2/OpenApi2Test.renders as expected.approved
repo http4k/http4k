@@ -43,6 +43,43 @@
         ]
       }
     },
+    "/basepath/body_auto_map": {
+      "put": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "putBasepathBody_auto_map",
+        "produces": [
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object490718055"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_auto_schema": {
       "post": {
         "tags": [
@@ -676,6 +713,15 @@
     }
   },
   "definitions": {
+    "object490718055": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "type": "integer",
+          "example": 123
+        }
+      }
+    },
     "object2083284563": {
       "type": "object",
       "properties": {
