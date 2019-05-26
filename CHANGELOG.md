@@ -4,10 +4,11 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.146.0
-- [http4k-contract] Support Map-based fields in Auto-schema generation.
+- [http4k-contract] Fix #228 - Support Map-based fields in OpenApi 3 Auto-schema generation as `additionalProperties`. H/T @noahbetzen-wk for the idea.
 
 ### v3.145.0
-- [http4k-contract] Reimplement Auto-schema generation using reflection. 
+- [http4k-contract] Reimplement Auto-schema generation using reflection. Added test cases to use 
+the OpenApi generator to create valid code-based OpenApi clients using the OpenApi generator.
 - [http4k-format-jackson] Removed reflective JSON schema creator, since it was not actually OA3 compliant.
 
 ### v3.144.0
