@@ -40,6 +40,7 @@ data class RegexHolder(val regex: Regex)
 
 data class StringHolder(val value: String)
 data class BooleanHolder(val value: Boolean)
+data class MapHolder(val value: Map<String, Any>)
 data class BigDecimalHolder(val value: BigDecimal)
 data class BigIntegerHolder(val value: BigInteger)
 data class MappedBigDecimalHolder(val value: BigDecimal)
@@ -93,6 +94,13 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
         val out = j.asJsonString(obj)
         assertThat(out, equalTo("""{"regex":".*"}"""))
         assertThat(j.asA(out, RegexHolder::class).regex.pattern, equalTo(obj.regex.pattern))
+    }
+
+    @Test
+    fun `roundtrip wrapped map`() {
+        val wrapper = MapHolder(mapOf("key" to "value", "key2" to "123"))
+        assertThat(j.asJsonString(wrapper), equalTo("""{"value":{"key":"value","key2":"123"}}"""))
+        assertThat(j.asA(j.asJsonString(wrapper), MapHolder::class), equalTo(wrapper))
     }
 
     @Test
