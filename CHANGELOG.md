@@ -3,20 +3,23 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.146.0
+- [http4k-contract] Support Map-based fields in Auto-schema generation 
+
 ### v3.145.0
-- [http4k-contract]- Reimplement Auto-schema generation using reflection. 
+- [http4k-contract] Reimplement Auto-schema generation using reflection. 
 - [http4k-format-jackson] Removed reflective JSON schema creator, since it was not actually OA3 compliant.
 
 ### v3.144.0
 - Update various dependencies.
-- [http4k-contract] - Improvements to better adhere to OA3 spec.
-- [http4k-security-oauth] - Allow injecting OpenID's `request` parameter into the authorization request.
-- [http4k-security-oauth] - Expose request to AuthRequestTracking. 
+- [http4k-contract] Improvements to better adhere to OA3 spec.
+- [http4k-security-oauth] Allow injecting OpenID's `request` parameter into the authorization request.
+- [http4k-security-oauth] Expose request to AuthRequestTracking. 
 
 ### v3.143.1
-- [http4k-core] - Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
-- [http4k-contract] - Added some missing deprecations.
-- [http4k-contract] - Fix #243 - Nulls not allowed in OpenApi V3 JSON models.
+- [http4k-core] Replace RequestContexts with reference to Store<RequestContext>. H/T @amcghie
+- [http4k-contract] Added some missing deprecations.
+- [http4k-contract] Fix #243 - Nulls not allowed in OpenApi V3 JSON models.
 
 ### v3.143.0
 - [http4k-contract] Fix #239 - OpenApi v3 schemas for raw lists blow up when rendering.
