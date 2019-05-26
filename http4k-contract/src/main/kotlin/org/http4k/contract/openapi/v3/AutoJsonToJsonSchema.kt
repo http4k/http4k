@@ -49,8 +49,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Array(name, isNullable, items, this)
     }
 
-    private fun <NODE> NODE.toEnumSchema(fieldName: String, param: ParamMeta,
-                                         enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
+    private fun NODE.toEnumSchema(fieldName: String, param: ParamMeta,
+                                  enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
         SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() })
 
     private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean) =
