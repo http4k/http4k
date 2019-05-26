@@ -1,0 +1,46 @@
+{
+  "node": {
+    "$ref": "#/components/schemas/MapHolder",
+    "example": null
+  },
+  "definitions": [
+    {
+      "first": "MapHolder",
+      "second": {
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/SingletonMap",
+            "example": null
+          }
+        },
+        "example": {
+          "value": {
+            "key": "value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    {
+      "first": "SingletonMap",
+      "second": {
+        "properties": {
+          "key": {
+            "example": "value",
+            "type": "string"
+          }
+        },
+        "example": {
+          "key": "value"
+        },
+        "type": "object",
+        "required": [
+          "key"
+        ]
+      }
+    }
+  ]
+}

@@ -51,14 +51,36 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() })
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
+        val fields = json.fields(this)
+        val properties = if (obj is Map<*, *>) fields.mapProperties(obj) else fields.objectProperties(obj)
+
+        return SchemaNode.Reference(objName
+            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
+            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+    }
+
+    private fun Iterable<Pair<String, NODE>>.mapProperties(obj: Map<*, *>): Map<String, SchemaNode> =
+        map { Triple(it.first, it.second, obj[it.first]!!) }
+            .map { (fieldName, field, value) ->
+                when (val param = json.typeOf(field).toParam()) {
+                    ArrayParam -> field.toArraySchema(fieldName, value, false)
+                    ObjectParam -> field.toObjectSchema(fieldName, value, false)
+                    else -> with(field) {
+                        value.javaClass.enumConstants?.let {
+                            toEnumSchema(fieldName, param, it, false)
+                        } ?: toSchema(fieldName, param, false)
+                    }
+                }
+            }.map { it.name() to it }.toMap()
+
+    private fun Iterable<Pair<String, NODE>>.objectProperties(obj: Any): Map<String, SchemaNode> {
         val fields = try {
             obj::class.memberProperties.map { it.name to it }.toMap()
         } catch (e: Error) {
             emptyMap<String, KProperty1<out Any, Any?>>()
         }
 
-        val properties = json.fields(this)
-            .map { Triple(it.first, it.second, fields.getValue(it.first)) }
+        return map { Triple(it.first, it.second, fields.getValue(it.first)) }
             .map { (fieldName, field, kField) ->
                 val fieldIsNullable = kField.returnType.isMarkedNullable
                 val value = kField.javaGetter!!(obj)
@@ -72,10 +94,6 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     }
                 }
             }.map { it.name() to it }.toMap()
-
-        return SchemaNode.Reference(objName
-            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
-            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 }
 
