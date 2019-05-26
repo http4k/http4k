@@ -10,6 +10,13 @@
         "properties": {
           "value": {
             "additionalProperties": {
+              "properties": {
+              },
+              "example": {
+              },
+              "type": "object",
+              "required": [
+              ]
             },
             "example": null,
             "type": "object"

@@ -56,10 +56,19 @@
               },
               "schema": {
                 "additionalProperties": {
-                  "foo": {
-                    "example": 123,
-                    "type": "number"
-                  }
+                  "properties": {
+                    "foo": {
+                      "example": 123,
+                      "type": "number"
+                    }
+                  },
+                  "example": {
+                    "foo": 123
+                  },
+                  "type": "object",
+                  "required": [
+                    "foo"
+                  ]
                 },
                 "example": null,
                 "type": "object"
@@ -783,10 +792,19 @@
           },
           "additional": {
             "additionalProperties": {
-              "foo": {
-                "example": 123,
-                "type": "number"
-              }
+              "properties": {
+                "foo": {
+                  "example": 123,
+                  "type": "number"
+                }
+              },
+              "example": {
+                "foo": 123
+              },
+              "type": "object",
+              "required": [
+                "foo"
+              ]
             },
             "example": null,
             "type": "object"
