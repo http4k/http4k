@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.146.0
-- [http4k-contract] Support Map-based fields in Auto-schema generation 
+- [http4k-contract] Support Map-based fields in Auto-schema generation.
 
 ### v3.145.0
 - [http4k-contract] Reimplement Auto-schema generation using reflection. 
