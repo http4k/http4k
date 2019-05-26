@@ -31,7 +31,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private fun NODE.toSchema(value: Any, objName: String?) =
         when (val param = json.typeOf(this).toParam()) {
             ArrayParam -> toArraySchema("", value, false)
-            ObjectParam -> toObjectSchema(objName, value, false)
+            ObjectParam -> toObjectOrMapSchema(objName, value, false)
             else -> toSchema("", param, false)
         }
 
@@ -39,61 +39,70 @@ class AutoJsonToJsonSchema<NODE : Any>(
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
     private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
-        val schemas = json.elements(this).zip(items(obj)) { node: NODE, value: Any ->
-            node.toSchema(value, null)
-        }
+        val items = Items(
+            json.elements(this)
+                .zip(items(obj)) { node: NODE, value: Any ->
+                    node.toSchema(value, null)
+                }
+        )
 
-        return SchemaNode.Array(name, isNullable, Items(schemas), this)
+        return SchemaNode.Array(name, isNullable, items, this)
     }
 
     private fun <NODE> NODE.toEnumSchema(fieldName: String, param: ParamMeta,
                                          enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
         SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() })
 
-    private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode {
-        val fields = json.fields(this)
-        val properties = if (obj is Map<*, *>) fields.mapProperties(obj) else fields.objectProperties(obj)
+    private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean) =
+        if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable) else toObjectSchema(objName, obj, isNullable)
 
-        return SchemaNode.Reference(objName
-            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
-            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
-    }
-
-    private fun Iterable<Pair<String, NODE>>.mapProperties(obj: Map<*, *>): Map<String, SchemaNode> =
-        map { Triple(it.first, it.second, obj[it.first]!!) }
-            .map { (fieldName, field, value) ->
-                when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, value, false)
-                    ObjectParam -> field.toObjectSchema(fieldName, value, false)
-                    else -> with(field) {
-                        value.javaClass.enumConstants?.let {
-                            toEnumSchema(fieldName, param, it, false)
-                        } ?: toSchema(fieldName, param, false)
-                    }
-                }
-            }.map { it.name() to it }.toMap()
-
-    private fun Iterable<Pair<String, NODE>>.objectProperties(obj: Any): Map<String, SchemaNode> {
+    private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode.Reference {
         val fields = try {
             obj::class.memberProperties.map { it.name to it }.toMap()
         } catch (e: Error) {
             emptyMap<String, KProperty1<out Any, Any?>>()
         }
 
-        return map { Triple(it.first, it.second, fields.getValue(it.first)) }
+        val properties = json.fields(this).map { Triple(it.first, it.second, fields.getValue(it.first)) }
             .map { (fieldName, field, kField) ->
                 val fieldIsNullable = kField.returnType.isMarkedNullable
                 val value = kField.javaGetter!!(obj)
                 when (val param = json.typeOf(field).toParam()) {
                     ArrayParam -> field.toArraySchema(fieldName, value, fieldIsNullable)
-                    ObjectParam -> field.toObjectSchema(fieldName, value, fieldIsNullable)
+                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, fieldIsNullable)
                     else -> with(field) {
                         value.javaClass.enumConstants?.let {
                             toEnumSchema(fieldName, param, it, fieldIsNullable)
                         } ?: toSchema(fieldName, param, fieldIsNullable)
                     }
                 }
-            }.map { it.name() to it }.toMap()
+            }
+            .map { it.name() to it }.toMap()
+
+        return SchemaNode.Reference(objName
+            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
+            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+    }
+
+    private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean): SchemaNode.Reference {
+        val nodeFields = json.fields(this)
+        val properties = nodeFields.map { Triple(it.first, it.second, obj[it.first]!!) }
+            .map { (fieldName, field, value) ->
+                when (val param = json.typeOf(field).toParam()) {
+                    ArrayParam -> field.toArraySchema(fieldName, value, false)
+                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false)
+                    else -> with(field) {
+                        value.javaClass.enumConstants?.let {
+                            toEnumSchema(fieldName, param, it, false)
+                        } ?: toSchema(fieldName, param, false)
+                    }
+                }
+            }
+            .map { it.name() to it }.toMap()
+
+        return SchemaNode.Reference(objName
+            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
+            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 }
 
