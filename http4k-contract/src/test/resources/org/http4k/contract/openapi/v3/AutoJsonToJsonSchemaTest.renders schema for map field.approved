@@ -9,13 +9,59 @@
       "second": {
         "properties": {
           "value": {
-            "$ref": "#/components/schemas/SingletonMap",
-            "example": null
+            "properties": {
+              "key": {
+                "example": "value",
+                "type": "string"
+              },
+              "key2": {
+                "example": 123,
+                "type": "number"
+              },
+              "key3": {
+                "properties": {
+                  "inner": {
+                    "$ref": "#/components/schemas/ArbObject2",
+                    "example": null
+                  }
+                },
+                "example": {
+                  "inner": {
+                    "uri": "foobar"
+                  }
+                },
+                "type": "object",
+                "required": [
+                  "inner"
+                ]
+              }
+            },
+            "example": {
+              "key": "value",
+              "key2": 123,
+              "key3": {
+                "inner": {
+                  "uri": "foobar"
+                }
+              }
+            },
+            "type": "object",
+            "required": [
+              "key",
+              "key2",
+              "key3"
+            ]
           }
         },
         "example": {
           "value": {
-            "key": "value"
+            "key": "value",
+            "key2": 123,
+            "key3": {
+              "inner": {
+                "uri": "foobar"
+              }
+            }
           }
         },
         "type": "object",
@@ -25,20 +71,20 @@
       }
     },
     {
-      "first": "SingletonMap",
+      "first": "ArbObject2",
       "second": {
         "properties": {
-          "key": {
-            "example": "value",
+          "uri": {
+            "example": "foobar",
             "type": "string"
           }
         },
         "example": {
-          "key": "value"
+          "uri": "foobar"
         },
         "type": "object",
         "required": [
-          "key"
+          "uri"
         ]
       }
     }

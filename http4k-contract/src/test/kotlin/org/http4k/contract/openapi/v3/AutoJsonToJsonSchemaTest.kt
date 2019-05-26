@@ -41,7 +41,11 @@ enum class Foo {
     value1, value2
 }
 
-data class MapHolder(val value: Map<String, Any>)
+data class MapHolder(val value: Map<String, Any> = mapOf(
+    "key" to "value",
+    "key2" to 123,
+    "key3" to mapOf("inner" to ArbObject2())
+))
 
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
@@ -61,7 +65,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(mapOf("key" to "value")), null)
+        approver.assertApproved(MapHolder(), null)
     }
 
     @Test

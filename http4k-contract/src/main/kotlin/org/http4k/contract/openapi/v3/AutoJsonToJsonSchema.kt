@@ -63,7 +63,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
             emptyMap<String, KProperty1<out Any, Any?>>()
         }
 
-        val properties = json.fields(this).map { Triple(it.first, it.second, fields.getValue(it.first)) }
+        val properties = json.fields(this)
+            .map { Triple(it.first, it.second, fields.getValue(it.first)) }
             .map { (fieldName, field, kField) ->
                 val fieldIsNullable = kField.returnType.isMarkedNullable
                 val value = kField.javaGetter!!(obj)
@@ -84,9 +85,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
             SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
     }
 
-    private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean): SchemaNode.Reference {
-        val nodeFields = json.fields(this)
-        val properties = nodeFields.map { Triple(it.first, it.second, obj[it.first]!!) }
+    private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean): SchemaNode {
+        val properties = json.fields(this)
+            .map { Triple(it.first, it.second, obj[it.first]!!) }
             .map { (fieldName, field, value) ->
                 when (val param = json.typeOf(field).toParam()) {
                     ArrayParam -> field.toArraySchema(fieldName, value, false)
@@ -100,9 +101,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
             .map { it.name() to it }.toMap()
 
-        return SchemaNode.Reference(objName
-            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
-            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+        return SchemaNode.Object(objName ?: obj.javaClass.simpleName, isNullable, properties, this)
     }
 }
 
