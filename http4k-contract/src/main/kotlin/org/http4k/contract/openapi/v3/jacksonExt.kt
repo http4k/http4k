@@ -7,7 +7,7 @@ import org.http4k.format.Jackson
 
 fun OpenApi3(apiInfo: ApiInfo, json: Jackson) = OpenApi3(
     apiInfo, json,
-    ApiRenderer.Auto(json, AutoJsonToJsonSchema(json, fieldRetrieval = FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))))
+    ApiRenderer.Auto(json, AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))))
 
 object JacksonAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String): Field {
