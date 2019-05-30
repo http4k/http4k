@@ -8,11 +8,17 @@ import org.junit.jupiter.api.Test
 
 class JacksonAnnotatedTest {
 
-    data class Beany(@JsonProperty("NEWNAME") val oldName: String = "hello")
+    open class Foo(@JsonProperty("SUPERNEWNAME") val superValue: String = "bob")
+    data class Beany(@JsonProperty("NEWNAME") val oldName: String = "hello") : Foo()
 
     @Test
     fun `finds value from object`() {
         assertThat("nonNullable", JacksonAnnotated(Beany(), "NEWNAME"), equalTo(Field("hello", false)))
+    }
+
+    @Test
+    fun `finds value from superclass object`() {
+        assertThat("superValue", JacksonAnnotated(Beany(), "SUPERNEWNAME"), equalTo(Field("bob", false)))
     }
 
     @Test

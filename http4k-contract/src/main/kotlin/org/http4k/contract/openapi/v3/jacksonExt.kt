@@ -10,13 +10,16 @@ fun OpenApi3(apiInfo: ApiInfo, json: Jackson) = OpenApi3(
     ApiRenderer.Auto(json, AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))))
 
 object JacksonAnnotated : FieldRetrieval {
-    override fun invoke(target: Any, name: String): Field {
-        val message = target.javaClass.kotlin.constructors.first().parameters
-            .mapNotNull { f ->
-                f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
-                    ?.let { f.name }
-            }.firstOrNull() ?: throw NoFieldFound
+    override fun invoke(target: Any, name: String) =
+        SimpleLookup(target, target.javaClass.findName(name) ?: throw NoFieldFound)
 
-        return SimpleLookup(target, message)
+    private fun Class<Any>.findName(name: String): String? = kotlin.constructors.first().parameters
+        .mapNotNull { f ->
+            f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
+                ?.let { f.name }
+        }.firstOrNull() ?: try {
+        superclass.findName(name)
+    } catch (e: IllegalStateException) {
+        throw NoFieldFound
     }
 }
