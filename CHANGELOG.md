@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.147.0
+- [http4k-contract] Support custom `JsonProperty` annotation for OpenAPi3 generation
+
 ### v3.146.0
 - [http4k-contract] Fix #228 - Support Map-based fields in OpenApi 3 Auto-schema generation as `additionalProperties`. H/T @noahbetzen-wk for the idea.
 
