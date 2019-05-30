@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.147.0
 - [http4k-contract] Support custom `JsonProperty` annotation for OpenAPi3 generation
+- [http4k-cloudnative] New exception type for unuathorised. H/T @tom
 
 ### v3.146.0
 - [http4k-contract] Fix #228 - Support Map-based fields in OpenApi 3 Auto-schema generation as `additionalProperties`. H/T @noahbetzen-wk for the idea.
