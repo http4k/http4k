@@ -1,9 +1,6 @@
 package org.http4k.security.oauth.server
 
-import com.natpryce.Failure
-import com.natpryce.get
-import com.natpryce.map
-import com.natpryce.mapFailure
+import com.natpryce.*
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -26,10 +23,8 @@ class GenerateAccessToken(
 ) : HttpHandler {
 
     override fun invoke(request: Request): Response {
-        val accessTokenRequest = request.accessTokenRequest()
-        val accessTokenResult = generateAccessToken(accessTokenRequest)
-
-        return accessTokenResult
+        return request.accessTokenRequest()
+            .flatMap(this::generateAccessToken)
             .map { token ->
                 Response(OK).let {
                     when {
@@ -41,6 +36,12 @@ class GenerateAccessToken(
     }
 
     private fun generateAccessToken(accessTokenRequest: AccessTokenRequest) =
+        when (accessTokenRequest) {
+            is ClientCredentialsTokenRequest -> Failure(UnsupportedGrantType("client_credentials"))
+            is AuthorizationCodeAccessTokenRequest -> generateAccessTokenForAuthorizationCode(accessTokenRequest)
+        }
+
+    private fun generateAccessTokenForAuthorizationCode(accessTokenRequest: AuthorizationCodeAccessTokenRequest) =
         when {
             accessTokenRequest.grantType != "authorization_code" -> Failure(UnsupportedGrantType(accessTokenRequest.grantType))
             !clientValidator.validateCredentials(accessTokenRequest.clientId, accessTokenRequest.clientSecret) -> Failure(InvalidClientCredentials)
