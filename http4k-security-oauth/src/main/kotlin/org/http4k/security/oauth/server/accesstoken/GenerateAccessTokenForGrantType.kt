@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server.accesstoken
 
 import com.natpryce.Failure
 import com.natpryce.Result
+import com.natpryce.Success
 import com.natpryce.flatMap
 import org.http4k.core.Body
 import org.http4k.core.Request
@@ -19,16 +20,19 @@ class GenerateAccessTokenForGrantType(
     clock: Clock,
     idTokens: IdTokens
 ) {
-    private val authorizationCodeAccessTokenGenerator = AuthorizationCodeAccessTokenGenerator(clientValidator, authorizationCodes, accessTokens, clock, idTokens)
+
+    private val supportedGrantTypes = setOf(
+        AuthorizationCodeAccessTokenGenerator(clientValidator, authorizationCodes, accessTokens, clock, idTokens)
+    ).map { it.rfcGrantType to it }.toMap()
 
     fun generate(request: Request): Result<AccessTokenDetails, AccessTokenError> {
-        grantTypeForm(request).let {
-            val grantType = grantType(it)
-            return when (grantType) {
-                "authorization_code" -> authorizationCodeAccessTokenGenerator.resolveRequest(request).flatMap(authorizationCodeAccessTokenGenerator::generate)
-                "client_credentials" -> Failure(UnsupportedGrantType(grantType))
-                else -> Failure(UnsupportedGrantType(grantType))
-            }
+        grantTypeForm(request).let { form ->
+            val grantType = grantType(form)
+            return (supportedGrantTypes[grantType]?.let(::Success) ?: Failure(UnsupportedGrantType(grantType)))
+                .flatMap { generator ->
+                    generator.resolveRequest(request)
+                        .flatMap(generator::generate)
+                }
         }
     }
 

@@ -22,6 +22,7 @@ class AuthorizationCodeAccessTokenGenerator(
     private val clock: Clock,
     private val idTokens: IdTokens
 ) : AccessTokenGenerator<AuthorizationCodeAccessTokenRequest> {
+    override val rfcGrantType = "authorization_code"
     override fun resolveRequest(request: Request) = extract(request)
 
     override fun generate(request: AuthorizationCodeAccessTokenRequest) = when {
