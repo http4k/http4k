@@ -11,18 +11,19 @@ import org.http4k.core.with
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.accesstoken.GenerateAccessTokenForGrantType
+import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import java.time.Clock
 
 class GenerateAccessToken(
-    clientValidator: ClientValidator,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
     clock: Clock,
     idTokens: IdTokens,
-    private val errorRenderer: ErrorRenderer
+    private val errorRenderer: ErrorRenderer,
+    grantTypes: GrantTypesConfiguration
 ) : HttpHandler {
 
-    private val generator = GenerateAccessTokenForGrantType(clientValidator, authorizationCodes, accessTokens, clock, idTokens)
+    private val generator = GenerateAccessTokenForGrantType(authorizationCodes, accessTokens, clock, idTokens, grantTypes)
 
     override fun invoke(request: Request): Response {
         return generator.generate(request)

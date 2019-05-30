@@ -17,6 +17,8 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.AccessTokenResponse
 import org.http4k.security.ResponseType.CodeIdToken
 import org.http4k.security.accessTokenResponseBody
+import org.http4k.security.oauth.server.accesstoken.GrantType
+import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -33,7 +35,8 @@ class GenerateAccessTokenTest {
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), "state")
     private val request = Request(Method.GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK)).get() as AuthorizationCode
-    private val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), ErrorRenderer(json))
+    private val clientValidator = HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret")
+    private val handler = GenerateAccessToken(codes, DummyAccessTokens(), handlerClock, DummyIdtokens(), ErrorRenderer(json), GrantTypesConfiguration.default(clientValidator))
 
     @Test
     fun `generates a dummy token`() {
@@ -72,6 +75,7 @@ class GenerateAccessTokenTest {
         val response = handler(Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "client_credentials")
+            .form("client_secret", "a-secret")
             .form("client_id", authRequest.client.value)
         )
 
@@ -158,7 +162,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles already used authentication code`() {
-        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json))
+        val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json), GrantTypesConfiguration.default(clientValidator))
         val request = Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
@@ -174,7 +178,7 @@ class GenerateAccessTokenTest {
     @Test
     fun `correctly returns documentation uri if provided`() {
         val documentationUri = "SomeUri"
-        val handler = GenerateAccessToken(HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret"), codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json, documentationUri))
+        val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json, documentationUri), GrantTypesConfiguration.default(clientValidator))
         val request = Request(Method.POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
@@ -185,6 +189,20 @@ class GenerateAccessTokenTest {
         val response = handler(request)
 
         assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorTypeAndUri("invalid_grant", documentationUri)))
+    }
+
+    @Test
+    fun `handles grant type not in configuration`(){
+        val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdtokens(), ErrorRenderer(json), GrantTypesConfiguration(emptyMap()))
+
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", GrantType.ClientCredentials.rfcValue)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+        )
+
+        assertThat(response, hasStatus(BAD_REQUEST) and hasBody(withErrorType("unsupported_grant_type")))
     }
 
     private fun withErrorType(errorType: String) =

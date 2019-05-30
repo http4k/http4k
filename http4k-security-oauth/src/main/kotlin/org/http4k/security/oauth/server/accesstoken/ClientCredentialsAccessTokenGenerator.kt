@@ -15,13 +15,11 @@ import org.http4k.security.oauth.server.ClientId
 class ClientCredentialsAccessTokenGenerator(private val accessTokens: AccessTokens) : AccessTokenGenerator {
     override fun generate(request: Request) = generate(ClientCredentialsForm.extract(request))
 
-    override val rfcGrantType = "client_credentials"
-
     fun generate(request: ClientCredentialsRequest): Result<AccessTokenDetails, AccessTokenError> =
         accessTokens.create(request.clientId).map { AccessTokenDetails(it) }
 }
 
-data class ClientCredentialsRequest(val clientId: ClientId)
+data class ClientCredentialsRequest( val clientId: ClientId)
 
 private object ClientCredentialsForm {
     private val clientId = FormField.map(::ClientId, ClientId::value).required("client_id")

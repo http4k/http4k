@@ -11,27 +11,48 @@ import org.http4k.lens.Validator
 import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.oauth.server.*
+import org.http4k.security.oauth.server.accesstoken.GrantType.AuthorizationCode
+import org.http4k.security.oauth.server.accesstoken.GrantType.ClientCredentials
 import java.time.Clock
 
 class GenerateAccessTokenForGrantType(
-    clientValidator: ClientValidator,
     authorizationCodes: AuthorizationCodes,
     accessTokens: AccessTokens,
     clock: Clock,
-    idTokens: IdTokens
+    idTokens: IdTokens,
+    private val grantTypes: GrantTypesConfiguration
 ) {
-    private val authorizationCode = AuthorizationCodeAccessTokenGenerator(clientValidator, authorizationCodes, accessTokens, clock, idTokens)
+    private val authorizationCode = AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens)
     private val clientCredentials = ClientCredentialsAccessTokenGenerator(accessTokens)
 
     fun generate(request: Request): Result<AccessTokenDetails, AccessTokenError> {
+        return resolveGrantTypeFromRequest(request)
+            .flatMap { resolveGrantTypeFromConfiguration(it) }
+            .flatMap { (generator, authenticator) ->
+                if (!authenticator.validateCredentials(request))
+                    Failure(InvalidClientCredentials)
+                else generator.generate(request)
+            }
+    }
+
+    private fun resolveGrantTypeFromConfiguration(grantType: GrantType) =
+        grantTypes.supportedGrantTypes[grantType]?.let { Success(grantType.generator() to it) }
+            ?: Failure(UnsupportedGrantType(grantType.rfcValue))
+
+    private fun resolveGrantTypeFromRequest(request: Request): Result<GrantType, UnsupportedGrantType> {
         grantTypeForm(request).let { form ->
             val grantType = grantType(form)
             return when (grantType) {
-                authorizationCode.rfcGrantType -> Success(authorizationCode)
-                clientCredentials.rfcGrantType -> Success(clientCredentials)
+                AuthorizationCode.rfcValue -> Success(AuthorizationCode)
+                ClientCredentials.rfcValue -> Success(ClientCredentials)
                 else -> Failure(UnsupportedGrantType(grantType))
-            }.flatMap { generator -> generator.generate(request) }
+            }
         }
+    }
+
+    private fun GrantType.generator() = when (this) {
+        AuthorizationCode -> authorizationCode
+        ClientCredentials -> clientCredentials
     }
 
     companion object {
@@ -39,4 +60,3 @@ class GenerateAccessTokenForGrantType(
         val grantTypeForm = Body.webForm(Validator.Strict, grantType).toLens()
     }
 }
-

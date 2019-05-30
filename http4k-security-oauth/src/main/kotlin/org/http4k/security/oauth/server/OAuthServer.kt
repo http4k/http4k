@@ -3,14 +3,13 @@ package org.http4k.security.oauth.server
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Query
 import org.http4k.lens.uri
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.AccessTokenContainer
 import org.http4k.security.ResponseType
+import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import java.time.Clock
 
 /**
@@ -29,12 +28,13 @@ class OAuthServer(
     json: AutoMarshallingJson,
     clock: Clock,
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
+    grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(clientValidator),
     idTokens: IdTokens = IdTokens.Unsupported,
     documentationUri: String? = null
 ) {
     private val errorRenderer = ErrorRenderer(json, documentationUri)
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(clientValidator, authorizationCodes, accessTokens, clock, idTokens, errorRenderer))
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, errorRenderer, grantTypes))
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(clientValidator, errorRenderer, authRequestExtractor)

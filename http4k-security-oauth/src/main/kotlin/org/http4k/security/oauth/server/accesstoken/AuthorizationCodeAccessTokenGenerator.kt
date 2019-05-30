@@ -1,9 +1,6 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.Failure
-import com.natpryce.Success
-import com.natpryce.flatMap
-import com.natpryce.map
+import com.natpryce.*
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -17,7 +14,6 @@ import org.http4k.security.oauth.server.*
 import java.time.Clock
 
 class AuthorizationCodeAccessTokenGenerator(
-    private val clientValidator: ClientValidator,
     private val authorizationCodes: AuthorizationCodes,
     private val accessTokens: AccessTokens,
     private val clock: Clock,
@@ -26,26 +22,21 @@ class AuthorizationCodeAccessTokenGenerator(
     override fun generate(request: Request) =
         extract(request).flatMap { generate(it) }
 
-    override val rfcGrantType = "authorization_code"
+    fun generate(request: AuthorizationCodeAccessTokenRequest): Result<AccessTokenDetails, AccessTokenError> {
+        val code = request.authorizationCode
+        val codeDetails = authorizationCodes.detailsFor(code)
 
-    fun generate(request: AuthorizationCodeAccessTokenRequest) = when {
-        !clientValidator.validateCredentials(request.clientId, request.clientSecret) -> Failure(InvalidClientCredentials)
-        else -> {
-            val code = request.authorizationCode
-            val codeDetails = authorizationCodes.detailsFor(code)
-
-            when {
-                codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
-                codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
-                codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
-                else -> accessTokens.create(code)
-                    .map { token ->
-                        when (codeDetails.responseType) {
-                            ResponseType.Code -> AccessTokenDetails(token)
-                            ResponseType.CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
-                        }
+        return when {
+            codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
+            codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
+            codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
+            else -> accessTokens.create(code)
+                .map { token ->
+                    when (codeDetails.responseType) {
+                        ResponseType.Code -> AccessTokenDetails(token)
+                        ResponseType.CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
                     }
-            }
+                }
         }
     }
 
