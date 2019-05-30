@@ -11,12 +11,13 @@ class SimpleLookupTest {
 
     @Test
     fun `finds value from object`() {
-        assertThat("nonNullable", SimpleLookup.lookup(Beany(), "nonNullable"), equalTo(Field("hello", false)))
-        assertThat("aNullable", SimpleLookup.lookup(Beany(), "aNullable"), equalTo(Field("aNullable", true)))
+        assertThat("nonNullable", SimpleLookup(Beany(), "nonNullable"), equalTo(Field("hello", false)))
+        assertThat("aNullable", SimpleLookup(Beany(), "aNullable"), equalTo(Field("aNullable", true)))
     }
 
     @Test
     fun `throws on no field found`() {
-        assertThat("non existent", { SimpleLookup.lookup(Beany(), "non existent") }, throws<NoFieldFound>())
+        assertThat("non existent", { SimpleLookup(Beany(), "non existent") }, throws<NoFieldFound>())
     }
 }
+

@@ -4,16 +4,15 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 
-interface FieldRetrieval {
-    fun lookup(target: Any, name: String): Field
+interface FieldRetrieval : (Any, String) -> Field {
 
     companion object {
         fun compose(vararg retrieval: FieldRetrieval): FieldRetrieval {
             return object : FieldRetrieval {
-                override fun lookup(target: Any, name: String): Field =
+                override fun invoke(target: Any, name: String): Field =
                     retrieval.mapNotNull {
                         try {
-                            it.lookup(target, name)
+                            it(target, name)
                         } catch (e: NoFieldFound) {
                             null
                         }
@@ -24,7 +23,7 @@ interface FieldRetrieval {
 }
 
 object SimpleLookup : FieldRetrieval {
-    override fun lookup(target: Any, name: String): Field {
+    override fun invoke(target: Any, name: String): Field {
         val fields = try {
             target::class.memberProperties.map { it.name to it }.toMap()
         } catch (e: Error) {

@@ -12,8 +12,6 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.memberProperties
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
@@ -58,7 +56,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode.Reference {
         val properties = json.fields(this)
-            .map { Triple(it.first, it.second, fieldRetrieval.lookup(obj, it.first)) }
+            .map { Triple(it.first, it.second, fieldRetrieval(obj, it.first)) }
             .map { (fieldName, field, kField) ->
                 when (val param = json.typeOf(field).toParam()) {
                     ArrayParam -> field.toArraySchema(fieldName, kField.value, kField.isNullable)
