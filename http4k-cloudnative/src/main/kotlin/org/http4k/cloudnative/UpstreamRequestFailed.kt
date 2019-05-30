@@ -4,6 +4,7 @@ import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.GATEWAY_TIMEOUT
 import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 
 /**
  * This hierarchy of exceptions should be used to indicate that an upstream remote system has failed with a
@@ -16,5 +17,7 @@ open class UpstreamRequestFailed(val status: Status, message: String) : RuntimeE
 class NotFound(message: String) : UpstreamRequestFailed(NOT_FOUND, message)
 
 class ClientTimeout(message: String) : UpstreamRequestFailed(CLIENT_TIMEOUT, message)
+
+class Unauthorized(message: String) : UpstreamRequestFailed(UNAUTHORIZED, message)
 
 class GatewayTimeout(message: String) : UpstreamRequestFailed(GATEWAY_TIMEOUT, message)
