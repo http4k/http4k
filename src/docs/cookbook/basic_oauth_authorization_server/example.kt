@@ -1,3 +1,4 @@
+import com.natpryce.Failure
 import com.natpryce.Success
 import org.http4k.client.OkHttp
 import org.http4k.core.*
@@ -100,6 +101,8 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 }
 
 class InsecureAccessTokens : AccessTokens {
+    override fun create(clientId: ClientId) = Failure(UnsupportedGrantType("client_credentials"))
+
     override fun isValid(accessToken: AccessTokenContainer): Boolean = true
 
     // an access token should be associated with a particular authorization flow

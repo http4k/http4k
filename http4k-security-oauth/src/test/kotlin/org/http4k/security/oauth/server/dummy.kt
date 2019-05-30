@@ -29,12 +29,16 @@ open class DummyIdtokens(private val username: String? = null) : IdTokens {
 }
 
 class DummyAccessTokens(val tokenIsValid: Boolean = true) : AccessTokens {
+    override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Success(AccessTokenContainer("dummy-access-token"))
+
     override fun isValid(accessToken: AccessTokenContainer): Boolean = tokenIsValid
 
     override fun create(authorizationCode: AuthorizationCode) = Success(AccessTokenContainer("dummy-access-token"))
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
+    override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Failure(error)
+
     override fun isValid(accessToken: AccessTokenContainer): Boolean = true
 
     override fun create(authorizationCode: AuthorizationCode) = Failure(error)

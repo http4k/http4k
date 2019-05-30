@@ -12,5 +12,13 @@ interface AccessTokens {
      */
     fun create(authorizationCode: AuthorizationCode): Result<AccessTokenContainer, AuthorizationCodeAlreadyUsed>
 
+    /**
+     * creates a new access token for a given client
+     */
+    fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError>
+
+    /**
+     * validates an given access token
+     */
     fun isValid(accessToken : AccessTokenContainer) : Boolean
 }

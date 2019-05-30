@@ -5,14 +5,10 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.ContentType
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
-import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.format.AutoMarshallingJson
 import org.http4k.format.Jackson
@@ -69,6 +65,17 @@ class GenerateAccessTokenTest {
         assertThat(response, hasStatus(OK))
 
         assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "dummy-id-token-for-access-token")))
+    }
+
+    @Test
+    fun `generates dummy token for client credentials grant type`(){
+        val response = handler(Request(Method.POST, "/token")
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "client_credentials")
+            .form("client_id", authRequest.client.value)
+        )
+
+        assertThat(response, hasStatus(OK) and hasBody("dummy-access-token"))
     }
 
     @Test
