@@ -48,7 +48,8 @@ data class MapHolder(val value: Map<String, Any>)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
-    private val creator = AutoJsonToJsonSchema(json)
+    private val creator = AutoJsonToJsonSchema(json,
+        fieldRetrieval = FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
@@ -83,7 +84,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for when cannot find entry`(approver: Approver) {
-        approver.assertApproved(JacksonAnnotated(), null)
+        approver.assertApproved(JacksonFieldAnnotated(), null)
     }
 
     private fun Approver.assertApproved(obj: Any, name: String?) {
@@ -93,4 +94,4 @@ class AutoJsonToJsonSchemaTest {
     }
 }
 
-data class JacksonAnnotated(@JsonProperty("ASDASD") val uri: Uri = Uri.of("foobar"))
+data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))

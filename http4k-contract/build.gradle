@@ -5,6 +5,7 @@ apply plugin: 'org.openapi.generator'
 dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
+    provided project(":http4k-format-jackson")
     compile Libs.kotlin_reflect
 
     testCompile project(":http4k-format-jackson")
