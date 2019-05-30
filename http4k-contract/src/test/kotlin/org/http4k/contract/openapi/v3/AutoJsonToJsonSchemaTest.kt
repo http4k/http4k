@@ -1,5 +1,6 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -47,7 +48,8 @@ data class MapHolder(val value: Map<String, Any>)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
-    private val creator = AutoJsonToJsonSchema(json)
+    private val creator = AutoJsonToJsonSchema(json,
+        fieldRetrieval = FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
@@ -80,9 +82,16 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(listOf(ArbObject()), null)
     }
 
+    @Test
+    fun `renders schema for when cannot find entry`(approver: Approver) {
+        approver.assertApproved(JacksonFieldAnnotated(), null)
+    }
+
     private fun Approver.assertApproved(obj: Any, name: String?) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(Jackson.asJsonString(creator.toSchema(obj, name))))
     }
 }
+
+data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))

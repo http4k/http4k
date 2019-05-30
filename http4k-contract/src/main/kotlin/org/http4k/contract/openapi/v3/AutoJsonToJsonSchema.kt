@@ -12,13 +12,11 @@ import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.IllegalSchemaException
 import org.http4k.util.JsonSchema
 import org.http4k.util.JsonSchemaCreator
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.javaGetter
 
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
-    private val refPrefix: String = "components/schemas"
+    private val refPrefix: String = "components/schemas",
+    private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup)
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {
@@ -57,24 +55,16 @@ class AutoJsonToJsonSchema<NODE : Any>(
         if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable) else toObjectSchema(objName, obj, isNullable)
 
     private fun NODE.toObjectSchema(objName: String?, obj: Any, isNullable: Boolean): SchemaNode.Reference {
-        val fields = try {
-            obj::class.memberProperties.map { it.name to it }.toMap()
-        } catch (e: Error) {
-            emptyMap<String, KProperty1<out Any, Any?>>()
-        }
-
         val properties = json.fields(this)
-            .map { Triple(it.first, it.second, fields.getValue(it.first)) }
+            .map { Triple(it.first, it.second, fieldRetrieval(obj, it.first)) }
             .map { (fieldName, field, kField) ->
-                val fieldIsNullable = kField.returnType.isMarkedNullable
-                val value = kField.javaGetter!!(obj)
                 when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, value, fieldIsNullable)
-                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, fieldIsNullable)
+                    ArrayParam -> field.toArraySchema(fieldName, kField.value, kField.isNullable)
+                    ObjectParam -> field.toObjectOrMapSchema(fieldName, kField.value, kField.isNullable)
                     else -> with(field) {
-                        value.javaClass.enumConstants?.let {
-                            toEnumSchema(fieldName, param, it, fieldIsNullable)
-                        } ?: toSchema(fieldName, param, fieldIsNullable)
+                        kField.value.javaClass.enumConstants?.let {
+                            toEnumSchema(fieldName, param, it, kField.isNullable)
+                        } ?: toSchema(fieldName, param, kField.isNullable)
                     }
                 }
             }

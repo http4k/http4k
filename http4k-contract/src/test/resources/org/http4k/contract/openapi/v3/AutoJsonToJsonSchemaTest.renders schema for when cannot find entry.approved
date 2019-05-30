@@ -1,0 +1,26 @@
+{
+  "node": {
+    "$ref": "#/components/schemas/JacksonFieldAnnotated",
+    "example": null
+  },
+  "definitions": [
+    {
+      "first": "JacksonFieldAnnotated",
+      "second": {
+        "properties": {
+          "OTHERNAME": {
+            "example": "foobar",
+            "type": "string"
+          }
+        },
+        "example": {
+          "OTHERNAME": "foobar"
+        },
+        "type": "object",
+        "required": [
+          "OTHERNAME"
+        ]
+      }
+    }
+  ]
+}
