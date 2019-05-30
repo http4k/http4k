@@ -1,5 +1,6 @@
 package org.http4k.contract.openapi.v3
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -80,9 +81,16 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(listOf(ArbObject()), null)
     }
 
+    @Test
+    fun `renders schema for when cannot find entry`(approver: Approver) {
+        approver.assertApproved(JacksonAnnotated(), null)
+    }
+
     private fun Approver.assertApproved(obj: Any, name: String?) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(Jackson.asJsonString(creator.toSchema(obj, name))))
     }
 }
+
+data class JacksonAnnotated(@JsonProperty("ASDASD") val uri: Uri = Uri.of("foobar"))
