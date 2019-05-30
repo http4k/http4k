@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server.accesstoken
 
 import com.natpryce.Failure
 import com.natpryce.Success
+import com.natpryce.flatMap
 import com.natpryce.map
 import org.http4k.core.Body
 import org.http4k.core.Request
@@ -21,11 +22,13 @@ class AuthorizationCodeAccessTokenGenerator(
     private val accessTokens: AccessTokens,
     private val clock: Clock,
     private val idTokens: IdTokens
-) : AccessTokenGenerator<AuthorizationCodeAccessTokenRequest> {
-    override val rfcGrantType = "authorization_code"
-    override fun resolveRequest(request: Request) = extract(request)
+) : AccessTokenGenerator {
+    override fun generate(request: Request) =
+        extract(request).flatMap { generate(it) }
 
-    override fun generate(request: AuthorizationCodeAccessTokenRequest) = when {
+    override val rfcGrantType = "authorization_code"
+
+    fun generate(request: AuthorizationCodeAccessTokenRequest) = when {
         !clientValidator.validateCredentials(request.clientId, request.clientSecret) -> Failure(InvalidClientCredentials)
         else -> {
             val code = request.authorizationCode
@@ -56,7 +59,7 @@ data class AuthorizationCodeAccessTokenRequest(
     val clientSecret: String,
     val redirectUri: Uri,
     val authorizationCode: AuthorizationCode
-) : AccessTokenRequest
+)
 
 private object AuthorizationCodeAccessTokenForm {
     private val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")

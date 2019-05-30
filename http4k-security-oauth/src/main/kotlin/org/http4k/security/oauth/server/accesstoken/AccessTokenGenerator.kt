@@ -5,8 +5,7 @@ import org.http4k.core.Request
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.oauth.server.AccessTokenError
 
-interface AccessTokenGenerator<T : AccessTokenRequest> {
+interface AccessTokenGenerator {
     val rfcGrantType: String
-    fun resolveRequest(request: Request): Result<T, AccessTokenError>
-    fun generate(request: T): Result<AccessTokenDetails, AccessTokenError>
+    fun generate(request: Request): Result<AccessTokenDetails, AccessTokenError>
 }
