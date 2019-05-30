@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.149.0
+- [http4k-security-oauth] Initial support for `client_credentials` grant type.
+
 ### v3.148.0
 - [http4k-contract] Jackson property searching in OpenApi3 now searches superclasses.
 
