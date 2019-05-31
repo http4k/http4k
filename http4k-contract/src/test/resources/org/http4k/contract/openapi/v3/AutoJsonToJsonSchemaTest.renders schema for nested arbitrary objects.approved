@@ -23,6 +23,9 @@
             "example": [
               {
                 "uri": "foobar"
+              },
+              {
+                "uri": "foobar"
               }
             ],
             "type": "array"
@@ -44,6 +47,9 @@
             },
             "example": [
               [
+                {
+                  "uri": "foobar"
+                },
                 {
                   "uri": "foobar"
                 }
@@ -123,10 +129,16 @@
           "list": [
             {
               "uri": "foobar"
+            },
+            {
+              "uri": "foobar"
             }
           ],
           "nestedList": [
             [
+              {
+                "uri": "foobar"
+              },
               {
                 "uri": "foobar"
               }
