@@ -103,6 +103,18 @@ private sealed class ArrayItem {
 
     class NonObject(paramMeta: ParamMeta) : ArrayItem() {
         val type = paramMeta.value
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as NonObject
+
+            if (type != other.type) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int = type.hashCode()
     }
 
     data class Ref(val `$ref`: String) : ArrayItem()

@@ -28,7 +28,8 @@
           "uri": "foobar"
         },
         "stringList": [
-          "hello"
+          "hello",
+          "goodbye"
         ],
         "anyList": [
           "123",
@@ -108,7 +109,8 @@
               ]
             },
             "example": [
-              "hello"
+              "hello",
+              "goodbye"
             ],
             "type": "array"
           },
@@ -179,7 +181,8 @@
             "uri": "foobar"
           },
           "stringList": [
-            "hello"
+            "hello",
+            "goodbye"
           ],
           "anyList": [
             "123",
