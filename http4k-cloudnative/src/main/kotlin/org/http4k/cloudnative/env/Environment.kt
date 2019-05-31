@@ -87,7 +87,7 @@ internal class MapEnvironment internal constructor(private val contents: Map<Str
 }
 
 /**
- * This models the key used to get a value out of the  Environment using the standard Lens mechanic. Note that if your
+ * This models the key used to get a value out of the Environment using the standard Lens mechanic. Note that if your
  * values contain commas, either use a EnvironmentKey.(mapping).multi.required()/optional()/defaulted() to retrieve the
  * entire list, or override the comma separator in your initial Environment.
  */
@@ -101,7 +101,7 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
     }
 ) {
     object k8s {
-        operator fun <T> invoke(fn: EnvironmentKey.k8s.() -> T): T = fn(this)
+        operator fun <T> invoke(fn: k8s.() -> T): T = fn(this)
 
         val SERVICE_PORT = int().required("SERVICE_PORT")
         val HEALTH_PORT = int().required("HEALTH_PORT")

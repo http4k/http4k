@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test
 class FieldRetrievalTest {
 
     private val blowUp = object : FieldRetrieval {
-        override fun invoke(p1: Any, p2: String) = throw NoFieldFound
+        override fun invoke(p1: Any, p2: String) = throw NoFieldFound(p2, p1)
     }
+
     private val result = Field("hello", true)
 
     private val findIt = object : FieldRetrieval {
