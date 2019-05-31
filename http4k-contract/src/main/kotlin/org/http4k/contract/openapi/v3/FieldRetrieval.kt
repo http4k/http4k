@@ -5,12 +5,11 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 
 interface FieldRetrieval : (Any, String) -> Field {
-
     companion object {
         fun compose(vararg retrieval: FieldRetrieval): FieldRetrieval {
             return object : FieldRetrieval {
                 override fun invoke(target: Any, name: String): Field =
-                    retrieval.mapNotNull {
+                    retrieval.asSequence().mapNotNull {
                         try {
                             it(target, name)
                         } catch (e: NoFieldFound) {

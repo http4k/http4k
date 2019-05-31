@@ -1,12 +1,16 @@
 package org.http4k.contract.openapi.v3
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.format.ConfigurableJackson
 import org.http4k.format.Jackson
+import org.http4k.format.asConfigurable
+import org.http4k.lens.BiDiMapping
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
@@ -16,6 +20,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 data class ArbObject2(val uri: Uri = Uri.of("foobar"))
+
+data class ArbObjectHolder(val inner: ArbObject2 = ArbObject2())
 
 data class ArbObject(
     val child: ArbObject2 = ArbObject2(),
@@ -48,8 +54,7 @@ data class MapHolder(val value: Map<String, Any>)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
-    private val creator = AutoJsonToJsonSchema(json,
-        fieldRetrieval = FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
+    private val creator = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
@@ -87,6 +92,20 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(JacksonFieldAnnotated(), null)
     }
 
+    @Test
+    fun `renders schema for custom json mapping`(approver: Approver) {
+        val json = ConfigurableJackson(KotlinModule()
+            .asConfigurable()
+            .text(BiDiMapping({ i: String -> ArbObject2(Uri.of(i)) }, { i: ArbObject2 -> i.uri.toString() }))
+            .done()
+        )
+
+        approver.assertApproved(Response(OK)
+            .with(CONTENT_TYPE of APPLICATION_JSON)
+            .body(Jackson.asJsonString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder(), null))))
+    }
+
+
     private fun Approver.assertApproved(obj: Any, name: String?) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
@@ -95,3 +114,5 @@ class AutoJsonToJsonSchemaTest {
 }
 
 data class JacksonFieldAnnotated(@JsonProperty("OTHERNAME") val uri: Uri = Uri.of("foobar"))
+
+
