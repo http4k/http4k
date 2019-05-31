@@ -15,7 +15,7 @@ fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(json, FieldRetrie
 
 object JacksonAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String) =
-        SimpleLookup(target, target.javaClass.findName(name) ?: throw NoFieldFound)
+        SimpleLookup(target, target.javaClass.findName(name) ?: throw NoFieldFound(name, this))
 
     private fun Class<Any>.findName(name: String): String? = kotlin.constructors.first().parameters
         .mapNotNull { f ->
@@ -24,6 +24,6 @@ object JacksonAnnotated : FieldRetrieval {
         }.firstOrNull() ?: try {
         superclass.findName(name)
     } catch (e: IllegalStateException) {
-        throw NoFieldFound
+        throw NoFieldFound(name, this, e)
     }
 }

@@ -15,7 +15,7 @@ interface FieldRetrieval : (Any, String) -> Field {
                         } catch (e: NoFieldFound) {
                             null
                         }
-                    }.firstOrNull() ?: throw NoFieldFound
+                    }.firstOrNull() ?: throw NoFieldFound(name, target)
             }
         }
     }
@@ -35,11 +35,11 @@ object SimpleLookup : FieldRetrieval {
                     ?.let { it(target) }
                     ?.let { it to field.returnType.isMarkedNullable }
             }
-            ?.let { Field(it.first, it.second) } ?: throw NoFieldFound
+            ?.let { Field(it.first, it.second) } ?: throw NoFieldFound(name, target)
 
     }
 }
 
-object NoFieldFound : Exception()
+class NoFieldFound(name: String, target: Any, cause: Throwable ?= null) : Exception("Could not find $name in $target", cause)
 
 data class Field(val value: Any, val isNullable: Boolean)
