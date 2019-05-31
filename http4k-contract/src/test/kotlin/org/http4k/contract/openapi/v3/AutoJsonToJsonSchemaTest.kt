@@ -21,7 +21,7 @@ import java.math.BigInteger
 
 data class ArbObject2(val uri: Uri = Uri.of("foobar"))
 
-data class ArbObjectHolder(val inner: ArbObject2 = ArbObject2())
+data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 
 data class ArbObject(
     val child: ArbObject2 = ArbObject2(),

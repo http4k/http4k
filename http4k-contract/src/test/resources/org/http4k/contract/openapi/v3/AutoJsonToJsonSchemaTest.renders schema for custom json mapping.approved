@@ -9,12 +9,23 @@
       "second": {
         "properties": {
           "inner": {
-            "example": "foobar",
-            "type": "string"
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "foobar"
+            ],
+            "type": "array"
           }
         },
         "example": {
-          "inner": "foobar"
+          "inner": [
+            "foobar"
+          ]
         },
         "type": "object",
         "required": [
