@@ -567,7 +567,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathPaths{firstName}Bertrand{age}"
+        "operationId": "postBasepathPaths_firstName_Bertrand_age"
       }
     },
     "/basepath/produces_and_consumes": {

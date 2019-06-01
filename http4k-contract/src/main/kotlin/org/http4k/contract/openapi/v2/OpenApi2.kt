@@ -10,6 +10,7 @@ import org.http4k.contract.ResponseMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
@@ -110,15 +111,12 @@ open class OpenApi2<out NODE>(
         val consumes = route.meta.consumes + (route.spec.routeMeta.body?.let { listOf(it.contentType) }
             ?: emptyList())
 
-        val operationId = route.meta.operationId ?: route.method.name.toLowerCase() + route.describeFor(pathSegments)
-            .split('/').joinToString("") { it.capitalize() }
-
         return json {
             val fields =
                 listOfNotNull(
                     "tags" to array(routeTags),
                     "summary" to string(route.meta.summary),
-                    "operationId" to string(operationId),
+                    "operationId" to string(route.operationId(pathSegments)),
                     "produces" to array(route.meta.produces.map { string(it.value) }),
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),

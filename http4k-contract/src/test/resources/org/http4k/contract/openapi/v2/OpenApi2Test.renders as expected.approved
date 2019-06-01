@@ -549,7 +549,7 @@
           "/basepath"
         ],
         "summary": "<unknown>",
-        "operationId": "postBasepathPaths{firstName}Bertrand{age}",
+        "operationId": "postBasepathPaths_firstName_Bertrand_age",
         "produces": [
         ],
         "consumes": [

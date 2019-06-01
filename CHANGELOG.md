@@ -3,8 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.153.0
+- [http4k-contract] OperationIds are generated without illegal characters `{}`.
+
 ### v3.152.0
-- [http4k-contract] Support non-string keys for "text convertible" values.
+- [http4k-contract] Support non-string keys for "text convertible" values in maps for Auto-schema generation.
 
 ### v3.151.0
 - [http4k-contract] Fixed Auto-schema generation to detect and remove duplicate items from list schemas.

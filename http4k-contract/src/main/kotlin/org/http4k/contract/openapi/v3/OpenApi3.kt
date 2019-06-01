@@ -11,6 +11,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.operationId
 import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
@@ -78,9 +79,6 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security): ApiPath<NODE> {
         val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
 
-        val operationId = meta.operationId ?: method.name.toLowerCase() + describeFor(contractRoot)
-            .split('/').joinToString("") { it.capitalize() }
-
         val security = json(listOf(meta.security, contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
 
@@ -92,7 +90,7 @@ class OpenApi3<NODE : Any>(
                 asOpenApiParameters(),
                 meta.responses(),
                 security,
-                operationId
+                operationId(contractRoot)
             )
         } else {
             ApiPath.WithBody(
@@ -103,7 +101,7 @@ class OpenApi3<NODE : Any>(
                 body,
                 meta.responses(),
                 security,
-                operationId
+                operationId(contractRoot)
             )
         }
     }
