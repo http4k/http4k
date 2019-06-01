@@ -76,8 +76,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 
     private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean): SchemaNode {
+        val objWithStringKeys = obj.mapKeys { it.key?.let(::toJsonKey) }
         val properties = json.fields(this)
-            .map { Triple(it.first, it.second, obj[it.first]!!) }
+            .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
             .map { (fieldName, field, value) ->
                 when (val param = json.typeOf(field).toParam()) {
                     ArrayParam -> field.toArraySchema(fieldName, value, false)
@@ -93,6 +94,11 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
         return SchemaNode.MapType(objName ?: obj.javaClass.simpleName, isNullable,
             SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+    }
+
+    private fun toJsonKey(it: Any): String {
+        data class MapKey(val keyAsString: Any)
+        return json.textValueOf(json.asJsonObject(MapKey(it)), "keyAsString")!!
     }
 }
 

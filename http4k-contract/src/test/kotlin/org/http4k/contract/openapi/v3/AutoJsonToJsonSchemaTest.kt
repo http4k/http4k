@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.LocalDate
 
 data class ArbObject2(val uri: Uri = Uri.of("foobar"))
 
@@ -48,7 +49,7 @@ enum class Foo {
     value1, value2
 }
 
-data class MapHolder(val value: Map<String, Any>)
+data class MapHolder(val value: Map<Any, Any>)
 
 @ExtendWith(JsonApprovalTest::class)
 class AutoJsonToJsonSchemaTest {
@@ -75,6 +76,11 @@ class AutoJsonToJsonSchemaTest {
                 "key3" to mapOf("inner" to ArbObject2())
             )
         ), null)
+    }
+
+    @Test
+    fun `renders schema for non-string-keyed map field`(approver: Approver) {
+        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.EPOCH to "value")), null)
     }
 
     @Test
