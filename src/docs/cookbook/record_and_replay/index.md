@@ -5,7 +5,7 @@ A set of classes to provide simple recording/replaying of HTTP traffic. This is 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.151.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.152.0"
 ```
 
 ### Caching HTTP Traffic 
