@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
 
-class ModelNamerTest {
+class SchemaModelNamerTest {
     @Test
     fun `simple namer`() {
         assertThat(SchemaModelNamer.Simple("bob"), equalTo("String"))
