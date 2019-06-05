@@ -1,22 +1,22 @@
 {
   "node": {
-    "$ref": "#/components/schemas/ArbObject",
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject",
     "example": null
   },
   "definitions": [
     {
-      "first": "ArbObject",
+      "first": "org.http4k.contract.openapi.v3.ArbObject",
       "second": {
         "properties": {
           "child": {
-            "$ref": "#/components/schemas/ArbObject2",
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
             "example": null
           },
           "list": {
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ArbObject2"
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
                 }
               ]
             },
@@ -37,7 +37,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ArbObject2"
+                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
                       }
                     ]
                   },
@@ -58,7 +58,7 @@
             "type": "array"
           },
           "nullableChild": {
-            "$ref": "#/components/schemas/ArbObject2",
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
             "example": null
           },
           "stringList": {
@@ -82,7 +82,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/ArbObject2"
+                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
                       }
                     ]
                   },
@@ -95,7 +95,7 @@
                   "type": "boolean"
                 },
                 {
-                  "$ref": "#/components/schemas/ArbObject2"
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2"
                 }
               ]
             },
@@ -178,7 +178,7 @@
       }
     },
     {
-      "first": "ArbObject2",
+      "first": "org.http4k.contract.openapi.v3.ArbObject2",
       "second": {
         "properties": {
           "uri": {

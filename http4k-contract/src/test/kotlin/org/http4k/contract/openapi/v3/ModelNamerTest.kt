@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test
 class ModelNamerTest {
     @Test
     fun `simple namer`() {
-        assertThat(ModelNamer.Simple("bob"), equalTo("String"))
+        assertThat(SchemaModelNamer.Simple("bob"), equalTo("String"))
     }
 
     @Test
     fun `full namer`() {
-        assertThat(ModelNamer.Full("bob"), equalTo("java.lang.String"))
+        assertThat(SchemaModelNamer.Full("bob"), equalTo("java.lang.String"))
     }
 }

@@ -55,7 +55,11 @@ data class MapHolder(val value: Map<Any, Any>)
 class AutoJsonToJsonSchemaTest {
     private val json = Jackson
 
-    private val creator = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
+    private val creator = AutoJsonToJsonSchema(json,
+        FieldRetrieval.compose(SimpleLookup, JacksonAnnotated),
+        SchemaModelNamer.Full,
+        "customPrefix"
+    )
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {

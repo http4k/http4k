@@ -16,8 +16,8 @@ import org.http4k.util.JsonSchemaCreator
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
     private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup),
-    private val refPrefix: String = "components/schemas",
-    private val modelNamer: ModelNamer = ModelNamer.Simple
+    private val modelNamer: SchemaModelNamer = SchemaModelNamer.Simple,
+    private val refPrefix: String = "components/schemas"
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {
@@ -103,12 +103,12 @@ class AutoJsonToJsonSchema<NODE : Any>(
     }
 }
 
-interface ModelNamer : (Any) -> String {
+interface SchemaModelNamer : (Any) -> String {
     companion object {
-        val Simple: ModelNamer = object : ModelNamer {
+        val Simple: SchemaModelNamer = object : SchemaModelNamer {
             override fun invoke(p1: Any) = p1.javaClass.simpleName
         }
-        val Full: ModelNamer = object : ModelNamer {
+        val Full: SchemaModelNamer = object : SchemaModelNamer {
             override fun invoke(p1: Any) = p1.javaClass.name
         }
     }

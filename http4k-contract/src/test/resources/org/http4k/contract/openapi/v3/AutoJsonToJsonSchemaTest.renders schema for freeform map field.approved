@@ -1,11 +1,11 @@
 {
   "node": {
-    "$ref": "#/components/schemas/MapHolder",
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
     "example": null
   },
   "definitions": [
     {
-      "first": "MapHolder",
+      "first": "org.http4k.contract.openapi.v3.MapHolder",
       "second": {
         "properties": {
           "value": {

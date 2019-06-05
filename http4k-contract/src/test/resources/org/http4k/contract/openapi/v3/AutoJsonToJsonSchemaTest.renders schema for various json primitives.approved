@@ -1,11 +1,11 @@
 {
   "node": {
-    "$ref": "#/components/schemas/JsonPrimitives",
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.JsonPrimitives",
     "example": null
   },
   "definitions": [
     {
-      "first": "JsonPrimitives",
+      "first": "org.http4k.contract.openapi.v3.JsonPrimitives",
       "second": {
         "properties": {
           "string": {

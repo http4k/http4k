@@ -1,11 +1,11 @@
 {
   "node": {
-    "$ref": "#/components/schemas/MapHolder",
+    "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.MapHolder",
     "example": null
   },
   "definitions": [
     {
-      "first": "MapHolder",
+      "first": "org.http4k.contract.openapi.v3.MapHolder",
       "second": {
         "properties": {
           "value": {
@@ -23,7 +23,7 @@
                   "additionalProperties": {
                     "properties": {
                       "inner": {
-                        "$ref": "#/components/schemas/ArbObject2",
+                        "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
                         "example": null
                       }
                     },
@@ -79,7 +79,7 @@
       }
     },
     {
-      "first": "ArbObject2",
+      "first": "org.http4k.contract.openapi.v3.ArbObject2",
       "second": {
         "properties": {
           "uri": {

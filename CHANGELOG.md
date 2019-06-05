@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.154.0
+- [http4k-contract] Add `SchemaModelNamer` to allow for custom JSON Schema model names.
+
 ### v3.153.0
 - [http4k-contract] OperationIds are generated without illegal characters `{}`.
 
