@@ -16,7 +16,8 @@ import org.http4k.util.JsonSchemaCreator
 class AutoJsonToJsonSchema<NODE : Any>(
     private val json: JsonLibAutoMarshallingJson<NODE>,
     private val fieldRetrieval: FieldRetrieval = FieldRetrieval.compose(SimpleLookup),
-    private val refPrefix: String = "components/schemas"
+    private val refPrefix: String = "components/schemas",
+    private val modelNamer: ModelNamer = ModelNamer.Simple
 ) : JsonSchemaCreator<Any, NODE> {
 
     override fun toSchema(obj: Any, overrideDefinitionId: String?): JsonSchema<NODE> {
@@ -71,8 +72,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { it.name() to it }.toMap()
 
         return SchemaNode.Reference(objName
-            ?: obj.javaClass.simpleName, "#/$refPrefix/${obj.javaClass.simpleName}",
-            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+            ?: modelNamer(obj), "#/$refPrefix/${modelNamer(obj)}",
+            SchemaNode.Object(modelNamer(obj), isNullable, properties, this))
     }
 
     private fun NODE.toMapSchema(objName: String?, obj: Map<*, *>, isNullable: Boolean): SchemaNode {
@@ -92,13 +93,24 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
             .map { it.name() to it }.toMap()
 
-        return SchemaNode.MapType(objName ?: obj.javaClass.simpleName, isNullable,
-            SchemaNode.Object(obj.javaClass.simpleName, isNullable, properties, this))
+        return SchemaNode.MapType(objName ?: modelNamer(obj), isNullable,
+            SchemaNode.Object(modelNamer(obj), isNullable, properties, this))
     }
 
     private fun toJsonKey(it: Any): String {
         data class MapKey(val keyAsString: Any)
         return json.textValueOf(json.asJsonObject(MapKey(it)), "keyAsString")!!
+    }
+}
+
+interface ModelNamer : (Any) -> String {
+    companion object {
+        val Simple: ModelNamer = object : ModelNamer {
+            override fun invoke(p1: Any) = p1.javaClass.simpleName
+        }
+        val Full: ModelNamer = object : ModelNamer {
+            override fun invoke(p1: Any) = p1.javaClass.name
+        }
     }
 }
 
