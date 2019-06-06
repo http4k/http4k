@@ -40,7 +40,7 @@ nav:
       - Server backend: guide/modules/servers/index.md
       - Serverless backend: guide/modules/serverless/index.md
       - Templating: guide/modules/templating/index.md
-      - Typesafe contracts: guide/modules/contracts/index.md
+      - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
       - OAuth: guide/modules/oauth/index.md
       - Cloud native: guide/modules/cloud_native/index.md
       - JSON RPC: guide/modules/jsonrpc/index.md
