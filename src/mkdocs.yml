@@ -31,9 +31,8 @@ nav:
     - Modules:
       - AWS: guide/modules/aws/index.md
       - Core: guide/modules/core/index.md
-      - Hamkrest: guide/modules/hamkrest/index.md
       - JSON handling: guide/modules/json/index.md
-      - HTTP/Websocket clients: guide/modules/clients/index.md
+      - HTTP & Websocket clients: guide/modules/clients/index.md
       - Metrics: guide/modules/metrics/index.md
       - Multipart forms: guide/modules/multipart/index.md
       - Resilience: guide/modules/resilience/index.md
@@ -46,6 +45,7 @@ nav:
       - JSON RPC: guide/modules/jsonrpc/index.md
       - XML handling: guide/modules/xml/index.md
       - Approval Testing: guide/modules/approvaltests/index.md
+      - Hamkrest: guide/modules/hamkrest/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
