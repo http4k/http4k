@@ -41,11 +41,11 @@ nav:
       - Templating: guide/modules/templating/index.md
       - Typesafe contracts (OpenAPI3): guide/modules/contracts/index.md
       - OAuth: guide/modules/oauth/index.md
-      - Cloud native: guide/modules/cloud_native/index.md
+      - Cloud native Configuration: guide/modules/cloud_native/index.md
       - JSON RPC: guide/modules/jsonrpc/index.md
       - XML handling: guide/modules/xml/index.md
-      - Approval Testing: guide/modules/approvaltests/index.md
       - Hamkrest: guide/modules/hamkrest/index.md
+      - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
