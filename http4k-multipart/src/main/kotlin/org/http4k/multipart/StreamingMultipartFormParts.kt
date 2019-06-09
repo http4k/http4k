@@ -4,7 +4,7 @@ import org.apache.commons.fileupload.util.ParameterParser
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
-import java.util.HashMap
+import java.util.TreeMap
 import java.util.NoSuchElementException
 
 /**
@@ -103,7 +103,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
     private fun parseHeaderLines(): Map<String, String> {
         if (MultipartFormStreamState.Header != state) throw IllegalStateException("Expected state ${MultipartFormStreamState.Header} but got $state")
 
-        val result = HashMap<String, String>()
+        val result = TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
         var previousHeaderName: String? = null
         val maxByteIndexForHeader = inputStream.currentByteIndex() + HEADER_SIZE_MAX
         while (inputStream.currentByteIndex() < maxByteIndexForHeader) {
