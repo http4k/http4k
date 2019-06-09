@@ -126,6 +126,12 @@ class UriTemplateTest {
         assertThat(from("/{something:.*}").matches("/foo/bar"), equalTo(true))
     }
 
+    @Test
+    fun doesNotMatchEmptyPathSegment(){
+        assertThat(from("/foo/{bar:.*}").matches("/foo/bar"), equalTo(true))
+        assertThat(from("/foo/{bar:.*}").matches("/foo"), equalTo(false))
+    }
+
     private fun pathParameters(vararg pairs: Pair<String, String>): Map<String, String> = mapOf(*pairs)
 
     private fun pair(v1: String, v2: String) = v1 to v2

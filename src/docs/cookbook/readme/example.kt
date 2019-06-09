@@ -21,8 +21,8 @@ fun main() {
     val app: HttpHandler = routes(
         "/ping" bind GET to { _: Request -> Response(OK).body("pong!") },
         "/greet/{name}" bind GET to { req: Request ->
-            val path: String? = req.path("name")
-            Response(OK).body("hello ${path ?: "anon!"}")
+            val path: String = req.path("name")!!
+            Response(OK).body("hello $path")
         }
     )
 
