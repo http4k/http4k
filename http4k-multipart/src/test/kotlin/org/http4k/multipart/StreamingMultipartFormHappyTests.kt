@@ -74,6 +74,21 @@ class StreamingMultipartFormHappyTests {
     }
 
     @Test
+    fun uploadFileWithLowercaseContentDisposition() {
+        val boundary = "-----2345"
+        val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
+            .part("File contents here".byteInputStream(),
+                  "content-disposition" to listOf("form-data" to null, "name" to "aFile", "filename" to "file.name"),
+                  "Content-Type" to listOf("application/octet-stream" to null)
+            )
+            .stream())
+
+        assertFilePart(form, "aFile", "file.name", "application/octet-stream", "File contents here")
+
+        assertThereAreNoMoreParts(form)
+    }
+
+    @Test
     fun uploadSmallFileAsAttachment() {
         val boundary = "-----4567"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
