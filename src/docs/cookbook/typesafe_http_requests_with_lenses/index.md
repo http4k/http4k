@@ -4,7 +4,8 @@ description: Recipes for using the inbuilt http4k Lens API to marshall HTTP mess
 Example showing how to create and apply lenses to requests and responses to both extract and inject typesafe values out of and into HTTP messages. Note that since the **http4k** `Request/Response` objects are immutable, all injection occurs via copy.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 

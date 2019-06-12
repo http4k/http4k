@@ -8,7 +8,8 @@ This [Heroku](http://http4k-data-class-gen.herokuapp.com/) app demonstrates how 
 This example show the usage of the `GenerateDataClasses` to generate Kotlin data class code for JSON messages from a remote endpoint. When used in conjunction with the "auto body-marshalling" functionality available with JSON libraries such as Jackson and GSON, this provides a super-fast way to integrate with upstream remote APIs in a typesafe way.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-format-gson", version: "3.154.1"
 ```

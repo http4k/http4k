@@ -14,7 +14,8 @@ Regardless of which of the above mechanisms are used, an instance of the `Server
 the shared bag of state for each request, and to remove the state after the request is complete.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 

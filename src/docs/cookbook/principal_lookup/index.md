@@ -3,7 +3,8 @@ description: Recipes for looking up and populating a user principal from a reque
 
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 

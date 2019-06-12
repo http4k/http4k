@@ -6,7 +6,8 @@ This example shows how to both how to serve an application HttpHandler using an 
 Alternatively, any http4k application can be mounted into any Servlet container using the `asServlet()` extension method. This is the mechanism used in the Jetty implementation.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-client-apache", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.154.1"

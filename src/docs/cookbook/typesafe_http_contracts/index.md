@@ -9,7 +9,8 @@ This contract example shows:
 - OpenApi v3 documentation - Run this example and point a browser [here](https://http4k.org/openapi3?url=http://localhost:8000/context/swagger.json)
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-contract", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-format-argo", version: "3.154.1"

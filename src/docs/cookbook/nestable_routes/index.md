@@ -12,7 +12,8 @@ This is a fairly comprehensive example of the core-routing logic available:
 - Serving of static content using a `Classpath` resource loader
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 

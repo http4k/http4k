@@ -2,7 +2,8 @@ title: http4k Websocket APIs
 description: Recipes for using http4k with websockets
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-client-websocket", version: "3.154.1"

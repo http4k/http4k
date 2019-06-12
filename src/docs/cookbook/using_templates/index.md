@@ -4,7 +4,8 @@ description: Recipes for using server-side templating engines with http4k applic
 Example showing how to use the Templating modules - in this case Handlebars, both by standard response manipulation and via a typesafe view lens.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
     implementation group: "org.http4k", name: "http4k-template-handlebars", version: "3.154.1"
 ```

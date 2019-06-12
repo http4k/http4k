@@ -4,7 +4,8 @@ description: Recipes for using http4k to consume HTTP services
 This example demonstrates using http4k as a client, to consume HTTP services. A client is just another HttpHandler.
 
 ### Gradle setup
-```
+
+```groovy
     implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 
