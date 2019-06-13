@@ -4,9 +4,8 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    compile Libs.hamkrest
+    api Libs.hamkrest
 
-    testCompile project(":http4k-format-jackson")
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-format-jackson")
+    testImplementation Config.TestDependencies
 }
-
