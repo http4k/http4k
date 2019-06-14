@@ -247,10 +247,10 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
     outputDirectory = "$buildDir/ddoc"
     outputFormat = "gfm"
     processConfigurations = []
+    jdkVersion = 9
 
     sourceDirs = files(subprojects.collect {
         p ->
-
             def path = new File(p.projectDir, "/src/main/kotlin")
 
             def relativePath = rootDir.toPath().relativize(path.toPath()).toString()
