@@ -4,10 +4,10 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    compile group: 'io.ktor', name: 'ktor-server-cio', version: '1.1.1'
+    api group: 'io.ktor', name: 'ktor-server-cio', version: '1.1.1'
 
-    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
-    testCompile Config.TestDependencies
+    testImplementation project(":http4k-client-apache")
+    testImplementation project(":http4k-testing-hamkrest")
+    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
+    testImplementation Config.TestDependencies
 }
-
-

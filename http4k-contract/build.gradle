@@ -6,13 +6,15 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
     provided project(":http4k-format-jackson")
-    compile Libs.kotlin_reflect
 
-    testCompile project(":http4k-format-jackson")
-    testCompile project(":http4k-format-argo")
-    testCompile project(":http4k-testing-approval")
-    testCompile project(path: ":http4k-core", configuration: "testArtifacts")
-    testCompile Config.TestDependencies
+    api Libs.kotlin_reflect
+
+    testImplementation project(":http4k-format-jackson")
+    testImplementation project(":http4k-format-argo")
+    testImplementation project(":http4k-testing-approval")
+    testImplementation project(":http4k-testing-hamkrest")
+    testImplementation project(path: ":http4k-core", configuration: "testArtifacts")
+    testImplementation Config.TestDependencies
 }
 
 task generateOpenApi3AutoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
