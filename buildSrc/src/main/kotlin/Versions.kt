@@ -5,9 +5,11 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val jackson_dataformat_xml: String = "2.9.9"
+    const val jackson_dataformat_xml_major_minor: String = "2.9"
+    const val jackson_dataformat_xml: String = "$jackson_dataformat_xml_major_minor.9"
 
-    const val com_fasterxml_jackson_module: String = "2.9.9"
+    const val com_fasterxml_jackson_module_major_minor: String = "2.9"
+    const val com_fasterxml_jackson_module: String = "$com_fasterxml_jackson_module_major_minor.9"
 
     const val underscore: String = "1.44"
 
@@ -23,9 +25,11 @@ object Versions {
 
     const val result4k: String = "2.0.0"
 
-    const val com_squareup_moshi: String = "1.8.0"
+    const val com_squareup_moshi_major: String = "1"
+    const val com_squareup_moshi: String = "$com_squareup_moshi_major.8.0"
 
-    const val okhttp: String = "3.14.1"
+    const val okhttp_major: String = "3"
+    const val okhttp: String = "$okhttp_major.14.1"
 
     const val io_github_resilience4j: String = "0.15.0"
 
@@ -33,11 +37,13 @@ object Versions {
 
     const val micrometer_core: String = "1.1.4"
 
-    const val netty_codec_http2: String = "4.1.36.Final"
+    const val netty_codec_http2_major_minor = "4.1"
+    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.36.Final"
 
     const val pebble: String = "3.0.9"
 
-    const val io_undertow: String = "2.0.20.Final"
+    const val io_undertow_major_minor: String = "2.0"
+    const val io_undertow: String = "$io_undertow_major_minor.20.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 

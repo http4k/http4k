@@ -247,10 +247,67 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
     outputDirectory = "$buildDir/ddoc"
     outputFormat = "gfm"
     processConfigurations = []
+    jdkVersion = 9
+
+    externalDocumentationLink {
+        // No version, apache does not seem to keep old versions of javadoc around
+        url = new URL("https://hc.apache.org/httpcomponents-asyncclient-ga/httpasyncclient/apidocs/")
+    }
+    externalDocumentationLink {
+        // No version, apache does not seem to keep old versions of javadoc around
+        url = new URL("https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/")
+    }
+    externalDocumentationLink {
+        // No version, apache does not seem to keep old versions of javadoc around
+        url = new URL("https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/")
+    }
+    externalDocumentationLink {
+        def version = Versions.okhttp_major
+        url = new URL("https://square.github.io/okhttp/${version}.x/okhttp/")
+    }
+    externalDocumentationLink {
+        // No version, argo does not seem to keep old versions of javadoc around
+        url = new URL("http://argo.sourceforge.net/javadoc/")
+    }
+    externalDocumentationLink {
+        def version = Versions.jackson_dataformat_xml_major_minor
+        url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
+    }
+    externalDocumentationLink {
+        def version = Versions.com_fasterxml_jackson_module_major_minor
+        url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
+    }
+    externalDocumentationLink {
+        def version = Versions.com_squareup_moshi_major
+        url = new URL("http://square.github.io/moshi/${version}.x/moshi/")
+    }
+    externalDocumentationLink {
+        def version = Versions.io_undertow_major_minor
+        url = new URL("http://undertow.io/javadoc/${version}.x/")
+    }
+    externalDocumentationLink {
+        def version = Versions.netty_codec_http2_major_minor
+        url = new URL("https://netty.io/$version/api/")
+    }
+    externalDocumentationLink {
+        // No version, this was the latest linkable javadoc I could find for javax servlet api
+        url = new URL("https://javaee.github.io/javaee-spec/javadocs/")
+    }
+    externalDocumentationLink {
+        def version = Versions.org_junit_jupiter
+        url = new URL("https://junit.org/junit5/docs/$version/api/")
+    }
+    externalDocumentationLink {
+        // No version, selenium does not seem to keep old versions of javadoc around
+        url = new URL("https://seleniumhq.github.io/selenium/docs/api/java/")
+    }
+    externalDocumentationLink {
+        // No version, jsoup does not seem to keep old versions of javadoc around
+        url = new URL("https://jsoup.org/apidocs/")
+    }
 
     sourceDirs = files(subprojects.collect {
         p ->
-
             def path = new File(p.projectDir, "/src/main/kotlin")
 
             def relativePath = rootDir.toPath().relativize(path.toPath()).toString()
