@@ -2,13 +2,30 @@ title: http4k JSON Message Format Modules
 description: Feature overview of the JSON http4k-format modules, several of which support automarshalling into data classes.
 
 ### Installation (Gradle)
-**Argo:**  ```compile group: "org.http4k", name: "http4k-format-argo", version: "3.154.1"```
 
-**Gson:**  ```compile group: "org.http4k", name: "http4k-format-gson", version: "3.154.1"```
+**Argo:**
 
-**Jackson:** ```compile group: "org.http4k", name: "http4k-format-jackson", version: "3.154.1"```
+```groovy
+implementation group: "org.http4k", name: "http4k-format-argo", version: "3.154.1"
+```
 
-**Moshi:** ```compile group: "org.http4k", name: "http4k-format-moshi", version: "3.154.1"```
+**Gson:**
+
+```groovy
+implementation group: "org.http4k", name: "http4k-format-gson", version: "3.154.1"
+```
+
+**Jackson:**
+
+```groovy
+implementation group: "org.http4k", name: "http4k-format-jackson", version: "3.154.1"
+```
+
+**Moshi:**
+
+```groovy
+implementation group: "org.http4k", name: "http4k-format-moshi", version: "3.154.1"
+```
 
 ### About
 These modules add the ability to use JSON as a first-class citizen when reading from and to HTTP messages. Each 

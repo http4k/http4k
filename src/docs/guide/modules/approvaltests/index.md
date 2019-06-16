@@ -2,7 +2,10 @@ title: http4k Approval Testing Module
 description: Feature overview of the http4k-testing-approval module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-approval", version: "3.154.1"```
+
+```groovy
+implementation group: "org.http4k", name: "http4k-testing-approval", version: "3.154.1"
+```
 
 ### About
 [Approval testing](http://approvaltests.com/) is a form of testing which allows the expected output of 

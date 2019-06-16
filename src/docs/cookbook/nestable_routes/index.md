@@ -12,8 +12,9 @@ This is a fairly comprehensive example of the core-routing logic available:
 - Serving of static content using a `Classpath` resource loader
 
 ### Gradle setup
-```
-    compile group: "org.http4k", name: "http4k-core", version: "3.154.1"
+
+```groovy
+    implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/nestable_routes/example.kt)
