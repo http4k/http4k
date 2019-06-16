@@ -266,15 +266,15 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         url = new URL("http://argo.sourceforge.net/javadoc/")
     }
     externalDocumentationLink {
-        def version = Versions.jackson_dataformat_xml_major_minor
+        def version = Versions.jackson_major_minor
         url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
     }
     externalDocumentationLink {
-        def version = Versions.com_fasterxml_jackson_module_major_minor
+        def version = Versions.jackson_major_minor
         url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
     }
     externalDocumentationLink {
-        def version = Versions.com_squareup_moshi_major
+        def version = Versions.moshi_major_minor
         url = new URL("http://square.github.io/moshi/${version}.x/moshi/")
     }
     externalDocumentationLink {
