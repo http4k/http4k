@@ -5,17 +5,15 @@
  *
  * YOU are responsible for updating manually the dependency version. */
 object Versions {
-    const val jackson_dataformat_xml_major_minor: String = "2.9"
-    const val jackson_dataformat_xml: String = "$jackson_dataformat_xml_major_minor.9"
+    const val jackson_dataformat_xml: String = "2.9.9"
 
-    const val com_fasterxml_jackson_module_major_minor: String = "2.9"
-    const val com_fasterxml_jackson_module: String = "$com_fasterxml_jackson_module_major_minor.9"
+    const val jackson_module_kotlin: String = "2.9.9"
 
-    const val underscore: String = "1.44"
+    const val underscore: String = "1.45"
 
     const val handlebars: String = "4.1.2"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.2"
+    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.4"
 
     const val gson: String = "2.8.5"
 
@@ -25,25 +23,21 @@ object Versions {
 
     const val result4k: String = "2.0.0"
 
-    const val com_squareup_moshi_major: String = "1"
-    const val com_squareup_moshi: String = "$com_squareup_moshi_major.8.0"
+    const val com_squareup_moshi: String = "1.8.0"
 
-    const val okhttp_major: String = "3"
-    const val okhttp: String = "$okhttp_major.14.1"
+    const val okhttp: String = "3.14.2"
 
-    const val io_github_resilience4j: String = "0.15.0"
+    const val io_github_resilience4j: String = "0.16.0"
 
-    const val ktor_server_cio: String = "1.2.0"
+    const val ktor_server_cio: String = "1.2.1"
 
     const val micrometer_core: String = "1.1.4"
 
-    const val netty_codec_http2_major_minor = "4.1"
-    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.36.Final"
+    const val netty_codec_http2: String = "4.1.36.Final"
 
-    const val pebble: String = "3.0.9"
+    const val pebble: String = "3.0.10"
 
-    const val io_undertow_major_minor: String = "2.0"
-    const val io_undertow: String = "$io_undertow_major_minor.20.Final"
+    const val io_undertow: String = "2.0.21.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -63,15 +57,15 @@ object Versions {
 
     const val httpasyncclient: String = "4.1.4"
 
-    const val httpclient: String = "4.5.8"
+    const val httpclient: String = "4.5.9"
 
     const val httpcore: String = "4.4.11"
 
-    const val http2_server: String = "9.4.18.v20190429"
+    const val http2_server: String = "9.4.19.v20190610"
 
-    const val javax_websocket_server_impl: String = "9.4.18.v20190429"
+    const val javax_websocket_server_impl: String = "9.4.19.v20190610"
 
-    const val org_eclipse_jetty: String = "9.4.18.v20190429"
+    const val org_eclipse_jetty: String = "9.4.19.v20190610"
 
     const val freemarker: String = "2.3.28"
 
@@ -87,11 +81,11 @@ object Versions {
 
     const val org_junit_jupiter: String = "5.4.2"
 
-    const val coveralls_gradle_plugin: String = "2.8.2"
+    const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val openapi_generator_gradle_plugin: String = "4.0.0"
+    const val openapi_generator_gradle_plugin: String = "4.0.1"
 
     const val selenium_api: String = "3.141.59"
 
@@ -107,8 +101,8 @@ object Versions {
 
         const val currentVersion: String = "5.4.1"
 
-        const val nightlyVersion: String = "5.6-20190519000207+0000"
+        const val nightlyVersion: String = "5.6-20190616000028+0000"
 
-        const val releaseCandidate: String = ""
+        const val releaseCandidate: String = "5.5-rc-3"
     }
 }

@@ -11,14 +11,9 @@ object Libs {
         "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:" + Versions.jackson_dataformat_xml
 
     /**
-     * [jackson-module-jsonSchema website](https://github.com/FasterXML/jackson-module-jsonSchema) */
-    const val jackson_module_jsonschema: String =
-        "com.fasterxml.jackson.module:jackson-module-jsonSchema:" + Versions.com_fasterxml_jackson_module
-
-    /**
      * [jackson-module-kotlin website](https://github.com/FasterXML/jackson-module-kotlin) */
     const val jackson_module_kotlin: String =
-        "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.com_fasterxml_jackson_module
+        "com.fasterxml.jackson.module:jackson-module-kotlin:" + Versions.jackson_module_kotlin
 
     /**
      * [underscore website](https://github.com/javadev/underscore-java) */
@@ -225,7 +220,7 @@ object Libs {
             "org.junit.jupiter:junit-jupiter-engine:" + Versions.org_junit_jupiter
 
     /**
-     * [coveralls-gradle-plugin website](https://github.com/kt3k/coveralls-gradle-plugin) */
+     * [coveralls-gradle-plugin website](http://github.com/kt3k/coveralls-gradle-plugin/) */
     const val coveralls_gradle_plugin: String =
             "org.kt3k.gradle.plugin:coveralls-gradle-plugin:" + Versions.coveralls_gradle_plugin
 

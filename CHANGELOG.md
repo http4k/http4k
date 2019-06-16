@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.155.0 (uncut)
+- Update deps.
+- Dokka improvements - use JDK 9 - mitigate #196. H/T @ivoanjo
+
 ### v3.154.1
 - [http4k-multipart] Made the multipart header parser case-insensitive. H/T @tenniscp25
 
