@@ -4,7 +4,7 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    api group: 'io.ktor', name: 'ktor-server-cio', version: '1.1.1'
+    api Libs.ktor_server_cio
 
     testImplementation project(":http4k-client-apache")
     testImplementation project(":http4k-testing-hamkrest")

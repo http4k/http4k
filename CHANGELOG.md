@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.155.0 (uncut)
 - Update deps.
-- Dokka improvements - use JDK 9 - mitigate #196. H/T @ivoanjo
+- Dokka improvements - use JDK 9 - mitigates #196. H/T @ivoanjo
+- Convert Gradle files to new style. H/T @ivoanjo
 
 ### v3.154.1
 - [http4k-multipart] Made the multipart header parser case-insensitive. H/T @tenniscp25
