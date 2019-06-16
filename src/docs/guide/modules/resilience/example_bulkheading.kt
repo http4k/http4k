@@ -8,6 +8,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
+import java.time.Duration
 import kotlin.concurrent.thread
 
 fun main() {
@@ -15,7 +16,7 @@ fun main() {
     // configure the Bulkhead filter here
     val config = BulkheadConfig.custom()
         .maxConcurrentCalls(5)
-        .maxWaitTime(0)
+        .maxWaitTimeDuration(Duration.ofMillis(1000))
         .build()
 
     val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
