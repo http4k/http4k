@@ -274,7 +274,7 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
     }
     externalDocumentationLink {
-        def version = Versions.moshi_major_minor
+        def version = Versions.moshi_major
         url = new URL("http://square.github.io/moshi/${version}.x/moshi/")
     }
     externalDocumentationLink {

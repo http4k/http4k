@@ -25,8 +25,8 @@ object Versions {
 
     const val result4k: String = "2.0.0"
 
-    const val moshi_major_minor: String = "1.8"
-    const val com_squareup_moshi: String = "$moshi_major_minor.0"
+    const val moshi_major: String = "1"
+    const val com_squareup_moshi: String = "$moshi_major.8.0"
 
     const val okhttp_major: String = "3"
     const val okhttp: String = "$okhttp_major.14.2"
