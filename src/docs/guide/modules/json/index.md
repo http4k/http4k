@@ -6,25 +6,25 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 **Argo:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-argo", version: "3.155.1"
+implementation group: "org.http4k", name: "http4k-format-argo", version: "3.155.2"
 ```
 
 **Gson:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-gson", version: "3.155.1"
+implementation group: "org.http4k", name: "http4k-format-gson", version: "3.155.2"
 ```
 
 **Jackson:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-jackson", version: "3.155.1"
+implementation group: "org.http4k", name: "http4k-format-jackson", version: "3.155.2"
 ```
 
 **Moshi:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-format-moshi", version: "3.155.1"
+implementation group: "org.http4k", name: "http4k-format-moshi", version: "3.155.2"
 ```
 
 ### About
