@@ -4,9 +4,9 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    implementation project(":http4k-contract")
-    implementation project(":http4k-format-jackson")
-    implementation project(":http4k-testing-hamkrest")
+    compile project(":http4k-contract")
+    compile project(":http4k-format-jackson")
+    compile project(":http4k-testing-hamkrest")
 
-    testImplementation Config.TestDependencies
+    testCompile Config.TestDependencies
 }

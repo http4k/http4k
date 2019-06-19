@@ -4,12 +4,12 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    implementation Libs.resilience4j_bulkhead
-    implementation Libs.resilience4j_circuitbreaker
-    implementation Libs.resilience4j_ratelimiter
-    implementation Libs.resilience4j_retry
+    compile Libs.resilience4j_bulkhead
+    compile Libs.resilience4j_circuitbreaker
+    compile Libs.resilience4j_ratelimiter
+    compile Libs.resilience4j_retry
 
-    testImplementation project(":http4k-testing-hamkrest")
-    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
-    testImplementation Config.TestDependencies
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile Config.TestDependencies
 }
+

@@ -4,19 +4,17 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    implementation Libs.jetty_server
-    implementation Libs.jetty_servlet
-    implementation Libs.javax_websocket_server_impl
-    implementation Libs.javax_servlet_api
+    compile Libs.jetty_server
+    compile Libs.jetty_servlet
+    compile Libs.javax_websocket_server_impl
+    compile Libs.javax_servlet_api
 
     // this list is for reference since http2 support is optional
     provided Libs.http2_server
     provided Libs.jetty_alpn_conscrypt_server
     provided Libs.alpn_boot
 
-    testImplementation project(":http4k-client-apache")
-    testImplementation project(":http4k-client-websocket")
-    testImplementation project(":http4k-testing-hamkrest")
-    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
-    testImplementation Config.TestDependencies
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile Config.TestDependencies
 }
+

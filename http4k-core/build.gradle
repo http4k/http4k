@@ -4,9 +4,10 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided Libs.javax_servlet_api
 
-    testImplementation Config.TestDependencies
-    testImplementation project(":http4k-client-apache")
-    testImplementation project(":http4k-client-websocket")
-    testImplementation project(":http4k-testing-hamkrest")
-    testImplementation project(":http4k-server-jetty")
+    testCompile Config.TestDependencies
+    testCompile project(":http4k-client-apache")
+    testCompile project(":http4k-client-websocket")
+    testCompile project(":http4k-testing-hamkrest")
+    testCompile project(":http4k-server-jetty")
 }
+

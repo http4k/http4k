@@ -4,12 +4,11 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    implementation Libs.jackson_module_kotlin
-    implementation Libs.jackson_dataformat_xml
+    compile Libs.jackson_module_kotlin
+    compile Libs.jackson_dataformat_xml
 
-    testImplementation project(":http4k-testing-hamkrest")
-    testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')
-    testImplementation project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
-    testImplementation project(":http4k-testing-approval")
-    testImplementation Config.TestDependencies
+    testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
+    testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
+    testCompile project(":http4k-testing-approval")
+    testCompile Config.TestDependencies
 }

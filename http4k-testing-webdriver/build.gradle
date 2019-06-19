@@ -4,8 +4,9 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    implementation Libs.selenium_api
-    implementation Libs.jsoup
+    compile Libs.selenium_api
+    compile Libs.jsoup
 
-    testImplementation Config.TestDependencies
+    testCompile Config.TestDependencies
 }
+

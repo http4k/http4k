@@ -226,7 +226,7 @@ dependencies {
     provided project(":http4k-testing-hamkrest")
     provided project(":http4k-testing-webdriver")
 
-    testImplementation Config.TestDependencies
+    testCompile Config.TestDependencies
 }
 
 sourceSets {
