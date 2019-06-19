@@ -13,7 +13,7 @@ import org.http4k.security.openid.RequestJwts
  * Provides a configured set of objects for use with an OAuth2 provider.
  */
 class OAuthProvider(
-    private val providerConfig: OAuthProviderConfig,
+    val providerConfig: OAuthProviderConfig,
     client: HttpHandler,
     private val callbackUri: Uri,
     private val scopes: List<String>,

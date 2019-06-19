@@ -35,7 +35,7 @@ object Versions {
 
     const val ktor_server_cio: String = "1.2.1"
 
-    const val micrometer_core: String = "1.1.4"
+    const val micrometer_core: String = "1.1.5"
 
     const val netty_codec_http2_major_minor = "4.1"
     const val netty_codec_http2: String = "$netty_codec_http2_major_minor.36.Final"
@@ -43,7 +43,7 @@ object Versions {
     const val pebble: String = "3.0.10"
 
     const val io_undertow_major_minor: String = "2.0"
-    const val io_undertow: String = "$io_undertow_major_minor.21.Final"
+    const val io_undertow: String = "$io_undertow_major_minor.22.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 
