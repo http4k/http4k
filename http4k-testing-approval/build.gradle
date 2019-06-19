@@ -6,7 +6,7 @@ dependencies {
     provided Libs.junit_jupiter_api
     provided Libs.hamkrest
 
-    api Libs.underscore
+    implementation Libs.underscore
 
     testImplementation project(":http4k-testing-hamkrest")
     testImplementation Config.TestDependencies

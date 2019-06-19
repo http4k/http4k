@@ -4,7 +4,7 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    api Libs.netty_codec_http2
+    implementation Libs.netty_codec_http2
 
     testImplementation project(":http4k-client-apache")
     testImplementation project(":http4k-testing-hamkrest")

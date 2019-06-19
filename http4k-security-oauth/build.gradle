@@ -5,7 +5,7 @@ dependencies {
     provided project(":http4k-core")
     provided project(":http4k-format-jackson")
 
-    api Libs.result4k
+    implementation Libs.result4k
 
     testImplementation project(":http4k-testing-hamkrest")
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')

@@ -7,7 +7,7 @@ dependencies {
     provided project(":http4k-core")
     provided project(":http4k-format-jackson")
 
-    api Libs.kotlin_reflect
+    implementation Libs.kotlin_reflect
 
     testImplementation project(":http4k-format-jackson")
     testImplementation project(":http4k-format-argo")

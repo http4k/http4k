@@ -4,8 +4,8 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    api Libs.jackson_module_kotlin
-    api Libs.jackson_dataformat_xml
+    implementation Libs.jackson_module_kotlin
+    implementation Libs.jackson_dataformat_xml
 
     testImplementation project(":http4k-testing-hamkrest")
     testImplementation project(path: ":http4k-core", configuration: 'testArtifacts')

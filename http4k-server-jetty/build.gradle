@@ -4,10 +4,10 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    api Libs.jetty_server
-    api Libs.jetty_servlet
-    api Libs.javax_websocket_server_impl
-    api Libs.javax_servlet_api
+    implementation Libs.jetty_server
+    implementation Libs.jetty_servlet
+    implementation Libs.javax_websocket_server_impl
+    implementation Libs.javax_servlet_api
 
     // this list is for reference since http2 support is optional
     provided Libs.http2_server
