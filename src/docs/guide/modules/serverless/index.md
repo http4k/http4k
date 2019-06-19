@@ -4,7 +4,7 @@ description: Feature overview of the http4k-serverless modules, covering Serverl
 ### Installation (Gradle)
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-serverless-lambda", version: "3.155.0"
 ```
 
 ### About

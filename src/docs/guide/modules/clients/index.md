@@ -6,37 +6,37 @@ description: Feature overview of the http4k-client modules
 **Java (for development only):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-core", version: "3.155.0"
 ```
 
 **Apache (Sync):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-client-apache", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-client-apache", version: "3.155.0"
 ```
 
 **Apache (Async):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-client-apache-async", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-client-apache-async", version: "3.155.0"
 ```
 
 **Jetty (Sync + Async):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-client-jetty", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-client-jetty", version: "3.155.0"
 ```
 
 **OkHttp (Sync + Async):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.155.0"
 ```
 
 **Websocket:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-client-websocket", version: "3.154.1"
+implementation group: "org.http4k", name: "http4k-client-websocket", version: "3.155.0"
 ```
 
 ### HTTP
