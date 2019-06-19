@@ -6,37 +6,37 @@ description: Feature overview of the http4k-server modules, covering Server back
 **Apache:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-server-apache", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-server-apache", version: "3.155.1"
 ```
 
 **Jetty:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.155.1"
 ```
 
 **Ktor CIO:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-server-ktorcio", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-server-ktorcio", version: "3.155.1"
 ```
 
 **Netty:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-server-netty", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-server-netty", version: "3.155.1"
 ```
 
 **Undertow:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-server-undertow", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-server-undertow", version: "3.155.1"
 ```
 
 **SunHttp (for development only):**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-core", version: "3.155.1"
 ```
 
 ### About

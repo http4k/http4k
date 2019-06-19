@@ -6,31 +6,31 @@ description: Feature overview of the http4k-templating modules
 **Dust:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-template-dust", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-template-dust", version: "3.155.1"
 ```
 
 **Freemarker:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-template-freemarker", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-template-freemarker", version: "3.155.1"
 ```
 
 **Handlebars:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-template-handlebars", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-template-handlebars", version: "3.155.1"
 ```
 
 **Pebble:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-template-pebble", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-template-pebble", version: "3.155.1"
 ```
 
 **Thymeleaf:**
 
 ```groovy
-implementation group: "org.http4k", name: "http4k-template-thymeleaf", version: "3.155.0"
+implementation group: "org.http4k", name: "http4k-template-thymeleaf", version: "3.155.1"
 ```
 
 ### About
