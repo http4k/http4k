@@ -8,9 +8,9 @@ This simple example demonstates how to serve and consume HTTP services using **h
 To install, add these dependencies to your **Gradle** file:
 ```groovy
 dependencies {
-    implementation group: "org.http4k", name: "http4k-core", version: "3.155.2"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.155.2"
-    implementation group: "org.http4k", name: "http4k-client-apache", version: "3.155.2"
+    compile group: "org.http4k", name: "http4k-core", version: "3.154.1"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.154.1"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "3.154.1"
 }
 ```
 

@@ -2,10 +2,7 @@ title: http4k Core Module
 description: Feature overview of the http4k-core module, including the Lens system for typesafe HTTP
 
 ### Installation (Gradle)
-
-```groovy
-implementation group: "org.http4k", name: "http4k-core", version: "3.155.2"
-```
+```compile group: "org.http4k", name: "http4k-core", version: "3.154.1"```
 
 ### About
 Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the following:

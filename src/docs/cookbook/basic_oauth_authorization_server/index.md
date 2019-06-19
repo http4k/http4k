@@ -2,10 +2,9 @@ title: http4k Custom OAuth Authorization Server
 description: Recipe for using http4k to create an authorization server that provides an *authorization code* access flow
 
 ### Gradle setup
-
-```groovy
-    implementation group: "org.http4k", name: "http4k-core", version: "3.155.2"
-    implementation group: "org.http4k", name: "http4k-security-oauth", version: "3.155.2"
+```
+    compile group: "org.http4k", name: "http4k-core", version: "3.154.1"
+    compile group: "org.http4k", name: "http4k-security-oauth", version: "3.154.1"
 ```
 
 For this example, you need to configure `OAuthServer` instance with the correct implementations of your login pages, generation of authentication codes and access tokens.

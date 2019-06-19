@@ -2,10 +2,7 @@ title: http4k Metrics Modules
 description: Feature overview of the http4k-metrics modules
 
 ### Installation (Gradle)
-
-```groovy
-implementation group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.155.2"
-```
+```compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.154.1"```
 
 ### About
 

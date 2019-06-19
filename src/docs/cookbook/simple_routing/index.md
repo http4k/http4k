@@ -4,9 +4,8 @@ description: Recipes for using the http4k composable routing API
 This example shows how to use the simple routing functionality to bind several routes
 
 ### Gradle setup
-
-```groovy
-    implementation group: "org.http4k", name: "http4k-core", version: "3.155.2"
+```
+    compile group: "org.http4k", name: "http4k-core", version: "3.154.1"
 ```
 
 ### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/simple_routing/example.kt)

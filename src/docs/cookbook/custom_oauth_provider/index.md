@@ -4,10 +4,9 @@ description: Recipe for using http4k with custom OAuth provider
 It is very easy to configure http4k to integrate with any OAuth2 provider who supports the Authorisation Code Grant.
 
 ### Gradle setup
-
-```groovy
-    implementation group: "org.http4k", name: "http4k-core", version: "3.155.2"
-    implementation group: "org.http4k", name: "http4k-security-oauth", version: "3.155.2"
+```
+    compile group: "org.http4k", name: "http4k-core", version: "3.154.1"
+    compile group: "org.http4k", name: "http4k-security-oauth", version: "3.154.1"
 ```
 
 For this example, simply reconfigure the `OAuthProvider` instance with the correct details, and provide custom logic for persisting and retrieving the CSRF and AccessToken.

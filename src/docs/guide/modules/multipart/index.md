@@ -2,10 +2,7 @@ title: http4k Multipart Module
 description: Feature overview of the http4k-multipart form module
 
 ### Installation (Gradle)
-
-```groovy
-implementation group: "org.http4k", name: "http4k-multipart", version: "3.155.2"
-```
+```compile group: "org.http4k", name: "http4k-multipart", version: "3.154.1"```
 
 ### About
 
