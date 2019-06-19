@@ -6,7 +6,6 @@ changes with their rationale when appropriate:
 ### v3.155.2
 - Update deps.
 - Dokka improvements. Does not mitigate #196 as we run the main build on OpenJdk11. H/T @ivoanjo
-- Convert Gradle files to new style. H/T @ivoanjo
 
 ### v3.155.1
 - DO NOT USE - broken
