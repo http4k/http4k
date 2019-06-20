@@ -51,7 +51,7 @@ fun main() {
 }
 
 // this interface allows us to provide custom logic for storing and verifying the CSRF and AccessTokens.
-// to be maximally secuire, never let the end-user see the access token!
+// to be maximally secure, never let the end-user see the access token!
 class CustomOAuthPersistence : OAuthPersistence {
     var csrf: CrossSiteRequestForgeryToken? = null
     var accessToken: AccessTokenContainer? = null

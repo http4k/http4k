@@ -6,6 +6,7 @@ import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.NoSecurity
+import org.http4k.contract.security.OAuthSecurity
 import org.http4k.contract.security.Security
 
 object OpenApi3SecurityRenderer : SecurityRenderer {
@@ -36,6 +37,19 @@ object OpenApi3SecurityRenderer : SecurityRenderer {
                     ))
                 }
             }
+            is OAuthSecurity -> {
+                {
+                    obj(security.name to obj(
+                        "type" to string("oauth2"),
+                        "flows" to obj("authorizationCode" to obj(
+                            "authorizationUrl" to string(security.authorizationUrl.toString()),
+                            "tokenUrl" to string(security.tokenUrl.toString()),
+                            "scopes" to obj(security.scopes.map { it.name to string(it.description) })
+                        ))
+                    ))
+                }
+            }
+
             is NoSecurity -> {
                 {
                     nullNode()
@@ -54,6 +68,9 @@ object OpenApi3SecurityRenderer : SecurityRenderer {
             }
             is BearerAuthSecurity -> {
                 { obj(security.name to array(emptyList())) }
+            }
+            is OAuthSecurity -> {
+                { obj(security.name to array(security.scopes.map { string(it.name) })) }
             }
             else -> null
         }

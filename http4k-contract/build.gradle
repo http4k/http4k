@@ -6,12 +6,14 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
     provided project(":http4k-format-jackson")
+    provided project(":http4k-security-oauth")
     compile Libs.kotlin_reflect
 
     testCompile project(":http4k-format-jackson")
     testCompile project(":http4k-format-argo")
     testCompile project(":http4k-testing-approval")
     testCompile project(path: ":http4k-core", configuration: "testArtifacts")
+    testCompile project(path: ":http4k-security-oauth", configuration: "testArtifacts")
     testCompile Config.TestDependencies
 }
 

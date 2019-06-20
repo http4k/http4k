@@ -61,7 +61,7 @@ fun http2(http2Port: Int, keystorePath: String, keystorePassword: String): Conne
     { server: Server ->
         ServerConnector(server,
             SslConnectionFactory(
-                SslContextFactory().apply {
+                SslContextFactory.Server().apply {
                     keyStorePath = keystorePath
                     setKeyStorePassword(keystorePassword)
                     cipherComparator = COMPARATOR

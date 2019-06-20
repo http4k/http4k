@@ -16,6 +16,30 @@
     }
   ],
   "paths": {
+    "/basepath/basic_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBasic_auth"
+      }
+    },
     "/basepath/bearer_auth": {
       "post": {
         "summary": "<unknown>",
@@ -405,30 +429,6 @@
         "operationId": "echoMessage"
       }
     },
-    "/basepath/extra_security": {
-      "post": {
-        "summary": "<unknown>",
-        "description": null,
-        "tags": [
-          "/basepath"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-        },
-        "security": [
-          {
-            "basicAuth": [
-            ]
-          },
-          {
-            "api_key": [
-            ]
-          }
-        ],
-        "operationId": "postBasepathExtra_security"
-      }
-    },
     "/basepath/headers": {
       "post": {
         "summary": "<unknown>",
@@ -503,6 +503,31 @@
           }
         ],
         "operationId": "getBasepathNometa"
+      }
+    },
+    "/basepath/oauth2_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "oauthSecurity": [
+              "user"
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathOauth2_auth"
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
@@ -722,6 +747,18 @@
       "basicAuth": {
         "scheme": "basic",
         "type": "http"
+      },
+      "oauthSecurity": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://github.com/login/oauth/authorize",
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "scopes": {
+              "user": ""
+            }
+          }
+        }
       },
       "bearerAuth": {
         "scheme": "bearer",
