@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.OAuthSecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -39,6 +40,9 @@ import org.http4k.lens.int
 import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
+import org.http4k.security.FakeOAuthPersistence
+import org.http4k.security.OAuthProvider
+import org.http4k.security.gitHub
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -112,8 +116,14 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     array(obj("aNumberField" to number(123)))
                 })
             } bindContract POST to { Response(OK) }
-            routes += "/extra_security" meta {
-                security = BasicAuthSecurity("realm", Credentials("user", "password"))
+            routes += "/basic_auth" meta {
+                security = BasicAuthSecurity("realm", credentials)
+            } bindContract POST to { Response(OK) }
+            routes += "/oauth2_auth" meta {
+                security = OAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
+                    credentials,
+                    Uri.of("http://localhost/callback"),
+                    FakeOAuthPersistence()))
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
                 receiving(Body.webForm(Validator.Strict,
@@ -155,6 +165,8 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 }
+
+private val credentials = Credentials("user", "password")
 
 enum class Foo {
     bar, bing

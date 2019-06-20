@@ -15,6 +15,38 @@
     }
   ],
   "paths": {
+    "/basepath/basic_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBasic_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/bearer_auth": {
       "post": {
         "tags": [
@@ -427,38 +459,6 @@
         "description": "some rambling description of what this thing actually does"
       }
     },
-    "/basepath/extra_security": {
-      "post": {
-        "tags": [
-          "/basepath"
-        ],
-        "summary": "<unknown>",
-        "operationId": "postBasepathExtra_security",
-        "produces": [
-        ],
-        "consumes": [
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-            }
-          }
-        },
-        "security": [
-          {
-            "basicAuth": [
-            ]
-          },
-          {
-            "api_key": [
-            ]
-          }
-        ]
-      }
-    },
     "/basepath/headers": {
       "post": {
         "tags": [
@@ -522,6 +522,34 @@
         ],
         "summary": "<unknown>",
         "operationId": "getBasepathNometa",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/oauth2_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathOauth2_auth",
         "produces": [
         ],
         "consumes": [

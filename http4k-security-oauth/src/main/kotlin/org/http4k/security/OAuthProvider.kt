@@ -16,7 +16,7 @@ class OAuthProvider(
     val providerConfig: OAuthProviderConfig,
     client: HttpHandler,
     private val callbackUri: Uri,
-    private val scopes: List<String>,
+    val scopes: List<String>,
     private val oAuthPersistence: OAuthPersistence,
     private val modifyAuthState: (Uri) -> Uri = { it },
     private val generateCrsf: CsrfGenerator = SECURE_CSRF,
