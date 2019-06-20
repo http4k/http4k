@@ -15,8 +15,8 @@ internal class ParamMappingJsonRequestHandler<NODE : Any, IN, OUT : Any>(json: J
                 paramsFieldNames.mapIndexed { index: Int, name: String ->
                     name to elements.getOrElse(index) { json.nullNode() }
                 }.takeUnless { it.isEmpty() }
-                        ?.let { json.obj(it) }
-                        ?: json.nullNode()
+                    ?.let { json.obj(it) }
+                    ?: json.nullNode()
             }
             else -> it
         }
@@ -27,7 +27,7 @@ internal class ParamMappingJsonRequestHandler<NODE : Any, IN, OUT : Any>(json: J
 }
 
 internal class NoParamsJsonRequestHandler<NODE, OUT : Any>(function: () -> OUT, resultLens: Mapping<OUT, NODE>) :
-        JsonRpcHandler<NODE, NODE> {
+    JsonRpcHandler<NODE, NODE> {
 
     private val handler: (NODE) -> NODE = { function().let(resultLens) }
 

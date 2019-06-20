@@ -1,6 +1,10 @@
 package org.http4k.security.oauth.server.accesstoken
 
-import com.natpryce.*
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import com.natpryce.flatMap
+import com.natpryce.map
 import org.http4k.core.Body
 import org.http4k.core.Request
 import org.http4k.core.Uri
@@ -10,7 +14,15 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenDetails
 import org.http4k.security.ResponseType
-import org.http4k.security.oauth.server.*
+import org.http4k.security.oauth.server.AccessTokenError
+import org.http4k.security.oauth.server.AccessTokens
+import org.http4k.security.oauth.server.AuthorizationCode
+import org.http4k.security.oauth.server.AuthorizationCodeExpired
+import org.http4k.security.oauth.server.AuthorizationCodes
+import org.http4k.security.oauth.server.ClientId
+import org.http4k.security.oauth.server.ClientIdMismatch
+import org.http4k.security.oauth.server.IdTokens
+import org.http4k.security.oauth.server.RedirectUriMismatch
 import java.time.Clock
 
 class AuthorizationCodeAccessTokenGenerator(

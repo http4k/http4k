@@ -10,7 +10,7 @@ class AggregateRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
             TemplateRoutingHttpHandler(
                 method = null,
                 template = UriTemplate.from(validPath),
-                    httpHandler = { Response(Status.OK) }
+                httpHandler = { Response(Status.OK) }
             )
         )
 }

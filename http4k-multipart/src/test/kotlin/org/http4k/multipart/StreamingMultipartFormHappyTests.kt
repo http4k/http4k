@@ -78,8 +78,8 @@ class StreamingMultipartFormHappyTests {
         val boundary = "-----2345"
         val form = getMultipartFormParts(boundary, MultipartFormBuilder(boundary)
             .part("File contents here".byteInputStream(),
-                  "content-disposition" to listOf("form-data" to null, "name" to "aFile", "filename" to "file.name"),
-                  "Content-Type" to listOf("application/octet-stream" to null)
+                "content-disposition" to listOf("form-data" to null, "name" to "aFile", "filename" to "file.name"),
+                "Content-Type" to listOf("application/octet-stream" to null)
             )
             .stream())
 

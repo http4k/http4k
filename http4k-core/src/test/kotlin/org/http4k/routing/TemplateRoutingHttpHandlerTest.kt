@@ -8,6 +8,6 @@ class TemplateRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler = TemplateRoutingHttpHandler(
         method = null,
         template = UriTemplate.from(validPath),
-            httpHandler = { Response(OK) }
+        httpHandler = { Response(OK) }
     )
 }

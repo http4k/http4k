@@ -9,10 +9,10 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 object JacksonXml : ConfigurableJacksonXml(KotlinModule().asConfigurableXml()
     .withStandardMappings()
     .done().apply {
-            disableDefaultTyping()
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
-            configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
-            configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
+        disableDefaultTyping()
+        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
+        configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)
+        configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
     }
 )

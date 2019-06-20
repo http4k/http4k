@@ -1,6 +1,10 @@
 package org.http4k.filter
 
-import org.http4k.cloudnative.*
+import org.http4k.cloudnative.ClientTimeout
+import org.http4k.cloudnative.GatewayTimeout
+import org.http4k.cloudnative.NotFound
+import org.http4k.cloudnative.Unauthorized
+import org.http4k.cloudnative.UpstreamRequestFailed
 import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status

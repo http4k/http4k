@@ -77,7 +77,7 @@ open class BiDiBodyLensSpec<OUT>(metas: List<Meta>,
         val getLens = get("")
         val setLens = set("")
         return BiDiBodyLens(metas, contentType,
-                { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing), target = it) else it.first() } },
+            { getLens(it).let { if (it.isEmpty()) throw LensFailure(metas.map(::Missing), target = it) else it.first() } },
             { out: OUT, target: HttpMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }

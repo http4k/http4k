@@ -87,8 +87,8 @@ class ServerFiltersTest {
         var end: Triple<Request, Response, ZipkinTraces>? = null
 
         val svc = ServerFilters.RequestTracing(
-                { req, trace -> start = req to trace },
-                { req, resp, trace -> end = Triple(req, resp, trace) }
+            { req, trace -> start = req to trace },
+            { req, resp, trace -> end = Triple(req, resp, trace) }
         ).then {
             val actual = ZipkinTraces.THREAD_LOCAL.get()
             val setOnRequest = ZipkinTraces(it)
@@ -116,9 +116,9 @@ class ServerFiltersTest {
         val response = handler(Request(GET, "/"))
 
         assertThat(response, hasStatus(I_M_A_TEAPOT)
-                .and(hasHeader("access-control-allow-origin", "*"))
-                .and(hasHeader("access-control-allow-headers", "content-type"))
-                .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD")))
+            .and(hasHeader("access-control-allow-origin", "*"))
+            .and(hasHeader("access-control-allow-headers", "content-type"))
+            .and(hasHeader("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS, TRACE, PATCH, PURGE, HEAD")))
     }
 
     @Test
@@ -127,9 +127,9 @@ class ServerFiltersTest {
         val response = handler(Request(OPTIONS, "/").header("Origin", "foo"))
 
         assertThat(response, hasStatus(OK)
-                .and(hasHeader("access-control-allow-origin", "foo"))
-                .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
+            .and(hasHeader("access-control-allow-origin", "foo"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -138,9 +138,9 @@ class ServerFiltersTest {
         val response = handler(Request(OPTIONS, "/").header("Origin", "baz"))
 
         assertThat(response, hasStatus(OK)
-                .and(hasHeader("access-control-allow-origin", "null"))
-                .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
+            .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -149,9 +149,9 @@ class ServerFiltersTest {
         val response = handler(Request(OPTIONS, "/"))
 
         assertThat(response, hasStatus(OK)
-                .and(hasHeader("access-control-allow-origin", "null"))
-                .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
-                .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
+            .and(hasHeader("access-control-allow-origin", "null"))
+            .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
+            .and(hasHeader("access-control-allow-methods", "DELETE, POST")))
     }
 
     @Test
@@ -240,7 +240,7 @@ class ServerFiltersTest {
     fun `catch lens failure - custom response`() {
         val e = LensFailure(Invalid(Header.required("bob").meta), Missing(Header.required("bill").meta), target = Request(GET, ""))
         val handler = ServerFilters.CatchLensFailure { Response(OK).body(it.localizedMessage) }
-                .then { throw e }
+            .then { throw e }
 
         val response = handler(Request(GET, "/"))
 
@@ -286,13 +286,13 @@ class ServerFiltersTest {
     fun `initialises request context for use further down the stack`() {
         val contexts = RequestContexts()
         val handler = ServerFilters.InitialiseRequestContext(contexts)
-                .then(Filter { next ->
-                    {
-                        contexts[it].set("foo", "manchu")
-                        next(it)
-                    }
-                })
-                .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
+            .then(Filter { next ->
+                {
+                    contexts[it].set("foo", "manchu")
+                    next(it)
+                }
+            })
+            .then { Response(OK).body(contexts[it].get<String>("foo")!!) }
 
         assertThat(handler(Request(GET, "/")), hasBody("manchu"))
     }

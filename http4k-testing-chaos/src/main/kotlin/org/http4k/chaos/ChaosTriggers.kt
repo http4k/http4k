@@ -159,7 +159,7 @@ internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = whe
 }
 
 private fun JsonNode.toRegexMap(name: String) =
-        asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
+    asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
 
 /**
  * Simple toggleable trigger to turn ChaosBehaviour on/off

@@ -37,15 +37,15 @@ object App {
     operator fun invoke(env: Environment): Http4kK8sServer {
         // define the main app API - it proxies to the "other" service
         val mainApp = ClientFilters.SetHostFrom(otherServiceUri(env))
-                .then(rewriteUriToLocalhostAsWeDoNotHaveDns) // this line only here to make the example work!
-                .then(JavaHttpClient())
+            .then(rewriteUriToLocalhostAsWeDoNotHaveDns) // this line only here to make the example work!
+            .then(JavaHttpClient())
 
         // define the health app API
         val healthApp = Health(
-                "/config" bind GET to { Response(OK).body(env.toString()) },
-                checks = listOf(DatabaseCheck(
-                        RandomlyFailingDatabase(dbRole(env), dbPassword(env)
-                        )))
+            "/config" bind GET to { Response(OK).body(env.toString()) },
+            checks = listOf(DatabaseCheck(
+                RandomlyFailingDatabase(dbRole(env), dbPassword(env)
+                )))
         )
         return mainApp.asK8sServer(::SunHttp, env, healthApp)
     }
@@ -86,16 +86,16 @@ database.user.password=myPassword
 
 fun main() {
     val defaultConfig = Environment.defaults(
-            EnvironmentKey.k8s.SERVICE_PORT of 8000,
-            EnvironmentKey.k8s.HEALTH_PORT of 8001,
-            EnvironmentKey.k8s.serviceUriFor("otherservice") of Uri.of("https://localhost:8000")
+        EnvironmentKey.k8s.SERVICE_PORT of 8000,
+        EnvironmentKey.k8s.HEALTH_PORT of 8001,
+        EnvironmentKey.k8s.serviceUriFor("otherservice") of Uri.of("https://localhost:8000")
     )
 
     // standard chaining order for properties is local file -> JVM -> Environment -> defaults -> boom!
     val k8sPodEnv = Environment.fromResource("app.properties") overrides
-            Environment.JVM_PROPERTIES overrides
-            Environment.ENV overrides
-            defaultConfig
+        Environment.JVM_PROPERTIES overrides
+        Environment.ENV overrides
+        defaultConfig
 
     // the end-server that we will proxy to
     val upstream = { _: Request -> Response(Status.OK).body("HELLO!") }.asServer(SunHttp(9000)).start()

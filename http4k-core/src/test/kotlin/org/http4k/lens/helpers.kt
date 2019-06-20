@@ -16,7 +16,7 @@ object BiDiLensContract {
     val spec = BiDiLensSpec("location", StringParam, LensGet { _: String, str: String ->
         if (str.isBlank()) emptyList() else listOf(str)
     },
-            LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
+        LensSet { _: String, values: List<String>, str: String -> values.fold(str) { memo, next -> memo + next } })
 
     inline fun <reified IN : Any, T> checkContract(spec: BiDiLensSpec<IN, T>, tValue: T, validValue: IN, nullValue: IN, invalidValue: IN?, unmodifiedValue: IN, modifiedValue: IN, listModifiedValue: IN) {
         //synonym methods

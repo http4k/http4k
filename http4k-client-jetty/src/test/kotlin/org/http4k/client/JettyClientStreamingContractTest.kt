@@ -6,7 +6,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.streaming.StreamingContract
 
-class JettyClientStreamingContractTest : StreamingContract(){
+class JettyClientStreamingContractTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = SunHttp()
 
     override fun createClient(): HttpHandler = JettyClient(bodyMode = BodyMode.Stream)

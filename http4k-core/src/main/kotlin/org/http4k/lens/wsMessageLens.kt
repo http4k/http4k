@@ -42,7 +42,7 @@ open class BiDiWsMessageLensSpec<OUT>(get: LensGet<WsMessage, OUT>,
         val getLens = get("")
         val setLens = set("")
         return BiDiWsMessageLens(
-                { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta), target = it) else it.first() } },
+            { getLens(it).let { if (it.isEmpty()) throw LensFailure(Missing(meta), target = it) else it.first() } },
             { out: OUT, target: WsMessage -> setLens(out?.let { listOf(it) } ?: emptyList(), target) }
         )
     }

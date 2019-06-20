@@ -4,8 +4,8 @@ import org.apache.commons.fileupload.util.ParameterParser
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
-import java.util.TreeMap
 import java.util.NoSuchElementException
+import java.util.TreeMap
 
 /**
  * [RFC 1867](http://www.ietf.org/rfc/rfc1867.txt)
@@ -24,7 +24,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
     override fun iterator() = iterator
 
     private fun addPrefixToBoundary(boundary: ByteArray?): ByteArray =
-    // in apache they just use BOUNDARY_PREFIX
+        // in apache they just use BOUNDARY_PREFIX
         ByteArray(boundary!!.size + FIELD_SEPARATOR.size).apply {
             System.arraycopy(boundary, 0, this, 2, boundary.size)
             System.arraycopy(FIELD_SEPARATOR, 0, this, 0, FIELD_SEPARATOR.size)

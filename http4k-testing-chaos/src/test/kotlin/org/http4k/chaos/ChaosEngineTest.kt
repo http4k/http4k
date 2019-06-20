@@ -70,9 +70,9 @@ class ChaosEngineTest {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosEngine(
-                Wait,
+            Wait,
             ApiKeySecurity(Header.required("secret"), { true }),
-                "/context"
+            "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
@@ -84,9 +84,9 @@ class ChaosEngineTest {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
         val appWithChaos = app.withChaosEngine(
-                Wait,
+            Wait,
             NoSecurity,
-                "/context"
+            "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))

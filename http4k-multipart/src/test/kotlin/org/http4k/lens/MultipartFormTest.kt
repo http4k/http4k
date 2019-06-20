@@ -102,7 +102,7 @@ class MultipartFormTest {
         )
         assertThat(
             { multipartFormLens(Validator.Strict)(request) },
-                throws(lensFailureWith<Any?>(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+            throws(lensFailureWith<Any?>(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 

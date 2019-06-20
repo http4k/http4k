@@ -26,7 +26,7 @@ class WebFormTest {
         val webForm = Body.webForm(Strict, stringField, intField).toLens()
 
         val populatedRequest = emptyRequest.with(
-                webForm of WebForm().with(stringField of "world", intField of 123)
+            webForm of WebForm().with(stringField of "world", intField of 123)
         )
 
         assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(APPLICATION_FORM_URLENCODED))
@@ -39,8 +39,8 @@ class WebFormTest {
 
         assertThat({
             Body.webForm(Strict,
-                    FormField.required("hello"),
-                    FormField.int().required("another")
+                FormField.required("hello"),
+                FormField.int().required("another")
             ).toLens()(request)
         }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
@@ -52,8 +52,8 @@ class WebFormTest {
         val expected = mapOf("hello" to listOf("world"), "another" to listOf("123"))
 
         assertThat(Body.webForm(Strict,
-                FormField.required("hello"),
-                FormField.int().required("another")
+            FormField.required("hello"),
+            FormField.int().required("another")
         ).toLens()(request), equalTo(WebForm(expected, emptyList())))
     }
 
@@ -63,8 +63,8 @@ class WebFormTest {
 
         val requiredString = FormField.required("hello")
         assertThat(Body.webForm(Feedback,
-                requiredString,
-                FormField.int().required("another")
+            requiredString,
+            FormField.int().required("another")
         ).toLens()(request), equalTo(WebForm(mapOf("another" to listOf("123")), listOf(Missing(requiredString.meta)))))
     }
 
@@ -75,8 +75,8 @@ class WebFormTest {
         val stringRequiredField = FormField.required("hello")
         val intRequiredField = FormField.int().required("another")
         assertThat(
-                { Body.webForm(Strict, stringRequiredField, intRequiredField).toLens()(request) },
-                throws(lensFailureWith<Any?>(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
+            { Body.webForm(Strict, stringRequiredField, intRequiredField).toLens()(request) },
+            throws(lensFailureWith<Any?>(Missing(stringRequiredField.meta), Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
 
@@ -86,8 +86,8 @@ class WebFormTest {
         val intField = FormField.int().required("another")
 
         val populated = WebForm()
-                .with(stringField of "world",
-                        intField of 123)
+            .with(stringField of "world",
+                intField of 123)
 
         assertThat(stringField(populated), equalTo("world"))
         assertThat(intField(populated), equalTo(123))

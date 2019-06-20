@@ -11,7 +11,7 @@ import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username

@@ -127,7 +127,7 @@ class UriTemplateTest {
     }
 
     @Test
-    fun doesNotMatchEmptyPathSegment(){
+    fun doesNotMatchEmptyPathSegment() {
         assertThat(from("/foo/{bar:.*}").matches("/foo/bar"), equalTo(true))
         assertThat(from("/foo/{bar:.*}").matches("/foo"), equalTo(false))
     }

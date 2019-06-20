@@ -74,7 +74,7 @@ internal class MultipartFormParser(private val encoding: Charset, private val wr
 
     private fun writeToDisk(part: StreamingPart, bytes: ByteArray, length: Int) =
         File.createTempFile(part.fileName ?: UUID.randomUUID().toString()
-        +"-", ".tmp", temporaryFileDirectory).apply {
+        + "-", ".tmp", temporaryFileDirectory).apply {
             deleteOnExit()
             FileOutputStream(this).apply {
                 write(bytes, 0, length)

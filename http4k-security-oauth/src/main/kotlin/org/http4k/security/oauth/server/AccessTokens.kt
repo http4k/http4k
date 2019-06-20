@@ -20,5 +20,5 @@ interface AccessTokens {
     /**
      * validates an given access token
      */
-    fun isValid(accessToken : AccessTokenContainer) : Boolean
+    fun isValid(accessToken: AccessTokenContainer): Boolean
 }

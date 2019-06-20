@@ -1,6 +1,8 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.security.oauth.server.RfcError.*
+import org.http4k.security.oauth.server.RfcError.InvalidClient
+import org.http4k.security.oauth.server.RfcError.InvalidGrant
+import org.http4k.security.oauth.server.RfcError.InvalidRequest
 
 
 abstract class OAuthError(val rfcError: RfcError, val description: String)

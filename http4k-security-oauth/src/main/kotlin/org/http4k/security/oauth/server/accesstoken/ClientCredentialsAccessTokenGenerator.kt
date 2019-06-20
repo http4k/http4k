@@ -19,7 +19,7 @@ class ClientCredentialsAccessTokenGenerator(private val accessTokens: AccessToke
         accessTokens.create(request.clientId).map { AccessTokenDetails(it) }
 }
 
-data class ClientCredentialsRequest( val clientId: ClientId)
+data class ClientCredentialsRequest(val clientId: ClientId)
 
 private object ClientCredentialsForm {
     private val clientId = FormField.map(::ClientId, ClientId::value).required("client_id")

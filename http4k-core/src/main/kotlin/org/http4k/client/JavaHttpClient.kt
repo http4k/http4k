@@ -49,7 +49,7 @@ object JavaHttpClient {
 
     // Because HttpURLConnection closes the stream if a new request is made, we are forced to consume it straight away
     private fun HttpURLConnection.body(status: Status) =
-            Body(resolveStream(status).readBytes().let { ByteBuffer.wrap(it) })
+        Body(resolveStream(status).readBytes().let { ByteBuffer.wrap(it) })
 
     private fun HttpURLConnection.resolveStream(status: Status) =
         when {

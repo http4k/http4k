@@ -10,7 +10,12 @@ import org.http4k.lens.FormField
 import org.http4k.lens.Validator
 import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenDetails
-import org.http4k.security.oauth.server.*
+import org.http4k.security.oauth.server.AccessTokenError
+import org.http4k.security.oauth.server.AccessTokens
+import org.http4k.security.oauth.server.AuthorizationCodes
+import org.http4k.security.oauth.server.IdTokens
+import org.http4k.security.oauth.server.InvalidClientCredentials
+import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.GrantType.AuthorizationCode
 import org.http4k.security.oauth.server.accesstoken.GrantType.ClientCredentials
 import java.time.Clock
