@@ -2,8 +2,6 @@ package org.http4k.contract.security
 
 import org.http4k.core.Filter
 import org.http4k.core.Uri
-import org.http4k.core.then
-import org.http4k.filter.ServerFilters
 import org.http4k.security.OAuthProvider
 
 data class OAuthSecurity(
@@ -15,12 +13,11 @@ data class OAuthSecurity(
 ) : Security {
     companion object {
         operator fun invoke(oAuthProvider: OAuthProvider,
-                            authFilter: Filter = ServerFilters.BearerAuth { true },
                             customScopes: List<OAuthScope>? = null) = OAuthSecurity(
             oAuthProvider.providerConfig.authUri,
             oAuthProvider.providerConfig.tokenUri,
             customScopes ?: oAuthProvider.scopes.map { OAuthScope(it, "") },
-            oAuthProvider.authFilter.then(authFilter)
+            oAuthProvider.authFilter
         )
     }
 }
