@@ -3,9 +3,13 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.156.0
+- [all] Update Kotlin to 1.3.40
+- [http4k-contract] Support OAuthSecurity renderer.
+
 ### v3.155.2
-- Update deps.
-- Dokka improvements. Does not mitigate #196 as we run the main build on OpenJdk11. H/T @ivoanjo
+- [all] Update various dependencies.
+- [all] Dokka improvements. Does not mitigate #196 as we run the main build on OpenJdk11. H/T @ivoanjo
 
 ### v3.155.1
 - DO NOT USE - broken
@@ -50,7 +54,7 @@ the OpenApi generator to create valid code-based OpenApi clients using the OpenA
 - [http4k-format-jackson] Removed reflective JSON schema creator, since it was not actually OA3 compliant.
 
 ### v3.144.0
-- Update various dependencies.
+- [all] Update various dependencies.
 - [http4k-contract] Improvements to better adhere to OA3 spec.
 - [http4k-security-oauth] Allow injecting OpenID's `request` parameter into the authorization request.
 - [http4k-security-oauth] Expose request to AuthRequestTracking. 
