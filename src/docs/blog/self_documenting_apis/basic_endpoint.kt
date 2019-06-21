@@ -8,19 +8,15 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Path
 import org.http4k.lens.int
 
-val uri = "/greet/{name}/{age}?alive=true"
-
 data class Age(val value: Int) {
     init {
         require(value >= 0)
     }
-
-    val isAdult = value >= 18
 }
 
 fun handler(name: String, age: Age): HttpHandler =
     {
-        val beverage = if (age.isAdult) "beer" else "lemonade"
+        val beverage = if (age.value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 
