@@ -1,0 +1,19 @@
+{
+  "info": {
+    "title": "my great api",
+    "version": "v1.0",
+    "description": null
+  },
+  "tags": [],
+  "paths": {},
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "openapi": "3.0.0"
+}
