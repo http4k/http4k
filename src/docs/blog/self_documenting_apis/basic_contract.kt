@@ -6,16 +6,10 @@ import org.http4k.contract.openapi.v3.OpenApi3
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method.GET
-import org.http4k.core.Request
 import org.http4k.format.Jackson
 
 val http: HttpHandler = contract {
     renderer = OpenApi3(ApiInfo("my great api", "v1.0"), Jackson)
     descriptionPath = "/api/swagger.json"
     security = BasicAuthSecurity("realm", Credentials("user", "password"))
-}
-
-fun main() {
-    println(http(Request(GET, "/api/swagger.json")))
 }
