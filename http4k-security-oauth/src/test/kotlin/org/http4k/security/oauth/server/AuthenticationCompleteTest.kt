@@ -28,7 +28,7 @@ class AuthenticationCompleteTest {
     val underTest = AuthenticationComplete(
         DummyAuthorizationCodes(authorizationRequest, this::isFailure, "jdoe"),
         DummyOAuthAuthRequestTracking(),
-        DummyIdtokens("jdoe")
+        DummyIdTokens("jdoe")
     )
 
     private fun isFailure(request: Request): Boolean = request.query("fail") == "true"
@@ -74,7 +74,7 @@ class AuthenticationCompleteTest {
         val underTest = AuthenticationComplete(
             DummyAuthorizationCodes(authorizationRequest, this::isFailure, "jdoe"),
             DummyOAuthAuthRequestTracking(),
-            DummyIdtokens("jdoe"),
+            DummyIdTokens("jdoe"),
             errorUri
         )
         val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))

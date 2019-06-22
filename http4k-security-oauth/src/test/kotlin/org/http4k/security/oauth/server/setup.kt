@@ -32,7 +32,7 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
         json = Jackson,
         clock = FixedClock,
         authRequestExtractor = AuthRequestFromQueryParameters,
-        idTokens = DummyIdtokens()
+        idTokens = DummyIdTokens()
     )
 
     return routes(
