@@ -28,7 +28,7 @@ open class DummyIdTokens(private val username: String? = null) : IdTokens {
         IdTokenContainer("dummy-id-token-for-access-token")
 }
 
-class DummyAccessTokens(val tokenIsValid: Boolean = true) : AccessTokens {
+class DummyAccessTokens(private val tokenIsValid: Boolean = true) : AccessTokens {
     override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Success(AccessTokenContainer("dummy-access-token"))
 
     override fun isValid(accessToken: AccessTokenContainer): Boolean = tokenIsValid
