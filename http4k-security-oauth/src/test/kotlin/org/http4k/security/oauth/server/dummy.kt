@@ -71,18 +71,13 @@ class HardcodedClientValidator(
 
 class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {
     private val codes = mutableMapOf<AuthorizationCode, AuthorizationCodeDetails>()
-    private val usedCodes = mutableSetOf<AuthorizationCode>()
 
-    override fun detailsFor(code: AuthorizationCode) =
-        codes[code] ?: error("code not stored")
+    override fun detailsFor(code: AuthorizationCode) = codes[code] ?: error("code not stored")
 
-    override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> {
-        return Success(AuthorizationCode(UUID.randomUUID().toString()).also {
+    override fun create(request: Request, authRequest: AuthRequest, response: Response) =
+        Success(AuthorizationCode(UUID.randomUUID().toString()).also {
             codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.responseType)
         })
-    }
-
-    fun available(authorizationCode: AuthorizationCode) = codes.containsKey(authorizationCode) && !usedCodes.contains(authorizationCode)
 }
 
 class InMemoryIdTokenConsumer : IdTokenConsumer {
