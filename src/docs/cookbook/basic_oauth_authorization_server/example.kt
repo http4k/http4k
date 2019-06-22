@@ -1,3 +1,4 @@
+
 import com.natpryce.Failure
 import com.natpryce.Success
 import org.http4k.client.OkHttp
@@ -7,7 +8,6 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -55,7 +55,7 @@ fun main() {
                     .body("""<html>Please <form method="POST"><button type="submit">authenticate</button></form></html>""")
             },
             "/my-login-page" bind POST to server.authenticationComplete,
-            "/my-protected-reosurce" bind GET to server.accessFilter.then {
+            "/my-protected-resource" bind GET to server.accessFilter.then {
                 Response(OK)
                     .body("{\"badger\" : \"monkey\"}")
             }
@@ -79,7 +79,7 @@ fun main() {
 
         return routes(
             "/my-callback" bind GET to oauthProvider.callback,
-            "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(Status.OK).body("user's protected resource") }
+            "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user's protected resource") }
         )
     }
 
@@ -125,6 +125,4 @@ class InsecureAccessTokens : AccessTokens {
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(authorizationCode: AuthorizationCode) =
         Success(AccessTokenContainer(UUID.randomUUID().toString()))
-
-
 }
