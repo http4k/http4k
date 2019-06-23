@@ -14,19 +14,22 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request): Response {
-        val state = request.query("state")?.toParameters() ?: emptyList()
-        val crsfInState = state.find { it.first == "csrf" }?.second?.let(::CrossSiteRequestForgeryToken)
-        return request.query("code")?.let { code ->
-            if (crsfInState != null && crsfInState == oAuthPersistence.retrieveCsrf(request)) {
-                request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdTokenContainer(it)) }
-                accessTokenFetcher.fetch(code)?.let { tokenDetails ->
-                    tokenDetails.idToken?.also { idTokenConsumer.consumeFromAccessTokenResponse(it) }
+    override fun invoke(request: Request) = request.query("code")
+        ?.let { code ->
+            val state = request.query("state")?.toParameters() ?: emptyList()
+            state.find { it.first == "csrf" }?.second
+                ?.let(::CrossSiteRequestForgeryToken)
+                ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
+                ?.let {
+                    request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdTokenContainer(it)) }
+                    accessTokenFetcher.fetch(code)?.let { tokenDetails ->
+                        tokenDetails.idToken?.also { idTokenConsumer.consumeFromAccessTokenResponse(it) }
 
-                    val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                    oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT).header("Location", originalUri), tokenDetails.accessToken)
+                        val originalUri = state.find { it.first == "uri" }?.second ?: "/"
+                        oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
+                            .header("Location", originalUri), tokenDetails.accessToken)
+                    }
                 }
-            } else null
-        } ?: oAuthPersistence.authFailureResponse()
-    }
+        }
+        ?: oAuthPersistence.authFailureResponse()
 }
