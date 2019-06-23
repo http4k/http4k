@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 /**
- * This is an example implementation which stores CSRF and AccessTokenEnvelope values in an INSECURE client-side cookie.
+ * This is an example implementation which stores CSRF and AccessToken values in an INSECURE client-side cookie.
  * Access-tokens for end-services are fully available to the browser so do not use this in production!
  */
 class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
