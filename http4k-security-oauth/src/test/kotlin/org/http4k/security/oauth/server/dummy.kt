@@ -13,14 +13,14 @@ import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 
-open class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
+class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
         ?: "unknown")))
 
     override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
 }
 
-open class DummyIdTokens(private val username: String? = null) : IdTokens {
+class DummyIdTokens(private val username: String? = null) : IdTokens {
     override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
         IdTokenContainer("dummy-id-token-for-" + (username ?: "unknown"))
 
@@ -28,18 +28,14 @@ open class DummyIdTokens(private val username: String? = null) : IdTokens {
         IdTokenContainer("dummy-id-token-for-access-token")
 }
 
-class DummyAccessTokens(private val tokenIsValid: Boolean = true) : AccessTokens {
+class DummyAccessTokens : AccessTokens {
     override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Success(AccessTokenContainer("dummy-access-token"))
-
-    override fun isValid(accessToken: AccessTokenContainer): Boolean = tokenIsValid
 
     override fun create(authorizationCode: AuthorizationCode) = Success(AccessTokenContainer("dummy-access-token"))
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
     override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Failure(error)
-
-    override fun isValid(accessToken: AccessTokenContainer): Boolean = true
 
     override fun create(authorizationCode: AuthorizationCode) = Failure(error)
 }
