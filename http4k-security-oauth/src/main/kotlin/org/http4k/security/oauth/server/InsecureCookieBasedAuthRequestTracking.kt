@@ -1,6 +1,6 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -16,10 +16,10 @@ class InsecureCookieBasedAuthRequestTracking : AuthRequestTracking {
 
     override fun resolveAuthRequest(request: Request): AuthRequest? =
         request.cookie(cookieName)?.value
-            ?.let { Request(Method.GET, Uri.of("dummy").query(it)) }
+            ?.let { Request(GET, Uri.of("dummy").query(it)) }
             ?.let { it.authorizationRequest() }
 
-    private fun AuthRequest.serialise() = Request(Method.GET, "dummy")
+    private fun AuthRequest.serialise() = Request(GET, "dummy")
         .with(OAuthServer.clientId of client)
         .with(OAuthServer.redirectUri of redirectUri)
         .with(OAuthServer.scopes of scopes)
