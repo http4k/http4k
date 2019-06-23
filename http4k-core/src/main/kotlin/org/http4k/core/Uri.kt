@@ -5,7 +5,8 @@ import org.http4k.appendIfPresent
 import java.net.URI
 import java.net.URLDecoder
 
-data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) {
+data class Uri(val scheme: String, val userInfo: String, val host: String, val port: Int?, val path: String, val query: String, val fragment: String) : Comparable<Uri> {
+
     companion object {
         private val AUTHORITY = Regex("(?:([^@]+)@)?([^:]+)(?::([\\d]+))?")
         private val RFC3986 = Regex("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?")
@@ -44,6 +45,8 @@ data class Uri(val scheme: String, val userInfo: String, val host: String, val p
     fun authority(authority: String): Uri = parseAuthority(authority).let { (userInfo, host, port) ->
         copy(userInfo = userInfo, host = host, port = port)
     }
+
+    override fun compareTo(other: Uri) = toString().compareTo(other.toString())
 
     override fun toString() = StringBuilder()
         .appendIfNotBlank(scheme, scheme, ":")
