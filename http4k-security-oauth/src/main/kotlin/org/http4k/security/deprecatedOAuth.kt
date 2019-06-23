@@ -1,4 +1,4 @@
 package org.http4k.security
 
-@Deprecated("use renamed version", ReplaceWith("org.http4k.security.oauth.server.AccessToken"))
+@Deprecated("use renamed version", ReplaceWith("org.http4k.security.AccessToken"))
 typealias AccessTokenContainer = AccessToken
