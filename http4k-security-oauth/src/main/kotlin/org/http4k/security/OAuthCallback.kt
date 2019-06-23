@@ -22,13 +22,14 @@ class OAuthCallback(
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
                     request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdTokenContainer(it)) }
-                    accessTokenFetcher.fetch(code)?.let { tokenDetails ->
-                        tokenDetails.idToken?.also { idTokenConsumer.consumeFromAccessTokenResponse(it) }
+                    accessTokenFetcher.fetch(code)
+                        ?.let { tokenDetails ->
+                            tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
 
-                        val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                        oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
-                            .header("Location", originalUri), tokenDetails.accessToken)
-                    }
+                            val originalUri = state.find { it.first == "uri" }?.second ?: "/"
+                            oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
+                                .header("Location", originalUri), tokenDetails.accessToken)
+                        }
                 }
         }
         ?: oAuthPersistence.authFailureResponse()
