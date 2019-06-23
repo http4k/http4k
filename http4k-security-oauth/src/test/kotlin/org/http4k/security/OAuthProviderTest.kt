@@ -49,7 +49,7 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when accessToken value is present, request is let through`() {
-        oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessTokenContainer("randomToken"))
+        oAuthPersistence.assignToken(Request(GET, ""), Response(OK), AccessToken("randomToken"))
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK).body("i am witorious!") }(Request(GET, "/")), hasStatus(OK).and(hasBody("i am witorious!")))
     }
 

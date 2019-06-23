@@ -25,15 +25,8 @@ class GenerateAccessToken(
 
     private val generator = GenerateAccessTokenForGrantType(authorizationCodes, accessTokens, clock, idTokens, grantTypes)
 
-    override fun invoke(request: Request): Response {
-        return generator.generate(request)
-            .map { token ->
-                Response(OK).let {
-                    when {
-                        token.idToken == null -> it.body(token.accessToken.value)
-                        else -> it.with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken.value))
-                    }
-                }
-            }.mapFailure(errorRenderer::response).get()
-    }
+    override fun invoke(request: Request) = generator.generate(request)
+        .map { token ->
+            Response(OK).with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken?.value))
+        }.mapFailure(errorRenderer::response).get()
 }

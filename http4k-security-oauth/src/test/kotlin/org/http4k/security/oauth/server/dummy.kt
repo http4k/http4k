@@ -6,9 +6,9 @@ import com.natpryce.Success
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
-import org.http4k.security.AccessTokenContainer
+import org.http4k.security.AccessToken
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
-import org.http4k.security.openid.IdTokenContainer
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -22,20 +22,20 @@ class DummyAuthorizationCodes(private val request: AuthRequest, private val shou
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
     override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
-        IdTokenContainer("dummy-id-token-for-" + (username ?: "unknown"))
+        IdToken("dummy-id-token-for-" + (username ?: "unknown"))
 
-    override fun createForAccessToken(code: AuthorizationCode): IdTokenContainer =
-        IdTokenContainer("dummy-id-token-for-access-token")
+    override fun createForAccessToken(code: AuthorizationCode): IdToken =
+        IdToken("dummy-id-token-for-access-token")
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Success(AccessTokenContainer("dummy-access-token"))
+    override fun create(clientId: ClientId): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
 
-    override fun create(authorizationCode: AuthorizationCode) = Success(AccessTokenContainer("dummy-access-token"))
+    override fun create(authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
-    override fun create(clientId: ClientId): Result<AccessTokenContainer, AccessTokenError> = Failure(error)
+    override fun create(clientId: ClientId): Result<AccessToken, AccessTokenError> = Failure(error)
 
     override fun create(authorizationCode: AuthorizationCode) = Failure(error)
 }
@@ -77,14 +77,14 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
 }
 
 class InMemoryIdTokenConsumer : IdTokenConsumer {
-    var consumedFromAuthorizationResponse: IdTokenContainer? = null
-    var consumedFromAccessTokenResponse: IdTokenContainer? = null
+    var consumedFromAuthorizationResponse: IdToken? = null
+    var consumedFromAccessTokenResponse: IdToken? = null
 
-    override fun consumeFromAuthorizationResponse(idToken: IdTokenContainer) {
+    override fun consumeFromAuthorizationResponse(idToken: IdToken) {
         consumedFromAuthorizationResponse = idToken
     }
 
-    override fun consumeFromAccessTokenResponse(idToken: IdTokenContainer) {
+    override fun consumeFromAccessTokenResponse(idToken: IdToken) {
         consumedFromAccessTokenResponse = idToken
     }
 }

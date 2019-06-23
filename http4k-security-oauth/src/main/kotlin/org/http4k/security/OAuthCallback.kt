@@ -5,8 +5,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.toParameters
+import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
-import org.http4k.security.openid.IdTokenContainer
 
 class OAuthCallback(
     private val oAuthPersistence: OAuthPersistence,
@@ -21,7 +21,7 @@ class OAuthCallback(
                 ?.let(::CrossSiteRequestForgeryToken)
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
-                    request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdTokenContainer(it)) }
+                    request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdToken(it)) }
                     accessTokenFetcher.fetch(code)
                         ?.let { tokenDetails ->
                             tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
