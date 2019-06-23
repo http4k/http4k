@@ -65,8 +65,8 @@ fun main() {
         val oauthProvider = OAuthProvider(
             OAuthProviderConfig(authorizationServer,
                 "/my-login-page", "/oauth2/token",
-                Credentials("my-app", "somepassword"),
-                authorizationServer),
+                Credentials("my-app", "somepassword")
+            ),
             tokenClient,
             Uri.of("http://localhost:8000/my-callback"),
             listOf("name", "age"),
