@@ -15,7 +15,7 @@ import org.http4k.format.Jackson
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
-import org.http4k.security.AccessTokenContainer
+import org.http4k.security.AccessToken
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
@@ -118,5 +118,5 @@ class InsecureAccessTokens : AccessTokens {
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(authorizationCode: AuthorizationCode) =
-        Success(AccessTokenContainer(UUID.randomUUID().toString()))
+        Success(AccessToken(UUID.randomUUID().toString()))
 }

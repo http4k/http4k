@@ -26,12 +26,12 @@ interface OAuthPersistence {
      * Assign the swapped AccessTokenContainer returned by the end-service. Opportunity here to modify the
      * response returned to the user when the redirection happens.
      */
-    fun assignToken(request: Request, redirect: Response, accessToken: AccessTokenContainer): Response
+    fun assignToken(request: Request, redirect: Response, accessToken: AccessToken): Response
 
     /**
      * Retrieve the stored AccessTokenContainer token for this user request
      */
-    fun retrieveToken(request: Request): AccessTokenContainer?
+    fun retrieveToken(request: Request): AccessToken?
 
     /**
      * Build the default failure response which occurs when a failure occurs during the callback process (eg. a mismatch/missing

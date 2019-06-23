@@ -9,7 +9,7 @@ import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.with
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.security.openid.IdTokenContainer
+import org.http4k.security.openid.IdToken
 
 class AccessTokenFetcher(
     private val api: HttpHandler,
@@ -27,9 +27,9 @@ class AccessTokenFetcher(
         ?.let {
             if (CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) {
                 with(accessTokenResponseBody(it)) {
-                    AccessTokenDetails(AccessTokenContainer(accessToken), idToken?.let(::IdTokenContainer))
+                    AccessTokenDetails(AccessToken(accessToken), idToken?.let(::IdToken))
                 }
             } else
-                AccessTokenDetails(AccessTokenContainer(it.bodyString()))
+                AccessTokenDetails(AccessToken(it.bodyString()))
         }
 }

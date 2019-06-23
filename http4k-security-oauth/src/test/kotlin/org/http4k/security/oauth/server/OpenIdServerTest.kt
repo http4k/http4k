@@ -15,7 +15,7 @@ import org.http4k.filter.ClientFilters
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.CodeIdToken
-import org.http4k.security.openid.IdTokenContainer
+import org.http4k.security.openid.IdToken
 import org.junit.jupiter.api.Test
 
 
@@ -45,8 +45,8 @@ class OpenIdServerTest {
         val postAuthResponse = browserWithRedirection(Request(POST, loginPage).form("some", "credentials"))
         assertThat(postAuthResponse, hasStatus(OK) and hasBody("user resource"))
 
-        assertThat(tokenConsumer.consumedFromAuthorizationResponse, equalTo(IdTokenContainer("dummy-id-token-for-unknown")))
-        assertThat(tokenConsumer.consumedFromAccessTokenResponse, equalTo(IdTokenContainer("dummy-id-token-for-access-token")))
+        assertThat(tokenConsumer.consumedFromAuthorizationResponse, equalTo(IdToken("dummy-id-token-for-unknown")))
+        assertThat(tokenConsumer.consumedFromAccessTokenResponse, equalTo(IdToken("dummy-id-token-for-access-token")))
     }
 
 }

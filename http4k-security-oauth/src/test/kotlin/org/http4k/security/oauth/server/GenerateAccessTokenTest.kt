@@ -53,7 +53,7 @@ class GenerateAccessTokenTest {
             .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(OK) and hasBody("dummy-access-token"))
+        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token"))))
     }
 
     @Test
@@ -83,7 +83,7 @@ class GenerateAccessTokenTest {
             .form("client_id", authRequest.client.value)
         )
 
-        assertThat(response, hasStatus(OK) and hasBody("dummy-access-token"))
+        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token"))))
     }
 
     @Test
