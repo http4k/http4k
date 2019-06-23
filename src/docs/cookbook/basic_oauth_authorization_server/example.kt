@@ -52,7 +52,7 @@ fun main() {
             server.tokenRoute,
             "/my-login-page" bind GET to server.authenticationStart.then {
                 Response(OK)
-                    .body("""<html>Please <form method="POST"><button type="submit">authenticate</button></form></html>""")
+                    .body("""<html><form method="POST"><button type="submit">Please authenticate</button></form></html>""")
             },
             "/my-login-page" bind POST to server.authenticationComplete
         )
