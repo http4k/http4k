@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.157.0
 - [http4k-security-oauth] Default to JSON format response in Access Token response
-- [http4k-security-oauth] Renamed a couple of classes, and removed `isValid` method from `AuthorizationCodes` because it doesn't make sense for this to be on the OAuthServer.
+- [http4k-security-oauth] Renamed a couple of classes (AccessTokenContainer -> AccessToken), and removed `isValid` method from `AuthorizationCodes` because it doesn't make sense for this to be on the OAuthServer.
 
 ### v3.156.0
 - [all] Update Kotlin to 1.3.40
