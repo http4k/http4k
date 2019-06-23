@@ -54,11 +54,7 @@ fun main() {
                 Response(OK)
                     .body("""<html>Please <form method="POST"><button type="submit">authenticate</button></form></html>""")
             },
-            "/my-login-page" bind POST to server.authenticationComplete,
-            "/my-protected-resource" bind GET to server.accessFilter.then {
-                Response(OK)
-                    .body("{\"badger\" : \"monkey\"}")
-            }
+            "/my-login-page" bind POST to server.authenticationComplete
         )
     }
 
@@ -118,8 +114,6 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 
 class InsecureAccessTokens : AccessTokens {
     override fun create(clientId: ClientId) = Failure(UnsupportedGrantType("client_credentials"))
-
-    override fun isValid(accessToken: AccessTokenContainer): Boolean = true
 
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date

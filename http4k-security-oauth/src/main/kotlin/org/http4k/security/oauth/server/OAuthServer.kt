@@ -43,9 +43,6 @@ class OAuthServer(
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
 
-    //use this filter to protect endpoints which should only be accessed with a valid access token
-    val accessFilter = AccessTokenValidationFilter(accessTokens)
-
     companion object {
         val clientId = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopes = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
