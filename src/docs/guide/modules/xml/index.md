@@ -7,14 +7,13 @@ description: Feature overview of the modules providing XML support, including an
 ```compile group: "org.http4k", name: "http4k-format-jackson-xml", version: "3.157.1"```
 
 ### About
-These modules provide auto-marshalling functionality to convert XML into arbitrary data classes. The 2 differ slightly in their behaviour, due to the underlying libraries used for implementation:
+These modules provide auto-marshalling functionality to convert XML into arbitrary data classes. The 2 differ slightly in their behaviour, due to the underlying libraries used for implementation. We recommend using `http4k-format-jackson-xml` as it has more predictable and consistent behaviour.
 
 ### JacksonXml
 - Provides bi-directional conversion
 - Does NOT expose an XML DOM node model
 - Generally requires `Jackson` field annotations to manipulate output format
-- Provides extension point to map custom types using BiDiMapping registration (so supports all Java and 
-Http4k primitives such as `Uri`)
+- Provides extension point to map custom types using BiDiMapping registration (so supports all Java and Http4k primitives such as `Uri`)
 
 #### JacksonXML Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/jacksonAutoXml.kt)
 - Provides extraction conversion only
@@ -25,6 +24,9 @@ Http4k primitives such as `Uri`)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/jacksonAutoXml.kt"></script>
 
+### Xml
+As above, we recommend using `http4k-format-jackson-xml` as it has more predictable and consistent behaviour.
+ 
 #### XML Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt)
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/xml/autoXml.kt"></script>
