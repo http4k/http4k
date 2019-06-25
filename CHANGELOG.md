@@ -3,8 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.157.2
-- [http4k-contract] Fix #259 - Contract blocks do not produce 400s if an external CatchAll is provided. This may have an effect on how errors are generated (a 400 is produced instead of the previous 500 from the CatchAll).
+### v3.158.0
+- [http4k-contract] POSSIBLE BEHAVIOUR CHANGE DUE TO BUG: Fix #259 - Contract blocks do not produce 400s if an external CatchAll is provided. This may have an effect on how errors are generated (a 400 is produced instead of the previous 500 from the CatchAll).
 
 ### v3.157.1
 - [http4k-security-oauth] Fix broken deprecation annotation.
