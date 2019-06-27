@@ -12,6 +12,7 @@ import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
+import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
 
@@ -23,8 +24,8 @@ class HttpUndertowHandler(handler: HttpHandler) : io.undertow.server.HttpHandler
 
     private fun Response.into(exchange: HttpServerExchange) {
         exchange.statusCode = status.code
-        headers.forEach {
-            exchange.responseHeaders.put(HttpString(it.first), it.second)
+        headers.toParametersMap().forEach { (name, values) ->
+            exchange.responseHeaders.putAll(HttpString(name), values.toList())
         }
         body.stream.use { it.copyTo(exchange.outputStream) }
     }

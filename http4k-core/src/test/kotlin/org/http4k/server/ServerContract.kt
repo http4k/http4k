@@ -18,6 +18,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.StreamBody
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.binary
 import org.http4k.routing.bind
@@ -55,6 +56,7 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
                 }
             },
             "/uri" bind GET to { Response(OK).body(it.uri.toString()) },
+            "/multiple-headers" bind GET to { Response(OK).header("foo", "value1").header("foo", "value2") },
             "/boom" bind GET to { throw IllegalArgumentException("BOOM!") }
         )
 
@@ -97,6 +99,14 @@ abstract class ServerContract(private val serverConfig: (Int) -> ServerConfig, p
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello mum"))
+    }
+
+    @Test
+    fun `can set multiple headers with the same name`() {
+        val response = client(Request(GET, "$baseUrl/multiple-headers"))
+
+        assertThat(response.status, equalTo(OK))
+        assertThat(response, hasHeader("foo", listOf("value1", "value2")))
     }
 
     @Test

@@ -32,6 +32,7 @@ import org.http4k.core.Status.Companion.CONTINUE
 import org.http4k.core.Uri
 import org.http4k.core.safeLong
 import org.http4k.core.then
+import org.http4k.core.toParametersMap
 import org.http4k.filter.ServerFilters
 import java.net.InetSocketAddress
 
@@ -53,7 +54,7 @@ class Http4kChannelHandler(handler: HttpHandler) : SimpleChannelInboundHandler<F
 
     private fun Response.asNettyResponse(): DefaultFullHttpResponse =
         DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus(status.code, status.description)).apply {
-            headers.forEach { (key, value) -> headers().set(key, value) }
+            headers.toParametersMap().forEach { (key, values) -> headers().set(key, values) }
             body.stream.use { it.copyTo(ByteBufOutputStream(content())) }
         }
 
