@@ -3,7 +3,7 @@ package org.http4k.client
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody.create
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
 import org.http4k.core.BodyMode
 import org.http4k.core.Request
@@ -58,13 +58,12 @@ private fun Request.asOkHttp(): okhttp3.Request = headers.fold(okhttp3.Request.B
 }.build()
 
 private fun Request.requestBody() =
-    if (permitsRequestBody(method.toString())) create(null, body.payload.array())
+    if (permitsRequestBody(method.toString())) body.payload.array().toRequestBody()
     else null
 
 private fun okhttp3.Response.asHttp4k(bodyMode: BodyMode): Response {
-    val init = Response(Status(code(), ""))
-    val headers = headers().toMultimap().flatMap { it.value.map { hValue -> it.key to hValue } }
+    val init = Response(Status(code, ""))
+    val headers = headers.toMultimap().flatMap { it.value.map { hValue -> it.key to hValue } }
 
-    return (body()?.let { init.body(bodyMode(it.byteStream())) } ?: init)
-        .headers(headers)
+    return (body?.let { init.body(bodyMode(it.byteStream())) } ?: init).headers(headers)
 }

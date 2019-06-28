@@ -28,17 +28,17 @@ object Versions {
     const val moshi_major: String = "1"
     const val com_squareup_moshi: String = "$moshi_major.8.0"
 
-    const val okhttp_major: String = "3"
-    const val okhttp: String = "$okhttp_major.14.2"
+    const val okhttp_major: String = "4"
+    const val okhttp: String = "$okhttp_major.0.0"
 
     const val io_github_resilience4j: String = "0.16.0"
 
-    const val ktor_server_cio: String = "1.2.1"
+    const val ktor_server_cio: String = "1.2.2"
 
     const val micrometer_core: String = "1.1.5"
 
     const val netty_codec_http2_major_minor = "4.1"
-    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.36.Final"
+    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.37.Final"
 
     const val pebble: String = "3.0.10"
 
@@ -91,7 +91,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val openapi_generator_gradle_plugin: String = "4.0.1"
+    const val openapi_generator_gradle_plugin: String = "4.0.2"
 
     const val selenium_api: String = "3.141.59"
 

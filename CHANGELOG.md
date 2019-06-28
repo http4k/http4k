@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.159.0 (uncut)
+- [all] Update various dependencies.
+- [http4k-client-okhttp] Updated `OkHttp` to v4.0.0 (Kotlin edition)
+
 ### v3.158.1
 - [http4k-server-netty] Fix #260 - cannot set multiple response headers with same name
 - [http4k-server-undertow] Fix #260 - cannot set multiple response headers with same name
