@@ -14,7 +14,7 @@ to declare server-side `Routes` in a completely typesafe way, leveraging the Len
 - **Auto-validating** - the `Route` contract is automatically validated on each call for required-fields and type conversions, removing the requirement  for any validation code to be written by the API user. Invalid calls result in a `HTTP 400 (BAD_REQUEST)` response.     
 - **Self-describing:** - a generated endpoint is provided which describes all of the `Routes` in that module. Implementations include [OpenApi v2 & v3/Swagger](http://swagger.io/) documentation, including generation of [JSON schema](http://json-schema.org/). These documents can then be used to generate HTTP client and server code in various languages using the [OpenAPI generator](https://openapi-generator.tech/).
  models for messages.
-- **Security:** to secure the `Routes` against unauthorised access. Current implementations include `ApiKey`, `BasicAuth`, `BearerAuth`.
+- **Security:** to secure the `Routes` against unauthorised access. Current implementations include `ApiKey`, `BasicAuth`, `BearerAuth` and `OAuth`.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/contracts/example.kt)
 
