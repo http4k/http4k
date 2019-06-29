@@ -51,10 +51,12 @@ And here's a test for that route - it's marginly more complex than a standard [h
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_route_test.kt"></script>
 
-### Adding the route metadata
-The metadata for the route forms the rest of the documented contract. The DSL for specifying this consists of a `meta [}` block containing a mixture of purely informational/organisational fields and those which should form part of the contract. For the latter case, we can further use the [http4k] lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form before the contract HttpHandler is invoked, this eliminating the need for any custom validation code to be written.
+### Adding metadata to the route contract
+The metadata for the route forms the rest of the documented contract. The DSL for specifying this consists of a `meta [}` block containing a mixture of purely informational/organisational fields and those which should form part of the contract. For the latter case, we can further use the [http4k] lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/metadata_route.kt"></script>
+
+As expected, if we look at the OpenAPI UI [here](https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fmetadata_contract.json), the greetings endpoint UI has now been embellished with more data.
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org

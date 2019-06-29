@@ -1,0 +1,75 @@
+{
+  "info": {
+    "title": "my friendly api",
+    "version": "v1.0",
+    "description": null
+  },
+  "tags": [
+    {
+      "name": "query",
+      "description": null
+    }
+  ],
+  "paths": {
+    "/greet/{name}/{age}": {
+      "get": {
+        "summary": "Send greetings",
+        "description": "Greets the stupid human by offering them a beverage suitable for their age",
+        "tags": [
+          "query"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "drink",
+            "required": false,
+            "description": "your favourite beverage"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": null
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "operationId": "getGreet_name__age"
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "openapi": "3.0.0"
+}

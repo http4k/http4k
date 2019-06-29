@@ -14,18 +14,17 @@ import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
 
-object Greetings {
-
-    data class Drink(val name: String) {
-        init {
-            require(name.isNotEmpty())
-        }
+data class Drink(val name: String) {
+    init {
+        require(name.isNotEmpty())
     }
+}
 
-    private val favouriteDrink = Query.map(::Drink).optional("drink")
+object Greetings {
+    private val favouriteDrink = Query.map(::Drink).optional("drink", "your favourite beverage")
 
     private fun handler(name: String, age: Age): HttpHandler = { req: Request ->
-        val beverage = if (age.value >= 18) "beer" else favouriteDrink(req)?.name ?: "lemonade"
+        val beverage = favouriteDrink(req)?.name ?: if (age.isAdult) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 
