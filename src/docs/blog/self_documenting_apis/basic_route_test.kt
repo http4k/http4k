@@ -7,10 +7,10 @@ import org.http4k.core.Request
 import org.http4k.hamkrest.hasBody
 import org.junit.jupiter.api.Test
 
-class GreetingEndpointTest {
+class GreetingRouteTest {
     @Test
     fun `greets an adult`() {
-        val app = contract { routes += route }
+        val app = contract { routes += basicRoute }
         assertThat(app(Request(GET, "/greet/Bob/21")), hasBody("Hello Bob, would you like some beer?"))
     }
 }

@@ -5,14 +5,14 @@ description: An overview of the OpenApi support available in the http4k library.
 
 ##### [@daviddenton][github]
 
-This post describes http4k support for describing HTTP endpoint services using the [OpenAPI specification], providing typesafe documentation and automatic contract validation of incoming 
+This post describes http4k support for describing HTTP route services using the [OpenAPI specification], providing typesafe documentation and automatic contract validation of incoming 
 HTTP messages.
 
 In microservice environments, some of the biggest challenges exist around the communiciations between processes that simply aren't present when you're doing monolith-based development. This manifests in many different operational ways such as monitoring, discovery and fault tolerance, but one of the key aspects is communicating the the contract provided by a particular service.
 
 There have been various efforts to standardise these aspects, and one of the most popular is the [OpenAPI specification], which grew out of the original Swagger project. There are 3 key advantages to OpenAPI:
 
-1. It provides a standardised way of documenting APIs, including endpoints, parameter optionality and format, security models and JSON Schema breakdown of JSON message formats.
+1. It provides a standardised way of documenting APIs, including routes, parameter optionality and format, security models and JSON Schema breakdown of JSON message formats.
 1. The OpenAPI UI allows a very simple and developer-focused way of exploring and interacting with HTTP services from a browser environment.
 1. It is cross-platform and has good tooling support. An OpenAPI specification document can be used to generate stub HTTP servers and clients in a variety of languages, thus reducing integration efforts.
 
@@ -24,33 +24,37 @@ In line with the overall [ethos of the project](/rationale), [OpenAPI3] support 
 
 Out of the box, the module provides the following benefits when configured for OpenApi3:
 
-1. Automatic generation of endpoint documentation in [OpenAPI3] format, including JSON Schema models for incoming and outgoing messages.
-1. Completely automatic validation of the defined HTTP contract through the typesafe [http4k] Lens mechanism - violations will be detected and a BAD_REQUEST returned to the caller. This means that absolutely zero custom validation code is required to clutter up your endpoint code and you can concentrate on working with meaningful domain types instead of primitives.
-1. Support for all defined [OpenAPI3] security models at both a global and per-endpoint scope - BearerToken, ApiKey, OAuth (AuthCode flow) and BasicAuth, although you can define and use custom implementations.
+1. Automatic generation of route documentation in [OpenAPI3] format, including JSON Schema models for incoming and outgoing messages.
+1. Completely automatic validation of the defined HTTP contract through the typesafe [http4k] Lens mechanism - violations will be detected and a BAD_REQUEST returned to the caller. This means that absolutely zero custom validation code is required to clutter up your route code and you can concentrate on working with meaningful domain types instead of primitives.
+1. Support for all defined [OpenAPI3] security models at both a global and per-route scope - BearerToken, ApiKey, OAuth (AuthCode flow) and BasicAuth, although you can define and use custom implementations.
 
 ### Defining an HTTP contract
 So, how does it look using the [http4k] API? The first thing to note is that we will be using a slightly different routing DSL the standard [http4k] one - for contract-based routing we use the`contract {}` routing block which provides us with a much richer way of describing the contract. However, these new routing blocks are completely compatible with the `routes()` blocks, so they can be composed together to form route-matching trees.
 
 When we define a contract, we can configure it with an instance of the `ContractRenderer` interface, which is responsible for creating the generated documentation. In this case, we are using the [OpenAPI3] renderer, which also requires a standardised http4k `Json` instance to do the actual rendering - we are using the `http4k-format-jackson` module here:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_contract.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/empty_contract.kt"></script>
 
-All configuration above are optional to specify (with sensible defaults) - changing the URL location of the generated documentation and, more interestingly, supplying an instance of `Security` that we can use to protect our endpoints. [http4k] 
+All configuration above are optional to specify (with sensible defaults) - changing the URL location of the generated documentation and, more interestingly, supplying an instance of `Security` that we can use to protect our routes. [http4k] 
 As you can see, the result of the `contract {...}` block is just a standard http4k `HttpHandler` (which is just defined as a `typealias (Request) -> Response`).
 
-If we open the resulting JSON spec in the OpenApi UI (see [here](https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fbasic_contract.json) ), we can see how this empty contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
+If we open the resulting JSON spec in the OpenApi UI (see [here](https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fempty_contract.json) ), we can see how this empty contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
 
-### Adding a basic endpoint
-The next step is to actually add an endpoint (or `ContractRoute`) to our contract. These endpoints can be defined independently (and thus tested separately) to the main contract. The `ContractRoute` DSL utilises the [http4k] Lens API to automatically extract and convert incoming path parameters into richer domain types. 
+### Adding a basic route
+The next step is to actually add an route (or `ContractRoute`) to our contract. These routes can be defined independently (and thus tested separately) to the main contract. The `ContractRoute` DSL utilises the [http4k] Lens API to automatically extract and convert incoming path parameters into richer domain types. 
 
 In this simple example, we're going to use a path with two dynamic parameters - `name` which is a String, and `age` which will be extracted and converted to a simple validated domain wrapper type. If the basic format of the path or the values for these path parameters cannot be extracted correctly, the contract will not match the request and a 404 will be generated - this allows for several different versions of the same URI path to co-exist. Once the values have been extracted, they are passed to a function which will return a pre-configured `HttpHandler` for that path:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_endpoint.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_route.kt"></script>
 
-And here's a test for that endpoint - it's marginly more complex than a standard [http4k] endpoint test due to the need to wrap the route in a `contract {}` block, but is still ultra simple. Here, we're leveraging `http4k-testing-hamkrest` to supply Matchers for testing the response message:
+And here's a test for that route - it's marginly more complex than a standard [http4k] route test due to the need to wrap the route in a `contract {}` block, but is still ultra simple. Here, we're leveraging `http4k-testing-hamkrest` to supply Matchers for testing the response message:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_endpoint_test.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/basic_route_test.kt"></script>
 
+### Adding the route metadata
+The metadata for the route forms the rest of the documented contract. The DSL for specifying this consists of a `meta [}` block containing a mixture of purely informational/organisational fields and those which should form part of the contract. For the latter case, we can further use the [http4k] lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form before the contract HttpHandler is invoked, this eliminating the need for any custom validation code to be written.
+
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/metadata_route.kt"></script>
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org

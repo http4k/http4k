@@ -15,10 +15,10 @@ data class Age(val value: Int) {
     }
 }
 
-fun handler(name: String, age: Age): HttpHandler = { req: Request ->
+fun basicHandler(name: String, age: Age): HttpHandler = { req: Request ->
     val beverage = if (age.value >= 18) "beer" else "lemonade"
     Response(OK).body("Hello $name, would you like some $beverage?")
 }
 
-val route = "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract GET to ::handler
+val basicRoute = "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract GET to ::basicHandler
 
