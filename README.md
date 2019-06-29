@@ -44,7 +44,7 @@ plugging together of services without HTTP container being required.
      * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
     * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust, Thymeleaf and Freemarker
     * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
-    * Typesafe, auto-validating, self-documenting (via Fi v2 & v3) contracts for HTTP services
+    * Typesafe, auto-validating, self-documenting (via OpenApi v2 & v3) contracts for HTTP services
     * AWS request signing: super-simple interactions with AWS services.
     * Metrics gathering for performance analysis.
     * Multipart form handling, including stream processing for uploaded files.
@@ -90,7 +90,7 @@ plugging together of services without HTTP container being required.
     * Define **Typesafe** HTTP contracts, with required and optional path/query/header/bodies
     * **Typesafe** path matching
     * **Auto-validation** of incoming requests == **zero boilerplate validation code**
-    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3r** description endpoints including **JSON Schema** model breakdown. 
+    * Self-documenting for all routes - eg. Built in support for live **OpenApi v2 and v3** description endpoints including **JSON Schema** model breakdown. 
 * [Templating:](https://http4k.org/guide/modules/templating) 
     * **Pluggable** templating system support for:
         * **Dust** 
