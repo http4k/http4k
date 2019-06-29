@@ -25,7 +25,7 @@ In line with the overall [ethos of the project](/rationale), OpenApi3 support is
 Out of the box, the module provides the following benefits when configured for OpenApi3:
 
 1. Automatic generation of endpoint documentation in OpenApi3 format, including JSON Schema models for incoming and outgoing messages.
-1. Completely automatic validation of the defined HTTP contract through the typesafe [http4k] Lens mechanism - violations will be detected and a BAD_REQUEST returned to the caller. This means that absolutely zero custom validation code is required to clutter up your endpoint code.
+1. Completely automatic validation of the defined HTTP contract through the typesafe [http4k] Lens mechanism - violations will be detected and a BAD_REQUEST returned to the caller. This means that absolutely zero custom validation code is required to clutter up your endpoint code and you can concentrate on working with meaningful domain types instead of primitives.
 1. Support for all defined OpenApi3 security models at both a global and per-endpoint scope - BearerToken, ApiKey, OAuth (AuthCode flow) and BasicAuth, although you can define and use custom implementations.
 
 ### Defining an HTTP contract
