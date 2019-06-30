@@ -36,16 +36,28 @@ These data classes are compatible with using the `Body.auto<T>()` functionality.
 
 #### FAQ (aka gotchas) regarding Auto-marshalling capabilities
 
-##### Uppercase JSON key names
-The Jackson version of the automarshalling does NOT work for objects with uppercase key names - this is a known issue 
-with the Jackson library and we are unable to fix it. Either use the GSON alternative, or annotate your Data class fields 
-with `JsonAlias` annotations to work around this.
+**Q. Where is the `Body.auto` method defined?**
 
-##### JSON arrays
-When handling raw JSON array messages, such as: `[123, 456, 567]`, there is a slight gotcha when auto-marshalling messages 
-from JSON.
+**A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson`, `Moshi` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
+`import org.http4k.format.Jackson.auto`
 
-This is demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT 
+**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
+
+**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class with `@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)` or the fields with `@JsonAlias` or to get it work correctly.
+
+**Q. Using Jackson, Boolean properties with names starting with "is" do not marshall properly**
+
+**A.** This is due to the way in which the Jackson `ObjectMapper` is configured. Annotation of the fields in question should help, or using `ObjectMapper.disable(MapperFeature.AUTO_DETECT_IS_GETTERS)`
+
+**Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
+
+**A.** This happens because [http4k] uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
+
+**Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
+
+**A.** This occurs in Jackson and Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
+
+This can be demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT 
 the same as a native Kotlin list of objects. This can make tests break as the unmarshalled list is NOT equal to the native list.
 
 As shown, a workaround to this is to use `Body.auto<Array<MyIntWrapper>>().toLens()` instead, and then compare using 

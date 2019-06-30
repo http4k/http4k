@@ -34,23 +34,9 @@ If you're running [http4k] in production and would like to be listed on the site
 - `org.http4k.filter.TrafficFilters`
 
 ### Lenses & Auto-Marshalling
+**Q. I am having a problem with the usage of Jackson or GSON for auto marshalling**
 
-**Q. Where is the `Body.auto` method defined?**
-
-**A.** `Body.auto` is an extension method which is declared on the parent singleton `object` for each of the message libraries that supports auto-marshalling - eg. `Jackson`, `Gson`, `Moshi` and `Xml`. All of these objects are declared in the same package, so you need to add an import similar to:
-`import org.http4k.format.Jackson.auto`
-
-**Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
-
-**A.** This occurs in Jackson and Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
-
-**Q. Using Jackson, the Data class auto-marshalling is not working correctly when my JSON fields start with capital letters**
-
-**A.** Because of the way in which the Jackson library works, uppercase field names are NOT supported. Either switch out to use `http4k-format-gson` (which has the same API), or annotate your Data class with `@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)` or the fields with `@JsonAlias` or to get it work correctly.
-
-**Q. Using Gson, the data class auto-marshalling does not fail when a null is populated in a Kotlin non-nullable field**
-
-**A.** This happens because [http4k] uses straight GSON demarshalling, of JVM objects with no-Kotlin library in the mix. The nullability generally gets checked at compile-type and the lack of a Kotlin sanity check library exposes this flaw. No current fix - apart from to use the Jackson demarshalling instead!
+**A.** Please see the [custom FAQ](/guide/modules/json/) for JSON handling questions.
 
 **Q. My application uses Lenses, but when they fail I get an HTTP 500 instead of the promised 400.**
 
