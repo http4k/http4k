@@ -3,8 +3,8 @@ description: Feature overview of the http4k-contract module
 
 ### Installation (Gradle)
 ```
-compile group: "org.http4k", name: "http4k-contract", version: "3.158.1"
-compile group: "org.http4k", name: "http4k-format-<insert json lib>", version: "3.158.1"
+compile group: "org.http4k", name: "http4k-contract", version: "3.159.0"
+compile group: "org.http4k", name: "http4k-format-<insert json lib>", version: "3.159.0"
 ```
 
 ### About
