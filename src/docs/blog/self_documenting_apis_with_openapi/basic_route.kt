@@ -1,4 +1,4 @@
-package blog.self_documenting_apis
+package blog.self_documenting_apis_with_openapi
 
 import org.http4k.contract.div
 import org.http4k.core.HttpHandler

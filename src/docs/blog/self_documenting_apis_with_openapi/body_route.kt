@@ -1,4 +1,4 @@
-package blog.self_documenting_apis
+package blog.self_documenting_apis_with_openapi
 
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.Tag
@@ -18,12 +18,12 @@ data class Person(val name: String, val age: Age, val children: List<Person> = e
 
 object Family {
 
-    private val tree = Person("Bob", Age(85), listOf(
+    private val familyData = Person("Bob", Age(85), listOf(
         Person("Anita", Age(55)),
         Person("Donald", Age(52), listOf(Person("Don Jr", Age(21))))
     ))
 
-    private val response = Body.auto<Person>("The matched family tree").toLens()
+    private val responseLens = Body.auto<Person>("The matched family tree").toLens()
 
     private fun handler(queryName: String): HttpHandler = {
         fun Person.search(): Person? = when (name) {
@@ -31,14 +31,14 @@ object Family {
             else -> children.firstOrNull { it.search() != null }
         }
 
-        tree.search()?.let { Response(OK).with(response of it) } ?: Response(NOT_FOUND)
+        familyData.search()?.let { Response(OK).with(responseLens of it) } ?: Response(NOT_FOUND)
     }
 
     operator fun invoke(): ContractRoute = "/search" / Path.of("name") meta {
         summary = "Search family tree"
         description = "Given a name, returns a sub family tree starting with that person"
         tags += Tag("query")
-        returning(OK, response to tree, "Cut down family tree")
+        returning(OK, responseLens to Person("Donald", Age(52), listOf(Person("Don Jr", Age(21)))), "Cut down family tree")
         returning(NOT_FOUND to "That person does not exist the family")
     } bindContract GET to ::handler
 }

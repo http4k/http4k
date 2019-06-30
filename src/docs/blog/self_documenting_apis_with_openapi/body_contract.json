@@ -85,32 +85,17 @@
             "content": {
               "application/json": {
                 "example": {
-                  "name": "Bob",
+                  "name": "Donald",
                   "age": {
-                    "value": 85
+                    "value": 52
                   },
                   "children": [
                     {
-                      "name": "Anita",
+                      "name": "Don Jr",
                       "age": {
-                        "value": 55
+                        "value": 21
                       },
                       "children": []
-                    },
-                    {
-                      "name": "Donald",
-                      "age": {
-                        "value": 52
-                      },
-                      "children": [
-                        {
-                          "name": "Don Jr",
-                          "age": {
-                            "value": 21
-                          },
-                          "children": []
-                        }
-                      ]
                     }
                   ]
                 },
@@ -140,7 +125,7 @@
       "Person": {
         "properties": {
           "name": {
-            "example": "Bob",
+            "example": "Donald",
             "type": "string"
           },
           "age": {
@@ -157,58 +142,28 @@
             },
             "example": [
               {
-                "name": "Anita",
+                "name": "Don Jr",
                 "age": {
-                  "value": 55
+                  "value": 21
                 },
                 "children": []
-              },
-              {
-                "name": "Donald",
-                "age": {
-                  "value": 52
-                },
-                "children": [
-                  {
-                    "name": "Don Jr",
-                    "age": {
-                      "value": 21
-                    },
-                    "children": []
-                  }
-                ]
               }
             ],
             "type": "array"
           }
         },
         "example": {
-          "name": "Bob",
+          "name": "Donald",
           "age": {
-            "value": 85
+            "value": 52
           },
           "children": [
             {
-              "name": "Anita",
+              "name": "Don Jr",
               "age": {
-                "value": 55
+                "value": 21
               },
               "children": []
-            },
-            {
-              "name": "Donald",
-              "age": {
-                "value": 52
-              },
-              "children": [
-                {
-                  "name": "Don Jr",
-                  "age": {
-                    "value": 21
-                  },
-                  "children": []
-                }
-              ]
             }
           ]
         },
@@ -222,12 +177,12 @@
       "Age": {
         "properties": {
           "value": {
-            "example": 85,
+            "example": 52,
             "type": "number"
           }
         },
         "example": {
-          "value": 85
+          "value": 52
         },
         "type": "object",
         "required": [
