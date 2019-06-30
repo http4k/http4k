@@ -34,7 +34,7 @@ object Family {
         familyData.search()?.let { Response(OK).with(responseLens of it) } ?: Response(NOT_FOUND)
     }
 
-    operator fun invoke(): ContractRoute = "/search" / Path.of("name") meta {
+    operator fun invoke(): ContractRoute = "/search" / Path.of("name", "The name to search for in the tree") meta {
         summary = "Search family tree"
         description = "Given a name, returns a sub family tree starting with that person"
         tags += Tag("query")

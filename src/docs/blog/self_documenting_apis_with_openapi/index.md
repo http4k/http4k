@@ -62,7 +62,13 @@ As expected, if we look at the OpenAPI UI <a target="_blank" href="https://www.h
 The most exciting part [http4k] supporting OpenApi3 is the ability to represent HTTP messages in [JSON Schema] 
 form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenAPI UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using the overloads of the `receiving()` and `returning()` functions.
 
+Lets add another route to the mix which returns a body object modelled with a Kotlin Data class, and once again using [http4k] lenses (this time created using `Body.auto<>().toLens()`) to auto-convert them into JSON:
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis/body_route.kt"></script>
+
+Taking a final look at the OpenAPI UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
+
+
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org

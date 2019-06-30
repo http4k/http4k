@@ -26,7 +26,7 @@
             "in": "query",
             "name": "drink",
             "required": false,
-            "description": "your favourite beverage"
+            "description": "Your favourite beverage"
           },
           {
             "schema": {
@@ -35,7 +35,7 @@
             "in": "path",
             "name": "name",
             "required": true,
-            "description": null
+            "description": "Your name"
           },
           {
             "schema": {
@@ -44,7 +44,7 @@
             "in": "path",
             "name": "age",
             "required": true,
-            "description": null
+            "description": "Your age"
           }
         ],
         "responses": {
