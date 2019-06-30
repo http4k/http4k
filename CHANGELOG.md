@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.159.0 (uncut)
 - [all] Update various dependencies.
-- [http4k-client-okhttp] Updated `OkHttp` to v4.0.0 (Kotlin edition)
+- [http4k-client-okhttp] Updated `OkHttp` to v4.0.0 (Kotlin edition).
+- [http4k-contract] Tweak to JSON Schema rendering to hande recursive objects better.
 
 ### v3.158.1
 - [http4k-server-netty] Fix #260 - cannot set multiple response headers with same name
