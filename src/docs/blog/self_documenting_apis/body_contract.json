@@ -140,7 +140,7 @@
       "Person": {
         "properties": {
           "name": {
-            "example": "Don Jr",
+            "example": "Bob",
             "type": "string"
           },
           "age": {
@@ -149,18 +149,68 @@
           },
           "children": {
             "items": {
-              "oneOf": []
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Person"
+                }
+              ]
             },
-            "example": [],
+            "example": [
+              {
+                "name": "Anita",
+                "age": {
+                  "value": 55
+                },
+                "children": []
+              },
+              {
+                "name": "Donald",
+                "age": {
+                  "value": 52
+                },
+                "children": [
+                  {
+                    "name": "Don Jr",
+                    "age": {
+                      "value": 21
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ],
             "type": "array"
           }
         },
         "example": {
-          "name": "Don Jr",
+          "name": "Bob",
           "age": {
-            "value": 21
+            "value": 85
           },
-          "children": []
+          "children": [
+            {
+              "name": "Anita",
+              "age": {
+                "value": 55
+              },
+              "children": []
+            },
+            {
+              "name": "Donald",
+              "age": {
+                "value": 52
+              },
+              "children": [
+                {
+                  "name": "Don Jr",
+                  "age": {
+                    "value": 21
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
         },
         "type": "object",
         "required": [
@@ -172,12 +222,12 @@
       "Age": {
         "properties": {
           "value": {
-            "example": 21,
+            "example": 85,
             "type": "number"
           }
         },
         "example": {
-          "value": 21
+          "value": 85
         },
         "type": "object",
         "required": [
