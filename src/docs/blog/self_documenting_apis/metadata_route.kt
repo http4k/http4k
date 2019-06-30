@@ -24,7 +24,7 @@ object Greetings {
     private val favouriteDrink = Query.map(::Drink).optional("drink", "your favourite beverage")
 
     private fun handler(name: String, age: Age): HttpHandler = { req: Request ->
-        val beverage = favouriteDrink(req)?.name ?: if (age.isAdult) "beer" else "lemonade"
+        val beverage = favouriteDrink(req)?.name ?: if (age.value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 

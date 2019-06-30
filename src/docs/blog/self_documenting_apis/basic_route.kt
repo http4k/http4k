@@ -13,12 +13,10 @@ data class Age(val value: Int) {
     init {
         require(value >= 0)
     }
-
-    val isAdult = value >= 18
 }
 
 fun basicHandler(name: String, age: Age): HttpHandler = { req: Request ->
-    val beverage = if (age.isAdult) "beer" else "lemonade"
+    val beverage = if (age.value >= 18) "beer" else "lemonade"
     Response(OK).body("Hello $name, would you like some $beverage?")
 }
 

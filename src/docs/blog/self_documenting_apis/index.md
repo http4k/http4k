@@ -58,7 +58,12 @@ The metadata for the route forms the rest of the documented contract. The DSL fo
 
 As expected, if we look at the OpenAPI UI [here](https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fmetadata_contract.json), the greetings endpoint UI has now been embellished with more data.
 
+### Modelling HTTP body messages
+The most exciting part [http4k] supporting the [OpenApi3 Specification] is the ability to represent HTTP messages in [JSON Schema] 
+form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenAPI UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using the overloads of the `receiving()` and `returning()` functions.
+
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
 [OpenAPI specification]: https://swagger.io/specification/
 [OpenAPI3]: https://www.openapis.org/
+[JSON Schema]: https://json-schema.org/

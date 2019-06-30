@@ -16,6 +16,7 @@ val finalHttp: HttpHandler = contract {
     security = BasicAuthSecurity("realm", Credentials("user", "password"))
 
     routes += Greetings()
+    routes += Family()
 }
 
 fun main() {
