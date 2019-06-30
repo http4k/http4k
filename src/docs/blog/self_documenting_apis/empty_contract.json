@@ -2,7 +2,7 @@
   "info": {
     "title": "my great api",
     "version": "v1.0",
-    "description": null
+    "description": "Describing the purpose of the API"
   },
   "tags": [],
   "paths": {},
