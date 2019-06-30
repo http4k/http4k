@@ -20,6 +20,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 
+data class RecursiveObject(val children: List<RecursiveObject> = emptyList())
+
 data class ArbObject2(val uri: Uri = Uri.of("foobar"))
 
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
@@ -69,6 +71,11 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for nested arbitrary objects`(approver: Approver) {
         approver.assertApproved(ArbObject(), null)
+    }
+
+    @Test
+    fun `renders schema for recursive objects`(approver: Approver) {
+        approver.assertApproved(RecursiveObject(listOf(RecursiveObject())), null)
     }
 
     @Test

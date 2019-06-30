@@ -24,7 +24,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val schema = json.asJsonObject(obj).toSchema(obj, null)
         return JsonSchema(
             json.asJsonObject(schema),
-            schema.definitions().map { it.name() to json.asJsonObject(it) }.toSet())
+            schema.definitions().map { it.name() to json.asJsonObject(it) }.distinctBy { it.first }.toSet())
     }
 
     private fun NODE.toSchema(value: Any, objName: String?) =
