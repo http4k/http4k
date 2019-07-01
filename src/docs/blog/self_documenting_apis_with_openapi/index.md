@@ -1,36 +1,36 @@
-title: http4k blog: Writing self-documenting APIs with OpenAPI
+title: http4k blog: Writing self-documenting APIs with OpenApi
 description: An overview of the OpenApi support available in the http4k library.
 
-# Writing self-documenting APIs with OpenAPI
+# Writing self-documenting APIs with OpenApi
 
 ##### [@daviddenton][github]
 
-This post describes [http4k] support for describing HTTP route services using the [OpenAPI specification v3], providing typesafe documentation and automatic contract validation of incoming HTTP messages.
+This post describes [http4k] support for describing HTTP route services using the [OpenApi specification v3], providing typesafe documentation and automatic contract validation of incoming HTTP messages.
 
 In microservice environments, some of the biggest challenges exist around the communiciations between processes that simply aren't present when you're doing monolith-based development. This manifests in many different operational ways such as monitoring, discovery and fault tolerance, but one of the key aspects is communicating the the contract provided by a particular service.
 
-There have been various efforts to standardise these aspects, and one of the most popular is the OpenAPI specification, which grew out of the original Swagger project. There are 3 key advantages to OpenAPI:
+There have been various efforts to standardise these aspects, and one of the most popular is the OpenApi specification, which grew out of the original Swagger project. There are 3 key advantages to OpenApi:
 
 1. It provides a standardised way of documenting APIs, including routes, parameter optionality and format, security models and JSON Schema breakdown of JSON messages.
-1. The [OpenAPI UI](https://www.http4k.org/openapi3/) allows a very simple and developer-focused way of exploring and interacting with HTTP services from a browser environment.
-1. It is cross-platform and has good tooling support. An OpenAPI specification document can be used to generate HTTP server stubs and working HTTP clients in a variety of languages, thus reducing integration efforts.
+1. The [OpenApi UI](https://www.http4k.org/openapi3/) allows a very simple and developer-focused way of exploring and interacting with HTTP services from a browser environment.
+1. It is cross-platform and has good tooling support. An OpenApi specification document can be used to generate HTTP server stubs and working HTTP clients in a variety of languages, thus reducing integration efforts.
 
 ### Typesafe HTTP contracts with http4k-contract
 
-[http4k] has supported the basic Swagger spec for a while via a plugin into it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenAPI3 support with the release of http4k version 3.159.0.
+[http4k] has supported the basic Swagger spec for a while via a plugin into it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.159.0.
 
-In line with the overall [ethos of the project](/rationale), OpenAPI3 support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenAPI3 (where often annotations and other compile-time magic are used) and means that the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
+In line with the overall [ethos of the project](/rationale), OpenApi3 support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenApi (where often annotations and other compile-time magic are used) and means that the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
 
 Out of the box, `http4k-contract` the module now provides the following features when configured for OpenApi3:
 
-1. Automatic generation of route documentation in OpenAPI3 format, including JSON Schema models for incoming and outgoing messages.
+1. Automatic generation of route documentation in OpenApi3 format, including JSON Schema models for incoming and outgoing messages.
 1. Complete auto-validation of the defined HTTP contract through the typesafe [http4k] Lens mechanism - violations are automatically  detected and a BAD_REQUEST returned to the caller. This means that absolutely zero custom validation code is required to clutter up your routing layer and you can concentrate on working with meaningful domain types instead of primitives.
-1. Support for all defined OpenAPI3 security models at both a global and per-route scope - BearerToken, ApiKey, OAuth (AuthCode flow) and BasicAuth, although you can of course define and use custom implementations.
+1. Support for all defined OpenApi3 security models at both a global and per-route scope - BearerToken, ApiKey, OAuth (AuthCode flow) and BasicAuth, although you can of course define and use custom implementations.
 
 ### Defining an HTTP contract
 So, how does it look using the [http4k] API? The first thing to note is that we will be using a slightly different routing DSL the standard [http4k] one - for contract-based routing we use a`contract {}` routing block which provides us with a much richer way of describing the API. However, these new routing blocks are completely compatible with the standard `routes()` blocks, so they can be composed together to form route-matching trees.
 
-When we define a contract, we can configure it with an instance of the `ContractRenderer` interface, which is responsible for creating the generated documentation. In this case, we are using the OpenAPI3 renderer, which also requires a standardised http4k `Json` instance to do the actual rendering - we are using the `http4k-format-jackson` module here:
+When we define a contract, we can configure it with an instance of the `ContractRenderer` interface, which is responsible for creating the generated documentation. In this case, we are using the OpenApi3 renderer, which also requires a standardised http4k `Json` instance to do the actual rendering - we are using the `http4k-format-jackson` module here:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/empty_contract.kt"></script>
 
@@ -56,22 +56,27 @@ The metadata for the route forms the rest of the documented contract. The DSL fo
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/metadata_route.kt"></script>
 
-As expected, if we look at the OpenAPI UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fmetadata_contract.json">here</a>, the greetings endpoint UI has now been embellished with more data.
+As expected, if we look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fmetadata_contract.json">here</a>, the greetings endpoint UI has now been embellished with more data.
 
 ### Modelling HTTP body messages
 The most exciting part [http4k] supporting OpenApi3 is the ability to represent HTTP messages in [JSON Schema] 
-form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenAPI UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using the overloads of the `receiving()` and `returning()` functions.
+form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using overloads of the `receiving()` and `returning()` functions.
 
-Lets add another route to the mix which returns a body object modelled with a Kotlin Data class, and once again using [http4k] lenses (this time created using `Body.auto<>().toLens()`) to auto-convert them into JSON:
+Lets add another route to the mix which returns a body object modelled with a Kotlin Data class and once again using [http4k] lenses. This time the lens is created with the `Body.auto<>().toLens()`) which provides the typed injection and extraction functions. Notice here that for injection we are using the more fluent API  `with()` extension function on `HttpMessage`, as opposed to the standard lens function`(X, HttpMessage) -> HttpMessage`:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/body_route.kt"></script>
 
-Taking a final look at the OpenAPI UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
+Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 
+### Further reading...
+And that's it. Once we have the final specification document available, users of our API can use various [OpenApi Generators] to generate HTTP clients in various languages for interacting with the it, or to generate fake services that provide our API in their own environments (and thus enabling more simple end-to-end testing). The "Fake HTTP services" technique also enables the creation of Consumer-Driven-Contract style tests, and opens up possibilities for all kinds of interesting Chaos/failure-mode testing (you can even use the `http4k-testing-chaos` module to help ;) with this).
 
+For a sense of how this all looks in when mixed into a complete http4k project, check out the [http4k-by-example] repo, which contains an entire TDD'd project showcasing a multitude of http4k features and testing styles.
 
 [github]: http://github.com/daviddenton
 [http4k]: https://http4k.org
-[OpenAPI specification v3]: https://swagger.io/specification/
-[OpenAPI3]: https://www.openapis.org/
+[OpenApi specification v3]: https://swagger.io/specification/
+[OpenApi3]: https://www.openapis.org/
 [JSON Schema]: https://json-schema.org/
+[OpenApi Generators]: https://openapi-generator.tech
+[http4k-by-example]: https://github.com/http4k/http4k-by-example
