@@ -126,7 +126,6 @@ object ChaosBehaviours {
                 next(with(it) {
                     val max = limitFn(body.length ?: 0)
                     val limit = if (max == 0L) 0L else random.nextLong(max)
-                    println(limit)
                     body(body.snipTo(limit)).with(Header.CHAOS of "Snip request body (${limit}b)")
                 })
             }
