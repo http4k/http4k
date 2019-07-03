@@ -138,8 +138,8 @@ object ChaosTriggers {
             private val count = AtomicInteger(initial)
 
             override fun invoke(req: Request) = if (count.get() > 0) {
-                count.decrementAndGet(); true
-            } else false
+                count.decrementAndGet(); false
+            } else true
 
             override fun toString() = "Countdown (${count.get()} remaining)"
         }

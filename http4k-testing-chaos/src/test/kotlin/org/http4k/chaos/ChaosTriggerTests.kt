@@ -67,10 +67,10 @@ class CountdownTriggerTest : ChaosTriggerContract() {
     @Test
     fun `behaves as expected`() {
         val trigger = Countdown(2)
-        assertThat(trigger(request), equalTo(true))
-        assertThat(trigger(request), equalTo(true))
         assertThat(trigger(request), equalTo(false))
         assertThat(trigger(request), equalTo(false))
+        assertThat(trigger(request), equalTo(true))
+        assertThat(trigger(request), equalTo(true))
     }
 }
 
