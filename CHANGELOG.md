@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.160.0
+- [http4k-testing-chaos] Slight fix to avoid consuming stream body when setting chaos.
+
 ### v3.159.0
 - [all] Update various dependencies.
 - [http4k-client-okhttp] Updated `OkHttp` to v4.0.0 (Kotlin edition).
