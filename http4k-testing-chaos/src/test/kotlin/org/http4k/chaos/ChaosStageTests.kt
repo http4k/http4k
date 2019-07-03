@@ -91,7 +91,7 @@ class VariableStageTest {
         val variable = Variable()
         assertThat(variable.toString(), equalTo(("Always None")))
         assertThat(variable(request)!!.then { response }(request), equalTo(response))
-        variable.current = ChaosStages.Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always()) }
+        variable.current = Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always()) }
         assertThat(variable.toString(), equalTo(("Repeat [Always ReturnStatus (404)]")))
         assertThat(variable(request)!!.then { response }(request), hasStatus(NOT_FOUND.description("x-http4k-chaos")).and(hasHeader("x-http4k-chaos", Regex("Status 404"))))
     }
