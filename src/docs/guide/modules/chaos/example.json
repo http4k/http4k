@@ -16,7 +16,7 @@
           "status": 404
         },
         "trigger": {
-          "type": "always",
+          "type": "always"
         },
         "until": {
           "type": "countdown",

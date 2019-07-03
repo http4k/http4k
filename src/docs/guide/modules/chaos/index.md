@@ -88,7 +88,7 @@ Apart from being able to turn the Chaos on/off and check the status, the most po
           "status": 404
         },
         "trigger": {
-          "type": "always",
+          "type": "always"
         },
         "until": {
           "type": "countdown",
