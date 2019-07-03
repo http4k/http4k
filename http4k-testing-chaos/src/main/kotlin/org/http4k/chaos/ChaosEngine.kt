@@ -62,7 +62,7 @@ object ChaosEngine {
 
         val activate = Filter { next ->
             {
-                if (it.body.stream.available() != 0) variable.current = setStages(it)
+                if (it.bodyString().isNotEmpty()) variable.current = setStages(it)
                 trigger.toggle(true)
                 next(it)
             }
