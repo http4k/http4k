@@ -49,9 +49,8 @@ object ChaosTriggers {
     object Once {
         operator fun invoke(trigger: Trigger? = Always()) = object : Trigger {
             private val active = AtomicBoolean(true)
-            override fun invoke(request: Request): Boolean {
-                return if (trigger?.invoke(request) != false) active.get().also { active.set(false) } else false
-            }
+            override fun invoke(request: Request) =
+                if (trigger?.invoke(request) != false) active.get().also { active.set(false) } else false
 
             override fun toString() = "Once" + (trigger?.let { " (trigger = $trigger)" } ?: "")
         }
