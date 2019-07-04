@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.161.0
+- [http4k-cloudnative] Added Forbidden request exception to HandleUpstreamRequestFailed.
+
 ### v3.160.1
 - [http4k-testing-chaos] Countdown chaos trigger fixed.
 
