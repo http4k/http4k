@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.162.0
+- [http4k-testing-chaos] Add detail to Chaos OpenApi interface.
+
 ### v3.161.0
 - [http4k-cloudnative] Added Forbidden request exception to HandleUpstreamRequestFailed.
 
