@@ -20,6 +20,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CorsPolicy
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.ServerFilters
 import org.http4k.filter.ServerFilters.Cors
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.json
@@ -81,16 +82,19 @@ object ChaosEngine {
                 next(it)
             }
         }
-        val description = ""
-
-        val exampleChaos = obj(
-        )
+        val description = """This is the Open API interface for the http4k Chaos Engine. 
+            |
+            |Using this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. 
+            |
+            |See the | <a href="https://www.http4k.org/guide/modules/chaos/">user guide</a> for details about the 
+            | exact format of the JSON to post to the activation endpoint.""".trimMargin()
 
         return controlsPath bind
             Cors(corsPolicy)
+                .then(ServerFilters.CatchAll())
                 .then(
                     contract {
-                        renderer = OpenApi3(ApiInfo("Http4k Chaos controls", "1.0", description), Jackson)
+                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", description), Jackson)
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {
@@ -139,4 +143,25 @@ fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
     val variable = Variable(stage)
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
     return routes(ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
+}
+
+private val exampleChaos = Jackson {
+    array(listOf(
+        obj("type" to string("repeat"),
+            "stages" to array(
+                listOf(
+                    obj("type" to string("wait"),
+                        "until" to obj("type" to string("delay"), "period" to string("PT30S"))
+                    ),
+                    obj("type" to string("trigger"),
+                        "behaviour" to obj("type" to string("status"), "status" to number(418)),
+                        "trigger" to obj("type" to string("always")),
+                        "until" to obj("type" to string("countdown"), "count" to number(10))
+                    )
+                )
+            ),
+            "until" to obj("type" to string("deadline"),
+                "endTime" to string("2030-01-01T00:00:00Z"))
+        )
+    ))
 }
