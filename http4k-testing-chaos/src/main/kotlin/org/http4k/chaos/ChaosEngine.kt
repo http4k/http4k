@@ -98,15 +98,15 @@ object ChaosEngine {
             | exact format of the JSON to post to the activation endpoint.""".trimMargin()
 
 
-        fun RouteMetaDsl.returningExampleChaosDescription() {
-            val description = Repeat {
-                Wait.until(Delay(ofMinutes(1)))
-                    .then(ReturnStatus(I_M_A_TEAPOT)
-                        .appliedWhen(Always())
-                        .until(Deadline(ofEpochSecond(1735689600))))
-            }.toString()
-            returning(OK, jsonLens to chaosStatus(description), "The current Chaos being applied to requests.")
-        }
+        val currentChaosDescription = Repeat {
+            Wait.until(Delay(ofMinutes(1)))
+                .then(ReturnStatus(I_M_A_TEAPOT)
+                    .appliedWhen(Always())
+                    .until(Deadline(ofEpochSecond(1735689600))))
+        }.toString()
+
+        fun RouteMetaDsl.returningExampleChaosDescription() =
+            returning(OK, jsonLens to chaosStatus(currentChaosDescription), "The current Chaos being applied to requests.")
 
         return controlsPath bind
             Cors(corsPolicy)
