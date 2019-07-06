@@ -33,12 +33,12 @@ fun main() {
 
     val svc: HttpHandler = { Response(OK).body("A normal response") }
     filter.then(svc).asServer(SunHttp(9000)).start().use {
-        (1..10).forEach { performA(GET) }
+        repeat(10) { performA(GET) }
 
         // this triggers the change in behaviour
         performA(POST)
 
-        (1..10).forEach { performA(GET) }
+        repeat(10) { performA(GET) }
     }
 }
 
