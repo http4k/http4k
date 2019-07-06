@@ -19,6 +19,7 @@ import org.http4k.hamkrest.hasQuery
 import org.http4k.hamkrest.hasUri
 import org.http4k.hamkrest.hasUriPath
 import java.time.Clock
+import java.time.Clock.systemUTC
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
@@ -89,7 +90,7 @@ object ChaosTriggers {
      * Activates after a particular instant in time.
      */
     object Deadline {
-        operator fun invoke(endTime: Instant, clock: Clock) = object : Trigger {
+        operator fun invoke(endTime: Instant, clock: Clock = systemUTC()) = object : Trigger {
             override fun invoke(req: Request) = clock.instant().isAfter(endTime)
             override fun toString() = "Deadline ($endTime)"
         }
@@ -99,7 +100,7 @@ object ChaosTriggers {
      * Activates after a particular delay (compared to instantiation).
      */
     object Delay {
-        operator fun invoke(period: Duration, clock: Clock = Clock.systemUTC()) = object : Trigger {
+        operator fun invoke(period: Duration, clock: Clock = systemUTC()) = object : Trigger {
             private val endTime = Instant.now(clock).plus(period)
             override fun invoke(req: Request) = clock.instant().isAfter(endTime)
             override fun toString() = "Delay (expires $endTime)"
@@ -146,7 +147,7 @@ object ChaosTriggers {
     }
 }
 
-internal fun JsonNode.asTrigger(clock: Clock = Clock.systemUTC()): Trigger = when (nonNullable<String>("type")) {
+internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<String>("type")) {
     "deadline" -> Deadline(nonNullable("endTime"), clock)
     "delay" -> Delay(nonNullable("period"), clock)
     "countdown" -> Countdown(nonNullable("count"))

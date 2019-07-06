@@ -1,8 +1,13 @@
 package org.http4k.chaos
 
+import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Variable
 import org.http4k.chaos.ChaosStages.Wait
+import org.http4k.chaos.ChaosTriggers.Always
+import org.http4k.chaos.ChaosTriggers.Deadline
+import org.http4k.chaos.ChaosTriggers.Delay
+import org.http4k.contract.RouteMetaDsl
 import org.http4k.contract.contract
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.ApiInfo
@@ -15,6 +20,8 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
@@ -30,6 +37,8 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import java.time.Clock
+import java.time.Duration.ofMinutes
+import java.time.Instant.ofEpochSecond
 
 /**
  * Adds a set of endpoints to an application which will control the switching on/off of chaos behaviour. The added endpoints are:
@@ -55,10 +64,9 @@ object ChaosEngine {
                 .reduce { acc, next -> acc.then(next) }
         }.toLens()
 
+        val jsonLens = Body.json().toLens()
         val showCurrentStatus: HttpHandler = {
-            Response(OK).with(Body.json().toLens() of obj(
-                "chaos" to string(if (trigger.isActive()) variable.toString() else "none")
-            ))
+            Response(OK).with(jsonLens of chaosStatus(if (trigger.isActive()) variable.toString() else "none"))
         }
 
         val activate = Filter { next ->
@@ -82,36 +90,58 @@ object ChaosEngine {
                 next(it)
             }
         }
-        val description = """This is the Open API interface for the http4k Chaos Engine. 
+        val apiDescription = """This is the Open API interface for the http4k Chaos Engine. 
             |
             |Using this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. 
             |
             |See the <a href="https://www.http4k.org/guide/modules/chaos/">user guide</a> for details about the 
             | exact format of the JSON to post to the activation endpoint.""".trimMargin()
 
+
+        fun RouteMetaDsl.returningExampleChaosDescription() {
+            val description = Repeat {
+                Wait.until(Delay(ofMinutes(1)))
+                    .then(ReturnStatus(I_M_A_TEAPOT)
+                        .appliedWhen(Always())
+                        .until(Deadline(ofEpochSecond(1735689600))))
+            }.toString()
+            returning(OK, jsonLens to chaosStatus(description), "The current Chaos being applied to requests.")
+        }
+
         return controlsPath bind
             Cors(corsPolicy)
                 .then(ServerFilters.CatchAll())
                 .then(
                     contract {
-                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", description), Jackson)
+                        renderer = OpenApi3(ApiInfo("http4k Chaos Engine", "1.0", apiDescription), Jackson)
                         descriptionPath = openApiPath
                         security = chaosSecurity
                         routes += "/status" meta {
-                            summary = "show the current chaos being applied"
+                            summary = "Show the current Chaos being applied."
+                            description = "Returns a textual description of the current Chaos behaviour being applied to traffic."
+                            returningExampleChaosDescription()
                         } bindContract GET to showCurrentStatus
                         routes += "/activate/new" meta {
-                            summary = "activate new chaos on all routes"
-                            receiving(Body.json("New chaos to be applied").toLens() to exampleChaos)
+                            summary = "Activate new Chaos on all routes."
+                            description = "Replace the current Chaos being applied to traffic and activates that behaviour."
+                            receiving(jsonLens to exampleChaos)
+                            returning(BAD_REQUEST to "New Chaos could not be deserialised from the request body.")
+                            returningExampleChaosDescription()
                         } bindContract POST to activate.then(showCurrentStatus)
                         routes += "/activate" meta {
-                            summary = "activate chaos on all routes"
+                            summary = "Activate Chaos on all routes."
+                            description = "Toggles on the previously stored Chaos behaviour."
+                            returningExampleChaosDescription()
                         } bindContract POST to activate.then(showCurrentStatus)
                         routes += "/deactivate" meta {
-                            summary = "deactivate the chaos on all routes"
+                            summary = "Deactivate Chaos on all routes."
+                            description = "Toggles off the previously stored Chaos behaviour."
+                            returningExampleChaosDescription()
                         } bindContract POST to deactivate.then(showCurrentStatus)
                         routes += "/toggle" meta {
-                            summary = "toggle the chaos on all routes"
+                            summary = "Toggle on/off the Chaos on all routes."
+                            description = "Toggles the previously stored Chaos behaviour."
+                            returningExampleChaosDescription()
                         } bindContract POST to toggle.then(showCurrentStatus)
                     }
                 )
@@ -144,6 +174,8 @@ fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
     val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
     return routes(ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy), repeatStage.asFilter().then(this))
 }
+
+private fun chaosStatus(value: String) = obj("chaos" to string(value))
 
 private val exampleChaos = Jackson {
     array(listOf(
