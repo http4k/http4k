@@ -2,7 +2,6 @@
 *.iml
 .gradle/
 build/
-gradle.properties
 .DS_Store
 classes/
 /site/
