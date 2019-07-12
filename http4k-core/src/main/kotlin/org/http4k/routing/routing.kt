@@ -69,7 +69,7 @@ fun websockets(vararg list: RoutingWsHandler): RoutingWsHandler = object : Routi
 
 fun Request.path(name: String): String? = when (this) {
     is RoutedRequest -> xUriTemplate.extract(uri.path)[name]
-    else -> throw IllegalStateException("Request was not routed, so no uri-template not present")
+    else -> throw IllegalStateException("Request was not routed, so no uri-template present")
 }
 
 data class PathMethod(val path: String, val method: Method) {
