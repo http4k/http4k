@@ -19,7 +19,9 @@ import kotlin.reflect.jvm.javaGetter
 
 fun OpenApi3(apiInfo: ApiInfo, json: Jackson) = OpenApi3(apiInfo, json, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
 
-fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated))
+fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
+
+val JacksonAnnotated = FieldRetrieval.compose(JacksonJsonPropertyAnnotated, JacksonJsonNamingAnnotated)
 
 object JacksonJsonPropertyAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String) =
