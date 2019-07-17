@@ -5,14 +5,11 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
-import org.http4k.core.HttpHandler
+import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.with
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
@@ -92,6 +89,24 @@ class ContractRouteTest {
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") bindContract GET to { _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") bindContract GET to { _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") / Path.of("value7") bindContract GET to { _, _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}/{value7}")
+    }
+
+    @Test
+    fun `can still execute underlying HttpHandler`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val route = "/" bindContract GET to { Response(OK) }
+
+        assertThat(route(Request(GET, "/")).status, equalTo(OK))
+    }
+
+    @Test
+    fun `reports not found for invalid path when executing underlying HttpHandler`() {
+        val path1 = Path.int().of("sue")
+        val path2 = Path.string().of("bob")
+        val route = "/" bindContract GET to { Response(OK) }
+
+        assertThat(route(Request(GET, "/non-existatn")).status, equalTo(NOT_FOUND))
     }
 
     @Test
