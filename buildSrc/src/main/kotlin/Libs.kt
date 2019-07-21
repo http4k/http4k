@@ -6,7 +6,7 @@
  * to update this file */
 object Libs {
     /**
-     * [jackson-dataformat-xml website](http://wiki.fasterxml.com/JacksonExtensionXmlDataBinding) */
+     * [jackson-dataformat-xml website](https://github.com/FasterXML/jackson-dataformat-xml) */
     const val jackson_dataformat_xml: String =
         "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:" + Versions.jackson_dataformat_xml
 

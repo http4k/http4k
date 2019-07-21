@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.164.0 (uncut)
+- [all] Update various dependencies, including Kotlin to 1.3.41.
+- [http4k-testing-approval] Upgrade of HTML library from above may have an effect on output of HTML approval tests.
+
 ### v3.163.0
 - [http4k-testing-chaos] Add detail to Chaos OpenApi interface.
 

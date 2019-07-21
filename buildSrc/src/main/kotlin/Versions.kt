@@ -11,7 +11,7 @@ object Versions {
 
     const val jackson_module_kotlin: String = "$jackson_major_minor.9"
 
-    const val underscore: String = "1.45"
+    const val underscore: String = "1.46"
 
     const val handlebars: String = "4.1.2"
 
@@ -29,13 +29,13 @@ object Versions {
     const val com_squareup_moshi: String = "$moshi_major.8.0"
 
     const val okhttp_major: String = "4"
-    const val okhttp: String = "$okhttp_major.0.0"
+    const val okhttp: String = "$okhttp_major.0.1"
 
     const val io_github_resilience4j: String = "0.16.0"
 
     const val ktor_server_cio: String = "1.2.2"
 
-    const val micrometer_core: String = "1.1.5"
+    const val micrometer_core: String = "1.2.0"
 
     const val netty_codec_http2_major_minor = "4.1"
     const val netty_codec_http2: String = "$netty_codec_http2_major_minor.37.Final"
@@ -79,19 +79,19 @@ object Versions {
 
     const val dokka_gradle_plugin: String = "0.9.18"
 
-    const val org_jetbrains_kotlin: String = "1.3.40"
+    const val org_jetbrains_kotlin: String = "1.3.41"
 
     const val json: String = "20180813"
 
     const val jsoup: String = "1.12.1"
 
-    const val org_junit_jupiter: String = "5.4.2"
+    const val org_junit_jupiter: String = "5.5.1"
 
     const val coveralls_gradle_plugin: String = "2.8.3"
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val openapi_generator_gradle_plugin: String = "4.0.2"
+    const val openapi_generator_gradle_plugin: String = "4.0.3"
 
     const val selenium_api: String = "3.141.59"
 
@@ -103,12 +103,12 @@ object Versions {
      *      ./gradle/wrapper/gradle-wrapper.properties
      */
     object Gradle {
-        const val runningVersion: String = "5.4.1"
+        const val runningVersion: String = "5.5"
 
-        const val currentVersion: String = "5.4.1"
+        const val currentVersion: String = "5.5.1"
 
-        const val nightlyVersion: String = "5.6-20190616000028+0000"
+        const val nightlyVersion: String = "5.7-20190720220029+0000"
 
-        const val releaseCandidate: String = "5.5-rc-3"
+        const val releaseCandidate: String = ""
     }
 }
