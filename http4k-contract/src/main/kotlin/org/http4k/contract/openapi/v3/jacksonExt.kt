@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.format.Jackson
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
@@ -45,7 +46,7 @@ object JacksonJsonNamingAnnotated : FieldRetrieval {
         val fields = try {
             target::class.memberProperties.map { renmaingStrategy(it.name) to it }.toMap()
         } catch (e: Error) {
-            emptyMap()
+            emptyMap<String, KProperty1<out Any, Any?>>()
         }
 
         return fields[name]
