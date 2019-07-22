@@ -62,7 +62,6 @@ open class OpenApi2<out NODE>(
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
-            println("memo = $memo, path=$path, routes=$routes")
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
                 memoFields + render(contractRoot, security, route)
             }
