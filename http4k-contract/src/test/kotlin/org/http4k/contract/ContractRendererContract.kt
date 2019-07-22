@@ -23,6 +23,7 @@ import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.format.Jackson.asJsonObject
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
 import org.http4k.lens.FormField
@@ -73,6 +74,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
+            host = "http://example.org"
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
@@ -164,6 +166,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
+
 }
 
 private val credentials = Credentials("user", "password")

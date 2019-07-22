@@ -21,6 +21,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                                       private val descriptionPath: String,
                                       private val preFlightExtraction: PreFlightExtraction,
                                       private val routes: List<ContractRoute> = emptyList(),
+                                      private val host: String,
                                       private val rootAsString: String = "",
                                       private val preSecurityFilter: Filter = Filter.NoOp,
                                       private val postSecurityFilter: Filter = Filter.NoOp
@@ -43,7 +44,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun invoke(request: Request): Response = handler(request)
 
-    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
+    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes, host) }
 
     private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
 

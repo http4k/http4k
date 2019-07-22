@@ -39,7 +39,7 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>, host: String) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
@@ -48,6 +48,7 @@ open class OpenApi2<out NODE>(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
+                        "host" to string(host),
                         "tags" to array(renderTags(routes)),
                         "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),

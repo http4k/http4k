@@ -6,6 +6,7 @@
     "description": "module description"
   },
   "basePath": "/",
+  "host": "http://example.org",
   "tags": [
     {
       "name": "tag1"
