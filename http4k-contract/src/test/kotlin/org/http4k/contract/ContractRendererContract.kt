@@ -74,7 +74,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            host = "http://example.org"
+            host = "example.org"
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
