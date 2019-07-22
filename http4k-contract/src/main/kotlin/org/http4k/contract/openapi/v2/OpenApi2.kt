@@ -62,13 +62,19 @@ open class OpenApi2<out NODE>(
     private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
+            println("memo = $memo, path=$path, routes=$routes")
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
                 memoFields + render(contractRoot, security, route)
             }
             memo + FieldAndDefinitions(
-                path to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
+                normalisePath(path) to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
             )
         }
+
+    private fun normalisePath(path: String): String = when(path) {
+        "" -> "/"
+        else -> path
+    }
 
     private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
