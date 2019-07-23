@@ -66,9 +66,14 @@ open class OpenApi2<out NODE>(
                 memoFields + render(contractRoot, security, route)
             }
             memo + FieldAndDefinitions(
-                path to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
+                normalisePath(path) to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
             )
         }
+
+    private fun normalisePath(path: String): String = when(path) {
+        "" -> "/"
+        else -> path
+    }
 
     private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
