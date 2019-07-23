@@ -49,7 +49,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(JsonApprovalTest::class)
-abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, val rendererToUse: ContractRenderer) {
+abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, protected val rendererToUse: ContractRenderer) {
     @Test
     fun `can build 400`() {
         val response = rendererToUse.badRequest(listOf(

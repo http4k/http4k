@@ -70,10 +70,7 @@ open class OpenApi2<out NODE>(
             )
         }
 
-    private fun normalisePath(path: String): String = when(path) {
-        "" -> "/"
-        else -> path
-    }
+    private fun normalisePath(path: String): String = if (path == "") "/" else path
 
     private fun Meta.renderMeta(schema: JsonSchema<NODE>? = null) = json {
         obj(
