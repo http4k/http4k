@@ -47,7 +47,7 @@ In this simple example, we're going to use a path with two dynamic parameters - 
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_route.kt"></script>
 
-And here's a test for that route - it's marginly more complex than a standard [http4k] routing test due to the need to add the route into a `contract {}` block to produce the `HttpHandler`, but is still ultra simple. Here, we're leveraging `http4k-testing-hamkrest` to supply Matchers for testing the response message:
+And here's a unit test for that route - the good news is that it's no more complex than a standard [http4k] routing test due as a `ContractRoute` is also a `HttpHandler`, so it's still ultra simple. Here, we're leveraging `http4k-testing-hamkrest` to supply Matchers for testing the response message:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_route_test.kt"></script>
 

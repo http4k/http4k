@@ -6,8 +6,10 @@ import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
+import org.http4k.core.then
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
@@ -15,7 +17,9 @@ import org.http4k.routing.Router
 class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
                                          val meta: RouteMeta,
-                                         internal val toHandler: (ExtractedParts) -> HttpHandler) {
+                                         internal val toHandler: (ExtractedParts) -> HttpHandler) : HttpHandler {
+    override fun invoke(p1: Request) = meta.security.filter.then(toRouter(Root).match(p1)
+        ?: { Response(NOT_FOUND) })(p1)
 
     val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 

@@ -6,13 +6,16 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
+import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
@@ -211,6 +214,9 @@ class ContractRouteTest {
     }
 
     private fun checkMatching(route: ContractRoute, valid: String, expected: String) {
+        assertThat(route(Request(GET, valid)).bodyString(), equalTo(expected))
+        assertThat(route(Request(DELETE, valid)), hasStatus(NOT_FOUND))
+
         val routerOnNoPrefix = route.toRouter(Root)
         assertThat(routerOnNoPrefix.match(Request(GET, "")), absent())
         assertThat(routerOnNoPrefix.match(Request(POST, valid)), absent())
