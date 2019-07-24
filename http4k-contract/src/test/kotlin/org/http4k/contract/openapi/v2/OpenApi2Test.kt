@@ -30,5 +30,4 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(Argo, OpenApi2(ApiInfo("
 
         approver.assertApproved(router(Request(Method.GET, "/docs?the_api_key=somevalue")))
     }
-
 }

@@ -3,9 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.165.0 (uncut)
-- [http4k-contract] Fix invalid OpenAPI2 when root and base path match. H/T @rgladwell
+### v3.165.0
+- [http4k-contract] Fix invalid OpenApi2 when root and base path match. H/T @rgladwell
 - [http4k-contract] `ContractRoute` is now an `HttpHandler`, so no need to wrap contract routes in a `contract {}` to test them. H/T @rgladwell for the inspiration.
+- [http4k-contract] Support Host/baseUri values in OpenApi2. H/T @rgladwell
 
 ### v3.164.0
 - [all] Update various dependencies, including Kotlin to 1.3.41.
