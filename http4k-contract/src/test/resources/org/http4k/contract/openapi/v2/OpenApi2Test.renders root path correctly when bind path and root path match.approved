@@ -47,7 +47,7 @@
   },
   "definitions": {
   },
-  "host": "example.org",
+  "host": "example.org:8000",
   "schemes": [
     "http"
   ]
