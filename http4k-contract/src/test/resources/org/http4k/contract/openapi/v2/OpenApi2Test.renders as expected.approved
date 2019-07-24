@@ -829,5 +829,9 @@
         }
       }
     }
-  }
+  },
+  "host": "example.org",
+  "schemes": [
+    "http"
+  ]
 }

@@ -164,6 +164,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
 
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
+
 }
 
 private val credentials = Credentials("user", "password")

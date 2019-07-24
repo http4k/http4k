@@ -15,6 +15,7 @@ import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.lens.Failure
@@ -31,6 +32,7 @@ import org.http4k.util.JsonSchemaCreator
 open class OpenApi2<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
+    private val baseUri: Uri? = null,
     private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
@@ -44,7 +46,7 @@ open class OpenApi2<out NODE>(
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
-                    pretty(obj(
+                    val properties = listOf(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
@@ -52,7 +54,18 @@ open class OpenApi2<out NODE>(
                         "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
                         "definitions" to obj(definitions)
-                    ))
+                    )
+
+                    val propertiesWithUriData =
+                        if(baseUri != null) {
+                            properties
+                                .plus("host" to string(baseUri.host))
+                                .plus("schemes" to array(string(baseUri.scheme)))
+                        } else {
+                            properties
+                        }
+
+                    pretty(obj(propertiesWithUriData))
                 })
         }
 
