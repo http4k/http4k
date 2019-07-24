@@ -53,7 +53,7 @@ class OpenApi3<NODE : Any>(
 
     constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>) : this(apiInfo, json, ApiRenderer.Auto(json))
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>, host: String): Response {
+    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + security
         val paths = routes.map { it.asPath(security, contractRoot) }
 

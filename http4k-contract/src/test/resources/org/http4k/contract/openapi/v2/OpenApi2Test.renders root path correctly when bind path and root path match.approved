@@ -46,5 +46,9 @@
     }
   },
   "definitions": {
-  }
+  },
+  "host": "example.org",
+  "schemes": [
+    "http"
+  ]
 }

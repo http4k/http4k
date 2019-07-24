@@ -10,13 +10,14 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Uri
 import org.http4k.format.Argo
 import org.http4k.lens.Query
 import org.http4k.routing.bind
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 
-class OpenApi2Test : ContractRendererContract<JsonNode>(Argo, OpenApi2(ApiInfo("title", "1.2", "module description"), Argo)) {
+class OpenApi2Test : ContractRendererContract<JsonNode>(Argo, OpenApi2(ApiInfo("title", "1.2", "module description"), Argo, Uri.of("http://example.org"))) {
 
     @Test
     fun `renders root path correctly when bind path and root path match`(approver: Approver) {
