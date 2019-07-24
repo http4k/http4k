@@ -46,26 +46,17 @@ open class OpenApi2<out NODE>(
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
-                    val properties = listOf(
+                    pretty(obj(listOfNotNull(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
-                        "paths" to obj(fields.sortedBy { it.first }),
+                        "paths" to this.obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
-                        "definitions" to obj(definitions)
-                    )
-
-                    val propertiesWithUriData =
-                        if(baseUri != null) {
-                            properties
-                                .plus("host" to string(baseUri.host))
-                                .plus("schemes" to array(string(baseUri.scheme)))
-                        } else {
-                            properties
-                        }
-
-                    pretty(obj(propertiesWithUriData))
+                        "definitions" to this.obj(definitions),
+                        baseUri?.let { "host" to string(it.authority) },
+                        baseUri?.let { "schemes" to array(string(it.scheme)) }
+                    )))
                 })
         }
 
