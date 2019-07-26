@@ -8,6 +8,7 @@ changes with their rationale when appropriate:
 - [http4k-contract] `ContractRoute` is now an `HttpHandler`, so no need to wrap contract routes in a `contract {}` to test them. H/T @rgladwell for the inspiration.
 - [http4k-contract] Support Host/baseUri values in OpenApi2. H/T @rgladwell
 - [http4k-contract] Optionally add description route to route list H/T @rgladwell
+- [http4k-core] Added `singlePageApp {}` routing handler, which matches both static content or falls back to an index file
 
 ### v3.164.0
 - [all] Update various dependencies, including Kotlin to 1.3.41.
