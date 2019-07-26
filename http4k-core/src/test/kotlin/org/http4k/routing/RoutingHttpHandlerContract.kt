@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 abstract class RoutingHttpHandlerContract {
 
     protected val validPath = "/route-contract"
-    private val prefix = "/prefix"
+    protected val prefix = "/prefix"
     private val prePrefix = "/pre-prefix"
 
     abstract val handler: RoutingHttpHandler
@@ -28,7 +28,7 @@ abstract class RoutingHttpHandlerContract {
     }
 
     @Test
-    fun `does not match a particular route`() {
+    open fun `does not match a particular route`() {
         assertThat(handler(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
     }
 
@@ -57,7 +57,7 @@ abstract class RoutingHttpHandlerContract {
     }
 
     @Test
-    fun `with base path - no longer matches original`() {
+    open fun `with base path - no longer matches original`() {
         val withBase = handler.withBasePath(prefix)
         assertThat(withBase(Request(GET, validPath)), hasStatus(NOT_FOUND))
     }
@@ -68,7 +68,7 @@ abstract class RoutingHttpHandlerContract {
         assertThat(withBase(Request(GET, "$prePrefix$prefix$validPath")), hasStatus(OK))
     }
 
-    private fun filterAppending(value: String) = Filter { next ->
+    protected fun filterAppending(value: String) = Filter { next ->
         {
             next(it).replaceHeader("res-header", next(it).header("res-header").orEmpty() + value)
         }
