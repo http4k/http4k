@@ -1,6 +1,7 @@
 package org.http4k.contract
 
 
+import org.http4k.contract.PreFlightExtraction.Companion
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
@@ -18,8 +19,10 @@ class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
                                          val meta: RouteMeta,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) : HttpHandler {
-    override fun invoke(p1: Request) = meta.security.filter.then(toRouter(Root).match(p1)
-        ?: { Response(NOT_FOUND) })(p1)
+    override fun invoke(p1: Request) = meta.security.filter
+        .then(PreFlightExtractionFilter(meta, Companion.All))
+        .then(toRouter(Root).match(p1) ?: { Response(NOT_FOUND) })
+        .invoke(p1)
 
     val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 
