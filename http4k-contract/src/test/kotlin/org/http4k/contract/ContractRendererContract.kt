@@ -165,6 +165,19 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
         approver.assertApproved(router(Request(GET, "/basepath?the_api_key=somevalue")))
     }
 
+    @Test
+    fun `when enabled renders description including its own path`(approver: Approver) {
+        val router = "/" bind contract {
+            renderer = rendererToUse
+            security = ApiKeySecurity(Query.required("the_api_key"), { true })
+            routes += "/" bindContract GET to { Response(OK) }
+            descriptionPath = "/docs"
+            includeDescriptionRoute = true
+        }
+
+        approver.assertApproved(router(Request(GET, "/docs?the_api_key=somevalue")))
+    }
+
 }
 
 private val credentials = Credentials("user", "password")
