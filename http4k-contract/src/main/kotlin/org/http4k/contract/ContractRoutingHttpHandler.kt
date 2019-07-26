@@ -7,9 +7,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
 import org.http4k.core.then
-import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Validator
@@ -45,15 +45,11 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun invoke(request: Request): Response = handler(request)
 
-    private val descriptionRoute by lazy {
-        val spec = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
-
-        val allRoutes =
-            if(includeDescriptionRoute) routes + (spec bindContract GET to { Response(OK) })
-            else routes
-
-        spec bindContract GET to { renderer.description(contractRoot, security, allRoutes) }
-    }
+    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
+        .let {
+            val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
+            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
+        }
 
     private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
 
