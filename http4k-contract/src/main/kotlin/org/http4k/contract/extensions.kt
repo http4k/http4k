@@ -38,6 +38,7 @@ infix fun <A> PathLens<A>.bindContract(method: Method) = ContractRouteSpec1({ it
 infix fun String.bindContract(method: Method) = ContractRouteSpec0(toBaseFn(this), RouteMeta()).bindContract(method)
 
 infix fun String.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(toBaseFn(this), routeMetaDsl(new))
+infix fun <A> PathLens<A>.meta(new: RouteMetaDsl.() -> Unit) = "/" / this meta (new)
 infix fun ContractRouteSpec0.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec0(pathFn, routeMetaDsl(new))
 infix fun <A> ContractRouteSpec1<A>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec1(pathFn, routeMetaDsl(new), a)
 infix fun <A, B> ContractRouteSpec2<A, B>.meta(new: RouteMetaDsl.() -> Unit) = ContractRouteSpec2(pathFn, routeMetaDsl(new), a, b)

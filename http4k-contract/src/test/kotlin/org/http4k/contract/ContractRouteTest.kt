@@ -5,14 +5,17 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
+import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.hamkrest.hasStatus
@@ -95,6 +98,33 @@ class ContractRouteTest {
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") bindContract GET to { _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") bindContract GET to { _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}")
         assertRequest(Path.of("value") / Path.of("value2") / Path.of("value3") / Path.of("value4") / Path.of("value5") / Path.of("value6") / Path.of("value7") bindContract GET to { _, _, _, _, _, _, _ -> handler }, "http://foo.com/{value}/{value2}/{value3}/{value4}/{value5}/{value6}/{value7}")
+    }
+
+    @Test
+    fun `route as HttpHandler matches as expected`() {
+        val route = Path.int().of("value") meta {} bindContract GET to { { _: Request -> Response(OK) } }
+
+        assertThat(route(Request(GET, "/1")), hasStatus(OK))
+        assertThat(route(Request(DELETE, "/1")), hasStatus(NOT_FOUND))
+        assertThat(route(Request(GET, "/notInt")), hasStatus(NOT_FOUND))
+    }
+
+    @Test
+    fun `route as HttpHandler validates security of route`() {
+        val route = Path.int().of("value") meta {
+            security = ApiKeySecurity(Query.required("foo"), { true })
+        } bindContract GET to { { _: Request -> Response(OK) } }
+        assertThat(route(Request(GET, "/1")), hasStatus(UNAUTHORIZED))
+        assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
+    }
+
+    @Test
+    fun `route as HttpHandler performs pre-extraction of route`() {
+        val route = Path.int().of("value") meta {
+            queries += Query.required("foo")
+        } bindContract GET to { { _: Request -> Response(OK) } }
+        assertThat(route(Request(GET, "/1")), hasStatus(BAD_REQUEST))
+        assertThat(route(Request(GET, "/1").query("foo", "bar")), hasStatus(OK))
     }
 
     @Test

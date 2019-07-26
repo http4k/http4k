@@ -7,10 +7,12 @@ import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import org.http4k.lens.LensFailure
 import org.http4k.lens.PathLens
 import org.http4k.routing.Router
@@ -19,11 +21,6 @@ class ContractRoute internal constructor(val method: Method,
                                          val spec: ContractRouteSpec,
                                          val meta: RouteMeta,
                                          internal val toHandler: (ExtractedParts) -> HttpHandler) : HttpHandler {
-    override fun invoke(p1: Request) = meta.security.filter
-        .then(PreFlightExtractionFilter(meta, Companion.All))
-        .then(toRouter(Root).match(p1) ?: { Response(NOT_FOUND) })
-        .invoke(p1)
-
     val nonBodyParams = meta.requestParams.plus(spec.pathLenses).flatten()
 
     val tags = meta.tags.toSet().sortedBy { it.name }
@@ -50,6 +47,22 @@ class ContractRoute internal constructor(val method: Method,
     }
 
     fun describeFor(contractRoot: PathSegments) = spec.describe(contractRoot)
+
+    /**
+     * ContractRoutes are chiefly designed to operate within a contract {} block and not directly as an HttpHandler,
+     * but this function exists to enable the testing of the ContractRoute logic outside of a wider contract context.
+     * This means that certain behaviour is defaulted - chiefly the generation of NOT_FOUND and BAD_REQUEST responses.
+     */
+    override fun invoke(p1: Request): Response {
+        val handler = toRouter(Root).match(p1)
+            ?.let {
+                meta.security.filter
+                    .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
+                    .then(PreFlightExtractionFilter(meta, Companion.All))
+                    .then(it)
+            }
+        return handler?.invoke(p1) ?: Response(NOT_FOUND)
+    }
 
     override fun toString() = "${method.name}: ${spec.describe(Root)}"
 }
