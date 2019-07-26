@@ -11,6 +11,7 @@ import org.http4k.core.MimeTypes
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.UriTemplate
@@ -109,4 +110,15 @@ internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
     } else null
 
     override fun withBasePath(new: String): TemplateRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
+}
+
+internal class SinglePageAppHandler(private val staticHandler: RoutingHttpHandler) : RoutingHttpHandler {
+    override fun invoke(p1: Request) =
+        staticHandler(p1).takeIf { it.status != Status.NOT_FOUND } ?: staticHandler(Request(GET, "/"))
+
+    override fun match(request: Request) = staticHandler
+
+    override fun withFilter(new: Filter) = SinglePageAppHandler(staticHandler.withFilter(new))
+
+    override fun withBasePath(new: String) = SinglePageAppHandler(staticHandler.withBasePath(new))
 }
