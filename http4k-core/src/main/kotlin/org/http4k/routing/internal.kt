@@ -111,15 +111,21 @@ internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
     override fun withBasePath(new: String): TemplateRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
-internal class SinglePageAppHandler(private val pathSegments: String, private val staticHandler: StaticRoutingHttpHandler) : RoutingHttpHandler {
-    override fun invoke(p1: Request) =
-        staticHandler(p1).takeIf { it.status != NOT_FOUND } ?: {
-            staticHandler(Request(GET, pathSegments))
-        }()
+internal data class SinglePageAppRoutingHandler(
+    private val pathSegments: String,
+    private val staticHandler: StaticRoutingHttpHandler
+) : RoutingHttpHandler {
+
+    override fun invoke(p1: Request): Response {
+        val matchOnStatic = staticHandler.match(p1)?.let { it(p1) }
+        val matchOnIndex = staticHandler.match(Request(GET, pathSegments))
+        val fallbackHandler = matchOnIndex ?: { Response(NOT_FOUND) }
+        return matchOnStatic ?: fallbackHandler(Request(GET, pathSegments))
+    }
 
     override fun match(request: Request) = this
 
-    override fun withFilter(new: Filter) = SinglePageAppHandler(pathSegments, staticHandler.withFilter(new) as StaticRoutingHttpHandler)
+    override fun withFilter(new: Filter) = copy(staticHandler = staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 
-    override fun withBasePath(new: String) = SinglePageAppHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+    override fun withBasePath(new: String) = SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }

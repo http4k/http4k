@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -15,7 +16,7 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
 class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
-    override val handler: RoutingHttpHandler = SinglePageAppHandler(validPath,
+    override val handler: RoutingHttpHandler = SinglePageAppRoutingHandler(validPath,
         StaticRoutingHttpHandler(
             pathSegments = validPath,
             resourceLoader = ResourceLoader.Classpath(),
@@ -26,27 +27,43 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     @Test
     override fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        assertThat(filtered(Request(GET, "/not-found")), isHomePage() and hasHeader("res-header", "foobar"))
+        val request = Request(GET, "/not-found")
+        val criteria = isHomePage() and hasHeader("res-header", "foobar")
+
+        assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
     override fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
-        assertThat(filtered(Request(GET, "/not-found")), isHomePage() and hasHeader("res-header", "foo"))
+        val request = Request(GET, "/not-found")
+        val criteria = isHomePage() and hasHeader("res-header", "foo")
+
+        assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
     override fun `does not match a particular route`() {
-        assertThat(handler(Request(GET, "/not-found")), isHomePage())
+        val request = Request(GET, "/not-found")
+        val criteria = isHomePage()
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler(request), criteria)
     }
 
     @Test
     override fun `with base path - no longer matches original`() {
-        assertThat(handler.withBasePath(prefix)(Request(GET, validPath)), isHomePage())
+        val criteria = isHomePage()
+        val request = Request(GET, validPath)
+        val withBasePath = handler.withBasePath(prefix)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(withBasePath(request), criteria)
     }
 
     private fun isHomePage(): Matcher<Response> = hasStatus(Status.OK)
         .and(hasBody("hello from the root index.html"))
         .and(hasHeader("Content-Type", equalTo(ContentType.TEXT_HTML.value)))
-
 }

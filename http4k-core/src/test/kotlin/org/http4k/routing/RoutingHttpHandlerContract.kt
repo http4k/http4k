@@ -1,7 +1,9 @@
 package org.http4k.routing
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.present
 import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -24,53 +26,81 @@ abstract class RoutingHttpHandlerContract {
 
     @Test
     fun `matches a particular route`() {
-        assertThat(handler(Request(GET, validPath)), hasStatus(OK))
+        val criteria = hasStatus(OK)
+
+        assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(criteria))
+        assertThat(handler(Request(GET, validPath)), criteria)
     }
 
     @Test
     open fun `does not match a particular route`() {
+        assertThat(handler.matchAndInvoke(Request(GET, "/not-found")), absent())
         assertThat(handler(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasBody(expectedNotFoundBody))
     }
 
     @Test
     fun `with filter - applies to matching handler`() {
         val filtered = handler.withFilter(filterAppending("bar"))
-        assertThat(filtered(Request(GET, validPath)), hasStatus(OK) and hasHeader("res-header", "bar"))
+        val criteria = hasStatus(OK) and hasHeader("res-header", "bar")
+        val request = Request(GET, validPath)
+
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
+        assertThat(filtered(request), criteria)
     }
 
     @Test
     open fun `with filter - applies when not found`() {
         val filtered = handler.withFilter(filterAppending("foo"))
-        assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
+        val request = Request(GET, "/not-found")
+
+        assertThat(filtered.matchAndInvoke(request), absent())
+        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foo") and hasBody(expectedNotFoundBody))
     }
 
     @Test
     open fun `with filter - applies in correct order`() {
         val filtered = handler.withFilter(filterAppending("foo")).withFilter(filterAppending("bar"))
-        assertThat(filtered(Request(GET, "/not-found")), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
+        val request = Request(GET, "/not-found")
+
+        assertThat(filtered.matchAndInvoke(request), absent())
+        assertThat(filtered(request), hasStatus(NOT_FOUND) and hasHeader("res-header", "foobar"))
     }
 
     @Test
     fun `with base path - matches`() {
         val withBase = handler.withBasePath(prefix)
-        assertThat(withBase(Request(GET, "$prefix$validPath")), hasStatus(OK))
+        val request = Request(GET, "$prefix$validPath")
+        val criteria = hasStatus(OK)
+
+        assertThat(withBase.matchAndInvoke(request), present(criteria))
+        assertThat(withBase(request), criteria)
     }
 
     @Test
     open fun `with base path - no longer matches original`() {
         val withBase = handler.withBasePath(prefix)
-        assertThat(withBase(Request(GET, validPath)), hasStatus(NOT_FOUND))
+        val request = Request(GET, validPath)
+
+        assertThat(withBase.matchAndInvoke(request), absent())
+        assertThat(withBase(request), hasStatus(NOT_FOUND))
     }
 
     @Test
     fun `with base path - multiple levels`() {
         val withBase = handler.withBasePath(prefix).withBasePath(prePrefix)
-        assertThat(withBase(Request(GET, "$prePrefix$prefix$validPath")), hasStatus(OK))
+        val request = Request(GET, "$prePrefix$prefix$validPath")
+        val criteria = hasStatus(OK)
+
+        assertThat(withBase.matchAndInvoke(request), present(criteria))
+        assertThat(withBase(request), criteria)
     }
+
+    protected fun RoutingHttpHandler.matchAndInvoke(request: Request) = match(request)?.invoke(request)
 
     protected fun filterAppending(value: String) = Filter { next ->
         {
-            next(it).replaceHeader("res-header", next(it).header("res-header").orEmpty() + value)
+            val response = next(it)
+            response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }
     }
 }
