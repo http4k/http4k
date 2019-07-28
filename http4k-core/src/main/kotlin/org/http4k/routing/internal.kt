@@ -111,7 +111,7 @@ internal data class TemplateRoutingWsHandler(private val template: UriTemplate,
     override fun withBasePath(new: String): TemplateRoutingWsHandler = copy(template = UriTemplate.from("$new/$template"))
 }
 
-internal data class SinglePageAppHandler(
+internal data class SinglePageAppRoutingHandler(
     private val pathSegments: String,
     private val staticHandler: StaticRoutingHttpHandler,
     private val filter: Filter = Filter.NoOp
@@ -128,5 +128,5 @@ internal data class SinglePageAppHandler(
 
     override fun withFilter(new: Filter) = copy(filter = new.then(filter))
 
-    override fun withBasePath(new: String) = SinglePageAppHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
+    override fun withBasePath(new: String) = SinglePageAppRoutingHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }

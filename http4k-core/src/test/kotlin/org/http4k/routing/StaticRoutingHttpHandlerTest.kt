@@ -40,6 +40,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
 
         val request = Request(GET, of("/svc/mybob.xml"))
         val criteria = hasBody("<xml>content</xml>") and hasHeader("Content-type", APPLICATION_XML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -48,6 +50,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val criteria = hasStatus(NOT_FOUND)
         val request = Request(GET, of("/mybob.xml"))
+
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -56,6 +60,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
         val request = Request(GET, of("/svc/mybob.myxml"))
         val criteria = hasStatus(OK) and hasBody("<myxml>content</myxml>") and hasHeader("Content-type", APPLICATION_XML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -64,6 +70,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request = Request(GET, of("/svc"))
         val criteria = hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -72,6 +80,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/" bind static()
         val request = Request(GET, of("/"))
         val criteria = hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -80,6 +90,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static(Classpath("org"))
         val request = Request(GET, of("/svc"))
         val criteria = hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -93,6 +105,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = rewritePathToRootIndex.then("/" bind static(Classpath("")))
         val request = Request(GET, of("/asdas"))
         val criteria = hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-Type", TEXT_HTML.value)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -101,6 +115,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static(Classpath("org/http4k"))
         val request = Request(GET, of("/svc"))
         val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -109,6 +125,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request = Request(GET, of("/svc/$pkg/StaticRouter.js"))
         val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript")
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -117,6 +135,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/" bind static()
         val request = Request(GET, of("/$pkg/StaticRouter.js"))
         val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript")
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -125,6 +145,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static(Classpath(pkg))
         val request = Request(GET, of("/svc/StaticRouter.js"))
         val criteria = hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript")
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(handler(request), criteria)
     }
 
@@ -133,6 +155,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request = Request(GET, of("/svc/NotHere.xml"))
         val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -141,6 +165,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request = Request(GET, of("/svc/org"))
         val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -149,6 +175,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request = Request(GET, of("/bob/StaticRouter.js"))
         val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -157,8 +185,12 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val handler = "/svc" bind static()
         val request1 = Request(GET, of("/svc/../svc/Bob.xml"))
         val criteria = hasStatus(NOT_FOUND)
+
+        assertThat(handler.matchAndInvoke(request1), absent())
         assertThat(handler(request1), criteria)
         val request2 = Request(GET, of("/svc/~/.bashrc"))
+
+        assertThat(handler.matchAndInvoke(request2), absent())
         assertThat(handler(request2), criteria)
     }
 
@@ -173,7 +205,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `as a router finds file`() {
         val handler = "/svc" bind static()
         val req = Request(GET, of("/svc/mybob.xml"))
-        assertThat(handler.match(req)?.invoke(req), present(hasStatus(OK)))
+
+        assertThat(handler.matchAndInvoke(req), present(hasStatus(OK)))
     }
 
     @Test
@@ -182,9 +215,11 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
             { next(it.uri(it.uri.path("/svc/mybob.xml"))) }
         }
         val handler = "/svc" bind changePathFilter.then(static())
-        val req = Request(GET, of("/svc/notmybob.xml"))
+        val request = Request(GET, of("/svc/notmybob.xml"))
         val criteria = hasStatus(OK)
-        assertThat(handler(req), criteria)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler(request), criteria)
     }
 
     @Test
@@ -197,9 +232,11 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
             }
         }
         val handler = changePathFilter.then("/svc" bind static())
-        val req = Request(GET, of("/svc/notmybob.xml"))
+        val request = Request(GET, of("/svc/notmybob.xml"))
         val criteria = hasStatus(OK)
-        assertThat(handler(req), criteria)
+
+        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler(request), criteria)
         assertThat(calls.get(), equalTo(1))
     }
 
