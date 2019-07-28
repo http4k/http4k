@@ -117,7 +117,7 @@ internal class SinglePageAppHandler(private val pathSegments: String, private va
             staticHandler(Request(GET, pathSegments))
         }()
 
-    override fun match(request: Request) = staticHandler
+    override fun match(request: Request) = this
 
     override fun withFilter(new: Filter) = SinglePageAppHandler(pathSegments, staticHandler.withFilter(new) as StaticRoutingHttpHandler)
 
