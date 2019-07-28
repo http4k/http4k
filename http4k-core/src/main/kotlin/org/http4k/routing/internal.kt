@@ -118,15 +118,15 @@ internal data class SinglePageAppHandler(
 ) : RoutingHttpHandler {
 
     override fun invoke(p1: Request): Response {
-        val staticResponse: Response? = staticHandler.match(p1)?.let { filter.then(it)(p1) }
-        val indexFileResponse = staticHandler.match(Request(GET, pathSegments))?.let { filter.then(it) }
-        val fallbackHandler = indexFileResponse ?: filter.then { Response(NOT_FOUND) }
-        return staticResponse ?: fallbackHandler(Request(GET, pathSegments))
+        val matchOnStatic = staticHandler.match(p1)?.let { filter.then(it)(p1) }
+        val matchOnIndex = staticHandler.match(Request(GET, pathSegments))
+        val fallbackHandler = matchOnIndex ?: { Response(NOT_FOUND) }
+        return matchOnStatic ?: filter.then(fallbackHandler)(Request(GET, pathSegments))
     }
 
     override fun match(request: Request) = this
 
-    override fun withFilter(new: Filter) = copy(filter = filter.then(new))
+    override fun withFilter(new: Filter) = copy(filter = new.then(filter))
 
     override fun withBasePath(new: String) = SinglePageAppHandler(new + pathSegments, staticHandler.withBasePath(new) as StaticRoutingHttpHandler)
 }

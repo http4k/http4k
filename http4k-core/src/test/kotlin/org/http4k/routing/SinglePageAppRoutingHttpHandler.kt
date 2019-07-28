@@ -30,8 +30,8 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val request = Request(GET, "/not-found")
         val criteria = isHomePage() and hasHeader("res-header", "foobar")
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
@@ -40,8 +40,8 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val request = Request(GET, "/not-found")
         val criteria = isHomePage() and hasHeader("res-header", "foo")
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
         assertThat(filtered(request), criteria)
+        assertThat(filtered.matchAndInvoke(request), present(criteria))
     }
 
     @Test
@@ -66,5 +66,4 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     private fun isHomePage(): Matcher<Response> = hasStatus(Status.OK)
         .and(hasBody("hello from the root index.html"))
         .and(hasHeader("Content-Type", equalTo(ContentType.TEXT_HTML.value)))
-
 }
