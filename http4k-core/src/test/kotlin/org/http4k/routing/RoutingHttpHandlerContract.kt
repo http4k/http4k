@@ -99,7 +99,8 @@ abstract class RoutingHttpHandlerContract {
 
     protected fun filterAppending(value: String) = Filter { next ->
         {
-            next(it).replaceHeader("res-header", next(it).header("res-header").orEmpty() + value)
+            val response = next(it)
+            response.replaceHeader("res-header", response.header("res-header").orEmpty() + value)
         }
     }
 }
