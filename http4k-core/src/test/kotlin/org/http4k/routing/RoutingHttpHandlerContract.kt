@@ -27,6 +27,7 @@ abstract class RoutingHttpHandlerContract {
     @Test
     fun `matches a particular route`() {
         val criteria = hasStatus(OK)
+
         assertThat(handler.matchAndInvoke(Request(GET, validPath)), present(criteria))
         assertThat(handler(Request(GET, validPath)), criteria)
     }

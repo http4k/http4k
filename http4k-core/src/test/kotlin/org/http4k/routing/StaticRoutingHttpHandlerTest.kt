@@ -1,6 +1,7 @@
 package org.http4k.routing
 
 import com.natpryce.hamkrest.absent
+import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
@@ -17,6 +18,8 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.then
+import org.http4k.hamkrest.hasBody
+import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.junit.jupiter.api.Test
@@ -35,8 +38,8 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `looks up contents of existing root file`() {
         val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/mybob.xml")))
-        assertThat(result.bodyString(), equalTo("<xml>content</xml>"))
-        assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
+
+        assertThat(result, hasBody("<xml>content</xml>") and hasHeader("Content-type", APPLICATION_XML.value))
     }
 
     @Test
@@ -50,36 +53,28 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `can register custom mime types`() {
         val handler = "/svc" bind static(Classpath(), "myxml" to APPLICATION_XML)
         val result = handler(Request(GET, of("/svc/mybob.myxml")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("<myxml>content</myxml>"))
-        assertThat(result.header("Content-Type"), equalTo(APPLICATION_XML.value))
+        assertThat(result, hasStatus(OK) and hasBody("<myxml>content</myxml>") and hasHeader("Content-type", APPLICATION_XML.value))
     }
 
     @Test
     fun `defaults to index html if is no route`() {
         val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("hello from the root index.html"))
-        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+        assertThat(result, hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value))
     }
 
     @Test
     fun `defaults to index html if is no route - root-context`() {
         val handler = "/" bind static()
         val result = handler(Request(GET, of("/")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("hello from the root index.html"))
-        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+        assertThat(result, hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-type", TEXT_HTML.value))
     }
 
     @Test
     fun `defaults to index html if is no route - non-root-context`() {
         val handler = "/svc" bind static(Classpath("org"))
         val result = handler(Request(GET, of("/svc")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("hello from the io index.html"))
-        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+        assertThat(result, hasStatus(OK) and hasBody("hello from the io index.html") and hasHeader("Content-type", TEXT_HTML.value))
     }
 
     @Test
@@ -91,9 +86,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         }
         val handler = rewritePathToRootIndex.then("/" bind static(Classpath("")))
         val result = handler(Request(GET, of("/asdas")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("hello from the root index.html"))
-        assertThat(result.header("Content-Type"), equalTo(TEXT_HTML.value))
+        assertThat(result, hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-Type", TEXT_HTML.value))
     }
 
     @Test
@@ -107,27 +100,21 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     fun `looks up contents of existing subdir file - non-root context`() {
         val handler = "/svc" bind static()
         val result = handler(Request(GET, of("/svc/$pkg/StaticRouter.js")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(result.header("Content-Type"), equalTo("application/javascript"))
+        assertThat(result, hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript"))
     }
 
     @Test
     fun `looks up contents of existing subdir file`() {
         val handler = "/" bind static()
         val result = handler(Request(GET, of("/$pkg/StaticRouter.js")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(result.header("Content-Type"), equalTo("application/javascript"))
+        assertThat(result, hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript"))
     }
 
     @Test
     fun `can alter the root path`() {
         val handler = "/svc" bind static(Classpath(pkg))
         val result = handler(Request(GET, of("/svc/StaticRouter.js")))
-        assertThat(result, hasStatus(OK))
-        assertThat(result.bodyString(), equalTo("function hearMeNow() { }"))
-        assertThat(result.header("Content-Type"), equalTo("application/javascript"))
+        assertThat(result, hasStatus(OK) and hasBody("function hearMeNow() { }") and hasHeader("Content-type", "application/javascript"))
     }
 
     @Test
