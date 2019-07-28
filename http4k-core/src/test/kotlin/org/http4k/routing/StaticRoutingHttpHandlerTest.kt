@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger
 open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
     override val handler: RoutingHttpHandler = StaticRoutingHttpHandler(
         pathSegments = validPath,
-        resourceLoader = ResourceLoader.Classpath(),
+        resourceLoader = Classpath(),
         extraFileExtensionToContentTypes = emptyMap()
     )
 
