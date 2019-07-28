@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.166.0
-- [http4k-core] Tweak `singlePageApp()` routing handler, to correctly apply filters
+### v3.166.1
+- [http4k-core] Tweak `singlePageApp()` routing handler, to correctly apply filters when fallback page is used.
+
 ### v3.166.0
 - [http4k-core] Added `singlePageApp()` routing handler, which matches both static content or falls back to the root path index file
 

@@ -106,7 +106,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val request = Request(GET, of("/asdas"))
         val criteria = hasStatus(OK) and hasBody("hello from the root index.html") and hasHeader("Content-Type", TEXT_HTML.value)
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -218,7 +218,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val request = Request(GET, of("/svc/notmybob.xml"))
         val criteria = hasStatus(OK)
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
     }
 
@@ -235,7 +235,7 @@ open class StaticRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         val request = Request(GET, of("/svc/notmybob.xml"))
         val criteria = hasStatus(OK)
 
-        assertThat(handler.matchAndInvoke(request), present(criteria))
+        assertThat(handler.matchAndInvoke(request), absent())
         assertThat(handler(request), criteria)
         assertThat(calls.get(), equalTo(1))
     }
