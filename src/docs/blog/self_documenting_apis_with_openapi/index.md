@@ -17,7 +17,7 @@ There have been various efforts to standardise these aspects, and one of the mos
 
 ### Typesafe HTTP contracts with http4k-contract
 
-[http4k] has supported the basic Swagger spec for a while via a plugin into it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.166.1.
+[http4k] has supported the basic Swagger spec for a while via a plugin into it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.167.0.
 
 In line with the overall [ethos of the project](/rationale), OpenApi3 support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenApi (where often annotations and other compile-time magic are used) and means that the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
 
