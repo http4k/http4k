@@ -8,14 +8,24 @@ enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
     Feedback({ it.failures }),
     Ignore({ emptyList<Failure>() });
 
-    open operator fun <T : Any> invoke(entity: T, vararg lenses: LensExtractor<T, *>) = actOn(
-        lenses.fold(LensFailure(emptyList(), null, entity)) { memo: LensFailure, next ->
+    operator fun <T : Any> invoke(entity: T, vararg lenses: LensExtractor<T, *>): List<Failure> =
+        collectErrors(lenses, entity).run {
+            actOn(when (size) {
+                0 -> LensFailure()
+                1 -> first()
+                else -> LensFailure(flatMap { it.failures }, LensFailures(this), entity)
+            })
+        }
+
+    private fun <T : Any> collectErrors(lenses: Array<out LensExtractor<T, *>>, entity: T): List<LensFailure> =
+        lenses.fold(emptyList()) { memo, next ->
             try {
                 next(entity)
                 memo
             } catch (e: LensFailure) {
-                LensFailure(memo.failures + e.failures, null, entity)
+                memo + e
             }
         }
-    )
 }
+
+data class LensFailures(val causes: List<LensFailure>) : Exception()

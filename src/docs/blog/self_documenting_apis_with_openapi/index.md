@@ -38,7 +38,7 @@ All configuration above are optional to specify (with sensible defaults) - chang
 As you can see, the result of the `contract {...}` block is just a standard [http4k] `HttpHandler` (which is just defined as a `typealias (Request) -> Response`).
 
 If we open the resulting JSON spec in the OpenApi UI (see 
-<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fempty_contract.json">here</a>), we can see how this empty contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
+<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fempty_contract.json">here</a>), we can see how this empty contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
 
 ### Adding a basic route
 The next step is to actually add an route (or `ContractRoute`) to our contract. These routes can be defined independently (and thus tested separately) to the main contract. The `ContractRoute` DSL utilises the [http4k] Lens API to automatically extract and convert incoming path parameters into richer domain types. 
@@ -56,7 +56,7 @@ The metadata for the route forms the rest of the documented contract. The DSL fo
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/metadata_route.kt"></script>
 
-As expected, if we look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fmetadata_contract.json">here</a>, the greetings endpoint UI has now been embellished with more data.
+As expected, if we look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fmetadata_contract.json">here</a>, the greetings endpoint UI has now been embellished with more data.
 
 ### Modelling HTTP body messages
 The most exciting part [http4k] supporting OpenApi3 is the ability to represent HTTP messages in [JSON Schema] form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using overloads of the `receiving()` and `returning()` functions.
@@ -65,7 +65,7 @@ Lets add another route to the mix which returns a body object modelled with a Ko
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/body_route.kt"></script>
 
-Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
+Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 
 ### Further reading...
 And that's it. Once we have the final specification document available, users of our API can use various [OpenApi Generators] to generate HTTP clients in various languages for interacting with it, or to generate fake services that provide our API in their own environments (and thus enabling more simple end-to-end testing). The "Fake HTTP services" technique also enables the creation of Consumer-Driven-Contract style tests, and opens up possibilities for all kinds of interesting Chaos/failure-mode testing (you can even use the `http4k-testing-chaos` module to help ;) with this).
