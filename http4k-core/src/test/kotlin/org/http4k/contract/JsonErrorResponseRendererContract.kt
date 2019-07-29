@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.format.Json
 import org.http4k.lens.Invalid
+import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta.NumberParam
@@ -14,9 +15,9 @@ abstract class JsonErrorResponseRendererContract<NODE : Any>(val j: Json<NODE>) 
 
     @Test
     fun `can build 400`() {
-        val response = JsonErrorResponseRenderer(j).badRequest(listOf(
+        val response = JsonErrorResponseRenderer(j).badRequest(LensFailure(listOf(
             Missing(Meta(true, "location1", StringParam, "name1")),
-            Invalid(Meta(false, "location2", NumberParam, "name2"))))
+            Invalid(Meta(false, "location2", NumberParam, "name2"))), target = null))
         assertThat(response.bodyString(),
             equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","datatype":"string","required":true,"reason":"Missing"},{"name":"name2","type":"location2","datatype":"number","required":false,"reason":"Invalid"}]}"""))
     }

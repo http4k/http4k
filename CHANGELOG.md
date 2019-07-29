@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.167.0
+- [http4k-contract] [Possibly Break] Open out `ErrorResponseRenderer` interface to take LensFailure instead of the individual failures when rendering `badResponse()`. To fix, simply wrap the list of failures into a LensFailure.
+
 ### v3.166.1
 - [http4k-core] Tweak `singlePageApp()` routing handler, to correctly apply filters when fallback page is used.
 

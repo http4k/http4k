@@ -6,23 +6,23 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.LensFailure
 
 interface ErrorResponseRenderer {
-    fun badRequest(failures: List<Failure>) = Response(BAD_REQUEST)
+    fun badRequest(lensFailure: LensFailure) = Response(BAD_REQUEST)
     fun notFound() = Response(NOT_FOUND)
 }
 
 class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorResponseRenderer {
-    override fun badRequest(failures: List<Failure>) =
+    override fun badRequest(lensFailure: LensFailure) =
         Response(BAD_REQUEST)
             .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
             .body(
                 json {
                     compact(
                         obj("message" to string("Missing/invalid parameters"),
-                            "params" to array(failures.map {
+                            "params" to array(lensFailure.failures.map {
                                 obj(
                                     "name" to string(it.meta.name),
                                     "type" to string(it.meta.location),

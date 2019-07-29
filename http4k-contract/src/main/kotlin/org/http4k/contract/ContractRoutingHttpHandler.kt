@@ -51,13 +51,11 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
             it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
         }
 
-    private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
-
     private val routers = routes
         .map {
             identify(it)
                 .then(preSecurityFilter.then(security.filter).then(it.meta.security.filter).then(postSecurityFilter))
-                .then(catchLensFailure)
+                .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } +
         (identify(descriptionRoute).then(preSecurityFilter).then(postSecurityFilter) to descriptionRoute.toRouter(contractRoot))

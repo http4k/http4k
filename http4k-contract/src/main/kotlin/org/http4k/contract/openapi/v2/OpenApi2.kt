@@ -18,8 +18,8 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.lens.Failure
 import org.http4k.lens.Header
+import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
@@ -37,7 +37,7 @@ open class OpenApi2<out NODE>(
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by JsonErrorResponseRenderer(json) {
-    override fun badRequest(failures: List<Failure>) = errorResponseRenderer.badRequest(failures)
+    override fun badRequest(lensFailure: LensFailure) = errorResponseRenderer.badRequest(lensFailure)
 
     override fun notFound() = errorResponseRenderer.notFound()
 
