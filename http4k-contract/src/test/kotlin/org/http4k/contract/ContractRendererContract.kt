@@ -28,6 +28,7 @@ import org.http4k.format.Json
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
+import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
 import org.http4k.lens.ParamMeta.NumberParam
@@ -52,9 +53,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, protected val rendererToUse: ContractRenderer) {
     @Test
     fun `can build 400`() {
-        val response = rendererToUse.badRequest(listOf(
+        val response = rendererToUse.badRequest(LensFailure(listOf(
             Missing(Meta(true, "location1", StringParam, "name1")),
-            Invalid(Meta(false, "location2", NumberParam, "name2"))))
+            Invalid(Meta(false, "location2", NumberParam, "name2")))))
         assertThat(response.bodyString(),
             equalTo("""{"message":"Missing/invalid parameters","params":[{"name":"name1","type":"location1","datatype":"string","required":true,"reason":"Missing"},{"name":"name2","type":"location2","datatype":"number","required":false,"reason":"Invalid"}]}"""))
     }
