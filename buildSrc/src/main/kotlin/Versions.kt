@@ -11,7 +11,7 @@ object Versions {
 
     const val jackson_module_kotlin: String = "$jackson_major_minor.9"
 
-    const val underscore: String = "1.46"
+    const val underscore: String = "1.47"
 
     const val handlebars: String = "4.1.2"
 
@@ -31,19 +31,19 @@ object Versions {
     const val okhttp_major: String = "4"
     const val okhttp: String = "$okhttp_major.0.1"
 
-    const val io_github_resilience4j: String = "0.16.0"
+    const val io_github_resilience4j: String = "0.17.0"
 
     const val ktor_server_cio: String = "1.2.2"
 
     const val micrometer_core: String = "1.2.0"
 
     const val netty_codec_http2_major_minor = "4.1"
-    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.37.Final"
+    const val netty_codec_http2: String = "$netty_codec_http2_major_minor.38.Final"
 
     const val pebble: String = "3.0.10"
 
     const val io_undertow_major_minor: String = "2.0"
-    const val io_undertow: String = "$io_undertow_major_minor.22.Final"
+    const val io_undertow: String = "$io_undertow_major_minor.23.Final"
 
     const val javax_servlet_api: String = "4.0.1"
 
@@ -59,7 +59,7 @@ object Versions {
 
     const val cobertura: String = "2.1.1"
 
-    const val commons_pool2: String = "2.6.2"
+    const val commons_pool2: String = "2.7.0"
 
     const val httpasyncclient: String = "4.1.4"
 

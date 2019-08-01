@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.169.0
+- [all] Update various dependencies.
+
 ### v3.168.0
 - [http4k-contract] Collect LensFailure causes into a single place when validating.
 
