@@ -112,7 +112,7 @@ class ResilienceFiltersTest {
     fun `bulkhead filter`() {
         val config = BulkheadConfig.custom()
             .maxConcurrentCalls(1)
-            .maxWaitTimeDuration(Duration.ZERO)
+            .maxWaitDuration(Duration.ZERO)
             .build()
 
         val latch = CountDownLatch(1)
