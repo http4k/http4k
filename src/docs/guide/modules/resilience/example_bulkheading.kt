@@ -16,7 +16,7 @@ fun main() {
     // configure the Bulkhead filter here
     val config = BulkheadConfig.custom()
         .maxConcurrentCalls(5)
-        .maxWaitTimeDuration(Duration.ofMillis(1000))
+        .maxWaitDuration(Duration.ofMillis(1000))
         .build()
 
     val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
