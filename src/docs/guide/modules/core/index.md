@@ -18,7 +18,7 @@ Apart from Kotlin StdLib, the core module has ZERO dependencies and provides the
 - APIs to **record and replay** HTTP traffic to disk or memory
 
 #### HttpHandlers 
-In [[http4k]], an HTTP service is just a typealias of a simple function:
+In [http4k], an HTTP service is just a typealias of a simple function:
 ```kotlin
 typealias HttpHandler = (Request) -> Response
 ```
