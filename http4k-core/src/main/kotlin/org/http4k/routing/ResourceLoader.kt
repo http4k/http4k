@@ -15,10 +15,15 @@ interface ResourceLoader {
 
             init {
                 if (!muteWarning && finalBasePath == "/") {
-                    System.err.println("WARNING - http4k Classpath ResourceLoader is configured to serve ALL files " +
-                        "from the root of the Java classpath.\n" +
-                        "For security you should serve from a non-code package eg. /public, " +
-                        "or mute this warning using the flag on construction.")
+                    System.err.println(
+                        """|****************************************************************************
+                            |WARNING - http4k Classpath ResourceLoader is configured to serve ALL files
+                            |from the root of the Java classpath.
+                            |For security serve content from a non-code package eg. /public, or mute this 
+                            |warning using the flag on construction.
+                            |****************************************************************************"""
+                            .trimMargin()
+                    )
                 }
             }
 

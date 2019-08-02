@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.170.0
+- [http4k-core] Add a warning when `static()` is used with no package path, thus exposing the 
+contents of the classpath remotely.
+
 ### v3.169.0
 - [all] Update various dependencies.
 
