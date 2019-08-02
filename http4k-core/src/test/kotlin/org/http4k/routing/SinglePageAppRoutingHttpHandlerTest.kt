@@ -63,7 +63,17 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         assertThat(withBasePath(request), criteria)
     }
 
-    private fun isHomePage(): Matcher<Response> = hasStatus(Status.OK)
-        .and(hasBody("hello from the root index.html"))
+    @Test
+    fun `DSL construction defaults to using public as a root path`() {
+        val dslDefault = singlePageApp()
+        val criteria = isHomePage("public")
+
+        println(dslDefault(Request(GET, validPath)))
+        assertThat(dslDefault.matchAndInvoke(Request(GET, validPath)), present(criteria))
+        assertThat(dslDefault(Request(GET, validPath)), criteria)
+    }
+
+    private fun isHomePage(name: String = "root"): Matcher<Response> = hasStatus(Status.OK)
+        .and(hasBody("hello from the $name index.html"))
         .and(hasHeader("Content-Type", equalTo(ContentType.TEXT_HTML.value)))
 }

@@ -57,9 +57,10 @@ fun routes(vararg list: RoutingHttpHandler): RoutingHttpHandler = AggregateRouti
 fun static(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler = StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap())
 
 /**
- * For SPAs we serve static content as usual, or fall back to the index page.
+ * For SPAs we serve static content as usual, or fall back to the index page. The resource loader is configured to look at
+ * /public package (on the Classpath).
  */
-fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath(), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
+fun singlePageApp(resourceLoader: ResourceLoader = ResourceLoader.Classpath("/public"), vararg extraFileExtensionToContentTypes: Pair<String, ContentType>): RoutingHttpHandler =
     SinglePageAppRoutingHandler("", StaticRoutingHttpHandler("", resourceLoader, extraFileExtensionToContentTypes.asList().toMap()))
 
 interface RoutingWsHandler : WsHandler {

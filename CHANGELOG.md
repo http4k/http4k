@@ -3,9 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.171.0
+- [http4k-core] [Break (mitigation)] Replaced default resource loader location for `singlePageApp()` to `/public` instead of root - this is for safety of NOT serving the root of the classpath by default.
+
 ### v3.170.0
-- [http4k-core] Add a warning when `static()` is used with no package path, thus exposing the 
-contents of the classpath remotely.
+- [http4k-core] Add a warning when `static()` is used with no package path, thus exposing the contents of the classpath remotely.
 
 ### v3.169.0
 - [all] Update various dependencies.
