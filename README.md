@@ -63,9 +63,10 @@ plugging together of services without HTTP container being required.
     * **Path-based routing**, including nestable contexts
     * **Typesafe HTTP message construction/desconstruction and Request Contexts** using Lenses
     * **Static file-serving** capability with **Caching and Hot-Reload** 
+    * **Single Page Application** support with **Caching and Hot-Reload** 
     * Servlet implementation to allow **plugin to any Servlet container**
     * Launch applications in **1LOC** with an embedded **SunHttp** server backend (recommended for development use only)
-    * **Path-based websockets** including typesafe message marshalling using Lenses
+    * **Path-based websockets** including typesafe message marshalling using Lenses, which are **testable without a running container**
     * APIs to **record and replay** HTTP traffic to disk or memory
     * Core **abstraction APIs** implemented by the other modules 
 * [Client:](https://http4k.org/guide/modules/clients) 

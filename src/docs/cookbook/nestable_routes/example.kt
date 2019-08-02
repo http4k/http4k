@@ -12,6 +12,7 @@ import org.http4k.routing.ResourceLoader.Companion.Classpath
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import org.http4k.routing.singlePageApp
 import org.http4k.routing.static
 
 fun main() {
@@ -31,9 +32,11 @@ fun main() {
         "/rita" bind routes(
             "/delete/{name}" bind DELETE to { _: Request -> Response(OK) },
             "/post/{name}" bind POST to { _: Request -> Response(OK) }
-        )
+        ),
+        singlePageApp(Classpath("cookbook/nestable_routes"))
     )
 
     println(app(Request(GET, "/bob/get/value")))
     println(app(Request(GET, "/static/someStaticFile.txt")))
+    println(app(Request(GET, "/someSpaResource")))
 }

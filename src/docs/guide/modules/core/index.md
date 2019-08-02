@@ -115,11 +115,20 @@ Once the lens is declared, you can use it on a target object to either get or se
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/core/example.kt"></script>
 
 ### Serving static assets
-For serving static assets, just bind a path to a Static block as below, using either a Classpath or Directory (Hot reloading) based ResourceLoader instance (find these on the `ResourceLoader` companion object). Typically, Directory is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app":
+For serving static assets, just bind a path to a Static block as below, using either a Classpath or Directory (Hot reloading) based ResourceLoader instance (find these on the `ResourceLoader` companion object). Typically, Directory is used during development and the Classpath strategy is used to serve assets in production from an UberJar. This is usually based on a "devmode" flag when constructing your app". **Note** that you should avoid setting the Classpath value to the root because otherwise it will serve anything from your classpath (including Java class files!)!:
 ```kotlin
 routes(
     "/static" bind static(Classpath("/org/http4k/some/package/name")),
     "/hotreload" bind static(Directory("path/to/static/dir/goes/here"))
+)
+```
+
+### Single Page Apps
+These can be easily activated as below, and default to serving from `/public` package:
+```kotlin
+routes(
+    "/api" bind { Response(OK).body("some api content") },
+    singlePageApp()
 )
 ```
 

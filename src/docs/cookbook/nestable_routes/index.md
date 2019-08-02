@@ -10,6 +10,7 @@ This is a fairly comprehensive example of the core-routing logic available:
 - Routers can be combined together to form another `HttpHandler`
 - Usage of supplied core library `Filters`
 - Serving of static content using a `Classpath` resource loader
+- Support for Single Page Applications using a `singlePageApp()` block - resources loaded from here are loaded from the underlying `ResourceLoader` or fallback to `/` (and passed to the SPA code)
 
 ### Gradle setup
 ```
