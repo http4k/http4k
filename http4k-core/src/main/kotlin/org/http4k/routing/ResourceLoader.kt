@@ -3,6 +3,12 @@ package org.http4k.routing
 import java.io.File
 import java.net.URL
 
+/**
+ * Looks up contents of a resource path.
+ *
+ * WARNING: A ResourceLoader serves ANY resource it finds within it's structure. This means that you should be
+ * VERY careful to limit what resources it has access to.
+ */
 interface ResourceLoader {
     fun load(path: String): URL?
 
