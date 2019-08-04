@@ -1,7 +1,18 @@
 package org.http4k.format
 
 import org.http4k.lens.BiDiMapping
-import org.http4k.lens.StringBiDiMappings
+import org.http4k.lens.StringBiDiMappings.duration
+import org.http4k.lens.StringBiDiMappings.instant
+import org.http4k.lens.StringBiDiMappings.localDate
+import org.http4k.lens.StringBiDiMappings.localDateTime
+import org.http4k.lens.StringBiDiMappings.localTime
+import org.http4k.lens.StringBiDiMappings.offsetDateTime
+import org.http4k.lens.StringBiDiMappings.offsetTime
+import org.http4k.lens.StringBiDiMappings.regexObject
+import org.http4k.lens.StringBiDiMappings.uri
+import org.http4k.lens.StringBiDiMappings.url
+import org.http4k.lens.StringBiDiMappings.uuid
+import org.http4k.lens.StringBiDiMappings.zonedDateTime
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -36,16 +47,16 @@ interface AutoMappingConfiguration<T> {
  * This is the set of (additional) standardised string <-> type mappings which http4k supports out of the box.
  */
 fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
-    text(StringBiDiMappings.duration())
-    text(StringBiDiMappings.uri())
-    text(StringBiDiMappings.url())
-    text(StringBiDiMappings.uuid())
-    text(StringBiDiMappings.regexObject())
-    text(StringBiDiMappings.instant())
-    text(StringBiDiMappings.localTime())
-    text(StringBiDiMappings.localDate())
-    text(StringBiDiMappings.localDateTime())
-    text(StringBiDiMappings.zonedDateTime())
-    text(StringBiDiMappings.offsetTime())
-    text(StringBiDiMappings.offsetDateTime())
+    text(duration())
+    text(uri())
+    text(url())
+    text(uuid())
+    text(regexObject())
+    text(instant())
+    text(localTime())
+    text(localDate())
+    text(localDateTime())
+    text(zonedDateTime())
+    text(offsetTime())
+    text(offsetDateTime())
 }
