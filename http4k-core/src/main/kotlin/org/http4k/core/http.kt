@@ -79,33 +79,66 @@ class StreamBody(override val stream: InputStream, override val length: Long? = 
     override fun hashCode() = payload.hashCode()
 }
 
+/**
+ * HttpMessages are designed to be immutable, so any mutation methods return a modified copy of the message.
+ */
 interface HttpMessage : Closeable {
     val headers: Headers
     val body: Body
     val version: String
 
+    /**
+     * Returns a formatted wire representation of this message.
+     */
     fun toMessage(): String
 
+    /**
+     * Retrieves the first header value with this name.
+     */
     fun header(name: String): String? = headers.headerValue(name)
 
+    /**
+     * (Copy &) Adds a header value with this name.
+     */
     fun header(name: String, value: String?): HttpMessage
 
+    /**
+     * (Copy &) Add all passed headers.
+     */
     fun headers(headers: Headers): HttpMessage
 
+    /**
+     * (Copy &) Adds a header value with this name, replacing any previously set values.
+     */
     fun replaceHeader(name: String, value: String?): HttpMessage
 
+    /**
+     * (Copy &) remove headers with this name.
+     */
     fun removeHeader(name: String): HttpMessage
 
+    /**
+     * (Copy &) sets the body content.
+     */
     fun body(body: Body): HttpMessage
 
+    /**
+     * (Copy &) sets the body content.
+     */
     fun body(body: String): HttpMessage
 
+    /**
+     * (Copy &) sets the body content.
+     */
     fun body(body: InputStream, length: Long? = null): HttpMessage
 
+    /**
+     * Retrieves all header values with this name.
+     */
     fun headerValues(name: String): List<String?> = headers.headerValues(name)
 
     /**
-     * This will realise any underlying stream
+     * This will realise any underlying stream.
      */
     fun bodyString(): String = String(body.payload.array())
 
@@ -114,6 +147,10 @@ interface HttpMessage : Closeable {
         const val HTTP_2 = "HTTP/2"
     }
 
+    /**
+     * Closes the request. For server generated messages, this is called by all backend/client implementations,
+     * but when consuming external responses in streaming mode, this should be used.
+     */
     override fun close() = body.close()
 }
 
@@ -123,16 +160,34 @@ interface Request : HttpMessage {
     val method: Method
     val uri: Uri
 
+    /**
+     * (Copy &) sets the method.
+     */
     fun method(method: Method): Request
 
+    /**
+     * (Copy &) sets the Uri.
+     */
     fun uri(uri: Uri): Request
 
+    /**
+     * (Copy &) Adds a query value with this name.
+     */
     fun query(name: String, value: String): Request
 
+    /**
+     * Retrieves the first query value with this name.
+     */
     fun query(name: String): String?
 
+    /**
+     * Retrieves all query values with this name.
+     */
     fun queries(name: String): List<String?>
 
+    /**
+     * (Copy &) remove queries with this name.
+     */
     fun removeQuery(name: String): Request
 
     override fun header(name: String, value: String?): Request
