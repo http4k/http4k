@@ -38,23 +38,6 @@ plugging together of services without HTTP container being required.
     * applications
     * websockets
     * full suites of microservices
-* **Modularity:** Common behaviours are abstracted into the `http4k-core` module. Current add-on modules provide:
-    * Pluggable HTTP client adapters for Apache, Jetty, OkHttp and Websockets
-    * Pluggable Server backends: Single LOC Server spinup for Jetty, Netty, Undertow, Apache (Httpcore), Ktor CIO and SunHttp. 
-     * Serverless backends: Test your application locally and then deploy it to AWS Lambda.
-    * Templating support: Caching and Hot-Reload engine support for Handlebars, Pebble, Dust, Thymeleaf and Freemarker
-    * HTTP message adapters for Argo JSON, Gson JSON, Jackson JSON, Moshi JSON and XML - includes auto-marshalling capabilities to convert directly to Kotlin data classes.
-    * Typesafe, auto-validating, self-documenting (via OpenApi v2 & v3) contracts for HTTP services
-    * AWS request signing: super-simple interactions with AWS services.
-    * Metrics gathering for performance analysis.
-    * Multipart form handling, including stream processing for uploaded files.
-    * Resilience features: Circuits, retrying, rate limiting, bulkheading - via Resilience4J integration.
-    * Security: Simple, pluggable support for OAuth Auth Code Grant flow and ready made configurations to integrate with popular OAuth providers.
-    * Cloud-native tooling: support for 12-factor-based style apps.
-    * Testing: JUnit 5 Approval Test extensions for [http4k] messages.
-    * Testing: Hamkrest Matchers for [http4k] objects.
-    * Testing: Selenium WebDriver implementation for lightning fast, browserless testing of [http4k] apps
-    * Testing: Chaos Injection mechanism, allowing simple, dynamic injection of failure modes into  [http4k] applications.
 
 ## Module feature overview
 * [Core:](https://http4k.org/guide/modules/core) 
