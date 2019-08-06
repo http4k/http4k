@@ -4,6 +4,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
+import org.http4k.lens.BiDiMapping
+import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -45,6 +47,10 @@ data class BigDecimalHolder(val value: BigDecimal)
 data class BigIntegerHolder(val value: BigInteger)
 data class MappedBigDecimalHolder(val value: BigDecimal)
 data class HolderHolder(val value: MappedBigDecimalHolder)
+data class OutOnlyHolder(val value: OutOnly)
+data class OutOnly(val value: String)
+data class InOnlyHolder(val value: InOnly)
+data class InOnly(val value: String)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
@@ -113,6 +119,26 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     }
 
     @Test
+    fun `out only string`() {
+        val json = customJson()
+
+        val wrapper = OutOnlyHolder(OutOnly("foobar"))
+        val actual = json.asJsonString(wrapper)
+        assertThat(actual, equalTo("""{"value":"foobar"}"""))
+        assertThat({ json.asA(actual, OutOnlyHolder::class) }, throws<Exception>())
+    }
+
+    @Test
+    fun `in only string`() {
+        val json = customJson()
+
+        val wrapper = InOnlyHolder(InOnly("foobar"))
+        val expected = """{"value":"foobar"}"""
+        assertThat({ json.asJsonString(wrapper) }, throws<IllegalArgumentException>())
+        assertThat(json.asA(expected, InOnlyHolder::class), equalTo(wrapper))
+    }
+
+    @Test
     fun `roundtrip custom mapped number`() {
         val json = customJson()
 
@@ -154,5 +180,13 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     }
 
     abstract fun customJson(): AutoMarshallingJson
-
 }
+
+fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
+    .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
+    .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
+    .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
+    .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
+    .text(OutOnly::value)
+    .text(::InOnly)
+    .done()
