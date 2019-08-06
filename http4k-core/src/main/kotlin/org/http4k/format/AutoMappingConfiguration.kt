@@ -62,6 +62,30 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
 }
 
 /**
+ * This is the set of utility methods which avoid the creation of a BiDiMapping.
+ */
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.text(noinline inMapping: (String) -> OUT,
+                                                                         noinline outMapping: (OUT) -> String) = text(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.boolean(noinline inMapping: (Boolean) -> OUT,
+                                                                            noinline outMapping: (OUT) -> Boolean) = boolean(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.int(noinline inMapping: (Int) -> OUT,
+                                                                        noinline outMapping: (OUT) -> Int) = int(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.long(noinline inMapping: (Long) -> OUT,
+                                                                         noinline outMapping: (OUT) -> Long) = long(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.double(noinline outMapping: (OUT) -> Double,
+                                                                           noinline inMapping: (Double) -> OUT) = double(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigInteger(noinline inMapping: (BigInteger) -> OUT,
+                                                                               noinline outMapping: (OUT) -> BigInteger) = bigInteger(BiDiMapping(inMapping, outMapping))
+
+inline fun <BUILDER, reified OUT> AutoMappingConfiguration<BUILDER>.bigDecimal(noinline inMapping: (BigDecimal) -> OUT,
+                                                                               noinline outMapping: (OUT) -> BigDecimal) = bigDecimal(BiDiMapping(inMapping, outMapping))
+
+/**
  * Utility method for when only writing/serialization is required
  */
 @JvmName("textSerialize")

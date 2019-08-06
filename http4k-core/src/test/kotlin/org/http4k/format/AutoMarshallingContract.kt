@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
-import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -41,6 +40,8 @@ data class ArbObject(val string: String, val child: ArbObject?, val numbers: Lis
 data class RegexHolder(val regex: Regex)
 
 data class StringHolder(val value: String)
+data class AnotherStringHolder(val value: AnotherString)
+data class AnotherString(val value: String)
 data class BooleanHolder(val value: Boolean)
 data class MapHolder(val value: Map<String, Any>)
 data class BigDecimalHolder(val value: BigDecimal)
@@ -183,10 +184,11 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 }
 
 fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
-    .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
-    .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
-    .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
-    .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
+    .bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
+    .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)
+    .boolean(::BooleanHolder, BooleanHolder::value)
+    .text(::AnotherString, AnotherString::value)
     .text(OutOnly::value)
     .text(::InOnly)
+    .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
