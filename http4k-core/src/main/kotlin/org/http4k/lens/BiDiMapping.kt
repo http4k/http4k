@@ -27,6 +27,7 @@ import java.util.UUID
 /**
  * A BiDiMapping defines a reusable bidirectional transformation between an input and output type
  */
+
 class BiDiMapping<IN, OUT>(val clazz: Class<OUT>, val asOut: (IN) -> OUT, val asIn: (OUT) -> IN) {
 
     inline fun <reified NEXT> map(crossinline nextOut: (OUT) -> NEXT, crossinline nextIn: (NEXT) -> OUT): BiDiMapping<IN, NEXT> =
@@ -54,7 +55,7 @@ object StringBiDiMappings {
     fun bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
     fun bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
     fun boolean() = BiDiMapping(::safeBooleanFrom, Boolean::toString)
-    fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException() else s }, { it })
+    fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException("String cannot be empty") else s }, { it })
     fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
 

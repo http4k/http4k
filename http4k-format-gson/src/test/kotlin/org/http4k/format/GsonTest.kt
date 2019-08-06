@@ -9,8 +9,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.format.Gson.auto
-import org.http4k.lens.BiDiMapping
-import org.http4k.lens.StringBiDiMappings
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -37,16 +35,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     override fun `fails decoding when a required value is null`() {
     }
 
-    override fun customJson() = object : ConfigurableGson(
-        GsonBuilder()
-            .asConfigurable()
-            .prohibitStrings()
-            .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
-            .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
-            .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
-            .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
-            .done()
-    ) {}
+    override fun customJson() = object : ConfigurableGson(GsonBuilder().asConfigurable().customise()) {}
 }
 
 class GsonTest : JsonContract<JsonElement>(Gson) {

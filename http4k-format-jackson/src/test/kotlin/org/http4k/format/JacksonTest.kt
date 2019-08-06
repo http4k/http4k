@@ -13,8 +13,6 @@ import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
-import org.http4k.lens.BiDiMapping
-import org.http4k.lens.StringBiDiMappings
 import org.http4k.websocket.WsMessage
 import org.junit.jupiter.api.Test
 
@@ -65,16 +63,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         assertThat(publicLens(privateLens(arbObjectWithView)), equalTo(ArbObjectWithView(0, 5)))
     }
 
-    override fun customJson() = object : ConfigurableJackson(
-        KotlinModule()
-            .asConfigurable()
-            .prohibitStrings()
-            .bigDecimal(BiDiMapping(::BigDecimalHolder, BigDecimalHolder::value))
-            .bigInteger(BiDiMapping(::BigIntegerHolder, BigIntegerHolder::value))
-            .boolean(BiDiMapping(::BooleanHolder, BooleanHolder::value))
-            .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
-            .done()
-    ) {}
+    override fun customJson() = object : ConfigurableJackson(KotlinModule().asConfigurable().customise()) {}
 }
 
 class JacksonTest : JsonContract<JsonNode>(Jackson) {
