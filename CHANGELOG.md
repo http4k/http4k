@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.172.0
+- [http4k-core] Added uni-directional serialization/deserialization options to JSON lib auto-conversion configuration. 
+
 ### v3.171.0
 - [http4k-core] [Break (mitigation)] Replaced default resource loader location for `singlePageApp()` to `/public` instead of root - this is for safety of NOT serving the root of the classpath by default.
 
