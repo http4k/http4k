@@ -6,11 +6,12 @@ import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.rendererFor
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
+import org.http4k.contract.security.ImplicitOAuthSecurity
 
 /**
  * Compose the supported Security models
  */
-val OpenApi2SecurityRenderer = SecurityRenderer(ApiKeySecurity.renderer, BasicAuthSecurity.renderer)
+val OpenApi2SecurityRenderer = SecurityRenderer(ApiKeySecurity.renderer, BasicAuthSecurity.renderer, ImplicitOAuthSecurity.renderer)
 
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
@@ -39,3 +40,23 @@ val BasicAuthSecurity.Companion.renderer
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
+
+val ImplicitOAuthSecurity.Companion.renderer
+    get() = rendererFor<ImplicitOAuthSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to
+                    obj(
+                        listOfNotNull(
+                            "type" to string("oauth2"),
+                            "flows" to string("implicit"),
+                            "authorizationUrl" to string(it.authorizationUrl.toString())
+                        ) + it.extraFields.map { it.key to string(it.value) }
+                    )
+                )
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+        }
+    }
+
