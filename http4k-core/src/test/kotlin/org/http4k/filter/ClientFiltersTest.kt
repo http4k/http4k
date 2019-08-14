@@ -1,5 +1,6 @@
 package org.http4k.filter
 
+import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -19,6 +20,7 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
+import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.routing.RoutedRequest
@@ -97,7 +99,7 @@ class ClientFiltersTest {
 
     @Test
     fun `adds request tracing to outgoing request when already present`() {
-        val zipkinTraces = ZipkinTraces(TraceId("originalTraceId"), TraceId("originalSpanId"), TraceId("originalParentId"), SamplingDecision.SAMPLE)
+        val zipkinTraces = ZipkinTraces(TraceId("originalTraceId"), TraceId("originalSpanId"), TraceId("originalParentId"), SAMPLE)
         ZipkinTraces.THREAD_LOCAL.set(zipkinTraces)
 
         var start: Pair<Request, ZipkinTraces>? = null
@@ -106,22 +108,24 @@ class ClientFiltersTest {
         val svc = ClientFilters.RequestTracing(
             { req, trace -> start = req to trace },
             { req, resp, trace -> end = Triple(req, resp, trace) }
-        ).then { it ->
+        ).then {
             val actual = ZipkinTraces(it)
-            assertThat(actual, equalTo(ZipkinTraces(TraceId("originalTraceId"), actual.spanId, TraceId("originalSpanId"), SamplingDecision.SAMPLE)))
+            assertThat(actual, equalTo(ZipkinTraces(TraceId("originalTraceId"), actual.spanId, TraceId("originalSpanId"), SAMPLE)))
             assertThat(actual.spanId, !equalTo(zipkinTraces.spanId))
             Response(OK)
         }
 
         assertThat(svc(Request(GET, "")), equalTo(Response(OK)))
-        assertThat(start, equalTo(Request(GET, "") to ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SamplingDecision.SAMPLE)))
-        assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SamplingDecision.SAMPLE))))
+        assertThat(start, equalTo(Request(GET, "") to ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SAMPLE)))
+        assertThat(end, equalTo(Triple(Request(GET, ""), Response(OK), ZipkinTraces(TraceId("originalTraceId"), end!!.third.spanId, TraceId("originalSpanId"), SAMPLE))))
     }
 
     @Test
     fun `adds new request tracing to outgoing request when not present`() {
         val svc = ClientFilters.RequestTracing().then { it ->
-            assertThat(ZipkinTraces(it), present())
+            val actual = ZipkinTraces(it)
+            assertThat(actual, present())
+            assertThat(actual.parentSpanId, absent())
             Response(OK)
         }
 
