@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.172.1 (uncut)
+- [http4k-core] Fix #273 - parentSpanId trace incorrectly populated when no previous traces
+
 ### v3.172.0
 - [http4k-core] Added uni-directional serialization/deserialization options to JSON lib auto-conversion configuration. 
 
