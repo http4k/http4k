@@ -3,6 +3,7 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.NoSecurity
@@ -37,7 +38,7 @@ object OpenApi3SecurityRenderer : SecurityRenderer {
                     ))
                 }
             }
-            is OAuthSecurity -> {
+            is AuthCodeOAuthSecurity -> {
                 {
                     obj(security.name to obj(
                         "type" to string("oauth2"),
@@ -49,7 +50,6 @@ object OpenApi3SecurityRenderer : SecurityRenderer {
                     ))
                 }
             }
-
             is NoSecurity -> {
                 {
                     nullNode()
