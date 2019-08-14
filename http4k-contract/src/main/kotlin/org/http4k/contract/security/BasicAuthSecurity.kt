@@ -9,4 +9,6 @@ import org.http4k.filter.ServerFilters
  */
 class BasicAuthSecurity(realm: String, credentials: Credentials, val name: String = "basicAuth") : Security {
     override val filter: Filter = ServerFilters.BasicAuth(realm, credentials)
+
+    companion object
 }

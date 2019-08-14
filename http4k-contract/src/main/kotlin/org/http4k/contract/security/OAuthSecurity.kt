@@ -7,7 +7,9 @@ import org.http4k.security.OAuthProvider
 sealed class OAuthSecurity(override val filter: Filter,
                            val name: String,
                            val scopes: List<OAuthScope>,
-                           val refreshUrl: Uri?) : Security
+                           val refreshUrl: Uri?) : Security {
+    companion object
+}
 
 class AuthCodeOAuthSecurity(val authorizationUrl: Uri,
                             val tokenUrl: Uri,
