@@ -7,6 +7,11 @@ import org.http4k.contract.openapi.rendererFor
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 
+/**
+ * Compose the supported Security models
+ */
+val OpenApi2SecurityRenderer = SecurityRenderer(ApiKeySecurity.renderer, BasicAuthSecurity.renderer)
+
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
         object : RenderModes {
@@ -34,5 +39,3 @@ val BasicAuthSecurity.Companion.renderer
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
         }
     }
-
-val OpenApi2SecurityRenderer = SecurityRenderer(ApiKeySecurity.renderer, BasicAuthSecurity.renderer)
