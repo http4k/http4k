@@ -1,7 +1,7 @@
 package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.openapi.Render
-import org.http4k.contract.openapi.RenderMode
+import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.rendererFor
 import org.http4k.contract.security.ApiKeySecurity
@@ -11,7 +11,7 @@ import org.http4k.contract.security.BearerAuthSecurity
 
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {
-        object : RenderMode {
+        object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("apiKey"),
@@ -26,7 +26,7 @@ val ApiKeySecurity.Companion.renderer
 
 val AuthCodeOAuthSecurity.Companion.renderer
     get() = rendererFor<AuthCodeOAuthSecurity> {
-        object : RenderMode {
+        object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("oauth2"),
@@ -44,7 +44,7 @@ val AuthCodeOAuthSecurity.Companion.renderer
 
 val BasicAuthSecurity.Companion.renderer
     get() = rendererFor<BasicAuthSecurity> {
-        object : RenderMode {
+        object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "scheme" to string("basic"),
@@ -58,7 +58,7 @@ val BasicAuthSecurity.Companion.renderer
 
 val BearerAuthSecurity.Companion.renderer
     get() = rendererFor<BearerAuthSecurity> {
-        object : RenderMode {
+        object : RenderModes {
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "scheme" to string("bearer"),
