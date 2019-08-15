@@ -32,4 +32,6 @@ class ApiKeySecurity<out T>(val param: Lens<Request, T>,
             }
         }
     }
+
+    companion object
 }

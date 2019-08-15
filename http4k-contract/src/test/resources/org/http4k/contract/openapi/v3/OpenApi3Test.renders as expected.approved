@@ -518,7 +518,7 @@
         },
         "security": [
           {
-            "oauthSecurity": [
+            "oauthSecurityAuthCode": [
               "user"
             ]
           },
@@ -748,7 +748,7 @@
         "scheme": "basic",
         "type": "http"
       },
-      "oauthSecurity": {
+      "oauthSecurityAuthCode": {
         "type": "oauth2",
         "flows": {
           "authorizationCode": {

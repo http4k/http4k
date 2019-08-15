@@ -3,9 +3,9 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
-import org.http4k.contract.security.OAuthSecurity
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -121,7 +121,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = BasicAuthSecurity("realm", credentials)
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
-                security = OAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
+                security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
                     credentials,
                     Uri.of("http://localhost/callback"),
                     FakeOAuthPersistence()))

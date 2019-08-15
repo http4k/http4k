@@ -11,4 +11,6 @@ class BearerAuthSecurity private constructor(override val filter: Filter, val na
     constructor(token: String) : this(ServerFilters.BearerAuth(token))
     constructor(token: (String) -> Boolean) : this(ServerFilters.BearerAuth(token))
     constructor(key: RequestContextLens<Any>, lookup: (String) -> Any?) : this(ServerFilters.BearerAuth(key, lookup))
+
+    companion object
 }

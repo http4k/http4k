@@ -22,3 +22,13 @@ interface SecurityRenderer {
         }
     }
 }
+
+interface RenderModes {
+    fun <NODE> full(): Render<NODE>
+    fun <NODE> ref(): Render<NODE>
+}
+
+inline fun <reified T : Security> rendererFor(crossinline fn: (T) -> RenderModes) = object : SecurityRenderer {
+    override fun <NODE> full(security: Security): Render<NODE>? = if (security is T) fn(security).full() else null
+    override fun <NODE> ref(security: Security): Render<NODE>? = if (security is T) fn(security).ref() else null
+}

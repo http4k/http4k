@@ -1,0 +1,6 @@
+{
+  "basicAuth": {
+    "scheme": "basic",
+    "type": "http"
+  }
+}

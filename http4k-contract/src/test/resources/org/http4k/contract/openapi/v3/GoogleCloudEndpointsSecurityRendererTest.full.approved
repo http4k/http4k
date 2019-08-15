@@ -1,0 +1,15 @@
+{
+  "googleCloudEndpointsOAuth": {
+    "type": "oauth2",
+    "flows": {
+      "implicit": {
+        "authorizationUrl": "",
+        "scopes": {
+        },
+        "x-google-issuer": "issuer",
+        "x-google-jwks_uri": "issuer",
+        "x-google-audiences": "first"
+      }
+    }
+  }
+}

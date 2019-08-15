@@ -1,0 +1,16 @@
+{
+  "custom": {
+    "type": "oauth2",
+    "flows": {
+      "authorizationCode": {
+        "authorizationUrl": "/auth",
+        "refreshUrl": "/refresh",
+        "tokenUrl": "/token",
+        "scopes": {
+          "name": "value"
+        },
+        "extra1": "value2"
+      }
+    }
+  }
+}
