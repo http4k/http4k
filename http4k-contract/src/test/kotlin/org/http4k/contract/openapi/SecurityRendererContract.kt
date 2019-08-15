@@ -1,13 +1,13 @@
 package org.http4k.contract.openapi
 
-import argo.jdom.JsonNode
+import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.contract.security.Security
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
-import org.http4k.format.Argo
-import org.http4k.format.Argo.json
+import org.http4k.format.Jackson
+import org.http4k.format.Jackson.json
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
@@ -32,5 +32,5 @@ interface SecurityRendererContract {
 
 private fun Approver.assertSecurityRenders(function: Render<JsonNode>?) {
     val lens = Body.json().toLens()
-    assertApproved(Response(Status.OK).with(lens of function?.invoke(Argo)!!))
+    assertApproved(Response(Status.OK).with(lens of function?.invoke(Jackson)!!))
 }
