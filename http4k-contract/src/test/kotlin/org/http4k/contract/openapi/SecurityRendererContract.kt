@@ -2,15 +2,18 @@ package org.http4k.contract.openapi
 
 import argo.jdom.JsonNode
 import org.http4k.contract.security.Security
+import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.with
 import org.http4k.format.Argo
-import org.http4k.testing.ApprovalTest
+import org.http4k.format.Argo.json
 import org.http4k.testing.Approver
+import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(ApprovalTest::class)
+@ExtendWith(JsonApprovalTest::class)
 interface SecurityRendererContract {
 
     val security: Security
@@ -28,9 +31,6 @@ interface SecurityRendererContract {
 }
 
 private fun Approver.assertSecurityRenders(function: Render<JsonNode>?) {
-    assertApproved(Response(Status.OK).body(
-        Argo {
-            pretty(function?.invoke(this)!!)
-        }
-    ))
+    val lens = Body.json().toLens()
+    assertApproved(Response(Status.OK).with(lens of function?.invoke(Argo)!!))
 }
