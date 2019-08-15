@@ -2,7 +2,7 @@ title: http4k JSON-RPC Module
 description: Feature overview of the http4k-jsonrpc module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-jsonrpc", version: "3.172.0"```
+```compile group: "org.http4k", name: "http4k-jsonrpc", version: "3.173.0"```
 
 ### About
 
