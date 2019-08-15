@@ -4,7 +4,6 @@ import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.rendererFor
-import org.http4k.contract.openapi.v2.renderer
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
