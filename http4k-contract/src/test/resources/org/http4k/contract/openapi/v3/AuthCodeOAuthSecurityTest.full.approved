@@ -1,13 +1,15 @@
 {
-	"oauthSecurityAuthCode": {
+	"custom": {
 		"type": "oauth2",
 		"flows": {
 			"authorizationCode": {
-				"authorizationUrl": "https://github.com/login/oauth/authorize",
-				"tokenUrl": "https://github.com/login/oauth/access_token",
+				"authorizationUrl": "/auth",
+				"refreshUrl": "/refresh",
+				"tokenUrl": "/token",
 				"scopes": {
-					"user": ""
-				}
+					"name": "value"
+				},
+				"extra1": "value2"
 			}
 		}
 	}

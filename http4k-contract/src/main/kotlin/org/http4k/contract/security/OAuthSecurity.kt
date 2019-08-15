@@ -7,7 +7,8 @@ import org.http4k.security.OAuthProvider
 sealed class OAuthSecurity(override val filter: Filter,
                            val name: String,
                            val scopes: List<OAuthScope>,
-                           val refreshUrl: Uri?) : Security {
+                           val refreshUrl: Uri?,
+                           val extraFields: Map<String, String> = emptyMap()) : Security {
     companion object
 }
 
@@ -16,7 +17,10 @@ class AuthCodeOAuthSecurity(val authorizationUrl: Uri,
                             scopes: List<OAuthScope> = emptyList(),
                             filter: Filter,
                             name: String = "oauthSecurityAuthCode",
-                            refreshUrl: Uri? = null) : OAuthSecurity(filter, name, scopes, refreshUrl) {
+                            refreshUrl: Uri? = null,
+                            extraFields: Map<String, String> = emptyMap()) :
+    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+
     companion object {
         operator fun invoke(oAuthProvider: OAuthProvider,
                             customScopes: List<OAuthScope>? = null) = AuthCodeOAuthSecurity(
@@ -32,6 +36,8 @@ class ImplicitOAuthSecurity(val authorizationUrl: Uri,
                             filter: Filter,
                             scopes: List<OAuthScope> = emptyList(),
                             refreshUrl: Uri? = null,
-                            name: String = "oauthSecurityImplicit") : OAuthSecurity(filter, name, scopes, refreshUrl)
+                            name: String = "oauthSecurityImplicit",
+                            extraFields: Map<String, String> = emptyMap()) :
+    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields)
 
 data class OAuthScope(val name: String, val description: String = name)

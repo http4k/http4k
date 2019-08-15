@@ -5,14 +5,12 @@ import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.OAuthScope
 import org.http4k.core.Credentials
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Filter
+import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.lens.Query
-import org.http4k.security.FakeOAuthPersistence
-import org.http4k.security.OAuthProvider
-import org.http4k.security.gitHub
 
 class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val security = ApiKeySecurity(Query.required("the_api_key"), { true })
@@ -20,10 +18,16 @@ class ApiKeySecurityRendererTest : SecurityRendererContract {
 }
 
 class AuthCodeOAuthSecurityTest : SecurityRendererContract {
-    override val security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },
-        Credentials("user", "password"),
-        Uri.of("http://localhost/callback"),
-        FakeOAuthPersistence()))
+    override val security = AuthCodeOAuthSecurity(
+        Uri.of("/auth"),
+        Uri.of("/token"),
+        listOf(OAuthScope("name", "value")),
+        Filter.NoOp,
+        "custom",
+        Uri.of("/refresh"),
+        mapOf("extra1" to "value2")
+    )
+
     override val renderer = OpenApi3SecurityRenderer
 }
 

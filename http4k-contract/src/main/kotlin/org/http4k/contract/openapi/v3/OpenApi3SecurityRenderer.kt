@@ -4,6 +4,7 @@ import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.rendererFor
+import org.http4k.contract.openapi.v2.renderer
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
@@ -40,11 +41,17 @@ val AuthCodeOAuthSecurity.Companion.renderer
             override fun <NODE> full(): Render<NODE> = {
                 obj(it.name to obj(
                     "type" to string("oauth2"),
-                    "flows" to obj("authorizationCode" to obj(
-                        "authorizationUrl" to string(it.authorizationUrl.toString()),
-                        "tokenUrl" to string(it.tokenUrl.toString()),
-                        "scopes" to obj(it.scopes.map { it.name to string(it.description) })
-                    ))
+                    "flows" to obj("authorizationCode" to
+                        obj(
+                            listOfNotNull(
+                                "authorizationUrl" to string(it.authorizationUrl.toString()),
+                                it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
+                                "tokenUrl" to string(it.tokenUrl.toString()),
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
+                                )
+                            ) + it.extraFields.map { it.key to string(it.value) }
+                        )
+                    )
                 ))
             }
 
