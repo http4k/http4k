@@ -34,16 +34,4 @@ class ImplicitOAuthSecurity(val authorizationUrl: Uri,
                             refreshUrl: Uri? = null,
                             name: String = "oauthSecurityImplicit") : OAuthSecurity(filter, name, scopes, refreshUrl)
 
-class PasswordOAuthSecurity(filter: Filter,
-                            val tokenUrl: Uri,
-                            scopes: List<OAuthScope> = emptyList(),
-                            refreshUrl: Uri? = null,
-                            name: String = "oauthSecurityPassword") : OAuthSecurity(filter, name, scopes, refreshUrl)
-
-class ClientCredentialsOAuthSecurity(filter: Filter,
-                                     val tokenUrl: Uri,
-                                     scopes: List<OAuthScope> = emptyList(),
-                                     refreshUrl: Uri? = null,
-                                     name: String = "oauthSecurityClientCredentials") : OAuthSecurity(filter, name, scopes, refreshUrl)
-
 data class OAuthScope(val name: String, val description: String = name)

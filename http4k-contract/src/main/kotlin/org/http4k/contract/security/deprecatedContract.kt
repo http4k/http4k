@@ -3,11 +3,10 @@ package org.http4k.contract.security
 import org.http4k.core.Filter
 import org.http4k.core.Uri
 
-@Deprecated("use replacement", ReplaceWith("AuthCodeOAuthSecurity(authorizationUrl, tokenUrl, scopes, filter, name, refreshUrl)"))
+@Deprecated("Renamed", ReplaceWith("AuthCodeOAuthSecurity(authorizationUrl, tokenUrl, scopes, filter, name, refreshUrl)"))
 fun OAuthSecurity(authorizationUrl: Uri,
                   tokenUrl: Uri,
                   scopes: List<OAuthScope> = emptyList(),
                   filter: Filter,
-                  name: String = "oauthSecurity",
-                  refreshUrl: Uri? = null) = AuthCodeOAuthSecurity(authorizationUrl, tokenUrl, scopes, filter, name, refreshUrl)
+                  name: String = "oauthSecurity") = AuthCodeOAuthSecurity(authorizationUrl, tokenUrl, scopes, filter, name)
 
