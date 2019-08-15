@@ -33,11 +33,14 @@ class AuthCodeOAuthSecurity(val authorizationUrl: Uri,
 }
 
 class ImplicitOAuthSecurity(val authorizationUrl: Uri,
-                            filter: Filter,
                             scopes: List<OAuthScope> = emptyList(),
-                            refreshUrl: Uri? = null,
+                            filter: Filter,
                             name: String = "oauthSecurityImplicit",
+                            refreshUrl: Uri? = null,
                             extraFields: Map<String, String> = emptyMap()) :
-    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields)
+    OAuthSecurity(filter, name, scopes, refreshUrl, extraFields) {
+
+    companion object
+}
 
 data class OAuthScope(val name: String, val description: String = name)

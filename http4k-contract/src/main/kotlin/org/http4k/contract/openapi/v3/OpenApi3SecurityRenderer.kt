@@ -9,6 +9,7 @@ import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.ImplicitOAuthSecurity
 
 /**
  * Compose the supported Security models
@@ -17,7 +18,8 @@ val OpenApi3SecurityRenderer = SecurityRenderer(
     ApiKeySecurity.renderer,
     AuthCodeOAuthSecurity.renderer,
     BasicAuthSecurity.renderer,
-    BearerAuthSecurity.renderer
+    BearerAuthSecurity.renderer,
+    ImplicitOAuthSecurity.renderer
 )
 
 val ApiKeySecurity.Companion.renderer
@@ -84,5 +86,28 @@ val BearerAuthSecurity.Companion.renderer
             }
 
             override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(emptyList())) }
+        }
+    }
+
+val ImplicitOAuthSecurity.Companion.renderer
+    get() = rendererFor<ImplicitOAuthSecurity> {
+        object : RenderModes {
+            override fun <NODE> full(): Render<NODE> = {
+                obj(it.name to obj(
+                    "type" to string("oauth2"),
+                    "flows" to obj("implicit" to
+                        obj(
+                            listOfNotNull(
+                                "authorizationUrl" to string(it.authorizationUrl.toString()),
+                                it.refreshUrl?.let { "refreshUrl" to string(it.toString()) },
+                                "scopes" to obj(it.scopes.map { it.name to string(it.description) }
+                                )
+                            ) + it.extraFields.map { it.key to string(it.value) }
+                        )
+                    )
+                ))
+            }
+
+            override fun <NODE> ref(): Render<NODE> = { obj(it.name to array(it.scopes.map { string(it.name) })) }
         }
     }
