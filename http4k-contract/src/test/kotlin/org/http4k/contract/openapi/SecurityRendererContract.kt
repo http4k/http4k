@@ -5,12 +5,12 @@ import org.http4k.contract.security.Security
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.format.Argo
+import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
-import org.http4k.testing.JsonApprovalTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(JsonApprovalTest::class)
+@ExtendWith(ApprovalTest::class)
 interface SecurityRendererContract {
 
     val security: Security
