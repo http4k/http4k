@@ -1,5 +1,5 @@
 {
-  "basicAuth": {
-    "type": "basic"
-  }
+	"basicAuth": {
+		"type": "basic"
+	}
 }
