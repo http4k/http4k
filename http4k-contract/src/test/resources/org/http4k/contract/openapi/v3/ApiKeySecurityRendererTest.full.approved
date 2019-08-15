@@ -1,7 +1,7 @@
 {
-	"api_key": {
-		"type": "apiKey",
-		"in": "query",
-		"name": "the_api_key"
-	}
+  "api_key": {
+    "type": "apiKey",
+    "in": "query",
+    "name": "the_api_key"
+  }
 }
