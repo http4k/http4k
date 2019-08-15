@@ -6,7 +6,10 @@ import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.ImplicitOAuthSecurity
+import org.http4k.core.Filter
 import org.http4k.core.Method
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -30,4 +33,25 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(Argo, OpenApi2(ApiInfo("
 
         approver.assertApproved(router(Request(Method.GET, "/docs?the_api_key=somevalue")))
     }
+
+    @Test
+    fun `renders Google Cloud Endpoints OAuth2`(approver: Approver) {
+        val router = "/" bind contract {
+            renderer = rendererToUse
+            security = ImplicitOAuthSecurity(
+                name = "oauth2",
+                authorizationUrl = Uri.of(""),
+                extraFields = mapOf(
+                    "x-google-issuer" to "example-google-issuer",
+                    "x-google-jwks_uri" to "http://example.org/jwks",
+                    "x-google-audiences" to "client-id1,client-id2"
+                ),
+                filter = Filter.NoOp
+            )
+            routes += "/example" bindContract Method.GET to { Response(Status.OK) }
+        }
+
+        approver.assertApproved(router(Request(Method.GET, "/")))
+    }
+
 }
