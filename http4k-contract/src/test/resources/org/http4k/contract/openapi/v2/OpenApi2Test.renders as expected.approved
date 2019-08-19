@@ -43,6 +43,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -70,6 +74,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -108,6 +116,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -144,6 +156,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -184,6 +200,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -242,6 +262,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -283,6 +307,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -320,6 +348,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -349,6 +381,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -388,6 +424,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -425,6 +465,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -453,6 +497,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ],
@@ -511,6 +559,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -539,6 +591,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -566,6 +622,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -607,6 +667,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -638,6 +702,10 @@
         "security": [
           {
             "api_key": [
+            ]
+          },
+          {
+            "oauth2-service": [
             ]
           }
         ]
@@ -695,6 +763,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -725,6 +797,10 @@
           {
             "api_key": [
             ]
+          },
+          {
+            "oauth2-service": [
+            ]
           }
         ]
       }
@@ -735,6 +811,13 @@
       "type": "apiKey",
       "in": "query",
       "name": "the_api_key"
+    },
+    "oauth2-service": {
+      "type": "oauth2",
+      "flows": "implicit",
+      "authorizationUrl": "",
+      "x-google-issuer": "test@example.org",
+      "x-google-jwks_uri": "https://www.googleapis.com/robot/v1/metadata/x509/test@example.org"
     },
     "basicAuth": {
       "type": "basic"

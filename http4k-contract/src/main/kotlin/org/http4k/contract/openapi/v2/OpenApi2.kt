@@ -41,8 +41,8 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
-        with(renderPaths(routes, contractRoot, security)) {
+    override fun description(contractRoot: PathSegments, securities: List<Security>, routes: List<ContractRoute>) =
+        with(renderPaths(routes, contractRoot, securities)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
@@ -52,7 +52,7 @@ open class OpenApi2<out NODE>(
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
                         "paths" to this.obj(fields.sortedBy { it.first }),
-                        "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
+                        "securityDefinitions" to (securities + routes.map { it.meta.security }).combine(),
                         "definitions" to this.obj(definitions),
                         baseUri?.let { "host" to string(it.authority) },
                         baseUri?.let { "schemes" to array(string(it.scheme)) }
@@ -63,11 +63,11 @@ open class OpenApi2<out NODE>(
     private fun List<Security>.combine() =
         json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
-    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
+    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, securities: List<Security>): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
-                memoFields + render(contractRoot, security, route)
+                memoFields + render(contractRoot, securities, route)
             }
             memo + FieldAndDefinitions(
                 normalisePath(path) to json { obj(routeFieldsAndDefinitions.fields) }, routeFieldsAndDefinitions.definitions
@@ -103,7 +103,7 @@ open class OpenApi2<out NODE>(
         )
     }
 
-    private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute)
+    private fun render(pathSegments: PathSegments, contractSecurities: List<Security>, route: ContractRoute)
         : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
@@ -127,8 +127,7 @@ open class OpenApi2<out NODE>(
                     "consumes" to array(consumes.map { string(it.value) }),
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
-                    "security" to array(
-                        listOf(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
+                    "security" to array((listOf(route.meta.security) + contractSecurities).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

@@ -18,7 +18,7 @@ import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
-                                      private val security: Security,
+                                      private val securities: List<Security>,
                                       private val descriptionPath: String,
                                       private val preFlightExtraction: PreFlightExtraction,
                                       private val routes: List<ContractRoute> = emptyList(),
@@ -39,7 +39,9 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val notFound = preSecurityFilter.then(security.filter).then(postSecurityFilter).then { renderer.notFound() }
+    private val composedSecurityFilter = securities.fold(Filter.NoOp) { acc, security -> acc.then(security.filter) }
+
+    private val notFound = preSecurityFilter.then(composedSecurityFilter).then(postSecurityFilter).then { renderer.notFound() }
 
     private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
 
@@ -48,14 +50,14 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
             val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
-            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
+            it bindContract GET to { renderer.description(contractRoot, securities, routes + extra) }
         }
 
     private val routers = routes
         .map {
             identify(it)
                 .then(preSecurityFilter)
-                .then(security.filter)
+                .then(composedSecurityFilter)
                 .then(it.meta.security.filter)
                 .then(postSecurityFilter)
                 .then(CatchLensFailure(renderer::badRequest))

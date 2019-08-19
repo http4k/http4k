@@ -2,27 +2,19 @@ package org.http4k.contract
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.contract.security.*
 import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
-import org.http4k.contract.security.BearerAuthSecurity
-import org.http4k.core.Body
+import org.http4k.core.*
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Credentials
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
-import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
 import org.http4k.lens.FormField
@@ -74,6 +66,15 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
+            securities += ImplicitOAuthSecurity(
+                    name = "oauth2-service",
+                    authorizationUrl = Uri.of(""),
+                    extraFields = mapOf(
+                            "x-google-issuer" to "test@example.org",
+                            "x-google-jwks_uri" to "https://www.googleapis.com/robot/v1/metadata/x509/test@example.org"
+                    ),
+                    filter = Filter.NoOp
+            )
             routes += "/nometa" bindContract GET to { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
