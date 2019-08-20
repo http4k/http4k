@@ -41,7 +41,7 @@
   "securityDefinitions": {
     "oauth2": {
       "type": "oauth2",
-      "flows": "implicit",
+      "flow": "implicit",
       "authorizationUrl": "",
       "x-google-issuer": "example-google-issuer",
       "x-google-jwks_uri": "http://example.org/jwks",

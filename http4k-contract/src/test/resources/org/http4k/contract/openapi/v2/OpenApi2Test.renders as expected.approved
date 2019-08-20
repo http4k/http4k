@@ -814,7 +814,7 @@
     },
     "oauth2-service": {
       "type": "oauth2",
-      "flows": "implicit",
+      "flow": "implicit",
       "authorizationUrl": "",
       "x-google-issuer": "test@example.org",
       "x-google-jwks_uri": "https://www.googleapis.com/robot/v1/metadata/x509/test@example.org"
