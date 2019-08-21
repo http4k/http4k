@@ -11,7 +11,6 @@ buildscript {
         classpath Libs.dokka_gradle_plugin
         classpath Libs.com_jfrog_bintray_gradle_plugin
         classpath Libs.nebula_provided_base_gradle_plugin
-        classpath Libs.jmfayard_github_io_gradle_kotlin_dsl_libs_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
     }
 }
@@ -21,7 +20,7 @@ plugins {
     id 'net.saliman.cobertura' version '2.6.1'
     id 'nebula.provided-base' version '3.0.3'
     id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'jmfayard.github.io.gradle-kotlin-dsl-libs' version "0.2.6"
+    id 'de.fayard.buildSrcVersions' version '0.4.2'
 }
 
 allprojects {
@@ -262,7 +261,7 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         url = new URL("https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/")
     }
     externalDocumentationLink {
-        def version = Versions.okhttp_major
+        def version = Config.okhttp_major
         url = new URL("https://square.github.io/okhttp/${version}.x/okhttp/")
     }
     externalDocumentationLink {
@@ -270,23 +269,23 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         url = new URL("http://argo.sourceforge.net/javadoc/")
     }
     externalDocumentationLink {
-        def version = Versions.jackson_major_minor
+        def version = Config.jackson_major_minor
         url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
     }
     externalDocumentationLink {
-        def version = Versions.jackson_major_minor
+        def version = Config.jackson_major_minor
         url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
     }
     externalDocumentationLink {
-        def version = Versions.moshi_major
+        def version = Config.moshi_major
         url = new URL("http://square.github.io/moshi/${version}.x/moshi/")
     }
     externalDocumentationLink {
-        def version = Versions.io_undertow_major_minor
+        def version = Config.io_undertow_major_minor
         url = new URL("http://undertow.io/javadoc/${version}.x/")
     }
     externalDocumentationLink {
-        def version = Versions.netty_codec_http2_major_minor
+        def version = Config.netty_codec_http2_major_minor
         url = new URL("https://netty.io/$version/api/")
     }
     externalDocumentationLink {
@@ -319,4 +318,10 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
 
             return path
     })
+}
+
+
+buildSrcVersions {
+    indent = "     "
+    rejectedVersionKeywords.add("pr1") // jackson_dataformat_xml
 }
