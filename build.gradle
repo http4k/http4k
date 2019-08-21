@@ -325,3 +325,9 @@ buildSrcVersions {
     indent = "     "
     rejectedVersionKeywords.add("pr1") // jackson_dataformat_xml
 }
+
+// To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`
+wrapper {
+    gradleVersion = Versions.gradleLatestVersion
+    distributionType = Wrapper.DistributionType.ALL
+}
