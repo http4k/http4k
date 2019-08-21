@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.174.0 (uncut)
+- [all] Update various dependencies.
+
 ### v3.173.0
 - [http4k-core] Fix #273 - parentSpanId trace incorrectly populated when no previous traces
 - [http4k-contract] [Unlikely Break] Remodelled how Security is rendered, so it's possible that this may break slightly for customer implementations
@@ -188,8 +191,7 @@ it is more important that the content is correct than the content-type (and ofte
 get an erroneous error message which masks the fact that the content was wrong).
 
 ### v3.133.0
-- [http4-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This 
-allows for more fine grained custom control of which Responses are acceptable.
+- [http4-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This allows for more fine grained custom control of which Responses are acceptable.
 - [all] Upgrade deps, including Kotlin to `1.3.30`.
 - [http4-contract] Fix #221 - Contract path fixed segments cannot contain slash characters.
 
