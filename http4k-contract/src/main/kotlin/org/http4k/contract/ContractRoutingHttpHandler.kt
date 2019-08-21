@@ -54,7 +54,10 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val routers = routes
         .map {
             identify(it)
-                .then(preSecurityFilter.then(security.filter).then(it.meta.security.filter).then(postSecurityFilter))
+                .then(preSecurityFilter)
+                .then(security.filter)
+                .then(it.meta.security.filter)
+                .then(postSecurityFilter)
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)
         } +

@@ -92,7 +92,7 @@ object Versions {
 
     const val alpn_boot: String = "8.1.13.v20181017"
 
-    const val openapi_generator_gradle_plugin: String = "4.1.0"
+    const val openapi_generator_gradle_plugin: String = "4.0.3"
 
     const val selenium_api: String = "3.141.59"
 
