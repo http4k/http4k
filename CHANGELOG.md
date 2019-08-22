@@ -3,8 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.174.0 (uncut)
-- [all] Update various dependencies.
+### v3.174.0
+- [all] Update various dependencies, including Jackson for a CVE.
 
 ### v3.173.0
 - [http4k-core] Fix #273 - parentSpanId trace incorrectly populated when no previous traces
