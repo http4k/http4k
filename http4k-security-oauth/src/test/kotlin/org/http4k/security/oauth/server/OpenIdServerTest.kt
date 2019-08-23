@@ -27,7 +27,7 @@ class OpenIdServerTest {
     fun `can follow authorization code id_token flow`() {
         val authenticationServer = customOauthAuthorizationServer()
         val tokenConsumer = InMemoryIdTokenConsumer()
-        val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer)
+        val consumerApp = oauthClientApp(authenticationServer, debug, CodeIdToken, tokenConsumer, listOf("openid", "name", "age"))
 
         val browser = Filter.NoOp
             .then(ClientFilters.Cookies())

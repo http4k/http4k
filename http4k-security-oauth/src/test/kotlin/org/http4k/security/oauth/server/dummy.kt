@@ -17,7 +17,7 @@ class DummyAuthorizationCodes(private val request: AuthRequest, private val shou
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
         ?: "unknown")))
 
-    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.responseType)
+    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.isOIDC(), request.responseType)
 }
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
@@ -72,7 +72,7 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
 
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
         Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.responseType)
+            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.isOIDC(), authRequest.responseType)
         })
 }
 
