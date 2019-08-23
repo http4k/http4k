@@ -36,7 +36,7 @@ class AuthenticationComplete(
                 when (authorizationRequest.responseType) {
                     Code -> query("code", it.value)
                     CodeIdToken -> query("code", it.value)
-                        .query("id_token", idTokens.createForAuthorization(request, authorizationRequest, response).value)
+                        .query("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, it).value)
                 }
             }
                 .mapFailure {
