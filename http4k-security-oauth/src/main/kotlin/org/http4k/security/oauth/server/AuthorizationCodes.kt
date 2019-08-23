@@ -29,5 +29,6 @@ data class AuthorizationCodeDetails(
     val clientId: ClientId,
     val redirectUri: Uri,
     val expiresAt: Instant,
+    val isOIDC: Boolean,
     val responseType: ResponseType = Code
 )

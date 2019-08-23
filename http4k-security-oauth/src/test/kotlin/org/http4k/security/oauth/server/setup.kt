@@ -72,7 +72,8 @@ fun oauthClientApp(
     tokenClient: HttpHandler,
     debug: Boolean,
     responseType: ResponseType = ResponseType.Code,
-    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
+    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
+    scopes: List<String> = listOf("name", "age")
 ): RoutingHttpHandler {
     val persistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 
@@ -83,7 +84,7 @@ fun oauthClientApp(
             Uri.of("https://irrelevant")),
         debugFilter(debug).then(tokenClient),
         Uri.of("/my-callback"),
-        listOf("name", "age"),
+        scopes,
         persistence,
         responseType = responseType,
         idTokenConsumer = idTokenConsumer

@@ -9,6 +9,15 @@ data class AuthRequest(
     val scopes: List<String>,
     val redirectUri: Uri,
     val state: String?,
-    val responseType: ResponseType = Code
-)
+    val responseType: ResponseType = Code) {
+
+    fun isOIDC() = scopes.map { it.toLowerCase() }.contains(OIDC_SCOPE)
+
+    companion object {
+
+        const val OIDC_SCOPE = "openid"
+
+    }
+
+}
 

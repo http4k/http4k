@@ -13,7 +13,6 @@ import org.http4k.lens.Validator
 import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.security.AccessTokenDetails
-import org.http4k.security.ResponseType
 import org.http4k.security.oauth.server.AccessTokenError
 import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthorizationCode
@@ -44,9 +43,9 @@ class AuthorizationCodeAccessTokenGenerator(
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
             else -> accessTokens.create(code)
                 .map { token ->
-                    when (codeDetails.responseType) {
-                        ResponseType.Code -> AccessTokenDetails(token)
-                        ResponseType.CodeIdToken -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
+                    when {
+                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(code))
+                        else -> AccessTokenDetails(token)
                     }
                 }
         }
