@@ -21,10 +21,10 @@ class DummyAuthorizationCodes(private val request: AuthRequest, private val shou
 }
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
-    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response) =
+    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode) =
         IdToken("dummy-id-token-for-" + (username ?: "unknown"))
 
-    override fun createForAccessToken(code: AuthorizationCode): IdToken =
+    override fun createForAccessToken(code: AuthorizationCode, accessToken: AccessToken): IdToken =
         IdToken("dummy-id-token-for-access-token")
 }
 
