@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.175.0
+- [all] Update various dependencies, including Kotlin to 1.3.50.
+- [http4-security-oauth] Some support for OIDC. H/T @tom
+
 ### v3.174.0
 - [all] Update various dependencies, including Jackson for a CVE.
 
