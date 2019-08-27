@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.177.0
+- [http4-security-oauth] [Possibly breaking] More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
+
 ### v3.176.0
 - [http4-security-oauth] More support for OIDC. H/T @tom
 
