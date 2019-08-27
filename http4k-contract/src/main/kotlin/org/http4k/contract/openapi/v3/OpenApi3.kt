@@ -68,7 +68,7 @@ class OpenApi3<NODE : Any>(
                             it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
                         }
                         .toSortedMap(),
-                    Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.combineFull()))
+                    Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.filterNotNull().combineFull()))
                 )
             ))
     }
@@ -79,7 +79,7 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security): ApiPath<NODE> {
         val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
 
-        val security = json(listOf(meta.security, contractSecurity).combineRef())
+        val security = json(listOfNotNull(meta.security, contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
 
         return if (method in setOf(GET, DELETE, HEAD) || body == null) {

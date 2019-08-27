@@ -52,7 +52,7 @@ open class OpenApi2<out NODE>(
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
                         "paths" to this.obj(fields.sortedBy { it.first }),
-                        "securityDefinitions" to (listOf(security) + routes.map { it.meta.security }).combine(),
+                        "securityDefinitions" to (listOf(security) + routes.mapNotNull { it.meta.security }).combine(),
                         "definitions" to this.obj(definitions),
                         baseUri?.let { "host" to string(it.authority) },
                         baseUri?.let { "schemes" to array(string(it.scheme)) }
@@ -103,7 +103,7 @@ open class OpenApi2<out NODE>(
         )
     }
 
-    private fun render(pathSegments: PathSegments, contractSecurity: Security, route: ContractRoute)
+    private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute)
         : FieldAndDefinitions<NODE> {
         val (responses, responseDefinitions) = render(route.meta.responses)
 
@@ -128,7 +128,7 @@ open class OpenApi2<out NODE>(
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(
-                        listOf(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
+                        listOfNotNull(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

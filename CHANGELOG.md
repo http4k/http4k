@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.178.0 (uncut)
+- [http4k-contract] [Behaviour change] When specified, individual route security now replaces global security (this is as the security model in the OpenApi spec is specified) as opposed to both being applied. 
+ 
 ### v3.177.0
 - [http4-security-oauth] [Possibly breaking] More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
 
