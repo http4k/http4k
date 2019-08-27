@@ -44,7 +44,7 @@ class AuthorizationCodeAccessTokenGenerator(
             else -> accessTokens.create(code)
                 .map { token ->
                     when {
-                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(code, token))
+                        codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
                         else -> AccessTokenDetails(token)
                     }
                 }

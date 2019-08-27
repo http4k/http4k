@@ -8,15 +8,15 @@ import org.http4k.security.openid.IdToken
 interface IdTokens {
 
     fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode): IdToken
-    fun createForAccessToken(code: AuthorizationCode, accessToken: AccessToken): IdToken
+    fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken
 
     companion object {
         val Unsupported = object : IdTokens {
-            override fun createForAccessToken(code: AuthorizationCode, accessToken: AccessToken): IdToken {
+            override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode): IdToken {
                 throw UnsupportedOperationException("ID Tokens are not supported by this server")
             }
 
-            override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode): IdToken {
+            override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken {
                 throw UnsupportedOperationException("ID Tokens are not supported by this server")
             }
         }

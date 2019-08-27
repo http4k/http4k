@@ -11,21 +11,23 @@ import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 class DummyAuthorizationCodes(private val request: AuthRequest, private val shouldFail: (Request) -> Boolean, private val username: String? = null) : AuthorizationCodes {
     override fun create(request: Request, authRequest: AuthRequest, response: Response): Result<AuthorizationCode, UserRejectedRequest> = if (shouldFail(request)) Failure(UserRejectedRequest) else Success(AuthorizationCode("dummy-token-for-" + (username
-        ?: "unknown")))
+            ?: "unknown")))
 
-    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.isOIDC(), request.responseType)
+    override fun detailsFor(code: AuthorizationCode): AuthorizationCodeDetails = AuthorizationCodeDetails(request.client, request.redirectUri, Instant.EPOCH, request.state, request.isOIDC(), request.responseType)
 }
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
-    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode) =
-        IdToken("dummy-id-token-for-" + (username ?: "unknown"))
 
-    override fun createForAccessToken(code: AuthorizationCode, accessToken: AccessToken): IdToken =
-        IdToken("dummy-id-token-for-access-token")
+    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode) =
+            IdToken("dummy-id-token-for-" + (username ?: "unknown"))
+
+    override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken =
+            IdToken("dummy-id-token-for-access-token")
+
 }
 
 class DummyAccessTokens : AccessTokens {
@@ -52,17 +54,17 @@ class DummyOAuthAuthRequestTracking : AuthRequestTracking {
 }
 
 class HardcodedClientValidator(
-    private val expectedClientId: ClientId,
-    private val expectedRedirectionUri: Uri,
-    private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
+        private val expectedClientId: ClientId,
+        private val expectedRedirectionUri: Uri,
+        private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
 ) : ClientValidator {
     override fun validateClientId(clientId: ClientId): Boolean = clientId == this.expectedClientId
 
     override fun validateRedirection(clientId: ClientId, redirectionUri: Uri) =
-        redirectionUri == this.expectedRedirectionUri
+            redirectionUri == this.expectedRedirectionUri
 
     override fun validateCredentials(clientId: ClientId, clientSecret: String) =
-        clientId == expectedClientId && clientSecret == expectedClientSecret
+            clientId == expectedClientId && clientSecret == expectedClientSecret
 }
 
 class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {
@@ -71,9 +73,9 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
     override fun detailsFor(code: AuthorizationCode) = codes[code] ?: error("code not stored")
 
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
-        Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.isOIDC(), authRequest.responseType)
-        })
+            Success(AuthorizationCode(UUID.randomUUID().toString()).also {
+                codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant(), authRequest.state, authRequest.isOIDC(), authRequest.responseType)
+            })
 }
 
 class InMemoryIdTokenConsumer : IdTokenConsumer {
