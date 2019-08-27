@@ -1,5 +1,6 @@
 package org.http4k.contract
 
+import org.http4k.contract.security.NoSecurity
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -18,7 +19,7 @@ import org.http4k.routing.RoutedResponse
 import org.http4k.routing.RoutingHttpHandler
 
 data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
-                                      private val security: Security,
+                                      private val security: Security?,
                                       private val descriptionPath: String,
                                       private val preFlightExtraction: PreFlightExtraction,
                                       private val routes: List<ContractRoute> = emptyList(),
@@ -39,7 +40,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val notFound = preSecurityFilter.then(security.filter).then(postSecurityFilter).then { renderer.notFound() }
+    private val notFound = preSecurityFilter.then(security?.filter ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
 
     private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
 
@@ -48,15 +49,14 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
             val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
-            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
+            it bindContract GET to { renderer.description(contractRoot, security ?: NoSecurity, routes + extra) }
         }
 
     private val routers = routes
         .map {
             identify(it)
                 .then(preSecurityFilter)
-                .then(security.filter)
-                .then(it.meta.security.filter)
+                .then(it.meta.security?.filter ?: security?.filter ?: Filter.NoOp)
                 .then(postSecurityFilter)
                 .then(CatchLensFailure(renderer::badRequest))
                 .then(PreFlightExtractionFilter(it.meta, preFlightExtraction)) to it.toRouter(contractRoot)

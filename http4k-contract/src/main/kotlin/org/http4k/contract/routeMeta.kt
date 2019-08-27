@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.security.NoSecurity
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
@@ -40,7 +39,7 @@ class RouteMetaDsl internal constructor() {
     val queries = Appendable<Lens<Request, *>>()
     internal var requestBody: BodyLens<*>? = null
     var operationId: String? = null
-    var security: Security = NoSecurity
+    var security: Security? = null
     var preFlightExtraction: PreFlightExtraction? = null
 
     /**
@@ -129,5 +128,5 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val requests: List<HttpMessageMeta<Request>> = emptyList(),
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
-                     val security: Security = NoSecurity,
+                     val security: Security? = null,
                      val operationId: String? = null)

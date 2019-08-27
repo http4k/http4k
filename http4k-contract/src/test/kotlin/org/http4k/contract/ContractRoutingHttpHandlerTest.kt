@@ -146,11 +146,10 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
-    fun `combine security for one endpoint only`() {
+    fun `security from endpoint overrides global security`() {
         val credentials = Credentials("bill", "password")
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to { Response(OK) }
             routes += "/bill" meta {
                 security = BasicAuthSecurity("realm", credentials)
             } bindContract GET to { Response(OK) }
@@ -158,11 +157,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
         assertThat(root(Request(GET, "/root/bill?key=bob")).status, equalTo(UNAUTHORIZED))
 
-        assertThat(ClientFilters.BasicAuth(credentials)
-            .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(UNAUTHORIZED))
+        assertThat(ClientFilters.BasicAuth(Credentials("sue", "password"))
+            .then(root)(Request(GET, "/root/bill?key=bob")).status, equalTo(UNAUTHORIZED))
 
         assertThat(ClientFilters.BasicAuth(credentials)
-            .then(root)(Request(GET, "/root/bill?key=bob")).status, equalTo(OK))
+            .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(OK))
     }
 
     @Test

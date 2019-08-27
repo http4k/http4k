@@ -1,7 +1,6 @@
 package org.http4k.contract
 
 import org.http4k.contract.PreFlightExtraction.Companion.All
-import org.http4k.contract.security.NoSecurity
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.Method
@@ -19,7 +18,7 @@ fun contract(fn: ContractBuilder.() -> Unit) = ContractBuilder().apply(fn).run {
 
 class ContractBuilder internal constructor() {
     var renderer: ContractRenderer = NoRenderer
-    var security: Security = NoSecurity
+    var security: Security? = null
     var descriptionPath = ""
     var preFlightExtraction: PreFlightExtraction = All
     var routes = Appendable<ContractRoute>()

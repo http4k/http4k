@@ -2,9 +2,11 @@ package org.http4k.contract
 
 
 import org.http4k.contract.PreFlightExtraction.Companion
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Method.OPTIONS
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -56,7 +58,7 @@ class ContractRoute internal constructor(val method: Method,
     override fun invoke(p1: Request): Response {
         val handler = toRouter(Root).match(p1)
             ?.let {
-                meta.security.filter
+                (meta.security?.filter ?: Filter.NoOp)
                     .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
                     .then(PreFlightExtractionFilter(meta, Companion.All))
                     .then(it)
