@@ -49,7 +49,7 @@ val ImplicitOAuthSecurity.Companion.renderer
                     obj(
                         listOfNotNull(
                             "type" to string("oauth2"),
-                            "flows" to string("implicit"),
+                            "flow" to string("implicit"),
                             "authorizationUrl" to string(it.authorizationUrl.toString())
                         ) + it.extraFields.map { it.key to string(it.value) }
                     )
