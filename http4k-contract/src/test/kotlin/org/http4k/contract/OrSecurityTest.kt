@@ -3,7 +3,7 @@ package org.http4k.contract
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.OrSecurity
+import org.http4k.contract.security.or
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -24,10 +24,8 @@ class OrSecurityTest {
         Response(OK)
     }
 
-    private val composite = OrSecurity(
-        ApiKeySecurity(Query.required("first"), { true }),
-        ApiKeySecurity(Query.required("second"), { true })
-    )
+    private val composite = ApiKeySecurity(Query.required("first"), { true })
+        .or(ApiKeySecurity(Query.required("second"), { true }))
 
     @Test
     fun `requires either securities to pass to succeed`() {

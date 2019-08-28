@@ -3,8 +3,8 @@ package org.http4k.contract
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.contract.security.AndSecurity
 import org.http4k.contract.security.ApiKeySecurity
+import org.http4k.contract.security.and
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -25,10 +25,9 @@ class AndSecurityTest {
         Response(OK).body("hello")
     }
 
-    private val composite = AndSecurity(
-        ApiKeySecurity(Query.required("first"), { true }),
-        ApiKeySecurity(Query.required("second"), { true })
-    )
+    private val composite =
+        ApiKeySecurity(Query.required("first"), { true })
+            .and(ApiKeySecurity(Query.required("second"), { true }))
 
     @Test
     fun `requires both securities to pass to succeed`() {
