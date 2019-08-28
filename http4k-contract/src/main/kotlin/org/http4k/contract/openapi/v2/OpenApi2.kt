@@ -132,7 +132,7 @@ open class OpenApi2<out NODE>(
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(
-                        listOfNotNull(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
+                        listOfNotNull(route.meta.security ?: contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(
