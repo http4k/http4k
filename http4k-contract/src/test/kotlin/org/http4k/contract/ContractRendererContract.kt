@@ -6,6 +6,7 @@ import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.and
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -119,6 +120,12 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             } bindContract POST to { Response(OK) }
             routes += "/basic_auth" meta {
                 security = BasicAuthSecurity("realm", credentials)
+            } bindContract POST to { Response(OK) }
+            routes += "/and_auth" meta {
+                security = BearerAuthSecurity("foo", "and1").and(BearerAuthSecurity("foo", "and2"))
+            } bindContract POST to { Response(OK) }
+            routes += "/or_auth" meta {
+                security = BearerAuthSecurity("foo", "or1").and(BearerAuthSecurity("foo", "or2"))
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
                 security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },

@@ -15,6 +15,32 @@
     }
   ],
   "paths": {
+    "/basepath/and_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "and1": [
+            ],
+            "and2": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathAnd_auth"
+      }
+    },
     "/basepath/basic_auth": {
       "post": {
         "summary": "<unknown>",
@@ -557,6 +583,32 @@
         "operationId": "postBasepathOauth2_auth"
       }
     },
+    "/basepath/or_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "or1": [
+            ],
+            "or2": [
+            ]
+          },
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathOr_auth"
+      }
+    },
     "/basepath/paths/{firstName}/bertrand/{age}": {
       "post": {
         "summary": "<unknown>",
@@ -851,6 +903,22 @@
     "securitySchemes": {
       "basicAuth": {
         "scheme": "basic",
+        "type": "http"
+      },
+      "and1": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "and2": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "or1": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "or2": {
+        "scheme": "bearer",
         "type": "http"
       },
       "oauthSecurityAuthCode": {

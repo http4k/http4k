@@ -11,6 +11,8 @@
     "POST:/basepath/body_json_schema": "<unknown>",
     "POST:/basepath/body_json_list_schema": "<unknown>",
     "POST:/basepath/basic_auth": "<unknown>",
+    "POST:/basepath/and_auth": "<unknown>",
+    "POST:/basepath/or_auth": "<unknown>",
     "POST:/basepath/oauth2_auth": "<unknown>",
     "POST:/basepath/body_form": "<unknown>",
     "GET:/basepath/produces_and_consumes": "<unknown>",

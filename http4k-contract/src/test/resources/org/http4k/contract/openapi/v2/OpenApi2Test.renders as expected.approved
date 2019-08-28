@@ -15,6 +15,34 @@
     }
   ],
   "paths": {
+    "/basepath/and_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathAnd_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/basic_auth": {
       "post": {
         "tags": [
@@ -550,6 +578,34 @@
         ],
         "summary": "<unknown>",
         "operationId": "postBasepathOauth2_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
+    "/basepath/or_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathOr_auth",
         "produces": [
         ],
         "consumes": [
