@@ -32,10 +32,6 @@
             ],
             "and2": [
             ]
-          },
-          {
-            "api_key": [
-            ]
           }
         ],
         "operationId": "postBasepathAnd_auth"
@@ -56,10 +52,6 @@
           {
             "basicAuth": [
             ]
-          },
-          {
-            "api_key": [
-            ]
           }
         ],
         "operationId": "postBasepathBasic_auth"
@@ -79,10 +71,6 @@
         "security": [
           {
             "bearerAuth": [
-            ]
-          },
-          {
-            "api_key": [
             ]
           }
         ],
@@ -574,10 +562,6 @@
             "oauthSecurityAuthCode": [
               "user"
             ]
-          },
-          {
-            "api_key": [
-            ]
           }
         ],
         "operationId": "postBasepathOauth2_auth"
@@ -599,10 +583,6 @@
             "or1": [
             ],
             "or2": [
-            ]
-          },
-          {
-            "api_key": [
             ]
           }
         ],

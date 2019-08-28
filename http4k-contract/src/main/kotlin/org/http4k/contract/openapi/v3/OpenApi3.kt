@@ -55,8 +55,8 @@ class OpenApi3<NODE : Any>(
 
     constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>, extensions: List<OpenApiExtension> = emptyList()) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
-        val allSecurities = routes.map { it.meta.security } + security
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>): Response {
+        val allSecurities = routes.map { it.meta.security } + listOfNotNull(security)
         val paths = routes.map { it.asPath(security, contractRoot) }
 
         val unextended = apiRenderer.api(
@@ -78,13 +78,13 @@ class OpenApi3<NODE : Any>(
             .with(json.body().toLens() of final)
     }
 
-    private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =
+    private fun ContractRoute.asPath(contractSecurity: Security?, contractRoot: PathSegments) =
         PathAndMethod(describeFor(contractRoot), method, apiPath(contractRoot, contractSecurity))
 
-    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security): ApiPath<NODE> {
+    private fun ContractRoute.apiPath(contractRoot: PathSegments, contractSecurity: Security?): ApiPath<NODE> {
         val tags = if (tags.isEmpty()) listOf(contractRoot.toString()) else tags.map { it.name }.toSet().sorted()
 
-        val security = json(listOfNotNull(meta.security, contractSecurity).combineRef())
+        val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
 
         return if (method in setOf(GET, DELETE, HEAD) || body == null) {
