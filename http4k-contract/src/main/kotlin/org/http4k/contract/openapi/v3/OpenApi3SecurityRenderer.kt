@@ -3,7 +3,9 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
+import org.http4k.contract.openapi.renderer
 import org.http4k.contract.openapi.rendererFor
+import org.http4k.contract.security.AndSecurity
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
@@ -13,13 +15,16 @@ import org.http4k.contract.security.ImplicitOAuthSecurity
 /**
  * Compose the supported Security models
  */
-val OpenApi3SecurityRenderer = SecurityRenderer(
-    ApiKeySecurity.renderer,
-    AuthCodeOAuthSecurity.renderer,
-    BasicAuthSecurity.renderer,
-    BearerAuthSecurity.renderer,
-    ImplicitOAuthSecurity.renderer
-)
+val OpenApi3SecurityRenderer: SecurityRenderer = {
+    val supported = SecurityRenderer(
+        ApiKeySecurity.renderer,
+        AuthCodeOAuthSecurity.renderer,
+        BasicAuthSecurity.renderer,
+        BearerAuthSecurity.renderer,
+        ImplicitOAuthSecurity.renderer
+    )
+    SecurityRenderer(supported, AndSecurity.renderer(supported))
+}()
 
 val ApiKeySecurity.Companion.renderer
     get() = rendererFor<ApiKeySecurity<*>> {

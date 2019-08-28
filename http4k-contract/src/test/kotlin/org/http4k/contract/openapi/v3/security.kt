@@ -1,6 +1,7 @@
 package org.http4k.contract.openapi.v3
 
 import org.http4k.contract.openapi.SecurityRendererContract
+import org.http4k.contract.security.AndSecurity
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
@@ -18,7 +19,7 @@ class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class AuthCodeOAuthSecurityTest : SecurityRendererContract {
+class AuthCodeOAuthSecurityRendererTest : SecurityRendererContract {
     override val security = AuthCodeOAuthSecurity(
         Uri.of("/auth"),
         Uri.of("/token"),
@@ -42,7 +43,7 @@ class BearerAuthSecurityRendererTest : SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class ImplicitOAuthSecurityTest : SecurityRendererContract {
+class ImplicitOAuthSecurityRendererTest : SecurityRendererContract {
     override val security = ImplicitOAuthSecurity(
         Uri.of("/auth"),
         listOf(OAuthScope("name", "value")),
@@ -50,6 +51,15 @@ class ImplicitOAuthSecurityTest : SecurityRendererContract {
         "custom",
         Uri.of("/refresh"),
         mapOf("extra1" to "value2")
+    )
+
+    override val renderer = OpenApi3SecurityRenderer
+}
+
+class AndSecurityRendererTest : SecurityRendererContract {
+    override val security = AndSecurity(
+        ApiKeySecurity(Query.required("first"), { true }, name = "first"),
+        ApiKeySecurity(Query.required("second"), { true }, name = "second")
     )
 
     override val renderer = OpenApi3SecurityRenderer
