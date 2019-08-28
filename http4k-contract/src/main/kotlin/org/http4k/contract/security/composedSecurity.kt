@@ -6,7 +6,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 
-interface CompositeSecurity : Security {
+interface CompositeSecurity : Security, Iterable<Security> {
     companion object
 }
 
@@ -15,8 +15,7 @@ class AndSecurity(first: Security, vararg rest: Security) : CompositeSecurity {
 
     override fun iterator() = all.iterator()
 
-    override val filter = this
-        .fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
+    override val filter = fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
 }
 
 class OrSecurity(first: Security, vararg rest: Security) : CompositeSecurity {
