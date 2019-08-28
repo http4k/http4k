@@ -26,8 +26,7 @@ interface SecurityRenderer {
             }
 
             private fun <NODE> List<Render<NODE>>.toObj(): Json<NODE>.() -> NODE = {
-                val fields = flatMap { fields(it(this)) }.toTypedArray()
-                obj(*fields)
+                obj(*flatMap { fields(it(this)) }.toTypedArray())
             }
         }
     }
