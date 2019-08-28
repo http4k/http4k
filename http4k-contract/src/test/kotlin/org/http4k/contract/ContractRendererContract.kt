@@ -122,10 +122,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = BasicAuthSecurity("realm", credentials)
             } bindContract POST to { Response(OK) }
             routes += "/and_auth" meta {
-                security = BearerAuthSecurity("foo", "and1").and(BearerAuthSecurity("foo", "and2"))
+                security = BasicAuthSecurity("foo", credentials, "and1").and(BasicAuthSecurity("foo", credentials, "and2"))
             } bindContract POST to { Response(OK) }
             routes += "/or_auth" meta {
-                security = BearerAuthSecurity("foo", "or1").and(BearerAuthSecurity("foo", "or2"))
+                security = BasicAuthSecurity("foo", credentials, "or1").and(BasicAuthSecurity("foo", credentials, "or2"))
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
                 security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },

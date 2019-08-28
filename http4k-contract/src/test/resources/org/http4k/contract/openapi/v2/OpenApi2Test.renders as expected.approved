@@ -36,6 +36,12 @@
           }
         },
         "security": [
+          {
+            "and1": [
+            ],
+            "and2": [
+            ]
+          }
         ]
       }
     },
@@ -604,6 +610,12 @@
           }
         },
         "security": [
+          {
+            "or1": [
+            ],
+            "or2": [
+            ]
+          }
         ]
       }
     },
@@ -773,6 +785,18 @@
       "name": "the_api_key"
     },
     "basicAuth": {
+      "type": "basic"
+    },
+    "and1": {
+      "type": "basic"
+    },
+    "and2": {
+      "type": "basic"
+    },
+    "or1": {
+      "type": "basic"
+    },
+    "or2": {
       "type": "basic"
     }
   },

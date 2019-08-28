@@ -781,19 +781,19 @@
         "type": "http"
       },
       "and1": {
-        "scheme": "bearer",
+        "scheme": "basic",
         "type": "http"
       },
       "and2": {
-        "scheme": "bearer",
+        "scheme": "basic",
         "type": "http"
       },
       "or1": {
-        "scheme": "bearer",
+        "scheme": "basic",
         "type": "http"
       },
       "or2": {
-        "scheme": "bearer",
+        "scheme": "basic",
         "type": "http"
       },
       "oauthSecurityAuthCode": {
