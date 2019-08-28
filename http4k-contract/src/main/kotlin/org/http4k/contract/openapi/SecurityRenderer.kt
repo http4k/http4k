@@ -15,11 +15,33 @@ interface SecurityRenderer {
 
     companion object {
         operator fun invoke(vararg renderers: SecurityRenderer): SecurityRenderer = object : SecurityRenderer {
-            override fun <NODE> full(security: Security) =
-                renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
+            override fun <NODE> full(security: Security): Render<NODE>? = when (security) {
+                is CompositeSecurity -> security.mapNotNull { full<NODE>(it) }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let {
+                        return {
+                            val fields = it
+                                .flatMap { fields(it(this)) }
+                                .toTypedArray()
+                            obj(*fields)
+                        }
+                    }
+                else -> renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
+            }
 
-            override fun <NODE> ref(security: Security): Render<NODE>? =
-                renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
+            override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
+                is CompositeSecurity -> security.mapNotNull { ref<NODE>(it) }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let {
+                        return {
+                            val fields = it
+                                .flatMap { fields(it(this)) }
+                                .toTypedArray()
+                            obj(*fields)
+                        }
+                    }
+                else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
+            }
         }
     }
 }
@@ -32,23 +54,4 @@ interface RenderModes {
 inline fun <reified T : Security> rendererFor(crossinline fn: (T) -> RenderModes) = object : SecurityRenderer {
     override fun <NODE> full(security: Security): Render<NODE>? = if (security is T) fn(security).full() else null
     override fun <NODE> ref(security: Security): Render<NODE>? = if (security is T) fn(security).ref() else null
-}
-
-/**
- * This renderer collects the various renderings from the component parts
- */
-fun CompositeSecurity.Companion.renderer(delegate: SecurityRenderer) = rendererFor<CompositeSecurity> {
-    object : RenderModes {
-        override fun <NODE> full(): Render<NODE> = { all(delegate::full) }
-
-        override fun <NODE> ref(): Render<NODE> = { all(delegate::ref) }
-
-        private fun <NODE> Json<NODE>.all(transform: (Security) -> (Json<NODE>.() -> NODE)?): NODE {
-            val fields = it
-                .mapNotNull(transform)
-                .flatMap { fields(it(this)) }
-                .toTypedArray()
-            return obj(*fields)
-        }
-    }
 }
