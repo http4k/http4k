@@ -16,31 +16,18 @@ interface SecurityRenderer {
     companion object {
         operator fun invoke(vararg renderers: SecurityRenderer): SecurityRenderer = object : SecurityRenderer {
             override fun <NODE> full(security: Security): Render<NODE>? = when (security) {
-                is CompositeSecurity -> security.mapNotNull { full<NODE>(it) }
-                    .takeIf { it.isNotEmpty() }
-                    ?.let {
-                        return {
-                            val fields = it
-                                .flatMap { fields(it(this)) }
-                                .toTypedArray()
-                            obj(*fields)
-                        }
-                    }
+                is CompositeSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
             }
 
             override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
-                is CompositeSecurity -> security.mapNotNull { ref<NODE>(it) }
-                    .takeIf { it.isNotEmpty() }
-                    ?.let {
-                        return {
-                            val fields = it
-                                .flatMap { fields(it(this)) }
-                                .toTypedArray()
-                            obj(*fields)
-                        }
-                    }
+                is CompositeSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
+            }
+
+            private fun <NODE> List<Render<NODE>>.toObj(): Json<NODE>.() -> NODE = {
+                val fields = flatMap { fields(it(this)) }.toTypedArray()
+                obj(*fields)
             }
         }
     }
