@@ -5,11 +5,11 @@ import org.http4k.contract.openapi.RenderModes
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.renderer
 import org.http4k.contract.openapi.rendererFor
-import org.http4k.contract.security.AndSecurity
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import org.http4k.contract.security.CompositeSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 
 /**
@@ -23,7 +23,7 @@ val OpenApi3SecurityRenderer: SecurityRenderer = {
         BearerAuthSecurity.renderer,
         ImplicitOAuthSecurity.renderer
     )
-    SecurityRenderer(supported, AndSecurity.renderer(supported))
+    SecurityRenderer(supported, CompositeSecurity.renderer(supported))
 }()
 
 val ApiKeySecurity.Companion.renderer

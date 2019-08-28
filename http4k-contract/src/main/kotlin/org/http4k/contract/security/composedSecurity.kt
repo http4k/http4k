@@ -6,18 +6,20 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.then
 
-class AndSecurity(first: Security, vararg rest: Security) : Security {
+interface CompositeSecurity : Security {
+    companion object
+}
+
+class AndSecurity(first: Security, vararg rest: Security) : CompositeSecurity {
     private val all = listOf(first) + rest
 
     override fun iterator() = all.iterator()
 
     override val filter = this
         .fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
-
-    companion object
 }
 
-class OrSecurity(first: Security, vararg rest: Security) : Security {
+class OrSecurity(first: Security, vararg rest: Security) : CompositeSecurity {
     private val all = listOf(first) + rest
 
     override fun iterator() = all.iterator()
@@ -28,6 +30,4 @@ class OrSecurity(first: Security, vararg rest: Security) : Security {
                 .firstOrNull { it.status != UNAUTHORIZED } ?: Response(UNAUTHORIZED)
         }
     }
-
-    companion object
 }

@@ -1,6 +1,6 @@
 package org.http4k.contract.openapi
 
-import org.http4k.contract.security.AndSecurity
+import org.http4k.contract.security.CompositeSecurity
 import org.http4k.contract.security.Security
 import org.http4k.format.Json
 
@@ -37,7 +37,7 @@ inline fun <reified T : Security> rendererFor(crossinline fn: (T) -> RenderModes
 /**
  * This renderer collects the various renderings from the component parts
  */
-fun AndSecurity.Companion.renderer(delegate: SecurityRenderer) = rendererFor<AndSecurity> {
+fun CompositeSecurity.Companion.renderer(delegate: SecurityRenderer) = rendererFor<CompositeSecurity> {
     object : RenderModes {
         override fun <NODE> full(): Render<NODE> = { all(delegate::full) }
 
