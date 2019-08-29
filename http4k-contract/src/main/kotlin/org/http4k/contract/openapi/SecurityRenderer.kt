@@ -3,9 +3,6 @@ package org.http4k.contract.openapi
 import org.http4k.contract.security.AndSecurity
 import org.http4k.contract.security.OrSecurity
 import org.http4k.contract.security.Security
-import org.http4k.format.Json
-
-typealias Render<NODE> = Json<NODE>.() -> NODE
 
 /**
  * Provides rendering of Security models in to OpenApi specs.
@@ -31,7 +28,7 @@ interface SecurityRenderer {
             private fun <NODE> Iterable<Security>.allFrom(transform: (Security) -> Render<NODE>?) =
                 mapNotNull(transform).takeIf { it.isNotEmpty() }
 
-            private fun <NODE> List<Render<NODE>>.toObj(): Json<NODE>.() -> NODE = {
+            private fun <NODE> List<Render<NODE>>.toObj(): Render<NODE> = {
                 obj(*flatMap { fields(it(this)) }.toTypedArray())
             }
         }
