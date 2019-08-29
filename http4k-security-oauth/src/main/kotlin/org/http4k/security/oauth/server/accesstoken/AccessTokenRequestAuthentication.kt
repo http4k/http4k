@@ -11,8 +11,9 @@ interface AccessTokenRequestAuthentication {
 
 class ClientSecretAccessTokenRequestAuthentication(private val clientValidator: ClientValidator) : AccessTokenRequestAuthentication {
     override fun validateCredentials(request: Request) =
-        clientValidator.validateCredentials(
-            ClientId(request.form("client_id").orEmpty()),
-            request.form("client_secret").orEmpty()
-        )
+            clientValidator.validateCredentials(
+                    request,
+                    ClientId(request.form("client_id").orEmpty()),
+                    request.form("client_secret").orEmpty()
+            )
 }

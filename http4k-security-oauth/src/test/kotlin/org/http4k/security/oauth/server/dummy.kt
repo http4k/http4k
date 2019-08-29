@@ -43,9 +43,9 @@ class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : Ac
 }
 
 class DummyClientValidator : ClientValidator {
-    override fun validateClientId(clientId: ClientId): Boolean = true
-    override fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean = true
-    override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
+    override fun validateClientId(request: Request, clientId: ClientId): Boolean = true
+    override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true
+    override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean = true
 }
 
 class DummyOAuthAuthRequestTracking : AuthRequestTracking {
@@ -58,12 +58,12 @@ class HardcodedClientValidator(
         private val expectedRedirectionUri: Uri,
         private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
 ) : ClientValidator {
-    override fun validateClientId(clientId: ClientId): Boolean = clientId == this.expectedClientId
+    override fun validateClientId(request: Request, clientId: ClientId): Boolean = clientId == this.expectedClientId
 
-    override fun validateRedirection(clientId: ClientId, redirectionUri: Uri) =
+    override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri) =
             redirectionUri == this.expectedRedirectionUri
 
-    override fun validateCredentials(clientId: ClientId, clientSecret: String) =
+    override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String) =
             clientId == expectedClientId && clientSecret == expectedClientSecret
 }
 

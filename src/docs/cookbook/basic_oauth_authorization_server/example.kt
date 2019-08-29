@@ -88,13 +88,13 @@ fun main() {
 // This class allow you to make extra checks about the oauth client during the flow
 class InsecureClientValidator : ClientValidator {
     // the client id should be a registered one
-    override fun validateClientId(clientId: ClientId): Boolean = true
+    override fun validateClientId(request: Request, clientId: ClientId): Boolean = true
 
     // one should only redirect to URLs registered against a particular client
-    override fun validateRedirection(clientId: ClientId, redirectionUri: Uri): Boolean = true
+    override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean = true
 
     // certain operations can only be performed by fully authenticated clients (e.g. generate access tokens)
-    override fun validateCredentials(clientId: ClientId, clientSecret: String): Boolean = true
+    override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true
 }
 
 class InsecureAuthorizationCodes : AuthorizationCodes {
