@@ -17,16 +17,19 @@ interface SecurityRenderer {
     companion object {
         operator fun invoke(vararg renderers: SecurityRenderer): SecurityRenderer = object : SecurityRenderer {
             override fun <NODE> full(security: Security): Render<NODE>? = when (security) {
-                is AndSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
-                is OrSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is AndSecurity -> security.allFrom { full<NODE>(it) }?.toObj()
+                is OrSecurity -> security.allFrom { full<NODE>(it) }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
             }
 
             override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
-                is AndSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
-                is OrSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is AndSecurity -> security.allFrom { ref<NODE>(it) }?.toObj()
+                is OrSecurity -> security.allFrom { ref<NODE>(it) }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
             }
+
+            private fun <NODE> Iterable<Security>.allFrom(transform: (Security) -> Render<NODE>?) =
+                mapNotNull(transform).takeIf { it.isNotEmpty() }
 
             private fun <NODE> List<Render<NODE>>.toObj(): Json<NODE>.() -> NODE = {
                 obj(*flatMap { fields(it(this)) }.toTypedArray())
