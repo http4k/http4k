@@ -13,30 +13,23 @@ interface Security {
     val filter: Filter
 }
 
-interface CompositeSecurity : Security, Iterable<Security> {
-    companion object
+fun Security.and(that: Security): Security = AndSecurity(listOf(this) + that)
+
+internal class AndSecurity(private val all: List<Security>) : Security, Iterable<Security> {
+    override fun iterator() = all.iterator()
+
+    override val filter = all.fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
 }
 
-fun Security.and(that: Security): CompositeSecurity {
-    val all = listOf(this) + that
-    return object : CompositeSecurity {
-        override fun iterator() = all.iterator()
+fun Security.or(that: Security): Security = OrSecurity(listOf(this) + that)
 
-        override val filter = fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
-    }
-}
+internal class OrSecurity(private val all: List<Security>) : Security, Iterable<Security> {
+    override fun iterator() = all.iterator()
 
-fun Security.or(that: Security): CompositeSecurity {
-    val all = listOf(this) + that
-
-    return object : CompositeSecurity {
-        override fun iterator() = all.iterator()
-
-        override val filter = Filter { next ->
-            {
-                all.asSequence().map { sec -> sec.filter.then(next)(it) }
-                    .firstOrNull { it.status != UNAUTHORIZED } ?: Response(UNAUTHORIZED)
-            }
+    override val filter = Filter { next ->
+        {
+            all.asSequence().map { sec -> sec.filter.then(next)(it) }
+                .firstOrNull { it.status != UNAUTHORIZED } ?: Response(UNAUTHORIZED)
         }
     }
 }

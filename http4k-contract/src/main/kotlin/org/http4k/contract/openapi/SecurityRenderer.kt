@@ -1,6 +1,7 @@
 package org.http4k.contract.openapi
 
-import org.http4k.contract.security.CompositeSecurity
+import org.http4k.contract.security.AndSecurity
+import org.http4k.contract.security.OrSecurity
 import org.http4k.contract.security.Security
 import org.http4k.format.Json
 
@@ -16,12 +17,14 @@ interface SecurityRenderer {
     companion object {
         operator fun invoke(vararg renderers: SecurityRenderer): SecurityRenderer = object : SecurityRenderer {
             override fun <NODE> full(security: Security): Render<NODE>? = when (security) {
-                is CompositeSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is AndSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is OrSecurity -> security.mapNotNull { full<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
             }
 
             override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
-                is CompositeSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is AndSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
+                is OrSecurity -> security.mapNotNull { ref<NODE>(it) }.takeIf { it.isNotEmpty() }?.toObj()
                 else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
             }
 
