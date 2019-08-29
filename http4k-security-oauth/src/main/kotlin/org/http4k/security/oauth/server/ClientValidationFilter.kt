@@ -17,9 +17,9 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                 errorRenderer.response(UnsupportedResponseType(it.query("response_type").orEmpty()))
             } else {
                 extractor.extract(it).map { authorizationRequest ->
-                    if (!clientValidator.validateClientId(authorizationRequest.client)) {
+                    if (!clientValidator.validateClientId(it, authorizationRequest.client)) {
                         errorRenderer.response(InvalidClientId)
-                    } else if (!clientValidator.validateRedirection(authorizationRequest.client, authorizationRequest.redirectUri)) {
+                    } else if (!clientValidator.validateRedirection(it, authorizationRequest.client, authorizationRequest.redirectUri)) {
                         errorRenderer.response(InvalidRedirectUri)
                     } else {
                         next(it)
