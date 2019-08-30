@@ -7,6 +7,7 @@ import org.http4k.contract.security.AuthCodeOAuthSecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.and
+import org.http4k.contract.security.or
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -125,7 +126,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 security = BasicAuthSecurity("foo", credentials, "and1").and(BasicAuthSecurity("foo", credentials, "and2"))
             } bindContract POST to { Response(OK) }
             routes += "/or_auth" meta {
-                security = BasicAuthSecurity("foo", credentials, "or1").and(BasicAuthSecurity("foo", credentials, "or2"))
+                security = BasicAuthSecurity("foo", credentials, "or1").or(BasicAuthSecurity("foo", credentials, "or2"))
             } bindContract POST to { Response(OK) }
             routes += "/oauth2_auth" meta {
                 security = AuthCodeOAuthSecurity(OAuthProvider.gitHub({ Response(OK) },

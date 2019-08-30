@@ -7,8 +7,6 @@ import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
 import org.http4k.contract.security.OAuthScope
-import org.http4k.contract.security.and
-import org.http4k.contract.security.or
 import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
@@ -53,22 +51,6 @@ class ImplicitOAuthSecurityRendererTest : SecurityRendererContract {
         Uri.of("/refresh"),
         mapOf("extra1" to "value2")
     )
-
-    override val renderer = OpenApi3SecurityRenderer
-}
-
-class AndSecurityRendererTest : SecurityRendererContract {
-    override val security =
-        ApiKeySecurity(Query.required("first"), { true }, name = "first")
-            .and(ApiKeySecurity(Query.required("second"), { true }, name = "second"))
-
-    override val renderer = OpenApi3SecurityRenderer
-}
-
-class OrSecurityRendererTest : SecurityRendererContract {
-    override val security =
-        ApiKeySecurity(Query.required("first"), { true }, name = "first")
-            .or(ApiKeySecurity(Query.required("second"), { true }, name = "second"))
 
     override val renderer = OpenApi3SecurityRenderer
 }
