@@ -1,6 +1,5 @@
 package org.http4k.contract
 
-import org.http4k.contract.security.NoSecurity
 import org.http4k.contract.security.Security
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -49,7 +48,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta(operationId = "description"))
         .let {
             val extra = listOfNotNull(if (includeDescriptionRoute) it bindContract GET to { Response(OK) } else null)
-            it bindContract GET to { renderer.description(contractRoot, security ?: NoSecurity, routes + extra) }
+            it bindContract GET to { renderer.description(contractRoot, security, routes + extra) }
         }
 
     private val routers = routes

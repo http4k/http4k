@@ -15,6 +15,28 @@
     }
   ],
   "paths": {
+    "/basepath/and_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "and1": [
+            ],
+            "and2": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathAnd_auth"
+      }
+    },
     "/basepath/basic_auth": {
       "post": {
         "summary": "<unknown>",
@@ -29,10 +51,6 @@
         "security": [
           {
             "basicAuth": [
-            ]
-          },
-          {
-            "api_key": [
             ]
           }
         ],
@@ -53,10 +71,6 @@
         "security": [
           {
             "bearerAuth": [
-            ]
-          },
-          {
-            "api_key": [
             ]
           }
         ],
@@ -548,13 +562,33 @@
             "oauthSecurityAuthCode": [
               "user"
             ]
-          },
-          {
-            "api_key": [
-            ]
           }
         ],
         "operationId": "postBasepathOauth2_auth"
+      }
+    },
+    "/basepath/or_auth": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "or1": [
+            ]
+          },
+          {
+            "or2": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathOr_auth"
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
@@ -850,6 +884,22 @@
     },
     "securitySchemes": {
       "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "and1": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "and2": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "or1": {
+        "scheme": "basic",
+        "type": "http"
+      },
+      "or2": {
         "scheme": "basic",
         "type": "http"
       },

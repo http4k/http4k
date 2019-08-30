@@ -18,7 +18,7 @@ class ApiKeySecurityRendererTest : SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class AuthCodeOAuthSecurityTest : SecurityRendererContract {
+class AuthCodeOAuthSecurityRendererTest : SecurityRendererContract {
     override val security = AuthCodeOAuthSecurity(
         Uri.of("/auth"),
         Uri.of("/token"),
@@ -42,7 +42,7 @@ class BearerAuthSecurityRendererTest : SecurityRendererContract {
     override val renderer = OpenApi3SecurityRenderer
 }
 
-class ImplicitOAuthSecurityTest : SecurityRendererContract {
+class ImplicitOAuthSecurityRendererTest : SecurityRendererContract {
     override val security = ImplicitOAuthSecurity(
         Uri.of("/auth"),
         listOf(OAuthScope("name", "value")),

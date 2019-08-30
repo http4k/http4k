@@ -1,9 +1,8 @@
 package org.http4k.contract.openapi
 
+import org.http4k.contract.security.AndSecurity
+import org.http4k.contract.security.OrSecurity
 import org.http4k.contract.security.Security
-import org.http4k.format.Json
-
-typealias Render<NODE> = Json<NODE>.() -> NODE
 
 /**
  * Provides rendering of Security models in to OpenApi specs.
@@ -14,11 +13,28 @@ interface SecurityRenderer {
 
     companion object {
         operator fun invoke(vararg renderers: SecurityRenderer): SecurityRenderer = object : SecurityRenderer {
-            override fun <NODE> full(security: Security) =
-                renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
+            override fun <NODE> full(security: Security): Render<NODE>? = when (security) {
+                is AndSecurity -> security.renderAll { full<NODE>(it) }?.toObj()
+                is OrSecurity -> security.renderAll { full<NODE>(it) }?.toObj()
+                else -> renderers.asSequence().mapNotNull { it.full<NODE>(security) }.firstOrNull()
+            }
 
-            override fun <NODE> ref(security: Security): Render<NODE>? =
-                renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
+            override fun <NODE> ref(security: Security): Render<NODE>? = when (security) {
+                is AndSecurity -> security.renderAll { ref<NODE>(it) }?.toObj()
+                is OrSecurity -> security.renderAll { ref<NODE>(it) }?.toArray()
+                else -> renderers.asSequence().mapNotNull { it.ref<NODE>(security) }.firstOrNull()
+            }
+
+            private fun <NODE> Iterable<Security>.renderAll(transform: (Security) -> Render<NODE>?) =
+                mapNotNull(transform).takeIf { it.isNotEmpty() }
+
+            private fun <NODE> List<Render<NODE>>.toObj(): Render<NODE> = {
+                obj(*flatMap { fields(it(this)) }.toTypedArray())
+            }
+
+            private fun <NODE> List<Render<NODE>>.toArray(): Render<NODE> = {
+                array(flatMap { fields(it(this)) }.map { obj(it) })
+            }
         }
     }
 }

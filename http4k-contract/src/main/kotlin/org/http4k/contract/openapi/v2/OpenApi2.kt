@@ -19,6 +19,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
+import org.http4k.format.JsonType
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
@@ -43,7 +44,7 @@ open class OpenApi2<out NODE>(
 
     override fun notFound() = errorResponseRenderer.notFound()
 
-    override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>) =
+    override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
@@ -53,9 +54,9 @@ open class OpenApi2<out NODE>(
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
                         "tags" to array(renderTags(routes)),
-                        "paths" to this.obj(fields.sortedBy { it.first }),
-                        "securityDefinitions" to (listOf(security) + routes.mapNotNull { it.meta.security }).combine(),
-                        "definitions" to this.obj(definitions),
+                        "paths" to obj(fields.sortedBy { it.first }),
+                        "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
+                        "definitions" to obj(definitions),
                         baseUri?.let { "host" to string(it.authority) },
                         baseUri?.let { "schemes" to array(string(it.scheme)) }
                     ))
@@ -67,7 +68,7 @@ open class OpenApi2<out NODE>(
     private fun List<Security>.combine() =
         json { obj(mapNotNull { securityRenderer.full<NODE>(it) }.flatMap { fields(this(it)) }) }
 
-    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security): FieldsAndDefinitions<NODE> = routes
+    private fun renderPaths(routes: List<ContractRoute>, contractRoot: PathSegments, security: Security?): FieldsAndDefinitions<NODE> = routes
         .groupBy { it.describeFor(contractRoot) }.entries
         .fold(FieldsAndDefinitions()) { memo, (path, routes) ->
             val routeFieldsAndDefinitions = routes.fold(FieldsAndDefinitions<NODE>()) { memoFields, route ->
@@ -122,6 +123,11 @@ open class OpenApi2<out NODE>(
             ?: emptyList())
 
         return json {
+            val security = listOfNotNull(route.meta.security ?: contractSecurity)
+                .mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
+                    this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
+                }
+
             val fields =
                 listOfNotNull(
                     "tags" to array(routeTags),
@@ -132,7 +138,7 @@ open class OpenApi2<out NODE>(
                     "parameters" to array(nonBodyParamNodes + bodyParamNodes),
                     "responses" to obj(responses),
                     "security" to array(
-                        listOfNotNull(route.meta.security, contractSecurity).mapNotNull { securityRenderer.ref<NODE>(it) }.map { json(it) })
+                        security)
                 ) + (route.meta.description?.let { listOf("description" to string(it)) } ?: emptyList())
 
             FieldAndDefinitions(

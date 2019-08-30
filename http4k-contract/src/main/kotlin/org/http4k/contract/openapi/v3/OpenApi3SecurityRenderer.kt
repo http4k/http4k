@@ -13,7 +13,7 @@ import org.http4k.contract.security.ImplicitOAuthSecurity
 /**
  * Compose the supported Security models
  */
-val OpenApi3SecurityRenderer = SecurityRenderer(
+val OpenApi3SecurityRenderer: SecurityRenderer = SecurityRenderer(
     ApiKeySecurity.renderer,
     AuthCodeOAuthSecurity.renderer,
     BasicAuthSecurity.renderer,

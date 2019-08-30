@@ -15,6 +15,36 @@
     }
   ],
   "paths": {
+    "/basepath/and_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathAnd_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "and1": [
+            ],
+            "and2": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/basic_auth": {
       "post": {
         "tags": [
@@ -38,10 +68,6 @@
         "security": [
           {
             "basicAuth": [
-            ]
-          },
-          {
-            "api_key": [
             ]
           }
         ]
@@ -68,10 +94,6 @@
           }
         },
         "security": [
-          {
-            "api_key": [
-            ]
-          }
         ]
       }
     },
@@ -564,8 +586,36 @@
           }
         },
         "security": [
+        ]
+      }
+    },
+    "/basepath/or_auth": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathOr_auth",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
           {
-            "api_key": [
+            "or1": [
+            ]
+          },
+          {
+            "or2": [
             ]
           }
         ]
@@ -737,6 +787,18 @@
       "name": "the_api_key"
     },
     "basicAuth": {
+      "type": "basic"
+    },
+    "and1": {
+      "type": "basic"
+    },
+    "and2": {
+      "type": "basic"
+    },
+    "or1": {
+      "type": "basic"
+    },
+    "or2": {
       "type": "basic"
     }
   },
