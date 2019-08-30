@@ -19,6 +19,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Json
+import org.http4k.format.JsonType
 import org.http4k.lens.Header
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
@@ -123,7 +124,9 @@ open class OpenApi2<out NODE>(
 
         return json {
             val security = listOfNotNull(route.meta.security ?: contractSecurity)
-                .mapNotNull { securityRenderer.ref<NODE>(it) }.map { this(it) }
+                .mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
+                    this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
+                }
 
             val fields =
                 listOfNotNull(
