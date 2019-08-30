@@ -53,5 +53,8 @@
   "host": "example.org:8000",
   "schemes": [
     "http"
+  ],
+  "x-extension": [
+    "extensionField"
   ]
 }

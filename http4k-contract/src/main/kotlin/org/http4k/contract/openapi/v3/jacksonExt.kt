@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.format.Jackson
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
@@ -16,7 +17,7 @@ import kotlin.reflect.jvm.javaGetter
  * Sensible default objects for using Jackson with minimal fuss.
  */
 
-fun OpenApi3(apiInfo: ApiInfo, json: Jackson) = OpenApi3(apiInfo, json, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
+fun OpenApi3(apiInfo: ApiInfo, json: Jackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
 
 fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
 
@@ -42,9 +43,9 @@ object JacksonJsonPropertyAnnotated : FieldRetrieval {
 
 object JacksonJsonNamingAnnotated : FieldRetrieval {
     override fun invoke(target: Any, name: String): Field {
-        val renmaingStrategy = renamingStrategyIfRequired(target::class.java)
+        val renamingStrategy = renamingStrategyIfRequired(target::class.java)
         val fields = try {
-            target::class.memberProperties.map { renmaingStrategy(it.name) to it }.toMap()
+            target::class.memberProperties.map { renamingStrategy(it.name) to it }.toMap()
         } catch (e: Error) {
             emptyMap<String, KProperty1<out Any, Any?>>()
         }

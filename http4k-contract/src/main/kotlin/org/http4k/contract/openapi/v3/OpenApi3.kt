@@ -9,6 +9,7 @@ import org.http4k.contract.PathSegments
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
+import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
@@ -45,32 +46,36 @@ import org.http4k.util.JsonSchema
 class OpenApi3<NODE : Any>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
+    private val extensions: List<OpenApiExtension> = emptyList(),
     private val apiRenderer: ApiRenderer<Api<NODE>, NODE> = OpenApi3ApiRenderer(json),
     private val securityRenderer: SecurityRenderer = OpenApi3SecurityRenderer,
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
 ) : ContractRenderer, ErrorResponseRenderer by errorResponseRenderer {
     private data class PathAndMethod<NODE>(val path: String, val method: Method, val pathSpec: ApiPath<NODE>)
 
-    constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>) : this(apiInfo, json, ApiRenderer.Auto(json))
+    constructor(apiInfo: ApiInfo, json: JsonLibAutoMarshallingJson<NODE>, extensions: List<OpenApiExtension> = emptyList()) : this(apiInfo, json, extensions, ApiRenderer.Auto(json))
 
     override fun description(contractRoot: PathSegments, security: Security, routes: List<ContractRoute>): Response {
         val allSecurities = routes.map { it.meta.security } + security
         val paths = routes.map { it.asPath(security, contractRoot) }
 
+        val unextended = apiRenderer.api(
+            Api(
+                apiInfo,
+                routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
+                paths
+                    .groupBy { it.path }
+                    .mapValues {
+                        it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
+                    }
+                    .toSortedMap(),
+                Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.filterNotNull().combineFull()))
+            )
+        )
+
+        val final = extensions.fold(unextended) { acc, next -> json(next(acc)) }
         return Response(OK)
-            .with(json.body().toLens() of apiRenderer.api(
-                Api(
-                    apiInfo,
-                    routes.map(ContractRoute::tags).flatten().toSet().sortedBy { it.name },
-                    paths
-                        .groupBy { it.path }
-                        .mapValues {
-                            it.value.map { pam -> pam.method.name.toLowerCase() to pam.pathSpec }.toMap().toSortedMap()
-                        }
-                        .toSortedMap(),
-                    Components(json.obj(paths.flatMap { it.pathSpec.definitions() }), json(allSecurities.filterNotNull().combineFull()))
-                )
-            ))
+            .with(json.body().toLens() of final)
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security, contractRoot: PathSegments) =

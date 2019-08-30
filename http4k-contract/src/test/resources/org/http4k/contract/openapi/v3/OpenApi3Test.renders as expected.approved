@@ -770,5 +770,8 @@
         "name": "the_api_key"
       }
     }
-  }
+  },
+  "x-extension": [
+    "extensionField"
+  ]
 }

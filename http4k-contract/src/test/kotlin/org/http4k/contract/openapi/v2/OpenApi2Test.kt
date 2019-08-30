@@ -4,6 +4,7 @@ import argo.jdom.JsonNode
 import org.http4k.contract.ContractRendererContract
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
+import org.http4k.contract.openapi.AddSimpleFieldToRootNode
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.ImplicitOAuthSecurity
@@ -20,7 +21,15 @@ import org.http4k.routing.bind
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 
-class OpenApi2Test : ContractRendererContract<JsonNode>(Argo, OpenApi2(ApiInfo("title", "1.2", "module description"), Argo, Uri.of("http://example.org:8000"))) {
+class OpenApi2Test : ContractRendererContract<JsonNode>(
+    Argo,
+    OpenApi2(
+        ApiInfo("title", "1.2", "module description"),
+        Argo,
+        Uri.of("http://example.org:8000"),
+        listOf(AddSimpleFieldToRootNode)
+    )
+) {
 
     @Test
     fun `renders root path correctly when bind path and root path match`(approver: Approver) {

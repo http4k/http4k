@@ -9,6 +9,7 @@ import org.http4k.contract.PathSegments
 import org.http4k.contract.ResponseMeta
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
+import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
@@ -33,6 +34,7 @@ open class OpenApi2<out NODE>(
     private val apiInfo: ApiInfo,
     private val json: Json<NODE>,
     private val baseUri: Uri? = null,
+    private val extensions: List<OpenApiExtension> = emptyList(),
     private val securityRenderer: SecurityRenderer = OpenApi2SecurityRenderer,
     private val schemaGenerator: JsonSchemaCreator<NODE, NODE> = JsonToJsonSchema(json),
     private val errorResponseRenderer: ErrorResponseRenderer = JsonErrorResponseRenderer(json)
@@ -46,7 +48,7 @@ open class OpenApi2<out NODE>(
             Response(OK)
                 .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
                 .body(json {
-                    pretty(obj(listOfNotNull(
+                    val unextended = obj(listOfNotNull(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
@@ -56,7 +58,9 @@ open class OpenApi2<out NODE>(
                         "definitions" to this.obj(definitions),
                         baseUri?.let { "host" to string(it.authority) },
                         baseUri?.let { "schemes" to array(string(it.scheme)) }
-                    )))
+                    ))
+
+                    pretty(extensions.fold(unextended) { acc, next -> json(next(acc)) })
                 })
         }
 

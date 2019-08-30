@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.179.0 (uncut)
+- [http4k-contract] Added `OpenApiExtension` interface, which allows the definition of extensions that will modify the OpenApi specification JSON. H/T @rgladwell for the inspiration.
+
 ### v3.178.0
 - [http4-security-oauth] [Possibly breaking] Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
 - [http4k-contract] [Behaviour change] When specified, individual route security now replaces global security (this is as the security model in the OpenApi spec is specified) as opposed to both being applied. 
