@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.179.0 (uncut)
 - [http4k-contract] Added `OpenApiExtension` interface, which allows the definition of extensions that will modify the OpenApi specification JSON. H/T @rgladwell for the inspiration.
+- [http4k-contract] Support composite security models using `or()` and `and()`. Once again, H/T @rgladwell :)
 
 ### v3.178.0
 - [http4-security-oauth] [Possibly breaking] Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
