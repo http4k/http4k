@@ -33,6 +33,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
+import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
@@ -171,7 +172,9 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun List<Security>.combineRef(): Render<NODE> = {
-        array(mapNotNull { securityRenderer.ref<NODE>(it) }.map { this(it) })
+        array(mapNotNull { securityRenderer.ref<NODE>(it) }.flatMap {
+            this(it).let { if (typeOf(it) == JsonType.Array) elements(it) else listOf(it) }
+        })
     }
 
     private fun String.safeParse(): NODE? = try {
