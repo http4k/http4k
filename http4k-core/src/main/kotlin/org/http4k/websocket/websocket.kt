@@ -21,7 +21,15 @@ interface Websocket {
 
 typealias WsConsumer = (Websocket) -> Unit
 
-typealias WsHandler = (Request) -> WsConsumer?
+interface WsHandler {
+    operator fun invoke(request: Request): WsConsumer?
+
+    companion object {
+        operator fun invoke(fn: (Request) -> WsConsumer?) = object : WsHandler {
+            override operator fun invoke(request: Request) = fn(request)
+        }
+    }
+}
 
 /**
  * A PolyHandler represents the combined routing logic of an Http handler and a Websocket handler.

@@ -41,7 +41,7 @@ class WsClientTest {
     fun `when match, passes a consumer with the matching request`() {
         val consumer = TestConsumer();
 
-        { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
+        WsHandler { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
 
         assertThat(consumer.websocket.upgradeRequest, equalTo(Request(GET, "/")))
     }
@@ -49,7 +49,7 @@ class WsClientTest {
     @Test
     fun `sends outbound messages to the websocket`() {
         val consumer = TestConsumer()
-        val client = { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
+        val client = WsHandler { _: Request -> consumer }.testWsClient(Request(GET, "/"))!!
 
         client.send(message)
         assertThat(consumer.messages, equalTo(listOf(message)))
@@ -61,7 +61,7 @@ class WsClientTest {
 
     @Test
     fun `sends inbound messages to the client`() {
-        val client = { _: Request ->
+        val client = WsHandler {
             { ws: Websocket ->
                 ws.send(message)
                 ws.close(NEVER_CONNECTED)
@@ -74,7 +74,7 @@ class WsClientTest {
 
     @Test
     fun `closed websocket throws when read attempted`() {
-        val client = { _: Request ->
+        val client = WsHandler {
             { ws: Websocket ->
                 ws.close(NEVER_CONNECTED)
             }
