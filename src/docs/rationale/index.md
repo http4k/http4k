@@ -52,9 +52,9 @@ val route: RoutingHttpHandler = "/path" bind GET to { Response(OK).body("you GET
 * `RoutingHttpHandler`s can be grouped together:
 ```kotlin
 val app: RoutingHttpHandler = routes(
-    "bob" bind GET to { Response(OK).body("you GET bob") },
-    "rita" bind POST to { Response(OK).body("you POST rita") },
-    "sue" bind DELETE to { Response(OK).body("you DELETE sue") }
+    "/bob" bind GET to { Response(OK).body("you GET bob") },
+    "/rita" bind POST to { Response(OK).body("you POST rita") },
+    "/sue" bind DELETE to { Response(OK).body("you DELETE sue") }
 )
 ```
 * A `Router` is a selective request handler, which attempts to match a request. If it cannot, processing falls through to the next `Router` in the list.
