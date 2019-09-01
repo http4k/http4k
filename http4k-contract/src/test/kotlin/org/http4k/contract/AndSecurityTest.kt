@@ -33,7 +33,7 @@ object BarFoo : Security {
 class AndSecurityTest {
     private val callCount = AtomicInteger(0)
 
-    private val next: HttpHandler = {
+    private val next = HttpHandler {
         callCount.incrementAndGet()
         Response(OK).body("hello")
     }
