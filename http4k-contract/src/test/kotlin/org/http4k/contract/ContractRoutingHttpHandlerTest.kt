@@ -149,17 +149,19 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `security from endpoint overrides global security`() {
         val credentials = Credentials("bill", "password")
         val root = "/root" bind contract {
-            security = ApiKeySecurity(Query.required("key"), { it == "bob" })
+            security = ApiKeySecurity(Query.required("key"), { it == "valid" })
             routes += "/bill" meta {
                 security = BasicAuthSecurity("realm", credentials)
             } bindContract GET to { Response(OK) }
         }
 
-        assertThat(root(Request(GET, "/root/bill?key=bob")).status, equalTo(UNAUTHORIZED))
+        // nothing is rejected
+        assertThat(root(Request(GET, "/root/bill")).status, equalTo(UNAUTHORIZED))
 
-        assertThat(ClientFilters.BasicAuth(Credentials("sue", "password"))
-            .then(root)(Request(GET, "/root/bill?key=bob")).status, equalTo(UNAUTHORIZED))
+        // no basic auth is rejected
+        assertThat(root(Request(GET, "/root/bill?key=valid")).status, equalTo(UNAUTHORIZED))
 
+        // basic auth is invoked
         assertThat(ClientFilters.BasicAuth(credentials)
             .then(root)(Request(GET, "/root/bill?key=invalid")).status, equalTo(OK))
     }
