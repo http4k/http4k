@@ -150,10 +150,15 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         val credentials = Credentials("bill", "password")
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "valid" })
+            routes += "/bob" meta {
+            } bindContract GET to { Response(OK) }
             routes += "/bill" meta {
                 security = BasicAuthSecurity("realm", credentials)
             } bindContract GET to { Response(OK) }
         }
+
+        // non overridden security
+        assertThat(root(Request(GET, "/root/bob?key=valid")).status, equalTo(OK))
 
         // nothing is rejected
         assertThat(root(Request(GET, "/root/bill")).status, equalTo(UNAUTHORIZED))
