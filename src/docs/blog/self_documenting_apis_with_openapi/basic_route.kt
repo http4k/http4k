@@ -1,5 +1,6 @@
 package blog.self_documenting_apis_with_openapi
 
+import org.http4k.contract.ContractRoute
 import org.http4k.contract.div
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -20,5 +21,4 @@ fun basicHandler(name: String, age: Age): HttpHandler = { req: Request ->
     Response(OK).body("Hello $name, would you like some $beverage?")
 }
 
-val basicRoute = "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract GET to ::basicHandler
-
+val basicRoute: ContractRoute = "/greet" / Path.of("name") / Path.int().map(::Age).of("age") bindContract GET to ::basicHandler
