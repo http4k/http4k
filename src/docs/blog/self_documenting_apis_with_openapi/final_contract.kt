@@ -15,6 +15,7 @@ val finalHttp: HttpHandler = contract {
     descriptionPath = "/api/swagger.json"
     security = BasicAuthSecurity("realm", Credentials("user", "password"))
 
+    routes += basicRoute
     routes += Greetings()
     routes += Family()
 }

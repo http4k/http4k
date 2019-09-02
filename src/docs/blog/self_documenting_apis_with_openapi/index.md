@@ -30,7 +30,7 @@ Out of the box, `http4k-contract` the module now provides the following features
 So, how does we do all this using the [http4k] API? Let's find out with a worked example. 
 
 ### The first endpoint
-After importing the `http4k-core` and `http4k-contract` dependencies into your project, we can write a new endpoint aka `ContractRoute`. The first thing to note is that we will be using a slightly different routing DSL the standard [http4k] one, which provides a richer way to document routes - but don't worry - at it's core it utilises the same http4k building blocks of `HttpHandler` and `Filter` as well as leveraging the [http4k] Lens API to automatically extract and convert incoming path parameters into richer domain types. outes can (and should) be written and testing independently, which allows. 
+After importing the `http4k-core`, `http4k-contract` dependencies into your project, we can write a new endpoint aka `ContractRoute`. The first thing to note is that we will be using a slightly different routing DSL the standard [http4k] one, which provides a richer way to document routes - but don't worry - at it's core it utilises the same http4k building blocks of `HttpHandler` and `Filter` as well as leveraging the [http4k] Lens API to automatically extract and convert incoming path parameters into richer domain types. outes can (and should) be written and testing independently, which allows. 
 
 In this simple example, we're going to use a path with two dynamic parameters - `name` which is a String, and `age` which will be extracted and converted to a simple validated domain wrapper type. If the basic format of the path or the values for these path parameters cannot be extracted correctly, the contract will not match the request and a 404 will be generated - this allows for several different versions of the same URI path to co-exist. Once the values have been extracted, they are passed as arguments to a function which will return a pre-configured `HttpHandler` for that call:
 
@@ -41,21 +41,17 @@ And here's a unit test for that route - the good news is that it's no more compl
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_route_test.kt"></script>
 
 ### Defining an HTTP contract
-Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing we use a`contract {}` routing block which provides us with a much richer way of describing the API. However, these new routing blocks are completely compatible with the standard `routes()` blocks, so they can be composed together to form route-matching trees and treated as you would any other 
-
-When we define a contract, we can configure it with an instance of the `ContractRenderer` interface, which is responsible for creating the generated documentation. In this case, we are using the OpenApi3 renderer, which also requires a standardised http4k `Json` instance to do the actual rendering - we are using the `http4k-format-jackson` module here:
+Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing we use the `contract {}` routing block implementation - this allows us to specify a richer set of details about the API definition, but they expose exactly the same semantics as the normal `routes()` block and can both can be composed together to form standard route-matching trees.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 
-
- - changing the URL location of the generated documentation and, more interestingly, supplying an instance of `Security` that we can use to protect our routes. The result of the `contract {...}` block is just a standard [http4k] `HttpHandler` (which is just defined as a `typealias (Request) -> Response`).
+All of the settings used in the DSL above are optional and default to sensible values if not used - here we are overriding the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes. 
 
 If we open the resulting JSON spec in the OpenApi UI (see 
-<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fempty_contract.json">here</a>), we can see how this empty contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
-
+<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>), we can see how the endpoint contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
 
 ### Adding metadata to the route contract
-The metadata for the route forms the rest of the documented contract. The DSL for specifying this consists of a `meta [}` block containing a mixture of purely informational/organisational fields and those which should form part of the contract. For the latter case, we can further use the [http4k] lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written.
+The metadata for the route forms the rest of the documented contract - let's see how this is done by . The DSL for specifying this consists of a `meta [}` block containing a mixture of purely informational/organisational fields and those which should form part of the contract. For the latter case, we can further use the [http4k] lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/metadata_route.kt"></script>
 
