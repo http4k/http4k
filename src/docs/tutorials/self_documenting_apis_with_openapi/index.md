@@ -16,7 +16,7 @@ There have been various efforts to standardise these aspects, and one of the mos
 1. It is cross-platform and has good tooling support. Using [OpenApi Generators], a specification document can be used to generate HTTP server stubs and working HTTP clients in a variety of languages, thus reducing integration efforts.
 
 ### Typesafe HTTP contracts with http4k-contract
-http4k has supported generating version 2 of [OpenApi] docs since all the way back in 2017 (v1.16) via it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.179.0.
+http4k has supported generating version 2 of [OpenApi] docs since all the way back in 2017 (v1.16) via it's `http4k-contract` module, and after a couple of releases ironing out the niggles (and some amazing help from the community), the team is now happy to announce OpenApi3 support with the release of http4k version 3.179.1.
 
 In line with the overall [ethos of the project](/rationale), http4k OpenApi support is done entirely through code and in a typesafe and refactorable way. This is somewhat of a departure from how most other libraries have implemented OpenApi (where often annotations and other compile-time magic are used) and means that the spec defined in code is the same one that is used to generate the API documentation and the same one used to validate incoming HTTP messages, meaning that it can never go stale. This focus on runtime code also allows for dynamic behaviours which would be very difficult to replicate at compile-time.
 
