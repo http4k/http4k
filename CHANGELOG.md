@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.179.1
+- [http4k-client-okhttp] Include status description in Response object.
+
 ### v3.179.0
 - [http4k-contract] Added `OpenApiExtension` interface, which allows the definition of extensions that will modify the OpenApi specification JSON. H/T @rgladwell for the inspiration.
 - [http4k-contract] Support composite security models using `or()` and `and()`. Once again, H/T @rgladwell :)
