@@ -14,10 +14,10 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.hamkrest.hasStatus
-import org.http4k.server.SunHttp
+import org.http4k.server.Jetty
 import org.junit.jupiter.api.Test
 
-class ApacheClientTest : HttpClientContract({ SunHttp(it) }, ApacheClient(),
+class ApacheClientTest : HttpClientContract({ Jetty(it) }, ApacheClient(),
     ApacheClient(HttpClients.custom()
         .setDefaultSocketConfig(
             SocketConfig.custom()

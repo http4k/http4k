@@ -1,5 +1,5 @@
 package org.http4k.client
 
-import org.http4k.server.SunHttp
+import org.http4k.server.Jetty
 
-class OkHttpTest : HttpClientContract({ SunHttp(it) }, OkHttp(), OkHttp(timeout))
+class OkHttpTest : HttpClientContract({ Jetty(it) }, OkHttp(), OkHttp(timeout))

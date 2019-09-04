@@ -1,5 +1,5 @@
 package org.http4k.client
 
-import org.http4k.server.SunHttp
+import org.http4k.server.Jetty
 
-class JettyClientTest : HttpClientContract({ SunHttp(it) }, JettyClient(), JettyClient(requestModifier = timeout))
+class JettyClientTest : HttpClientContract({ Jetty(it) }, JettyClient(), JettyClient(requestModifier = timeout))

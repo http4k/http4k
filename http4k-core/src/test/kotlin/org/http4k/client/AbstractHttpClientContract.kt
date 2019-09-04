@@ -20,7 +20,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import java.util.Arrays
+import java.util.*
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
 
@@ -68,11 +68,13 @@ abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> Ser
                     Response(OK) else Response(BAD_REQUEST.description("Image content does not match"))
             },
             "/status/{status}" bind GET to { r: Request ->
-                val status = Status(r.path("status")!!.toInt(), "")
+                val code = r.path("status")!!.toInt()
+                val status = Status(code, "Description for $code")
                 Response(status).body("body for status ${status.code}")
             },
             "/status-no-body/{status}" bind GET to { r: Request ->
-                val status = Status(r.path("status")!!.toInt(), "")
+                val code = r.path("status")!!.toInt()
+                val status = Status(code, "Description for $code")
                 Response(status)
             })
         server = app.asServer(serverConfig(0)).start()
