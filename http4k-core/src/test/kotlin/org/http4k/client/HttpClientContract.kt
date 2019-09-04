@@ -181,7 +181,9 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     open fun `handles response with custom status message`(){
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
-            assertThat(response.status.description, equalTo("Description for $statusCode"))
+            response.use {
+                assertThat(response.status.description, equalTo("Description for $statusCode"))
+            }
         }
     }
 
