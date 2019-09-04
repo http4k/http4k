@@ -178,6 +178,14 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
+    open fun `handles response with custom status message`(){
+        listOf(200, 301, 404, 500).forEach { statusCode ->
+            val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
+            assertThat(response.status.description, equalTo("Description for $statusCode"))
+        }
+    }
+
+    @Test
     fun `handles empty response body for different statuses`() {
         listOf(200, 301, 400, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status-no-body/$statusCode"))
