@@ -78,7 +78,7 @@ private object AuthorizationCodeAccessTokenForm {
         with(accessTokenForm(request)) {
             AuthorizationCodeAccessTokenRequest(
                 clientId(this),
-                clientSecret(this) ?: "",
+                clientSecret(this).orEmpty(),
                 redirectUri(this),
                 authorizationCode(this))
         }
