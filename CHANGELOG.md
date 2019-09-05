@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.179.2
+- [http4-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows.
+
 ### v3.179.1
 - [http4k-client-okhttp] Include status description in Response object.
 
