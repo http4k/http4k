@@ -36,16 +36,16 @@ In this simple example, we're going to use a path with two dynamic parameters; `
 
 Once the values have been extracted, they are passed as arguments to a function which will return a pre-configured `HttpHandler` for that call:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_route.kt"></script>
 
 And here's a unit test for that endpoint - the good news is that it's no more complex than a standard http4k unit test because `ContractRoute` is also an `HttpHandler` so can just be invoked as a function. Here, we're also leveraging the `http4k-testing-hamkrest` module to supply Matchers for validating the response message:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_route_test.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_route_test.kt"></script>
 
 ### Defining an HTTP contract
 Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing, we use the `contract {}` routing block implementation - this allows us to specify a richer set of details about the API definition, but they expose exactly the same semantics as the normal `routes()` block (which is also an `HttpHandler`) and can therefore be composed together to form standard route-matching trees.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/basic_contract.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 
 All of the settings used in the DSL above are optional and default to sensible values if not overridden - here we are upating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
 
@@ -58,14 +58,14 @@ For a better standard of API docs, we should definitely add more details to the 
 
 For the latter case, we can further use the http4k lens API to accept and define other parameters from the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written.
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/metadata_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/metadata_route.kt"></script>
 
 ### Modelling HTTP body messages
 The most exciting part http4k supporting OpenApi3 is the ability to represent HTTP messages in [JSON Schema] form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using overloads of the `receiving()` and `returning()` functions.
 
 Lets add another route to the mix which returns a body object modelled with a Kotlin Data class and once again using http4k lenses. This time the lens is created with the `Body.auto<>().toLens()` which provides the typed injection and extraction functions. Notice here that for injection we are using the more fluent API  `with()` extension function on `HttpMessage`, as opposed to the standard lens injection function`(X, HttpMessage) -> HttpMessage`:
 
-<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/blog/self_documenting_apis_with_openapi/body_route.kt"></script>
+<script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/body_route.kt"></script>
 
 Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 
