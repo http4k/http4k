@@ -1,0 +1,12 @@
+{
+  "message": "Missing/invalid parameters",
+  "params": [
+    {
+      "name": "age",
+      "type": "query",
+      "datatype": "integer",
+      "required": true,
+      "reason": "Missing"
+    }
+  ]
+}

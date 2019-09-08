@@ -21,19 +21,22 @@ data class Drink(val name: String) {
 }
 
 object Greetings {
+    private val age = Query.int().map(::Age).required("age", "Your age")
     private val favouriteDrink = Query.map(::Drink).optional("drink", "Your favourite beverage")
 
-    private fun handler(name: String, age: Age): HttpHandler = { req: Request ->
+    private fun handler(name: String): HttpHandler = { req: Request ->
         val drinkToOffer: Drink? = favouriteDrink(req)
+        val age: Age = age(req)
         val beverage = drinkToOffer?.name ?: if (age.value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 
-    operator fun invoke(): ContractRoute = "/greet" / Path.of("name", "Your name") / Path.int().map(::Age).of("age", "Your age") meta {
+    operator fun invoke(): ContractRoute = "/greet" / Path.of("name", "Your name") meta {
         summary = "Send greetings"
         description = "Greets the stupid human by offering them a beverage suitable for their age"
         tags += Tag("query")
         queries += favouriteDrink
+        queries += age
         produces += TEXT_PLAIN
         returning(OK)
     } bindContract GET to ::handler
