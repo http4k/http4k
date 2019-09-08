@@ -50,7 +50,7 @@ Now that we've got our endpoint, we want to be able to actually serve it with th
 All of the settings used in the DSL above are optional and default to sensible values if not overridden - here we are upating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
 
 If we open the resulting JSON spec in the OpenApi UI (see 
-<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>), we can see how the endpoint contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
+<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>), we can see how the endpoint contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
 
 ### Moar metadata == better documentation
 For a better standard of API docs, we should definitely add more details to the endpoint definition. The OpenAPI spec allows us to add this detail, but this normally comes with a maintainence cost - especially when the documentation is static or disparate from the location of the actual code serving requests, as we want to minimise the risk of stale documentation. In http4k, further metadata for endpoints can be supplied via the `meta{}` DSL block, which contains a mixture of purely informational/organisational fields and those which should form part of the contract. 
@@ -67,7 +67,7 @@ Lets add another route to the mix which returns a body object modelled with a Ko
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/body_route.kt"></script>
 
-Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Fblog%2Fself_documenting_apis_with_openapi%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
+Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbody_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 
 
 ### Further reading...
