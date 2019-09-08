@@ -71,7 +71,7 @@ If we then also add the `Greetings` endpoint to the contract and make a call omi
 
 ```http://localhost:9000/greet/Bob?drink=cola```
 
-... the contract validation will fail and a HTTP Bad Request (400) returned to the client, with a JSON body describing the error:
+... the contract validation will fail and a HTTP Bad Request (400) returned to the client with a JSON body describing the error:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/metadata_failure.http"></script>
 
