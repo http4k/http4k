@@ -49,7 +49,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful offer of a drink to the lowly meatbag.",
             "content": {}
           }
         },

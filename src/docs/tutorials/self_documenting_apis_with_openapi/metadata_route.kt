@@ -37,6 +37,6 @@ object Greetings {
         queries += favouriteDrink
         queries += age
         produces += TEXT_PLAIN
-        returning(OK)
+        returning(OK to "A successful offer of a drink to the lowly meatbag.")
     } bindContract GET to ::handler
 }
