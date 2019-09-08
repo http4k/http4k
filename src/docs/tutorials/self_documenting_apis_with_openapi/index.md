@@ -43,7 +43,7 @@ And here's a unit test for that endpoint - the good news is that it's no more co
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_route_test.kt"></script>
 
 ### Defining an HTTP contract
-Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing, we use the `contract {}` routing block implementation - this allows us to specify a richer set of details about the API definition, but they expose exactly the same semantics as the normal `routes()` block (which is also an `HttpHandler`) and can therefore be composed together to form standard route-matching trees.
+Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing, we use the `contract {}` routing DSL which allows us to specify a richer set of details about the API definition, but exposes exactly the same API semantics as the standard `routes()` block - it is also an `HttpHandler` and can therefore be composed together to form standard route-matching trees.
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 

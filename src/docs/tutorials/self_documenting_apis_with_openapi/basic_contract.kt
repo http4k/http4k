@@ -12,7 +12,7 @@ import org.http4k.server.asServer
 
 fun main() {
     val http: HttpHandler = contract {
-        renderer = OpenApi3(ApiInfo("my empty but secure api", "v1.0", "Describing the purpose of the API"), Jackson)
+        renderer = OpenApi3(ApiInfo("my empty but secure api", "v1.0", "API description"), Jackson)
         descriptionPath = "/api/swagger.json"
         security = BasicAuthSecurity("realm", Credentials("user", "password"))
         routes += basicRoute

@@ -2,7 +2,7 @@
   "info": {
     "title": "my secure api",
     "version": "v1.0",
-    "description": "Describing the purpose of the API"
+    "description": "API description"
   },
   "tags": [],
   "paths": {

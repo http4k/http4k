@@ -11,7 +11,7 @@ import org.http4k.core.Request
 import org.http4k.format.Jackson
 
 val finalHttp: HttpHandler = contract {
-    renderer = OpenApi3(ApiInfo("my friendly api", "v1.0", "Describing the purpose of the API"), Jackson)
+    renderer = OpenApi3(ApiInfo("my friendly api", "v1.0", "API description"), Jackson)
     descriptionPath = "/api/swagger.json"
     security = BasicAuthSecurity("realm", Credentials("user", "password"))
 
