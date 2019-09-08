@@ -14,10 +14,9 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 
 /**
- * Sensible default objects for using Jackson with minimal fuss.
+ * Defaults for configuring OpenApi3 with Jackson
  */
-
-fun OpenApi3(apiInfo: ApiInfo, json: Jackson = Jackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
+fun OpenApi3(apiInfo: ApiInfo, extensions: List<OpenApiExtension> = emptyList(), json: Jackson = Jackson) = OpenApi3(apiInfo, json, extensions, ApiRenderer.Auto(json, AutoJsonToJsonSchema(json)))
 
 fun AutoJsonToJsonSchema(json: Jackson) = AutoJsonToJsonSchema(json, FieldRetrieval.compose(SimpleLookup, JacksonAnnotated))
 

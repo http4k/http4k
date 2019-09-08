@@ -6,6 +6,6 @@ import org.http4k.core.Uri
 import org.http4k.format.Jackson
 
 /**
- * Sensible default objects for using Jackson with minimal fuss.
+ * Defaults for configuring OpenApi2 with Jackson
  */
-fun OpenApi2(apiInfo: ApiInfo, baseUri: Uri, json: Jackson = Jackson, extensions: List<OpenApiExtension> = emptyList()) = OpenApi2(apiInfo, json, baseUri, extensions)
+fun OpenApi2(apiInfo: ApiInfo, baseUri: Uri, extensions: List<OpenApiExtension> = emptyList(), json: Jackson = Jackson) = OpenApi2(apiInfo, json, baseUri, extensions)
