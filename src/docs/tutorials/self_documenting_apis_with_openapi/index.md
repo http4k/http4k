@@ -45,6 +45,7 @@ And here's a unit test for that endpoint - the good news is that it's no more co
 ### Defining an HTTP contract
 Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing, we use the `contract {}` routing DSL which allows us to specify a richer set of details about the API definition, but exposes exactly the same API semantics as the standard `routes()` block - it is also an `HttpHandler` and can therefore be composed together to form standard route-matching trees.
 
+For rendering the API documentation, we configure an `OpenApi` object - supplying a standard http4k JSON adapter instance - the recommended one  `http4k-format-jackson`
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 
 All of the settings used in the DSL above are optional and default to sensible values if not overridden - here we are upating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
