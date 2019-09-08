@@ -45,13 +45,13 @@ And here's a unit test for that endpoint - the good news is that it's no more co
 ### Defining an HTTP contract
 Now that we've got our endpoint, we want to be able to actually serve it with the [OpenApi] documentation. For contract-based routing, we use the `contract {}` routing DSL which allows us to specify a richer set of details about the API definition, but exposes exactly the same API semantics as the standard `routes()` block - it is also an `HttpHandler` and can therefore be composed together to form standard route-matching trees.
 
-For rendering the API documentation, we configure an `OpenApi` object - supplying a standard http4k JSON adapter instance - the recommended one here is from `http4k-format-jackson`
+For rendering the API documentation, we configure an `OpenApi` object, supplying a standard http4k JSON adapter instance - the recommended one to use is `Jackson` from the `http4k-format-jackson` module, so we'll need to import that module into our project as well.
+
+Whilst all of the settings used in this DSL above are optional (and default to sensible values if not overridden), here we are updating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
+
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 
-All of the settings used in the DSL above are optional and default to sensible values if not overridden - here we are upating the URL where the OpenApi spec is served and supplying an instance of `Security` that we will use to protect our routes (more about that later). 
-
-If we open the resulting JSON spec in the OpenApi UI (see 
-<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>), we can see how the endpoint contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`.
+Now we've got a complete contract, we can simply start the server and browse to `http://localhost:9000/api/swagger.json` to see the basic API spec in the OpenApi UI (or see the online version <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>), we can see how the endpoint contract looks and how the process of supplying credentials is done through the OpenApi UI by clicking `Authorize`. It's still looking a bit bare though, so let's move on and see what else we can do to bulk it out...
 
 ### Moar metadata == better documentation
 For a better standard of API docs, we should definitely add more details to the endpoint definition. The OpenAPI spec allows us to add this detail, but this normally comes with a maintainence cost - especially when the documentation is static or disparate from the location of the actual code serving requests, as we want to minimise the risk of stale documentation. In http4k, further metadata for endpoints can be supplied via the `meta{}` DSL block, which contains a mixture of purely informational/organisational fields and those which should form part of the contract. 
