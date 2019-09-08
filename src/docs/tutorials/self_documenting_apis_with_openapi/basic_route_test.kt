@@ -6,7 +6,7 @@ import org.http4k.core.Request
 import org.http4k.hamkrest.hasBody
 import org.junit.jupiter.api.Test
 
-class GreetingRouteTest {
+class BasicGreetingRouteTest {
     @Test
     fun `greets an adult`() {
         assertThat(basicRoute(Request(GET, "/greet/Bob/21")), hasBody("Hello Bob, would you like some beer?"))
