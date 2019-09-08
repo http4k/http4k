@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/greet/{name}/{age}": {
+    "/greet/{name}": {
       "get": {
         "summary": "Send greetings",
         "description": "Greets the stupid human by offering them a beverage suitable for their age",
@@ -30,21 +30,21 @@
           },
           {
             "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "age",
+            "required": true,
+            "description": "Your age"
+          },
+          {
+            "schema": {
               "type": "string"
             },
             "in": "path",
             "name": "name",
             "required": true,
             "description": "Your name"
-          },
-          {
-            "schema": {
-              "type": "integer"
-            },
-            "in": "path",
-            "name": "age",
-            "required": true,
-            "description": "Your age"
           }
         ],
         "responses": {
@@ -58,7 +58,7 @@
             "basicAuth": []
           }
         ],
-        "operationId": "getGreet_name__age"
+        "operationId": "getGreet_name"
       }
     }
   },

@@ -67,7 +67,7 @@ Let's write a slightly different version of the same endpoint, but move `age` to
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/metadata_route.kt"></script>
 
-If we then also add the `Greetings` endpoint to the contract and make a call omitting `age`...
+If we then add the `Greetings` endpoint to the contract and make a call omitting `age`...
 
 ```http://localhost:9000/greet/Bob?drink=cola```
 
@@ -75,7 +75,7 @@ If we then also add the `Greetings` endpoint to the contract and make a call omi
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/metadata_failure.http"></script>
 
-
+We can see the updated OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fmetadata_contract.json">here</a>. Note that because request parameters are validated before sending, we cannot replicate the above invalid request in the UI.
 
 ### Modelling HTTP body messages
 The most exciting part http4k supporting OpenApi3 is the ability to represent HTTP messages in **[JSON Schema]** form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using overloads of the `receiving()` and `returning()` functions.
