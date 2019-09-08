@@ -26,8 +26,7 @@ object Greetings {
 
     private fun handler(name: String): HttpHandler = { req: Request ->
         val drinkToOffer: Drink? = favouriteDrink(req)
-        val age: Age = age(req)
-        val beverage = drinkToOffer?.name ?: if (age.value >= 18) "beer" else "lemonade"
+        val beverage: String = drinkToOffer?.name ?: if (age(req).value >= 18) "beer" else "lemonade"
         Response(OK).body("Hello $name, would you like some $beverage?")
     }
 
