@@ -50,7 +50,7 @@ Whilst all of the settings used in this DSL above are optional (and default to s
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/basic_contract.kt"></script>
 
-Now we've got a complete contract, we can simply start the server and browse to `http://localhost:9000/api/swagger.json` to see the basic API spec in the OpenApi UI (or see the online version <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>) to see how the endpoint contract looks and how the process of supplying credentials is done through the UI by clicking `Authorize`. 
+Now we've got a complete contract, we can simply start the server and browse to `http://localhost:9000/api/swagger.json` to see the basic API spec in the OpenApi UI (or see the online version **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fbasic_contract.json">here</a>**) to see how the endpoint contract looks and how the process of supplying credentials is done through the UI by clicking `Authorize`. 
 
 This covers the very basics of generating API docs, but there is still a lot more http4k can do for us...
 
@@ -75,7 +75,7 @@ If we then add the `Greetings` endpoint to the contract and make a call omitting
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/metadata_failure.http"></script>
 
-We can see the updated OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fmetadata_contract.json">here</a>. Note that because request parameters are validated before sending, we cannot replicate the above invalid request in the UI.
+We can see the updated OpenApi UI **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Fmetadata_contract.json">here</a>**. Note that because request parameters are validated before sending, we cannot replicate the above invalid request in the UI.
 
 ### Modelling HTTP body messages
 The most exciting part http4k supporting OpenApi3 is the ability to represent HTTP messages in **[JSON Schema]** form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can be specified in the `meta()` block using overloads of the `receiving()` and `returning()` functions.
@@ -84,7 +84,7 @@ Lets add another route to the mix which returns a body object modelled with a Ko
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/self_documenting_apis_with_openapi/body_route.kt"></script>
 
-Taking a final look at the OpenApi UI <a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Ffinal_contract.json">here</a> shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
+Taking a final look at the OpenApi UI **<a target="_blank" href="https://www.http4k.org/openapi3/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhttp4k%2Fhttp4k%2Fmaster%2Fsrc%2Fdocs%2Ftutorials%2Fself_documenting_apis_with_openapi%2Ffinal_contract.json">here</a>** shows that not just has the UI been updated with the new route, but that example entries for the expected response are now displayed, as well as JSON Schema entries for the `Person` and `Age` classes in the `Schemas` section at the bottom.
 
 ### Further reading...
 And that's it. Once we have the final specification document available, users of our API can use various **[OpenApi Generators]** to generate HTTP clients in various languages for interacting with it, or to generate fake services that provide our API in their own environments (and thus enabling more simple end-to-end testing). The "Fake HTTP services" technique also enables the creation of Consumer-Driven-Contract style tests, and opens up possibilities for all kinds of interesting Chaos/failure-mode testing (you can even use the `http4k-testing-chaos` module to help with this 😉).
