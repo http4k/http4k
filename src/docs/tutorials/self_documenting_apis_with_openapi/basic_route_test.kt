@@ -1,4 +1,4 @@
-package blog.self_documenting_apis_with_openapi
+package tutorials.self_documenting_apis_with_openapi
 
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method.GET

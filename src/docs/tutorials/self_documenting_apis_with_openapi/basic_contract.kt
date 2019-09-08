@@ -1,4 +1,4 @@
-package blog.self_documenting_apis_with_openapi
+package tutorials.self_documenting_apis_with_openapi
 
 import org.http4k.contract.contract
 import org.http4k.contract.openapi.ApiInfo
@@ -12,7 +12,7 @@ import org.http4k.server.asServer
 
 fun main() {
     val http: HttpHandler = contract {
-        renderer = OpenApi3(ApiInfo("my empty but secure api", "v1.0", "API description"), Jackson)
+        renderer = OpenApi3(ApiInfo("my secure api", "v1.0", "API description"), Jackson)
         descriptionPath = "/api/swagger.json"
         security = BasicAuthSecurity("realm", Credentials("user", "password"))
         routes += basicRoute
