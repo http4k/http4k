@@ -4,6 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.MemoryBody
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.RequestContexts
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.toUrlFormEncoded
@@ -14,7 +15,8 @@ import org.http4k.serverless.BootstrapAppLoader
  * to instantiate the Http4k handler which can be used for further invocations.
  */
 class LambdaFunction(env: Map<String, String> = System.getenv()) {
-    private val app = BootstrapAppLoader(env)
+    private val contexts = RequestContexts()
+    private val app = BootstrapAppLoader(env, contexts)
 
     fun handle(request: ApiGatewayProxyRequest) = app(request.asHttp4k()).asApiGateway()
 }
