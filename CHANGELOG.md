@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.180.0 (uncut)
 - [all] Update various dependencies.
+- [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz
 
 ### v3.179.1
 - [http4k-client-okhttp] Include status description in Response object.
