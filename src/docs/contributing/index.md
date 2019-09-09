@@ -1,1 +1,1 @@
-../../../CONTRIBUTING.md
+this page intentionally left blank. :p
