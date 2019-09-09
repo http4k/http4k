@@ -8,6 +8,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Status
+import org.http4k.core.then
+import org.http4k.filter.ServerFilters
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.serverless.BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS
@@ -22,8 +24,11 @@ class BootstrapAppLoaderTest {
 
     @Test
     fun `loads the expected app if it implements the AppLoaderWithContexts interface`() {
-        val app = BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to TestAppWithContexts::class.java.name), RequestContexts())
-        assertThat(app(Request(Method.GET, "/")), hasStatus(Status.CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestAppWithContexts::class.java.name)))
+        val contexts = RequestContexts()
+        val app = BootstrapAppLoader(mapOf(HTTP4K_BOOTSTRAP_CLASS to TestAppWithContexts::class.java.name), contexts)
+        val appWithContext = ServerFilters.InitialiseRequestContext(contexts).then(app)
+
+        assertThat(appWithContext(Request(Method.GET, "/")), hasStatus(Status.CREATED).and(hasHeader(HTTP4K_BOOTSTRAP_CLASS, TestAppWithContexts::class.java.name)))
     }
 
     @Test

@@ -307,4 +307,10 @@ object Libs {
       * http://www.thymeleaf.org
       */
      const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
+
+     /**
+      * https://github.com/aws/aws-lambda-java-libs/
+      */
+     const val lambda_core: String =
+               "com.amazonaws:aws-lambda-java-core:" + Versions.lambda_core
 }
