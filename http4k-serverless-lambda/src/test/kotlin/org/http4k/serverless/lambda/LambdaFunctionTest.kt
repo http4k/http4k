@@ -1,6 +1,7 @@
 package org.http4k.serverless.lambda
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
@@ -27,7 +28,7 @@ class LambdaFunctionTest {
 
     @Test
     fun `loads app from the environment and adapts API Gateway request and response`() {
-        val request = ApiGatewayProxyRequest()
+        val request = APIGatewayProxyRequestEvent()
         request.httpMethod = "GET"
         request.body = "input body"
         request.headers = mapOf("c" to "d")
@@ -49,7 +50,7 @@ class LambdaFunctionTest {
 
     @Test
     fun `loads app from the environment and adapts API Gateway request and response, as well as include the lambda context in the request context`() {
-        val request = ApiGatewayProxyRequest()
+        val request = APIGatewayProxyRequestEvent()
         request.httpMethod = "GET"
         request.body = "input body"
         request.headers = mapOf("c" to "d")

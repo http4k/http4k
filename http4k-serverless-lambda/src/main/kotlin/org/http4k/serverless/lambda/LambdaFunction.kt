@@ -1,6 +1,8 @@
 package org.http4k.serverless.lambda
 
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import org.http4k.core.Body
 import org.http4k.core.Filter
 import org.http4k.core.MemoryBody
@@ -25,7 +27,7 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
     private val app = BootstrapAppLoader(env, contexts)
     private val initializeRequestContext = ServerFilters.InitialiseRequestContext(contexts)
 
-    fun handle(request: ApiGatewayProxyRequest, lambdaContext: Context? = null) =
+    fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) =
         initializeRequestContext
             .then(AddLambdaContext(lambdaContext, contexts))
             .then(app)
@@ -33,15 +35,23 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
             .asApiGateway()
 }
 
-internal fun Response.asApiGateway() = ApiGatewayProxyResponse(status.code, headers.toMap(), bodyString())
+internal fun Response.asApiGateway(): APIGatewayProxyResponseEvent {
+    val apiGatewayResponse = APIGatewayProxyResponseEvent()
 
-internal fun ApiGatewayProxyRequest.asHttp4k() = (headers ?: emptyMap()).toList().fold(
+    apiGatewayResponse.statusCode = status.code
+    apiGatewayResponse.headers = headers.toMap()
+    apiGatewayResponse.body = bodyString()
+
+    return apiGatewayResponse
+}
+
+internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).toList().fold(
     Request(Method.valueOf(httpMethod), uri())
         .body(body?.let(::MemoryBody) ?: Body.EMPTY)) { memo, (first, second) ->
     memo.header(first, second)
 }
 
-internal fun ApiGatewayProxyRequest.uri() = Uri.of(path ?: "").query((queryStringParameters
+internal fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "").query((queryStringParameters
     ?: emptyMap()).toList().toUrlFormEncoded())
 
 internal fun AddLambdaContext(lambdaContext: Context?, contexts: RequestContexts) = Filter { next ->

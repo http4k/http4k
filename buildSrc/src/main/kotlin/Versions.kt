@@ -102,6 +102,8 @@ object Versions {
 
      const val lambda_core: String = "1.2.0"
 
+     const val lambda_events: String = "2.2.7"
+
      /**
       *
       * See issue 19: How to update Gradle itself?

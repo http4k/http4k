@@ -313,4 +313,7 @@ object Libs {
       */
      const val lambda_core: String =
                "com.amazonaws:aws-lambda-java-core:" + Versions.lambda_core
+
+     const val lambda_events: String =
+               "com.amazonaws:aws-lambda-java-events:" + Versions.lambda_events
 }

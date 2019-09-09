@@ -1,6 +1,6 @@
 package guide.modules.serverless
 
-
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -11,7 +11,6 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.serverless.AppLoader
 import org.http4k.serverless.BootstrapAppLoader
-import org.http4k.serverless.lambda.ApiGatewayProxyRequest
 import org.http4k.serverless.lambda.LambdaFunction
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
@@ -37,7 +36,7 @@ fun main() {
     // the following code is purely here for demonstration purposes, to explain exactly what is happening at AWS.
     fun runLambdaAsAwsWould() {
         val lambda = LambdaFunction(mapOf(BootstrapAppLoader.HTTP4K_BOOTSTRAP_CLASS to TweetEchoLambda::class.java.name))
-        val response = lambda.handle(ApiGatewayProxyRequest().apply {
+        val response = lambda.handle(APIGatewayProxyRequestEvent().apply {
             path = "/"
             body = "hello hello hello, i suppose this isn't 140 characters anymore.."
             httpMethod = "GET"
