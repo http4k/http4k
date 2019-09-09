@@ -44,7 +44,7 @@ class SecretTest {
 
     private fun assertEqualTo(secret: Secret, bytes: ByteArray) {
         val field = secret::class.java.declaredFields[0]
-        field.trySetAccessible()
+        field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
         assertTrue((field.get(secret) as AtomicReference<ByteArray>).get()!!.contentEquals(bytes))
     }
