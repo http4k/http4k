@@ -56,6 +56,7 @@ class LambdaFunctionTest {
         request.headers = mapOf("c" to "d")
         request.path = "/path"
         request.queryStringParameters = mapOf("query" to "value")
+        request.requestContext = APIGatewayProxyRequestEvent.ProxyRequestContext().apply { accountId = "123456789012" }
 
         val env = mapOf(
             HTTP4K_BOOTSTRAP_CLASS to TestAppWithContexts::class.java.name,
@@ -67,6 +68,7 @@ class LambdaFunctionTest {
         assertThat(response.body, equalTo(Request(GET, "/path")
             .header("c", "d")
             .header("LAMBDA_CONTEXT_FUNCTION_NAME", "TestFunction1")
+            .header("LAMBDA_REQUEST_ACCOUNT_ID", "123456789012")
             .body("input body")
             .query("query", "value").toString()))
     }

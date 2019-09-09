@@ -17,6 +17,7 @@ import org.http4k.filter.ServerFilters
 import org.http4k.serverless.BootstrapAppLoader
 
 const val LAMBDA_CONTEXT_KEY = "HTTP4K_LAMBDA_CONTEXT"
+const val LAMBDA_REQUEST_KEY = "HTTP4K_LAMBDA_REQUEST"
 
 /**
  * This is the main entry point for the lambda. It uses the local environment
@@ -29,7 +30,7 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
 
     fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) =
         initializeRequestContext
-            .then(AddLambdaContext(lambdaContext, contexts))
+            .then(AddLambdaContextAndRequest(lambdaContext, request, contexts))
             .then(app)
             .invoke(request.asHttp4k())
             .asApiGateway()
@@ -54,11 +55,12 @@ internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).to
 internal fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "").query((queryStringParameters
     ?: emptyMap()).toList().toUrlFormEncoded())
 
-internal fun AddLambdaContext(lambdaContext: Context?, contexts: RequestContexts) = Filter { next ->
+internal fun AddLambdaContextAndRequest(lambdaContext: Context?, request: APIGatewayProxyRequestEvent, contexts: RequestContexts) = Filter { next ->
     {
         if (lambdaContext != null) {
             contexts[it][LAMBDA_CONTEXT_KEY] = lambdaContext
         }
+        contexts[it][LAMBDA_REQUEST_KEY] = request
         next(it)
     }
 }
