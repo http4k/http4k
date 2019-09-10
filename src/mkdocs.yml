@@ -49,7 +49,7 @@ nav:
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
-  - Tutorials
+  - Tutorials:
     - Worked TDD Example: tutorials/tdding_http4k/index.md
     - Documenting apps with OpenApi: tutorials/self_documenting_apis_with_openapi/index.md
   - Cookbook:
