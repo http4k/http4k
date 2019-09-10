@@ -1,9 +1,8 @@
-package guide.example._4_adding_an_external_dependency
+package tutorials.tdding_http4k._4_adding_an_external_dependency
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import guide.example._4_adding_an_external_dependency.Matchers.answerShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import tutorials.tdding_http4k._4_adding_an_external_dependency.Matchers.answerShouldBe
 import java.util.Random
 
 object Matchers {

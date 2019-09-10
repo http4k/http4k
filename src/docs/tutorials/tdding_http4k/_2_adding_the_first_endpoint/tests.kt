@@ -1,8 +1,7 @@
-package guide.example._2_adding_the_first_endpoint
+package tutorials.tdding_http4k._2_adding_the_first_endpoint
 
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
-import guide.example._2_adding_the_first_endpoint.Matchers.answerShouldBe
 import org.http4k.client.OkHttp
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -14,6 +13,7 @@ import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tutorials.tdding_http4k._2_adding_the_first_endpoint.Matchers.answerShouldBe
 
 object Matchers {
     fun Response.answerShouldBe(expected: Int) {
