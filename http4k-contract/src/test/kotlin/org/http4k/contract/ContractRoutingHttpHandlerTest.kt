@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
+import org.http4k.contract.PreFlightExtraction.Companion.None
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.simple.SimpleJson
@@ -49,10 +50,16 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
         "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
         "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
         "/bad-request-body-via-meta" meta { receiving(requiredBody) } bindContract GET to { Response(OK) },
-        "/bad-request-body-override-precheck" meta {
+        "/bad-request-body-ignore-body" meta {
             receiving(requiredBody)
             preFlightExtraction = IgnoreBody
-        } bindContract GET to { Response(OK) })
+        } bindContract GET to { Response(OK) },
+        "/bad-request-body-ignore-all" meta {
+            queries += Query.required("myHeader")
+            receiving(requiredBody)
+            preFlightExtraction = None
+        } bindContract GET to { Response(OK) }
+    )
 
     private val header = Header.optional("FILTER")
 
@@ -265,6 +272,11 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
     @Test
     fun `can disable body checking by overriding pre-request-extraction`() {
-        assertThat(handler(Request(GET, "/bad-request-body-override-precheck")), hasStatus(OK))
+        assertThat(handler(Request(GET, "/bad-request-body-ignore-body")), hasStatus(OK))
+    }
+
+    @Test
+    fun `can all paramter checking by overriding pre-request-extraction`() {
+        assertThat(handler(Request(GET, "/bad-request-body-ignore-all")), hasStatus(OK))
     }
 }
