@@ -61,7 +61,7 @@ In http4k, the extended contract metadata is kept close to the endpoint code and
 Metadata for endpoints can be supplied via inserting a `meta {}` DSL block, which contains a mixture of 2 main types of property: 
 
 1. **Informational** properties - such as `summary`, `description` and `tags` simply improve the experience of the user of the UI.
-1. **Contractual** properties define parameters using the http4k lens API (in the same way as we used for the path) for the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be auto-validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written. We can then use the same Lenses to confidently extract those values inside our HttpHandler code.
+1. **Contractual** properties define parameters using the http4k lens API (in the same way as we used for the path) for the `Query`, `Header` or `Body` parts of the request. Once added to the contract, these items will also be auto-validated for form and presence before the contract HttpHandler is invoked, thus eliminating the need for any custom validation code to be written. We can then use the same lenses to confidently extract those values inside our HttpHandler code.
 
 Let's demonstrate by writing a slightly different version of the same endpoint, but move `age` to be a required query parameter, and also add the option to override the `drink` we offer:
 
