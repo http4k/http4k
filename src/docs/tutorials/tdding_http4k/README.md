@@ -17,6 +17,8 @@ Apps can generally be split into 3 tiers:
 1. Application: Builder function which takes the transport-level dependencies, and converts them into business-level dependencies. All routes are constructed and collected in this tier.
 1. Server: Builder function which takes the configuration for environmental concerns such as ports and downstream urls.
 
+The tutorial is split into 4 sections:
+
 - [Part 1: Building a walking skeleton](_1)
 - [Part 2: Adding an endpoint](_2)
 - [Part 3: Adding another endpoint](_3)
