@@ -29,7 +29,7 @@ Out of the box, `http4k-contract` the module now provides the following features
 So, how does we do all this using the http4k API? Let's find out with a worked example. 
 
 ### 1. Your first endpoint
-After importing the `http4k-core` and `http4k-contract` dependencies into your project, we can write a new endpoint aka `ContractRoute`. The first thing to note is that we will be using a slightly different routing DSL the standard http4k one, one which provides a richer way to document endpoints - but don't worry - at it's core it utilises the same simple http4k building blocks of `HttpHandler` and `Filter`, as well as leveraging the http4k Lens API to automatically extract and convert incoming  parameters into richer domain types. As ever, routes can (and should) be written and testing independently, which aids code decomposition and reuse. 
+After importing the `http4k-core` and `http4k-contract` dependencies into your project, we can write a new endpoint aka `ContractRoute`. The first thing to note is that we will be using a slightly different routing DSL the standard http4k one, one which provides a richer way to document endpoints - but don't worry - at it's core it utilises the same simple http4k building blocks of `HttpHandler` and `Filter`, as well as leveraging the **[http4k Lens API]** to automatically extract and convert incoming  parameters into richer domain types. As ever, routes can (and should) be written and testing independently, which aids code decomposition and reuse. 
 
 In this simple example, we're going to use a path with two dynamic parameters; `name` - a String, and the Integer `age` - which will be extracted and "mapped" into the constructor of a simple validated domain wrapper type. If the basic format of the path or the values for these path parameters cannot be extracted correctly, the endpoint fails to match and is skipped - this allows for several different variations of the same URI path signature to co-exist. 
 
@@ -101,3 +101,4 @@ The full source for this tutorial can be found **[here](https://github.com/http4
 [AWS API Gateway]: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions.html
 [Google Cloud Endpoints]: https://cloud.google.com/endpoints/docs/openapi/
 [http4k-by-example]: https://github.com/http4k/http4k-by-example
+[http4k Lens API]:  https://www.http4k.org/guide/modules/core/#typesafe-parameter-destructuringconstruction-of-http-messages-with-lenses
