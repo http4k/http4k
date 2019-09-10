@@ -3,11 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.180.0 (uncut)
+### v3.180.0
 - [all] Update various dependencies.
 - [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz
 - [http4k-cloudnative] Fix #291 - Readiness check result when there are > 2 checks may not report the correct result. H/T @alfi
-- [http4-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows.
+- [http4-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows. H/T @tom
 
 ### v3.179.1
 - [http4k-client-okhttp] Include status description in Response object.
