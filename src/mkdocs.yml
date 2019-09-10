@@ -1,5 +1,5 @@
 site_name: http4k
-site_url: https://www.http4k.org
+site_url: https://www.http4k.org/
 site_description: http4k is an HTTP toolkit written in Kotlin that enables the serving and consuming of HTTP services in a functional and consistent way.
 site_author: David Denton (@daviddenton), IvanSanchez (@s4nchez)
 copyright: 'Copyright &copy; 2019 - David Denton (@daviddenton), IvanSanchez (@s4nchez)'
@@ -49,12 +49,9 @@ nav:
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
     - Application Testing: guide/testing/index.md
-    - Worked TDD Example:
-      - Introduction: guide/example/index.md
-      - 1. Building a walking skeleton: guide/example/_1_building_a_walking_skeleton/index.md
-      - 2. Adding an endpoint: guide/example/_2_adding_the_first_endpoint/index.md
-      - 3. Adding another endpoint: guide/example/_3_adding_the_second_endpoint/index.md
-      - 4. An external dependency: guide/example/_4_adding_an_external_dependency/index.md
+  - Tutorials:
+    - TDDing http4k: tutorials/tdding_http4k/index.md
+    - Documenting apps with OpenApi: tutorials/documenting_apis_with_openapi/index.md
   - Cookbook:
     - Server as a function: cookbook/server_as_a_function/index.md
     - Client as a function: cookbook/client_as_a_function/index.md

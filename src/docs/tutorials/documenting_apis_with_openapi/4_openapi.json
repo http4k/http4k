@@ -1,0 +1,201 @@
+{
+  "info": {
+    "title": "my friendly api",
+    "version": "v1.0",
+    "description": "API description"
+  },
+  "tags": [
+    {
+      "name": "query",
+      "description": null
+    }
+  ],
+  "paths": {
+    "/greet/{name}": {
+      "get": {
+        "summary": "Send greetings",
+        "description": "Greets the stupid human by offering them a beverage suitable for their age",
+        "tags": [
+          "query"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "drink",
+            "required": false,
+            "description": "Your favourite beverage"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "age",
+            "required": true,
+            "description": "Your age"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": "Your name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful offer of a drink to the lowly meatbag.",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "operationId": "getGreet_name"
+      }
+    },
+    "/search/{name}": {
+      "get": {
+        "summary": "Search family tree",
+        "description": "Given a name, returns a sub family tree starting with that person",
+        "tags": [
+          "query"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": "The name to search for in the tree"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cut down family tree",
+            "content": {
+              "application/json": {
+                "example": {
+                  "name": "Donald",
+                  "age": {
+                    "value": 52
+                  },
+                  "children": [
+                    {
+                      "name": "Don Jr",
+                      "age": {
+                        "value": 21
+                      },
+                      "children": []
+                    }
+                  ]
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/Person",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "That person does not exist the family",
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "operationId": "getSearch_name"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Person": {
+        "properties": {
+          "name": {
+            "example": "Donald",
+            "type": "string"
+          },
+          "age": {
+            "$ref": "#/components/schemas/Age",
+            "example": null
+          },
+          "children": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Person"
+                }
+              ]
+            },
+            "example": [
+              {
+                "name": "Don Jr",
+                "age": {
+                  "value": 21
+                },
+                "children": []
+              }
+            ],
+            "type": "array"
+          }
+        },
+        "example": {
+          "name": "Donald",
+          "age": {
+            "value": 52
+          },
+          "children": [
+            {
+              "name": "Don Jr",
+              "age": {
+                "value": 21
+              },
+              "children": []
+            }
+          ]
+        },
+        "type": "object",
+        "required": [
+          "age",
+          "children",
+          "name"
+        ]
+      },
+      "Age": {
+        "properties": {
+          "value": {
+            "example": 52,
+            "type": "number"
+          }
+        },
+        "example": {
+          "value": 52
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "openapi": "3.0.0"
+}

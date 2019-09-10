@@ -1,0 +1,56 @@
+{
+  "info": {
+    "title": "my secure api",
+    "version": "v1.0",
+    "description": "API description"
+  },
+  "tags": [],
+  "paths": {
+    "/greet/{name}/{age}": {
+      "get": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          ""
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "description": null
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "path",
+            "name": "age",
+            "required": true,
+            "description": null
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "operationId": "getGreet_name__age"
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "openapi": "3.0.0"
+}

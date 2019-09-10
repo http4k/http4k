@@ -18,7 +18,8 @@ interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
     companion object {
 
         /**
-         * Check the entire contract, including the body.
+         * Check the entire contract, including extracting the body, before passing it to the underlying
+         * HttpHandler.
          */
         object All : PreFlightExtraction {
             override fun invoke(meta: RouteMeta) = meta.requestParams + (meta.body?.let { listOf(it) }
@@ -31,6 +32,15 @@ interface PreFlightExtraction : (RouteMeta) -> List<LensExtractor<Request, *>> {
          */
         object IgnoreBody : PreFlightExtraction {
             override fun invoke(meta: RouteMeta) = meta.requestParams
+        }
+
+        /**
+         * Check none the contract, relying entirely  on the HttpHandler code to raise a correct
+         * LensFailure if extraction fails. Use this option to fully optimise performance, at the risk
+         * of not checking
+         */
+        object None : PreFlightExtraction {
+            override fun invoke(meta: RouteMeta) = emptyList<LensExtractor<Request, *>>()
         }
     }
 }

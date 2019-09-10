@@ -67,7 +67,7 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     private fun HCookie.toWebDriver(): Cookie = Cookie(name, value, domain, path,
         expires?.let { Date.from(it.atZone(ZoneId.systemDefault()).toInstant()) }, secure, httpOnly)
 
-    private fun LocalCookie.toWebDriver(): Http4kWebDriver.StoredCookie = StoredCookie(cookie.toWebDriver(), this)
+    private fun LocalCookie.toWebDriver(): StoredCookie = StoredCookie(cookie.toWebDriver(), this)
 
     override fun get(url: String) {
         navigateTo(Request(GET, url).body(""))
@@ -184,5 +184,9 @@ class Http4kWebDriver(initialHandler: HttpHandler) : WebDriver {
     }
 
     private data class StoredCookie(val cookie: Cookie, val localCookie: LocalCookie)
-
 }
+
+/**
+ * DSL-helper so we can use this webdriver in a lambda-with-receiver context
+ */
+operator fun Http4kWebDriver.invoke(fn: Http4kWebDriver.() -> Unit): Http4kWebDriver = apply(fn)

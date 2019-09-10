@@ -25,9 +25,12 @@ data class Failed(override val name: String, val cause: Exception) : ReadinessCh
 /**
  * Result of multiple checks, for which it reports an overall result (ie. any failure is fatal).
  */
-data class Composite(private val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult(parts.fold(true) { acc, next -> acc && next.pass }) {
+data class Composite(internal val parts: Iterable<ReadinessCheckResult> = emptyList()) : ReadinessCheckResult(parts.fold(true) { acc, next -> acc && next.pass }) {
     override val name = "overall"
     override fun iterator() = parts.iterator()
 }
 
-operator fun ReadinessCheckResult.plus(that: ReadinessCheckResult) = Composite(listOf(this, that))
+operator fun ReadinessCheckResult.plus(that: ReadinessCheckResult): Composite = when (this) {
+    is Composite -> Composite(parts = parts + listOf(that))
+    else -> Composite(listOf(this, that))
+}
