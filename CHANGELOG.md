@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.180.0 (uncut)
 - [all] Update various dependencies.
 - [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz
+- [http4k-cloudnative] Fix #291 - Readiness check result when there are > 2 checks may not report the correct result. H/T @alfi
 
 ### v3.179.1
 - [http4k-client-okhttp] Include status description in Response object.

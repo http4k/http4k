@@ -41,7 +41,7 @@ object Readiness {
         checks: List<ReadinessCheck> = emptyList(),
         renderer: ReadinessCheckResultRenderer = DefaultReadinessCheckResultRenderer
     ): HttpHandler = {
-        val overall = when {
+        val overall: ReadinessCheckResult = when {
             checks.isNotEmpty() -> checks.map { check ->
                 try {
                     check()
@@ -55,5 +55,4 @@ object Readiness {
             .with(CONTENT_TYPE of renderer.contentType)
             .body(renderer(overall))
     }
-
 }

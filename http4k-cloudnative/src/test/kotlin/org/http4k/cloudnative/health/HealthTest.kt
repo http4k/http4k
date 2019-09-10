@@ -43,6 +43,27 @@ class HealthTest {
             hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nboom=false [foobar]\nsecond=true")))
     }
 
+    @Test
+    fun `readiness with three checks`() {
+        val checks = listOf(check(true, "first"), check(true, "second"), check(false, "third"))
+        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=false [foobar]")))
+    }
+
+    @Test
+    fun `readiness with four checks`() {
+        val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"), check(false, "fourth"))
+        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(SERVICE_UNAVAILABLE).and(hasBody("overall=false\nfirst=true\nsecond=true\nthird=true\nfourth=false [foobar]")))
+    }
+
+    @Test
+    fun `readiness with three passing checks`() {
+        val checks = listOf(check(true, "first"), check(true, "second"), check(true, "third"))
+        assertThat(Health(checks = checks)(Request(GET, "/readiness")),
+            hasStatus(OK).and(hasBody("overall=true\nfirst=true\nsecond=true\nthird=true")))
+    }
+
     private fun check(result: Boolean, name: String): ReadinessCheck = object : ReadinessCheck {
         override fun invoke(): ReadinessCheckResult =
             if (result) Completed(name) else Failed(name, "foobar")
