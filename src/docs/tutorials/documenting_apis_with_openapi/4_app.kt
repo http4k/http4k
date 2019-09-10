@@ -1,4 +1,4 @@
-package tutorials.self_documenting_apis_with_openapi
+package tutorials.documenting_apis_with_openapi
 
 import org.http4k.contract.contract
 import org.http4k.contract.openapi.ApiInfo
