@@ -1,4 +1,5 @@
-title: http4k Extended Step 4
+title:Part 4: Adding an external dependency
+
 description: A step-by-step guide to TDDing a simple http4k application
 
 At this point, the separation of the layers starts to become clear:

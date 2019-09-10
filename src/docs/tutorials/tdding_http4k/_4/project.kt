@@ -1,4 +1,4 @@
-package tutorials.tdding_http4k._4_adding_an_external_dependency
+package tutorials.tdding_http4k._4
 
 import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler

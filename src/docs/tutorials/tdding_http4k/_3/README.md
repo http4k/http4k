@@ -1,4 +1,4 @@
-title: http4k Extended Step 3
+title: TDDing http4k Part 3: Adding another endpoint
 description: A step-by-step guide to TDDing a simple http4k application
 
 ## Requirements:

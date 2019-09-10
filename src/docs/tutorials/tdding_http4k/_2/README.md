@@ -1,4 +1,4 @@
-title: http4k Extended Step 2
+title: TDDing http4k Part 2: Adding an endpoint
 description: A step-by-step guide to TDDing a simple http4k application
 
 Starting with another EndToEnd test, we can then drill-down into the functional behaviour of the system by introducing
