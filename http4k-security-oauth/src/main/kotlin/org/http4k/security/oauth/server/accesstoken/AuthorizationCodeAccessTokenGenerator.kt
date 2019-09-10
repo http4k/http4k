@@ -67,7 +67,7 @@ private object AuthorizationCodeAccessTokenForm {
     private val authorizationCode = FormField.map(::AuthorizationCode, AuthorizationCode::value).required("code")
     private val redirectUri = FormField.uri().required("redirect_uri")
 
-    private val clientSecret = FormField.required("client_secret")
+    private val clientSecret = FormField.optional("client_secret")
     private val clientId = FormField.map(::ClientId, ClientId::value).required("client_id")
 
     val accessTokenForm = Body.webForm(Validator.Strict,
@@ -78,7 +78,7 @@ private object AuthorizationCodeAccessTokenForm {
         with(accessTokenForm(request)) {
             AuthorizationCodeAccessTokenRequest(
                 clientId(this),
-                clientSecret(this),
+                clientSecret(this).orEmpty(),
                 redirectUri(this),
                 authorizationCode(this))
         }
