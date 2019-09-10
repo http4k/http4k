@@ -80,7 +80,9 @@ We can see the updated OpenApi UI **<a target="_blank" href="https://www.http4k.
 ### 4. Modelling HTTP body messages
 The most exciting part http4k supporting OpenApi3 is the ability to represent HTTP messages in **[JSON Schema]** form in the documentation. This facility is what unlocks the true cross-language support and takes the usefulness of the OpenApi UI to another level, for both exploratory and support functions. Request and response messages can both be specified in the `meta {}` block using overloads of the `receiving()` and `returning()` functions. By using these functions, we can supply an example object to the DSL - this is what drives the generation of the JSON Schema and, more importantly, ensures that the documentation cannot go stale as it is driven by code.
 
-Lets add another route to the mix which returns a body object modelled with a Kotlin Data class and once again using http4k lenses. This time the lens is created with `Body.auto<>().toLens()` which provides the typed injection and extraction functions. Notice here that for injection we are using the more fluent API  `with()` and `of()` extension functions, as opposed to the standard lens injection function`(X, HttpMessage) -> HttpMessage`:
+Lets add another route to the mix which returns a JSON body object modelled with a Kotlin Data class and once again using the **[http4k Lens API]**. Here, the lens not only provides the validating (de)serialisation mechanism, but also activates the `Content-Type` header injection and parsing behaviour - this will ensure that all incoming and outgoing messages have the correct headers. 
+
+For JSON bodies, the lens is created with `Body.auto<>().toLens()` (`auto()` is an extension function imported from `Jackson`) which provides the typed injection and extraction functions. Notice here that for injection we are using the more fluent API  `with()` and `of()` extension functions, as opposed to the standard lens injection function`(X, HttpMessage) -> HttpMessage`:
 
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/tutorials/documenting_apis_with_openapi/4_route.kt"></script>
 
