@@ -1,7 +1,7 @@
-title: Tutorial: Documenting http4k APIs with OpenApi
-description: An overview of the OpenApi support available in the http4k library.
+title: Tutorial: Documenting http4k APIs with OpenApi3
+description: An overview of the OpenApi3 support available in the http4k library.
 
-# Tutorial: Documenting http4k APIs with OpenApi
+# Tutorial: Documenting http4k APIs with OpenApi3
 
 This post describes **[http4k]** support for fully describing and securing HTTP endpoints using version 3 of the **[OpenApi]** specification, providing typesafe JSON-schema documentation for messages and automatically validating incoming HTTP messages.
 
