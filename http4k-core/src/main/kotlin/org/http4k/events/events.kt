@@ -1,4 +1,8 @@
-package org.http4k.core
+package org.http4k.events
+
+import org.http4k.core.EventCategory
+
+typealias Events = (Event) -> Unit
 
 interface Event {
     val category: EventCategory
@@ -9,8 +13,6 @@ interface Event {
         }
     }
 }
-
-typealias Events = (Event) -> Unit
 
 fun Events.then(next: Events): Events = { it.also(this).also(next) }
 
