@@ -33,9 +33,7 @@ operator fun Event.plus(that: Pair<String, Any>): Event = when (this) {
 }
 
 class MetadataEvent(val event: Event, val metadata: Map<String, Any> = emptyMap()) : Event by event {
-    operator fun plus(that: Pair<String, Any>) = MetadataEvent(event, metadata + that)
-
-    override fun toString() = "event=$event, metadata=$metadata"
+    override fun toString() = "MetadataEvent(event=$event, metadata=$metadata)"
 
     override fun hashCode(): Int {
         var result = event.hashCode()
