@@ -9,21 +9,13 @@ import org.http4k.events.TestEvent
 import org.http4k.events.plus
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
-import org.http4k.testing.FileSystemApprovalSource
 import org.http4k.testing.JsonApprovalTest
-import org.http4k.testing.TestNamer
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
-import java.io.File
+import org.junit.jupiter.api.extension.ExtendWith
 import java.io.StringWriter
 
-open class AutoEventsContract(private val j: AutoMarshallingJson) {
-
-    @RegisterExtension
-    @JvmField
-    val appTest = JsonApprovalTest(
-        TestNamer.MethodOnly,
-        FileSystemApprovalSource(File("../http4k-core/src/test/resources")))
+@ExtendWith(JsonApprovalTest::class)
+abstract class AutoEventsContract(private val j: AutoMarshallingJson) {
 
     @Test
     fun `event serialises to json`(approver: Approver) {

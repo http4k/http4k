@@ -3,7 +3,7 @@
     "first": "1",
     "second": 2
   },
-  "event": {
+  "event$http4k_core": {
     "value": "hello",
     "category": "Foo"
   }
