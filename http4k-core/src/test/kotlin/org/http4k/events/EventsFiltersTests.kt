@@ -16,7 +16,7 @@ class EventsFiltersTests {
     fun `timed event captures instant`() {
         val clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault())
         val events = EventFilters.Timed(clock).then(recording)
-        val event = TestEvent()
+        val event = MyEvent()
 
         events(event)
 

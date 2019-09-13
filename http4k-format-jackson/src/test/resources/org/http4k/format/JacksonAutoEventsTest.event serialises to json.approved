@@ -1,10 +1,10 @@
 {
+  "event": {
+    "value": "hello",
+    "category": "Foo"
+  },
   "metadata": {
     "first": "1",
     "second": 2
-  },
-  "event$http4k_core": {
-    "value": "hello",
-    "category": "Foo"
   }
 }

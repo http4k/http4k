@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class EventTest {
     @Test
     fun `combines into a singular event with metadata`() {
-        val final = TestEvent() + ("first" to "1") + ("second" to 2)
-        assertThat(final, equalTo<Event>(MetadataEvent(TestEvent(), mapOf("first" to "1", "second" to 2))))
+        val final = MyEvent() + ("first" to "1") + ("second" to 2)
+        assertThat(final, equalTo<Event>(MetadataEvent(MyEvent(), mapOf("first" to "1", "second" to 2))))
     }
 }
