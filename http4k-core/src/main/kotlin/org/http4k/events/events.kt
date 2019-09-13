@@ -27,6 +27,9 @@ data class EventCategory(private val name: String) {
     override fun toString(): String = name
 }
 
+/**
+ * Attach some metadata to this event
+ */
 operator fun Event.plus(that: Pair<String, Any>): Event = when (this) {
     is MetadataEvent -> MetadataEvent(event, metadata + that)
     else -> MetadataEvent(this, mapOf(that))

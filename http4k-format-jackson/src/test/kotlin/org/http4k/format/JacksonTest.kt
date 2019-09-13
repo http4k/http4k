@@ -74,4 +74,4 @@ class JacksonTest : JsonContract<JsonNode>(Jackson) {
 
 class JacksonGenerateDataClassesTest : GenerateDataClassesContract<JsonNode>(Jackson)
 
-class JacksonAutoEventsTest : AutoEventsContract(Jackson)
+class JacksonAutoEventsTest : AutoJsonEventsContract(Jackson)
