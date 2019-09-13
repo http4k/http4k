@@ -2,6 +2,7 @@ package org.http4k.format
 
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings.duration
+import org.http4k.lens.StringBiDiMappings.eventCategory
 import org.http4k.lens.StringBiDiMappings.instant
 import org.http4k.lens.StringBiDiMappings.localDate
 import org.http4k.lens.StringBiDiMappings.localDateTime
@@ -59,6 +60,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(zonedDateTime())
     text(offsetTime())
     text(offsetDateTime())
+    text(eventCategory())
 }
 
 /**

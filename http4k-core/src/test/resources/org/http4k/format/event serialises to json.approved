@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "first": "1",
+    "second": 2
+  },
+  "event": {
+    "value": "hello",
+    "category": "Foo"
+  }
+}

@@ -81,7 +81,10 @@ abstract class ContentTypeAwareApprovalTest(
 /**
  * Approval JUnit5 extension configured to compare prettified-JSON messages.
  */
-class JsonApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_JSON) {
+class JsonApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(APPLICATION_JSON, testNamer, approvalSource) {
     override fun format(input: String) = try {
         formatJson(input, TWO_SPACES)
     } catch (e: Json.ParseException) {
@@ -93,7 +96,10 @@ class JsonApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_JSON) {
  * Approval JUnit5 extension configured to compare prettified-HTML messages. Note that this strips
  * <!DOCTYPE tags from the start of the document.
  */
-class HtmlApprovalTest : ContentTypeAwareApprovalTest(TEXT_HTML) {
+class HtmlApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(TEXT_HTML, testNamer, approvalSource) {
     override fun format(input: String) = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
@@ -104,7 +110,10 @@ class HtmlApprovalTest : ContentTypeAwareApprovalTest(TEXT_HTML) {
 /**
  * Approval JUnit5 extension configured to compare prettified-XML messages.
  */
-class XmlApprovalTest : ContentTypeAwareApprovalTest(APPLICATION_XML) {
+class XmlApprovalTest(
+    testNamer: TestNamer = ClassAndMethod,
+    approvalSource: ApprovalSource = FileSystemApprovalSource(File("src/test/resources"))
+) : ContentTypeAwareApprovalTest(APPLICATION_XML, testNamer, approvalSource) {
     override fun format(input: String) = try {
         formatXml(input)
     } catch (e: IllegalArgumentException) {
