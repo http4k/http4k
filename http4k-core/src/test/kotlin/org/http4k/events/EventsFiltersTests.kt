@@ -13,9 +13,9 @@ class EventsFiltersTests {
     private val recording = RecordingEvents()
 
     @Test
-    fun `timed event captures instant`() {
+    fun `AddTimestamp captures instant`() {
         val clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault())
-        val events = EventFilters.Timed(clock).then(recording)
+        val events = EventFilters.AddTimestamp(clock).then(recording)
         val event = MyEvent()
 
         events(event)
