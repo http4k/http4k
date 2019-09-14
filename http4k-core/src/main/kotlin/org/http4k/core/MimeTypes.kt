@@ -1,6 +1,7 @@
 package org.http4k.core
 
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
+import org.http4k.util.loadMetaResource
 
 data class MimeTypes private constructor(private val map: Map<String, ContentType>) {
     fun forFile(file: String): ContentType =
@@ -15,7 +16,7 @@ data class MimeTypes private constructor(private val map: Map<String, ContentTyp
         private val standardTypes: MimeTypes by lazy { MimeTypes(loadStandard()) }
 
         private fun loadStandard(): Map<String, ContentType> =
-            MimeTypes::class.java.getResourceAsStream("/META-INF/org/http4k/core/mime.types").reader().readLines().flatMap { line ->
+            loadMetaResource<MimeTypes>("/mime.types").reader().readLines().flatMap { line ->
                 line.split('\t')
                     .filter { it.trim().isNotBlank() }
                     .run {
