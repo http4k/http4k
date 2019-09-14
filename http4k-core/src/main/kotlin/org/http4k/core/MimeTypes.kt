@@ -16,7 +16,7 @@ data class MimeTypes private constructor(private val map: Map<String, ContentTyp
         private val standardTypes: MimeTypes by lazy { MimeTypes(loadStandard()) }
 
         private fun loadStandard(): Map<String, ContentType> =
-            loadMetaResource<MimeTypes>("/mime.types").reader().readLines().flatMap { line ->
+            loadMetaResource<MimeTypes>("mime.types").reader().readLines().flatMap { line ->
                 line.split('\t')
                     .filter { it.trim().isNotBlank() }
                     .run {
