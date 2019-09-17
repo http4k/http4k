@@ -3,6 +3,9 @@ package org.http4k.lens
 import org.http4k.base64Decoded
 import org.http4k.base64Encode
 import org.http4k.core.Uri
+import org.http4k.events.EventCategory
+import org.http4k.filter.SamplingDecision
+import org.http4k.filter.TraceId
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
@@ -72,6 +75,9 @@ object StringBiDiMappings {
     fun zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = BiDiMapping({ ZonedDateTime.parse(it, formatter) }, formatter::format)
     fun offsetTime(formatter: DateTimeFormatter = ISO_OFFSET_TIME) = BiDiMapping({ OffsetTime.parse(it, formatter) }, formatter::format)
     fun offsetDateTime(formatter: DateTimeFormatter = ISO_OFFSET_DATE_TIME) = BiDiMapping({ OffsetDateTime.parse(it, formatter) }, formatter::format)
+    fun eventCategory() = BiDiMapping(::EventCategory, EventCategory::toString)
+    fun traceId() = BiDiMapping(::TraceId, TraceId::value)
+    fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
 }
 
 internal fun safeBooleanFrom(value: String): Boolean =

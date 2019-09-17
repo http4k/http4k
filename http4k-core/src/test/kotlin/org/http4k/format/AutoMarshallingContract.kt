@@ -40,7 +40,6 @@ data class ArbObject(val string: String, val child: ArbObject?, val numbers: Lis
 data class RegexHolder(val regex: Regex)
 
 data class StringHolder(val value: String)
-data class AnotherStringHolder(val value: AnotherString)
 data class AnotherString(val value: String)
 data class BooleanHolder(val value: Boolean)
 data class MapHolder(val value: Map<String, Any>)

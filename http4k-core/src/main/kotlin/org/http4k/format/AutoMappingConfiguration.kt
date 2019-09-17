@@ -2,6 +2,7 @@ package org.http4k.format
 
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings.duration
+import org.http4k.lens.StringBiDiMappings.eventCategory
 import org.http4k.lens.StringBiDiMappings.instant
 import org.http4k.lens.StringBiDiMappings.localDate
 import org.http4k.lens.StringBiDiMappings.localDateTime
@@ -9,6 +10,8 @@ import org.http4k.lens.StringBiDiMappings.localTime
 import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
 import org.http4k.lens.StringBiDiMappings.regexObject
+import org.http4k.lens.StringBiDiMappings.samplingDecision
+import org.http4k.lens.StringBiDiMappings.traceId
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
 import org.http4k.lens.StringBiDiMappings.uuid
@@ -59,6 +62,9 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(zonedDateTime())
     text(offsetTime())
     text(offsetDateTime())
+    text(eventCategory())
+    text(traceId())
+    text(samplingDecision())
 }
 
 /**

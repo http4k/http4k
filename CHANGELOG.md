@@ -3,6 +3,11 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.181.0 (uncut)
+- [http4k-core] Added base events implementations for StructuredLogging.
+- [http4k-core] [Repackage] Events classes are now in `org.http4k.events`.
+- [http4k-core] [Breaking] `EventCategory` is no longer a field of `Event`. To fix, just remove `override` from your `Event` classes.
+
 ### v3.180.0
 - [all] Update various dependencies.
 - [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz

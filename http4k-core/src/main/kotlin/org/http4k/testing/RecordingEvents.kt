@@ -1,7 +1,7 @@
 package org.http4k.testing
 
-import org.http4k.core.Event
-import org.http4k.core.Events
+import org.http4k.events.Event
+import org.http4k.events.Events
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
