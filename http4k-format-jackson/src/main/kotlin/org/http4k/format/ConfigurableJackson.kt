@@ -12,14 +12,10 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
-import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta.ObjectParam
-import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
@@ -69,9 +65,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
-        .map({ it.payload.asString() }, { Body(it) })
-        .map({ mapper.readValue(it, object : TypeReference<T>() {}) as T }, { mapper.writeValueAsString(it) })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = jsonHttpBodyLens(description, contentNegotiation).map({ mapper.readValue(it, object : TypeReference<T>() {}) as T }, { mapper.writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)

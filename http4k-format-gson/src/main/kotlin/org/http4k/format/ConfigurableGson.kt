@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
@@ -11,6 +12,7 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import com.google.gson.reflect.TypeToken
 import org.http4k.core.Body
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.ContentNegotiation
@@ -22,6 +24,9 @@ import java.math.BigInteger
 import kotlin.reflect.KClass
 
 open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<JsonElement>() {
+
+    val mapper: Gson = builder.create()
+    private val pretty = builder.setPrettyPrinting().create()
 
     override fun typeOf(value: JsonElement): JsonType =
         when {
@@ -39,9 +44,6 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
             else -> throw IllegalArgumentException("Don't know now to translate $value")
         }
 
-    private val compact = builder.create()
-    private val pretty = builder.setPrettyPrinting().create()
-
     override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).let {
         if (it.isJsonArray || it.isJsonObject) it else throw InvalidJsonException(
             "Could not convert to a JSON Object or Array. $this"
@@ -58,7 +60,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun <T : Iterable<JsonElement>> T.asJsonArray(): JsonElement = fold(JsonArray()) { memo, o -> memo.add(o); memo }
 
     override fun JsonElement.asPrettyJsonString(): String = pretty.toJson(this)
-    override fun JsonElement.asCompactJsonString(): String = compact.toJson(this)
+    override fun JsonElement.asCompactJsonString(): String = mapper.toJson(this)
     override fun <LIST : Iterable<Pair<String, JsonElement>>> LIST.asJsonObject() = JsonObject().apply { forEach { add(it.first, it.second) } }
 
     override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
@@ -81,14 +83,14 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     }
 
     // auto
-    override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
+    override fun asJsonObject(input: Any): JsonElement = mapper.toJsonTree(input)
 
-    override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
-    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.fromJson(input, target.java)
+    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = mapper.fromJson(j, target.java)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = body(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = jsonHttpBodyLens(description, contentNegotiation).map({ mapper.fromJson(it, object : TypeToken<T>() {}.type) as T }, { mapper.toJson(it) })
 }
 
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)

@@ -1,5 +1,12 @@
 package org.http4k.format
 
+import org.http4k.asString
+import org.http4k.core.Body
+import org.http4k.core.ContentType
+import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
+import org.http4k.lens.httpBodyRoot
 import java.io.InputStream
 import kotlin.reflect.KClass
 
@@ -29,3 +36,6 @@ abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), J
     @JvmName("nodeAsA")
     fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
 }
+
+fun jsonHttpBodyLens(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None) = httpBodyRoot(listOf(Meta(true, "body", ParamMeta.ObjectParam, "body", description)), ContentType.APPLICATION_JSON, contentNegotiation)
+    .map({ it.payload.asString() }, { Body(it) })

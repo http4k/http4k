@@ -31,6 +31,15 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     }
 
     @Test
+    fun `roundtrip array of arbitary objects to and from body`() {
+        val body = Body.auto<Array<ArbObject>>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
+    }
+
+    @Test
     @Disabled("GSON does not currently have Kotlin class support")
     override fun `fails decoding when a required value is null`() {
     }

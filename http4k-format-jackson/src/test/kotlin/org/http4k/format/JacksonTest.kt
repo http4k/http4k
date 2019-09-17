@@ -39,6 +39,15 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
     }
 
     @Test
+    fun `roundtrip array of arbitary objects to and from body`() {
+        val body = Body.auto<Array<ArbObject>>().toLens()
+
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(body(Response(OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
+    }
+
+    @Test
     fun `roundtrip body using view`() {
         val arbObjectWithView = ArbObjectWithView(3, 5)
         val publicLens = Body.autoView<ArbObjectWithView, Public>().toLens()
