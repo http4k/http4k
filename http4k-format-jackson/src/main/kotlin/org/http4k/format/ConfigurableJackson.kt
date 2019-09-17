@@ -41,34 +41,27 @@ open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoM
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
-    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().also {
-        it.addAll(toList())
-    }
-
+    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().also { it.addAll(toList()) }
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also {
-            it.setAll(mapOf(*toList().toTypedArray()))
-        }
+        mapper.createObjectNode().also { it.setAll(mapOf(*toList().toTypedArray())) }
 
-    override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> =
-        node.fields().asSequence().map { (key, value) ->
-            key to value
-        }.toList()
+    override fun fields(node: JsonNode) = node.fields().asSequence().map { (key, value) -> key to value }.toList()
 
-    override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
+    override fun elements(value: JsonNode) = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
     override fun integer(value: JsonNode) = value.asLong()
     override fun decimal(value: JsonNode) = BigDecimal(value.toString())
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 
+    // auto
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
-    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
-
+    // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
 

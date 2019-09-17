@@ -55,11 +55,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     override fun JsonElement.asPrettyJsonString(): String = pretty.toJson(this)
     override fun JsonElement.asCompactJsonString(): String = compact.toJson(this)
-    override fun <LIST : Iterable<Pair<String, JsonElement>>> LIST.asJsonObject(): JsonElement {
-        val root = JsonObject()
-        forEach { root.add(it.first, it.second) }
-        return root
-    }
+    override fun <LIST : Iterable<Pair<String, JsonElement>>> LIST.asJsonObject() = JsonObject().apply { forEach { add(it.first, it.second) } }
 
     override fun fields(node: JsonElement): Iterable<Pair<String, JsonElement>> =
         if (typeOf(node) != JsonType.Object) emptyList() else {
@@ -74,16 +70,17 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun text(value: JsonElement): String = value.asString
     override fun bool(value: JsonElement): Boolean = value.asBoolean
     override fun integer(value: JsonElement) = value.asLong
-    override fun decimal(value: JsonElement) = value.asBigDecimal
-
-    override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
-    override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
-    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
-
-    override fun textValueOf(node: JsonElement, name: String) = when (node) {
+    override fun decimal(value: JsonElement): BigDecimal = value.asBigDecimal
+    override fun textValueOf(node: JsonElement, name: String): String = when (node) {
         is JsonObject -> node[name].asString
         else -> throw IllegalArgumentException("node is not an object")
     }
+
+    // auto
+    override fun asJsonObject(input: Any): JsonElement = compact.toJsonTree(input)
+
+    override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
+    override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
 }
 
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
