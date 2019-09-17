@@ -55,7 +55,7 @@ These data classes are compatible with using the `Body.auto<T>()` functionality.
 
 **Q. Declared with `Body.auto<List<XXX>>().toLens()`, my auto-marshalled List doesn't extract properly!**
 
-**A.** This occurs in Jackson and Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
+**A.** This occurs in Moshi when serialising bare lists to/from JSON and is to do with the underlying library being lazy in deserialising objects (using LinkedHashTreeMap) ()). Use `Body.auto<Array<MyIntWrapper>>().toLens()` instead. Yes, it's annoying but we haven't found a way to turn if off.
 
 This can be demonstrated by the following, where you can see that the output of the auto-unmarshalling a naked JSON is NOT 
 the same as a native Kotlin list of objects. This can make tests break as the unmarshalled list is NOT equal to the native list.

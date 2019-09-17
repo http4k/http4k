@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -21,7 +22,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
+open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
@@ -41,35 +42,34 @@ open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoM
     override fun BigDecimal?.asJsonValue(): JsonNode = this?.let { DecimalNode(this) } ?: NullNode.instance
     override fun BigInteger?.asJsonValue(): JsonNode = this?.let { BigIntegerNode(this) } ?: NullNode.instance
     override fun Boolean?.asJsonValue(): JsonNode = this?.let { BooleanNode.valueOf(this) } ?: NullNode.instance
-    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().also {
-        it.addAll(toList())
-    }
-
+    override fun <T : Iterable<JsonNode>> T.asJsonArray(): JsonNode = mapper.createArrayNode().also { it.addAll(toList()) }
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also {
-            it.setAll(mapOf(*toList().toTypedArray()))
-        }
+        mapper.createObjectNode().also { it.setAll(mapOf(*toList().toTypedArray())) }
 
-    override fun fields(node: JsonNode): Iterable<Pair<String, JsonNode>> =
-        node.fields().asSequence().map { (key, value) ->
-            key to value
-        }.toList()
+    override fun fields(node: JsonNode) = node.fields().asSequence().map { (key, value) -> key to value }.toList()
 
-    override fun elements(value: JsonNode): Iterable<JsonNode> = value.elements().asSequence().asIterable()
+    override fun elements(value: JsonNode) = value.elements().asSequence().asIterable()
     override fun text(value: JsonNode): String = value.asText()
     override fun bool(value: JsonNode): Boolean = value.asBoolean()
     override fun integer(value: JsonNode) = value.asLong()
     override fun decimal(value: JsonNode) = BigDecimal(value.toString())
+    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
 
+    // auto
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
+
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
-    override fun textValueOf(node: JsonNode, name: String) = node[name]?.asText()
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = jsonHttpBodyLens(description, contentNegotiation).map({ mapper.readValue(it, object : TypeReference<T>() {}) as T }, { mapper.writeValueAsString(it) })
+
+    // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
+
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
 
     inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(description: String? = null,
