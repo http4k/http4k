@@ -2,6 +2,9 @@ package org.http4k.events
 
 typealias Events = (Event) -> Unit
 
+/**
+ * Represents a meaningful "happening" in an app.
+ */
 interface Event {
     companion object {
         data class Error(val message: String, val cause: Throwable? = null) : Event {
@@ -12,16 +15,19 @@ interface Event {
 
 fun Events.then(next: Events): Events = { it.also(this).also(next) }
 
-interface EventsFilter : (Events) -> Events {
+/**
+ * An EventFilter is used to create pipelines for Event processing.
+ */
+interface EventFilter : (Events) -> Events {
     companion object {
-        operator fun invoke(fn: (Events) -> Events) = object : EventsFilter {
+        operator fun invoke(fn: (Events) -> Events) = object : EventFilter {
             override operator fun invoke(next: Events): Events = fn(next)
         }
     }
 }
 
-fun EventsFilter.then(next: EventsFilter): EventsFilter = EventsFilter { this(next(it)) }
-fun EventsFilter.then(next: Events): Events = { this(next)(it) }
+fun EventFilter.then(next: EventFilter): EventFilter = EventFilter { this(next(it)) }
+fun EventFilter.then(next: Events): Events = { this(next)(it) }
 
 data class EventCategory(private val name: String) {
     override fun toString(): String = name

@@ -10,7 +10,7 @@ object EventFilters {
     /**
      * Adds timestamp metadata to the event.
      */
-    fun AddTimestamp(clock: Clock) = EventsFilter { next ->
+    fun AddTimestamp(clock: Clock) = EventFilter { next ->
         {
             next(it + ("timestamp" to clock.instant()))
         }
@@ -19,7 +19,7 @@ object EventFilters {
     /**
      * Adds Zipkin traces metadata to the event.
      */
-    fun AddZipkinTraces() = EventsFilter { next ->
+    fun AddZipkinTraces() = EventFilter { next ->
         {
             next(it + ("traces" to ZipkinTraces.THREAD_LOCAL.get()))
         }
