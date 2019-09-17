@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.182.0 (uncut)
+### v3.182.0
 - [http4k-core] Rename `EventsFilter` to `EventFilter` because sanity.
+- [http4k-format-jackson, http4k-format-gson] Reintroduce `autoBody()` method
 
 ### v3.181.0
 - [http4k-core] Added base events implementations for StructuredLogging.

@@ -90,7 +90,10 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = jsonHttpBodyLens(description, contentNegotiation).map({ mapper.fromJson(it, object : TypeToken<T>() {}.type) as T }, { mapper.toJson(it) })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
+
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
+        jsonHttpBodyLens(description, contentNegotiation).map({ mapper.fromJson(it, object : TypeToken<T>() {}.type) as T }, { mapper.toJson(it) })
 }
 
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
