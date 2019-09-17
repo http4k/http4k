@@ -61,6 +61,10 @@ open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoM
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = body(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
+
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)

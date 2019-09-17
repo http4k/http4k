@@ -1,10 +1,5 @@
 package org.http4k.format
 
-import org.http4k.core.Body
-import org.http4k.lens.BiDiBodyLensSpec
-import org.http4k.lens.BiDiWsMessageLensSpec
-import org.http4k.lens.ContentNegotiation
-import org.http4k.websocket.WsMessage
 import java.io.InputStream
 import kotlin.reflect.KClass
 
@@ -33,11 +28,4 @@ abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), J
 
     @JvmName("nodeAsA")
     fun <T : Any> NODE.asA(target: KClass<T>): T = asA(this, target)
-
-    inline fun <reified T : Any> WsMessage.Companion.auto(): BiDiWsMessageLensSpec<T> = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
-
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None): BiDiBodyLensSpec<T> = autoBody(description, contentNegotiation)
-
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = ContentNegotiation.None) =
-        body(description, contentNegotiation).map({ it.asA(T::class) }, { it.asJsonObject() })
 }

@@ -11,7 +11,11 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import org.http4k.core.Body
 import org.http4k.lens.BiDiMapping
+import org.http4k.lens.ContentNegotiation
+import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.websocket.WsMessage
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -81,6 +85,10 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 
     override fun <T : Any> asA(input: String, target: KClass<T>): T = compact.fromJson(input, target.java)
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = compact.fromJson(j, target.java)
+
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = body(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
 }
 
 class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
