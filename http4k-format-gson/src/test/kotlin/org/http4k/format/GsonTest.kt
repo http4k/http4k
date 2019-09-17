@@ -23,11 +23,11 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
 
     @Test
     fun `roundtrip list of arbitary objects to and from body`() {
-        val body = Body.auto<Array<ArbObject>>().toLens()
+        val body = Body.auto<List<ArbObject>>().toLens()
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
-        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).asList(), equalTo(arrayOf(obj).asList()))
+        assertThat(body(Response(Status.OK).with(body of listOf(obj))), equalTo(listOf(obj)))
     }
 
     @Test

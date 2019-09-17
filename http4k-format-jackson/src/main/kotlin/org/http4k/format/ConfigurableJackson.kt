@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -11,17 +12,21 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.http4k.asString
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
 import org.http4k.lens.ContentNegotiation.Companion.None
+import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.httpBodyRoot
 import org.http4k.lens.string
 import org.http4k.websocket.WsMessage
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KClass
 
-open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
+open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallingJson<JsonNode>() {
 
     override fun typeOf(value: JsonNode): JsonType = when (value) {
         is TextNode -> JsonType.String
@@ -58,15 +63,19 @@ open class ConfigurableJackson(internal val mapper: ObjectMapper) : JsonLibAutoM
 
     // auto
     override fun asJsonObject(input: Any): JsonNode = mapper.convertValue(input, JsonNode::class.java)
+
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
-    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = body(description, contentNegotiation).map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = httpBodyRoot(listOf(Meta(true, "body", ObjectParam, "body", description)), APPLICATION_JSON, contentNegotiation)
+        .map({ it.payload.asString() }, { Body(it) })
+        .map({ mapper.readValue(it, object : TypeReference<T>() {}) as T }, { mapper.writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
+
     fun <T : Any, V : Any> String.asUsingView(t: KClass<T>, v: KClass<V>): T = mapper.readerWithView(v.java).forType(t.java).readValue(this)
 
     inline fun <reified T : Any, reified V : Any> Body.Companion.autoView(description: String? = null,
