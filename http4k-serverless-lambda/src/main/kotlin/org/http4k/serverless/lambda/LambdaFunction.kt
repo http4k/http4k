@@ -31,8 +31,7 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
     fun handle(request: APIGatewayProxyRequestEvent, lambdaContext: Context? = null) =
         initializeRequestContext
             .then(AddLambdaContextAndRequest(lambdaContext, request, contexts))
-            .then(app)
-            .invoke(request.asHttp4k())
+            .then(app)(request.asHttp4k())
             .asApiGateway()
 }
 
@@ -57,9 +56,7 @@ internal fun APIGatewayProxyRequestEvent.uri() = Uri.of(path ?: "").query((query
 
 internal fun AddLambdaContextAndRequest(lambdaContext: Context?, request: APIGatewayProxyRequestEvent, contexts: RequestContexts) = Filter { next ->
     {
-        if (lambdaContext != null) {
-            contexts[it][LAMBDA_CONTEXT_KEY] = lambdaContext
-        }
+        lambdaContext?.apply { contexts[it][LAMBDA_CONTEXT_KEY] = lambdaContext }
         contexts[it][LAMBDA_REQUEST_KEY] = request
         next(it)
     }
