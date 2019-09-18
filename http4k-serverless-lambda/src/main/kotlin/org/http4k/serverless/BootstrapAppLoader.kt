@@ -1,18 +1,30 @@
 package org.http4k.serverless
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.RequestContexts
 
-data class BootstrapException(val m: String?) : Exception(m)
+open class BootstrapException(m: String?, cause: Throwable? = null) : Exception(m, cause)
+class CouldNotFindAppLoaderException(cause: ClassNotFoundException) : BootstrapException("Could not find AppLoader class: ${cause.message}", cause)
+class InvalidAppLoaderException(cause: Exception? = null) : BootstrapException(
+    "AppLoader class should be an object singleton that implements either ${AppLoaderWithContexts::class.qualifiedName} (recommended) " +
+    "or ${AppLoader::class.qualifiedName}",
+    cause
+)
 
-object BootstrapAppLoader : AppLoader {
+object BootstrapAppLoader : AppLoaderWithContexts {
     const val HTTP4K_BOOTSTRAP_CLASS = "HTTP4K_BOOTSTRAP_CLASS"
 
-    override fun invoke(environment: Map<String, String>): HttpHandler = try {
+    override fun invoke(environment: Map<String, String>, contexts: RequestContexts): HttpHandler = try {
         val loadClass = javaClass.classLoader.loadClass(environment[HTTP4K_BOOTSTRAP_CLASS])
-        (loadClass.getDeclaredField("INSTANCE").get(null) as AppLoader)(environment)
+
+        when (val appLoaderInstance: Any = loadClass.getDeclaredField("INSTANCE").get(null)) {
+            is AppLoaderWithContexts -> appLoaderInstance(environment, contexts)
+            is AppLoader -> appLoaderInstance(environment)
+            else -> throw InvalidAppLoaderException()
+        }
     } catch (e: ClassNotFoundException) {
-        throw BootstrapException("Could not find AppLoader class: ${e.message}")
+        throw CouldNotFindAppLoaderException(e)
     } catch (e: NoSuchFieldException) {
-        throw BootstrapException("AppLoader class should be an object singleton that implements ${AppLoader::class.qualifiedName}")
+        throw InvalidAppLoaderException(e)
     }
 }

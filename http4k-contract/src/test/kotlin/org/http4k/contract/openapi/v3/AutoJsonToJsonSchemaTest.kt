@@ -91,7 +91,7 @@ class AutoJsonToJsonSchemaTest {
 
     @Test
     fun `renders schema for non-string-keyed map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.EPOCH to "value")), null)
+        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.of(1970, 1, 1) to "value")), null)
     }
 
     @Test

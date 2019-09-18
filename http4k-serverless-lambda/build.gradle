@@ -5,6 +5,9 @@ dependencies {
     provided Libs.kotlin_reflect
     provided project(":http4k-core")
 
+    compile Libs.lambda_core
+    compile Libs.lambda_events
+
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies
 }

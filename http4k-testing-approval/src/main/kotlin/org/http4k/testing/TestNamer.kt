@@ -11,7 +11,7 @@ interface TestNamer {
     companion object {
         val ClassAndMethod = object : TestNamer {
             override fun nameFor(testClass: Class<*>, testMethod: Method): String =
-                testClass.packageName.replace('.', '/') + '/' + testClass.simpleName + "." + testMethod.name
+                testClass.`package`.name.replace('.', '/') + '/' + testClass.simpleName + "." + testMethod.name
         }
         val MethodOnly = object : TestNamer {
             override fun nameFor(testClass: Class<*>, testMethod: Method): String =
