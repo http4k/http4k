@@ -35,14 +35,10 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
             .asApiGateway()
 }
 
-internal fun Response.asApiGateway(): APIGatewayProxyResponseEvent {
-    val apiGatewayResponse = APIGatewayProxyResponseEvent()
-
-    apiGatewayResponse.statusCode = status.code
-    apiGatewayResponse.headers = headers.toMap()
-    apiGatewayResponse.body = bodyString()
-
-    return apiGatewayResponse
+internal fun Response.asApiGateway() = APIGatewayProxyResponseEvent().apply {
+    statusCode = status.code
+    headers = headers.toMap()
+    body = bodyString()
 }
 
 internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).toList().fold(
