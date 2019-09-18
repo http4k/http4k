@@ -9,9 +9,9 @@ object BootstrapAppLoader : AppLoaderWithContexts {
     override fun invoke(environment: Map<String, String>, contexts: RequestContexts): HttpHandler = try {
         val loadClass = javaClass.classLoader.loadClass(environment[HTTP4K_BOOTSTRAP_CLASS])
 
-        when (val appLoaderInstance: Any = loadClass.getDeclaredField("INSTANCE").get(null)) {
-            is AppLoaderWithContexts -> appLoaderInstance(environment, contexts)
+        when (val appLoaderInstance = loadClass.getDeclaredField("INSTANCE").get(null)) {
             is AppLoader -> appLoaderInstance(environment)
+            is AppLoaderWithContexts -> appLoaderInstance(environment, contexts)
             else -> throw InvalidAppLoaderException()
         }
     } catch (e: ClassNotFoundException) {
