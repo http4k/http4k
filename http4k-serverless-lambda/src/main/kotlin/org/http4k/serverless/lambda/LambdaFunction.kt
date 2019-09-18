@@ -35,10 +35,10 @@ class LambdaFunction(env: Map<String, String> = System.getenv()) {
             .asApiGateway()
 }
 
-internal fun Response.asApiGateway() = APIGatewayProxyResponseEvent().apply {
-    statusCode = status.code
-    headers = headers.toMap()
-    body = bodyString()
+internal fun Response.asApiGateway() = APIGatewayProxyResponseEvent().also {
+    it.statusCode = status.code
+    it.headers = headers.toMap()
+    it.body = bodyString()
 }
 
 internal fun APIGatewayProxyRequestEvent.asHttp4k() = (headers ?: emptyMap()).toList().fold(
