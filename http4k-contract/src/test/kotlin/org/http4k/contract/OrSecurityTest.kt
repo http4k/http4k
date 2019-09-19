@@ -26,6 +26,12 @@ class OrSecurityTest {
 
     private val composite = ApiKeySecurity(Query.required("first"), { true })
         .or(ApiKeySecurity(Query.required("second"), { true }))
+        .or(ApiKeySecurity(Query.required("third"), { true }))
+
+    @Test
+    fun `toString makes sense`() {
+        assertThat(FooBar.or(BarFoo).or(FooBar).toString(), equalTo("OrSecurity(all=[FooBar, BarFoo, FooBar])"))
+    }
 
     @Test
     fun `requires either securities to pass to succeed`() {

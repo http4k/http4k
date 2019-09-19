@@ -10,6 +10,7 @@ class AndSecurityRendererTest : SecurityRendererContract {
     override val security =
         ApiKeySecurity(Query.required("first"), { true }, name = "first")
             .and(ApiKeySecurity(Query.required("second"), { true }, name = "second"))
+            .and(ApiKeySecurity(Query.required("third"), { true }, name = "third"))
 
     override val renderer = OpenApi3SecurityRenderer
 }
@@ -18,6 +19,6 @@ class OrSecurityRendererTest : SecurityRendererContract {
     override val security =
         ApiKeySecurity(Query.required("first"), { true }, name = "first")
             .or(ApiKeySecurity(Query.required("second"), { true }, name = "second"))
-
+            .or(ApiKeySecurity(Query.required("third"), { true }, name = "third"))
     override val renderer = OpenApi3SecurityRenderer
 }

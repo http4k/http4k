@@ -13,17 +13,23 @@ interface Security {
     val filter: Filter
 }
 
-fun Security.and(that: Security): Security = AndSecurity(listOf(this) + that)
+fun Security.and(that: Security): Security = when (this) {
+    is AndSecurity -> AndSecurity(this + that)
+    else -> AndSecurity(listOf(this) + that)
+}
 
-internal class AndSecurity(private val all: List<Security>) : Security, Iterable<Security> {
+internal data class AndSecurity(internal val all: List<Security>) : Security, Iterable<Security> {
     override fun iterator() = all.iterator()
 
     override val filter = all.fold(Filter.NoOp) { acc, next -> acc.then(next.filter) }
 }
 
-fun Security.or(that: Security): Security = OrSecurity(listOf(this) + that)
+fun Security.or(that: Security): Security = when (this) {
+    is OrSecurity -> OrSecurity(this + that)
+    else -> OrSecurity(listOf(this) + that)
+}
 
-internal class OrSecurity(private val all: List<Security>) : Security, Iterable<Security> {
+internal data class OrSecurity(internal val all: List<Security>) : Security, Iterable<Security> {
     override fun iterator() = all.iterator()
 
     override val filter = Filter { next ->

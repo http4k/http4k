@@ -5,7 +5,8 @@ changes with their rationale when appropriate:
 
 ### v3.183.0 (uncut)
 - [http4k-serverless-lambda] Add ability to access Lambda context. H/T @ivoanjo for the PR.
- 
+- [http4k-contract] Fix rendering of OrSecurity when there are more than 2 parts.
+
 ### v3.182.0
 - [http4k-core] Rename `EventsFilter` to `EventFilter` because sanity.
 - [http4k-format-jackson, http4k-format-gson] Reintroduce `autoBody()` method
