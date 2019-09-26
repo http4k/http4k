@@ -449,6 +449,44 @@
         "operationId": "postBasepathBody_string"
       }
     },
+    "/basepath/cookies": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "cookie",
+            "name": "b",
+            "required": true,
+            "description": "requiredCookie"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "cookie",
+            "name": "s",
+            "required": false,
+            "description": "optionalCookie"
+          }
+        ],
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathCookies"
+      }
+    },
     "/basepath/descriptions": {
       "get": {
         "summary": "endpoint",

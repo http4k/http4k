@@ -4,6 +4,7 @@
     "GET:/basepath/descriptions": "endpoint",
     "POST:/basepath/paths/{firstName}/bertrand/{age}": "<unknown>",
     "POST:/basepath/queries": "<unknown>",
+    "POST:/basepath/cookies": "<unknown>",
     "POST:/basepath/headers": "<unknown>",
     "POST:/basepath/body_string": "<unknown>",
     "POST:/basepath/body_json_noschema": "<unknown>",

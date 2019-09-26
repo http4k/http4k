@@ -27,6 +27,7 @@ import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
 import org.http4k.format.Json
+import org.http4k.lens.Cookies
 import org.http4k.lens.FormField
 import org.http4k.lens.Header
 import org.http4k.lens.Invalid
@@ -90,6 +91,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += json.lens(Query).optional("j", "jsonQuery")
+            } bindContract POST to { Response(OK).body("hello") }
+            routes += "/cookies" meta {
+                cookies += Cookies.required("b", "requiredCookie")
+                cookies += Cookies.optional("s", "optionalCookie")
             } bindContract POST to { Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")

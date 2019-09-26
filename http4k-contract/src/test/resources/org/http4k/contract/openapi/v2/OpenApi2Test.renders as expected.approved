@@ -451,6 +451,48 @@
         ]
       }
     },
+    "/basepath/cookies": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathCookies",
+        "produces": [
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "b",
+            "required": true,
+            "type": "string",
+            "description": "requiredCookie"
+          },
+          {
+            "in": "cookie",
+            "name": "s",
+            "required": false,
+            "type": "string",
+            "description": "optionalCookie"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/descriptions": {
       "get": {
         "tags": [
