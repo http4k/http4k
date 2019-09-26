@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.184.0
+- [http4k-contract] Add `Cookies` options to contract DSL
+
 ### v3.183.0
 - [http4k-serverless-lambda] Add ability to access Lambda context. H/T @ivoanjo for the PR.
 - [http4k-contract] Fix rendering of OrSecurity when there are more than 2 parts.
