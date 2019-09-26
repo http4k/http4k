@@ -149,7 +149,7 @@ private sealed class SchemaNode(
     private val paramMeta: ParamMeta,
     private val isNullable: Boolean,
     val example: Any?) {
-    open fun definitions(): Iterable<SchemaNode> = emptyList()
+    abstract fun definitions(): Iterable<SchemaNode>
 
     fun name() = name
 
@@ -160,12 +160,14 @@ private sealed class SchemaNode(
         SchemaNode(name, paramMeta, isNullable, example) {
         val type = paramMeta().value
         override fun arrayItem() = ArrayItem.NonObject(paramMeta())
+        override fun definitions() = emptyList<SchemaNode>()
     }
 
     class Enum(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, val enum: List<String>) :
         SchemaNode(name, paramMeta, isNullable, example) {
         val type = paramMeta().value
         override fun arrayItem() = ArrayItem.NonObject(paramMeta())
+        override fun definitions() = emptyList<SchemaNode>()
     }
 
     class Array(name: String, isNullable: Boolean, val items: Items, example: Any?) :
