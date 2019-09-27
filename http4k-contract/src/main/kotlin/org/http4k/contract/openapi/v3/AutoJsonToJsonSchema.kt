@@ -41,7 +41,9 @@ class AutoJsonToJsonSchema<NODE : Any>(
         val items = Items(
             json.elements(this)
                 .zip(items(obj)) { node: NODE, value: Any ->
-                    node.toSchema(value, null)
+                    value.javaClass.enumConstants?.let {
+                        node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false)
+                    } ?: node.toSchema(value, null)
                 }
         )
 
