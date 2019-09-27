@@ -165,12 +165,8 @@
             "type": "array"
           },
           "enumVal": {
-            "example": "value2",
-            "enum": [
-              "value1",
-              "value2"
-            ],
-            "type": "string"
+            "$ref": "enumVal",
+            "example": null
           }
         },
         "example": {
@@ -244,6 +240,17 @@
         "required": [
           "uri"
         ]
+      }
+    },
+    {
+      "first": "enumVal",
+      "second": {
+        "example": "value2",
+        "enum": [
+          "value1",
+          "value2"
+        ],
+        "type": "string"
       }
     }
   ]

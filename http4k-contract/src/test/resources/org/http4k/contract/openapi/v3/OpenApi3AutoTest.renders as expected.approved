@@ -865,12 +865,8 @@
       "ArbObject1": {
         "properties": {
           "anotherString": {
-            "example": "bing",
-            "enum": [
-              "bar",
-              "bing"
-            ],
-            "type": "string"
+            "$ref": "anotherString",
+            "example": null
           }
         },
         "example": {
@@ -880,6 +876,14 @@
         "required": [
           "anotherString"
         ]
+      },
+      "anotherString": {
+        "example": "bing",
+        "enum": [
+          "bar",
+          "bing"
+        ],
+        "type": "string"
       },
       "ArbObject3": {
         "properties": {

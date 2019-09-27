@@ -50,7 +50,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toEnumSchema(fieldName: String, param: ParamMeta,
                                   enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
-        SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() })
+        SchemaNode.Reference(fieldName, fieldName,SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() }) )
+
 
     private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean) =
         if (obj is Map<*, *>) toMapSchema(objName, obj, isNullable) else toObjectSchema(objName, obj, isNullable)
@@ -166,7 +167,7 @@ private sealed class SchemaNode(
     class Enum(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?, val enum: List<String>) :
         SchemaNode(name, paramMeta, isNullable, example) {
         val type = paramMeta().value
-        override fun arrayItem() = ArrayItem.NonObject(paramMeta())
+        override fun arrayItem() = ArrayItem.Ref(name())
         override fun definitions() = emptyList<SchemaNode>()
     }
 
@@ -193,7 +194,7 @@ private sealed class SchemaNode(
 
     class Reference(name: String,
                     val `$ref`: String,
-                    private val schemaNode: Object) : SchemaNode(name, ObjectParam, false, null) {
+                    private val schemaNode: SchemaNode) : SchemaNode(name, ObjectParam, false, null) {
         override fun arrayItem() = ArrayItem.Ref(`$ref`)
         override fun definitions() = listOf(schemaNode) + schemaNode.definitions()
     }
