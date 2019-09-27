@@ -865,7 +865,7 @@
       "ArbObject1": {
         "properties": {
           "anotherString": {
-            "$ref": "anotherString",
+            "$ref": "#/components/schemas/Foo",
             "example": null
           }
         },
@@ -877,7 +877,7 @@
           "anotherString"
         ]
       },
-      "anotherString": {
+      "Foo": {
         "example": "bing",
         "enum": [
           "bar",

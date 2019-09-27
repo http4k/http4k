@@ -48,9 +48,10 @@ class AutoJsonToJsonSchema<NODE : Any>(
         return SchemaNode.Array(name, isNullable, items, this)
     }
 
-    private fun NODE.toEnumSchema(fieldName: String, param: ParamMeta,
+    private fun NODE.toEnumSchema(fieldName: String, obj: Any, param: ParamMeta,
                                   enumConstants: Array<Any>, isNullable: Boolean): SchemaNode =
-        SchemaNode.Reference(fieldName, fieldName,SchemaNode.Enum(fieldName, param, isNullable, this, enumConstants.map { it.toString() }) )
+        SchemaNode.Reference(fieldName, "#/$refPrefix/${modelNamer(obj)}",
+            SchemaNode.Enum(modelNamer(obj), param, isNullable, this, enumConstants.map { it.toString() }))
 
 
     private fun NODE.toObjectOrMapSchema(objName: String?, obj: Any, isNullable: Boolean) =
@@ -65,7 +66,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     ObjectParam -> field.toObjectOrMapSchema(fieldName, kField.value, kField.isNullable)
                     else -> with(field) {
                         kField.value.javaClass.enumConstants?.let {
-                            toEnumSchema(fieldName, param, it, kField.isNullable)
+                            toEnumSchema(fieldName, kField.value, param, it, kField.isNullable)
                         } ?: toSchema(fieldName, param, kField.isNullable)
                     }
                 }
@@ -87,7 +88,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
                     ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false)
                     else -> with(field) {
                         value.javaClass.enumConstants?.let {
-                            toEnumSchema(fieldName, param, it, false)
+                            toEnumSchema(fieldName, value, param, it, false)
                         } ?: toSchema(fieldName, param, false)
                     }
                 }

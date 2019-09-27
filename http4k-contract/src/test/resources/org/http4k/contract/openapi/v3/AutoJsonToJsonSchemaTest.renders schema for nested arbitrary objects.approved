@@ -114,7 +114,7 @@
             "type": "array"
           },
           "enumVal": {
-            "$ref": "enumVal",
+            "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.Foo",
             "example": null
           }
         },
@@ -192,7 +192,7 @@
       }
     },
     {
-      "first": "enumVal",
+      "first": "org.http4k.contract.openapi.v3.Foo",
       "second": {
         "example": "value2",
         "enum": [

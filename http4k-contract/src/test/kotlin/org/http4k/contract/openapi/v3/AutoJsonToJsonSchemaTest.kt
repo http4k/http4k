@@ -104,6 +104,11 @@ class AutoJsonToJsonSchemaTest {
         approver.assertApproved(listOf(ArbObject()), null)
     }
 
+//    @Test
+//    fun `renders schema for list of enums`(approver: Approver) {
+//        approver.assertApproved(listOf(Foo.value1, Foo.value2), null)
+//    }
+
     @Test
     fun `renders schema for when cannot find entry`(approver: Approver) {
         approver.assertApproved(JacksonFieldAnnotated(), null)
