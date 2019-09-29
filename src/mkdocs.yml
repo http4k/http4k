@@ -79,8 +79,8 @@ nav:
   - Blog:
     - Meet http4k: blog/meet_http4k/index.md
     - Typesafe Websockets: blog/typesafe_websockets/index.md
-  - Changelog: changelog/index.md
+  - Getting Support: support/index.md
   - Contribute/Support http4k: contributing/index.md
   - API docs: api/index.md
+  - Changelog: changelog/index.md
   - FAQ: faq/index.md
-  - Help & Support: support/index.md
