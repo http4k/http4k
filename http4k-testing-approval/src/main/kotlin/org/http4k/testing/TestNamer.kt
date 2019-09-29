@@ -15,7 +15,7 @@ interface TestNamer {
         }
         val MethodOnly = object : TestNamer {
             override fun nameFor(testClass: Class<*>, testMethod: Method): String =
-                testClass.packageName.replace('.', '/') + '/' + testMethod.name
+                testClass.`package`.name.replace('.', '/') + '/' + testMethod.name
         }
     }
 }
