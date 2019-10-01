@@ -29,8 +29,6 @@ abstract class JsonLibAutoMarshallingJson<NODE : Any> : AutoMarshallingJson(), J
 
     abstract fun <T : Any> asA(j: NODE, target: KClass<T>): T
 
-    inline fun <reified T : Any> NODE.asA(): T = asA(this, T::class)
-
     @JvmName("anyAsJsonObject")
     fun Any.asJsonObject(): NODE = asJsonObject(this)
 

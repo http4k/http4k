@@ -88,15 +88,20 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.fromJson(input, target.java)
     override fun <T : Any> asA(j: JsonElement, target: KClass<T>): T = mapper.fromJson(j, target.java)
 
+    inline fun <reified T : Any> JsonElement.asA(): T = mapper.fromJson(this, object : TypeToken<T>() {}.type)
+
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        jsonHttpBodyLens(description, contentNegotiation).map({ mapper.fromJson(it, object : TypeToken<T>() {}.type) as T }, { mapper.toJson(it) })
+        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.toJson(it) })
 }
 
-class InvalidJsonException(messasge: String, cause: Throwable? = null) : Exception(messasge, cause)
+inline fun <reified T : Any> Gson.read(): (String) -> T =
+    { fromJson(it, object : TypeToken<T>() {}.type) as T }
+
+class InvalidJsonException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
 fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsInt)

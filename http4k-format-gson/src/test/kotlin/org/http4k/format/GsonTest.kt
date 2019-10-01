@@ -8,6 +8,7 @@ import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.with
+import org.http4k.format.Gson.asA
 import org.http4k.format.Gson.auto
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -18,7 +19,14 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
     fun ` roundtrip arbitary object to and from JSON element`() {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
         val out = Gson.asJsonObject(obj)
-        assertThat(Gson.asA(out, ArbObject::class), equalTo(obj))
+        assertThat(asA(out, ArbObject::class), equalTo(obj))
+    }
+
+    @Test
+    fun `roundtrip list of arbitary objects to and from node`() {
+        val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
+
+        assertThat(Gson.asJsonObject(listOf(obj)).asA(), equalTo(listOf(obj)))
     }
 
     @Test
