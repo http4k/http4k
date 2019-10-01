@@ -1,34 +1,13 @@
-title: http4k blog: <todo>.
-description: <todo>
+title: Tutorial: Add a little chaos to your life
+description: How to leverage http4k APIs to harden your apps against remote failures
 
-# <todo>
-
-##### [@daviddenton][github] 
+# Add a little chaos to your life
 
 ## Intro
 
 ## plan
-testing http4k apps
 
--http4k testing i: the basics
-    - http handlers 
-        definition
-        example 
-        test
-        swapping out for a system test
-        
-    - filters
-        definition
-        example
-        test
-
-- http4k testing ii: contract approval testing with okeydoke
-
-- http4k testing iii: fake it off
-    simple fakes
-    in memory
-    on the wire 
-    contract testing
+- 
 
 - http4k testing iv: add a little chaos to your life
     chaos testing with the chaos engine
