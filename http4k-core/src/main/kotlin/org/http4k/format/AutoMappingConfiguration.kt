@@ -15,6 +15,7 @@ import org.http4k.lens.StringBiDiMappings.traceId
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
 import org.http4k.lens.StringBiDiMappings.uuid
+import org.http4k.lens.StringBiDiMappings.yearMonth
 import org.http4k.lens.StringBiDiMappings.zonedDateTime
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -56,6 +57,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(uuid())
     text(regexObject())
     text(instant())
+    text(yearMonth())
     text(localTime())
     text(localDate())
     text(localDateTime())

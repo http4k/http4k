@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.YearMonth
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_INSTANT
@@ -69,6 +70,7 @@ object StringBiDiMappings {
     fun base64() = BiDiMapping(String::base64Decoded, String::base64Encode)
 
     fun instant() = BiDiMapping(Instant::parse, ISO_INSTANT::format)
+    fun yearMonth(formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")) = BiDiMapping({ YearMonth.parse(it, formatter) }, formatter::format)
     fun localTime(formatter: DateTimeFormatter = ISO_LOCAL_TIME) = BiDiMapping({ LocalTime.parse(it, formatter) }, formatter::format)
     fun localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = BiDiMapping({ LocalDate.parse(it, formatter) }, formatter::format)
     fun localDateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = BiDiMapping({ LocalDateTime.parse(it, formatter) }, formatter::format)

@@ -5,9 +5,10 @@ changes with their rationale when appropriate:
 
 ### v3.186.0 (uncut)
 - [all] Update some dependency versions, and changes to various APIs involved (Jackson and Resilience4J)
+- [http4k-core] - Add YearMonth mapping
     
 ### v3.186.0
-- [http4k-core] - rollback a couple of places which were using Java9+ APIs (for no good reason).
+- [http4k-core] - Rollback a couple of places which were using Java9+ APIs (for no good reason).
 
 ### v3.185.0
 - [http4k-contract] Improvements to rendering enums as their own objects in JSON Schema.

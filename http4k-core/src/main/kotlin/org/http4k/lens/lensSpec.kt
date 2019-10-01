@@ -230,6 +230,7 @@ fun <IN : Any> BiDiLensSpec<IN, String>.regexObject() = map(StringBiDiMappings.r
 fun <IN : Any> BiDiLensSpec<IN, String>.duration() = map(StringBiDiMappings.duration())
 fun <IN : Any> BiDiLensSpec<IN, String>.base64() = map(StringBiDiMappings.base64())
 fun <IN : Any> BiDiLensSpec<IN, String>.instant() = map(StringBiDiMappings.instant())
+fun <IN : Any> BiDiLensSpec<IN, String>.yearMonth() = map(StringBiDiMappings.yearMonth())
 fun <IN : Any> BiDiLensSpec<IN, String>.dateTime(formatter: DateTimeFormatter = ISO_LOCAL_DATE_TIME) = map(StringBiDiMappings.localDateTime(formatter))
 fun <IN : Any> BiDiLensSpec<IN, String>.zonedDateTime(formatter: DateTimeFormatter = ISO_ZONED_DATE_TIME) = map(StringBiDiMappings.zonedDateTime(formatter))
 fun <IN : Any> BiDiLensSpec<IN, String>.localDate(formatter: DateTimeFormatter = ISO_LOCAL_DATE) = map(StringBiDiMappings.localDate(formatter))

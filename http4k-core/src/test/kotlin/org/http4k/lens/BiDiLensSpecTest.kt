@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.OffsetTime
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -106,6 +107,9 @@ class BiDiLensSpecTest {
 
     @Test
     fun uri() = checkContract(spec.uri(), Uri.of("http://localhost"), "http://localhost", "", null, "o", "ohttp://localhost", "ohttp://localhosthttp://localhost")
+
+    @Test
+    fun yearMonth() = checkContract(spec.yearMonth(), YearMonth.of(2000, 2), "2000-02", "", "invalid", "o", "o2000-02", "o2000-022000-02")
 
     @Test
     fun bytes() {
