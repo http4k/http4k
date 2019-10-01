@@ -6,7 +6,25 @@
  */
 object Libs {
      /**
-      * http://wiki.fasterxml.com/JacksonExtensionXmlDataBinding
+      * https://aws.amazon.com/lambda/
+      */
+     const val aws_lambda_java_core: String = "com.amazonaws:aws-lambda-java-core:" +
+               Versions.aws_lambda_java_core
+
+     /**
+      * https://aws.amazon.com/lambda/
+      */
+     const val aws_lambda_java_events: String = "com.amazonaws:aws-lambda-java-events:" +
+               Versions.aws_lambda_java_events
+
+     /**
+      * http://github.com/FasterXML/jackson
+      */
+     const val jackson_databind: String = "com.fasterxml.jackson.core:jackson-databind:" +
+               Versions.jackson_databind
+
+     /**
+      * https://github.com/FasterXML/jackson-dataformat-xml
       */
      const val jackson_dataformat_xml: String =
                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:" +
@@ -18,10 +36,6 @@ object Libs {
      const val jackson_module_kotlin: String =
                "com.fasterxml.jackson.module:jackson-module-kotlin:" +
                Versions.jackson_module_kotlin
-
-     const val jackson_databind: String =
-               "com.fasterxml.jackson.core:jackson-databind:" +
-               Versions.jackson_databind
 
      /**
       * https://github.com/javadev/underscore-java
@@ -307,13 +321,4 @@ object Libs {
       * http://www.thymeleaf.org
       */
      const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
-
-     /**
-      * https://github.com/aws/aws-lambda-java-libs/
-      */
-     const val lambda_core: String =
-               "com.amazonaws:aws-lambda-java-core:" + Versions.lambda_core
-
-     const val lambda_events: String =
-               "com.amazonaws:aws-lambda-java-events:" + Versions.lambda_events
 }

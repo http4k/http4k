@@ -46,7 +46,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     override fun JsonNode.asPrettyJsonString(): String = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this)
     override fun JsonNode.asCompactJsonString(): String = mapper.writeValueAsString(this)
     override fun <LIST : Iterable<Pair<String, JsonNode>>> LIST.asJsonObject(): JsonNode =
-        mapper.createObjectNode().also { it.setAll(mapOf(*toList().toTypedArray())) }
+        mapper.createObjectNode().also { it.setAll<JsonNode>(mapOf(*toList().toTypedArray())) }
 
     override fun fields(node: JsonNode) = node.fields().asSequence().map { (key, value) -> key to value }.toList()
 

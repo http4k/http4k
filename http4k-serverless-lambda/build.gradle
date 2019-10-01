@@ -5,8 +5,8 @@ dependencies {
     provided Libs.kotlin_reflect
     provided project(":http4k-core")
 
-    compile Libs.lambda_core
-    compile Libs.lambda_events
+    compile Libs.aws_lambda_java_core
+    compile Libs.aws_lambda_java_events
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile Config.TestDependencies

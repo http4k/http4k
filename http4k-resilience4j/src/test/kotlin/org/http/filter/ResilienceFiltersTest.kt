@@ -9,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.HALF_OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.of
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType
 import io.github.resilience4j.ratelimiter.RateLimiter
 import io.github.resilience4j.ratelimiter.RateLimiterConfig
 import io.github.resilience4j.retry.Retry
@@ -36,8 +37,8 @@ class ResilienceFiltersTest {
     fun `circuit break filter`() {
         val minimumOpenStateApparently = Duration.ofSeconds(1)
         val config = CircuitBreakerConfig.custom()
-            .ringBufferSizeInClosedState(2)
-            .ringBufferSizeInHalfOpenState(2)
+            .slidingWindow(2, 2, SlidingWindowType.COUNT_BASED)
+            .permittedNumberOfCallsInHalfOpenState(2)
             .waitDurationInOpenState(minimumOpenStateApparently)
             .build()
 

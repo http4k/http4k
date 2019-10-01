@@ -9,7 +9,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 object JacksonXml : ConfigurableJacksonXml(KotlinModule().asConfigurableXml()
     .withStandardMappings()
     .done().apply {
-        disableDefaultTyping()
+        deactivateDefaultTyping()
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true)

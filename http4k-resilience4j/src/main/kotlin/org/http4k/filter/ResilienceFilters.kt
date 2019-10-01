@@ -12,6 +12,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.TOO_MANY_REQUESTS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 object ResilienceFilters {
 
@@ -29,7 +30,7 @@ object ResilienceFilters {
                 try {
                     circuitBreaker.executeCallable {
                         next(it).apply {
-                            if (isError(this)) circuitBreaker.onError(0, CircuitError)
+                            if (isError(this)) circuitBreaker.onError(0, MILLISECONDS, CircuitError)
                         }
                     }
                 } catch (e: CallNotPermittedException) {
