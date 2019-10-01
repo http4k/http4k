@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.186.0
+### v3.187.0
 - [all] Update some dependency versions, and changes to various APIs involved (Jackson and Resilience4J)
 - [http4k-core] - Add YearMonth mapping
 - [http4k-format-jackson, http4k-format-gson] [Possible break] - Moved reified `NODE.asA()` method from `JsonLibAutoMarshallingJson` down onto the instances of the `Json` (`ConfigurableJackson`/`ConfigurableGson`). This is so that we can handle generified classes such as lists and maps correctly. (As per the problems fixed in 3.181.0)
