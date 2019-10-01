@@ -63,12 +63,12 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
-    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.json().map({ it.asA<T>() }, { it.asJsonObject() })
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), ::asJsonString)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        jsonHttpBodyLens(description, contentNegotiation).map({ mapper.readValue(it, object : TypeReference<T>() {}) as T }, { mapper.writeValueAsString(it) })
+        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
@@ -84,3 +84,5 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 }
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
+
+inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it, object : TypeReference<T>() {}) as T }

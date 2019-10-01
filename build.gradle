@@ -268,10 +268,10 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         // No version, argo does not seem to keep old versions of javadoc around
         url = new URL("http://argo.sourceforge.net/javadoc/")
     }
-    externalDocumentationLink {
-        def version = Config.jackson_major_minor
-        url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
-    }
+//    externalDocumentationLink {
+//        def version = Config.jackson_major_minor
+//        url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
+//    }
     externalDocumentationLink {
         def version = Config.jackson_major_minor
         url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
