@@ -168,6 +168,22 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
                 returning(Status.SEE_OTHER, Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing)))
             } bindContract Method.PUT to { Response(OK) }
+            routes += "/body_auto_schema_multiple_body_schemas" meta {
+                receiving(Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bar))
+                receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
+                    "s",
+                    ArbObject1(Foo.bar),
+                    listOf(1),
+                    true
+                ))
+                returning(Status.SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
+                returning(Status.SEE_OTHER, Body.auto<ArbObject2>().toLens() to ArbObject2(
+                    "s",
+                    ArbObject1(Foo.bar),
+                    listOf(1),
+                    true
+                ))
+            } bindContract POST to { Response(OK) }
             routes += "/body_auto_map" meta {
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
             } bindContract Method.PUT to { Response(OK) }

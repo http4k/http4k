@@ -229,6 +229,68 @@
         "operationId": "putBasepathBody_auto_schema"
       }
     },
+    "/basepath/body_auto_schema_multiple_body_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "string": "s",
+                "child": {
+                  "anotherString": "bar"
+                },
+                "numbers": [
+                  1
+                ],
+                "bool": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/ArbObject2",
+                "example": null
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "content": {
+              "application/json": {
+                "example": {
+                  "string": "s",
+                  "child": {
+                    "anotherString": "bar"
+                  },
+                  "numbers": [
+                    1
+                  ],
+                  "bool": true
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ArbObject2",
+                  "example": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas"
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
@@ -870,7 +932,7 @@
           }
         },
         "example": {
-          "anotherString": "bing"
+          "anotherString": "bar"
         },
         "type": "object",
         "required": [
@@ -878,7 +940,7 @@
         ]
       },
       "Foo": {
-        "example": "bing",
+        "example": "bar",
         "enum": [
           "bar",
           "bing"

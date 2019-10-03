@@ -211,6 +211,45 @@
         ]
       }
     },
+    "/basepath/body_auto_schema_multiple_body_schemas": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/object1544899175"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "schema": {
+              "$ref": "#/definitions/object-2027516848"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "tags": [
@@ -854,15 +893,35 @@
         }
       }
     },
-    "object1366892779": {
+    "object1544899175": {
       "type": "object",
       "properties": {
-        "uri": {
+        "anotherString": {
           "type": "string",
-          "example": "http://foowang"
+          "example": "bar"
+        }
+      }
+    },
+    "object-2027516848": {
+      "type": "object",
+      "properties": {
+        "string": {
+          "type": "string",
+          "example": "s"
         },
-        "additional": {
-          "$ref": "#/definitions/object490718055"
+        "child": {
+          "$ref": "#/definitions/object1544899175"
+        },
+        "numbers": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "bool": {
+          "type": "boolean",
+          "example": true
         }
       }
     },
@@ -875,12 +934,15 @@
         }
       }
     },
-    "object1544899175": {
+    "object1366892779": {
       "type": "object",
       "properties": {
-        "anotherString": {
+        "uri": {
           "type": "string",
-          "example": "bar"
+          "example": "http://foowang"
+        },
+        "additional": {
+          "$ref": "#/definitions/object490718055"
         }
       }
     },

@@ -203,6 +203,66 @@
         "operationId": "putBasepathBody_auto_schema"
       }
     },
+    "/basepath/body_auto_schema_multiple_body_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "string": "s",
+                "child": {
+                  "anotherString": "bar"
+                },
+                "numbers": [
+                  1
+                ],
+                "bool": true
+              },
+              "schema": {
+                "$ref": "#/components/schemas/object744721296"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "303": {
+            "description": "See Other",
+            "content": {
+              "application/json": {
+                "example": {
+                  "string": "s",
+                  "child": {
+                    "anotherString": "bar"
+                  },
+                  "numbers": [
+                    1
+                  ],
+                  "bool": true
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object744721296"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas"
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "summary": "<unknown>",
