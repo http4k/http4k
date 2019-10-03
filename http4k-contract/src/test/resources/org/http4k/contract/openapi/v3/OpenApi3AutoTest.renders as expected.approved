@@ -252,7 +252,14 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject2",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ArbObject1"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ArbObject2"
+                  }
+                ],
                 "example": null
               }
             }
@@ -275,7 +282,14 @@
                   "bool": true
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/ArbObject2",
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ArbObject1"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArbObject2"
+                    }
+                  ],
                   "example": null
                 }
               }

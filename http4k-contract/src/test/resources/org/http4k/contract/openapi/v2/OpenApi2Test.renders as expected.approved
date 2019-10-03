@@ -238,7 +238,7 @@
           "303": {
             "description": "See Other",
             "schema": {
-              "$ref": "#/definitions/object-2027516848"
+              "$ref": "#/definitions/object-924231513"
             }
           }
         },
@@ -902,7 +902,7 @@
         }
       }
     },
-    "object-2027516848": {
+    "object-924231513": {
       "type": "object",
       "properties": {
         "string": {
