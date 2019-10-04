@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.188.0
-- [http4k-contract] Support multiple-response models in OpenApi2 and 3.
+- [http4k-contract] Support multiple-response models in OpenApi2 and 3. Note that this currently is unsupported in the OpenApi UI due to a bug (which doesn't display the schema for the response correctly). However, the JSON schema is generated correctly in these cases.
 - [all] Update some dependency versions.
 
 ### v3.187.0
