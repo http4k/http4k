@@ -235,7 +235,14 @@
           "303": {
             "description": "See Other",
             "schema": {
-              "$ref": "#/definitions/object1762736786"
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/object1547825812"
+                },
+                {
+                  "$ref": "#/definitions/object1762736786"
+                }
+              ]
             }
           }
         },
@@ -890,6 +897,15 @@
         }
       }
     },
+    "object1547825812": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bing"
+        }
+      }
+    },
     "object1544899175": {
       "type": "object",
       "properties": {
@@ -919,15 +935,6 @@
         "bool": {
           "type": "boolean",
           "example": true
-        }
-      }
-    },
-    "object1547825812": {
-      "type": "object",
-      "properties": {
-        "anotherString": {
-          "type": "string",
-          "example": "bing"
         }
       }
     },
