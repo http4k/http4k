@@ -94,7 +94,7 @@
                 "foo": 123
               },
               "schema": {
-                "$ref": "#/components/schemas/object744721296"
+                "$ref": "#/components/schemas/object490718055"
               }
             }
           },
@@ -168,7 +168,7 @@
                 }
               },
               "schema": {
-                "$ref": "#/components/schemas/object744721296"
+                "$ref": "#/components/schemas/object367178684"
               }
             }
           },
@@ -221,7 +221,7 @@
                   "anotherString": "bing"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object744721296"
+                  "$ref": "#/components/schemas/object1547825812"
                 }
               }
             }
@@ -233,10 +233,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/object744721296"
+                      "$ref": "#/components/schemas/object1547825812"
                     },
                     {
-                      "$ref": "#/components/schemas/object744721296"
+                      "$ref": "#/components/schemas/object367178684"
                     }
                   ]
                 }
@@ -857,11 +857,25 @@
           }
         }
       },
-      "object744721296": {
+      "object490718055": {
         "type": "object",
-        "required": [
-        ],
         "properties": {
+          "foo": {
+            "type": "integer",
+            "example": 123
+          }
+        }
+      },
+      "object367178684": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "example": "http://foowang"
+          },
+          "additional": {
+            "$ref": "#/components/schemas/object490718055"
+          }
         }
       }
     },

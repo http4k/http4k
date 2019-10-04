@@ -163,11 +163,13 @@ class OpenApi3<NODE : Any>(
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             if (example is Array<*>
                 || example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
-            else true
+            else apiRenderer.toSchema(object {}) != schema
 
-        val jsonSchema = example?.let { apiRenderer.toSchema(it, definitionId) }
+        val jsonSchema = example?.
+            let { apiRenderer.toSchema(it, definitionId) }
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
+
         return SchemaContent(jsonSchema, message.bodyString().safeParse())
     }
 

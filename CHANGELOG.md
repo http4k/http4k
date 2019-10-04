@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.188.0 (uncut)
+- [http4k-contract] Support multiple-response models in OpenApi2 and 3.
+
 ### v3.187.0
 - [all] Update some dependency versions, and changes to various APIs involved (Jackson and Resilience4J)
 - [http4k-core] - Add YearMonth support to standard JSON mappings
