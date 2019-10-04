@@ -7,7 +7,6 @@ import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
 import org.http4k.contract.ResponseMeta
-import org.http4k.contract.Root
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.OpenApiExtension
@@ -112,10 +111,6 @@ open class OpenApi2<out NODE>(
 
     private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute)
         : FieldAndDefinitions<NODE> {
-        println(route.describeFor(Root))
-        if ("/body_auto_schema_multiple_body_schemas" == route.describeFor(Root)) {
-            println("")
-        }
 
         val (responses, responseDefinitions) = route.meta.responses.render()
 
