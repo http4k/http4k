@@ -222,23 +222,20 @@
           "application/json"
         ],
         "consumes": [
-          "application/json"
         ],
         "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/object1544899175"
-            }
-          }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/object1547825812"
+            }
+          },
           "303": {
             "description": "See Other",
             "schema": {
-              "$ref": "#/definitions/object-924231513"
+              "$ref": "#/definitions/object1762736786"
             }
           }
         },
@@ -902,7 +899,7 @@
         }
       }
     },
-    "object-924231513": {
+    "object1762736786": {
       "type": "object",
       "properties": {
         "string": {
