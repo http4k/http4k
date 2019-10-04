@@ -2,6 +2,7 @@ package guide.modules.resilience
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,8 +24,8 @@ fun main() {
     // configure the circuit breaker filter here
     val circuitBreaker = CircuitBreaker.of("circuit",
         CircuitBreakerConfig.custom()
-            .ringBufferSizeInClosedState(2)
-            .ringBufferSizeInHalfOpenState(2)
+            .slidingWindow(2, 2, COUNT_BASED)
+            .permittedNumberOfCallsInHalfOpenState(2)
             .waitDurationInOpenState(Duration.ofSeconds(1))
             .build()
     )
