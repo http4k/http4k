@@ -238,59 +238,22 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "string": "s",
-                "child": {
-                  "anotherString": "bar"
-                },
-                "numbers": [
-                  1
-                ],
-                "bool": true
-              },
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ArbObject1"
-                  },
-                  {
-                    "$ref": "#/components/schemas/ArbObject2"
-                  }
-                ],
-                "example": null
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "303": {
             "description": "See Other",
             "content": {
               "application/json": {
-                "example": {
-                  "string": "s",
-                  "child": {
-                    "anotherString": "bar"
-                  },
-                  "numbers": [
-                    1
-                  ],
-                  "bool": true
-                },
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ArbObject1"
+                      "$ref": "#/components/schemas/ArbObject1",
+                      "example": null
                     },
                     {
-                      "$ref": "#/components/schemas/ArbObject2"
+                      "$ref": "#/components/schemas/ArbObject2",
+                      "example": null
                     }
-                  ],
-                  "example": null
+                  ]
                 }
               }
             }

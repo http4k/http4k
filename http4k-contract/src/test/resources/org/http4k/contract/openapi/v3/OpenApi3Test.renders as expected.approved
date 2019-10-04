@@ -212,41 +212,11 @@
         ],
         "parameters": [
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "example": {
-                "string": "s",
-                "child": {
-                  "anotherString": "bar"
-                },
-                "numbers": [
-                  1
-                ],
-                "bool": true
-              },
-              "schema": {
-                "$ref": "#/components/schemas/object744721296"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "303": {
             "description": "See Other",
             "content": {
               "application/json": {
-                "example": {
-                  "string": "s",
-                  "child": {
-                    "anotherString": "bar"
-                  },
-                  "numbers": [
-                    1
-                  ],
-                  "bool": true
-                },
                 "schema": {
                   "$ref": "#/components/schemas/object744721296"
                 }

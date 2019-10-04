@@ -62,7 +62,9 @@ interface HasSchema<NODE> {
     fun definitions(): Iterable<Pair<String, NODE>>
 }
 
+
 sealed class BodyContent {
+
     class NoSchema(paramMeta: ParamMeta) : BodyContent() {
         val schema = mapOf("type" to paramMeta.value)
     }
@@ -70,6 +72,21 @@ sealed class BodyContent {
     class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
+    }
+
+    class OneOfSchemaContent<NODE>(private val schemas: List<BodyContent>) : BodyContent(), HasSchema<NODE> {
+        data class OneOf(val oneOf: List<Any>)
+
+        val schema = OneOf(schemas.mapNotNull {
+            when(it) {
+                is NoSchema -> it.schema
+                is SchemaContent<*> -> it.schema
+                else -> null
+            }
+        })
+        override fun definitions() = schemas
+            .filterIsInstance<HasSchema<NODE>>()
+            .flatMap { it.definitions() }
     }
 
     class FormContent(val schema: FormSchema) : BodyContent() {

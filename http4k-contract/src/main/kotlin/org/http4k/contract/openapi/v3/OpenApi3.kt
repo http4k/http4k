@@ -6,6 +6,7 @@ import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
+import org.http4k.contract.Root
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
@@ -88,6 +89,8 @@ class OpenApi3<NODE : Any>(
         val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
 
+        println(this.describeFor(Root))
+
         return if (method in setOf(GET, DELETE, HEAD) || body == null) {
             ApiPath.NoBody(
                 meta.summary,
@@ -112,8 +115,24 @@ class OpenApi3<NODE : Any>(
         }
     }
 
-    private fun RouteMeta.responses() =
-        responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap()
+    private fun RouteMeta.responses() = responses
+        .groupBy { it.message.status.code.toString() }
+        .map {
+            it.key to
+                ResponseContents<NODE>(it.value
+                    .map { it.description }.toSortedSet().joinToString(","), it.value.collectSchemas())
+        }.toMap()
+
+    private fun List<HttpMessageMeta<Response>>.collectSchemas() = groupBy { CONTENT_TYPE(it.message) }
+        .filterKeys { it == APPLICATION_JSON }
+        .mapValues {
+            when (it.value.size) {
+                1 -> it.value.first().toSchemaContent()
+                else -> BodyContent.OneOfSchemaContent<NODE>(it.value.map { it.toSchemaContent() })
+            }
+        }
+        .mapNotNull { i -> i.key?.let { it.value to i.value } }
+        .toMap()
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
@@ -143,7 +162,7 @@ class OpenApi3<NODE : Any>(
             ?.let { RequestContents(it.toMap()) }
     }
 
-    private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
+    private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             if (example is Array<*>
                 || example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
@@ -153,14 +172,6 @@ class OpenApi3<NODE : Any>(
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
         return SchemaContent(jsonSchema, message.bodyString().safeParse())
-    }
-
-    private fun HttpMessageMeta<Response>.asOpenApiResponse(): ResponseContents<NODE> {
-        val contentTypes = CONTENT_TYPE(message)
-            ?.takeIf { it == APPLICATION_JSON }
-            ?.let { mapOf(it.value to toSchemaContent()) }
-            ?: emptyMap()
-        return ResponseContents(description, contentTypes)
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()
