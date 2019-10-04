@@ -213,6 +213,19 @@
         "parameters": [
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "anotherString": "bing"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object744721296"
+                }
+              }
+            }
+          },
           "303": {
             "description": "See Other",
             "content": {
