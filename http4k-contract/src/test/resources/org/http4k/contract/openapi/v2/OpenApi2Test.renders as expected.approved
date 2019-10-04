@@ -240,7 +240,7 @@
                   "$ref": "#/definitions/object1547825812"
                 },
                 {
-                  "$ref": "#/definitions/object1762736786"
+                  "$ref": "#/definitions/object1366892779"
                 }
               ]
             }
@@ -906,38 +906,6 @@
         }
       }
     },
-    "object1544899175": {
-      "type": "object",
-      "properties": {
-        "anotherString": {
-          "type": "string",
-          "example": "bar"
-        }
-      }
-    },
-    "object1762736786": {
-      "type": "object",
-      "properties": {
-        "string": {
-          "type": "string",
-          "example": "s"
-        },
-        "child": {
-          "$ref": "#/definitions/object1544899175"
-        },
-        "numbers": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "example": 1
-          }
-        },
-        "bool": {
-          "type": "boolean",
-          "example": true
-        }
-      }
-    },
     "object1366892779": {
       "type": "object",
       "properties": {
@@ -947,6 +915,15 @@
         },
         "additional": {
           "$ref": "#/definitions/object490718055"
+        }
+      }
+    },
+    "object1544899175": {
+      "type": "object",
+      "properties": {
+        "anotherString": {
+          "type": "string",
+          "example": "bar"
         }
       }
     },

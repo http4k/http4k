@@ -264,7 +264,7 @@
                       "example": null
                     },
                     {
-                      "$ref": "#/components/schemas/ArbObject2",
+                      "$ref": "#/components/schemas/ArbObject3",
                       "example": null
                     }
                   ]
@@ -923,7 +923,7 @@
           }
         },
         "example": {
-          "anotherString": "bar"
+          "anotherString": "bing"
         },
         "type": "object",
         "required": [
@@ -931,7 +931,7 @@
         ]
       },
       "Foo": {
-        "example": "bar",
+        "example": "bing",
         "enum": [
           "bar",
           "bing"
