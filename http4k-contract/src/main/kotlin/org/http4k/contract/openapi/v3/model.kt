@@ -3,7 +3,6 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.lens.Meta
-import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
 
 data class Api<NODE>(
@@ -63,13 +62,25 @@ interface HasSchema<NODE> {
 }
 
 sealed class BodyContent {
-    class NoSchema(paramMeta: ParamMeta) : BodyContent() {
-        val schema = mapOf("type" to paramMeta.value)
-    }
 
-    class SchemaContent<NODE>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
+    data class NoSchema<NODE : Any>(val schema: NODE) : BodyContent()
+
+    class SchemaContent<NODE : Any>(private val jsonSchema: JsonSchema<NODE>?, val example: NODE?) : BodyContent(), HasSchema<NODE> {
         val schema = jsonSchema?.node
         override fun definitions() = jsonSchema?.definitions ?: emptySet()
+    }
+
+    class OneOfSchemaContent<NODE : Any>(private val schemas: List<BodyContent>) : BodyContent(), HasSchema<NODE> {
+        data class OneOf<NODE>(val oneOf: List<NODE>)
+
+        val schema = OneOf(
+            schemas.filterIsInstance<NoSchema<NODE>>().map { it.schema } +
+                schemas.filterIsInstance<SchemaContent<NODE>>().mapNotNull { it.schema }
+        )
+
+        override fun definitions() = schemas
+            .filterIsInstance<HasSchema<NODE>>()
+            .flatMap { it.definitions() }
     }
 
     class FormContent(val schema: FormSchema) : BodyContent() {

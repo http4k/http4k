@@ -15,14 +15,14 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.FORBIDDEN
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.format.Jackson.auto
@@ -166,11 +166,16 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_schema" meta {
                 receiving(Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
-                returning(Status.SEE_OTHER, Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing)))
-            } bindContract Method.PUT to { Response(OK) }
+                returning(status = SEE_OTHER, body = Body.auto<List<ArbObject1>>().toLens() to listOf(ArbObject1(Foo.bing)))
+            } bindContract PUT to { Response(OK) }
+            routes += "/body_auto_schema_multiple_body_schemas" meta {
+                returning(OK, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
+                returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
+                returning(SEE_OTHER, Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
+            } bindContract POST to { Response(OK) }
             routes += "/body_auto_map" meta {
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
-            } bindContract Method.PUT to { Response(OK) }
+            } bindContract PUT to { Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
             } bindContract POST to { Response(OK) }

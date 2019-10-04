@@ -20,6 +20,7 @@
     "POST:/basepath/returning": "<unknown>",
     "POST:/basepath/body_auto_schema": "<unknown>",
     "PUT:/basepath/body_auto_schema": "<unknown>",
+    "POST:/basepath/body_auto_schema_multiple_body_schemas": "<unknown>",
     "PUT:/basepath/body_auto_map": "<unknown>",
     "POST:/basepath/bearer_auth": "<unknown>"
   }

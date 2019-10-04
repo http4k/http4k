@@ -35,8 +35,8 @@ import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
 
 /**
@@ -112,8 +112,24 @@ class OpenApi3<NODE : Any>(
         }
     }
 
-    private fun RouteMeta.responses() =
-        responses.map { it.message.status.code.toString() to it.asOpenApiResponse() }.toMap()
+    private fun RouteMeta.responses() = responses
+        .groupBy { it.message.status.code.toString() }
+        .map {
+            it.key to
+                ResponseContents<NODE>(it.value
+                    .map { it.description }.toSortedSet().joinToString(","), it.value.collectSchemas())
+        }.toMap()
+
+    private fun List<HttpMessageMeta<Response>>.collectSchemas() = groupBy { CONTENT_TYPE(it.message) }
+        .filterKeys { it == APPLICATION_JSON }
+        .mapValues {
+            when (it.value.size) {
+                1 -> it.value.first().toSchemaContent()
+                else -> BodyContent.OneOfSchemaContent<NODE>(it.value.map { it.toSchemaContent() })
+            }
+        }
+        .mapNotNull { i -> i.key?.let { it.value to i.value } }
+        .toMap()
 
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
@@ -125,7 +141,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
-        val noSchema = consumes.map { it.value to NoSchema(ParamMeta.StringParam) }
+        val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
@@ -143,24 +159,18 @@ class OpenApi3<NODE : Any>(
             ?.let { RequestContents(it.toMap()) }
     }
 
-    private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): SchemaContent<NODE> {
+    private fun HttpMessageMeta<HttpMessage>.toSchemaContent(): BodyContent {
         fun exampleSchemaIsValid(schema: JsonSchema<NODE>) =
             if (example is Array<*>
                 || example is Iterable<*>) !json.fields(schema.node).toMap().containsKey("\$ref")
-            else true
+            else apiRenderer.toSchema(object {}) != schema
 
-        val jsonSchema = example?.let { apiRenderer.toSchema(it, definitionId) }
+        val jsonSchema = example?.
+            let { apiRenderer.toSchema(it, definitionId) }
             ?.takeIf(::exampleSchemaIsValid)
             ?: message.bodyString().toSchema(definitionId)
-        return SchemaContent(jsonSchema, message.bodyString().safeParse())
-    }
 
-    private fun HttpMessageMeta<Response>.asOpenApiResponse(): ResponseContents<NODE> {
-        val contentTypes = CONTENT_TYPE(message)
-            ?.takeIf { it == APPLICATION_JSON }
-            ?.let { mapOf(it.value to toSchemaContent()) }
-            ?: emptyMap()
-        return ResponseContents(description, contentTypes)
+        return SchemaContent(jsonSchema, message.bodyString().safeParse())
     }
 
     private fun String.toSchema(definitionId: String? = null) = safeParse()

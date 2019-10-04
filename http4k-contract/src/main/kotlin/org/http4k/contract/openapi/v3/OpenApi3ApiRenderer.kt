@@ -5,6 +5,7 @@ import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
+import org.http4k.contract.openapi.v3.BodyContent.OneOfSchemaContent
 import org.http4k.contract.openapi.v3.BodyContent.SchemaContent
 import org.http4k.contract.openapi.v3.RequestParameter.PrimitiveParameter
 import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
@@ -14,7 +15,7 @@ import org.http4k.util.JsonSchema
 /**
  * Converts a API to OpenApi3 format JSON.
  */
-class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
+class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRenderer<Api<NODE>, NODE> {
     private val jsonToJsonSchema = JsonToJsonSchema(json, "components/schemas")
 
     override fun api(api: Api<NODE>): NODE =
@@ -90,7 +91,8 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
         obj(
             map {
                 it.key to (
-                    listOf(it.value).filterIsInstance<NoSchema>().map { it.toJson() } +
+                    listOf(it.value).filterIsInstance<OneOfSchemaContent<NODE>>().map { it.toJson() } +
+                    listOf(it.value).filterIsInstance<NoSchema<NODE>>().map { it.toJson() } +
                         listOf(it.value).filterIsInstance<SchemaContent<NODE>>().map { it.toJson() } +
                         listOf(it.value).filterIsInstance<FormContent>().map { it.toJson() }
                     ).firstOrNull().orNullNode()
@@ -98,8 +100,12 @@ class OpenApi3ApiRenderer<NODE>(private val json: Json<NODE>) : ApiRenderer<Api<
         )
     }
 
-    private fun NoSchema.toJson(): NODE = json {
-        obj("schema" to obj(schema.map { it.key to string(it.value) }))
+    private fun NoSchema<NODE>.toJson(): NODE = json {
+        obj("schema" to schema)
+    }
+
+    private fun OneOfSchemaContent<NODE>.toJson(): NODE = json {
+        obj("schema" to obj("oneOf" to array(schema.oneOf)))
     }
 
     private fun SchemaContent<NODE>.toJson(): NODE = json {

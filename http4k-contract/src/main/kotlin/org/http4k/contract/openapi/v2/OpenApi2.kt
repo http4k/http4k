@@ -15,6 +15,7 @@ import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType
 import org.http4k.core.Response
+import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
@@ -53,7 +54,7 @@ open class OpenApi2<out NODE>(
                         "swagger" to string("2.0"),
                         "info" to apiInfo.asJson(),
                         "basePath" to string("/"),
-                        "tags" to array(renderTags(routes)),
+                        "tags" to array(routes.renderTags()),
                         "paths" to obj(fields.sortedBy { it.first }),
                         "securityDefinitions" to (listOfNotNull(security) + routes.mapNotNull { it.meta.security }).combine(),
                         "definitions" to obj(definitions),
@@ -110,7 +111,8 @@ open class OpenApi2<out NODE>(
 
     private fun render(pathSegments: PathSegments, contractSecurity: Security?, route: ContractRoute)
         : FieldAndDefinitions<NODE> {
-        val (responses, responseDefinitions) = render(route.meta.responses)
+
+        val (responses, responseDefinitions) = route.meta.responses.render()
 
         val schema = route.meta.requests.find { Header.CONTENT_TYPE(it.message) == ContentType.APPLICATION_JSON }?.asSchema()
 
@@ -153,17 +155,33 @@ open class OpenApi2<out NODE>(
         JsonSchema(json.obj(), emptySet())
     }
 
-    private fun render(responses: List<HttpMessageMeta<Response>>) = json {
-        (responses.takeIf { it.isNotEmpty() } ?: listOf(
+    private fun List<HttpMessageMeta<Response>>.render() = json {
+        val all = this@render.takeIf { it.isNotEmpty() } ?: listOf(
             ResponseMeta(OK.description, Response(OK))
-        )).fold(FieldsAndDefinitions<NODE>()) { memo, meta ->
-            val (node, definitions) = meta.asSchema()
+        )
+
+        val collected: Map<Status, Pair<String, JsonSchema<NODE>>> = all.groupBy { it.message.status }
+            .mapValues { (_, responses) ->
+                when (responses.size) {
+                    1 -> {
+                        responses.first().run { description to asSchema() }
+                    }
+                    else -> {
+                        val description = responses.map { it.description }.toSortedSet().joinToString(",")
+                        val allSchemas = responses.map { it.asSchema() }
+                        description to JsonSchema(obj("oneOf" to array(allSchemas.map { it.node })), allSchemas.flatMap { it.definitions }.toSet())
+                    }
+                }
+            }
+        collected.entries.fold(FieldsAndDefinitions<NODE>()) { memo, entry ->
+            val (status, descriptionSchema) = entry
+            val (description, schema) = descriptionSchema
 
             memo + FieldAndDefinitions(
-                meta.message.status.code.toString() to obj(
-                    listOf("description" to string(meta.description)) +
-                        if (node == nullNode()) emptyList() else listOf("schema" to node)),
-                definitions)
+                status.code.toString() to obj(
+                    listOf("description" to string(description)) +
+                        if (schema.node == nullNode()) emptyList() else listOf("schema" to schema.node)),
+                schema.definitions)
         }
     }
 
@@ -173,8 +191,7 @@ open class OpenApi2<out NODE>(
         obj("title" to string(title), "version" to string(version), "description" to string(description ?: ""))
     }
 
-    private fun renderTags(routes: List<ContractRoute>) = routes
-        .flatMap(ContractRoute::tags).toSet()
+    private fun List<ContractRoute>.renderTags() = flatMap(ContractRoute::tags).toSet()
         .sortedBy { it.name }
         .map {
             json {
