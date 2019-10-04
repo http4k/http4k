@@ -6,7 +6,6 @@ import org.http4k.contract.ErrorResponseRenderer
 import org.http4k.contract.HttpMessageMeta
 import org.http4k.contract.JsonErrorResponseRenderer
 import org.http4k.contract.PathSegments
-import org.http4k.contract.Root
 import org.http4k.contract.RouteMeta
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.contract.openapi.ApiRenderer
@@ -36,8 +35,8 @@ import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.lens.ParamMeta
 import org.http4k.lens.ParamMeta.ObjectParam
+import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
 
 /**
@@ -88,8 +87,6 @@ class OpenApi3<NODE : Any>(
 
         val security = json(listOfNotNull(meta.security ?: contractSecurity).combineRef())
         val body = meta.requestBody()?.takeIf { it.required }
-
-        println(this.describeFor(Root))
 
         return if (method in setOf(GET, DELETE, HEAD) || body == null) {
             ApiPath.NoBody(
@@ -144,7 +141,7 @@ class OpenApi3<NODE : Any>(
     }
 
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
-        val noSchema = consumes.map { it.value to NoSchema(ParamMeta.StringParam) }
+        val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
         val withSchema = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {

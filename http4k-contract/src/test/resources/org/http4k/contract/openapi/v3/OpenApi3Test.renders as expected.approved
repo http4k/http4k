@@ -218,7 +218,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/object744721296"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/object744721296"
+                    },
+                    {
+                      "$ref": "#/components/schemas/object744721296"
+                    }
+                  ]
                 }
               }
             }
