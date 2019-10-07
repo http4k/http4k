@@ -96,6 +96,6 @@ data class Netty(val port: Int = 8000) : ServerConfig {
             masterGroup.shutdownGracefully()
         }
 
-        override fun port(): Int = if (port > 0) 0 else address.port
+        override fun port(): Int = if (port > 0) port else address.port
     }
 }
