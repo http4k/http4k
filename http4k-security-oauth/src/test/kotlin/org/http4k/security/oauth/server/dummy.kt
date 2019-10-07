@@ -46,6 +46,7 @@ class DummyClientValidator : ClientValidator {
     override fun validateClientId(request: Request, clientId: ClientId): Boolean = true
     override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true
     override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean = true
+    override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean = true
 }
 
 class DummyOAuthAuthRequestTracking : AuthRequestTracking {
@@ -56,7 +57,8 @@ class DummyOAuthAuthRequestTracking : AuthRequestTracking {
 class HardcodedClientValidator(
         private val expectedClientId: ClientId,
         private val expectedRedirectionUri: Uri,
-        private val expectedClientSecret: String = "secret for ${expectedClientId.value}"
+        private val expectedClientSecret: String = "secret for ${expectedClientId.value}",
+        private val expectedScopes: List<String> = emptyList()
 ) : ClientValidator {
     override fun validateClientId(request: Request, clientId: ClientId): Boolean = clientId == this.expectedClientId
 
@@ -65,6 +67,9 @@ class HardcodedClientValidator(
 
     override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String) =
             clientId == expectedClientId && clientSecret == expectedClientSecret
+
+    override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean =
+            scopes.toSet() == expectedScopes.toSet()
 }
 
 class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {

@@ -1,8 +1,6 @@
 package org.http4k.security.oauth.server
 
-import org.http4k.security.oauth.server.RfcError.InvalidClient
-import org.http4k.security.oauth.server.RfcError.InvalidGrant
-import org.http4k.security.oauth.server.RfcError.InvalidRequest
+import org.http4k.security.oauth.server.RfcError.*
 
 
 abstract class OAuthError(val rfcError: RfcError, val description: String)
@@ -12,6 +10,7 @@ enum class RfcError {
     InvalidClient,
     InvalidRequest,
     InvalidGrant,
+    InvalidScope,
     UnsupportedGrantType,
     UnsupportedResponseType;
 
@@ -19,6 +18,7 @@ enum class RfcError {
         get() = when (this) {
             InvalidClient -> "invalid_client"
             InvalidGrant -> "invalid_grant"
+            InvalidScope -> "invalid_scope"
             UnsupportedGrantType -> "unsupported_grant_type"
             UnsupportedResponseType -> "unsupported_response_type"
             AccessDenied -> "access_denied"
@@ -42,5 +42,6 @@ sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuth
 object UserRejectedRequest : AuthorizationError(RfcError.AccessDenied, "The user declined the authorization request")
 object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
+object InvalidScopes : AuthorizationError(InvalidScope, "The specified scopes are invalid")
 data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")
 data class InvalidAuthorizationRequest(val reason: String) : AuthorizationError(InvalidRequest, reason)
