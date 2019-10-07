@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.188.1 (uncut)
+### v3.189.0
 - [http4k-server-netty] Fix reported port in `Netty`. H/T @fantayeneh for the PR :)
+- [http4k-security-oauth] Add `validateScopes()` to `ClientValidator`. H/T  @tom
 
 ### v3.188.0
 - [http4k-contract] Support multiple-response models in OpenApi2 and 3. Note that this currently is unsupported in the OpenApi UI due to a bug (which doesn't display the schema for the response correctly). However, the JSON schema is generated correctly in these cases.
