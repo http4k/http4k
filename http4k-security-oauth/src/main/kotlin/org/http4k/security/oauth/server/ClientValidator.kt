@@ -18,6 +18,11 @@ interface ClientValidator {
     fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean
 
     /**
+     * - scopes are allowed for that client
+     */
+    fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean
+
+    /**
      * Validate that credentials provided by the client match its registration records
      */
     fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean
