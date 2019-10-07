@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Test
 class LibraryTest {
     @Test
     fun `retrieve sorted list of books`() {
-        val remoteApi: HttpHandler = { Response(OK).body("Fahrenheit 451, Brave New World, 1984") }
+        val remoteApi = HttpHandler { Response(OK).body("Fahrenheit 451, Brave New World, 1984") }
         assertThat(Library(remoteApi).titles(), equalTo(listOf("1984", "Brave New World", "Fahrenheit 451")))
     }
 
     @Test
     fun `library call fails`() {
-        val remoteApi: HttpHandler = { Response(INTERNAL_SERVER_ERROR) }
+        val remoteApi: HttpHandler = HttpHandler { Response(INTERNAL_SERVER_ERROR) }
         assertThat({ Library(remoteApi).titles() }, throws<RemoteRequestFailed>())
     }
 }
@@ -33,13 +33,13 @@ class LibraryTest {
 class ServerTest {
     @Test
     fun `retrieve sorted list of books`() {
-        val remoteApi: HttpHandler = { Response(OK).body("Fahrenheit 451, Brave New World, 1984") }
+        val remoteApi = HttpHandler { Response(OK).body("Fahrenheit 451, Brave New World, 1984") }
         assertThat(Server(remoteApi)(Request(GET, "/api/books")), hasStatus(OK).and(hasBody("1984,Brave New World,Fahrenheit 451")))
     }
 
     @Test
     fun `library call fails`() {
-        val remoteApi: HttpHandler = { Response(INTERNAL_SERVER_ERROR) }
+        val remoteApi = HttpHandler { Response(INTERNAL_SERVER_ERROR) }
         assertThat(Server(remoteApi)(Request(GET, "/api/books")), hasStatus(SERVICE_UNAVAILABLE))
     }
 }

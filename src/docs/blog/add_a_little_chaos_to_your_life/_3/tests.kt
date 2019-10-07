@@ -18,13 +18,12 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-fun FakeLibrary(succeed: Boolean): HttpHandler =
-    {
-        when (succeed) {
-            true -> Response(OK).body("Fahrenheit 451, Brave New World, 1984")
-            else -> Response(INTERNAL_SERVER_ERROR)
-        }
+fun FakeLibrary(succeed: Boolean) = HttpHandler {
+    when (succeed) {
+        true -> Response(OK).body("Fahrenheit 451, Brave New World, 1984")
+        else -> Response(INTERNAL_SERVER_ERROR)
     }
+}
 
 class LibraryTest {
     @Test
