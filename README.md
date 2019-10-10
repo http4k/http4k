@@ -119,7 +119,8 @@ plugging together of services without HTTP container being required.
 * [Chaos:](https://http4k.org/guide/modules/chaos) 
     * API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
     
-## Example
+## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)
+
 This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
 
 To install, add these dependencies to your **Gradle** file:
@@ -131,7 +132,7 @@ dependencies {
 }
 ```
 
-This "Hello World" style example ([<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)) demonstrates how to serve and consume HTTP services with dynamic routing:
+This "Hello World" style example demonstrates how to serve and consume HTTP services with dynamic routing:
 
 ```kotlin
 package cookbook
