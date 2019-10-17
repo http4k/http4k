@@ -268,6 +268,8 @@ interface Response : HttpMessage {
 
     override fun body(body: InputStream, length: Long?): Response
 
+    fun status(new: Status): Response
+
     override fun toMessage(): String = listOf("$version $status", headers.toHeaderMessage(), bodyString()).joinToString("\r\n")
 
     companion object {
@@ -288,6 +290,8 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun body(body: Body) = copy(body = body)
 
     override fun body(body: String) = copy(body = Body(body))
+
+    override fun status(new: Status) = copy(status = new)
 
     override fun body(body: InputStream, length: Long?) = copy(body = Body(body, length))
 

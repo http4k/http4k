@@ -3,7 +3,9 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
 class HttpMessageTest {
@@ -12,6 +14,11 @@ class HttpMessageTest {
     fun can_modify_body() {
         val testBody = Body("abc")
         assertThat(Response(OK).body(testBody).body, equalTo(testBody))
+    }
+
+    @Test
+    fun can_modify_status() {
+        assertThat(Response(OK).status(INTERNAL_SERVER_ERROR), hasStatus(INTERNAL_SERVER_ERROR))
     }
 
     @Test
