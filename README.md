@@ -121,7 +121,7 @@ plugging together of services without HTTP container being required.
     
 ## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)
 
-This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point.
+This quick example is designed to convey the simplicity & features of [http4k] . See also the [quickstart](https://http4k.org/quickstart/) for the simplest possible starting point and demonstrates how to serve and consume HTTP services with dynamic routing.
 
 To install, add these dependencies to your **Gradle** file:
 ```groovy
@@ -131,8 +131,6 @@ dependencies {
     compile group: "org.http4k", name: "http4k-client-okhttp", version: "3.189.0"
 }
 ```
-
-This "Hello World" style example demonstrates how to serve and consume HTTP services with dynamic routing:
 
 ```kotlin
 package cookbook
