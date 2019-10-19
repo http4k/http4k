@@ -28,7 +28,7 @@ object Versions {
 
      const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.4"
 
-     const val gson: String = "2.8.5"
+     const val gson: String = "2.8.6"
 
      const val com_jfrog_bintray_gradle_plugin: String = "1.8.4"
 
@@ -38,9 +38,9 @@ object Versions {
 
      const val com_squareup_moshi: String = "1.8.0"
 
-     const val okhttp: String = "4.2.1"
+     const val okhttp: String = "4.2.1" // available: "4.2.2"
 
-     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.6.3"
+     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
      const val io_github_resilience4j: String = "1.1.0"
 
@@ -52,7 +52,7 @@ object Versions {
 
      const val pebble: String = "3.1.0"
 
-     const val io_undertow: String = "2.0.26.Final"
+     const val io_undertow: String = "2.0.27.Final"
 
      const val javax_servlet_api: String = "4.0.1"
 
@@ -76,8 +76,7 @@ object Versions {
 
      const val http2_server: String = "9.4.21.v20190926"
 
-     const val javax_websocket_server_impl: String = "9.4.20.v20190813"
-                // available: "9.4.21.v20190926"
+     const val javax_websocket_server_impl: String = "9.4.21.v20190926"
 
      const val org_eclipse_jetty: String = "9.4.21.v20190926"
 
@@ -85,7 +84,7 @@ object Versions {
 
      const val java_websocket: String = "1.4.0"
 
-     const val dokka_gradle_plugin: String = "0.9.18"
+     const val dokka_gradle_plugin: String = "0.10.0"
 
      const val org_jetbrains_kotlin: String = "1.3.50"
 
@@ -110,7 +109,7 @@ object Versions {
       * See issue 19: How to update Gradle itself?
       * https://github.com/jmfayard/buildSrcVersions/issues/19
       */
-     const val gradleLatestVersion: String = "5.6.2"
+     const val gradleLatestVersion: String = "5.6.3"
 
      const val gradleCurrentVersion: String = "5.5"
 }

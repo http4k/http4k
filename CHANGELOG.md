@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.190.0 (uncut)
 - [http4k-core] Added method to (immutably) modify status on `Response`. H/T @brandon-atkinson for the suggestion
 - [http4k-core] Added composite object support to lens system, allowing creation of simple lenses which draw from several different values (of the same location only - e.g Query/EnvironmentKey)
+- [all] Update some dependency versions.
 
 ### v3.189.0
 - [http4k-server-netty] Fix reported port in `Netty`. H/T @fantayeneh for the PR :)
