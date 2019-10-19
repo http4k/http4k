@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
 import org.http4k.core.Uri
+import org.http4k.core.with
 import org.http4k.lens.BiDiLensContract.checkContract
 import org.http4k.lens.ParamMeta.StringParam
 import org.junit.jupiter.api.Test
@@ -116,5 +117,18 @@ class BiDiLensSpecTest {
         val requiredLens = spec.bytes().required("hello")
         assertThat(String(requiredLens("123")), equalTo("123"))
         assertThat({ requiredLens("") }, throws(lensFailureWith<String>(Missing(requiredLens.meta), overallType = Failure.Type.Missing)))
+    }
+
+    @Test
+    fun `can composite object from several sources and decompose it again`() {
+        data class CompositeObject(val number: Int, val string: String?)
+
+        val lens = spec.composite(
+            { CompositeObject(int().required("")(it), required("")(it)) },
+            { it + number + string }
+        )
+        val expected = CompositeObject(123, "123")
+        assertThat(lens("123"), equalTo(expected))
+        assertThat("prefix".with(lens of expected), equalTo("prefix123123"))
     }
 }
