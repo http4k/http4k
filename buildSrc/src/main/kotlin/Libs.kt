@@ -321,4 +321,9 @@ object Libs {
       * http://www.thymeleaf.org
       */
      const val thymeleaf: String = "org.thymeleaf:thymeleaf:" + Versions.thymeleaf
+
+     /**
+      * https://github.com/neuland/jade4j
+      */
+     const val jade4j: String = "de.neuland-bfi:jade4j:" + Versions.jade4j
 }

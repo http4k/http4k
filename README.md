@@ -82,6 +82,7 @@ plugging together of services without HTTP container being required.
         * **Handlebars** 
         * **Pebble**
         * **Thymeleaf**
+        * **Jade4j**
     * Caching and **Hot-Reload** template support
 * **Message formats:** 
     * Consistent API provides first class support for marshalling formats to/from HTTP messages for:
