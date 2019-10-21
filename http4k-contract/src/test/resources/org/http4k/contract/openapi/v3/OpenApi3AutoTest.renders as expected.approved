@@ -149,7 +149,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject2",
+                "$ref": "#/components/schemas/someOtherId",
                 "example": null
               }
             }
@@ -227,6 +227,45 @@
           }
         ],
         "operationId": "putBasepathBody_auto_schema"
+      }
+    },
+    "/basepath/body_auto_schema_merge_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/impl1",
+                      "example": null
+                    },
+                    {
+                      "$ref": "#/components/schemas/impl2",
+                      "example": null
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_merge_schemas"
       }
     },
     "/basepath/body_auto_schema_multiple_body_schemas": {
@@ -869,7 +908,7 @@
           }
         }
       },
-      "ArbObject2": {
+      "someOtherId": {
         "properties": {
           "string": {
             "example": "s",
@@ -974,6 +1013,70 @@
         "required": [
           "additional",
           "uri"
+        ]
+      },
+      "impl1": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl1",
+            "example": null
+          }
+        },
+        "example": {
+          "obj": {
+            "value": "bob"
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl1": {
+        "properties": {
+          "value": {
+            "example": "bob",
+            "type": "string"
+          }
+        },
+        "example": {
+          "value": "bob"
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      },
+      "impl2": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl2",
+            "example": null
+          }
+        },
+        "example": {
+          "obj": {
+            "value": 123
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl2": {
+        "properties": {
+          "value": {
+            "example": 123,
+            "type": "number"
+          }
+        },
+        "example": {
+          "value": 123
+        },
+        "type": "object",
+        "required": [
+          "value"
         ]
       }
     },

@@ -173,6 +173,11 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
                 returning(SEE_OTHER, Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
             } bindContract POST to { Response(OK) }
+            routes += "/body_auto_schema_merge_schemas" meta {
+                val toLens = Body.auto<InterfaceHolder>().toLens()
+                returning(OK, toLens to InterfaceHolder(Impl1()), definitionId = "impl1")
+                returning(OK, toLens to InterfaceHolder(Impl2()), definitionId = "impl2")
+            } bindContract POST to { Response(OK) }
             routes += "/body_auto_map" meta {
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
             } bindContract PUT to { Response(OK) }
@@ -208,3 +213,8 @@ enum class Foo {
 data class ArbObject1(val anotherString: Foo)
 data class ArbObject2(val string: String, val child: ArbObject1?, val numbers: List<Int>, val bool: Boolean)
 data class ArbObject3(val uri: Uri, val additional: Map<String, *>)
+
+interface ObjInterface
+data class Impl1(val value: String = "bob") : ObjInterface
+data class Impl2(val value: Int = 123) : ObjInterface
+data class InterfaceHolder(val obj: ObjInterface)
