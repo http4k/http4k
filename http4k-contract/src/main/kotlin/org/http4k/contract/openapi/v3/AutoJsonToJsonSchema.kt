@@ -29,7 +29,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
 
     private fun NODE.toSchema(value: Any, objName: String?, topLevel: Boolean) =
         when (val param = json.typeOf(this).toParam()) {
-            ArrayParam -> toArraySchema("", value, false, topLevel)
+            ArrayParam -> toArraySchema("", value, false)
             ObjectParam -> toObjectOrMapSchema(objName, value, false, topLevel)
             else -> toSchema("", param, false)
         }
@@ -37,13 +37,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
     private fun NODE.toSchema(name: String, paramMeta: ParamMeta, isNullable: Boolean) =
         SchemaNode.Primitive(name, paramMeta, isNullable, this)
 
-    private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean, topLevel: Boolean): SchemaNode.Array {
+    private fun NODE.toArraySchema(name: String, obj: Any, isNullable: Boolean): SchemaNode.Array {
         val items = Items(
             json.elements(this)
                 .zip(items(obj)) { node: NODE, value: Any ->
                     value.javaClass.enumConstants?.let {
                         node.toEnumSchema("", it[0], json.typeOf(node).toParam(), it, false)
-                    } ?: node.toSchema(value, null, topLevel)
+                    } ?: node.toSchema(value, null, false)
                 }
         )
 
@@ -64,7 +64,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { Triple(it.first, it.second, fieldRetrieval(obj, it.first)) }
             .map { (fieldName, field, kField) ->
                 when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, kField.value, kField.isNullable, false)
+                    ArrayParam -> field.toArraySchema(fieldName, kField.value, kField.isNullable)
                     ObjectParam -> field.toObjectOrMapSchema(fieldName, kField.value, kField.isNullable, false)
                     else -> with(field) {
                         kField.value.javaClass.enumConstants
@@ -88,7 +88,7 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
             .map { (fieldName, field, value) ->
                 when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, value, false, false)
+                    ArrayParam -> field.toArraySchema(fieldName, value, false)
                     ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false, false)
                     else -> with(field) {
                         value.javaClass.enumConstants?.let {
