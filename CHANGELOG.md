@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.190.0 (uncut)
+### v3.190.0
 - [http4k-core] Added method to (immutably) modify status on `Response`. H/T @brandon-atkinson for the suggestion
 - [http4k-core] Added composite object support to lens system, allowing creation of simple lenses which draw from several different values (of the same location only - e.g Query/EnvironmentKey)
 - [http4k-contract] Support for overriding the entity definition id in JSON schema generation
