@@ -13,7 +13,6 @@ import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.Render
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
-import org.http4k.contract.openapi.v2.JsonToJsonSchema
 import org.http4k.contract.openapi.v3.BodyContent.FormContent
 import org.http4k.contract.openapi.v3.BodyContent.FormContent.FormSchema
 import org.http4k.contract.openapi.v3.BodyContent.NoSchema
