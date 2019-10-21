@@ -39,6 +39,10 @@
                   },
                   "example": null,
                   "type": "object"
+                },
+                "key4": {
+                  "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
+                  "example": null
                 }
               },
               "example": {
@@ -48,13 +52,17 @@
                   "inner": {
                     "uri": "foobar"
                   }
+                },
+                "key4": {
+                  "uri": "foobar"
                 }
               },
               "type": "object",
               "required": [
                 "key",
                 "key2",
-                "key3"
+                "key3",
+                "key4"
               ]
             },
             "example": null,
@@ -69,6 +77,9 @@
               "inner": {
                 "uri": "foobar"
               }
+            },
+            "key4": {
+              "uri": "foobar"
             }
           }
         },

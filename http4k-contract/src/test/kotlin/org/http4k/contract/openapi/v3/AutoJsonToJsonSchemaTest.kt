@@ -79,6 +79,14 @@ class AutoJsonToJsonSchemaTest {
         ), "foobar")
     }
 
+    @Test
+    fun `can override definition id for a raw map`(approver: Approver) {
+        approver.assertApproved(mapOf(
+            "key" to "value",
+            "key2" to 123,
+            "key3" to mapOf("inner" to ArbObject2())
+        ), "foobar")
+    }
 
     @Test
     fun `renders schema for various json primitives`(approver: Approver) {
@@ -101,8 +109,19 @@ class AutoJsonToJsonSchemaTest {
             mapOf(
                 "key" to "value",
                 "key2" to 123,
-                "key3" to mapOf("inner" to ArbObject2())
+                "key3" to mapOf("inner" to ArbObject2()),
+                "key4" to ArbObject2()
             )
+        ))
+    }
+
+    @Test
+    fun `renders schema for raw map field`(approver: Approver) {
+        approver.assertApproved(mapOf(
+            "key" to "value",
+            "key2" to 123,
+            "key3" to mapOf("inner" to ArbObject2()),
+            "key4" to ArbObject2()
         ))
     }
 
