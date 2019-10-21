@@ -94,7 +94,7 @@
                 "foo": 123
               },
               "schema": {
-                "$ref": "#/components/schemas/object490718055"
+                "$ref": "#/components/schemas/object-1898199891"
               }
             }
           },
@@ -168,7 +168,7 @@
                 }
               },
               "schema": {
-                "$ref": "#/components/schemas/object367178684"
+                "$ref": "#/components/schemas/object-444827817"
               }
             }
           },
@@ -187,7 +187,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/object1547825812"
+                    "$ref": "#/components/schemas/object-841092134"
                   }
                 }
               }
@@ -221,7 +221,7 @@
                   "anotherString": "bing"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1547825812"
+                  "$ref": "#/components/schemas/object-841092134"
                 }
               }
             }
@@ -233,10 +233,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/object1547825812"
+                      "$ref": "#/components/schemas/object-841092134"
                     },
                     {
-                      "$ref": "#/components/schemas/object367178684"
+                      "$ref": "#/components/schemas/object-444827817"
                     }
                   ]
                 }
@@ -251,6 +251,43 @@
           }
         ],
         "operationId": "postBasepathBody_auto_schema_multiple_body_schemas"
+      }
+    },
+    "/basepath/body_auto_schema_name_definition_id": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/impl1"
+                    },
+                    {
+                      "$ref": "#/components/schemas/impl2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_name_definition_id"
       }
     },
     "/basepath/body_form": {
@@ -391,7 +428,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-1365611171"
+                  "$ref": "#/components/schemas/object540438179"
                 }
               }
             }
@@ -784,7 +821,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1283926341"
+                  "$ref": "#/components/schemas/object-1104991605"
                 }
               }
             }
@@ -802,15 +839,6 @@
   },
   "components": {
     "schemas": {
-      "object-1365611171": {
-        "type": "object",
-        "properties": {
-          "aNumberField": {
-            "type": "integer",
-            "example": 123
-          }
-        }
-      },
       "object540438179": {
         "type": "object",
         "required": [
@@ -832,8 +860,10 @@
           }
         }
       },
-      "object1283926341": {
+      "object-1104991605": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "aString": {
             "type": "string",
@@ -848,8 +878,10 @@
         "properties": {
         }
       },
-      "object1547825812": {
+      "object-841092134": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "anotherString": {
             "type": "string",
@@ -857,8 +889,10 @@
           }
         }
       },
-      "object490718055": {
+      "object-1898199891": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "foo": {
             "type": "integer",
@@ -866,16 +900,32 @@
           }
         }
       },
-      "object367178684": {
+      "object-444827817": {
         "type": "object",
+        "required": [
+        ],
         "properties": {
           "uri": {
             "type": "string",
             "example": "http://foowang"
           },
           "additional": {
-            "$ref": "#/components/schemas/object490718055"
+            "$ref": "#/components/schemas/object-1898199891"
           }
+        }
+      },
+      "impl1": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+        }
+      },
+      "impl2": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
         }
       }
     },

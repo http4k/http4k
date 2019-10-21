@@ -149,7 +149,7 @@
                 "bool": true
               },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject2",
+                "$ref": "#/components/schemas/someOtherId",
                 "example": null
               }
             }
@@ -280,6 +280,45 @@
           }
         ],
         "operationId": "postBasepathBody_auto_schema_multiple_body_schemas"
+      }
+    },
+    "/basepath/body_auto_schema_name_definition_id": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/impl1",
+                      "example": null
+                    },
+                    {
+                      "$ref": "#/components/schemas/impl2",
+                      "example": null
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_name_definition_id"
       }
     },
     "/basepath/body_form": {
@@ -421,7 +460,7 @@
                   "aNumberField": 123
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object1482787387"
+                  "$ref": "#/components/schemas/object1089648089"
                 }
               }
             }
@@ -814,7 +853,7 @@
                   "aString": "a message of some kind"
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/object-1662053258"
+                  "$ref": "#/components/schemas/object-2055192556"
                 }
               }
             }
@@ -832,23 +871,6 @@
   },
   "components": {
     "schemas": {
-      "object1482787387": {
-        "type": "object",
-        "properties": {
-          "aNumberField": {
-            "type": "integer",
-            "example": 123
-          }
-        }
-      },
-      "someDefinitionId": {
-        "type": "object",
-        "properties": {
-          "anAnotherObject": {
-            "$ref": "#/components/schemas/object1482787387"
-          }
-        }
-      },
       "object1089648089": {
         "type": "object",
         "required": [
@@ -860,8 +882,20 @@
           }
         }
       },
-      "object-1662053258": {
+      "someDefinitionId": {
         "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "anAnotherObject": {
+            "$ref": "#/components/schemas/object1089648089"
+          }
+        }
+      },
+      "object-2055192556": {
+        "type": "object",
+        "required": [
+        ],
         "properties": {
           "aString": {
             "type": "string",
@@ -869,7 +903,7 @@
           }
         }
       },
-      "ArbObject2": {
+      "someOtherId": {
         "properties": {
           "string": {
             "example": "s",
@@ -974,6 +1008,70 @@
         "required": [
           "additional",
           "uri"
+        ]
+      },
+      "impl1": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl1",
+            "example": null
+          }
+        },
+        "example": {
+          "obj": {
+            "value": "bob"
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl1": {
+        "properties": {
+          "value": {
+            "example": "bob",
+            "type": "string"
+          }
+        },
+        "example": {
+          "value": "bob"
+        },
+        "type": "object",
+        "required": [
+          "value"
+        ]
+      },
+      "impl2": {
+        "properties": {
+          "obj": {
+            "$ref": "#/components/schemas/Impl2",
+            "example": null
+          }
+        },
+        "example": {
+          "obj": {
+            "value": 123
+          }
+        },
+        "type": "object",
+        "required": [
+          "obj"
+        ]
+      },
+      "Impl2": {
+        "properties": {
+          "value": {
+            "example": 123,
+            "type": "number"
+          }
+        },
+        "example": {
+          "value": 123
+        },
+        "type": "object",
+        "required": [
+          "value"
         ]
       }
     },

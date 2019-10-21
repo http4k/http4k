@@ -254,6 +254,43 @@
         ]
       }
     },
+    "/basepath/body_auto_schema_name_definition_id": {
+      "post": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "postBasepathBody_auto_schema_name_definition_id",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/impl1"
+                },
+                {
+                  "$ref": "#/definitions/impl2"
+                }
+              ]
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/body_form": {
       "post": {
         "tags": [
@@ -894,6 +931,40 @@
         "foo": {
           "type": "integer",
           "example": 123
+        }
+      }
+    },
+    "object1506938668": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "example": "bob"
+        }
+      }
+    },
+    "impl1": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/object1506938668"
+        }
+      }
+    },
+    "object-336243684": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "example": 123
+        }
+      }
+    },
+    "impl2": {
+      "type": "object",
+      "properties": {
+        "obj": {
+          "$ref": "#/definitions/object-336243684"
         }
       }
     },
