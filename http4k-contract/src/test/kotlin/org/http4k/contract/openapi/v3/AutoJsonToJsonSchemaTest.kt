@@ -64,6 +64,11 @@ class AutoJsonToJsonSchemaTest {
     )
 
     @Test
+    fun `can override definition id`(approver: Approver) {
+        approver.assertApproved(JsonPrimitives(), "foobar")
+    }
+
+    @Test
     fun `renders schema for various json primitives`(approver: Approver) {
         approver.assertApproved(JsonPrimitives(), null)
     }
