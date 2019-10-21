@@ -99,8 +99,13 @@ class AutoJsonToJsonSchema<NODE : Any>(
             }
             .map { it.name() to it }.toMap()
 
-        return SchemaNode.MapType(objName ?: modelNamer(obj), isNullable,
-            SchemaNode.Object(modelNamer(obj), isNullable, properties, this))
+        return if (topLevel && objName != null) {
+            SchemaNode.Reference(objName, "#/$refPrefix/$objName",
+                SchemaNode.Object(objName, isNullable, properties, this)
+            )
+        } else
+            SchemaNode.MapType(objName ?: modelNamer(obj), isNullable,
+                SchemaNode.Object(modelNamer(obj), isNullable, properties, this))
     }
 
     private fun toJsonKey(it: Any): String {
