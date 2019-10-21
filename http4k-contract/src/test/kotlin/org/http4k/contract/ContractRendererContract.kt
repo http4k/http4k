@@ -173,7 +173,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 returning(SEE_OTHER, Body.auto<ArbObject1>().toLens() to ArbObject1(Foo.bing))
                 returning(SEE_OTHER, Body.auto<ArbObject3>().toLens() to ArbObject3(Uri.of("http://foowang"), mapOf("foo" to 123)))
             } bindContract POST to { Response(OK) }
-            routes += "/body_auto_schema_merge_schemas" meta {
+            routes += "/body_auto_schema_name_definition_id" meta {
                 val toLens = Body.auto<InterfaceHolder>().toLens()
                 returning(OK, toLens to InterfaceHolder(Impl1()), definitionId = "impl1")
                 returning(OK, toLens to InterfaceHolder(Impl2()), definitionId = "impl2")
