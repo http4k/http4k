@@ -14,7 +14,7 @@
           "additionalProperties": {
             "properties": {
               "inner": {
-                "$ref": "#/customPrefix/inner",
+                "$ref": "#/customPrefix/org.http4k.contract.openapi.v3.ArbObject2",
                 "example": null
               }
             },
@@ -53,7 +53,7 @@
   },
   "definitions": [
     {
-      "first": "inner",
+      "first": "org.http4k.contract.openapi.v3.ArbObject2",
       "second": {
         "properties": {
           "uri": {

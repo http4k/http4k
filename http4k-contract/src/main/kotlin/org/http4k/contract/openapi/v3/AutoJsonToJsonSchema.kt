@@ -88,8 +88,8 @@ class AutoJsonToJsonSchema<NODE : Any>(
             .map { Triple(it.first, it.second, objWithStringKeys[it.first]!!) }
             .map { (fieldName, field, value) ->
                 when (val param = json.typeOf(field).toParam()) {
-                    ArrayParam -> field.toArraySchema(fieldName, value, false, topLevel)
-                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false, topLevel)
+                    ArrayParam -> field.toArraySchema(fieldName, value, false, false)
+                    ObjectParam -> field.toObjectOrMapSchema(fieldName, value, false, false)
                     else -> with(field) {
                         value.javaClass.enumConstants?.let {
                             toEnumSchema(fieldName, value, param, it, false)
