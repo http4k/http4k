@@ -69,18 +69,30 @@ class AutoJsonToJsonSchemaTest {
     }
 
     @Test
+    fun `can override definition id for a map`(approver: Approver) {
+        approver.assertApproved(MapHolder(
+            mapOf(
+                "key" to "value",
+                "key2" to 123,
+                "key3" to mapOf("inner" to ArbObject2())
+            )
+        ), "foobar")
+    }
+
+
+    @Test
     fun `renders schema for various json primitives`(approver: Approver) {
-        approver.assertApproved(JsonPrimitives(), null)
+        approver.assertApproved(JsonPrimitives())
     }
 
     @Test
     fun `renders schema for nested arbitrary objects`(approver: Approver) {
-        approver.assertApproved(ArbObject(), null)
+        approver.assertApproved(ArbObject())
     }
 
     @Test
     fun `renders schema for recursive objects`(approver: Approver) {
-        approver.assertApproved(RecursiveObject(listOf(RecursiveObject())), null)
+        approver.assertApproved(RecursiveObject(listOf(RecursiveObject())))
     }
 
     @Test
@@ -91,32 +103,32 @@ class AutoJsonToJsonSchemaTest {
                 "key2" to 123,
                 "key3" to mapOf("inner" to ArbObject2())
             )
-        ), null)
+        ))
     }
 
     @Test
     fun `renders schema for non-string-keyed map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.of(1970, 1, 1) to "value")), null)
+        approver.assertApproved(MapHolder(mapOf(Foo.value1 to "value", LocalDate.of(1970, 1, 1) to "value")))
     }
 
     @Test
     fun `renders schema for freeform map field`(approver: Approver) {
-        approver.assertApproved(MapHolder(emptyMap()), null)
+        approver.assertApproved(MapHolder(emptyMap()))
     }
 
     @Test
     fun `renders schema for top level list`(approver: Approver) {
-        approver.assertApproved(listOf(ArbObject()), null)
+        approver.assertApproved(listOf(ArbObject()))
     }
 
     @Test
     fun `renders schema for list of enums`(approver: Approver) {
-        approver.assertApproved(listOf(Foo.value1, Foo.value2), null)
+        approver.assertApproved(listOf(Foo.value1, Foo.value2))
     }
 
     @Test
     fun `renders schema for when cannot find entry`(approver: Approver) {
-        approver.assertApproved(JacksonFieldAnnotated(), null)
+        approver.assertApproved(JacksonFieldAnnotated())
     }
 
     @Test
@@ -129,11 +141,11 @@ class AutoJsonToJsonSchemaTest {
 
         approver.assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
-            .body(Jackson.asJsonString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder(), null))))
+            .body(Jackson.asJsonString(AutoJsonToJsonSchema(json).toSchema(ArbObjectHolder()))))
     }
 
 
-    private fun Approver.assertApproved(obj: Any, name: String?) {
+    private fun Approver.assertApproved(obj: Any, name: String? = null) {
         assertApproved(Response(OK)
             .with(CONTENT_TYPE of APPLICATION_JSON)
             .body(Jackson.asJsonString(creator.toSchema(obj, name))))
