@@ -16,12 +16,12 @@ import java.util.concurrent.ConcurrentHashMap
 class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfiguration()) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         configure.templateLoader = ClasspathTemplateLoader()
-        configure.basePath = if(baseClasspathPackage.isEmpty()) "/"
-                else baseClasspathPackage.replace('.', '/')
+        val basePath = if(baseClasspathPackage.isEmpty()) ""
+                else baseClasspathPackage.replace('.', '/') + "/"
 
         return fun(viewModel: ViewModel): String {
             try {
-                val template = configure.getTemplate(viewModel.template())
+                val template = configure.getTemplate(basePath + viewModel.template())
                 return configure.renderTemplate(template, mutableMapOf<String, Any>( Pair("model", viewModel) ))
             }  catch (e: NullPointerException) {
                 throw ViewNotFound(viewModel)
