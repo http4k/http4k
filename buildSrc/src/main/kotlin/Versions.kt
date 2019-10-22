@@ -104,6 +104,8 @@ object Versions {
 
      const val thymeleaf: String = "3.0.11.RELEASE"
 
+     const val jade4j: String = "1.2.7"
+
      /**
       *
       * See issue 19: How to update Gradle itself?

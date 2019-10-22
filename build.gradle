@@ -220,6 +220,7 @@ dependencies {
     provided project(":http4k-template-pebble")
     provided project(":http4k-template-thymeleaf")
     provided project(":http4k-template-dust")
+    provided project(":http4k-template-jade4j")
     provided project(":http4k-testing-approval")
     provided project(":http4k-testing-chaos")
     provided project(":http4k-testing-hamkrest")
