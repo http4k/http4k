@@ -2,6 +2,7 @@ package org.http4k.template
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import de.neuland.jade4j.JadeConfiguration
 import org.junit.jupiter.api.Test
 
 class Jade4jTemplatesTest : TemplatesContract<Jade4jTemplates>(Jade4jTemplates()) {
