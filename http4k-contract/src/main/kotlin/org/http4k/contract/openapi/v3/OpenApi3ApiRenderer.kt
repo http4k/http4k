@@ -70,7 +70,8 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
                 if (this@toJson is ApiPath.WithBody<NODE>) this@toJson.requestBody.asJson() else null,
                 "responses" to responses.asJson(),
                 "security" to security,
-                "operationId" to operationId.asJson()
+                "operationId" to operationId.asJson(),
+                "deprecated" to boolean(deprecated)
             )
         )
     }

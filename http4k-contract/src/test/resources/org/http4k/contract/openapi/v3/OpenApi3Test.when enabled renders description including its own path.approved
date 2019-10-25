@@ -25,7 +25,8 @@
             ]
           }
         ],
-        "operationId": "get"
+        "operationId": "get",
+        "deprecated": false
       }
     },
     "/docs": {
@@ -45,7 +46,8 @@
             ]
           }
         ],
-        "operationId": "description"
+        "operationId": "description",
+        "deprecated": false
       }
     }
   },

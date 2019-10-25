@@ -42,6 +42,7 @@ class RouteMetaDsl internal constructor() {
     var operationId: String? = null
     var security: Security? = null
     var preFlightExtraction: PreFlightExtraction? = null
+    internal var deprecated: Boolean = false
 
     /**
      * Add possible responses to this Route.
@@ -109,11 +110,15 @@ class RouteMetaDsl internal constructor() {
         requestBody = bodyLens
         receiving(RequestMeta(Request(POST, "").with(Header.CONTENT_TYPE of bodyLens.contentType)))
     }
+
+    fun markAsDeprecated() {
+        deprecated = true
+    }
 }
 
 fun routeMetaDsl(fn: RouteMetaDsl.() -> Unit = {}) = RouteMetaDsl().apply(fn).run {
     RouteMeta(
-        summary, description, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all + cookies.all, requests.all, responses.all, preFlightExtraction, security, operationId
+        summary, description, tags.all.toSet(), requestBody, produces.all.toSet(), consumes.all.toSet(), queries.all + headers.all + cookies.all, requests.all, responses.all, preFlightExtraction, security, operationId, deprecated
     )
 }
 
@@ -130,4 +135,5 @@ data class RouteMeta(val summary: String = "<unknown>",
                      val responses: List<HttpMessageMeta<Response>> = emptyList(),
                      val preFlightExtraction: PreFlightExtraction? = null,
                      val security: Security? = null,
-                     val operationId: String? = null)
+                     val operationId: String? = null,
+                     val deprecated: Boolean = false)

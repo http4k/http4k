@@ -84,6 +84,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 operationId = "echoMessage"
                 tags += Tag("tag3")
                 tags += Tag("tag1")
+                markAsDeprecated()
             } bindContract GET to { Response(OK) }
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> { Response(OK).body(a) } }
             routes += "/queries" meta {

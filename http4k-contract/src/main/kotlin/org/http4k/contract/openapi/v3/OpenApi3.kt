@@ -95,7 +95,8 @@ class OpenApi3<NODE : Any>(
                 asOpenApiParameters(),
                 meta.responses(),
                 security,
-                operationId(contractRoot)
+                operationId(contractRoot),
+                meta.deprecated
             )
         } else {
             ApiPath.WithBody(
@@ -106,7 +107,8 @@ class OpenApi3<NODE : Any>(
                 body,
                 meta.responses(),
                 security,
-                operationId(contractRoot)
+                operationId(contractRoot),
+                meta.deprecated
             )
         }
     }

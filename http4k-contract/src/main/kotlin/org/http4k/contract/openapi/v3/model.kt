@@ -26,7 +26,8 @@ sealed class ApiPath<NODE>(
     val parameters: List<RequestParameter<NODE>>,
     val responses: Map<String, ResponseContents<NODE>>,
     val security: NODE,
-    val operationId: String
+    val operationId: String,
+    val deprecated: Boolean
 ) {
     open fun definitions() = listOfNotNull(
         responses.flatMap { it.value.definitions() },
@@ -40,8 +41,9 @@ sealed class ApiPath<NODE>(
         parameters: List<RequestParameter<NODE>>,
         responses: Map<String, ResponseContents<NODE>>,
         security: NODE,
-        operationId: String
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId)
+        operationId: String,
+        deprecated: Boolean
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated)
 
     class WithBody<NODE>(
         summary: String,
@@ -51,8 +53,9 @@ sealed class ApiPath<NODE>(
         val requestBody: RequestContents<NODE>,
         responses: Map<String, ResponseContents<NODE>>,
         security: NODE,
-        operationId: String
-    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId) {
+        operationId: String,
+        deprecated: Boolean
+    ) : ApiPath<NODE>(summary, description, tags, parameters, responses, security, operationId, deprecated) {
         override fun definitions() = super.definitions() + requestBody.definitions().toList()
     }
 }

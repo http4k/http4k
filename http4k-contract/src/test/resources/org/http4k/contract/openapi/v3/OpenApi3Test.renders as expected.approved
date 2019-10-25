@@ -35,7 +35,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathAnd_auth"
+        "operationId": "postBasepathAnd_auth",
+        "deprecated": false
       }
     },
     "/basepath/basic_auth": {
@@ -55,7 +56,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBasic_auth"
+        "operationId": "postBasepathBasic_auth",
+        "deprecated": false
       }
     },
     "/basepath/bearer_auth": {
@@ -75,7 +77,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBearer_auth"
+        "operationId": "postBasepathBearer_auth",
+        "deprecated": false
       }
     },
     "/basepath/body_auto_map": {
@@ -108,7 +111,8 @@
             ]
           }
         ],
-        "operationId": "putBasepathBody_auto_map"
+        "operationId": "putBasepathBody_auto_map",
+        "deprecated": false
       }
     },
     "/basepath/body_auto_schema": {
@@ -148,7 +152,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema"
+        "operationId": "postBasepathBody_auto_schema",
+        "deprecated": false
       },
       "put": {
         "summary": "<unknown>",
@@ -200,7 +205,8 @@
             ]
           }
         ],
-        "operationId": "putBasepathBody_auto_schema"
+        "operationId": "putBasepathBody_auto_schema",
+        "deprecated": false
       }
     },
     "/basepath/body_auto_schema_multiple_body_schemas": {
@@ -250,7 +256,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas"
+        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "deprecated": false
       }
     },
     "/basepath/body_auto_schema_name_definition_id": {
@@ -287,7 +294,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema_name_definition_id"
+        "operationId": "postBasepathBody_auto_schema_name_definition_id",
+        "deprecated": false
       }
     },
     "/basepath/body_form": {
@@ -339,7 +347,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_form"
+        "operationId": "postBasepathBody_form",
+        "deprecated": false
       }
     },
     "/basepath/body_json_list_schema": {
@@ -377,7 +386,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_json_list_schema"
+        "operationId": "postBasepathBody_json_list_schema",
+        "deprecated": false
       }
     },
     "/basepath/body_json_noschema": {
@@ -406,7 +416,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_json_noschema"
+        "operationId": "postBasepathBody_json_noschema",
+        "deprecated": false
       }
     },
     "/basepath/body_json_response": {
@@ -440,7 +451,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_json_response"
+        "operationId": "postBasepathBody_json_response",
+        "deprecated": false
       }
     },
     "/basepath/body_json_schema": {
@@ -476,7 +488,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_json_schema"
+        "operationId": "postBasepathBody_json_schema",
+        "deprecated": false
       }
     },
     "/basepath/body_string": {
@@ -506,7 +519,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_string"
+        "operationId": "postBasepathBody_string",
+        "deprecated": false
       }
     },
     "/basepath/cookies": {
@@ -544,7 +558,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathCookies"
+        "operationId": "postBasepathCookies",
+        "deprecated": false
       }
     },
     "/basepath/descriptions": {
@@ -565,7 +580,8 @@
             ]
           }
         ],
-        "operationId": "echoMessage"
+        "operationId": "echoMessage",
+        "deprecated": true
       }
     },
     "/basepath/headers": {
@@ -621,7 +637,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathHeaders"
+        "operationId": "postBasepathHeaders",
+        "deprecated": false
       }
     },
     "/basepath/nometa": {
@@ -641,7 +658,8 @@
             ]
           }
         ],
-        "operationId": "getBasepathNometa"
+        "operationId": "getBasepathNometa",
+        "deprecated": false
       }
     },
     "/basepath/oauth2_auth": {
@@ -662,7 +680,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathOauth2_auth"
+        "operationId": "postBasepathOauth2_auth",
+        "deprecated": false
       }
     },
     "/basepath/or_auth": {
@@ -686,7 +705,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathOr_auth"
+        "operationId": "postBasepathOr_auth",
+        "deprecated": false
       }
     },
     "/basepath/paths/{firstName}/bertrand/{age}": {
@@ -724,7 +744,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathPaths_firstName_Bertrand_age"
+        "operationId": "postBasepathPaths_firstName_Bertrand_age",
+        "deprecated": false
       }
     },
     "/basepath/produces_and_consumes": {
@@ -744,7 +765,8 @@
             ]
           }
         ],
-        "operationId": "getBasepathProduces_and_consumes"
+        "operationId": "getBasepathProduces_and_consumes",
+        "deprecated": false
       }
     },
     "/basepath/queries": {
@@ -800,7 +822,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathQueries"
+        "operationId": "postBasepathQueries",
+        "deprecated": false
       }
     },
     "/basepath/returning": {
@@ -833,7 +856,8 @@
             ]
           }
         ],
-        "operationId": "postBasepathReturning"
+        "operationId": "postBasepathReturning",
+        "deprecated": false
       }
     }
   },
