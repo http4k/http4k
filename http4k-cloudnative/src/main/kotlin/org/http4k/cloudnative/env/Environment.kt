@@ -2,7 +2,9 @@ package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
+import org.http4k.lens.Failure.Type.Missing
 import org.http4k.lens.Lens
+import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
@@ -73,7 +75,12 @@ internal class OverridingEnvironment(
     private val environment: Environment,
     private val fallback: Environment
 ) : Environment {
-    override fun <T> get(key: Lens<Environment, T>): T = environment[key] ?: fallback[key]
+    override fun <T> get(key: Lens<Environment, T>): T = try {
+        environment[key]
+    } catch(e: LensFailure) {
+        if(e.overall() == Missing)  fallback[key] else throw e
+    }
+
     override fun get(key: String): String? = environment[key] ?: fallback[key]
     override fun set(key: String, value: String): Environment = environment.set(key, value)
     override fun minus(key: String): Environment = OverridingEnvironment(environment - key, fallback - key)

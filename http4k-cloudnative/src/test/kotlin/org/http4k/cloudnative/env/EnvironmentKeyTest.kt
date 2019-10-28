@@ -3,6 +3,7 @@ package org.http4k.cloudnative.env
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.cloudnative.env.Environment.Companion.EMPTY
 import org.http4k.cloudnative.env.Environment.Companion.from
 import org.http4k.cloudnative.env.EnvironmentKey.k8s.HEALTH_PORT
 import org.http4k.cloudnative.env.EnvironmentKey.k8s.SERVICE_PORT
@@ -10,13 +11,14 @@ import org.http4k.cloudnative.env.EnvironmentKey.k8s.serviceUriFor
 import org.http4k.core.Uri
 import org.http4k.core.with
 import org.http4k.lens.LensFailure
+import org.http4k.lens.composite
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class EnvironmentKeyTest {
 
-    private val env = Environment.EMPTY
+    private val env = EMPTY
 
     @Test
     fun `custom key roundtrip`() {
@@ -84,5 +86,24 @@ class EnvironmentKeyTest {
         assertThat(serviceUriFor("myservice", true)(
             from("MYSERVICE_SERVICE_PORT" to "443")),
             equalTo(Uri.of("https://myservice/")))
+    }
+
+    @Test
+    fun `falls back to value when using environment key`() {
+        val finalEnv = EMPTY overrides from("FOO" to "bill")
+
+        val key = EnvironmentKey.required("FOO")
+        assertThat(finalEnv[key], equalTo("bill"))
+        assertThat(key(finalEnv), equalTo("bill"))
+    }
+
+    @Test
+    fun `composite can use a mixture of overridden and non overridden values`() {
+        data class Target(val foo: String, val bar: Int)
+        val finalEnv = from("bar" to "123") overrides from("FOO" to "bill")
+
+        val key = EnvironmentKey.composite { Target(required("FOO")(it), int().required("BAR")(it)) }
+
+        assertThat(key(finalEnv), equalTo(Target("bill", 123)))
     }
 }
