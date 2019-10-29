@@ -19,6 +19,8 @@ abstract class ContractRouteSpec internal constructor(val pathFn: (PathSegments)
     open inner class ContractRequestBuilder(internal val method: Method) {
         fun newRequest(baseUri: Uri = Uri.of("")) = Request(method, "").uri(baseUri.path(describe(Root)))
     }
+
+    abstract infix fun bindContract(method: Method): ContractRequestBuilder
 }
 
 class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta) : ContractRouteSpec(pathFn, routeMeta) {
@@ -30,7 +32,7 @@ class ContractRouteSpec0 internal constructor(pathFn: (PathSegments) -> PathSegm
         infix fun to(fn: HttpHandler) = with(this@ContractRouteSpec0) { ContractRoute(method, this, routeMeta) { fn } }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta, val a: PathLens<A>) : ContractRouteSpec(pathFn, routeMeta, a) {
@@ -44,7 +46,7 @@ class ContractRouteSpec1<out A> internal constructor(pathFn: (PathSegments) -> P
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta, val a: PathLens<A>, val b: PathLens<B>) : ContractRouteSpec(pathFn, routeMeta, a, b) {
@@ -58,7 +60,7 @@ class ContractRouteSpec2<out A, out B> internal constructor(pathFn: (PathSegment
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -73,7 +75,7 @@ class ContractRouteSpec3<out A, out B, out C> internal constructor(pathFn: (Path
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -88,7 +90,7 @@ class ContractRouteSpec4<out A, out B, out C, out D> internal constructor(pathFn
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -103,7 +105,7 @@ class ContractRouteSpec5<out A, out B, out C, out D, out E> internal constructor
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -118,7 +120,7 @@ class ContractRouteSpec6<out A, out B, out C, out D, out E, out F> internal cons
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -134,7 +136,7 @@ class ContractRouteSpec7<out A, out B, out C, out D, out E, out F, out G> intern
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -150,7 +152,7 @@ class ContractRouteSpec8<out A, out B, out C, out D, out E, out F, out G, out H>
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H, out I> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -167,7 +169,7 @@ class ContractRouteSpec9<out A, out B, out C, out D, out E, out F, out G, out H,
             }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
 class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J> internal constructor(pathFn: (PathSegments) -> PathSegments, routeMeta: RouteMeta,
@@ -184,6 +186,6 @@ class ContractRouteSpec10<out A, out B, out C, out D, out E, out F, out G, out H
         }
     }
 
-    infix fun bindContract(method: Method) = Binder(method)
+    override infix fun bindContract(method: Method) = Binder(method)
 }
 
