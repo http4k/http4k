@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.194.0
+- [http4k-contract] Useful tweaks to the contracts API
+
 ### v3.193.1
 [http4k-cloudnative] Fix #304 - map `get()` does not respect fallback values in overridden environment.
 

@@ -28,6 +28,7 @@ class ContractBuilder internal constructor() {
 }
 
 operator fun <A> String.div(next: PathLens<A>): ContractRouteSpec1<A> = ContractRouteSpec0(toBaseFn(this), RouteMeta()) / next
+operator fun String.div(next: String) = "$this/$next"
 
 operator fun <A> PathLens<A>.div(next: String): ContractRouteSpec2<A, String> = this / Path.fixed(next)
 operator fun <A, B> PathLens<A>.div(next: PathLens<B>): ContractRouteSpec2<A, B> = ContractRouteSpec1({ it }, RouteMeta(), this) / next
