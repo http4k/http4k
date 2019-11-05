@@ -20,9 +20,11 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 
+interface Generic
+
 data class RecursiveObject(val children: List<RecursiveObject> = emptyList())
 
-data class ArbObject2(val uri: Uri = Uri.of("foobar"))
+data class ArbObject2(val uri: Uri = Uri.of("foobar")) :Generic
 
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 
@@ -34,7 +36,7 @@ data class ArbObject(
     val stringList: List<String> = listOf("hello", "goodbye"),
     val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
     val enumVal: Foo = Foo.value2
-)
+) : Generic
 
 data class JsonPrimitives(
     val string: String = "string",
@@ -51,6 +53,7 @@ enum class Foo {
     value1, value2
 }
 
+data class GenericListHolder(val value: List<Generic>)
 data class MapHolder(val value: Map<Any, Any>)
 
 @ExtendWith(JsonApprovalTest::class)
@@ -138,6 +141,16 @@ class AutoJsonToJsonSchemaTest {
     @Test
     fun `renders schema for top level list`(approver: Approver) {
         approver.assertApproved(listOf(ArbObject()))
+    }
+
+    @Test
+    fun `renders schema for top level generic list`(approver: Approver) {
+        approver.assertApproved(listOf(ArbObject(), ArbObject2()))
+    }
+
+    @Test
+    fun `renders schema for holder with generic list`(approver: Approver) {
+        approver.assertApproved(GenericListHolder(listOf(ArbObject(), ArbObject2())))
     }
 
     @Test
