@@ -25,7 +25,7 @@ class AccessTokenFetcher(
         .form("code", code))
         .let { if (it.status != Status.OK) null else it }
         ?.let {
-            if (CONTENT_TYPE(it) == ContentType.APPLICATION_JSON) {
+            if (CONTENT_TYPE(it) == ContentType.APPLICATION_JSON || CONTENT_TYPE(it) == ContentType.APPLICATION_JSON.withNoDirective()) {
                 with(accessTokenResponseBody(it)) {
                     AccessTokenDetails(AccessToken(accessToken), idToken?.let(::IdToken))
                 }

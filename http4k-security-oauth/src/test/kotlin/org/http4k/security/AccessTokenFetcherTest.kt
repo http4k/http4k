@@ -36,6 +36,19 @@ internal class AccessTokenFetcherTest {
     }
 
     @Test
+    fun `can get access token from json body for content-type without directive`() {
+        val api = { _: Request ->
+            Response(OK)
+                .header("Content-Type", "application/json")
+                .body("{\"access_token\": \"some-access-token\"}")
+        }
+
+        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
+
+        assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
+    }
+
+    @Test
     fun `handle non-successful response`() {
         val api = { _: Request -> Response(BAD_REQUEST) }
 
