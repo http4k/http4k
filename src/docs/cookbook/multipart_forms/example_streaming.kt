@@ -18,6 +18,7 @@ import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.Validator
 import org.http4k.lens.multipartForm
+import org.http4k.lens.string
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
@@ -48,7 +49,7 @@ fun main() {
 
 private fun buildMultipartRequest(): Request {
     // define fields using the standard lens syntax
-    val nameField = MultipartFormField.map(::Name, Name::value).required("name")
+    val nameField = MultipartFormField.string().map(::Name, Name::value).required("name")
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator

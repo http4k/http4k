@@ -2,6 +2,7 @@ package org.http4k.lens
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.FormFieldValue
 import org.http4k.core.FormFile
 import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
@@ -10,11 +11,13 @@ import org.http4k.core.with
 import java.io.Closeable
 import java.util.UUID
 
-object MultipartFormField : BiDiLensSpec<MultipartForm, String>("form",
+object MultipartFormField : BiDiLensSpec<MultipartForm, FormFieldValue>("form",
     ParamMeta.StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
     LensSet { name, values, target -> values.fold(target.minusField(name)) { m, next -> m + (name to next) } }
 )
+
+fun MultipartFormField.string() = map(FormFieldValue::value) { FormFieldValue(it) }
 
 object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
     ParamMeta.FileParam,
@@ -24,14 +27,17 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
     LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m + (name to next) } }
 )
 
-data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
+data class MultipartForm(val fields: Map<String, List<FormFieldValue>> = emptyMap(),
                          val files: Map<String, List<FormFile>> = emptyMap(),
                          val errors: List<Failure> = emptyList()) : Closeable {
 
     override fun close() = files.values.flatten().forEach(FormFile::close)
 
-    @JvmName("plusField")
     operator fun plus(kv: Pair<String, String>): MultipartForm =
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + FormFieldValue(kv.second)))
+
+    @JvmName("plusField")
+    operator fun plus(kv: Pair<String, FormFieldValue>): MultipartForm =
         copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + kv.second))
 
     @JvmName("plusFile")

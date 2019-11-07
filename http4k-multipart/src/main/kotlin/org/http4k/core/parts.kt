@@ -3,7 +3,7 @@ package org.http4k.core
 import java.io.Closeable
 import java.io.InputStream
 
-class FormFieldValue(val value: String, val headers: Headers = emptyList())
+data class FormFieldValue(val value: String, val headers: Headers = emptyList())
 
 data class FormFile(val filename: String, val contentType: ContentType, val content: InputStream) : Closeable {
     override fun close() {
