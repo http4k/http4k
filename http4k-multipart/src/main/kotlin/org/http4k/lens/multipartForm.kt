@@ -13,7 +13,7 @@ import java.util.UUID
 object MultipartFormField : BiDiLensSpec<MultipartForm, String>("form",
     ParamMeta.StringParam,
     LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-    LensSet { name, values, target -> values.fold(target.minusField(name)) { m, next -> m.plus(name to next) } }
+    LensSet { name, values, target -> values.fold(target.minusField(name)) { m, next -> m + (name to next) } }
 )
 
 object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
@@ -21,7 +21,7 @@ object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
     LensGet { name, form ->
         form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList()
     },
-    LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m.plus(name to next) } }
+    LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m + (name to next) } }
 )
 
 data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
@@ -32,11 +32,11 @@ data class MultipartForm(val fields: Map<String, List<String>> = emptyMap(),
 
     @JvmName("plusField")
     operator fun plus(kv: Pair<String, String>): MultipartForm =
-        copy(fields = fields.plus(kv.first to fields.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + kv.second))
 
     @JvmName("plusFile")
     operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
-        copy(files = files.plus(kv.first to files.getOrDefault(kv.first, emptyList()).plus(kv.second)))
+        copy(files = files + (kv.first to files.getOrDefault(kv.first, emptyList()) + kv.second))
 
     fun minusField(name: String): MultipartForm = copy(fields = fields - name)
     fun minusFile(name: String): MultipartForm = copy(files = files - name)
