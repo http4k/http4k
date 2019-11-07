@@ -4,11 +4,10 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.FormFieldValue
 import org.junit.jupiter.api.Test
 
 class MultipartFormFieldTest {
-    private val form = MultipartForm(mapOf("hello" to listOf(FormFieldValue("world"), FormFieldValue("world2"))))
+    private val form = MultipartForm(mapOf("hello" to listOf(MultipartFormField("world"), MultipartFormField("world2"))))
 
     @Test
     fun `value present`() {
@@ -72,7 +71,7 @@ class MultipartFormFieldTest {
         val instance = MyCustomBodyType("hello world!")
         val formWithField = custom(instance, MultipartForm())
 
-        assertThat(formWithField.fields["bob"], equalTo(listOf(FormFieldValue("hello world!"))))
+        assertThat(formWithField.fields["bob"], equalTo(listOf(MultipartFormField("hello world!"))))
 
         assertThat(custom(formWithField), equalTo(MyCustomBodyType("hello world!")))
     }

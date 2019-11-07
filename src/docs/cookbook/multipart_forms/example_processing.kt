@@ -3,7 +3,6 @@ package cookbook.multipart_forms
 import org.http4k.client.ApacheClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.MultipartEntity
 import org.http4k.core.Request
@@ -19,7 +18,6 @@ import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.Validator
 import org.http4k.lens.multipartForm
-import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
@@ -60,6 +58,6 @@ private fun buildValidMultipartRequest(): Request {
 
     val multipartform = MultipartForm().with(
         nameField of AName("rita"),
-        imageFile of FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
     return Request(Method.POST, "http://localhost:8000").with(strictFormBody of multipartform)
 }

@@ -2,12 +2,12 @@ package cookbook.multipart_forms
 
 import org.http4k.client.ApacheClient
 import org.http4k.core.ContentType
-import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.MultipartFormFile
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
@@ -25,7 +25,7 @@ fun main() {
     // add fields and files to the multipart form body
     val body = MultipartFormBody()
         .plus("field" to "value")
-        .plus("file" to FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        .plus("file" to MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
 
     // we need to set both the body AND the correct content type header on the the request
     val request = Request(Method.POST, "http://localhost:8000")

@@ -5,8 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.FormFieldValue
-import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
@@ -21,7 +19,7 @@ class MultipartFormTest {
     private val requiredFile = MultipartFormFile.required("file")
 
     private val validBody = javaClass.getResourceAsStream("hello.txt").reader().readText()
-    private fun validFile() = FormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
+    private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"
     private val CONTENT_TYPE_WITH_BOUNDARY = ContentType.MultipartFormWithBoundary(DEFAULT_BOUNDARY)
@@ -66,8 +64,8 @@ class MultipartFormTest {
         )
 
         val expected = MultipartForm(
-            mapOf("hello" to listOf(FormFieldValue("world")),
-                "another" to listOf(FormFieldValue("123"))),
+            mapOf("hello" to listOf(MultipartFormField("world")),
+                "another" to listOf(MultipartFormField("123"))),
             mapOf("file" to listOf(validFile())))
         assertThat(multipartFormLens(Validator.Strict)(request), equalTo(expected))
     }
@@ -84,7 +82,7 @@ class MultipartFormTest {
 
         val requiredString = MultipartFormField.string().required("hello")
         assertThat(multipartFormLens(Validator.Feedback)(request), equalTo(MultipartForm(
-            mapOf("another" to listOf(FormFieldValue("123"))),
+            mapOf("another" to listOf(MultipartFormField("123"))),
             mapOf("file" to listOf(validFile())),
             listOf(Missing(requiredString.meta)))))
     }

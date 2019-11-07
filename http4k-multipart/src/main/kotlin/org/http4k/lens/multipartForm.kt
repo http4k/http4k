@@ -2,59 +2,45 @@ package org.http4k.lens
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.FormFieldValue
-import org.http4k.core.FormFile
+import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
+import org.http4k.core.MultipartFormBody.Companion.DEFAULT_DISK_THRESHOLD
 import org.http4k.core.with
+import org.http4k.lens.ContentNegotiation.Companion.Strict
+import org.http4k.lens.Header.CONTENT_TYPE
 import java.io.Closeable
 import java.util.UUID
 
-object MultipartFormField : BiDiLensSpec<MultipartForm, FormFieldValue>("form",
-    ParamMeta.StringParam,
-    LensGet { name, (fields) -> fields.getOrDefault(name, listOf()) },
-    LensSet { name, values, target -> values.fold(target.minusField(name)) { m, next -> m + (name to next) } }
-)
-
-fun MultipartFormField.string() = map(FormFieldValue::value) { FormFieldValue(it) }
-
-object MultipartFormFile : BiDiLensSpec<MultipartForm, FormFile>("form",
-    ParamMeta.FileParam,
-    LensGet { name, form ->
-        form.files[name]?.map { FormFile(it.filename, it.contentType, it.content) } ?: emptyList()
-    },
-    LensSet { name, values, target -> values.fold(target.minusFile(name)) { m, next -> m + (name to next) } }
-)
-
-data class MultipartForm(val fields: Map<String, List<FormFieldValue>> = emptyMap(),
-                         val files: Map<String, List<FormFile>> = emptyMap(),
+data class MultipartForm(val fields: Map<String, List<MultipartFormField>> = emptyMap(),
+                         val files: Map<String, List<MultipartFormFile>> = emptyMap(),
                          val errors: List<Failure> = emptyList()) : Closeable {
 
-    override fun close() = files.values.flatten().forEach(FormFile::close)
+    override fun close() = files.values.flatten().forEach(MultipartFormFile::close)
 
-    operator fun plus(kv: Pair<String, String>): MultipartForm =
-        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + FormFieldValue(kv.second)))
+    operator fun plus(kv: Pair<String, String>) =
+        copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + MultipartFormField(kv.second)))
 
     @JvmName("plusField")
-    operator fun plus(kv: Pair<String, FormFieldValue>): MultipartForm =
+    operator fun plus(kv: Pair<String, MultipartFormField>) =
         copy(fields = fields + (kv.first to fields.getOrDefault(kv.first, emptyList()) + kv.second))
 
     @JvmName("plusFile")
-    operator fun plus(kv: Pair<String, FormFile>): MultipartForm =
+    operator fun plus(kv: Pair<String, MultipartFormFile>) =
         copy(files = files + (kv.first to files.getOrDefault(kv.first, emptyList()) + kv.second))
 
-    fun minusField(name: String): MultipartForm = copy(fields = fields - name)
-    fun minusFile(name: String): MultipartForm = copy(files = files - name)
+    fun minusField(name: String) = copy(fields = fields - name)
+    fun minusFile(name: String) = copy(files = files - name)
 }
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
 
-fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY, diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): BiDiBodyLensSpec<MultipartForm> =
-    BiDiBodyLensSpec(parts.map { it.meta }, ContentType.MULTIPART_FORM_DATA,
+fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): BiDiBodyLensSpec<MultipartForm> =
+    BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
         LensGet { _, target ->
             listOf(MultipartFormBody.from(target, diskThreshold).apply {
-                ContentNegotiation.Strict(ContentType.MultipartFormWithBoundary(boundary), Header.CONTENT_TYPE(target))
+                Strict(ContentType.MultipartFormWithBoundary(boundary), CONTENT_TYPE(target))
             })
         },
         LensSet { _: String, values: List<Body>, target: HttpMessage ->

@@ -5,7 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.195.0
 - [http4k-security-oauth] - Tweak to handle Content-Type comparisons (with and without directive). H/T @jippeholwerda for the PR
-- [http4k-multipart] - [Breaking] Added support for setting custom headers in Multipart form fields and files. This has removed the `String` as the default field type (it is now `FormFieldValue`. Calls to create lenses using `MultipartFormField` will now require `MultipartFormField.string()` instead.
+- [http4k-multipart] - [Breaking] Added support for setting custom headers in Multipart form fields and files. This has removed the `String` as the default field type (it is now `MultipartFormField`. Calls to create lenses using `MultipartFormField` will now require `MultipartFormField.string()` instead.
 
 ### v3.194.0
 - [http4k-contract] Useful tweaks to the contracts API
