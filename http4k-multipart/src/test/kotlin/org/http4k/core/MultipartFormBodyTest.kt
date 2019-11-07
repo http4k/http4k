@@ -28,9 +28,11 @@ class MultipartFormBodyTest {
         assertThat(form.files("file"), equalTo(listOf(file1, file2)))
     }
 
+    private val formFieldValue = FormFieldValue("bar", listOf("Content-Disposition" to """form-data; name="field""""))
+
     @Test
     fun roundtrip() {
-        val form = MultipartFormBody("bob") + ("field" to "bar") +
+        val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
             ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
@@ -38,14 +40,14 @@ class MultipartFormBodyTest {
             .body(form)
 
         assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to "bar") +
+            MultipartFormBody("bob") + ("field" to formFieldValue) +
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         ))
     }
 
     @Test
     fun `can handle when body is already pulled into memory`() {
-        val form = MultipartFormBody("bob") + ("field" to "bar") +
+        val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
             ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
@@ -55,7 +57,7 @@ class MultipartFormBodyTest {
         req.bodyString()
 
         assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to "bar") +
+            MultipartFormBody("bob") + ("field" to formFieldValue) +
                 ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         ))
     }

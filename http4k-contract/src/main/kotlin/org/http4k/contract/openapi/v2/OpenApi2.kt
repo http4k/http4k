@@ -13,7 +13,7 @@ import org.http4k.contract.openapi.OpenApiExtension
 import org.http4k.contract.openapi.SecurityRenderer
 import org.http4k.contract.openapi.operationId
 import org.http4k.contract.security.Security
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
@@ -48,7 +48,7 @@ open class OpenApi2<out NODE>(
     override fun description(contractRoot: PathSegments, security: Security?, routes: List<ContractRoute>) =
         with(renderPaths(routes, contractRoot, security)) {
             Response(OK)
-                .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+                .with(Header.CONTENT_TYPE of APPLICATION_JSON)
                 .body(json {
                     val unextended = obj(listOfNotNull(
                         "swagger" to string("2.0"),
@@ -114,7 +114,9 @@ open class OpenApi2<out NODE>(
 
         val (responses, responseDefinitions) = route.meta.responses.render()
 
-        val schema = route.meta.requests.find { Header.CONTENT_TYPE(it.message) == ContentType.APPLICATION_JSON }?.asSchema()
+        val schema = route.meta.requests.find {
+            Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirective(APPLICATION_JSON) ?: false
+        }?.asSchema()
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()
 

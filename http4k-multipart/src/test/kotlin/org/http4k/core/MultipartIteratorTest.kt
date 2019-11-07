@@ -36,8 +36,8 @@ class MultipartIteratorTest {
         assertThat({ String(fileStream.get().readBytes()) }, throws<AlreadyClosedException>())
 
         assertThat(fields, equalTo(listOf(
-            MultipartEntity.Field("field", "bar"),
-            MultipartEntity.Field("field2", "bar2")
+            MultipartEntity.Field("field", "bar", listOf("Content-Disposition" to "form-data; name=\"field\"")),
+            MultipartEntity.Field("field2", "bar2", listOf("Content-Disposition" to "form-data; name=\"field2\""))
         )))
     }
 

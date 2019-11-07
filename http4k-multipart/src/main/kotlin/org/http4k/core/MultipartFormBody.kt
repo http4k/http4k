@@ -16,13 +16,13 @@ sealed class MultipartEntity : Closeable {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
-    data class Field(override val name: String, val value: String) : MultipartEntity() {
+    data class Field(override val name: String, val value: String, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = Unit
 
         override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
     }
 
-    data class File(override val name: String, val file: FormFile) : MultipartEntity() {
+    data class File(override val name: String, val file: FormFile, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = file.content.close()
 
         override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content)
@@ -35,8 +35,8 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
     return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
         .asSequence()
         .map {
-            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString)
-            else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream))
+            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
+            else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream), it.headers.toList())
         }.iterator()
 }
 
@@ -58,8 +58,11 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun field(name: String) = fields(name).firstOrNull()
     fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
-    @JvmName("plusField")
+    @JvmName("plus")
     operator fun plus(field: Pair<String, String>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
+
+    @JvmName("plusField")
+    operator fun plus(field: Pair<String, FormFieldValue>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second.value, field.second.headers))
 
     @JvmName("plusFile")
     operator fun plus(field: Pair<String, FormFile>) = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
@@ -78,7 +81,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold))
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold), it.headers.toList())
                 else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
             }
             return MultipartFormBody(parts, boundary)

@@ -1,6 +1,7 @@
 package org.http4k.multipart
 
 import org.http4k.core.Parameters
+import org.http4k.lens.MULTIPART_BOUNDARY
 import java.io.InputStream
 import java.io.SequenceInputStream
 import java.nio.charset.Charset
@@ -13,7 +14,7 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
 
     private val waitingToStream = mutableListOf<InputStream>()
 
-    constructor(boundary: String) : this(boundary.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+    constructor(boundary: String = MULTIPART_BOUNDARY) : this(boundary.toByteArray(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
 
     init {
         boundary.push(StreamingMultipartFormParts.prependBoundaryWithStreamTerminator(inBoundary))
