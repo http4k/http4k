@@ -1,5 +1,6 @@
 package org.http4k.multipart
 
+import org.http4k.core.Parameters
 import java.io.InputStream
 import java.io.SequenceInputStream
 import java.nio.charset.Charset
@@ -26,11 +27,11 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         return SequenceInputStream(Collections.enumeration(waitingToStream))
     }
 
-    fun field(name: String, value: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = apply {
+    fun field(name: String, value: String, vararg headers: Pair<String, Parameters>): MultipartFormBuilder = apply {
         part(value, *(headers.toList() + ("Content-Disposition" to listOf("form-data" to null, "name" to name))).toTypedArray())
     }
 
-    private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) {
+    private fun appendHeader(headerName: String, pairs: Parameters) {
         val headerLine = "$headerName: " + pairs.joinToString("; ") { (first, second) ->
             if (second != null) """$first="$second"""" else first
         }
@@ -39,10 +40,10 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>) =
+    fun part(contents: String, vararg headers: Pair<String, Parameters>) =
         part(contents.byteInputStream(encoding), *headers)
 
-    fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>) = apply {
+    fun part(contents: InputStream, vararg headers: Pair<String, Parameters>) = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if (headers.isNotEmpty()) {
@@ -67,7 +68,7 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     }
 
     fun attachment(fileName: String, contentType: String, contents: String,
-                   vararg headers: Pair<String, List<Pair<String, String?>>>) =
+                   vararg headers: Pair<String, Parameters>) =
         part(contents,
             *(listOf(
                 "Content-Disposition" to listOf("attachment" to null, "filename" to fileName),
@@ -76,7 +77,7 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         )
 
     fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
-             vararg headers: Pair<String, List<Pair<String, String?>>>) =
+             vararg headers: Pair<String, Parameters>) =
         part(contents,
             *(listOf(
                 "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
