@@ -26,22 +26,23 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         return SequenceInputStream(Collections.enumeration(waitingToStream))
     }
 
-    fun field(name: String, value: String): MultipartFormBuilder = apply {
-        part(value, Pair("Content-Disposition", listOf("form-data" to null, "name" to name)))
+    fun field(name: String, value: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = apply {
+        part(value, *(headers.toList() + ("Content-Disposition" to listOf("form-data" to null, "name" to name))).toTypedArray())
     }
 
     private fun appendHeader(headerName: String, pairs: List<Pair<String, String?>>) {
-        val headers = "$headerName: " + pairs.joinToString("; ") { (first, second) ->
+        val headerLine = "$headerName: " + pairs.joinToString("; ") { (first, second) ->
             if (second != null) """$first="$second"""" else first
         }
 
-        add(headers.toByteArray(encoding))
+        add(headerLine.toByteArray(encoding))
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = part(contents.byteInputStream(encoding), *headers)
+    fun part(contents: String, vararg headers: Pair<String, List<Pair<String, String?>>>) =
+        part(contents.byteInputStream(encoding), *headers)
 
-    fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>): MultipartFormBuilder = apply {
+    fun part(contents: InputStream, vararg headers: Pair<String, List<Pair<String, String?>>>) = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if (headers.isNotEmpty()) {
@@ -59,22 +60,28 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     fun startMultipart(multipartFieldName: String, subpartBoundary: String): MultipartFormBuilder = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        appendHeader("Content-Disposition", listOf(Pair("form-data", null), Pair("name", multipartFieldName)))
-        appendHeader("Content-Type", listOf(Pair("multipart/mixed", null), Pair("boundary", subpartBoundary)))
+        appendHeader("Content-Disposition", listOf("form-data" to null, "name" to multipartFieldName))
+        appendHeader("Content-Type", listOf("multipart/mixed" to null, "boundary" to subpartBoundary))
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
     }
 
-    fun attachment(fileName: String, contentType: String, contents: String): MultipartFormBuilder =
+    fun attachment(fileName: String, contentType: String, contents: String,
+                   vararg headers: Pair<String, List<Pair<String, String?>>>) =
         part(contents,
-            Pair("Content-Disposition", listOf(Pair("attachment", null), Pair("filename", fileName))),
-            Pair("Content-Type", listOf(Pair(contentType, null)))
+            *(listOf(
+                "Content-Disposition" to listOf("attachment" to null, "filename" to fileName),
+                "Content-Type" to listOf(contentType to null)
+            ) + headers).toTypedArray()
         )
 
-    fun file(fieldName: String, filename: String, contentType: String, contents: InputStream): MultipartFormBuilder =
+    fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
+             vararg headers: Pair<String, List<Pair<String, String?>>>) =
         part(contents,
-            "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
-            "Content-Type" to listOf(contentType to null)
+            *(listOf(
+                "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
+                "Content-Type" to listOf(contentType to null)
+            ) + headers).toTypedArray()
         )
 
     fun endMultipart(): MultipartFormBuilder = apply {
