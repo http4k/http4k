@@ -10,8 +10,8 @@ Content-Disposition: form-data; name="another"
 
 123
 --hello
-MyHeader: myHeaderValue
 Content-Disposition: form-data; name="fieldWithHeaders"
+MyHeader: myHeaderValue
 
 someValue
 --hello

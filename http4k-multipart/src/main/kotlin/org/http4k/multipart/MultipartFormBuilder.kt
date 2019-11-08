@@ -28,7 +28,7 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     }
 
     fun field(name: String, value: String, headers: Parameters): MultipartFormBuilder = apply {
-        part(value, headers + ("Content-Disposition" to """form-data; name="$name""""))
+        part(value, listOf("Content-Disposition" to """form-data; name="$name"""") + headers)
     }
 
     private fun appendHeader(headerName: String, headerValue: String?) {
@@ -68,17 +68,17 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     fun attachment(fileName: String, contentType: String, contents: String,
                    headers: Parameters) =
         part(contents,
-            headers + listOf(
+            listOf(
                 "Content-Disposition" to """attachment; filename="$fileName"""",
-                "Content-Type" to contentType)
+                "Content-Type" to contentType) + headers
             )
 
     fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
              headers: Parameters) =
         part(contents,
-            headers + listOf(
+             listOf(
                 "Content-Disposition" to """form-data; name="$fieldName"; filename="$filename"""",
-                "Content-Type" to contentType)
+                "Content-Type" to contentType) + headers
             )
 
     fun endMultipart(): MultipartFormBuilder = apply {
