@@ -44,7 +44,7 @@ class MultipartFormTest {
             )
         )
 
-        assertThat(populatedRequest.toMessage(), equalTo(message))
+        assertThat(populatedRequest.toMessage().replace("\r\n", "\n"), equalTo(message))
     }
 
     @Test
