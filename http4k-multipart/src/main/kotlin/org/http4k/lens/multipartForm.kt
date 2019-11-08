@@ -3,6 +3,7 @@ package org.http4k.lens
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
+import org.http4k.core.ContentType.Companion.MultipartFormWithBoundary
 import org.http4k.core.HttpMessage
 import org.http4k.core.MultipartEntity
 import org.http4k.core.MultipartFormBody
@@ -36,17 +37,23 @@ data class MultipartForm(val fields: Map<String, List<MultipartFormField>> = emp
 
 val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
 
-fun Body.Companion.multipartForm(validator: Validator, vararg parts: Lens<MultipartForm, *>, defaultBoundary: String = MULTIPART_BOUNDARY, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): BiDiBodyLensSpec<MultipartForm> =
+fun Body.Companion.multipartForm(
+    validator: Validator,
+    vararg parts: Lens<MultipartForm, *>,
+    defaultBoundary: String = MULTIPART_BOUNDARY,
+    diskThreshold: Int = DEFAULT_DISK_THRESHOLD,
+    contentTypeFn: (String) -> ContentType = ::MultipartFormWithBoundary
+): BiDiBodyLensSpec<MultipartForm> =
     BiDiBodyLensSpec(parts.map { it.meta }, MULTIPART_FORM_DATA,
         LensGet { _, target ->
             listOf(MultipartFormBody.from(target, diskThreshold).apply {
-                Strict(ContentType.MultipartFormWithBoundary(boundary), CONTENT_TYPE(target))
+                Strict(contentTypeFn(boundary), CONTENT_TYPE(target))
             })
         },
         LensSet { _: String, values: List<Body>, target: HttpMessage ->
             values.fold(target) { a, b ->
                 a.body(b)
-                    .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(defaultBoundary))
+                    .with(CONTENT_TYPE of contentTypeFn(defaultBoundary))
             }
         })
         .map({ it.toMultipartForm() }, { it.toMultipartFormBody(defaultBoundary) })

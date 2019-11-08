@@ -5,9 +5,12 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.MultipartMixedWithBoundary
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
+import org.http4k.lens.Validator.Feedback
+import org.http4k.lens.Validator.Strict
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -28,7 +31,7 @@ class MultipartFormTest {
     @Disabled
     fun `multipart form serialized into request`() {
         val populatedRequest = emptyRequest.with(
-            multipartFormLens(Validator.Strict) of MultipartForm().with(
+            multipartFormLens(Strict) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
@@ -42,21 +45,21 @@ class MultipartFormTest {
     @Test
     fun `multipart form blows up if not correct content type`() {
         val request = emptyRequest.with(
-            multipartFormLens(Validator.Strict) of MultipartForm().with(
+            multipartFormLens(Strict) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
             )).replaceHeader("Content-Type", "unknown; boundary=hello")
 
         assertThat({
-            multipartFormLens(Validator.Strict)(request)
+            multipartFormLens(Strict)(request)
         }, throws(lensFailureWith<Any?>(Unsupported(Header.CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
     }
 
     @Test
     fun `multipart form extracts ok form values`() {
         val request = emptyRequest.with(
-            multipartFormLens(Validator.Strict) of MultipartForm().with(
+            multipartFormLens(Strict) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
@@ -67,21 +70,21 @@ class MultipartFormTest {
             mapOf("hello" to listOf(MultipartFormField("world")),
                 "another" to listOf(MultipartFormField("123"))),
             mapOf("file" to listOf(validFile())))
-        assertThat(multipartFormLens(Validator.Strict)(request), equalTo(expected))
+        assertThat(multipartFormLens(Strict)(request), equalTo(expected))
     }
 
     @Test
     fun `feedback multipart form extracts ok form values and errors`() {
 
         val request = emptyRequest.with(
-            multipartFormLens(Validator.Feedback) of MultipartForm().with(
+            multipartFormLens(Feedback) of MultipartForm().with(
                 intRequiredField of 123,
                 requiredFile of validFile()
             )
         )
 
         val requiredString = MultipartFormField.string().required("hello")
-        assertThat(multipartFormLens(Validator.Feedback)(request), equalTo(MultipartForm(
+        assertThat(multipartFormLens(Feedback)(request), equalTo(MultipartForm(
             mapOf("another" to listOf(MultipartFormField("123"))),
             mapOf("file" to listOf(validFile())),
             listOf(Missing(requiredString.meta)))))
@@ -92,7 +95,14 @@ class MultipartFormTest {
         val intStringField = MultipartFormField.string().required("another")
 
         val request = emptyRequest.with(
-            Body.multipartForm(Validator.Strict, stringRequiredField, intStringField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY).toLens() of
+            Body.multipartForm(
+                Strict,
+                stringRequiredField,
+                intStringField,
+                requiredFile,
+                defaultBoundary = DEFAULT_BOUNDARY,
+                contentTypeFn = ::MultipartMixedWithBoundary
+            ).toLens() of
                 MultipartForm().with(
                     stringRequiredField of "hello",
                     intStringField of "world",
@@ -100,7 +110,7 @@ class MultipartFormTest {
                 )
         )
         assertThat(
-            { multipartFormLens(Validator.Strict)(request) },
+            { multipartFormLens(Strict)(request) },
             throws(lensFailureWith<Any?>(Invalid(intRequiredField.meta), overallType = Failure.Type.Invalid))
         )
     }
@@ -118,5 +128,5 @@ class MultipartFormTest {
         assertThat(intField(populated), equalTo(123))
     }
 
-    private fun multipartFormLens(validator: Validator) = Body.multipartForm(validator, stringRequiredField, intRequiredField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY).toLens()
+    private fun multipartFormLens(validator: Validator) = Body.multipartForm(validator, stringRequiredField, intRequiredField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY, contentTypeFn = ::MultipartMixedWithBoundary).toLens()
 }
