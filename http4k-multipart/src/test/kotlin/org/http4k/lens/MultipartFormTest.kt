@@ -13,8 +13,11 @@ import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
+import org.http4k.testing.ApprovalTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(ApprovalTest::class)
 class MultipartFormTest {
 
     private val emptyRequest = Request(Method.GET, "")
@@ -23,6 +26,7 @@ class MultipartFormTest {
     private val requiredFile = MultipartFormFile.required("file")
 
     private val validBody = javaClass.getResourceAsStream("hello.txt").reader().readText()
+    private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().readText()
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"
@@ -37,8 +41,7 @@ class MultipartFormTest {
             )
         )
 
-        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(MultipartMixedWithBoundary(DEFAULT_BOUNDARY)))
-        assertThat(populatedRequest.bodyString(), equalTo(validBody))
+        assertThat(populatedRequest.toMessage(), equalTo(message))
     }
 
     @Test
