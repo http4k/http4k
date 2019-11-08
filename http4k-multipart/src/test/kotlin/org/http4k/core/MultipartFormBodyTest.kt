@@ -23,8 +23,8 @@ class MultipartFormBodyTest {
             ("file" to file1) +
             ("file" to file2)
 
-        assertThat(form.field("field"), equalTo("foo"))
-        assertThat(form.fields("field"), equalTo(listOf("foo", "bar")))
+        assertThat(form.fieldValue("field"), equalTo("foo"))
+        assertThat(form.fieldValues("field"), equalTo(listOf("foo", "bar")))
 
         assertThat(form.file("file"), equalTo(file1))
         assertThat(form.files("file"), equalTo(listOf(file1, file2)))

@@ -12,7 +12,7 @@ import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
-import java.util.UUID
+import java.util.*
 
 sealed class MultipartEntity : Closeable {
     abstract val name: String
@@ -58,7 +58,10 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun files(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.File }.map { it.file }
 
     fun field(name: String) = fields(name).firstOrNull()
-    fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
+    fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { MultipartFormField(it.value, it.headers) }
+
+    fun fieldValue(name: String) = fieldValues(name).firstOrNull()
+    fun fieldValues(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
 
     @JvmName("plus")
     operator fun plus(field: Pair<String, String>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
