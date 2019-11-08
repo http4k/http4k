@@ -21,13 +21,13 @@ sealed class MultipartEntity : Closeable {
     data class Field(override val name: String, val value: String, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = Unit
 
-        override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
+        override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value, headers)
     }
 
     data class File(override val name: String, val file: MultipartFormFile, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = file.content.close()
 
-        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content)
+        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content, headers)
     }
 }
 

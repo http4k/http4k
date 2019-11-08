@@ -6,8 +6,7 @@ import java.io.InputStream
 import java.io.SequenceInputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.ArrayDeque
-import java.util.Collections
+import java.util.*
 
 internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
@@ -28,23 +27,21 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
         return SequenceInputStream(Collections.enumeration(waitingToStream))
     }
 
-    fun field(name: String, value: String, vararg headers: Pair<String, Parameters>): MultipartFormBuilder = apply {
-        part(value, *(headers.toList() + ("Content-Disposition" to listOf("form-data" to null, "name" to name))).toTypedArray())
+    fun field(name: String, value: String, headers: Parameters): MultipartFormBuilder = apply {
+        part(value, headers + ("Content-Disposition" to """form-data; name="$name""""))
     }
 
-    private fun appendHeader(headerName: String, pairs: Parameters) {
-        val headerLine = "$headerName: " + pairs.joinToString("; ") { (first, second) ->
-            if (second != null) """$first="$second"""" else first
-        }
+    private fun appendHeader(headerName: String, headerValue: String?) {
+        val headerLine = "$headerName: ${headerValue.orEmpty()}"
 
         add(headerLine.toByteArray(encoding))
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
     }
 
-    fun part(contents: String, vararg headers: Pair<String, Parameters>) =
-        part(contents.byteInputStream(encoding), *headers)
+    fun part(contents: String, headers: Parameters) =
+        part(contents.byteInputStream(encoding), headers)
 
-    fun part(contents: InputStream, vararg headers: Pair<String, Parameters>) = apply {
+    fun part(contents: InputStream, headers: Parameters) = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         if (headers.isNotEmpty()) {
@@ -62,29 +59,27 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
     fun startMultipart(multipartFieldName: String, subpartBoundary: String): MultipartFormBuilder = apply {
         add(boundary.peek())
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
-        appendHeader("Content-Disposition", listOf("form-data" to null, "name" to multipartFieldName))
-        appendHeader("Content-Type", listOf("multipart/mixed" to null, "boundary" to subpartBoundary))
+        appendHeader("Content-Disposition", """form-data; name="$multipartFieldName"""")
+        appendHeader("Content-Type", """multipart/mixed; boundary="$subpartBoundary"""")
         add(StreamingMultipartFormParts.FIELD_SEPARATOR)
         boundary.push((String(StreamingMultipartFormParts.STREAM_TERMINATOR, encoding) + subpartBoundary).toByteArray(encoding))
     }
 
     fun attachment(fileName: String, contentType: String, contents: String,
-                   vararg headers: Pair<String, Parameters>) =
+                   headers: Parameters) =
         part(contents,
-            *(listOf(
-                "Content-Disposition" to listOf("attachment" to null, "filename" to fileName),
-                "Content-Type" to listOf(contentType to null)
-            ) + headers).toTypedArray()
-        )
+            headers + listOf(
+                "Content-Disposition" to """attachment; filename="$fileName"""",
+                "Content-Type" to contentType)
+            )
 
     fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
-             vararg headers: Pair<String, Parameters>) =
+             headers: Parameters) =
         part(contents,
-            *(listOf(
-                "Content-Disposition" to listOf("form-data" to null, "name" to fieldName, "filename" to filename),
-                "Content-Type" to listOf(contentType to null)
-            ) + headers).toTypedArray()
-        )
+            headers + listOf(
+                "Content-Disposition" to """form-data; name="$fieldName"; filename="$filename"""",
+                "Content-Type" to contentType)
+            )
 
     fun endMultipart(): MultipartFormBuilder = apply {
         add(boundary.pop())
