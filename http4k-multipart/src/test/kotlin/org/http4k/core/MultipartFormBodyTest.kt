@@ -6,6 +6,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.lens.Header
+import org.http4k.lens.MultipartFormField
+import org.http4k.lens.MultipartFormFile
 import org.junit.jupiter.api.Test
 import java.io.InputStream
 
@@ -13,40 +15,42 @@ class MultipartFormBodyTest {
 
     @Test
     fun `retreiving files and fields`() {
-        val file1 = FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())
-        val file2 = FormFile("foo2.txt", TEXT_PLAIN, "content2".byteInputStream())
+        val file1 = MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())
+        val file2 = MultipartFormFile("foo2.txt", TEXT_PLAIN, "content2".byteInputStream())
         val form = MultipartFormBody("bob") +
             ("field" to "foo") +
             ("field" to "bar") +
             ("file" to file1) +
             ("file" to file2)
 
-        assertThat(form.field("field"), equalTo("foo"))
-        assertThat(form.fields("field"), equalTo(listOf("foo", "bar")))
+        assertThat(form.fieldValue("field"), equalTo("foo"))
+        assertThat(form.fieldValues("field"), equalTo(listOf("foo", "bar")))
 
         assertThat(form.file("file"), equalTo(file1))
         assertThat(form.files("file"), equalTo(listOf(file1, file2)))
     }
 
+    private val formFieldValue = MultipartFormField("bar", listOf("Content-Disposition" to """form-data; name="field""""))
+
     @Test
     fun roundtrip() {
-        val form = MultipartFormBody("bob") + ("field" to "bar") +
-            ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+        val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
+            ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
         assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to "bar") +
-                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to formFieldValue) +
+                ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         ))
     }
 
     @Test
     fun `can handle when body is already pulled into memory`() {
-        val form = MultipartFormBody("bob") + ("field" to "bar") +
-            ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+        val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
+            ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
         val req = Request(Method.POST, "")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
@@ -55,8 +59,8 @@ class MultipartFormBodyTest {
         req.bodyString()
 
         assertThat(MultipartFormBody.from(req), equalTo(
-            MultipartFormBody("bob") + ("field" to "bar") +
-                ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
+            MultipartFormBody("bob") + ("field" to formFieldValue) +
+                ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
         ))
     }
 
@@ -102,7 +106,7 @@ class MultipartFormBodyTest {
 
     private fun List<TestInputStream>.toMultipartForm() =
         foldIndexed(MultipartFormBody())
-        { index, acc, stream -> acc.plus("file$index" to FormFile("foo$index.txt", TEXT_PLAIN, stream)) }
+        { index, acc, stream -> acc.plus("file$index" to MultipartFormFile("foo$index.txt", TEXT_PLAIN, stream)) }
 
     private class TestInputStream(private var text: String) : InputStream() {
         private val stream = text.byteInputStream()

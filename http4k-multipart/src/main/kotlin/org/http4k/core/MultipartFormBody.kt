@@ -1,6 +1,8 @@
 package org.http4k.core
 
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.MultipartFormField
+import org.http4k.lens.MultipartFormFile
 import org.http4k.multipart.MultipartFormBuilder
 import org.http4k.multipart.MultipartFormParser
 import org.http4k.multipart.Part
@@ -10,22 +12,22 @@ import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
-import java.util.UUID
+import java.util.*
 
 sealed class MultipartEntity : Closeable {
     abstract val name: String
     internal abstract fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder
 
-    data class Field(override val name: String, val value: String) : MultipartEntity() {
+    data class Field(override val name: String, val value: String, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = Unit
 
-        override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value)
+        override fun applyTo(builder: MultipartFormBuilder) = builder.field(name, value, headers)
     }
 
-    data class File(override val name: String, val file: FormFile) : MultipartEntity() {
+    data class File(override val name: String, val file: MultipartFormFile, val headers: Headers = emptyList()) : MultipartEntity() {
         override fun close() = file.content.close()
 
-        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content)
+        override fun applyTo(builder: MultipartFormBuilder): MultipartFormBuilder = builder.file(name, file.filename, file.contentType.value, file.content, headers)
     }
 }
 
@@ -35,8 +37,8 @@ fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
     return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
         .asSequence()
         .map {
-            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString)
-            else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream))
+            if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
+            else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream), it.headers.toList())
         }.iterator()
 }
 
@@ -56,13 +58,19 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     fun files(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.File }.map { it.file }
 
     fun field(name: String) = fields(name).firstOrNull()
-    fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
+    fun fields(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { MultipartFormField(it.value, it.headers) }
 
-    @JvmName("plusField")
+    fun fieldValue(name: String) = fieldValues(name).firstOrNull()
+    fun fieldValues(name: String) = formParts.filter { it.name == name }.mapNotNull { it as? MultipartEntity.Field }.map { it.value }
+
+    @JvmName("plus")
     operator fun plus(field: Pair<String, String>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second))
 
+    @JvmName("plusField")
+    operator fun plus(field: Pair<String, MultipartFormField>) = copy(formParts = formParts + MultipartEntity.Field(field.first, field.second.value, field.second.headers))
+
     @JvmName("plusFile")
-    operator fun plus(field: Pair<String, FormFile>) = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
+    operator fun plus(field: Pair<String, MultipartFormFile>) = copy(formParts = formParts + MultipartEntity.File(field.first, field.second))
 
     override val stream by lazy { formParts.fold(MultipartFormBuilder(boundary.toByteArray())) { memo, next -> next.applyTo(memo) }.stream() }
     override val payload: ByteBuffer by lazy { stream.use { ByteBuffer.wrap(it.readBytes()) } }
@@ -78,8 +86,8 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
-                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold))
-                else MultipartEntity.File(it.fieldName!!, FormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
+                if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold), it.headers.toList())
+                else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
             }
             return MultipartFormBody(parts, boundary)
         }

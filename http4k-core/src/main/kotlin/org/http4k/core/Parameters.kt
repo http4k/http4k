@@ -9,7 +9,7 @@ fun Uri.queries(): Parameters = query.toParameters()
 
 fun Parameters.toUrlFormEncoded(): String = joinToString("&") { it.first.toFormEncoded() + it.second?.let { "=" + it.toFormEncoded() }.orEmpty() }
 
-fun Parameters.toParametersMap(): Map<String, List<String?>> = groupBy(Pair<String, String?>::first, Pair<String, String?>::second)
+fun Parameters.toParametersMap(): Map<String, List<String?>> = groupBy(Parameter::first, Parameter::second)
 
 fun <K, V> Map<K, List<V>>.getFirst(key: K) = this[key]?.firstOrNull()
 

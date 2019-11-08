@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.MultipartFormFile
 import org.http4k.multipart.AlreadyClosedException
 import org.junit.jupiter.api.Test
 import java.io.InputStream
@@ -15,7 +16,7 @@ class MultipartIteratorTest {
     @Test
     fun `can stream multiparts`() {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
-            ("file" to FormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())) +
+            ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream())) +
             ("field2" to "bar2")
 
         val req = Request(Method.POST, "")
@@ -36,8 +37,8 @@ class MultipartIteratorTest {
         assertThat({ String(fileStream.get().readBytes()) }, throws<AlreadyClosedException>())
 
         assertThat(fields, equalTo(listOf(
-            MultipartEntity.Field("field", "bar"),
-            MultipartEntity.Field("field2", "bar2")
+            MultipartEntity.Field("field", "bar", listOf("Content-Disposition" to "form-data; name=\"field\"")),
+            MultipartEntity.Field("field2", "bar2", listOf("Content-Disposition" to "form-data; name=\"field2\""))
         )))
     }
 

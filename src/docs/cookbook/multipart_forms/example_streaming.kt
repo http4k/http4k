@@ -3,7 +3,6 @@ package cookbook.multipart_forms
 import org.http4k.client.ApacheClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType
-import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.MultipartEntity
 import org.http4k.core.Request
@@ -48,7 +47,7 @@ fun main() {
 
 private fun buildMultipartRequest(): Request {
     // define fields using the standard lens syntax
-    val nameField = MultipartFormField.map(::Name, Name::value).required("name")
+    val nameField = MultipartFormField.string().map(::Name, Name::value).required("name")
     val imageFile = MultipartFormFile.optional("image")
 
     // add fields to a form definition, along with a validator
@@ -56,7 +55,7 @@ private fun buildMultipartRequest(): Request {
 
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
-        imageFile of FormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
+        imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
     val validRequest = Request(Method.POST, "http://localhost:8000").with(strictFormBody of multipartform)
     return validRequest
 }

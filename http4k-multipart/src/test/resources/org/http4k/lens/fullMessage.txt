@@ -1,0 +1,22 @@
+GET  HTTP/1.1
+content-type: multipart/mixed; boundary=hello
+
+--hello
+Content-Disposition: form-data; name="hello"
+
+world
+--hello
+Content-Disposition: form-data; name="another"
+
+123
+--hello
+Content-Disposition: form-data; name="fieldWithHeaders"
+MyHeader: myHeaderValue
+
+someValue
+--hello
+Content-Disposition: form-data; name="file"; filename="hello.txt"
+Content-Type: text/html
+
+bits
+--hello--

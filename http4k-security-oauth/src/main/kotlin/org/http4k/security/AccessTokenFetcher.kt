@@ -1,10 +1,11 @@
 package org.http4k.security
 
-import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
+import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.body.form
 import org.http4k.core.with
@@ -17,19 +18,19 @@ class AccessTokenFetcher(
     private val providerConfig: OAuthProviderConfig
 ) {
     fun fetch(code: String): AccessTokenDetails? = api(Request(POST, providerConfig.tokenPath)
-        .with(CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
+        .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
         .form("grant_type", "authorization_code")
         .form("redirect_uri", callbackUri.toString())
         .form("client_id", providerConfig.credentials.user)
         .form("client_secret", providerConfig.credentials.password)
         .form("code", code))
-        .let { if (it.status != Status.OK) null else it }
-        ?.let {
-            if (CONTENT_TYPE(it) == ContentType.APPLICATION_JSON || CONTENT_TYPE(it) == ContentType.APPLICATION_JSON.withNoDirective()) {
-                with(accessTokenResponseBody(it)) {
-                    AccessTokenDetails(AccessToken(accessToken), idToken?.let(::IdToken))
-                }
-            } else
-                AccessTokenDetails(AccessToken(it.bodyString()))
+        .let { if (it.status != OK) null else it }
+        ?.let { msg ->
+            CONTENT_TYPE(msg)?.takeIf { APPLICATION_JSON.equalsIgnoringDirective(it) }
+                ?.let {
+                    with(accessTokenResponseBody(msg)) {
+                        AccessTokenDetails(AccessToken(accessToken), idToken?.let(::IdToken))
+                    }
+                } ?: AccessTokenDetails(AccessToken(msg.bodyString()))
         }
 }

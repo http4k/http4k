@@ -3,7 +3,6 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType
-import org.http4k.core.FormFile
 import org.http4k.core.Method
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.Request
@@ -13,6 +12,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.hamkrest.hasBody
 import org.http4k.lens.Header
+import org.http4k.lens.MultipartFormFile
 import org.junit.jupiter.api.Test
 
 class FiltersTest {
@@ -20,7 +20,7 @@ class FiltersTest {
     @Test
     fun `process files filter and convert form from multipart webform`() {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
-            ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
+            ("file" to MultipartFormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
             ("field" to "bar")
 
         val req = Request(Method.POST, "")

@@ -1,5 +1,6 @@
 package org.http4k.core.cookie
 
+import org.http4k.core.Parameters
 import org.http4k.quoted
 import org.http4k.unquoted
 import java.time.LocalDateTime
@@ -51,12 +52,12 @@ data class Cookie(val name: String, val value: String,
             }
         }
 
-        private fun List<Pair<String, String?>>.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()
-        private fun List<Pair<String, String?>>.expires(): LocalDateTime? = find { it.first.equals("Expires", true) }?.second?.parseDate()
-        private fun List<Pair<String, String?>>.domain(): String? = find { it.first.equals("Domain", true) }?.second
-        private fun List<Pair<String, String?>>.path(): String? = find { it.first.equals("Path", true) }?.second
-        private fun List<Pair<String, String?>>.secure(): Boolean = find { it.first.equals("secure", true) } != null
-        private fun List<Pair<String, String?>>.httpOnly(): Boolean = find { it.first.equals("HttpOnly", true) } != null
+        private fun Parameters.maxAge(): Long? = find { it.first.equals("Max-Age", true) }?.second?.toLong()
+        private fun Parameters.expires(): LocalDateTime? = find { it.first.equals("Expires", true) }?.second?.parseDate()
+        private fun Parameters.domain(): String? = find { it.first.equals("Domain", true) }?.second
+        private fun Parameters.path(): String? = find { it.first.equals("Path", true) }?.second
+        private fun Parameters.secure(): Boolean = find { it.first.equals("secure", true) } != null
+        private fun Parameters.httpOnly(): Boolean = find { it.first.equals("HttpOnly", true) } != null
 
         private fun String.parseDate(): LocalDateTime? {
             for (supportedFormat in supportedFormats) {

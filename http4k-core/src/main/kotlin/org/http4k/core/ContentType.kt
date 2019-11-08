@@ -8,15 +8,19 @@ data class ContentType(val value: String, val directive: Pair<String, String>? =
 
     fun toHeaderValue() = value + (directive?.let { "; ${it.first}=${it.second}" } ?: "")
 
+    fun equalsIgnoringDirective(that: ContentType): Boolean = withNoDirective() == that.withNoDirective()
+
     companion object {
 
         fun Text(value: String, charset: Charset? = Charsets.UTF_8) = ContentType(value, charset?.let { "charset" to charset.name().toLowerCase() })
         fun MultipartFormWithBoundary(boundary: String): ContentType = ContentType("multipart/form-data", "boundary" to boundary)
+        fun MultipartMixedWithBoundary(boundary: String): ContentType = ContentType("multipart/mixed", "boundary" to boundary)
 
         val APPLICATION_JSON = Text("application/json")
         val APPLICATION_FORM_URLENCODED = Text("application/x-www-form-urlencoded")
         val MULTIPART_FORM_DATA = Text("multipart/form-data")
         val APPLICATION_XML = Text("application/xml")
+        val APPLICATION_PDF = Text("application/pdf")
         val TEXT_HTML = Text("text/html")
         val TEXT_XML = Text("text/xml")
         val TEXT_PLAIN = Text("text/plain")

@@ -14,7 +14,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.ISO_8859_1
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.Arrays
+import java.util.*
 
 class MultipartFormParserTest {
 
@@ -64,11 +64,11 @@ class MultipartFormParserTest {
     fun uploadMultipleFilesAndFields() {
         val boundary = "-----1234"
         val multipartFormContentsStream = MultipartFormBuilder(boundary)
-            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream())
-            .field("field", "fieldValue" + CR_LF + "with cr lf")
-            .field("multi", "value1")
-            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream())
-            .field("multi", "value2")
+            .file("file", "foo.tab", "text/whatever", "This is the content of the file\n".byteInputStream(), emptyList())
+            .field("field", "fieldValue" + CR_LF + "with cr lf", emptyList())
+            .field("multi", "value1", emptyList())
+            .file("anotherFile", "BAR.tab", "text/something", "This is another file\n".byteInputStream(), emptyList())
+            .field("multi", "value2", emptyList())
             .stream()
         val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), multipartFormContentsStream, UTF_8)
 
