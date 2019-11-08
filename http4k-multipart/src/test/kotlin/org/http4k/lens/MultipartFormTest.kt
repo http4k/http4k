@@ -23,9 +23,9 @@ class MultipartFormTest {
     private val emptyRequest = Request(Method.GET, "")
     private val stringRequiredField = MultipartFormField.string().required("hello")
     private val intRequiredField = MultipartFormField.string().int().required("another")
+    private val fieldWithHeaders = MultipartFormField.required("fieldWithHeaders")
     private val requiredFile = MultipartFormFile.required("file")
 
-    private val validBody = javaClass.getResourceAsStream("hello.txt").reader().readText()
     private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().readText()
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
@@ -37,7 +37,10 @@ class MultipartFormTest {
             multipartFormLens(Strict, ::MultipartMixedWithBoundary) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
-                requiredFile of validFile()
+                requiredFile of validFile(),
+                fieldWithHeaders of MultipartFormField("someValue",
+                    listOf("MyHeader" to "myHeaderValue")
+                )
             )
         )
 
