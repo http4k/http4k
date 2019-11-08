@@ -5,13 +5,14 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Body
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion
+import org.http4k.core.ContentType.Companion.MultipartFormWithBoundary
 import org.http4k.core.ContentType.Companion.MultipartMixedWithBoundary
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Validator.Feedback
 import org.http4k.lens.Validator.Strict
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MultipartFormTest {
@@ -25,20 +26,18 @@ class MultipartFormTest {
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"
-    private val CONTENT_TYPE_WITH_BOUNDARY = ContentType.MultipartFormWithBoundary(DEFAULT_BOUNDARY)
 
     @Test
-    @Disabled
     fun `multipart form serialized into request`() {
         val populatedRequest = emptyRequest.with(
-            multipartFormLens(Strict) of MultipartForm().with(
+            multipartFormLens(Strict, ::MultipartMixedWithBoundary) of MultipartForm().with(
                 stringRequiredField of "world",
                 intRequiredField of 123,
                 requiredFile of validFile()
             )
         )
 
-        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(CONTENT_TYPE_WITH_BOUNDARY))
+        assertThat(Header.CONTENT_TYPE(populatedRequest), equalTo(MultipartMixedWithBoundary(DEFAULT_BOUNDARY)))
         assertThat(populatedRequest.bodyString(), equalTo(validBody))
     }
 
@@ -101,7 +100,7 @@ class MultipartFormTest {
                 intStringField,
                 requiredFile,
                 defaultBoundary = DEFAULT_BOUNDARY,
-                contentTypeFn = ::MultipartMixedWithBoundary
+                contentTypeFn = ::MultipartFormWithBoundary
             ).toLens() of
                 MultipartForm().with(
                     stringRequiredField of "hello",
@@ -128,5 +127,7 @@ class MultipartFormTest {
         assertThat(intField(populated), equalTo(123))
     }
 
-    private fun multipartFormLens(validator: Validator) = Body.multipartForm(validator, stringRequiredField, intRequiredField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY, contentTypeFn = ::MultipartMixedWithBoundary).toLens()
+    private fun multipartFormLens(validator: Validator,
+                                  contentTypeFn: (String) -> ContentType = Companion::MultipartFormWithBoundary
+    ) = Body.multipartForm(validator, stringRequiredField, intRequiredField, requiredFile, defaultBoundary = DEFAULT_BOUNDARY, contentTypeFn = contentTypeFn).toLens()
 }
