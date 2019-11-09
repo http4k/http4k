@@ -77,12 +77,12 @@ internal class OverridingEnvironment(
 ) : Environment {
     override fun <T> get(key: Lens<Environment, T>): T = try {
         environment[key]
-    } catch(e: LensFailure) {
-        if(e.overall() == Missing)  fallback[key] else throw e
+    } catch (e: LensFailure) {
+        if (e.overall() == Missing) fallback[key] else throw e
     }
 
     override fun get(key: String): String? = environment[key] ?: fallback[key]
-    override fun set(key: String, value: String): Environment = environment.set(key, value)
+    override fun set(key: String, value: String): Environment = OverridingEnvironment(environment.set(key, value), fallback)
     override fun minus(key: String): Environment = OverridingEnvironment(environment - key, fallback - key)
 }
 

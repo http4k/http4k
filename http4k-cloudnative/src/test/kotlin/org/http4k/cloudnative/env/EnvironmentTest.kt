@@ -31,6 +31,16 @@ class EnvironmentTest {
     }
 
     @Test
+    fun `add to overriding environment`() {
+        val finalEnv = Environment.from("FOO" to "bob") overrides Environment.from("BAR" to "bill")
+        val extendedEnv = finalEnv.set("BAZ", "bud")
+
+        assertThat(extendedEnv["FOO"], equalTo("bob"))
+        assertThat(extendedEnv["BAR"], equalTo("bill"))
+        assertThat(extendedEnv["BAZ"], equalTo("bud"))
+    }
+
+    @Test
     fun defaults() {
         val default = EnvironmentKey.required("BAR")
         val finalEnv = Environment.from("FOO" to "bob") overrides Environment.defaults(default of "bill")
