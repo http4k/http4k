@@ -25,13 +25,11 @@ fun main() {
             .then(AddRequestCount())
             .then(AutoJsonEvents(Jackson))
 
-    val app: HttpHandler = { _: Request ->
-        Response(OK).body("hello")
-    }
+    val app: HttpHandler = { _: Request -> Response(OK).body("hello") }
 
     val appWithEvents =
         ResponseFilters.ReportHttpTransaction {
-            // to "emit" an event, just invoke the Events!
+            // to "emit" an event, just invoke() the Events!
             events(IncomingHttpRequest(it.request.uri, it.response.status.code, it.duration.toMillis()))
         }.then(app)
 
