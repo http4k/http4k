@@ -10,7 +10,7 @@ object EventFilters {
     /**
      * Adds timestamp metadata to the event.
      */
-    fun AddTimestamp(clock: Clock) = EventFilter { next ->
+    fun AddTimestamp(clock: Clock = Clock.systemUTC()) = EventFilter { next ->
         {
             next(it + ("timestamp" to clock.instant()))
         }
