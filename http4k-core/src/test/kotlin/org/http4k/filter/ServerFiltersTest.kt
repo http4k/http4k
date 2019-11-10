@@ -131,7 +131,7 @@ class ServerFiltersTest {
             .and(hasHeader("access-control-allow-origin", "foo"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
             .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-            .and(hasHeader("access-control-allow-credentials").not()))
+            .and(!hasHeader("access-control-allow-credentials")))
     }
 
     @Test
@@ -143,7 +143,7 @@ class ServerFiltersTest {
             .and(hasHeader("access-control-allow-origin", "null"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
             .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-            .and(hasHeader("access-control-allow-credentials").not()))
+            .and(!hasHeader("access-control-allow-credentials")))
     }
 
     @Test
@@ -155,7 +155,7 @@ class ServerFiltersTest {
             .and(hasHeader("access-control-allow-origin", "null"))
             .and(hasHeader("access-control-allow-headers", "rita, sue, bob"))
             .and(hasHeader("access-control-allow-methods", "DELETE, POST"))
-            .and(hasHeader("access-control-allow-credentials").not()))
+            .and(!hasHeader("access-control-allow-credentials")))
     }
 
     @Test

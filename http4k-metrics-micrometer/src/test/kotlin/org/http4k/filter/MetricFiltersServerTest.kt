@@ -144,12 +144,12 @@ class MetricFiltersServerTest {
     )
 
     private fun hasNoRequestTimer(method: Method, path: String, status: Status) =
-        hasTimer("http.server.request.latency",
+        !hasTimer("http.server.request.latency",
             listOf(Tag.of("path", path), Tag.of("method", method.name), Tag.of("status", status.code.toString()))
-        ).not()
+        )
 
     private fun hasNoRequestCounter(method: Method, path: String, status: Status) =
-        hasCounter("http.server.request.count",
+        !hasCounter("http.server.request.count",
             listOf(Tag.of("path", path), Tag.of("method", method.name), Tag.of("status", status.code.toString()))
-        ).not()
+        )
 }
