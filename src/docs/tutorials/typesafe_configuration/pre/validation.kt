@@ -1,4 +1,4 @@
-package blog.typesafe_configuration.pre
+package tutorials.typesafe_configuration.pre
 
 class Port(val value: Int) {
     init {

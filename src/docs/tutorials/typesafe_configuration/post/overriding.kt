@@ -1,4 +1,4 @@
-package blog.typesafe_configuration.post
+package tutorials.typesafe_configuration.post
 
 import org.http4k.cloudnative.env.Environment
 import java.io.File
