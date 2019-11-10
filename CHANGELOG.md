@@ -6,6 +6,7 @@ changes with their rationale when appropriate:
 ### v3.196.0 (uncut)
 - [all] Update some dependency versions.
 - [http4k-format-jackson, http4k-format-gson] Add support for auto marshalling `Throwable` in a sensible way.
+- [http4k-cloudnative] Renamed badly named `UpstreamRequestFailed` to `RemoteRequestFailed`. Improved error handling.
 
 ### v3.195.1
 - [http4k-cloudnative] Fix adding value to overridden environment when using `set()`.  H/T @jippeholwerda for the PR

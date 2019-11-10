@@ -6,8 +6,8 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
-import org.http4k.cloudnative.UpstreamRequestFailed
-import org.http4k.core.HttpHandler
+import org.http4k.cloudnative.RemoteRequestFailed
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -17,16 +17,18 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONFLICT
 import org.http4k.core.Status.Companion.GATEWAY_TIMEOUT
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
+import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.junit.jupiter.api.Test
 
-class HandleUpstreamRequestFailedTest {
+class HandleRemoteRequestFailedTest {
 
     @Test
     fun `when server and client filters are used together, converts errors as expected`() {
@@ -46,22 +48,40 @@ class HandleUpstreamRequestFailedTest {
     @Test
     fun `client throws when filter fails`() {
         assertThat({
-            ClientFilters.HandleUpstreamRequestFailed({ false }).then { Response(NOT_FOUND) }(Request(GET, ""))
-        }, throws(has(UpstreamRequestFailed::status, equalTo(NOT_FOUND))))
+            ClientFilters.HandleRemoteRequestFailed({ false }).then { Response(NOT_FOUND) }(Request(GET, ""))
+        }, throws(has(RemoteRequestFailed::status, equalTo(NOT_FOUND))))
     }
 
     @Test
     fun `server handles custom exception`() {
-        assertThat(ServerFilters.HandleUpstreamRequestFailed().then { throw CustomUpstreamFailure }(Request(GET, "")), hasStatus(SERVICE_UNAVAILABLE).and(hasBody(CustomUpstreamFailure.localizedMessage)))
+        assertThat(ServerFilters.HandleRemoteRequestFailed().then { throw CustomUpstreamFailure }(Request(GET, "")), hasStatus(SERVICE_UNAVAILABLE).and(hasBody(CustomUpstreamFailure.localizedMessage)))
+    }
+
+    @Test
+    fun `multi stack errors looks sane`() {
+        fun stack(clientUri: String) = ServerFilters.HandleRemoteRequestFailed()
+            .then(Filter { next ->
+                {
+                    next(it.uri(Uri.of(clientUri)))
+                }
+            })
+            .then(ClientFilters.HandleRemoteRequestFailed())
+
+        val multiStack = stack("http://first")
+            .then(stack("http://second"))
+            .then { Response(INTERNAL_SERVER_ERROR).body("original error") }
+
+        assertThat(multiStack(Request(GET, Uri.of("http://foobar/baz"))), hasBody("http://first (503):\n" +
+            "\thttp://second (500):\n" +
+            "\t\toriginal error"))
     }
 
     private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>) = assertThat(stackWith({ status.successful || status == NOT_FOUND }, input)(Request(GET, "")), responseMatcher)
 
-    private fun stackWith(acceptNotFound: Response.() -> Boolean, input: Status): HttpHandler {
-        return ServerFilters.HandleUpstreamRequestFailed()
-            .then(ClientFilters.HandleUpstreamRequestFailed(acceptNotFound))
+    private fun stackWith(acceptNotFound: Response.() -> Boolean, input: Status) =
+        ServerFilters.HandleRemoteRequestFailed()
+            .then(ClientFilters.HandleRemoteRequestFailed(acceptNotFound))
             .then { Response(input).body(input.code.toString()) }
-    }
 
-    private object CustomUpstreamFailure : UpstreamRequestFailed(I_M_A_TEAPOT, "foo")
+    private object CustomUpstreamFailure : RemoteRequestFailed(I_M_A_TEAPOT, "foo")
 }
