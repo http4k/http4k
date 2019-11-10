@@ -67,6 +67,7 @@ nav:
     - Generating data classes for messages: cookbook/generating_data_classes/index.md
     - Websockets: cookbook/websockets/index.md
     - Typesafe HTTP contracts: cookbook/typesafe_http_contracts/index.md
+    - Structured Logging with Events: cookbook/structured_logging_with_events/index.md
     - Basic OAuth Server configuration: cookbook/basic_oauth_authorization_server/index.md
     - Custom OAuth Provider configuration: cookbook/custom_oauth_provider/index.md
     - Principal lookup: cookbook/principal_lookup/index.md
