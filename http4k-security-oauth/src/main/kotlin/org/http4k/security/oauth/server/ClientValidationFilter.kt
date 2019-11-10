@@ -21,7 +21,7 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                         errorRenderer.response(InvalidClientId)
                     } else if (!clientValidator.validateRedirection(it, authorizationRequest.client, authorizationRequest.redirectUri)) {
                         errorRenderer.response(InvalidRedirectUri)
-                    } else if(!clientValidator.validateScopes(it, authorizationRequest.client, authorizationRequest.scopes)){
+                    } else if (!clientValidator.validateScopes(it, authorizationRequest.client, authorizationRequest.scopes)) {
                         errorRenderer.response(InvalidScopes)
                     } else {
                         next(it)

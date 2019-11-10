@@ -178,7 +178,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     }
 
     @Test
-    open fun `handles response with custom status message`(){
+    open fun `handles response with custom status message`() {
         listOf(200, 301, 404, 500).forEach { statusCode ->
             val response = client(Request(GET, "http://localhost:$port/status/$statusCode"))
             response.use {

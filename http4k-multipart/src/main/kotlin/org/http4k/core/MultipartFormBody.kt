@@ -12,7 +12,7 @@ import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 
 sealed class MultipartEntity : Closeable {
     abstract val name: String

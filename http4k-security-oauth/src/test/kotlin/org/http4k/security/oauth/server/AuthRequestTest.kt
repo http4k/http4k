@@ -23,10 +23,10 @@ internal class AuthRequestTest {
     }
 
     private val defaultAuthRequest = AuthRequest(
-            client = ClientId(UUID.randomUUID().toString()),
-            redirectUri = Uri.of("http://someredirecturi"),
-            responseType = ResponseType.Code,
-            state = "some state",
-            scopes = emptyList())
+        client = ClientId(UUID.randomUUID().toString()),
+        redirectUri = Uri.of("http://someredirecturi"),
+        responseType = ResponseType.Code,
+        state = "some state",
+        scopes = emptyList())
 
 }

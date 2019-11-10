@@ -11,12 +11,12 @@ import org.http4k.lens.HeaderLens
 
 internal fun <T : HttpMessage, R> httpMessageHas(name: String, feature: (T) -> R, featureMatcher: Matcher<R>): Matcher<T> = object : Matcher<T> {
     override fun invoke(actual: T) =
-            featureMatcher(feature(actual)).let {
-                when (it) {
-                    is MatchResult.Mismatch -> MatchResult.Mismatch("had ${name} that ${it.description}\nin: $actual")
-                    else -> it
-                }
+        featureMatcher(feature(actual)).let {
+            when (it) {
+                is MatchResult.Mismatch -> MatchResult.Mismatch("had ${name} that ${it.description}\nin: $actual")
+                else -> it
             }
+        }
 
     override val description = "has ${name} that ${featureMatcher.description}"
     override val negatedDescription = "does not have ${name} that ${featureMatcher.description}"

@@ -61,12 +61,12 @@ class GenerateAccessTokenTest {
         val codeForIdTokenRequest = codes.create(request, authRequest.copy(scopes = listOf("openid")), Response(OK)).get()
 
         val response = handler(Request(Method.POST, "/token")
-                .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
-                .form("grant_type", "authorization_code")
-                .form("code", codeForIdTokenRequest.value)
-                .form("client_id", authRequest.client.value)
-                .form("client_secret", "a-secret")
-                .form("redirect_uri", authRequest.redirectUri.toString())
+            .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
+            .form("grant_type", "authorization_code")
+            .form("code", codeForIdTokenRequest.value)
+            .form("client_id", authRequest.client.value)
+            .form("client_secret", "a-secret")
+            .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
         assertThat(response, hasStatus(OK))

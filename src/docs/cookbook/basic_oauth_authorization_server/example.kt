@@ -37,23 +37,23 @@ import java.util.UUID
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {
         val server = OAuthServer(
-                tokenPath = "/oauth2/token",
-                authRequestTracking = InsecureCookieBasedAuthRequestTracking(),
-                clientValidator = InsecureClientValidator(),
-                authorizationCodes = InsecureAuthorizationCodes(),
-                accessTokens = InsecureAccessTokens(),
-                json = Jackson,
-                clock = Clock.systemUTC(),
-                documentationUri = "See the full API docs at https://example.com/docs/access_token"
+            tokenPath = "/oauth2/token",
+            authRequestTracking = InsecureCookieBasedAuthRequestTracking(),
+            clientValidator = InsecureClientValidator(),
+            authorizationCodes = InsecureAuthorizationCodes(),
+            accessTokens = InsecureAccessTokens(),
+            json = Jackson,
+            clock = Clock.systemUTC(),
+            documentationUri = "See the full API docs at https://example.com/docs/access_token"
         )
 
         return routes(
-                server.tokenRoute,
-                "/my-login-page" bind GET to server.authenticationStart.then {
-                    Response(OK)
-                            .body("""<html><form method="POST"><button type="submit">Please authenticate</button></form></html>""")
-                },
-                "/my-login-page" bind POST to server.authenticationComplete
+            server.tokenRoute,
+            "/my-login-page" bind GET to server.authenticationStart.then {
+                Response(OK)
+                    .body("""<html><form method="POST"><button type="submit">Please authenticate</button></form></html>""")
+            },
+            "/my-login-page" bind POST to server.authenticationComplete
         )
     }
 
@@ -62,19 +62,19 @@ fun main() {
         val authorizationServer = Uri.of("http://localhost:9000")
 
         val oauthProvider = OAuthProvider(
-                OAuthProviderConfig(authorizationServer,
-                        "/my-login-page", "/oauth2/token",
-                        Credentials("my-app", "somepassword")
-                ),
-                tokenClient,
-                Uri.of("http://localhost:8000/my-callback"),
-                listOf("name", "age"),
-                persistence
+            OAuthProviderConfig(authorizationServer,
+                "/my-login-page", "/oauth2/token",
+                Credentials("my-app", "somepassword")
+            ),
+            tokenClient,
+            Uri.of("http://localhost:8000/my-callback"),
+            listOf("name", "age"),
+            persistence
         )
 
         return routes(
-                "/my-callback" bind GET to oauthProvider.callback,
-                "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user's protected resource") }
+            "/my-callback" bind GET to oauthProvider.callback,
+            "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user's protected resource") }
         )
     }
 
@@ -104,14 +104,14 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
     private val codes = mutableMapOf<AuthorizationCode, AuthorizationCodeDetails>()
 
     override fun detailsFor(code: AuthorizationCode) =
-            codes[code] ?: error("code not stored")
+        codes[code] ?: error("code not stored")
 
     // Authorization codes should be associated to a particular user (who can be identified in the Response)
     // so they can be checked in various stages of the authorization flow
     override fun create(request: Request, authRequest: AuthRequest, response: Response) =
-            Success(AuthorizationCode(UUID.randomUUID().toString()).also {
-                codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS), authRequest.state, authRequest.isOIDC())
-            })
+        Success(AuthorizationCode(UUID.randomUUID().toString()).also {
+            codes[it] = AuthorizationCodeDetails(authRequest.client, authRequest.redirectUri, clock.instant().plus(1, DAYS), authRequest.state, authRequest.isOIDC())
+        })
 }
 
 class InsecureAccessTokens : AccessTokens {
@@ -120,5 +120,5 @@ class InsecureAccessTokens : AccessTokens {
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date
     override fun create(authorizationCode: AuthorizationCode) =
-            Success(AccessToken(UUID.randomUUID().toString()))
+        Success(AccessToken(UUID.randomUUID().toString()))
 }

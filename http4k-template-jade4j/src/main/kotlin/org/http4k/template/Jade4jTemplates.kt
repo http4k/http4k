@@ -16,14 +16,14 @@ import java.util.concurrent.ConcurrentHashMap
 class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfiguration()) : Templates {
     override fun CachingClasspath(baseClasspathPackage: String): TemplateRenderer {
         configure.templateLoader = ClasspathTemplateLoader()
-        val basePath = if(baseClasspathPackage.isEmpty()) ""
-                else baseClasspathPackage.replace('.', '/') + "/"
+        val basePath = if (baseClasspathPackage.isEmpty()) ""
+        else baseClasspathPackage.replace('.', '/') + "/"
 
         return fun(viewModel: ViewModel): String {
             try {
                 val template = configure.getTemplate(basePath + viewModel.template())
-                return configure.renderTemplate(template, mutableMapOf<String, Any>( Pair("model", viewModel) ))
-            }  catch (e: NullPointerException) {
+                return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
+            } catch (e: NullPointerException) {
                 throw ViewNotFound(viewModel)
             }
         }
@@ -35,15 +35,15 @@ class Jade4jTemplates(private val configure: JadeConfiguration = JadeConfigurati
 
         val cachingFun = fun(viewModel: ViewModel): String {
             val template = configure.getTemplate(viewModel.template())
-            return configure.renderTemplate(template, mutableMapOf<String, Any>( Pair("model", viewModel) ))
+            return configure.renderTemplate(template, mutableMapOf<String, Any>(Pair("model", viewModel)))
         }
         return safeRender(cachingFun)
     }
 
     override fun HotReload(baseTemplateDir: String): TemplateRenderer {
         val hotReloadFun = fun(viewModel: ViewModel) = Jade4J.render(
-                baseTemplateDir + File.separator + viewModel.template(),
-                mutableMapOf<String, Any>( Pair("model", viewModel) )
+            baseTemplateDir + File.separator + viewModel.template(),
+            mutableMapOf<String, Any>(Pair("model", viewModel))
         )
         return safeRender(hotReloadFun)
     }

@@ -17,7 +17,7 @@ object Config {
     private fun String.major(): String =
         this.substringBefore(".")
 
-    private fun String.major_minor() : String {
+    private fun String.major_minor(): String {
         val (major, minor) = this.split(".")
         return "$major.$minor"
     }

@@ -172,11 +172,11 @@ class StreamingMultipartFormHappyTests {
             MultipartFormBuilder(boundary)
                 .part("This is the content of the file\n",
                     listOf("Content-Disposition" to "form-data; name=\"fileFieldName\"; filename=\"filename.txt\"",
-                    "Content-Type" to "plain/text",
-                    "Some-header" to "some value"))
+                        "Content-Type" to "plain/text",
+                        "Some-header" to "some value"))
                 .part("This is the content of the field\n",
                     listOf("Content-Disposition" to "form-data; name=\"fieldFieldName\"",
-                    "Another-header" to "some-key=\"some-value\""))
+                        "Another-header" to "some-key=\"some-value\""))
                 .stream())
 
         val file = assertFilePart(form, "fileFieldName", "filename.txt", "plain/text", "This is the content of the file\n")

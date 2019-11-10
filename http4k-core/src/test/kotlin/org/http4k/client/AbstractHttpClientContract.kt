@@ -20,7 +20,7 @@ import org.http4k.server.ServerConfig
 import org.http4k.server.asServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import java.util.*
+import java.util.Arrays
 
 abstract class AbstractHttpClientContract(private val serverConfig: (Int) -> ServerConfig) {
 

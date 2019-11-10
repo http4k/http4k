@@ -14,7 +14,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.StandardCharsets.ISO_8859_1
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.*
+import java.util.Arrays
 
 class MultipartFormParserTest {
 

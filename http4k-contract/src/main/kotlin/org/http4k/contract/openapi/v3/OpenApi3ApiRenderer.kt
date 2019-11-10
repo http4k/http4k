@@ -93,7 +93,7 @@ class OpenApi3ApiRenderer<NODE : Any>(private val json: Json<NODE>) : ApiRendere
             map {
                 it.key to (
                     listOf(it.value).filterIsInstance<OneOfSchemaContent<NODE>>().map { it.toJson() } +
-                    listOf(it.value).filterIsInstance<NoSchema<NODE>>().map { it.toJson() } +
+                        listOf(it.value).filterIsInstance<NoSchema<NODE>>().map { it.toJson() } +
                         listOf(it.value).filterIsInstance<SchemaContent<NODE>>().map { it.toJson() } +
                         listOf(it.value).filterIsInstance<FormContent>().map { it.toJson() }
                     ).firstOrNull().orNullNode()

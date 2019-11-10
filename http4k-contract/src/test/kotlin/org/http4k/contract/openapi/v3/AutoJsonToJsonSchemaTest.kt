@@ -24,7 +24,7 @@ interface Generic
 
 data class RecursiveObject(val children: List<RecursiveObject> = emptyList())
 
-data class ArbObject2(val uri: Uri = Uri.of("foobar")) :Generic
+data class ArbObject2(val uri: Uri = Uri.of("foobar")) : Generic
 
 data class ArbObjectHolder(val inner: List<ArbObject2> = listOf(ArbObject2()))
 

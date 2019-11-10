@@ -6,7 +6,8 @@ import java.io.InputStream
 import java.io.SequenceInputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.ArrayDeque
+import java.util.Collections
 
 internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding: Charset = Charset.defaultCharset()) {
     private val boundary = ArrayDeque<ByteArray>()
@@ -71,15 +72,15 @@ internal class MultipartFormBuilder(inBoundary: ByteArray, private val encoding:
             listOf(
                 "Content-Disposition" to """attachment; filename="$fileName"""",
                 "Content-Type" to contentType) + headers
-            )
+        )
 
     fun file(fieldName: String, filename: String, contentType: String, contents: InputStream,
              headers: Parameters) =
         part(contents,
-             listOf(
+            listOf(
                 "Content-Disposition" to """form-data; name="$fieldName"; filename="$filename"""",
                 "Content-Type" to contentType) + headers
-            )
+        )
 
     fun endMultipart(): MultipartFormBuilder = apply {
         add(boundary.pop())
