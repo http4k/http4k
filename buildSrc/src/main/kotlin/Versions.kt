@@ -1,4 +1,4 @@
-import kotlin.String
+
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -16,17 +16,17 @@ object Versions {
 
      const val aws_lambda_java_events: String = "2.2.7"
 
-     const val jackson_databind: String = "2.10.0" // available: "2.10.1"
+     const val jackson_databind: String = "2.10.1"
 
-     const val jackson_dataformat_xml: String = "2.10.0" // available: "2.10.1"
+     const val jackson_dataformat_xml: String = "2.10.1"
 
      const val jackson_module_kotlin: String = "2.10.0"
 
-     const val underscore: String = "1.48" // available: "1.49"
+     const val underscore: String = "1.49"
 
      const val handlebars: String = "4.1.2"
 
-     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.2" // available: "2.8.4"
+     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.8.4"
 
      const val gson: String = "2.8.6"
 
@@ -36,21 +36,21 @@ object Versions {
 
      const val result4k: String = "2.0.0"
 
-     const val com_squareup_moshi: String = "1.8.0" // available: "1.9.1"
+     const val com_squareup_moshi: String = "1.9.1"
 
-     const val okhttp: String = "4.2.1" // available: "4.2.2"
+     const val okhttp: String = "4.2.2"
 
-     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.4.2" // available: "0.7.0"
+     const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
      const val jade4j: String = "1.2.7"
 
      const val io_github_resilience4j: String = "1.1.0"
 
-     const val ktor_server_cio: String = "1.1.1" // available: "1.2.5"
+     const val ktor_server_cio: String = "1.2.5"
 
-     const val micrometer_core: String = "1.3.0" // available: "1.3.1"
+     const val micrometer_core: String = "1.3.1"
 
-     const val netty_codec_http2: String = "4.1.42.Final" // available: "4.1.43.Final"
+     const val netty_codec_http2: String = "4.1.43.Final"
 
      const val pebble: String = "3.1.0"
 
@@ -64,7 +64,7 @@ object Versions {
 
      const val gradle_cobertura_plugin: String = "2.6.1"
 
-     const val argo: String = "5.5" // available: "5.8"
+     const val argo: String = "5.8"
 
      const val cobertura: String = "2.1.1"
 
@@ -76,12 +76,11 @@ object Versions {
 
      const val httpcore: String = "4.4.12"
 
-     const val http2_server: String = "9.4.21.v20190926" // available: "9.4.22.v20191022"
+     const val http2_server: String = "9.4.22.v20191022"
 
-     const val javax_websocket_server_impl: String = "9.4.21.v20190926"
-                // available: "9.4.22.v20191022"
+     const val javax_websocket_server_impl: String = "9.4.22.v20191022"
 
-     const val org_eclipse_jetty: String = "9.4.21.v20190926" // available: "9.4.22.v20191022"
+     const val org_eclipse_jetty: String = "9.4.22.v20191022"
 
      const val freemarker: String = "2.3.29"
 
@@ -101,7 +100,7 @@ object Versions {
 
      const val alpn_boot: String = "8.1.13.v20181017"
 
-     const val openapi_generator_gradle_plugin: String = "4.1.3" // available: "4.2.0"
+     const val openapi_generator_gradle_plugin: String = "4.2.0"
 
      const val selenium_api: String = "3.141.59"
 

@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.196.0 (uncut)
+- [all] Update some dependency versions.
+
 ### v3.195.1
 - [http4k-cloudnative] Fix adding value to overridden environment when using `set()`.  H/T @jippeholwerda for the PR
 
