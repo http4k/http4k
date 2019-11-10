@@ -6,6 +6,8 @@ import org.http4k.core.Uri
 import org.http4k.events.EventCategory
 import org.http4k.filter.SamplingDecision
 import org.http4k.filter.TraceId
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.net.URL
@@ -58,7 +60,7 @@ object StringBiDiMappings {
     fun float() = BiDiMapping(String::toFloat, Float::toString)
     fun bigDecimal() = BiDiMapping(String::toBigDecimal, BigDecimal::toString)
     fun bigInteger() = BiDiMapping(String::toBigInteger, BigInteger::toString)
-    fun boolean() = BiDiMapping(::safeBooleanFrom, Boolean::toString)
+    fun boolean() = BiDiMapping(String::asSafeBoolean, Boolean::toString)
     fun nonEmpty() = BiDiMapping({ s: String -> if (s.isEmpty()) throw IllegalArgumentException("String cannot be empty") else s }, { it })
     fun regex(pattern: String, group: Int = 1) = pattern.toRegex().run { BiDiMapping({ s: String -> matchEntire(s)?.groupValues?.get(group)!! }, { it }) }
     fun regexObject() = BiDiMapping(::Regex, Regex::pattern)
@@ -80,11 +82,14 @@ object StringBiDiMappings {
     fun eventCategory() = BiDiMapping(::EventCategory, EventCategory::toString)
     fun traceId() = BiDiMapping(::TraceId, TraceId::value)
     fun samplingDecision() = BiDiMapping(::SamplingDecision, SamplingDecision::value)
+    fun throwable() = BiDiMapping<String, Throwable>({ throw Exception(it) }, Throwable::asString)
 }
 
-internal fun safeBooleanFrom(value: String): Boolean =
+internal fun Throwable.asString() = StringWriter().use { output -> PrintWriter(output).use { printer -> printStackTrace(printer); output.toString() } }
+
+internal fun String.asSafeBoolean(): Boolean =
     when {
-        value.toUpperCase() == "TRUE" -> true
-        value.toUpperCase() == "FALSE" -> false
-        else -> throw IllegalArgumentException("illegal boolean")
+        toUpperCase() == "TRUE" -> true
+        toUpperCase() == "FALSE" -> false
+        else -> throw IllegalArgumentException("illegal boolean: $this}")
     }

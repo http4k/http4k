@@ -11,6 +11,7 @@ import org.http4k.lens.StringBiDiMappings.offsetDateTime
 import org.http4k.lens.StringBiDiMappings.offsetTime
 import org.http4k.lens.StringBiDiMappings.regexObject
 import org.http4k.lens.StringBiDiMappings.samplingDecision
+import org.http4k.lens.StringBiDiMappings.throwable
 import org.http4k.lens.StringBiDiMappings.traceId
 import org.http4k.lens.StringBiDiMappings.uri
 import org.http4k.lens.StringBiDiMappings.url
@@ -67,6 +68,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(eventCategory())
     text(traceId())
     text(samplingDecision())
+    text(throwable())
 }
 
 /**

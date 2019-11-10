@@ -5,12 +5,13 @@ changes with their rationale when appropriate:
 
 ### v3.196.0 (uncut)
 - [all] Update some dependency versions.
+- [http4k-format-jackson, http4k-format-gson] Add support for auto marshalling `Throwable` in a sensible way.
 
 ### v3.195.1
 - [http4k-cloudnative] Fix adding value to overridden environment when using `set()`.  H/T @jippeholwerda for the PR
 
 ### v3.195.0
-- [http4k-security-oauth] - Tweak to handle Content-Type comparisons (with and without directive). H/T @jippeholwerda for the PR
+- [http4k-security-oauth] Tweak to handle Content-Type comparisons (with and without directive). H/T @jippeholwerda for the PR
 - [http4k-multipart] - [Breaking] Added support for setting custom headers in Multipart form fields and files. This has removed the `String` as the default field type (it is now `MultipartFormField`. Calls to create lenses using `MultipartFormField` will now require `MultipartFormField.string()` instead.
 
 ### v3.194.0

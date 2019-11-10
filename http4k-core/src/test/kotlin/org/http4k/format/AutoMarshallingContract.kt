@@ -2,6 +2,7 @@ package org.http4k.format
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.startsWith
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Uri
 import org.http4k.lens.StringBiDiMappings
@@ -51,6 +52,9 @@ data class OutOnlyHolder(val value: OutOnly)
 data class OutOnly(val value: String)
 data class InOnlyHolder(val value: InOnly)
 data class InOnly(val value: String)
+data class ExceptionHolder(val value: Throwable)
+
+class CustomException(m: String) : Exception(m)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
@@ -177,6 +181,11 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     @Test
     fun `convert to inputstream`() {
         assertThat(j.asInputStream(StringHolder("hello")).reader().readText(), equalTo("""{"value":"hello"}"""))
+    }
+
+    @Test
+    fun `throwable is marshalled`() {
+        assertThat(j.asJsonString(ExceptionHolder(CustomException("foobar"))), startsWith("""{"value":"org.http4k.format.CustomException: foobar"""))
     }
 
     abstract fun customJson(): AutoMarshallingJson
