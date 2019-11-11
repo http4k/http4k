@@ -17,11 +17,11 @@ import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 
 /**
- * Handle exceptions from remmote calls and convert them into sensible server-side errors.
+ * Handle exceptions from remote calls and convert them into sensible server-side errors.
  * Optionally pass in a function to format the response body from the exception.
  */
 fun ServerFilters.HandleRemoteRequestFailed(
-    exceptionToBody: RemoteRequestFailed.() -> String = { localizedMessage }
+    exceptionToBody: RemoteRequestFailed.() -> String = Throwable::getLocalizedMessage
 ): Filter {
     fun Status.toResponse(e: RemoteRequestFailed) = Response(this).body(e.exceptionToBody())
 
@@ -43,7 +43,7 @@ fun ServerFilters.HandleRemoteRequestFailed(
 /**
  * Convert errors from remote calls into exceptions which can be handled at a higher level.
  * Optionally pass in:
- * 1. a function to determine which responses are successful - defaults to status 200.299
+ * 1. a function to determine which responses are successful - defaults to status 200..299
  * 2. a function to format the exception message from the response.
  */
 
