@@ -26,8 +26,12 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(ApprovalTest::class)
 class HandleRemoteRequestFailedTest {
 
     @Test
@@ -58,7 +62,7 @@ class HandleRemoteRequestFailedTest {
     }
 
     @Test
-    fun `multi stack errors looks sane`() {
+    fun `multi stack errors looks sane`(approver: Approver) {
         fun stack(clientUri: String) = ServerFilters.HandleRemoteRequestFailed()
             .then(Filter { next ->
                 {
@@ -71,9 +75,7 @@ class HandleRemoteRequestFailedTest {
             .then(stack("http://second"))
             .then { Response(INTERNAL_SERVER_ERROR).body("original error") }
 
-        assertThat(multiStack(Request(GET, Uri.of("http://foobar/baz"))), hasBody("http://first (503):\n" +
-            "\thttp://second (500):\n" +
-            "\t\toriginal error"))
+        approver.assertApproved(multiStack(Request(GET, Uri.of("http://foobar/baz"))))
     }
 
     private fun assertServerResponseForClientStatus(input: Status, responseMatcher: Matcher<Response>) = assertThat(stackWith({ status.successful || status == NOT_FOUND }, input)(Request(GET, "")), responseMatcher)
