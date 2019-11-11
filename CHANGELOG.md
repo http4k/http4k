@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.196.0 (uncut)
+### v3.196.0
 - [all] Update some dependency versions.
 - [http4k-format-jackson, http4k-format-gson] Add support for auto marshalling `Throwable` in a sensible way.
 - [http4k-cloudnative] Renamed badly named `UpstreamRequestFailed` to `RemoteRequestFailed`. Improved error handling.
