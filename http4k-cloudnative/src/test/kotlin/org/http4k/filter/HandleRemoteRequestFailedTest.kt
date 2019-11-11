@@ -71,8 +71,8 @@ class HandleRemoteRequestFailedTest {
             })
             .then(ClientFilters.HandleRemoteRequestFailed())
 
-        val multiStack = stack("http://first")
-            .then(stack("http://second"))
+        val multiStack = stack("http://parent")
+            .then(stack("http://child"))
             .then { Response(INTERNAL_SERVER_ERROR).body("original error") }
 
         approver.assertApproved(multiStack(Request(GET, Uri.of("http://foobar/baz"))))
