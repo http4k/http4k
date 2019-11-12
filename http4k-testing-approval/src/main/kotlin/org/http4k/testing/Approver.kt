@@ -49,7 +49,7 @@ class NamedResourceApprover(private val name: String,
     }
 }
 
-class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\ncp '$actual' '$expected'")
+class ApprovalFailed(prefix: String, actual: ReadResource, expected: ReadResource) : RuntimeException("$prefix. To approve output:\nmv '$actual' '$expected'")
 
 fun Approver.assertApproved(response: Response, expectedStatus: Status) =
     assertApproved(response.apply { assertEquals(expectedStatus, response.status) })
