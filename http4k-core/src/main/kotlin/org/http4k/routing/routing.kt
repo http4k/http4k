@@ -115,7 +115,7 @@ data class RoutedRequest(private val delegate: Request, val xUriTemplate: UriTem
 
     override fun uri(uri: Uri): Request = RoutedRequest(delegate.uri(uri), xUriTemplate)
 
-    override fun query(name: String, value: String): Request = RoutedRequest(delegate.query(name, value), xUriTemplate)
+    override fun query(name: String, value: String?): Request = RoutedRequest(delegate.query(name, value), xUriTemplate)
 
     override fun header(name: String, value: String?): Request = RoutedRequest(delegate.header(name, value), xUriTemplate)
 

@@ -173,7 +173,7 @@ interface Request : HttpMessage {
     /**
      * (Copy &) Adds a query value with this name.
      */
-    fun query(name: String, value: String): Request
+    fun query(name: String, value: String?): Request
 
     /**
      * Retrieves the first query value with this name.
@@ -219,7 +219,7 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
 
     override fun uri(uri: Uri) = copy(uri = uri)
 
-    override fun query(name: String, value: String) = copy(uri = uri.query(name, value))
+    override fun query(name: String, value: String?) = copy(uri = uri.query(name, value))
 
     override fun query(name: String): String? = uri.queries().findSingle(name)
 
