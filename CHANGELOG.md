@@ -3,8 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.197.0 (uncut)
-- [all] Update some dependency versions, including Kotlin to `1.3.60`
+### v3.197.0
+- [all] Update some dependency versions, including Kotlin to `1.3.60`.
 - [http4k-core] Make Query value optional when setting on a `Request`.
 
 ### v3.196.0
