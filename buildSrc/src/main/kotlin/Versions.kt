@@ -20,7 +20,7 @@ object Versions {
 
      const val jackson_dataformat_xml: String = "2.10.1"
 
-     const val jackson_module_kotlin: String = "2.10.0"
+     const val jackson_module_kotlin: String = "2.10.1"
 
      const val underscore: String = "1.49"
 
@@ -36,7 +36,7 @@ object Versions {
 
      const val result4k: String = "2.0.0"
 
-     const val com_squareup_moshi: String = "1.9.1"
+     const val com_squareup_moshi: String = "1.9.2"
 
      const val okhttp: String = "4.2.2"
 
@@ -52,19 +52,19 @@ object Versions {
 
      const val netty_codec_http2: String = "4.1.43.Final"
 
-     const val pebble: String = "3.1.0"
+     const val pebble: String = "3.1.0" // available: "3.1.1"
 
-     const val io_undertow: String = "2.0.27.Final"
+     const val io_undertow: String = "2.0.28.Final"
 
      const val javax_servlet_api: String = "4.0.1"
 
      const val nebula_provided_base_gradle_plugin: String = "3.0.3" // available: "5.0.3"
 
-     const val net_saliman_cobertura_gradle_plugin: String = "2.6.1"
+     const val net_saliman_cobertura_gradle_plugin: String = "3.0.0"
 
-     const val gradle_cobertura_plugin: String = "2.6.1"
+     const val gradle_cobertura_plugin: String = "3.0.0"
 
-     const val argo: String = "5.8"
+     const val argo: String = "5.9"
 
      const val cobertura: String = "2.1.1"
 
@@ -88,7 +88,7 @@ object Versions {
 
      const val dokka_gradle_plugin: String = "0.9.18" // available: "0.10.0"
 
-     const val org_jetbrains_kotlin: String = "1.3.50"
+     const val org_jetbrains_kotlin: String = "1.3.60"
 
      const val json: String = "20190722"
 
@@ -100,7 +100,7 @@ object Versions {
 
      const val alpn_boot: String = "8.1.13.v20181017"
 
-     const val openapi_generator_gradle_plugin: String = "4.2.0"
+     const val openapi_generator_gradle_plugin: String = "4.2.1"
 
      const val selenium_api: String = "3.141.59"
 
@@ -111,7 +111,7 @@ object Versions {
       * See issue 19: How to update Gradle itself?
       * https://github.com/jmfayard/buildSrcVersions/issues/19
       */
-     const val gradleLatestVersion: String = "6.0"
+     const val gradleLatestVersion: String = "6.0.1"
 
      const val gradleCurrentVersion: String = "5.5"
 }
