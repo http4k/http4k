@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.cloudnative.UpstreamRequestFailed
+import org.http4k.cloudnative.RemoteRequestFailed
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -26,7 +26,7 @@ class LibraryTest {
     @Test
     fun `library call fails`() {
         val remoteApi: HttpHandler = { Response(INTERNAL_SERVER_ERROR) }
-        assertThat({ Library(remoteApi).titles() }, throws<UpstreamRequestFailed>())
+        assertThat({ Library(remoteApi).titles() }, throws<RemoteRequestFailed>())
     }
 }
 
