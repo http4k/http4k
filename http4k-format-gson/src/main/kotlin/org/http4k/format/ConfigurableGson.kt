@@ -44,7 +44,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
             else -> throw IllegalArgumentException("Don't know now to translate $value")
         }
 
-    override fun String.asJsonObject(): JsonElement = JsonParser().parse(this).let {
+    override fun String.asJsonObject(): JsonElement = JsonParser.parseString(this).let {
         if (it.isJsonArray || it.isJsonObject) it else throw InvalidJsonException(
             "Could not convert to a JSON Object or Array. $this"
         )
