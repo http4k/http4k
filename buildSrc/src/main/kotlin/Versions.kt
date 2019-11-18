@@ -20,7 +20,7 @@ object Versions {
 
      const val jackson_dataformat_xml: String = "2.10.1"
 
-     const val jackson_module_kotlin: String = "2.10.1"
+     const val jackson_module_kotlin: String = "2.10.0"
 
      const val underscore: String = "1.49"
 
