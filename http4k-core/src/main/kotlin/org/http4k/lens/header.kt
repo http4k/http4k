@@ -17,7 +17,7 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
             val parts = it.split(";")
             if (parts.size == 2) {
                 val directive = parts[1].split("=")
-                if (directive.size == 2) ContentType(parts[0].trim(), directive[0].trim() to directive[1].trim())
+                if (directive.size == 2) ContentType(parts[0].trim(), listOf(directive[0].trim() to directive[1].trim()))
                 else ContentType(parts[0].trim())
             } else ContentType(it.trim())
         },

@@ -15,15 +15,15 @@ class MimeTypesTest {
 
     @Test
     fun `uses known content types from mime types file`() {
-        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.xml", APPLICATION_XML.withNoDirective())
-        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.html", TEXT_HTML.withNoDirective())
-        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.txt", TEXT_PLAIN.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.xml", APPLICATION_XML.withNoDirectives())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.html", TEXT_HTML.withNoDirectives())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.txt", TEXT_PLAIN.withNoDirectives())
     }
 
     @Test
     fun `defaults back to octet stream for unknown file type`() {
-        assertCorrectContentTypeFoundFor(standardTypes, "txt", OCTET_STREAM.withNoDirective())
-        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.foobar", OCTET_STREAM.withNoDirective())
+        assertCorrectContentTypeFoundFor(standardTypes, "txt", OCTET_STREAM.withNoDirectives())
+        assertCorrectContentTypeFoundFor(standardTypes, "/foo/bob.foobar", OCTET_STREAM.withNoDirectives())
     }
 
     @Test

@@ -41,7 +41,7 @@ class NewResourceLoadingHandlerTest {
             handler(Request(GET, Uri.of("/root/file.txt"))),
             allOf(
                 hasStatus(Status.OK),
-                hasContentType(TEXT_PLAIN.withNoDirective()),
+                hasContentType(TEXT_PLAIN.withNoDirectives()),
                 hasHeader("Content-Length", "7"),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
                 hasHeader("ETag", """W/"etag-value""""),

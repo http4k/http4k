@@ -115,7 +115,7 @@ open class OpenApi2<out NODE>(
         val (responses, responseDefinitions) = route.meta.responses.render()
 
         val schema = route.meta.requests.find {
-            Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirective(APPLICATION_JSON) ?: false
+            Header.CONTENT_TYPE(it.message)?.equalsIgnoringDirectives(APPLICATION_JSON) ?: false
         }?.asSchema()
 
         val bodyParamNodes = route.spec.routeMeta.body?.metas?.map { it.renderBodyMeta(schema) } ?: emptyList()

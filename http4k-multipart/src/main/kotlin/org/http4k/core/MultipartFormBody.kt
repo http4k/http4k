@@ -1,5 +1,6 @@
 package org.http4k.core
 
+import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
@@ -32,13 +33,13 @@ sealed class MultipartEntity : Closeable {
 }
 
 fun HttpMessage.multipartIterator(): Iterator<MultipartEntity> {
-    val boundary = CONTENT_TYPE(this)?.directive?.second ?: ""
+    val boundary = CONTENT_TYPE(this)?.directives?.firstOrNull()?.second ?: ""
 
     return StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), body.stream, UTF_8)
         .asSequence()
         .map {
             if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.contentsAsString, it.headers.toList())
-            else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.inputStream), it.headers.toList())
+            else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, TEXT_HTML.directives), it.inputStream), it.headers.toList())
         }.iterator()
 }
 
@@ -80,14 +81,14 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
         const val DEFAULT_DISK_THRESHOLD = 1000 * 1024
 
         fun from(httpMessage: HttpMessage, diskThreshold: Int = DEFAULT_DISK_THRESHOLD): MultipartFormBody {
-            val boundary = CONTENT_TYPE(httpMessage)?.directive?.second ?: ""
+            val boundary = CONTENT_TYPE(httpMessage)?.directives?.firstOrNull()?.second ?: ""
             val inputStream = httpMessage.body.run { if (stream.available() > 0) stream else ByteArrayInputStream(payload.array()) }
             val form = StreamingMultipartFormParts.parse(boundary.toByteArray(UTF_8), inputStream, UTF_8)
             val dir = Files.createTempDirectory("http4k-mp").toFile().apply { deleteOnExit() }
 
             val parts = MultipartFormParser(UTF_8, diskThreshold, dir).formParts(form).map {
                 if (it.isFormField) MultipartEntity.Field(it.fieldName!!, it.string(diskThreshold), it.headers.toList())
-                else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, ContentType.TEXT_HTML.directive), it.newInputStream))
+                else MultipartEntity.File(it.fieldName!!, MultipartFormFile(it.fileName!!, ContentType(it.contentType!!, TEXT_HTML.directives), it.newInputStream))
             }
             return MultipartFormBody(parts, boundary)
         }

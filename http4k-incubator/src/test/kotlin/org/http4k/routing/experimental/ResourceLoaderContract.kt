@@ -51,7 +51,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
             val response = (loader.match(request)!!).invoke(request)
             assertThat(response, hasBody(expected))
             assertThat(response, hasHeader("Content-Length", expected.length.toString()) or hasHeader("Content-Length", absent()))
-            assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirective().toHeaderValue()))
+            assertThat(response, hasHeader("Content-Type", expectedContentType.withNoDirectives().toHeaderValue()))
         }
     }
 }
