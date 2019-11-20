@@ -42,7 +42,6 @@ class BodyTest {
         val strictBody = Body.string(TEXT_PLAIN, contentNegotiation = ContentNegotiation.Strict).toLens()
         assertThat({ strictBody(emptyRequest.body("some value")) }, throws(lensFailureWith<Any?>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
         assertThat({ strictBody(emptyRequest.header("content-type", "text/bob;charset=not-utf-8").body("some value")) }, throws(lensFailureWith<ContentType>(Unsupported(CONTENT_TYPE.meta), overallType = Failure.Type.Unsupported)))
-        assertThat(strictBody(emptyRequest.header("content-type", "text/plain;  charset  = utf-8  ").body("some value")), equalTo("some value"))
     }
 
     @Test
