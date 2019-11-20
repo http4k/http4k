@@ -1,6 +1,7 @@
 package org.http4k.multipart
 
 import org.apache.commons.fileupload.util.ParameterParser
+import org.http4k.multipart.StreamingMultipartFormParts.MultipartFormStreamState.BoundaryFound
 import org.http4k.multipart.StreamingMultipartFormParts.MultipartFormStreamState.Contents
 import org.http4k.multipart.StreamingMultipartFormParts.MultipartFormStreamState.Eos
 import org.http4k.multipart.StreamingMultipartFormParts.MultipartFormStreamState.FindBoundary
@@ -44,7 +45,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
 
         if (state == FindBoundary && !inputStream.matchInStream(boundary)) throw TokenNotFoundException("Boundary not found <<" + String(boundary, encoding) + ">>")
 
-        state = MultipartFormStreamState.BoundaryFound
+        state = BoundaryFound
         if (inputStream.matchInStream(STREAM_TERMINATOR)) {
             if (!inputStream.matchInStream(FIELD_SEPARATOR)) throw TokenNotFoundException("Stream terminator must be followed by field separator, but didn't find it")
             when {
@@ -148,7 +149,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                 currentPart = safelyParseNextPart()
             }
 
-            return !isEndOfStream
+            return !isEndOfStream()
         }
 
         /**
@@ -160,14 +161,14 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
          */
         override fun next(): StreamingPart {
             if (nextIsKnown) {
-                if (isEndOfStream) throw NoSuchElementException("No more parts in this MultipartForm")
+                if (isEndOfStream()) throw NoSuchElementException("No more parts in this MultipartForm")
                 nextIsKnown = false
             } else {
 
                 if (state == Contents) currentPart!!.inputStream.close()
 
                 currentPart = safelyParseNextPart()
-                if (isEndOfStream) throw NoSuchElementException("No more parts in this MultipartForm")
+                if (isEndOfStream()) throw NoSuchElementException("No more parts in this MultipartForm")
             }
             return currentPart!!
         }
@@ -181,9 +182,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                 throw ParseError(e)
             }
 
-        private val isEndOfStream: Boolean
-            get() = currentPart == null
-
+        private fun isEndOfStream() = currentPart == null
     }
 
     private inner class BoundedInputStream : InputStream() {
@@ -202,7 +201,7 @@ internal class StreamingMultipartFormParts private constructor(inBoundary: ByteA
                     -1
                 }
                 -2 -> {
-                    state = MultipartFormStreamState.BoundaryFound
+                    state = BoundaryFound
                     endOfStream = true
                     -1 // inputStream.read(byte b[], int off, int len) checks for exactly -1
                 }
