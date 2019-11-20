@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType
 import org.http4k.core.Method
 import org.http4k.core.Method.GET
+import org.http4k.core.Parameter
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
 import org.http4k.core.with
@@ -108,8 +109,9 @@ class HeaderTest {
     @Test
     fun `content type serialises and deserialises correctly to message - with illegal directive is ignored`() {
         val lens = Header.CONTENT_TYPE
-        val reqWithHeader = Request(GET, "").header("Content-Type", "bob ; foomanchu")
-        assertThat(lens(reqWithHeader), equalTo(ContentType("bob")))
+        val reqWithHeader = Request(GET, "").header("Content-Type", "bob; charset=UTF-8 ;boundary=asd; foomanchu; media-type=a/b")
+        assertThat(lens(reqWithHeader), equalTo(ContentType("bob",
+            listOf("charset" to "UTF-8", "boundary" to "asd", "media-type" to "a/b"))))
     }
 
     @Test
@@ -119,4 +121,15 @@ class HeaderTest {
         assertThat(reqWithHeader.header("Content-Type"), equalTo("value"))
         assertThat(lens(reqWithHeader), equalTo(ContentType("value")))
     }
+
+    @Test
+    fun `multiple directives are parsed correctly`() {
+        assertThat(Header.parseValueAndDirectives("some value"), equalTo("some value" to emptyList()))
+        assertThat(Header.parseValueAndDirectives("some value ;"), equalTo("some value" to emptyList()))
+        assertThat(Header.parseValueAndDirectives("some value; bob"), equalTo("some value" to listOf<Parameter>("bob" to null)))
+        assertThat(Header.parseValueAndDirectives("some value; bob   ;bob2=anotherValue   "),
+            equalTo("some value" to
+                listOf("bob" to null, "bob2" to "anotherValue")))
+    }
+
 }

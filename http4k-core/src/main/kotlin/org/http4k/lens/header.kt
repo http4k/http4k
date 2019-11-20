@@ -2,6 +2,7 @@ package org.http4k.lens
 
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
+import org.http4k.core.Parameters
 import org.http4k.core.Uri
 import org.http4k.core.Uri.Companion.of
 import org.http4k.lens.ParamMeta.StringParam
@@ -14,14 +15,24 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
 ) {
     val CONTENT_TYPE = map(
         {
-            val parts = it.split(";")
-            if (parts.size == 2) {
-                val directive = parts[1].split("=")
-                if (directive.size == 2) ContentType(parts[0].trim(), listOf(directive[0].trim() to directive[1].trim()))
-                else ContentType(parts[0].trim())
-            } else ContentType(it.trim())
+            parseValueAndDirectives(it).let {
+                ContentType(it.first, it.second
+                    .filter { it.first.toLowerCase() in setOf("boundary", "charset", "media-type") }
+                )
+            }
         },
         ContentType::toHeaderValue).optional("content-type")
 
     val LOCATION = map({ of(it) }, Uri::toString).required("location")
+
+    internal fun parseValueAndDirectives(it: String): Pair<String, Parameters> =
+        with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {
+            first() to drop(1).map {
+                val directiveParts = it.split("=")
+                directiveParts.first() to when (directiveParts.size) {
+                    1 -> null
+                    else -> directiveParts.drop(1).joinToString("=")
+                }
+            }
+        }
 }
