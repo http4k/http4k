@@ -8,7 +8,6 @@ data class OAuthProviderConfig(
     val authPath: String,
     val tokenPath: String,
     val credentials: Credentials,
-    val apiBase: Uri = authBase) {
-    val authUri = authBase.path(authPath)
-    val tokenUri = authBase.path(tokenPath)
-}
+    val apiBase: Uri = authBase,
+    val authUri: Uri = authBase.path(authPath),
+    val tokenUri: Uri = authBase.path(tokenPath))
