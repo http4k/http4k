@@ -28,10 +28,8 @@ object Header : BiDiLensSpec<HttpMessage, String>("header", StringParam,
     internal fun parseValueAndDirectives(it: String): Pair<String, Parameters> =
         with(it.split(";").mapNotNull { it.trim().takeIf(String::isNotEmpty) }) {
             first() to drop(1).map {
-                val directiveParts = it.split("=")
-                directiveParts.first() to when (directiveParts.size) {
-                    1 -> null
-                    else -> directiveParts.drop(1).joinToString("=")
+                with(it.split("=")) {
+                    first() to if (size == 1) null else drop(1).joinToString("=")
                 }
             }
         }
