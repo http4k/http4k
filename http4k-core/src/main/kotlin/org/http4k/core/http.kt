@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package org.http4k.core
 
 import org.http4k.asString
@@ -9,7 +7,6 @@ import org.http4k.routing.RoutedRequest
 import java.io.Closeable
 import java.io.InputStream
 import java.nio.ByteBuffer
-
 
 typealias Headers = Parameters
 
