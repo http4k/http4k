@@ -1,6 +1,7 @@
 package org.http4k.core
 
 import org.http4k.core.ContentType.Companion.TEXT_HTML
+import org.http4k.core.MultipartFormBody.Companion.DEFAULT_DISK_THRESHOLD
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
@@ -95,7 +96,7 @@ data class MultipartFormBody private constructor(internal val formParts: List<Mu
     }
 }
 
-internal fun Part.string(diskThreshold: Int = MultipartFormBody.DEFAULT_DISK_THRESHOLD): String = when (this) {
+internal fun Part.string(diskThreshold: Int = DEFAULT_DISK_THRESHOLD): String = when (this) {
     is Part.DiskBacked -> throw RuntimeException("Fields configured to not be greater than $diskThreshold bytes.")
     is Part.InMemory -> String(bytes, encoding)
 }
