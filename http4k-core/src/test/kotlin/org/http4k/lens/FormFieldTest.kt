@@ -66,14 +66,14 @@ class FormFieldTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = FormField.map(::MyCustomBodyType, { it.value }).required("bob")
+        val custom = FormField.map(::MyCustomType, { it.value }).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
+        val instance = MyCustomType("hello world!")
         val formWithField = custom(instance, WebForm())
 
         assertThat(formWithField.fields["bob"], equalTo(listOf("hello world!")))
 
-        assertThat(custom(formWithField), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(formWithField), equalTo(MyCustomType("hello world!")))
     }
 
     @Test

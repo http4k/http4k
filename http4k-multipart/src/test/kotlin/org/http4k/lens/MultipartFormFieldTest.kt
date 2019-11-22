@@ -66,14 +66,14 @@ class MultipartFormFieldTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = MultipartFormField.string().map(::MyCustomBodyType, MyCustomBodyType::value).required("bob")
+        val custom = MultipartFormField.string().map(::MyCustomType, MyCustomType::value).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
+        val instance = MyCustomType("hello world!")
         val formWithField = custom(instance, MultipartForm())
 
         assertThat(formWithField.fields["bob"], equalTo(listOf(MultipartFormField("hello world!"))))
 
-        assertThat(custom(formWithField), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(formWithField), equalTo(MyCustomType("hello world!")))
     }
 
     @Test

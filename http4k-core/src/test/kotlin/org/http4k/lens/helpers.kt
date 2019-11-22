@@ -82,7 +82,7 @@ object BiDiLensContract {
     }
 }
 
-data class MyCustomBodyType(val value: String)
+data class MyCustomType(val value: String)
 
 inline fun <reified T> lensFailureWith(vararg failures: Failure, overallType: Failure.Type) = object : Matcher<LensFailure> {
     private val expectedList = failures.toList()

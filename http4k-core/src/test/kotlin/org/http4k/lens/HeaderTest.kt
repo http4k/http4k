@@ -80,14 +80,14 @@ class HeaderTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Header.map(::MyCustomBodyType, { it.value }).required("bob")
+        val custom = Header.map(::MyCustomType, { it.value }).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
+        val instance = MyCustomType("hello world!")
         val reqWithHeader = custom(instance, Request(Method.GET, ""))
 
         assertThat(reqWithHeader.header("bob"), equalTo("hello world!"))
 
-        assertThat(custom(reqWithHeader), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(reqWithHeader), equalTo(MyCustomType("hello world!")))
     }
 
     @Test

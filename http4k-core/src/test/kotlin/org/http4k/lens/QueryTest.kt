@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
@@ -12,7 +11,7 @@ import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
 class QueryTest {
-    private val request = withQueryOf("/?hello=world&hello=world2")
+    private val request = "/?hello=world&hello=world2".withQueryOf()
 
     @Test
     fun `value present`() {
@@ -72,17 +71,17 @@ class QueryTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Query.map(::MyCustomBodyType, { it.value }).required("bob")
+        val custom = Query.map(::MyCustomType) { it.value }.required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
-        val reqWithQuery = custom(instance, Request(Method.GET, ""))
+        val instance = MyCustomType("hello world!")
+        val reqWithQuery = custom(instance, Request(GET, ""))
 
         assertThat(reqWithQuery.query("bob"), equalTo("hello world!"))
 
-        assertThat(custom(reqWithQuery), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(reqWithQuery), equalTo(MyCustomType("hello world!")))
     }
 
-    private fun withQueryOf(value: String) = Request(GET, of(value))
+    private fun String.withQueryOf() = Request(GET, of(this))
 
     @Test
     fun `toString is ok`() {

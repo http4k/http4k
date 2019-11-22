@@ -83,22 +83,22 @@ class BodyTest {
 
     @Test
     fun `can create a custom Body type and get and set on request`() {
-        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType, { it.value }).toLens()
+        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType, { it.value }).toLens()
 
-        val custom = MyCustomBodyType("hello world!")
+        val custom = MyCustomType("hello world!")
         val reqWithBody = customBody(custom, emptyRequest)
 
         assertThat(reqWithBody.bodyString(), equalTo("hello world!"))
 
-        assertThat(customBody(reqWithBody), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(customBody(reqWithBody), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
     fun `can create a one way custom Body type`() {
-        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomBodyType).toLens()
+        val customBody = Body.string(TEXT_PLAIN).map(::MyCustomType).toLens()
         assertThat(customBody(emptyRequest
             .header("Content-type", TEXT_PLAIN.toHeaderValue())
-            .body("hello world!")), equalTo(MyCustomBodyType("hello world!")))
+            .body("hello world!")), equalTo(MyCustomType("hello world!")))
     }
 }
 

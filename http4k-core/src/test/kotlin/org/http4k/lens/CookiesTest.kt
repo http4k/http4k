@@ -79,14 +79,14 @@ class CookiesTest {
 
     @Test
     fun `can create a custom type and get and set on request`() {
-        val custom = Cookies.map({ MyCustomBodyType(it.value) }, { Cookie("bob", it.value) }).required("bob")
+        val custom = Cookies.map({ MyCustomType(it.value) }, { Cookie("bob", it.value) }).required("bob")
 
-        val instance = MyCustomBodyType("hello world!")
+        val instance = MyCustomType("hello world!")
         val reqWithCookies = custom(instance, Request(Method.GET, ""))
 
         assertThat(reqWithCookies.cookie("bob"), equalTo(Cookie("bob", "hello world!")))
 
-        assertThat(custom(reqWithCookies), equalTo(MyCustomBodyType("hello world!")))
+        assertThat(custom(reqWithCookies), equalTo(MyCustomType("hello world!")))
     }
 
     @Test

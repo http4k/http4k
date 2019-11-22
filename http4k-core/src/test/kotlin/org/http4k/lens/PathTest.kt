@@ -68,8 +68,8 @@ class PathTest {
 
     @Test
     fun `can create a custom type and get it`() {
-        val path = Path.map(::MyCustomBodyType).of("bob")
-        assertThat(path("hello world!"), equalTo(MyCustomBodyType("hello world!")))
+        val path = Path.map(::MyCustomType).of("bob")
+        assertThat(path("hello world!"), equalTo(MyCustomType("hello world!")))
     }
 
     @Test
