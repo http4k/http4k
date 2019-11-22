@@ -82,14 +82,15 @@ class QueryTest {
     }
 
     @Test
-    fun `test mapping for optional custom type`() {
+    fun `optional custom type with null value`() {
         val custom = Query.map(::MyCustomType) { it.value }.optional("bob")
 
         val request = Request(GET, "/foo")
+        assertThat(request.query("bob"), absent())
 
-        val requestWithEmptyQueryValue = request.query("bob", null)
-        assertThat(requestWithEmptyQueryValue.uri.toString(), equalTo("/foo?bob"))
-        assertThat(requestWithEmptyQueryValue.query("bob"), absent())
+        val requestWithNullQueryValue = request.query("bob", null)
+        assertThat(requestWithNullQueryValue.uri.toString(), equalTo("/foo?bob"))
+        assertThat(requestWithNullQueryValue.query("bob"), absent())
 
         val requestWithEmptyMappedType = request.with(custom of MyCustomType(""))
         assertThat(requestWithEmptyMappedType.uri.toString(), equalTo("/foo?bob="))
