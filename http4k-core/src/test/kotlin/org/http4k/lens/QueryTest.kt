@@ -11,7 +11,7 @@ import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
 class QueryTest {
-    private val request = "/?hello=world&hello=world2".withQueryOfValue()
+    private val request = Request(GET, of("/?hello=world&hello=world2"))
 
     @Test
     fun `value present`() {
@@ -83,7 +83,8 @@ class QueryTest {
 
     @Test
     fun `optional custom type with null value`() {
-        val custom = Query.map(::MyCustomType) { it.value }.optional("bob")
+        val mapped = Query.map(::MyCustomType) { it.value }.optional("bob")
+        val nonMapped = Query.optional("bob")
 
         val request = Request(GET, "/foo")
         assertThat(request.query("bob"), absent())
@@ -91,17 +92,21 @@ class QueryTest {
         val requestWithNullQueryValue = request.query("bob", null)
         assertThat(requestWithNullQueryValue.uri.toString(), equalTo("/foo?bob"))
         assertThat(requestWithNullQueryValue.query("bob"), absent())
+        assertThat(mapped(requestWithNullQueryValue), absent())
+        assertThat(nonMapped(requestWithNullQueryValue), absent())
 
-        val requestWithEmptyMappedType = request.with(custom of MyCustomType(""))
+        val requestWithEmptyMappedType = request.with(mapped of MyCustomType(""))
         assertThat(requestWithEmptyMappedType.uri.toString(), equalTo("/foo?bob="))
-        assertThat(custom(requestWithEmptyMappedType), equalTo(MyCustomType("")))
+        assertThat(requestWithEmptyMappedType.query("bob"), equalTo(""))
+        assertThat(mapped(requestWithEmptyMappedType), equalTo(MyCustomType("")))
+        assertThat(nonMapped(requestWithEmptyMappedType), equalTo(""))
 
-        val requestWithNullMappedType = request.with(custom of null)
+        val requestWithNullMappedType = request.with(mapped of null)
         assertThat(requestWithNullMappedType.uri.toString(), equalTo("/foo"))
-        assertThat(custom(requestWithNullMappedType), absent())
+        assertThat(requestWithEmptyMappedType.query("bob"), absent())
+        assertThat(mapped(requestWithNullMappedType), absent())
+        assertThat(nonMapped(requestWithNullMappedType), absent())
     }
-
-    private fun String.withQueryOfValue() = Request(GET, of(this))
 
     @Test
     fun `toString is ok`() {
