@@ -103,7 +103,7 @@ class QueryTest {
 
         val requestWithNullMappedType = request.with(mapped of null)
         assertThat(requestWithNullMappedType.uri.toString(), equalTo("/foo"))
-        assertThat(requestWithEmptyMappedType.query("bob"), absent())
+        assertThat(requestWithNullMappedType.query("bob"), absent())
         assertThat(mapped(requestWithNullMappedType), absent())
         assertThat(nonMapped(requestWithNullMappedType), absent())
     }
