@@ -11,7 +11,7 @@ import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
 class QueryTest {
-    private val request = "/?hello=world&hello=world2".withQueryOf()
+    private val request = "/?hello=world&hello=world2".withQueryOfValue()
 
     @Test
     fun `value present`() {
@@ -81,7 +81,26 @@ class QueryTest {
         assertThat(custom(reqWithQuery), equalTo(MyCustomType("hello world!")))
     }
 
-    private fun String.withQueryOf() = Request(GET, of(this))
+    @Test
+    fun `test mapping for optional custom type`() {
+        val custom = Query.map(::MyCustomType) { it.value }.optional("bob")
+
+        val request = Request(GET, "/foo")
+
+        val requestWithEmptyQueryValue = request.query("bob", null)
+        assertThat(requestWithEmptyQueryValue.uri.toString(), equalTo("/foo?bob"))
+        assertThat(requestWithEmptyQueryValue.query("bob"), absent())
+
+        val requestWithEmptyMappedType = request.with(custom of MyCustomType(""))
+        assertThat(requestWithEmptyMappedType.uri.toString(), equalTo("/foo?bob="))
+        assertThat(custom(requestWithEmptyMappedType), equalTo(MyCustomType("")))
+
+        val requestWithNullMappedType = request.with(custom of null)
+        assertThat(requestWithNullMappedType.uri.toString(), equalTo("/foo"))
+        assertThat(custom(requestWithNullMappedType), absent())
+    }
+
+    private fun String.withQueryOfValue() = Request(GET, of(this))
 
     @Test
     fun `toString is ok`() {
