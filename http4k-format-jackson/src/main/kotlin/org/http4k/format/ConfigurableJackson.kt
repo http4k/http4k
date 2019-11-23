@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
@@ -70,7 +71,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.writeValueAsString(it) })
+        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.writerFor(jacksonTypeRef<T>()).writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
