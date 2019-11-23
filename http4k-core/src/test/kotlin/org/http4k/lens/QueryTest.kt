@@ -92,6 +92,7 @@ class QueryTest {
 
         val requestWithNullQueryValue = request.uri(request.uri.query("bob", null))
 
+        assertThat({ nonMapped(request) }, throws<LensFailure>())
         assertThat(nonMapped(requestWithNullQueryValue), present(equalTo("")))
     }
 
