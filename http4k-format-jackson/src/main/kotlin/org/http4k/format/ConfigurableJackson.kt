@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
@@ -64,7 +66,7 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
-    inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this, object : TypeReference<T>() {})
+    inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), ::asJsonString)
 
@@ -88,4 +90,4 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
 
-inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it, object : TypeReference<T>() {}) as T }
+inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it) }
