@@ -10,6 +10,7 @@ changes with their rationale when appropriate:
 ### v3.197.0
 - [all] Update some dependency versions, including Kotlin to `1.3.60`.
 - [http4k-core] Make Query value optional when setting on a `Request`.
+- [http4k-core] [Breaking] Fix #316. Optional Query lens handling is more accurate. See issue for details of change in behaviour.
 
 ### v3.196.0
 - [all] Update some dependency versions.
