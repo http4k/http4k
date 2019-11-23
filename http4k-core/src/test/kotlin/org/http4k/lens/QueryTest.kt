@@ -3,15 +3,17 @@ package org.http4k.lens
 import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
+import org.http4k.core.query
 import org.http4k.core.with
 import org.junit.jupiter.api.Test
 
 class QueryTest {
-    private val request = "/?hello=world&hello=world2".withQueryOfValue()
+    private val request = Request(GET, of("/?hello=world&hello=world2"))
 
     @Test
     fun `value present`() {
@@ -82,26 +84,48 @@ class QueryTest {
     }
 
     @Test
-    fun `optional custom type with null value`() {
-        val custom = Query.map(::MyCustomType) { it.value }.optional("bob")
+    fun `required custom type with null value`() {
+        val nonMapped = Query.required("bob")
 
         val request = Request(GET, "/foo")
         assertThat(request.query("bob"), absent())
 
-        val requestWithNullQueryValue = request.query("bob", null)
-        assertThat(requestWithNullQueryValue.uri.toString(), equalTo("/foo?bob"))
-        assertThat(requestWithNullQueryValue.query("bob"), absent())
+        val requestWithNullQueryValue = request.uri(request.uri.query("bob", null))
 
-        val requestWithEmptyMappedType = request.with(custom of MyCustomType(""))
-        assertThat(requestWithEmptyMappedType.uri.toString(), equalTo("/foo?bob="))
-        assertThat(custom(requestWithEmptyMappedType), equalTo(MyCustomType("")))
-
-        val requestWithNullMappedType = request.with(custom of null)
-        assertThat(requestWithNullMappedType.uri.toString(), equalTo("/foo"))
-        assertThat(custom(requestWithNullMappedType), absent())
+        assertThat({ nonMapped(request) }, throws<LensFailure>())
+        assertThat(nonMapped(requestWithNullQueryValue), present(equalTo("")))
     }
 
-    private fun String.withQueryOfValue() = Request(GET, of(this))
+    @Test
+    fun `optional custom type with null value`() {
+        val mapped = Query.map(::MyCustomType) { it.value }.optional("bob")
+        val nonMapped = Query.optional("bob")
+
+        val request = Request(GET, "/foo")
+        assertThat(request.query("bob"), absent())
+        assertThat(request.queries("bob"), equalTo(emptyList()))
+
+        val requestWithNullQueryValue = request.uri(request.uri.query("bob", null))
+        assertThat(requestWithNullQueryValue.uri.toString(), equalTo("/foo?bob"))
+        assertThat(requestWithNullQueryValue.query("bob"), absent())
+        assertThat(requestWithNullQueryValue.queries("bob"), equalTo(listOf<String?>(null)))
+        assertThat(mapped(requestWithNullQueryValue), present(equalTo(MyCustomType(""))))
+        assertThat(nonMapped(requestWithNullQueryValue), equalTo(""))
+
+        val requestWithEmptyMappedType = request.with(mapped of MyCustomType(""))
+        assertThat(requestWithEmptyMappedType.uri.toString(), equalTo("/foo?bob="))
+        assertThat(requestWithEmptyMappedType.query("bob"), equalTo(""))
+        assertThat(requestWithEmptyMappedType.queries("bob"), equalTo(listOf<String?>("")))
+        assertThat(mapped(requestWithEmptyMappedType), equalTo(MyCustomType("")))
+        assertThat(nonMapped(requestWithEmptyMappedType), equalTo(""))
+
+        val requestWithNullMappedType = request.with(mapped of null)
+        assertThat(requestWithNullMappedType.uri.toString(), equalTo("/foo"))
+        assertThat(requestWithNullMappedType.query("bob"), absent())
+        assertThat(requestWithNullMappedType.queries("bob"), equalTo(emptyList()))
+        assertThat(mapped(requestWithNullMappedType), absent())
+        assertThat(nonMapped(requestWithNullMappedType), absent())
+    }
 
     @Test
     fun `toString is ok`() {
