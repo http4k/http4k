@@ -1,5 +1,7 @@
 package org.http4k.format
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -20,6 +22,15 @@ open class Public
 class Private : Public()
 
 data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, @JsonView(Public::class) @JvmField val pub: Int)
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = FirstChild::class, name = "first"),
+    JsonSubTypes.Type(value = SecondChild::class, name = "second")
+)
+sealed class PolymorphicParent
+data class FirstChild(val something: String): PolymorphicParent()
+data class SecondChild(val somethingElse: String): PolymorphicParent()
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
@@ -53,6 +64,27 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
         assertThat(body(Response(OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
+    }
+
+    @Test
+    fun `roundtrip polymorphic object to and from body`() {
+        val body = Body.auto<PolymorphicParent>().toLens()
+
+        val firstChild: PolymorphicParent = FirstChild("hello")
+        val secondChild: PolymorphicParent = SecondChild("world")
+
+        assertThat(body(Response(OK).with(body of firstChild)), equalTo(firstChild))
+        assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
+    }
+
+
+    @Test
+    fun `roundtrip list of polymorphic objects to and from body`() {
+        val body = Body.auto<List<PolymorphicParent>>().toLens()
+
+        val list = listOf(FirstChild("hello"), SecondChild("world"))
+        
+        assertThat(body(Response(OK).with(body of list)), equalTo(list))
     }
 
     @Test
