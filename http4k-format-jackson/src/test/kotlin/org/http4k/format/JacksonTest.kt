@@ -31,6 +31,12 @@ data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, 
 )
 sealed class PolymorphicParent
 
+data class FirstChild(val something: String) : PolymorphicParent()
+data class SecondChild(val somethingElse: String) : PolymorphicParent()
+
+abstract class NotSealedParent
+data class NonSealedChild(val something: String) : NotSealedParent()
+
 interface Interface {
     val value: String
 }
@@ -39,9 +45,6 @@ class InterfaceImpl : Interface {
     override val value = "hello"
     val subValue = "123"
 }
-
-data class FirstChild(val something: String) : PolymorphicParent()
-data class SecondChild(val somethingElse: String) : PolymorphicParent()
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
@@ -84,6 +87,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         val firstChild: PolymorphicParent = FirstChild("hello")
         val secondChild: PolymorphicParent = SecondChild("world")
 
+        println(Response(OK).with(body of firstChild))
         assertThat(body(Response(OK).with(body of firstChild)), equalTo(firstChild))
         assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
     }
@@ -94,9 +98,21 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
             Body.auto<Interface>().toLens() of InterfaceImpl()
         ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
 
+        // this is the wrong behaviour if we want to use the same auto method for both ...
         assertThat(Response(OK).with(
             Jackson.autoBody<Interface>(writeFn = { writerFor(jacksonTypeRef<Interface>()).writeValueAsString(it) }).toLens() of InterfaceImpl()
         ).bodyString(), equalTo("""{"value":"hello"}"""))
+    }
+
+    @Test
+    fun `writes using non-sealed parent type`() {
+        val nonSealedChild = NonSealedChild("hello")
+        assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something":"hello"}"""))
+
+        // this is the wrong behaviour if we want to use the same auto method for both ...
+        assertThat(Response(OK).with(
+            Jackson.autoBody<NotSealedParent>(writeFn = { writerFor(jacksonTypeRef<NotSealedParent>()).writeValueAsString(it) }).toLens() of nonSealedChild
+        ).bodyString(), equalTo("""{}"""))
     }
 
     @Test
