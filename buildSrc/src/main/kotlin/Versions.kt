@@ -46,13 +46,13 @@ object Versions {
 
      const val io_github_resilience4j: String = "1.1.0"
 
-     const val ktor_server_cio: String = "1.2.5"
+     const val ktor_server_cio: String = "1.2.6"
 
      const val micrometer_core: String = "1.3.1"
 
      const val netty_codec_http2: String = "4.1.43.Final"
 
-     const val pebble: String = "3.1.0" // available: "3.1.1"
+     const val pebble: String = "3.1.1"
 
      const val io_undertow: String = "2.0.28.Final"
 
@@ -76,11 +76,11 @@ object Versions {
 
      const val httpcore: String = "4.4.12"
 
-     const val http2_server: String = "9.4.22.v20191022"
+     const val http2_server: String = "9.4.24.v20191120"
 
-     const val javax_websocket_server_impl: String = "9.4.22.v20191022"
+     const val javax_websocket_server_impl: String = "9.4.24.v20191120"
 
-     const val org_eclipse_jetty: String = "9.4.22.v20191022"
+     const val org_eclipse_jetty: String = "9.4.24.v20191120"
 
      const val freemarker: String = "2.3.29"
 

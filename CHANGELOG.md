@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.199.0 (uncut)
 - [http4k-format-jackson] Fix #313 - ConfigurableJackson.autoBody implementation would not work with collections of polymorphic types. H/T @alphaho for the PR.
+- [all] Update some dependency versions
 
 ### v3.198.0
 - [http4k-core] [Breaking] Reworking of ContentType to support multiple directives. `directive` field is now `directives`, so just add the extra 's' to fix :)
