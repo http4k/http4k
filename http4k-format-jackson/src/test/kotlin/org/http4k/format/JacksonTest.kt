@@ -96,23 +96,12 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         assertThat(Response(OK).with(
             Body.auto<Interface>().toLens() of InterfaceImpl()
         ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
-
-        // this is the wrong behaviour if we want to use the same auto method for both ...
-        assertThat(Response(OK).with(
-            Jackson.autoBody<Interface>(writeFn = { writerFor(jacksonTypeRef<Interface>()).writeValueAsString(it) }).toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""{"value":"hello"}"""))
-        assertThat(Response(OK).with(Body.auto<Interface>().toLens() of InterfaceImpl()).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
     }
 
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
         assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something":"hello"}"""))
-
-        // this is the wrong behaviour if we want to use the same auto method for both ...
-        assertThat(Response(OK).with(
-            Jackson.autoBody<NotSealedParent>(writeFn = { writerFor(jacksonTypeRef<NotSealedParent>()).writeValueAsString(it) }).toLens() of nonSealedChild
-        ).bodyString(), equalTo("""{}"""))
     }
 
     @Test
