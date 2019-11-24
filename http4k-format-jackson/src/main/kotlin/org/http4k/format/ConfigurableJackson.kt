@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.convertValue
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -71,10 +72,8 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None,
-                                          crossinline writeFn: ObjectMapper.(T) -> String = ObjectMapper::writeValueAsString): BiDiBodyLensSpec<T> {
-        return jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), { mapper.writeFn(it) })
-    }
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
+        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), { mapper.writerFor(jacksonTypeRef<T>()).writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
