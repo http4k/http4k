@@ -12,6 +12,9 @@ import com.fasterxml.jackson.databind.node.NumericNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.convertValue
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
 import org.http4k.lens.ContentNegotiation
@@ -63,14 +66,14 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
     override fun <T : Any> asA(input: String, target: KClass<T>): T = mapper.readValue(input, target.java)
     override fun <T : Any> asA(j: JsonNode, target: KClass<T>): T = mapper.convertValue(j, target.java)
 
-    inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this, object : TypeReference<T>() {})
+    inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
     inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), ::asJsonString)
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
     inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.writeValueAsString(it) })
+        jsonHttpBodyLens(description, contentNegotiation).map(mapper.read<T>(), { mapper.writerFor(jacksonTypeRef<T>()).writeValueAsString(it) })
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
@@ -87,4 +90,4 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
 
-inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it, object : TypeReference<T>() {}) as T }
+inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it) }
