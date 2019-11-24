@@ -29,8 +29,9 @@ data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, 
     JsonSubTypes.Type(value = SecondChild::class, name = "second")
 )
 sealed class PolymorphicParent
-data class FirstChild(val something: String): PolymorphicParent()
-data class SecondChild(val somethingElse: String): PolymorphicParent()
+
+data class FirstChild(val something: String) : PolymorphicParent()
+data class SecondChild(val somethingElse: String) : PolymorphicParent()
 
 class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
@@ -83,7 +84,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         val body = Body.auto<List<PolymorphicParent>>().toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
-        
+
         assertThat(body(Response(OK).with(body of list)), equalTo(list))
     }
 

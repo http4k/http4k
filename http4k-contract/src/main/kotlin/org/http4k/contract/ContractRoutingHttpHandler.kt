@@ -39,7 +39,8 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun withBasePath(new: String) = copy(rootAsString = new + rootAsString)
 
-    private val notFound = preSecurityFilter.then(security?.filter ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
+    private val notFound = preSecurityFilter.then(security?.filter
+        ?: Filter.NoOp).then(postSecurityFilter).then { renderer.notFound() }
 
     private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
 

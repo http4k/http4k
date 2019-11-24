@@ -2,7 +2,6 @@ package org.http4k.hamkrest
 
 import com.natpryce.hamkrest.Matcher
 import com.natpryce.hamkrest.equalTo
-import com.natpryce.hamkrest.has
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.cookie.Cookie

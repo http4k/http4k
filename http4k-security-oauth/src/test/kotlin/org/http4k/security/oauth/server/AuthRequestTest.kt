@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 internal class AuthRequestTest {
 

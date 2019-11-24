@@ -4,11 +4,8 @@ import de.neuland.jade4j.Jade4J
 import de.neuland.jade4j.JadeConfiguration
 import de.neuland.jade4j.template.ClasspathTemplateLoader
 import de.neuland.jade4j.template.FileTemplateLoader
-import de.neuland.jade4j.template.JadeTemplate
 import java.io.File
 import java.io.FileNotFoundException
-import java.lang.Exception
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Jade4j templating support. Use the function in the constructor to configure the instance.

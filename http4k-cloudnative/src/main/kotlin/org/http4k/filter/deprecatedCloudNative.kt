@@ -6,7 +6,7 @@ import org.http4k.core.Response
 @Deprecated("Renamed", ReplaceWith("ServerFilters.HandleRemoteRequestFailed"))
 fun ServerFilters.HandleUpstreamRequestFailed(
     exceptionToBody: RemoteRequestFailed.() -> String = { localizedMessage }
-)= HandleRemoteRequestFailed(exceptionToBody)
+) = HandleRemoteRequestFailed(exceptionToBody)
 
 @Deprecated("Renamed", ReplaceWith("ClientFilters.HandleRemoteRequestFailed"))
 fun ClientFilters.HandleUpstreamRequestFailed(

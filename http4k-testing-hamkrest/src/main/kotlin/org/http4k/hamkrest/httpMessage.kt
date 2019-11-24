@@ -1,6 +1,11 @@
 package org.http4k.hamkrest
 
-import com.natpryce.hamkrest.*
+import com.natpryce.hamkrest.MatchResult
+import com.natpryce.hamkrest.Matcher
+import com.natpryce.hamkrest.anything
+import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.matches
+import com.natpryce.hamkrest.present
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.HttpMessage
