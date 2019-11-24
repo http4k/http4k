@@ -31,6 +31,15 @@ data class ArbObjectWithView(@JsonView(Private::class) @JvmField val priv: Int, 
 )
 sealed class PolymorphicParent
 
+interface Interface {
+    val value: String
+}
+
+class InterfaceImpl : Interface {
+    override val value = "hello"
+    val subValue = "123"
+}
+
 data class FirstChild(val something: String) : PolymorphicParent()
 data class SecondChild(val somethingElse: String) : PolymorphicParent()
 
@@ -77,6 +86,17 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
         assertThat(body(Response(OK).with(body of firstChild)), equalTo(firstChild))
         assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
+    }
+
+    @Test
+    fun `write interface implementation to body`() {
+        assertThat(Response(OK).with(
+            Body.auto<Interface>().toLens() of InterfaceImpl()
+        ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
+
+        assertThat(Response(OK).with(
+            Jackson.autoBody<Interface>(writeFn = { writerFor(jacksonTypeRef<Interface>()).writeValueAsString(it) }).toLens() of InterfaceImpl()
+        ).bodyString(), equalTo("""{"value":"hello"}"""))
     }
 
     @Test
