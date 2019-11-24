@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
@@ -78,10 +79,9 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
     }
 
-
     @Test
     fun `roundtrip list of polymorphic objects to and from body`() {
-        val body = Body.auto<List<PolymorphicParent>>().toLens()
+        val body = Jackson.autoBody<List<PolymorphicParent>>(writeFn = { writerFor(jacksonTypeRef<List<PolymorphicParent>>()).writeValueAsString(it) }).toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
