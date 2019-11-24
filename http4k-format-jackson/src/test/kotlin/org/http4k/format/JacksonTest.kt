@@ -13,6 +13,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
+import org.http4k.format.Jackson.autoGeneric
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
 import org.http4k.websocket.WsMessage
@@ -106,7 +107,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
     @Test
     fun `roundtrip list of polymorphic objects to and from body`() {
-        val body = Body.auto<List<PolymorphicParent>>().toLens()
+        val body = Body.autoGeneric<List<PolymorphicParent>>().toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
