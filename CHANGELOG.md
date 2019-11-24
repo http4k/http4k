@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.199.0
-- [http4k-format-jackson] Fix #313 - ConfigurableJackson.autoBody implementation would not work with collections of polymorphic types. H/T @alphaho for the PR.
+- [http4k-format-jackson] [Breaking] Fix #313 - ConfigurableJackson.autoBody implementation would not work with collections of polymorphic types. This fix has the effect of blowing up auto-json behaviour when classes are defined inside functions (causing nasty `java.lang.reflect.GenericSignatureFormatError: Signature Parse error` exceptions). To remedy, just move inlined classes outside of the functions that they are defined in. H/T @alphaho for the PR.
 - [all] Update some dependency versions
 
 ### v3.198.0
