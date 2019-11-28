@@ -193,8 +193,8 @@
           }
         ],
         "responses": {
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "schema": {
               "type": "array",
               "items": {
@@ -269,8 +269,8 @@
               "$ref": "#/definitions/object1547825812"
             }
           },
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "schema": {
               "oneOf": [
                 {

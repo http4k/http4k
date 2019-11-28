@@ -180,8 +180,8 @@
           "required": true
         },
         "responses": {
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "example": [
@@ -270,8 +270,8 @@
               }
             }
           },
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
