@@ -73,9 +73,8 @@ class OpenApi3<NODE : Any>(
             )
         )
 
-        val final = extensions.fold(unextended) { acc, next -> json(next(acc)) }
         return Response(OK)
-            .with(json.body().toLens() of final)
+            .with(json.body().toLens() of extensions.fold(unextended) { acc, next -> json(next(acc)) })
     }
 
     private fun ContractRoute.asPath(contractSecurity: Security?, contractRoot: PathSegments) =
@@ -144,7 +143,7 @@ class OpenApi3<NODE : Any>(
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
-        val withSchema = requests.mapNotNull {
+        val withSchema: List<Pair<String, BodyContent>> = requests.mapNotNull {
             when (CONTENT_TYPE(it.message)) {
                 APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
                 APPLICATION_FORM_URLENCODED -> {
@@ -155,7 +154,19 @@ class OpenApi3<NODE : Any>(
             }
         }
 
-        return (noSchema + withSchema)
+        val collectedWithSchema = withSchema
+            .groupBy { it.first }
+            .mapValues {
+                when (it.value.size) {
+                    1 -> it.value.first().second
+                    else -> {
+                        val schemas: List<Pair<String, BodyContent>> = it.value
+                        BodyContent.OneOfSchemaContent<NODE>(schemas.map { it.second })
+                    }
+                }
+            }.toList()
+
+        return (noSchema + collectedWithSchema)
             .takeIf { it.isNotEmpty() }
             ?.let { RequestContents(it.toMap()) }
     }

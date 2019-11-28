@@ -180,8 +180,8 @@
           "required": true
         },
         "responses": {
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "example": [
@@ -209,7 +209,45 @@
         "deprecated": false
       }
     },
-    "/basepath/body_auto_schema_multiple_body_schemas": {
+    "/basepath/body_auto_schema_multiple_request_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/object-841092134"
+                  },
+                  {
+                    "$ref": "#/components/schemas/object-444827817"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
+        "deprecated": false
+      }
+    },
+    "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -232,8 +270,8 @@
               }
             }
           },
-          "303": {
-            "description": "See Other",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -256,7 +294,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
         "deprecated": false
       }
     },

@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.200.0
+- [http4k-contract] Support multiple request bodies in OpenApi v3
+
 ### v3.199.1
 - [http4k-format-jackson] Fix #313 Part 2 - Revert default behaviour for collections of polymorphic types, but is now overridable by using `autoBody()` instead of `auto()`. Reopened #313.
 
