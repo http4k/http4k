@@ -247,15 +247,17 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "example": {
-                "uri": "http://foowang",
-                "additional": {
-                  "foo": 123
-                }
-              },
               "schema": {
-                "$ref": "#/components/schemas/ArbObject3",
-                "example": null
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ArbObject1",
+                    "example": null
+                  },
+                  {
+                    "$ref": "#/components/schemas/ArbObject3",
+                    "example": null
+                  }
+                ]
               }
             }
           },
@@ -1172,7 +1174,7 @@
       },
       "bearerAuth": {
         "scheme": "bearer",
-        "type"  : "http"
+        "type": "http"
       },
       "api_key": {
         "type": "apiKey",

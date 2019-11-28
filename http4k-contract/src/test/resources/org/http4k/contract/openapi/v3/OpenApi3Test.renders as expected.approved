@@ -221,14 +221,15 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "example": {
-                "uri": "http://foowang",
-                "additional": {
-                  "foo": 123
-                }
-              },
               "schema": {
-                "$ref": "#/components/schemas/object-444827817"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/object-841092134"
+                  },
+                  {
+                    "$ref": "#/components/schemas/object-444827817"
+                  }
+                ]
               }
             }
           },
