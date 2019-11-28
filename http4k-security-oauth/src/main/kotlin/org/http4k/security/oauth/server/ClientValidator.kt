@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Request
 import org.http4k.core.Uri
+import org.http4k.security.openid.RequestJwtContainer
 
 /**
  * Provides a consistent way to retrieve clients attempting to use an authorization code flow
@@ -21,6 +22,11 @@ interface ClientValidator {
      * - scopes are allowed for that client
      */
     fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean
+
+    /**
+     * - request jwt are allowed for that client
+     */
+    fun validateRequestJwt(request: Request, clientId: ClientId, authRequest: AuthRequest, requestJwt: RequestJwtContainer?): Boolean
 
     /**
      * Validate that credentials provided by the client match its registration records

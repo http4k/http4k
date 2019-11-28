@@ -28,6 +28,7 @@ import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.InsecureCookieBasedAuthRequestTracking
 import org.http4k.security.oauth.server.OAuthServer
 import org.http4k.security.oauth.server.UnsupportedGrantType
+import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
@@ -94,6 +95,8 @@ class InsecureClientValidator : ClientValidator {
 
     // one should validate the scopes are correct for that client
     override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean = true
+
+    override fun validateRequestJwt(request: Request, clientId: ClientId, authRequest: AuthRequest, requestJwt: RequestJwtContainer?): Boolean = true
 
     // certain operations can only be performed by fully authenticated clients (e.g. generate access tokens)
     override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true

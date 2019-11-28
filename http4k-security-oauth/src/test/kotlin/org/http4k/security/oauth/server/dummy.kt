@@ -9,6 +9,7 @@ import org.http4k.core.Uri
 import org.http4k.security.AccessToken
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
+import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -47,6 +48,7 @@ class DummyClientValidator : ClientValidator {
     override fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean = true
     override fun validateRedirection(request: Request, clientId: ClientId, redirectionUri: Uri): Boolean = true
     override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean = true
+    override fun validateRequestJwt(request: Request, clientId: ClientId, authRequest: AuthRequest, requestJwt: RequestJwtContainer?) = true
 }
 
 class DummyOAuthAuthRequestTracking : AuthRequestTracking {
@@ -58,7 +60,8 @@ class HardcodedClientValidator(
     private val expectedClientId: ClientId,
     private val expectedRedirectionUri: Uri,
     private val expectedClientSecret: String = "secret for ${expectedClientId.value}",
-    private val expectedScopes: List<String> = emptyList()
+    private val expectedScopes: List<String> = emptyList(),
+    private val expectedRequestJwt: RequestJwtContainer? = null
 ) : ClientValidator {
     override fun validateClientId(request: Request, clientId: ClientId): Boolean = clientId == this.expectedClientId
 
@@ -70,6 +73,9 @@ class HardcodedClientValidator(
 
     override fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean =
         scopes.toSet() == expectedScopes.toSet()
+
+    override fun validateRequestJwt(request: Request, clientId: ClientId, authRequest: AuthRequest, requestJwt: RequestJwtContainer?): Boolean =
+            expectedRequestJwt == requestJwt
 }
 
 class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes {
