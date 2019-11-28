@@ -96,9 +96,13 @@
                 "foo": 123
               },
               "schema": {
+                "name": "SingletonMap",
                 "additionalProperties": {
+                  "name": "SingletonMap",
                   "properties": {
                     "foo": {
+                      "name": "foo",
+                      "paramMeta": "NumberParam",
                       "example": 123,
                       "type": "number"
                     }
@@ -106,11 +110,13 @@
                   "example": {
                     "foo": 123
                   },
+                  "paramMeta": "ObjectParam",
                   "type": "object",
                   "required": [
                     "foo"
                   ]
                 },
+                "paramMeta": "ObjectParam",
                 "example": null,
                 "type": "object"
               }
@@ -153,7 +159,9 @@
                 "bool": true
               },
               "schema": {
+                "name": "someOtherId",
                 "$ref": "#/components/schemas/someOtherId",
+                "paramMeta": "ObjectParam",
                 "example": null
               }
             }
@@ -189,7 +197,9 @@
                 }
               },
               "schema": {
+                "name": "ArbObject3",
                 "$ref": "#/components/schemas/ArbObject3",
+                "paramMeta": "ObjectParam",
                 "example": null
               }
             }
@@ -207,6 +217,7 @@
                   }
                 ],
                 "schema": {
+                  "name": "",
                   "items": {
                     "oneOf": [
                       {
@@ -219,6 +230,7 @@
                       "anotherString": "bing"
                     }
                   ],
+                  "paramMeta": "ArrayParam",
                   "type": "array"
                 }
               }
@@ -235,7 +247,7 @@
         "deprecated": false
       }
     },
-    "/basepath/body_auto_schema_multiple_body_schemas": {
+    "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -253,7 +265,9 @@
                   "anotherString": "bing"
                 },
                 "schema": {
+                  "name": "ArbObject1",
                   "$ref": "#/components/schemas/ArbObject1",
+                  "paramMeta": "ObjectParam",
                   "example": null
                 }
               }
@@ -266,11 +280,15 @@
                 "schema": {
                   "oneOf": [
                     {
+                      "name": "ArbObject1",
                       "$ref": "#/components/schemas/ArbObject1",
+                      "paramMeta": "ObjectParam",
                       "example": null
                     },
                     {
+                      "name": "ArbObject3",
                       "$ref": "#/components/schemas/ArbObject3",
+                      "paramMeta": "ObjectParam",
                       "example": null
                     }
                   ]
@@ -285,7 +303,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
         "deprecated": false
       }
     },
@@ -306,11 +324,15 @@
                 "schema": {
                   "oneOf": [
                     {
+                      "name": "impl1",
                       "$ref": "#/components/schemas/impl1",
+                      "paramMeta": "ObjectParam",
                       "example": null
                     },
                     {
+                      "name": "impl2",
                       "$ref": "#/components/schemas/impl2",
+                      "paramMeta": "ObjectParam",
                       "example": null
                     }
                   ]
@@ -928,16 +950,22 @@
         }
       },
       "someOtherId": {
+        "name": "someOtherId",
         "properties": {
           "string": {
+            "name": "string",
+            "paramMeta": "StringParam",
             "example": "s",
             "type": "string"
           },
           "child": {
+            "name": "child",
             "$ref": "#/components/schemas/ArbObject1",
+            "paramMeta": "ObjectParam",
             "example": null
           },
           "numbers": {
+            "name": "numbers",
             "items": {
               "oneOf": [
                 {
@@ -948,9 +976,12 @@
             "example": [
               1
             ],
+            "paramMeta": "ArrayParam",
             "type": "array"
           },
           "bool": {
+            "name": "bool",
+            "paramMeta": "BooleanParam",
             "example": true,
             "type": "boolean"
           }
@@ -965,6 +996,7 @@
           ],
           "bool": true
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "bool",
@@ -974,21 +1006,27 @@
         ]
       },
       "ArbObject1": {
+        "name": "ArbObject1",
         "properties": {
           "anotherString": {
+            "name": "anotherString",
             "$ref": "#/components/schemas/Foo",
+            "paramMeta": "ObjectParam",
             "example": null
           }
         },
         "example": {
           "anotherString": "bing"
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "anotherString"
         ]
       },
       "Foo": {
+        "name": "Foo",
+        "paramMeta": "StringParam",
         "example": "bing",
         "enum": [
           "bar",
@@ -997,15 +1035,22 @@
         "type": "string"
       },
       "ArbObject3": {
+        "name": "ArbObject3",
         "properties": {
           "uri": {
+            "name": "uri",
+            "paramMeta": "StringParam",
             "example": "http://foowang",
             "type": "string"
           },
           "additional": {
+            "name": "additional",
             "additionalProperties": {
+              "name": "SingletonMap",
               "properties": {
                 "foo": {
+                  "name": "foo",
+                  "paramMeta": "NumberParam",
                   "example": 123,
                   "type": "number"
                 }
@@ -1013,11 +1058,13 @@
               "example": {
                 "foo": 123
               },
+              "paramMeta": "ObjectParam",
               "type": "object",
               "required": [
                 "foo"
               ]
             },
+            "paramMeta": "ObjectParam",
             "example": null,
             "type": "object"
           }
@@ -1028,6 +1075,7 @@
             "foo": 123
           }
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "additional",
@@ -1035,9 +1083,12 @@
         ]
       },
       "impl1": {
+        "name": "impl1",
         "properties": {
           "obj": {
+            "name": "obj",
             "$ref": "#/components/schemas/Impl1",
+            "paramMeta": "ObjectParam",
             "example": null
           }
         },
@@ -1046,14 +1097,18 @@
             "value": "bob"
           }
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "obj"
         ]
       },
       "Impl1": {
+        "name": "Impl1",
         "properties": {
           "value": {
+            "name": "value",
+            "paramMeta": "StringParam",
             "example": "bob",
             "type": "string"
           }
@@ -1061,15 +1116,19 @@
         "example": {
           "value": "bob"
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "value"
         ]
       },
       "impl2": {
+        "name": "impl2",
         "properties": {
           "obj": {
+            "name": "obj",
             "$ref": "#/components/schemas/Impl2",
+            "paramMeta": "ObjectParam",
             "example": null
           }
         },
@@ -1078,14 +1137,18 @@
             "value": 123
           }
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "obj"
         ]
       },
       "Impl2": {
+        "name": "Impl2",
         "properties": {
           "value": {
+            "name": "value",
+            "paramMeta": "NumberParam",
             "example": 123,
             "type": "number"
           }
@@ -1093,6 +1156,7 @@
         "example": {
           "value": 123
         },
+        "paramMeta": "ObjectParam",
         "type": "object",
         "required": [
           "value"

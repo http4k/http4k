@@ -209,7 +209,7 @@
         "deprecated": false
       }
     },
-    "/basepath/body_auto_schema_multiple_body_schemas": {
+    "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "summary": "<unknown>",
         "description": null,
@@ -256,7 +256,7 @@
             ]
           }
         ],
-        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
         "deprecated": false
       }
     },

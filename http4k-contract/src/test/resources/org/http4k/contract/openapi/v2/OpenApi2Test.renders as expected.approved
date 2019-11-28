@@ -211,13 +211,13 @@
         ]
       }
     },
-    "/basepath/body_auto_schema_multiple_body_schemas": {
+    "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "tags": [
           "/basepath"
         ],
         "summary": "<unknown>",
-        "operationId": "postBasepathBody_auto_schema_multiple_body_schemas",
+        "operationId": "postBasepathBody_auto_schema_multiple_response_schemas",
         "produces": [
           "application/json"
         ],
