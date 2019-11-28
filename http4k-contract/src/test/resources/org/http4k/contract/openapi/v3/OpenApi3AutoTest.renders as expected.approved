@@ -247,6 +247,46 @@
         "deprecated": false
       }
     },
+    "/basepath/body_auto_schema_multiple_request_schemas": {
+      "post": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "uri": "http://foowang",
+                "additional": {
+                  "foo": 123
+                }
+              },
+              "schema": {
+                "name": "ArbObject3",
+                "$ref": "#/components/schemas/ArbObject3",
+                "paramMeta": "ObjectParam",
+                "example": null
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "postBasepathBody_auto_schema_multiple_request_schemas",
+        "deprecated": false
+      }
+    },
     "/basepath/body_auto_schema_multiple_response_schemas": {
       "post": {
         "summary": "<unknown>",

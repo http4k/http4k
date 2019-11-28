@@ -21,6 +21,7 @@
     "POST:/basepath/body_auto_schema": "<unknown>",
     "PUT:/basepath/body_auto_schema": "<unknown>",
     "POST:/basepath/body_auto_schema_multiple_response_schemas": "<unknown>",
+    "POST:/basepath/body_auto_schema_multiple_request_schemas": "<unknown>",
     "POST:/basepath/body_auto_schema_name_definition_id": "<unknown>",
     "PUT:/basepath/body_auto_map": "<unknown>",
     "POST:/basepath/bearer_auth": "<unknown>"
