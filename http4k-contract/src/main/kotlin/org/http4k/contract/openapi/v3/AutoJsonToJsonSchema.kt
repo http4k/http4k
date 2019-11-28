@@ -156,15 +156,15 @@ private class Items(private val schemas: List<SchemaNode>) {
 }
 
 private sealed class SchemaNode(
-    private val name: String,
-    private val paramMeta: ParamMeta,
+    private val _name: String,
+    private val _paramMeta: ParamMeta,
     private val isNullable: Boolean,
     val example: Any?) {
     abstract fun definitions(): Iterable<SchemaNode>
 
-    fun name() = name
+    fun name() = _name
 
-    fun paramMeta() = paramMeta
+    fun paramMeta() = _paramMeta
     abstract fun arrayItem(): ArrayItem
 
     class Primitive(name: String, paramMeta: ParamMeta, isNullable: Boolean, example: Any?) :
