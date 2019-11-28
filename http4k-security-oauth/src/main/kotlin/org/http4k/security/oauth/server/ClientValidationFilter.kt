@@ -6,6 +6,7 @@ import com.natpryce.mapFailure
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.security.ResponseType
+import org.http4k.security.openid.RequestJwtContainer
 
 class ClientValidationFilter(private val clientValidator: ClientValidator,
                              private val errorRenderer: ErrorRenderer,
@@ -23,6 +24,8 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                         errorRenderer.response(InvalidRedirectUri)
                     } else if (!clientValidator.validateScopes(it, authorizationRequest.client, authorizationRequest.scopes)) {
                         errorRenderer.response(InvalidScopes)
+                    } else if (!clientValidator.validateRequestJwt(it, authorizationRequest.client, authorizationRequest, it.query("request")?.let { jwt -> RequestJwtContainer(jwt) })) {
+                        errorRenderer.response(InvalidRequestObject)
                     } else {
                         next(it)
                     }
