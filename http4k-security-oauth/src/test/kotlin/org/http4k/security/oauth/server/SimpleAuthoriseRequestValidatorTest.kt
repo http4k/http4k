@@ -1,0 +1,80 @@
+package org.http4k.security.oauth.server
+
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method.GET
+import org.http4k.core.Request
+import org.http4k.core.Uri
+import org.http4k.security.ResponseType
+import org.junit.jupiter.api.Test
+
+class SimpleAuthoriseRequestValidatorTest {
+    private val validClientId = ClientId("a-client")
+    private val validRedirectUri = Uri.of("https://a-redirect-uri")
+    private val validScopes = listOf("openid", "profile")
+
+    private val aRequest = Request(GET, "/some/path")
+
+    private val authoriseRequestValidator = SimpleAuthoriseRequestValidator(HardcodedClientValidator(
+            validClientId,
+            validRedirectUri,
+            expectedScopes = validScopes))
+
+
+    @Test
+    fun `return auth request when client is valid`() {
+        val validAuthRequest = AuthRequest(
+                responseType = ResponseType.Code,
+                client = validClientId,
+                redirectUri = validRedirectUri,
+                scopes = validScopes,
+                state = ""
+        )
+        assertThat(authoriseRequestValidator.validate(aRequest, validAuthRequest),
+                equalTo(success(validAuthRequest)))
+    }
+
+    @Test
+    fun `validates client_id value`() {
+        val authRequest = AuthRequest(
+                responseType = ResponseType.Code,
+                client = ClientId("invalid-client"),
+                redirectUri = validRedirectUri,
+                scopes = validScopes,
+                state = "some state"
+        )
+        assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidClientId)))
+    }
+
+    @Test
+    fun `validates redirect_uri value`() {
+        val authRequest = AuthRequest(
+                responseType = ResponseType.Code,
+                client = validClientId,
+                redirectUri = Uri.of("http://invalid.uri"),
+                scopes = validScopes,
+                state = "some state"
+        )
+        assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidRedirectUri)))
+    }
+    @Test
+    fun `validates scopes`() {
+        val authRequest = AuthRequest(
+                responseType = ResponseType.Code,
+                client = validClientId,
+                redirectUri = validRedirectUri,
+                scopes = listOf("some", "invalid", "scopes"),
+                state = "some state"
+        )
+        assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidScopes)))
+    }
+
+    private fun success(authRequest: AuthRequest): Result<AuthRequest, OAuthError>
+            = Success(authRequest)
+
+    private fun failure(oAuthError: OAuthError): Result<AuthRequest, OAuthError>
+            = Failure(oAuthError)
+}

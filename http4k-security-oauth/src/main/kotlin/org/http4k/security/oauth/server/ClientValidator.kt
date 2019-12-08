@@ -24,11 +24,6 @@ interface ClientValidator {
     fun validateScopes(request: Request, clientId: ClientId, scopes: List<String>): Boolean
 
     /**
-     * - request jwt are allowed for that client
-     */
-    fun validateRequestJwt(request: Request, clientId: ClientId, authRequest: AuthRequest, requestJwt: RequestJwtContainer?): Boolean
-
-    /**
      * Validate that credentials provided by the client match its registration records
      */
     fun validateCredentials(request: Request, clientId: ClientId, clientSecret: String): Boolean
