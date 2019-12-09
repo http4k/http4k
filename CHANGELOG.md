@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.201.0 (uncut)
-- [http4-security-oauth] Validate request object. H/T @tom
+- [http4-security-oauth] Allowing a scope to be set on AccessToken. Allowing for more low level validation of Authorise and Token Requests, by implementing `org.http4k.security.oauth.server.AuthoriseRequestValidator` and `org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication` respectively. H/T @tom
 
 ### v3.200.0
 - [http4k-contract] Support multiple request bodies in OpenApi v3
