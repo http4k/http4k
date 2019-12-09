@@ -1,5 +1,8 @@
 package org.http4k.security.oauth.server
 
+import com.natpryce.Failure
+import com.natpryce.Result
+import com.natpryce.Success
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -14,7 +17,6 @@ import org.http4k.format.Jackson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.Code
-import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.Test
 
 internal class ClientValidationFilterTest {
@@ -22,14 +24,24 @@ internal class ClientValidationFilterTest {
     private val validClientId = ClientId("a-client")
     private val validRedirectUri = Uri.of("https://a-redirect-uri")
     private val validScopes = listOf("openid", "profile")
-    private val validRequestJwt = RequestJwtContainer("some really long request object")
 
     private val loginPage = { _: Request -> Response(OK).body("login page") }
     private val isLoginPage = hasStatus(OK) and hasBody("login page")
     private val json = Jackson
 
+    private val  authoriseRequestValidator: AuthoriseRequestValidator = object : AuthoriseRequestValidator{
+        override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
+            return if(authorizationRequest.client == validClientId) {
+                Success(request.header("Success", "true"))
+            } else {
+                Failure(InvalidClientId)
+            }
+        }
+
+    }
+
     private val filter =
-        ClientValidationFilter(HardcodedClientValidator(validClientId, validRedirectUri, expectedScopes = validScopes, expectedRequestJwt = validRequestJwt), ErrorRenderer(json, documentationUri), AuthRequestFromQueryParameters)
+        ClientValidationFilter(authoriseRequestValidator, ErrorRenderer(json, documentationUri), AuthRequestFromQueryParameters)
             .then(loginPage)
 
 
@@ -40,7 +52,6 @@ internal class ClientValidationFilterTest {
             .query("client_id", validClientId.value)
             .query("redirect_uri", validRedirectUri.toString())
             .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
         )
         assertThat(response, isLoginPage)
     }
@@ -51,7 +62,6 @@ internal class ClientValidationFilterTest {
             .query("response_type", Code.queryParameterValue)
             .query("redirect_uri", validRedirectUri.toString())
             .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
         )
         assertThat(response, hasStatus(BAD_REQUEST))
         assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request\",\"error_description\":\"query 'client_id' is required\",\"error_uri\":\"SomeUri\"}"))
@@ -63,7 +73,6 @@ internal class ClientValidationFilterTest {
             .query("response_type", Code.queryParameterValue)
             .query("client_id", validClientId.value)
             .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
         )
         assertThat(response, hasStatus(BAD_REQUEST))
         assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request\",\"error_description\":\"query 'redirect_uri' is required\",\"error_uri\":\"SomeUri\"}"))
@@ -76,74 +85,10 @@ internal class ClientValidationFilterTest {
             .query("client_id", "invalid-client")
             .query("redirect_uri", validRedirectUri.toString())
             .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
         )
         assertThat(response, hasStatus(BAD_REQUEST))
         assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_client\",\"error_description\":\"The specified client id is invalid\",\"error_uri\":\"SomeUri\"}"))
     }
 
-    @Test
-    fun `validates redirect_uri value`() {
-        val response = filter(Request(GET, "/auth")
-            .query("response_type", Code.queryParameterValue)
-            .query("client_id", validClientId.value)
-            .query("redirect_uri", "invalid-redirect")
-            .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
-        )
-        assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_client\",\"error_description\":\"The specified redirect uri is not registered\",\"error_uri\":\"SomeUri\"}"))
-    }
-
-    @Test
-    fun `validates response_type`() {
-        val response = filter(Request(GET, "/auth")
-            .query("response_type", "invalid")
-            .query("client_id", validClientId.value)
-            .query("redirect_uri", validRedirectUri.toString())
-            .query("scope", validScopes.joinToString(" "))
-            .query("request", validRequestJwt.value)
-        )
-        assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.bodyString(), equalTo("{\"error\":\"unsupported_response_type\",\"error_description\":\"The specified response_type 'invalid' is not supported\",\"error_uri\":\"SomeUri\"}"))
-    }
-
-    @Test
-    fun `validates scopes`() {
-        val response = filter(Request(GET, "/auth")
-            .query("response_type", Code.queryParameterValue)
-            .query("client_id", validClientId.value)
-            .query("redirect_uri", validRedirectUri.toString())
-            .query("scope", "some invalid scopes")
-            .query("request", validRequestJwt.value)
-        )
-        assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_scope\",\"error_description\":\"The specified scopes are invalid\",\"error_uri\":\"SomeUri\"}"))
-    }
-
-    @Test
-    fun `validates request jwt object`() {
-        val response = filter(Request(GET, "/auth")
-                .query("response_type", Code.queryParameterValue)
-                .query("client_id", validClientId.value)
-                .query("redirect_uri", validRedirectUri.toString())
-                .query("scope", validScopes.joinToString(" "))
-                .query("request", "something invalid")
-        )
-        assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request_object\",\"error_description\":\"The specified request object is invalid\",\"error_uri\":\"SomeUri\"}"))
-    }
-
-    @Test
-    fun `validates request jwt object, copes with null values`() {
-        val response = filter(Request(GET, "/auth")
-                .query("response_type", Code.queryParameterValue)
-                .query("client_id", validClientId.value)
-                .query("redirect_uri", validRedirectUri.toString())
-                .query("scope", validScopes.joinToString(" "))
-        )
-        assertThat(response, hasStatus(BAD_REQUEST))
-        assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_request_object\",\"error_description\":\"The specified request object is invalid\",\"error_uri\":\"SomeUri\"}"))
-    }
 }
 
