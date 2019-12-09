@@ -7,7 +7,7 @@ import org.http4k.core.Request
 
 class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidator) : AuthoriseRequestValidator {
 
-    override fun validate(request: Request, authorizationRequest: AuthRequest): Result<AuthRequest, OAuthError> {
+    override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
         return if (!clientValidator.validateClientId(request, authorizationRequest.client)) {
             Failure(InvalidClientId)
         } else if (!clientValidator.validateRedirection(request, authorizationRequest.client, authorizationRequest.redirectUri)) {
@@ -15,7 +15,7 @@ class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidat
         } else if (!clientValidator.validateScopes(request, authorizationRequest.client, authorizationRequest.scopes)) {
             Failure(InvalidScopes)
         } else {
-            Success(authorizationRequest)
+            Success(request)
         }
     }
 

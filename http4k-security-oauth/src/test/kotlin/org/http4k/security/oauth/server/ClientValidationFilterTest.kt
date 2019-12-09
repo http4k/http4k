@@ -30,11 +30,11 @@ internal class ClientValidationFilterTest {
     private val json = Jackson
 
     private val  authoriseRequestValidator: AuthoriseRequestValidator = object : AuthoriseRequestValidator{
-        override fun validate(request: Request, authorizationRequest: AuthRequest): Result<AuthRequest, OAuthError> {
-            if(authorizationRequest.client == validClientId) {
-                return Success(authorizationRequest)
+        override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
+            return if(authorizationRequest.client == validClientId) {
+                Success(request.header("Success", "true"))
             } else {
-                return Failure(InvalidClientId)
+                Failure(InvalidClientId)
             }
         }
 

@@ -34,7 +34,7 @@ class SimpleAuthoriseRequestValidatorTest {
                 state = ""
         )
         assertThat(authoriseRequestValidator.validate(aRequest, validAuthRequest),
-                equalTo(success(validAuthRequest)))
+                equalTo(success(aRequest)))
     }
 
     @Test
@@ -72,9 +72,9 @@ class SimpleAuthoriseRequestValidatorTest {
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidScopes)))
     }
 
-    private fun success(authRequest: AuthRequest): Result<AuthRequest, OAuthError>
-            = Success(authRequest)
+    private fun success(request: Request): Result<Request, OAuthError>
+            = Success(request)
 
-    private fun failure(oAuthError: OAuthError): Result<AuthRequest, OAuthError>
+    private fun failure(oAuthError: OAuthError): Result<Request, OAuthError>
             = Failure(oAuthError)
 }

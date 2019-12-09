@@ -5,7 +5,7 @@ import org.http4k.core.Request
 
 interface AuthoriseRequestValidator {
 
-    fun validate(request: Request, authorizationRequest: AuthRequest): Result<AuthRequest, OAuthError>
+    fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError>
 
 }
 
