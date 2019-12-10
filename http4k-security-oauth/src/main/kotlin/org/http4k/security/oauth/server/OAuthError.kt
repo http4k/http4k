@@ -35,6 +35,8 @@ enum class RfcError {
 sealed class AccessTokenError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)
 
 data class UnsupportedGrantType(val requestedGrantType: String) : AccessTokenError(RfcError.UnsupportedGrantType, "$requestedGrantType is not supported")
+object InvalidClientAssertionType : AccessTokenError(InvalidGrant, "The 'client_assertion_type' is invalid")
+object InvalidClientAssertion : AccessTokenError(InvalidGrant, "The 'client_assertion' is invalid")
 object InvalidClientCredentials : AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
 object AuthorizationCodeExpired : AccessTokenError(InvalidGrant, "The authorization code has expired")
 object ClientIdMismatch : AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
