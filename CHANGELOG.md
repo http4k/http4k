@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.203.0
+- [http4-security-oauth] On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
+
 ### v3.202.0
 - [http4-security-oauth] Adding new errors to support issues with client assertions. H/T @tom
 

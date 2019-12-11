@@ -35,7 +35,10 @@ class GenerateAccessTokenForGrantType(
         val grantType = resolveGrantTypeFromRequest(request).onFailure { return it }
         return resolveGrantTypeFromConfiguration(grantType)
             .flatMap { (generator, authenticator) ->
-                authenticator.validateCredentials(request, request.tokenRequest(grantType)).flatMap { generator.generate(request) }
+                authenticator.validateCredentials(request, request.tokenRequest(grantType))
+                        .flatMap { (request, clientId, tokenRequest) ->
+                            generator.generate(request, clientId, tokenRequest)
+                        }
             }
     }
 
