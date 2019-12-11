@@ -15,5 +15,5 @@ interface AccessTokens {
     /**
      * creates a new access token for a given client.
      */
-    fun create(clientId: ClientId): Result<AccessToken, AccessTokenError>
+    fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError>
 }

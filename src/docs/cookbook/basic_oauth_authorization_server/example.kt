@@ -27,13 +27,13 @@ import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.oauth.server.ClientValidator
 import org.http4k.security.oauth.server.InsecureCookieBasedAuthRequestTracking
 import org.http4k.security.oauth.server.OAuthServer
+import org.http4k.security.oauth.server.TokenRequest
 import org.http4k.security.oauth.server.UnsupportedGrantType
-import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.UUID
+import java.util.*
 
 fun main() {
     fun authorizationServer(): RoutingHttpHandler {
@@ -116,7 +116,7 @@ class InsecureAuthorizationCodes : AuthorizationCodes {
 }
 
 class InsecureAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId) = Failure(UnsupportedGrantType("client_credentials"))
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest) = Failure(UnsupportedGrantType("client_credentials"))
 
     // an access token should be associated with a particular authorization flow
     // (i.e. limited to the requested scopes), and contain an expiration date

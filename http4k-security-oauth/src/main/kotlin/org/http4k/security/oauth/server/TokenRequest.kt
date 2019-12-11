@@ -7,6 +7,8 @@ data class TokenRequest(
         val grantType: GrantType,
         val clientId: ClientId?,
         val clientSecret: String?,
+        val code: String?,
+        val redirectUri: Uri?,
         val scopes: List<String>,
         val clientAssertionType: Uri?,
         val clientAssertion: String?)

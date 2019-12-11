@@ -31,13 +31,13 @@ class DummyIdTokens(private val username: String? = null) : IdTokens {
 }
 
 class DummyAccessTokens : AccessTokens {
-    override fun create(clientId: ClientId): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
 
     override fun create(authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
-    override fun create(clientId: ClientId): Result<AccessToken, AccessTokenError> = Failure(error)
+    override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Failure(error)
 
     override fun create(authorizationCode: AuthorizationCode) = Failure(error)
 }

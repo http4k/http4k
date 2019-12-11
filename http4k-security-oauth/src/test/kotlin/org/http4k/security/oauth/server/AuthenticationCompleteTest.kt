@@ -92,6 +92,6 @@ class AuthenticationCompleteTest {
 private fun Request.withAuthorization(authorizationRequest: AuthRequest, responseType: ResponseType = Code) =
     with(OAuthServer.clientIdQueryParameter of authorizationRequest.client)
         .with(OAuthServer.scopesQueryParameter of authorizationRequest.scopes)
-        .with(OAuthServer.redirectUri of authorizationRequest.redirectUri)
+        .with(OAuthServer.redirectUriQueryParameter of authorizationRequest.redirectUri)
         .with(OAuthServer.state of authorizationRequest.state)
         .with(OAuthServer.responseType of responseType)

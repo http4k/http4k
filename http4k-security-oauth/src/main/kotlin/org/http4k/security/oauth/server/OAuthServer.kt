@@ -82,7 +82,7 @@ class OAuthServer(
     companion object {
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
-        val redirectUri = Query.uri().required("redirect_uri")
+        val redirectUriQueryParameter = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
         val nonce = Query.string().optional("nonce")
@@ -90,6 +90,8 @@ class OAuthServer(
 
         val clientIdForm = FormField.map(::ClientId, ClientId::value).optional("client_id")
         val clientSecret = FormField.optional("client_secret")
+        val code = FormField.optional("code")
+        val redirectUriForm = FormField.uri().optional("redirect_uri")
         val scopesForm = FormField.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val clientAssertionType = FormField.uri().optional("client_assertion_type")
         val clientAssertion = FormField.optional("client_assertion")
@@ -97,6 +99,8 @@ class OAuthServer(
                 Strict,
                 clientIdForm,
                 clientSecret,
+                code,
+                redirectUriForm,
                 scopesForm,
                 clientAssertionType,
                 clientAssertion).toLens()
@@ -111,7 +115,7 @@ internal fun Request.authorizationRequest() =
         AuthRequest(
                 OAuthServer.clientIdQueryParameter(this),
                 OAuthServer.scopesQueryParameter(this) ?: listOf(),
-                OAuthServer.redirectUri(this),
+                OAuthServer.redirectUriQueryParameter(this),
                 OAuthServer.state(this),
                 OAuthServer.responseType(this),
                 OAuthServer.nonce(this),
@@ -124,6 +128,8 @@ internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
             grantType,
             OAuthServer.clientIdForm(tokenRequestWebForm),
             OAuthServer.clientSecret(tokenRequestWebForm),
+            OAuthServer.code(tokenRequestWebForm),
+            OAuthServer.redirectUriForm(tokenRequestWebForm),
             OAuthServer.scopesForm(tokenRequestWebForm) ?: listOf(),
             OAuthServer.clientAssertionType(tokenRequestWebForm),
             OAuthServer.clientAssertion(tokenRequestWebForm))

@@ -40,8 +40,10 @@ object InvalidClientAssertion : AccessTokenError(InvalidGrant, "The 'client_asse
 object InvalidClientCredentials : AccessTokenError(InvalidClient, "The 'client_id' parameter does not match the authorization request")
 object AuthorizationCodeExpired : AccessTokenError(InvalidGrant, "The authorization code has expired")
 object ClientIdMismatch : AccessTokenError(InvalidGrant, "The 'client_id' parameter does not match the authorization request")
-object RedirectUriMismatch : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
+object RedirectUriMismatch : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter is required")
+object MissingRedirectUri : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
 object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
+object MissingAuthorizationCode : AccessTokenError(InvalidGrant, "The authorization code is required")
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-4.1.2.1
 sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)
