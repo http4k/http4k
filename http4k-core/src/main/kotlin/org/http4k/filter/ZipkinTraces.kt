@@ -6,7 +6,7 @@ import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.lens.BiDiLensSpec
 import org.http4k.lens.Header
 import org.http4k.lens.composite
-import kotlin.experimental.and
+import org.http4k.util.Hex
 import kotlin.random.Random
 
 data class TraceId(val value: String) {
@@ -14,11 +14,7 @@ data class TraceId(val value: String) {
         fun new(random: Random = Random): TraceId {
             val randomBytes = ByteArray(8)
             random.nextBytes(randomBytes)
-            val sb = StringBuilder(randomBytes.size * 2)
-            for (b in randomBytes) {
-                sb.append(String.format("%02x", b and 0xff.toByte()))
-            }
-            return TraceId(sb.toString())
+            return TraceId(Hex.hex(randomBytes))
         }
     }
 }
