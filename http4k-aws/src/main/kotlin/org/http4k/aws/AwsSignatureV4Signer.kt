@@ -1,5 +1,6 @@
 package org.http4k.aws
 
+import org.http4k.util.Hex
 import java.io.UnsupportedEncodingException
 
 internal object AwsSignatureV4Signer {
@@ -7,7 +8,7 @@ internal object AwsSignatureV4Signer {
     fun sign(request: AwsCanonicalRequest, scope: AwsCredentialScope, awsCredentials: AwsCredentials, date: AwsRequestDate): String {
         val signatureKey = getSignatureKey(awsCredentials.secretKey, date.basic, scope.region, scope.service)
         val signature = AwsHmacSha256.hmacSHA256(signatureKey, request.stringToSign(scope, date))
-        return AwsHmacSha256.hex(signature)
+        return Hex.hex(signature)
     }
 
     private fun getSignatureKey(key: String, dateStamp: String, regionName: String, serviceName: String): ByteArray = try {
