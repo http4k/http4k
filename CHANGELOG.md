@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.204.0
+### v3.204.0 (uncut)
 - [http4k-core, http4k-aws] - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
 
 ### v3.203.0
