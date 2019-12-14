@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.204.0 (uncut)
+### v3.204.0
 - [http4k-core, http4k-aws] - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
+- [http4k-cloudnative] Reimplemented Environment to be more efficient. H/T @time4tea for noticing this.
 
 ### v3.203.0
 - [http4-security-oauth] On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
