@@ -2,9 +2,7 @@ package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Failure.Type.Missing
 import org.http4k.lens.Lens
-import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
@@ -28,13 +26,17 @@ interface Environment {
 
     operator fun get(key: String): String?
 
+    operator fun minus(key: String): Environment
+
     operator fun set(key: String, value: String): Environment
 
     /**
      * Overlays the configuration set in this Environment on top of the values in the passed Environment.
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
-    infix fun overrides(that: Environment): Environment = OverridingEnvironment(this, that)
+    infix fun overrides(that: Environment): Environment = MapEnvironment(
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap()
+    )
 
     companion object {
         val EMPTY: Environment = from()
@@ -60,7 +62,7 @@ interface Environment {
          */
         fun from(file: File): Environment = file.reader().toProperties()
 
-        fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment(pairs.toMap())
+        fun from(vararg pairs: Pair<String, String>): Environment = pairs.toMap().toProperties().toEnvironment()
 
         /**
          * Setup default configuration mappings using EnvironmentKey lens bindings
@@ -74,31 +76,12 @@ interface Environment {
     }
 }
 
-internal class OverridingEnvironment(
-    private val environment: Environment,
-    private val fallback: Environment
-) : Environment {
-    private val results = keys().map { it to (environment[it] ?: fallback[it]) }.toMap()
-
-    override fun <T> get(key: Lens<Environment, T>): T = try {
-        environment[key]
-    } catch (e: LensFailure) {
-        if (e.overall() == Missing) fallback[key] else throw e
-    }
-
-    override fun get(key: String) = results[key.convertFromKey()]
-
-    override fun set(key: String, value: String) = OverridingEnvironment(environment.set(key.convertFromKey(), value), fallback)
-
-    override fun keys() = environment.keys().union(fallback.keys()).map(String::convertFromKey).toSet()
-}
-
-internal class MapEnvironment internal constructor(input: Map<String, String>, override val separator: String = ",") : Environment {
-    private val contents = input.mapKeys { it.key.convertFromKey() }
+internal class MapEnvironment internal constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
     override operator fun get(key: String): String? = contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
-    override fun keys() = contents.keys.map(String::convertFromKey).toSet()
+    override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
+    override fun keys() = contents.keys
 }
 
 /**
@@ -109,7 +92,7 @@ internal class MapEnvironment internal constructor(input: Map<String, String>, o
 object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.StringParam,
     LensGet { name, target -> target[name]?.split(target.separator)?.map(String::trim) ?: emptyList() },
     LensSet { name, values, target ->
-        values.fold(target) { acc, next ->
+        values.fold(target - name) { acc, next ->
             val existing = acc[name]?.let { listOf(it) } ?: emptyList()
             acc.set(name, (existing + next).joinToString(target.separator))
         }
