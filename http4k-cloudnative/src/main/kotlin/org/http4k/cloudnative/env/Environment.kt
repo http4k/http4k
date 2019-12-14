@@ -70,7 +70,7 @@ interface Environment {
         private fun Reader.toProperties() = Properties().apply { load(this@toProperties) }.toEnvironment()
 
         private fun Properties.toEnvironment() = MapEnvironment(entries
-            .fold(emptyMap()) { acc, (k, v) -> acc.plus(k.toString().convertFromKey() to v.toString()) })
+            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) })
     }
 }
 
@@ -86,18 +86,19 @@ internal class OverridingEnvironment(
         if (e.overall() == Missing) fallback[key] else throw e
     }
 
-    override fun get(key: String) = results[key]
+    override fun get(key: String) = results[key.convertFromKey()]
 
-    override fun set(key: String, value: String) = OverridingEnvironment(environment.set(key, value), fallback)
+    override fun set(key: String, value: String) = OverridingEnvironment(environment.set(key.convertFromKey(), value), fallback)
 
-    override fun keys() = environment.keys().union(fallback.keys())
+    override fun keys() = environment.keys().union(fallback.keys()).map(String::convertFromKey).toSet()
 }
 
-internal class MapEnvironment internal constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
+internal class MapEnvironment internal constructor(input: Map<String, String>, override val separator: String = ",") : Environment {
+    private val contents = input.mapKeys { it.key.convertFromKey() }
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
-    override operator fun get(key: String): String? = contents[key] ?: contents[key.convertFromKey()]
-    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey().toUpperCase() to value))
-    override fun keys() = contents.keys
+    override operator fun get(key: String): String? = contents[key.convertFromKey()]
+    override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
+    override fun keys() = contents.keys.map(String::convertFromKey).toSet()
 }
 
 /**
@@ -132,4 +133,4 @@ object EnvironmentKey : BiDiLensSpec<Environment, String>("env", ParamMeta.Strin
     }
 }
 
-internal fun String.convertFromKey() = replace(".", "-").toLowerCase()
+internal fun String.convertFromKey() = replace("_", "-").replace(".", "-").toLowerCase()
