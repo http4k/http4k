@@ -2,7 +2,7 @@ package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Failure
+import org.http4k.lens.Failure.Type.Missing
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
@@ -83,7 +83,7 @@ internal class OverridingEnvironment(
     override fun <T> get(key: Lens<Environment, T>): T = try {
         environment[key]
     } catch (e: LensFailure) {
-        if (e.overall() == Failure.Type.Missing) fallback[key] else throw e
+        if (e.overall() == Missing) fallback[key] else throw e
     }
 
     override fun get(key: String) = results[key]
