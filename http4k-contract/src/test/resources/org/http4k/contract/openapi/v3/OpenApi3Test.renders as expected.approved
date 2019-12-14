@@ -679,6 +679,37 @@
         "deprecated": false
       }
     },
+    "/basepath/multipart_fields": {
+      "put": {
+        "summary": "<unknown>",
+        "description": null,
+        "tags": [
+          "/basepath"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ],
+        "operationId": "putBasepathMultipart_fields",
+        "deprecated": false
+      }
+    },
     "/basepath/nometa": {
       "get": {
         "summary": "<unknown>",

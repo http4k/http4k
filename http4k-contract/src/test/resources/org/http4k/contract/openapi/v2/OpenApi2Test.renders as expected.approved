@@ -696,6 +696,51 @@
         ]
       }
     },
+    "/basepath/multipart_fields": {
+      "put": {
+        "tags": [
+          "/basepath"
+        ],
+        "summary": "<unknown>",
+        "operationId": "putBasepathMultipart_fields",
+        "produces": [
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "form",
+            "name": "json",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "form",
+            "name": "picture",
+            "required": true,
+            "schema": {
+              "type": "file"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": [
+            ]
+          }
+        ]
+      }
+    },
     "/basepath/nometa": {
       "get": {
         "tags": [
