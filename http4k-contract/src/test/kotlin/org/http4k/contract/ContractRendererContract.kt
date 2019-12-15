@@ -34,13 +34,16 @@ import org.http4k.lens.Invalid
 import org.http4k.lens.LensFailure
 import org.http4k.lens.Meta
 import org.http4k.lens.Missing
+import org.http4k.lens.MultipartFormField
+import org.http4k.lens.MultipartFormFile
 import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.lens.Validator
+import org.http4k.lens.Validator.Strict
 import org.http4k.lens.boolean
 import org.http4k.lens.int
+import org.http4k.lens.multipartForm
 import org.http4k.lens.string
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
@@ -141,7 +144,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                     FakeOAuthPersistence()))
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
-                receiving(Body.webForm(Validator.Strict,
+                receiving(Body.webForm(Strict,
                     FormField.boolean().required("b", "booleanField"),
                     FormField.int().optional("i", "intField"),
                     FormField.string().optional("s", "stringField"),
@@ -185,6 +188,11 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
             } bindContract POST to { Response(OK) }
             routes += "/body_auto_map" meta {
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
+            } bindContract PUT to { Response(OK) }
+            routes += "/multipart_fields" meta {
+                val field = MultipartFormField.required("json")
+                val pic = MultipartFormFile.required("picture")
+                receiving(Body.multipartForm(Strict, field, pic).toLens())
             } bindContract PUT to { Response(OK) }
             routes += "/bearer_auth" meta {
                 security = BearerAuthSecurity("foo")
