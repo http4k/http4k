@@ -2,9 +2,7 @@ package org.http4k.cloudnative.env
 
 import org.http4k.core.Uri
 import org.http4k.lens.BiDiLensSpec
-import org.http4k.lens.Failure.Type.Missing
 import org.http4k.lens.Lens
-import org.http4k.lens.LensFailure
 import org.http4k.lens.LensGet
 import org.http4k.lens.LensSet
 import org.http4k.lens.ParamMeta
@@ -21,17 +19,24 @@ import java.util.Properties
  */
 interface Environment {
     val separator: String get() = ","
+
+    fun keys(): Set<String>
+
     operator fun <T> get(key: Lens<Environment, T>): T
 
     operator fun get(key: String): String?
+
     operator fun minus(key: String): Environment
 
     operator fun set(key: String, value: String): Environment
+
     /**
      * Overlays the configuration set in this Environment on top of the values in the passed Environment.
      * Used to chain: eg. Local File -> System Properties -> Env Properties -> Defaults
      */
-    infix fun overrides(that: Environment): Environment = OverridingEnvironment(this, that)
+    infix fun overrides(that: Environment): Environment = MapEnvironment.from(
+        (that.keys().map { it to that[it]!! } + keys().map { it to this[it]!! }).toMap().toProperties()
+    )
 
     companion object {
         val EMPTY: Environment = from()
@@ -39,58 +44,46 @@ interface Environment {
         /**
          * Configuration from the runtime environment
          */
-        val ENV: Environment = MapEnvironment(System.getenv())
+        val ENV: Environment = MapEnvironment.from(System.getenv().toProperties())
 
         /**
          * Configuration from JVM properties (-D flags)
          */
-        val JVM_PROPERTIES: Environment = System.getProperties().toEnvironment()
+        val JVM_PROPERTIES: Environment = MapEnvironment.from(System.getProperties())
 
         /**
          * Load configuration from standard Properties file format on classpath
          */
         fun fromResource(resource: String): Environment =
-            Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader().toProperties()
+            MapEnvironment.from(Companion::class.java.getResourceAsStream("/${resource.removePrefix("/")}").reader())
 
         /**
          * Load configuration from standard Properties file format on disk
          */
-        fun from(file: File): Environment = file.reader().toProperties()
-
-        fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment(pairs.toMap())
+        fun from(file: File): Environment = MapEnvironment.from(file.reader())
 
         /**
          * Setup default configuration mappings using EnvironmentKey lens bindings
          */
         fun defaults(vararg fn: (Environment) -> Environment) = fn.fold(EMPTY) { acc, next -> next(acc) }
 
-        private fun Reader.toProperties() = Properties().apply { load(this@toProperties) }.toEnvironment()
-
-        private fun Properties.toEnvironment() = MapEnvironment(entries
-            .fold(emptyMap()) { acc, (k, v) -> acc.plus(k.toString().convertFromKey() to v.toString()) })
+        fun from(vararg pairs: Pair<String, String>): Environment = MapEnvironment.from(pairs.toMap().toProperties())
     }
 }
 
-internal class OverridingEnvironment(
-    private val environment: Environment,
-    private val fallback: Environment
-) : Environment {
-    override fun <T> get(key: Lens<Environment, T>): T = try {
-        environment[key]
-    } catch (e: LensFailure) {
-        if (e.overall() == Missing) fallback[key] else throw e
-    }
-
-    override fun get(key: String): String? = environment[key] ?: fallback[key]
-    override fun set(key: String, value: String): Environment = OverridingEnvironment(environment.set(key, value), fallback)
-    override fun minus(key: String): Environment = OverridingEnvironment(environment - key, fallback - key)
-}
-
-internal class MapEnvironment internal constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
+class MapEnvironment private constructor(private val contents: Map<String, String>, override val separator: String = ",") : Environment {
     override operator fun <T> get(key: Lens<Environment, T>) = key(this)
-    override operator fun get(key: String): String? = contents[key] ?: contents[key.convertFromKey()]
+    override operator fun get(key: String): String? = contents[key.convertFromKey()]
     override operator fun set(key: String, value: String) = MapEnvironment(contents + (key.convertFromKey() to value))
-    override fun minus(key: String): Environment = MapEnvironment(contents - key, separator)
+    override fun minus(key: String): Environment = MapEnvironment(contents - key.convertFromKey(), separator)
+    override fun keys() = contents.keys
+
+    companion object {
+        fun from(properties: Properties, separator: String = ","): Environment = MapEnvironment(properties.entries
+            .fold(emptyMap()) { acc, (k, v) -> acc + (k.toString().convertFromKey() to v.toString()) }, separator)
+
+        fun from(reader: Reader, separator: String = ","): Environment = from(Properties().apply { load(reader) }, separator)
+    }
 }
 
 /**
