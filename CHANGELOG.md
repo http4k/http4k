@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.205.0 (uncut)
+### v3.205.0
 - [all] Upgrade some dependency versions, including Kotlin to 1.3.61
 - [http4-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
 
