@@ -25,7 +25,7 @@ class InsecureCookieBasedOAuthPersistence(cookieNamePrefix: String,
 
     override fun retrieveCsrf(request: Request) = request.cookie(csrfName)?.value?.let(::CrossSiteRequestForgeryToken)
 
-    override fun retrieveToken(request: Request): AccessToken? = request.cookie(accessTokenCookieName)?.value?.let(::AccessToken)
+    override fun retrieveToken(request: Request): AccessToken? = request.cookie(accessTokenCookieName)?.value?.let { AccessToken(it) }
 
     override fun assignCsrf(redirect: Response, csrf: CrossSiteRequestForgeryToken) = redirect.cookie(expiring(csrfName, csrf.value))
 

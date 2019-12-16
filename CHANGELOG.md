@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.205.0 (uncut)
 - [all] Upgrade some dependency versions, including Kotlin to 1.3.61
+- [http4-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
 
 ### v3.204.0
 - [http4k-core, http4k-aws] - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
