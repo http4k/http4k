@@ -3,6 +3,7 @@ package org.http4k.contract.openapi.v3
 import org.http4k.contract.Tag
 import org.http4k.contract.openapi.ApiInfo
 import org.http4k.lens.Meta
+import org.http4k.lens.ParamMeta
 import org.http4k.util.JsonSchema
 
 data class Api<NODE>(
@@ -89,7 +90,13 @@ sealed class BodyContent {
     class FormContent(val schema: FormSchema) : BodyContent() {
         class FormSchema(metas: List<Meta>) {
             val type = "object"
-            val properties = metas.map { it.name to mapOf("type" to it.paramMeta.value, "description" to it.description) }.toMap()
+            val properties = metas.map {
+                it.name to mapOf(
+                    "type" to it.paramMeta.value,
+                    "format" to it.paramMeta.takeIf { it == ParamMeta.FileParam }?.let { "binary" },
+                    "description" to it.description
+                ).filter { it.value != null }
+            }.toMap()
             val required = metas.filter(Meta::required).map { it.name }
         }
     }

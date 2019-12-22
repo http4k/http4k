@@ -729,12 +729,11 @@
                 "type": "object",
                 "properties": {
                   "stringField": {
-                    "type": "string",
-                    "description": null
+                    "type": "string"
                   },
                   "fileField": {
-                    "type": "file",
-                    "description": null
+                    "type": "string",
+                    "format": "binary"
                   }
                 },
                 "required": [

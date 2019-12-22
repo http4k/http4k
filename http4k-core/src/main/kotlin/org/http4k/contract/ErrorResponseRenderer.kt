@@ -6,7 +6,7 @@ import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.with
 import org.http4k.format.Json
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.lens.LensFailure
 
 interface ErrorResponseRenderer {
@@ -17,7 +17,7 @@ interface ErrorResponseRenderer {
 class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorResponseRenderer {
     override fun badRequest(lensFailure: LensFailure) =
         Response(BAD_REQUEST)
-            .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
+            .with(CONTENT_TYPE of ContentType.APPLICATION_JSON)
             .body(
                 json {
                     compact(
@@ -26,7 +26,7 @@ class JsonErrorResponseRenderer<NODE>(private val json: Json<NODE>) : ErrorRespo
                                 obj(
                                     "name" to string(it.meta.name),
                                     "type" to string(it.meta.location),
-                                    "datatype" to string(it.meta.paramMeta.value),
+                                    "datatype" to string(it.meta.paramMeta.description),
                                     "required" to boolean(it.meta.required),
                                     "reason" to string(it.javaClass.simpleName))
                             })))

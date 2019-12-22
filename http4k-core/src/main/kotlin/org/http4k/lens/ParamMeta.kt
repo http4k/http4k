@@ -1,6 +1,6 @@
 package org.http4k.lens
 
-enum class ParamMeta(val value: String) {
+enum class ParamMeta(val description: String) {
     ArrayParam("array"),
     StringParam("string"),
     ObjectParam("object"),

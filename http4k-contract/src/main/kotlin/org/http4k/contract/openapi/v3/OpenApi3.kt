@@ -35,6 +35,7 @@ import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
 import org.http4k.format.JsonType
 import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.ParamMeta.FileParam
 import org.http4k.lens.ParamMeta.ObjectParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.util.JsonSchema
@@ -135,6 +136,9 @@ class OpenApi3<NODE : Any>(
     private fun ContractRoute.asOpenApiParameters() = nonBodyParams.map {
         when (it.paramMeta) {
             ObjectParam -> SchemaParameter(it, "{}".toSchema())
+            FileParam -> PrimitiveParameter(it, json {
+                obj("type" to string(FileParam.value), "format" to string("binary"))
+            })
             else -> PrimitiveParameter(it, json {
                 obj("type" to string(it.paramMeta.value))
             })

@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.206.0 (uncut)
+- Fix #323. Doc generation does not work with multipart lenses
+
 ### v3.205.0
 - [all] Upgrade some dependency versions, including Kotlin to 1.3.61
 - [http4-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
