@@ -726,7 +726,21 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "string"
+                "type": "object",
+                "properties": {
+                  "stringField": {
+                    "type": "string",
+                    "description": null
+                  },
+                  "fileField": {
+                    "type": "file",
+                    "description": null
+                  }
+                },
+                "required": [
+                  "stringField",
+                  "fileField"
+                ]
               }
             }
           },

@@ -22,6 +22,7 @@ import org.http4k.contract.openapi.v3.RequestParameter.SchemaParameter
 import org.http4k.contract.security.Security
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
+import org.http4k.core.ContentType.Companion.MULTIPART_FORM_DATA
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
@@ -143,14 +144,14 @@ class OpenApi3<NODE : Any>(
     private fun RouteMeta.requestBody(): RequestContents<NODE>? {
         val noSchema = consumes.map { it.value to NoSchema(json { obj("type" to string(StringParam.value)) }) }
 
-        val withSchema: List<Pair<String, BodyContent>> = requests.mapNotNull {
-            when (CONTENT_TYPE(it.message)) {
-                APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
-                APPLICATION_FORM_URLENCODED -> {
-                    APPLICATION_FORM_URLENCODED.value to
+        val withSchema = requests.mapNotNull {
+            with(CONTENT_TYPE(it.message)) {
+                when (this) {
+                    APPLICATION_JSON -> APPLICATION_JSON.value to it.toSchemaContent()
+                    APPLICATION_FORM_URLENCODED, MULTIPART_FORM_DATA -> value to
                         (body?.metas?.let { FormContent(FormSchema(it)) } ?: SchemaContent("".toSchema(), null))
+                    else -> null
                 }
-                else -> null
             }
         }
 
@@ -159,10 +160,7 @@ class OpenApi3<NODE : Any>(
             .mapValues {
                 when (it.value.size) {
                     1 -> it.value.first().second
-                    else -> {
-                        val schemas: List<Pair<String, BodyContent>> = it.value
-                        BodyContent.OneOfSchemaContent<NODE>(schemas.map { it.second })
-                    }
+                    else -> BodyContent.OneOfSchemaContent<NODE>(it.value.map { it.second })
                 }
             }.toList()
 

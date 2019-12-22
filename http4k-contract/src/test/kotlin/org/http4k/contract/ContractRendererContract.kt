@@ -190,8 +190,8 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, prot
                 receiving(Body.auto<Map<String, *>>().toLens() to mapOf("foo" to 123))
             } bindContract PUT to { Response(OK) }
             routes += "/multipart_fields" meta {
-                val field = MultipartFormField.required("json")
-                val pic = MultipartFormFile.required("picture")
+                val field = MultipartFormField.required("stringField")
+                val pic = MultipartFormFile.required("fileField")
                 receiving(Body.multipartForm(Strict, field, pic).toLens())
             } bindContract PUT to { Response(OK) }
             routes += "/bearer_auth" meta {

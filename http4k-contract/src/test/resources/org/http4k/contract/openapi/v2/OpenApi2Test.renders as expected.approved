@@ -711,7 +711,7 @@
         "parameters": [
           {
             "in": "form",
-            "name": "json",
+            "name": "stringField",
             "required": true,
             "schema": {
               "type": "string"
@@ -719,7 +719,7 @@
           },
           {
             "in": "form",
-            "name": "picture",
+            "name": "fileField",
             "required": true,
             "schema": {
               "type": "file"
