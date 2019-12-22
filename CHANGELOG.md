@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.206.0 (uncut)
+- [all] Upgrade some dependency versions.
 - [http4k-contract] Fix #323. Doc generation does not work with multipart lenses.
 - [http4k-core] [Break] Renamed `value` on `ParamMeta` to `description`.
 

@@ -50,7 +50,7 @@ object Versions {
 
      const val micrometer_core: String = "1.3.2"
 
-     const val netty_codec_http2: String = "4.1.43.Final"
+     const val netty_codec_http2: String = "4.1.44.Final"
 
      const val pebble: String = "3.1.2"
 
