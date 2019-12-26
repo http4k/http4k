@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonView
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
@@ -97,27 +96,24 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         assertThat(Response(OK).with(
             Body.auto<Interface>().toLens() of InterfaceImpl()
         ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
+    }
 
-        // this is the wrong behaviour if we want to use the same auto method for both ...
+    @Test
+    fun `write list of interface implementation to body`() {
         assertThat(Response(OK).with(
-            Jackson.autoBody<Interface>(writeFn = { writerFor(jacksonTypeRef<Interface>()).writeValueAsString(it) }).toLens() of InterfaceImpl()
-        ).bodyString(), equalTo("""{"value":"hello"}"""))
+            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
+        ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]"""))
     }
 
     @Test
     fun `writes using non-sealed parent type`() {
         val nonSealedChild = NonSealedChild("hello")
         assertThat(Response(OK).with(Body.auto<NotSealedParent>().toLens() of nonSealedChild).bodyString(), equalTo("""{"something":"hello"}"""))
-
-        // this is the wrong behaviour if we want to use the same auto method for both ...
-        assertThat(Response(OK).with(
-            Jackson.autoBody<NotSealedParent>(writeFn = { writerFor(jacksonTypeRef<NotSealedParent>()).writeValueAsString(it) }).toLens() of nonSealedChild
-        ).bodyString(), equalTo("""{}"""))
     }
 
     @Test
     fun `roundtrip list of polymorphic objects to and from body`() {
-        val body = Jackson.autoBody<List<PolymorphicParent>>(writeFn = { writerFor(jacksonTypeRef<List<PolymorphicParent>>()).writeValueAsString(it) }).toLens()
+        val body = Body.auto<List<PolymorphicParent>>().toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 
