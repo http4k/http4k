@@ -13,7 +13,6 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson.asA
 import org.http4k.format.Jackson.auto
-import org.http4k.format.Jackson.autoGeneric
 import org.http4k.format.Jackson.autoView
 import org.http4k.hamkrest.hasBody
 import org.http4k.websocket.WsMessage
@@ -95,14 +94,14 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
     @Test
     fun `write interface implementation to body`() {
         assertThat(Response(OK).with(
-            Body.autoGeneric<Interface>().toLens() of InterfaceImpl()
+            Body.auto<Interface>().toLens() of InterfaceImpl()
         ).bodyString(), equalTo("""{"value":"hello","subValue":"123"}"""))
     }
 
     @Test
     fun `write list of interface implementation to body`() {
         assertThat(Response(OK).with(
-            Body.autoGeneric<List<Interface>>().toLens() of listOf(InterfaceImpl())
+            Body.auto<List<Interface>>().toLens() of listOf(InterfaceImpl())
         ).bodyString(), equalTo("""[{"value":"hello","subValue":"123"}]"""))
     }
 
@@ -114,7 +113,7 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
 
     @Test
     fun `roundtrip list of polymorphic objects to and from body`() {
-        val body = Body.autoGeneric<List<PolymorphicParent>>().toLens()
+        val body = Body.auto<List<PolymorphicParent>>().toLens()
 
         val list = listOf(FirstChild("hello"), SecondChild("world"))
 

@@ -72,19 +72,15 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
-    inline fun <reified T : Any> Body.Companion.autoGeneric(description: String? = null, contentNegotiation: ContentNegotiation = None) =
-        autoBody<T>(description, contentNegotiation) {
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> {
+        return jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), {
             val typeRef = jacksonTypeRef<T>()
-            if (typeFactory.constructType(typeRef).isContainerType) {
-                writer().forType(typeRef).writeValueAsString(it)
+            if (mapper.typeFactory.constructType(typeRef).isContainerType) {
+                mapper.writer().forType(typeRef).writeValueAsString(it)
             } else {
-                writeValueAsString(it)
+                mapper.writeValueAsString(it)
             }
-        }
-
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None,
-                                          crossinline writeFn: ObjectMapper.(T) -> String = ObjectMapper::writeValueAsString): BiDiBodyLensSpec<T> {
-        return jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), { mapper.writeFn(it) })
+        })
     }
 
     // views
