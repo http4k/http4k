@@ -68,20 +68,28 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
-    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), ::asJsonString)
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), {
+        with(mapper) {
+            val typeRef = jacksonTypeRef<T>()
+            when {
+                typeFactory.constructType(typeRef).isContainerType -> writer().forType(typeRef).writeValueAsString(it)
+                else -> writeValueAsString(it)
+            }
+        }
+    })
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> {
-        return jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), {
-            val typeRef = jacksonTypeRef<T>()
-            if (mapper.typeFactory.constructType(typeRef).isContainerType) {
-                mapper.writer().forType(typeRef).writeValueAsString(it)
-            } else {
-                mapper.writeValueAsString(it)
-            }
-        })
-    }
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
+        with(mapper) {
+            jsonHttpBodyLens(description, contentNegotiation).map(read(), {
+                val typeRef = jacksonTypeRef<T>()
+                when {
+                    typeFactory.constructType(typeRef).isContainerType -> writer().forType(typeRef).writeValueAsString(it)
+                    else -> writeValueAsString(it)
+                }
+            })
+        }
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
