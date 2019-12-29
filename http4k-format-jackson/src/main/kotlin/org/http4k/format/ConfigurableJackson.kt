@@ -68,28 +68,11 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 
     inline fun <reified T : Any> JsonNode.asA(): T = mapper.convertValue(this)
 
-    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), {
-        with(mapper) {
-            val typeRef = jacksonTypeRef<T>()
-            when {
-                typeFactory.constructType(typeRef).isContainerType -> writer().forType(typeRef).writeValueAsString(it)
-                else -> writeValueAsString(it)
-            }
-        }
-    })
+    inline fun <reified T : Any> WsMessage.Companion.auto() = WsMessage.string().map(mapper.read<T>(), mapper.write())
 
     inline fun <reified T : Any> Body.Companion.auto(description: String? = null, contentNegotiation: ContentNegotiation = None) = autoBody<T>(description, contentNegotiation)
 
-    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> =
-        with(mapper) {
-            jsonHttpBodyLens(description, contentNegotiation).map(read(), {
-                val typeRef = jacksonTypeRef<T>()
-                when {
-                    typeFactory.constructType(typeRef).isContainerType -> writer().forType(typeRef).writeValueAsString(it)
-                    else -> writeValueAsString(it)
-                }
-            })
-        }
+    inline fun <reified T : Any> autoBody(description: String? = null, contentNegotiation: ContentNegotiation = None): BiDiBodyLensSpec<T> = jsonHttpBodyLens(description, contentNegotiation).map(mapper.read(), mapper.write())
 
     // views
     fun <T : Any, V : Any> T.asCompactJsonStringUsingView(v: KClass<V>): String = mapper.writerWithView(v.java).writeValueAsString(this)
@@ -107,3 +90,13 @@ open class ConfigurableJackson(val mapper: ObjectMapper) : JsonLibAutoMarshallin
 fun KotlinModule.asConfigurable() = asConfigurable(ObjectMapper())
 
 inline fun <reified T : Any> ObjectMapper.read(): (String) -> T = { readValue(it) }
+
+inline fun <reified T : Any> ObjectMapper.write(): (T) -> String = {
+    with(this) {
+        val typeRef = jacksonTypeRef<T>()
+        when {
+            typeFactory.constructType(typeRef).isContainerType -> writer().forType(typeRef).writeValueAsString(it)
+            else -> writeValueAsString(it)
+        }
+    }
+}
