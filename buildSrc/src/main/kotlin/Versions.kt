@@ -76,11 +76,11 @@ object Versions {
 
      const val httpcore: String = "4.4.12"
 
-     const val http2_server: String = "9.4.24.v20191120"
+     const val http2_server: String = "9.4.25.v20191220"
 
-     const val javax_websocket_server_impl: String = "9.4.24.v20191120"
+     const val javax_websocket_server_impl: String = "9.4.25.v20191220"
 
-     const val org_eclipse_jetty: String = "9.4.24.v20191120"
+     const val org_eclipse_jetty: String = "9.4.25.v20191220"
 
      const val freemarker: String = "2.3.29"
 
