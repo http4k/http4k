@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.206.0 (uncut)
+### v3.206.0
 - [all] Upgrade some dependency versions.
 - [http4k-contract] Fix #323. Doc generation does not work with multipart lenses.
 - [http4k-format-jackson] Fix #313. Jackson serialization is not working properly with polymorphic types stored in a collection. H/T @alphaho for the PR :)
