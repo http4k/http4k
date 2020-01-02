@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.207.0 (uncut)
+- [all] Upgrade some dependency versions
+
 ### v3.206.0
 - [all] Upgrade some dependency versions.
 - [http4k-contract] Fix #323. Doc generation does not work with multipart lenses.

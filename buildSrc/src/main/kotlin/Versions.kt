@@ -22,7 +22,7 @@ object Versions {
 
      const val jackson_module_kotlin: String = "2.10.0" // available: "2.10.1"
 
-     const val underscore: String = "1.50"
+     const val underscore: String = "1.51"
 
      const val handlebars: String = "4.1.2"
 
@@ -38,7 +38,7 @@ object Versions {
 
      const val com_squareup_moshi: String = "1.9.2"
 
-     const val okhttp: String = "4.2.2"
+     const val okhttp: String = "4.3.0"
 
      const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
