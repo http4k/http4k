@@ -47,11 +47,7 @@ ${response.bodyBlock()}
 }
 
 fun Replay.Companion.Servirtium(output: File) = object : Replay {
-    override fun requests(): Sequence<Request> {
-        TODO("not implemented")
-    }
+    override fun requests() = emptySequence<Request>()
 
-    override fun responses(): Sequence<Response> {
-        TODO("not implemented")
-    }
+    override fun responses() = emptySequence<Response>()
 }
