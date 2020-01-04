@@ -23,7 +23,7 @@ interface Replay {
             override fun responses() = read(Response.Companion::parse, "response.txt").asSequence()
 
             private fun <T : HttpMessage> read(convert: (String) -> T, file: String) =
-                baseDir.toBaseFolder().listFiles().sortedBy { it.name }
+                (baseDir.toBaseFolder().listFiles() ?: emptyArray<File>()).sortedBy { it.name }
                     .map { File(it, file).run { convert(String(readBytes())) } }
         }
 
