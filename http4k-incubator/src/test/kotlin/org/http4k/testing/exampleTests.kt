@@ -10,6 +10,7 @@ import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.io.File
 
 class Client(private val http: HttpHandler) {
     fun someMethod(): String = http(Request(GET, "/")).bodyString()
@@ -35,3 +36,5 @@ class RecordingClientTest : ClientContract {
     val record = ServirtiumRecording(name, app)
 }
 
+@Disabled
+class ReplayTest : ReplayServirtiumContract(File("."), ClientContract::class.java.name)

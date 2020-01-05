@@ -14,9 +14,7 @@ import java.lang.invoke.MethodHandles
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicInteger
 
-class ReplayServirtiumContract {
-    private val root = File(".")
-    private val name = "org.http4k.testing.ClientContract"
+abstract class ReplayServirtiumContract(private val root: File, name: String) {
     private val testClass = Class.forName(name)
     private val instance = Proxy.newProxyInstance(testClass.classLoader, arrayOf(testClass)) { _, _, _ -> null }
 
