@@ -1,4 +1,4 @@
-package org.http4k.filter
+package org.http4k.traffic
 
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
@@ -6,9 +6,6 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.traffic.ReadWriteStream
-import org.http4k.traffic.Replay
-import org.http4k.traffic.Sink
 import java.io.File
 import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
@@ -42,6 +39,7 @@ ${response.bodyBlock()}
 """)
             }
         }
+        println(output.exists())
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {

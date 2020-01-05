@@ -1,4 +1,4 @@
-package org.http4k.filter
+package org.http4k.traffic
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -10,8 +10,6 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
-import org.http4k.traffic.Replay
-import org.http4k.traffic.Sink
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
@@ -24,7 +22,7 @@ class ServirtiumTest {
     fun `can sink and replay from markdown format`(@TempDir tempDir: File, approver: Approver) {
         val output = File(tempDir, "output.md")
 
-        val sink = Sink.Servirtium(output)
+        val readWriteStream = ReadWriteStream.Servirtium(tempDir, "some name")
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
@@ -38,13 +36,12 @@ class ServirtiumTest {
         val request2 = Request(POST, "/")
         val response2 = Response(INTERNAL_SERVER_ERROR)
 
-        sink[request1] = response1
-        sink[request2] = response2
+        readWriteStream[request1] = response1
+        readWriteStream[request2] = response2
 
         approver.assertApproved(Response(OK).body(output.readText()))
 
-        val replay = Replay.Servirtium(output)
-        assertThat(replay.requests().toList(), equalTo(listOf(request1, request2)))
-        assertThat(replay.responses().toList(), equalTo(listOf(response1, response2)))
+        assertThat(readWriteStream.requests().toList(), equalTo(listOf(request1, request2)))
+        assertThat(readWriteStream.responses().toList(), equalTo(listOf(response1, response2)))
     }
 }
