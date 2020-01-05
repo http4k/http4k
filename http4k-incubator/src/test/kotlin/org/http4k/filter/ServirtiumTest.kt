@@ -30,6 +30,7 @@ class ServirtiumTest {
             .header("header1", "value1")
             .header("Content-Type", "request-content-type/value")
             .body("body1")
+
         val response1 = Response(OK)
             .header("header3", "value3")
             .header("Content-Type", "response-content-type/value")

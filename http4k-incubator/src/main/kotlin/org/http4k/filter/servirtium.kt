@@ -1,8 +1,10 @@
 package org.http4k.filter
 
 import org.http4k.core.HttpMessage
+import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.traffic.ReadWriteStream
 import org.http4k.traffic.Replay
@@ -26,13 +28,13 @@ fun Sink.Companion.Servirtium(output: File) = object : Sink {
             use {
                 write("""## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
 
-### Request headers recorded for playback:
+${headerLine<Request>()}:
 ${request.headerBlock()}
-### Request body recorded for playback (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):
+${bodyLine<Request>()} (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):
 ${request.bodyBlock()}
-### Response headers recorded for playback:
+${headerLine<Response>()}:
 ${response.headerBlock()}
-### Response body recorded for playback (${response.status.code}: ${CONTENT_TYPE(response)?.toHeaderValue() ?: ""}):
+${bodyLine<Response>()} (${response.status.code}: ${CONTENT_TYPE(response)?.toHeaderValue() ?: ""}):
 ${response.bodyBlock()}
 """)
             }
@@ -47,7 +49,46 @@ ${response.bodyBlock()}
 }
 
 fun Replay.Companion.Servirtium(output: File) = object : Replay {
-    override fun requests() = emptySequence<Request>()
 
-    override fun responses() = emptySequence<Response>()
+    private val requests: List<Request>
+    private val responses: List<Response>
+
+    init {
+        val interactions = parseInteractions(output.readText())
+        requests = interactions.map { it.first }
+        responses = interactions.map { it.second }
+    }
+
+    override fun requests() = requests.asSequence()
+
+    override fun responses() = responses.asSequence()
+
+    private fun parseInteractions(readText: String) = readText
+        .split(Regex("## Interaction \\d+: "))
+        .filter { it.trim().isNotBlank() }
+        .map {
+            val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
+
+            val req = Request.parse(listOf(
+                listOf(sections[0][0] + " " + HTTP_1_1),
+                sections[1].dropWhile(String::isBlank) + "\r\n",
+                sections[3].dropWhile(String::isBlank)
+            ).flatten().joinToString("\r\n"))
+
+            val resp = Response.parse(
+                listOf(
+                    listOf(HTTP_1_1 +
+                        " " +
+                        sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
+                        " "
+                    ),
+                    sections[5].dropWhile(String::isBlank) + "\r\n",
+                    sections[7].dropWhile(String::isBlank)
+                ).flatten().joinToString("\r\n")
+            )
+            req to resp
+        }
 }
+
+private inline fun <reified T : HttpMessage> headerLine() = """### ${T::class.java.simpleName} headers recorded for playback"""
+private inline fun <reified T : HttpMessage> bodyLine() = """### ${T::class.java.simpleName} body recorded for playback"""
