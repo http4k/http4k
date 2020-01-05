@@ -15,6 +15,7 @@ class Client(private val http: HttpHandler) {
 }
 
 interface ClientContract : ServirtiumContract {
+    @JvmDefault
     override val name get() = "Recording"
 
     @Test

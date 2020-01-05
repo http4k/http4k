@@ -8,36 +8,35 @@ import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Proxy
 
 class ReplayStoredContract {
 
     private val name = "org.http4k.testing.ClientContract"
+    private val testClass = Class.forName(name)
+    private val instance = Proxy.newProxyInstance(testClass.classLoader, arrayOf(testClass)) { _, _, _ -> null }
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay(name)
+    val replay = ServirtiumReplay("getName"().invokeWithArguments() as String)
 
     @TestFactory
     fun `replay stored tests`(): List<DynamicTest> {
-        val testClass = Class.forName(name)
-
         val handler = { _: Request -> Response(OK) }
 
-        val instance = Proxy.newProxyInstance(testClass.classLoader, arrayOf(testClass)) { _, _, _ -> null }
         return testClass.methods
             .filter { it.annotations.any { it.annotationClass == Test::class } }
             .map {
-                dynamicTest(it.name) { it.name(testClass, instance, handler) }
+                dynamicTest(it.name) { it.name().invokeWithArguments(handler) }
             }
     }
 
-    private operator fun String.invoke(testClass: Class<*>, instance: Any, handler: (Request) -> Response) {
+    private operator fun String.invoke(): MethodHandle {
         val method = testClass.methods.toList().first { m -> m.name == this }
-        MethodHandles.privateLookupIn(testClass, MethodHandles.lookup())
+        return MethodHandles.privateLookupIn(testClass, MethodHandles.lookup())
             .unreflectSpecial(method, method.declaringClass)
             .bindTo(instance)
-            .invokeWithArguments(handler)
     }
 }
