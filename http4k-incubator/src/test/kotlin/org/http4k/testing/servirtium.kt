@@ -1,5 +1,6 @@
 package org.http4k.testing
 
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -25,11 +26,8 @@ abstract class ServirtiumExtension(private val name: String,
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         if (pc.supports()) ec.lookup(name)["http"] else null
 
-    private fun ParameterContext.supports(): Boolean {
-        println(parameter.parameterizedType.typeName)
-        return parameter.parameterizedType.typeName ==
-            "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
-    }
+    private fun ParameterContext.supports() = parameter.parameterizedType.typeName ==
+        "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
     private fun ExtensionContext.lookup(name: String) = getStore(create(name, requiredTestMethod.name))
 }
@@ -42,7 +40,17 @@ class ServirtiumRecording(private val name: String, original: HttpHandler) : Ser
 
 class ServirtiumReplay(private val name: String) : ServirtiumExtension(name,
     {
-        TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)).then {
+        val readWriteStream = ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)
+        val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
+        Filter { next ->
+            {
+                val (request, response) = zipped.next()
+                when (request) {
+                    it -> response
+                    else -> next(it)
+                }
+            }
+        }.then {
             Response(OK)
         }
     }
