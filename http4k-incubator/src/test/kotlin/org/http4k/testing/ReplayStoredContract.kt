@@ -1,7 +1,6 @@
 package org.http4k.testing
 
-import org.http4k.core.Filter
-import org.http4k.core.then
+import org.http4k.core.Request
 import org.http4k.traffic.ReadWriteStream
 import org.http4k.traffic.Servirtium
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,16 +31,11 @@ class ReplayStoredContract {
                     val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
                     val count = AtomicInteger()
 
-                    val handler = Filter {
-                        {
-                            val (request, response) = zipped.next()
-                            assertEquals(it.toString(), request.toString(), "Unexpected request received for Interaction " + count.get())
-                            response
-                        }
-                    }.then { throw IllegalAccessException("Should never get here") }
-
-
-                    it.name().invokeWithArguments(handler)
+                    it.name().invokeWithArguments({ req: Request ->
+                        val (request, response) = zipped.next()
+                        assertEquals(req.toString(), request.toString(), "Unexpected request received for Interaction " + count.get())
+                        response
+                    })
                 }
             }
     }
