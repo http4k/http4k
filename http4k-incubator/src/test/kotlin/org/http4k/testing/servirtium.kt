@@ -8,12 +8,14 @@ import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteStream
 import org.http4k.traffic.Servirtium
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace.create
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 abstract class ServirtiumExtension(private val name: String,
                                    private val fn: (ExtensionContext) -> HttpHandler
@@ -42,16 +44,13 @@ class ServirtiumReplay(private val name: String) : ServirtiumExtension(name,
     {
         val readWriteStream = ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)
         val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
-        Filter { next ->
+        val count = AtomicInteger()
+        Filter {
             {
                 val (request, response) = zipped.next()
-                when (request) {
-                    it -> response
-                    else -> next(it)
-                }
+                assertEquals(it.toString(), request.toString(), "Unexpected request received for Interaction " + count.get())
+                response
             }
-        }.then {
-            Response(OK)
-        }
+        }.then { Response(OK) }
     }
 )

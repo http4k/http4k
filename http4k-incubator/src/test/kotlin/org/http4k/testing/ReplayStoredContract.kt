@@ -1,8 +1,6 @@
 package org.http4k.testing
 
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
+import org.http4k.core.HttpHandler
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
@@ -23,9 +21,7 @@ class ReplayStoredContract {
     val replay = ServirtiumReplay("getName"().invokeWithArguments() as String)
 
     @TestFactory
-    fun `replay stored tests`(): List<DynamicTest> {
-        val handler = { _: Request -> Response(OK) }
-
+    fun `replay stored tests`(handler: HttpHandler): List<DynamicTest> {
         return testClass.methods
             .filter { it.annotations.any { it.annotationClass == Test::class } }
             .map {
