@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class ReplayServirtiumContract(private val root: File, name: String) {
+abstract class VerifyServirtiumContract(private val root: File, name: String) {
     private val testClass = Class.forName(name)
     private val instance = Proxy.newProxyInstance(testClass.classLoader, arrayOf(testClass)) { _, _, _ -> null }
 
