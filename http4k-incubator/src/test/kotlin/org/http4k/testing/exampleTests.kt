@@ -14,14 +14,17 @@ class Client(private val http: HttpHandler) {
     fun getThing(): String = http(Request(GET, "/")).bodyString()
 }
 
-abstract class ClientContract : ServirtiumContract("Recording") {
+interface ClientContract : ServirtiumContract {
+    override val name get() = "Recording"
+
     @Test
+    @JvmDefault
     fun `foo bar`(handler: HttpHandler) {
         assertThat(Client(handler).getThing(), equalTo("some value"))
     }
 }
 
-class RecordingClientTest : ClientContract() {
+class RecordingClientTest : ClientContract {
     private val app = { _: Request -> Response(OK).body("some value") }
 
     @JvmField

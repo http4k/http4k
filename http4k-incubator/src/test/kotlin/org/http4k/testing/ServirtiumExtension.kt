@@ -1,6 +1,8 @@
 package org.http4k.testing
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteStream
@@ -35,5 +37,13 @@ abstract class ServirtiumExtension(private val name: String,
 class ServirtiumRecording(private val name: String, original: HttpHandler) : ServirtiumExtension(name,
     {
         TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)).then(original)
+    }
+)
+
+class ServirtiumReplay(private val name: String) : ServirtiumExtension(name,
+    {
+        TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)).then {
+            Response(OK)
+        }
     }
 )
