@@ -15,7 +15,7 @@ class ServirtiumRecording(private val name: String, private val original: HttpHa
 
     override fun beforeTestExecution(context: ExtensionContext) =
         with(context) {
-            store(this).put("http", TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."),
+            store().put("http", TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."),
                 name + "." + requiredTestMethod.name)).then(original))
         }
 
@@ -24,9 +24,7 @@ class ServirtiumRecording(private val name: String, private val original: HttpHa
             "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
 
     override fun resolveParameter(parameterContext: ParameterContext, context: ExtensionContext) =
-        if (supportsParameter(parameterContext, context)) store(context)["http"] else null
+        if (supportsParameter(parameterContext, context)) context.store()["http"] else null
 
-    private fun store(context: ExtensionContext) = with(context) {
-        getStore(ExtensionContext.Namespace.create(name, requiredTestMethod.name))
-    }
+    private fun ExtensionContext.store() = getStore(ExtensionContext.Namespace.create(name, requiredTestMethod.name))
 }
