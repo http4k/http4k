@@ -14,7 +14,7 @@ class Client(private val http: HttpHandler) {
     fun getThing(): String = http(Request(GET, "/")).bodyString()
 }
 
-open class ClientContract : ServirtiumContract("Recording") {
+abstract class ClientContract : ServirtiumContract("Recording") {
     @Test
     fun `foo bar`(handler: HttpHandler) {
         assertThat(Client(handler).getThing(), equalTo("some value"))
@@ -22,8 +22,10 @@ open class ClientContract : ServirtiumContract("Recording") {
 }
 
 class RecordingClientTest : ClientContract() {
+    private val app = { _: Request -> Response(OK).body("some value") }
+
     @JvmField
     @RegisterExtension
-    val record = ServirtiumRecording(name) { Response(OK).body("some value") }
+    val record = ServirtiumRecording(name, app)
 }
 

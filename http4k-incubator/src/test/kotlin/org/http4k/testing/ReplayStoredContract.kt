@@ -8,14 +8,21 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.extension.RegisterExtension
 import java.lang.reflect.InvocationTargetException
 
 class ReplayStoredContract {
 
+    private val name = "org.http4k.testing.ClientContract"
+
+    @JvmField
+    @RegisterExtension
+    val record = ServirtiumRecording(name) { Response(OK) }
+
     @TestFactory
     @Disabled
     fun `replay stored tests`(): List<DynamicTest> {
-        val testClass = Class.forName("org.http4k.testing.ClientContract")
+        val testClass = Class.forName(name)
         val instance = testClass.getDeclaredConstructor().newInstance()
         val handler = { _: Request -> Response(OK) }
 
