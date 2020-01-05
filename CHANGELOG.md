@@ -3,8 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.207.0 (uncut)
+### v3.207.0
 - [all] Upgrade some dependency versions
+- [http4k-incubator] Added first cut of Servirtium classes for recording and replaying traffic. Needs validating in the wild
+- [http4k-format-jackson] Fix #320. http4k-format-jackson incompatible with jackson-module-kotlin 2.10.1
 
 ### v3.206.0
 - [all] Upgrade some dependency versions.
