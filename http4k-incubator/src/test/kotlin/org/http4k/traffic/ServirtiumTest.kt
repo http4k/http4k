@@ -19,9 +19,7 @@ import java.io.File
 class ServirtiumTest {
 
     @Test
-    fun `can sink and replay from markdown format`(@TempDir tempDir: File, approver: Approver) {
-        val output = File(tempDir, "output.md")
-
+    fun `stores and replays traffic in servirtium markdown format`(@TempDir tempDir: File, approver: Approver) {
         val readWriteStream = ReadWriteStream.Servirtium(tempDir, "some name")
 
         val request1 = Request(GET, "/hello?query=123")
@@ -39,9 +37,9 @@ class ServirtiumTest {
         readWriteStream[request1] = response1
         readWriteStream[request2] = response2
 
-        approver.assertApproved(Response(OK).body(output.readText()))
-
         assertThat(readWriteStream.requests().toList(), equalTo(listOf(request1, request2)))
         assertThat(readWriteStream.responses().toList(), equalTo(listOf(response1, response2)))
+
+        approver.assertApproved(Response(OK).body(File(tempDir, "some name.md").readText()))
     }
 }
