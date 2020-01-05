@@ -12,11 +12,9 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
 
-abstract class ServirtiumExtension(private val name: String,
-                                   private val fn: (ExtensionContext) -> HttpHandler
-) : BeforeTestExecutionCallback, ParameterResolver {
+class ServirtiumRecording(private val name: String, private val original: HttpHandler) : BeforeTestExecutionCallback, ParameterResolver {
 
-    override fun beforeTestExecution(ec: ExtensionContext) = ec.lookup(name).put("http", fn(ec))
+    override fun beforeTestExecution(ec: ExtensionContext) = ec.lookup(name).put("http", TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."), name + "." + ec.requiredTestMethod.name)).then(original))
 
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supports()
 
@@ -28,9 +26,3 @@ abstract class ServirtiumExtension(private val name: String,
 
     private fun ExtensionContext.lookup(name: String) = getStore(create(name, requiredTestMethod.name))
 }
-
-class ServirtiumRecording(private val name: String, original: HttpHandler) : ServirtiumExtension(name,
-    {
-        TrafficFilters.RecordTo(ReadWriteStream.Servirtium(File("."), name + "." + it.requiredTestMethod.name)).then(original)
-    }
-)
