@@ -16,11 +16,11 @@ object Versions {
 
      const val aws_lambda_java_events: String = "2.2.7"
 
-     const val jackson_databind: String = "2.10.1"
+     const val jackson_databind: String = "2.10.2"
 
-     const val jackson_dataformat_xml: String = "2.10.1"
+     const val jackson_dataformat_xml: String ="2.10.2"
 
-     const val jackson_module_kotlin: String = "2.10.0" // available: "2.10.1"
+     const val jackson_module_kotlin: String = "2.10.2"
 
      const val underscore: String = "1.51"
 
@@ -54,7 +54,7 @@ object Versions {
 
      const val pebble: String = "3.1.2"
 
-     const val io_undertow: String = "2.0.28.Final"
+     const val io_undertow: String = "2.0.29.Final"
 
      const val javax_servlet_api: String = "4.0.1"
 
