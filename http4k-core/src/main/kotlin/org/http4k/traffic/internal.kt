@@ -6,7 +6,6 @@ import java.io.File
 import java.security.MessageDigest
 import java.util.Base64
 
-
 internal fun HttpMessage.writeTo(folder: File) {
     toFile(folder).apply {
         folder.mkdirs()
