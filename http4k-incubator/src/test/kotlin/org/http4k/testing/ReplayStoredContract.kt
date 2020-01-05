@@ -17,7 +17,7 @@ class ReplayStoredContract {
 
     @JvmField
     @RegisterExtension
-    val record = ServirtiumReplay(name)
+    val replay = ServirtiumReplay(name)
 
     @TestFactory
     fun `replay stored tests`(): List<DynamicTest> {
@@ -29,13 +29,15 @@ class ReplayStoredContract {
         return testClass.methods
             .filter { it.annotations.any { it.annotationClass == Test::class } }
             .map {
-                dynamicTest(it.name) {
-                    val testMethod = testClass.methods.toList().first { m -> m.name == it.name }
-                    MethodHandles.privateLookupIn(testClass, MethodHandles.lookup())
-                        .unreflectSpecial(testMethod, testMethod.declaringClass)
-                        .bindTo(instance)
-                        .invokeWithArguments(handler)
-                }
+                dynamicTest(it.name) { it.name(testClass, instance, handler) }
             }
+    }
+
+    private operator fun String.invoke(testClass: Class<*>, instance: Any, handler: (Request) -> Response) {
+        val method = testClass.methods.toList().first { m -> m.name == this }
+        MethodHandles.privateLookupIn(testClass, MethodHandles.lookup())
+            .unreflectSpecial(method, method.declaringClass)
+            .bindTo(instance)
+            .invokeWithArguments(handler)
     }
 }
