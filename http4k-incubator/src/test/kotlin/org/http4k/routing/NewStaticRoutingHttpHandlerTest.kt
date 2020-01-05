@@ -1,8 +1,7 @@
-package org.http4k.routing.experimental
+package org.http4k.routing
 
-import org.http4k.routing.RoutingHttpHandler
-import org.http4k.routing.StaticRoutingHttpHandlerTest
 import org.http4k.routing.experimental.ResourceLoaders.Classpath
+import org.http4k.routing.experimental.StaticRoutingHttpHandler
 
 class NewStaticRoutingHttpHandlerTest : StaticRoutingHttpHandlerTest() {
     override val handler: RoutingHttpHandler = StaticRoutingHttpHandler(
