@@ -14,8 +14,8 @@ import java.lang.invoke.MethodHandles
 import java.lang.reflect.Proxy
 import java.util.concurrent.atomic.AtomicInteger
 
-class ReplayStoredContract {
-
+class ReplayServirtiumContract {
+    private val root = File(".")
     private val name = "org.http4k.testing.ClientContract"
     private val testClass = Class.forName(name)
     private val instance = Proxy.newProxyInstance(testClass.classLoader, arrayOf(testClass)) { _, _, _ -> null }
@@ -27,7 +27,7 @@ class ReplayStoredContract {
             .filter { it.annotations.any { it.annotationClass == Test::class } }
             .map {
                 dynamicTest(it.name) {
-                    val readWriteStream = ReadWriteStream.Servirtium(File("."), mainName + "." + it.name)
+                    val readWriteStream = ReadWriteStream.Servirtium(root, mainName + "." + it.name)
                     val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
                     val count = AtomicInteger()
 
