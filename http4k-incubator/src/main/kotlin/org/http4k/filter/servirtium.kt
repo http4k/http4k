@@ -13,9 +13,12 @@ import java.io.File
 import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * Read and write HTTP traffic to disk in Servirtium markdown format
+ */
 fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String): ReadWriteStream {
-    val output = File(baseDir, "$name.md")
-    return object : ReadWriteStream, Replay by Replay.Servirtium(output), Sink by Sink.Servirtium(output) {}
+    val storageFile = File(baseDir, "$name.md")
+    return object : ReadWriteStream, Replay by Replay.Servirtium(storageFile), Sink by Sink.Servirtium(storageFile) {}
 }
 
 /**
@@ -48,6 +51,9 @@ ${response.bodyBlock()}
     private fun HttpMessage.bodyBlock() = "\n```\n${bodyString()}\n```\n"
 }
 
+/**
+ * Read HTTP traffic from disk in Servirtium markdown format
+ */
 fun Replay.Companion.Servirtium(output: File) = object : Replay {
 
     private val requests: List<Request>
