@@ -39,7 +39,6 @@ ${response.bodyBlock()}
 """)
             }
         }
-        println(output.exists())
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
@@ -54,21 +53,11 @@ ${response.bodyBlock()}
  */
 fun Replay.Companion.Servirtium(output: File) = object : Replay {
 
-    private val requests: List<Request>
-    private val responses: List<Response>
+    override fun requests() = output.readText().parseInteractions().map { it.first }.asSequence()
 
-    init {
-        val interactions = parseInteractions(output.readText())
-        requests = interactions.map { it.first }
-        responses = interactions.map { it.second }
-    }
+    override fun responses() = output.readText().parseInteractions().map { it.second }.asSequence()
 
-    override fun requests() = requests.asSequence()
-
-    override fun responses() = responses.asSequence()
-
-    private fun parseInteractions(readText: String) = readText
-        .split(Regex("## Interaction \\d+: "))
+    private fun String.parseInteractions() = split(Regex("## Interaction \\d+: "))
         .filter { it.trim().isNotBlank() }
         .map {
             val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
