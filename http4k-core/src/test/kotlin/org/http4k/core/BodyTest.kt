@@ -57,7 +57,7 @@ class BodyTest {
         val body = Body(ByteBuffer.wrap("abc".toByteArray()))
         assertThat(body.length, equalTo(3L))
         assertThat(body.toString(), equalTo("abc"))
-        assertThat(body.stream.bufferedReader().readText(), equalTo("abc"))
+        assertThat(body.stream.bufferedReader().use { it.readText() }, equalTo("abc"))
     }
 
     @Test
@@ -65,6 +65,6 @@ class BodyTest {
         val body = Body(ByteBuffer.wrap("abc".toByteArray()).asReadOnlyBuffer())
         assertThat(body.length, equalTo(3L))
         assertThat(body.toString(), equalTo("abc"))
-        assertThat(body.stream.bufferedReader().readText(), equalTo("abc"))
+        assertThat(body.stream.bufferedReader().use { it.readText() }, equalTo("abc"))
     }
 }

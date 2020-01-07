@@ -22,7 +22,7 @@ class FileReadWriteResourceTest {
         val target = File("/tmp", javaClass.name + Random(1).nextLong().toString())
         with(FileReadWriteResource(target)) {
             output().writer().use { it.write("goodbye") }
-            assertThat(input()!!.reader().readText(), equalTo("goodbye"))
+            assertThat(input()!!.reader().use { it.readText() }, equalTo("goodbye"))
         }
         target.delete()
     }
@@ -30,14 +30,14 @@ class FileReadWriteResourceTest {
     @Test
     fun `existing file can be read`() {
         val file = FileReadWriteResource(existingFile("hello"))
-        assertThat(file.input()!!.reader().readText(), equalTo("hello"))
+        assertThat(file.input()!!.reader().use { it.readText() }, equalTo("hello"))
     }
 
     @Test
     fun `existing file can be written to`() {
         with(FileReadWriteResource(existingFile("hello"))) {
             output().writer().use { it.write("goodbye") }
-            assertThat(input()!!.reader().readText(), equalTo("goodbye"))
+            assertThat(input()!!.reader().use { it.readText() }, equalTo("goodbye"))
         }
     }
 

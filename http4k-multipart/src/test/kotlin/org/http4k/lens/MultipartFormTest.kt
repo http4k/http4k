@@ -26,7 +26,7 @@ class MultipartFormTest {
     private val fieldWithHeaders = MultipartFormField.required("fieldWithHeaders")
     private val requiredFile = MultipartFormFile.required("file")
 
-    private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().readText()
+    private val message = javaClass.getResourceAsStream("fullMessage.txt").reader().use { it.readText() }
     private fun validFile() = MultipartFormFile("hello.txt", ContentType.TEXT_HTML, "bits".byteInputStream())
 
     private val DEFAULT_BOUNDARY = "hello"

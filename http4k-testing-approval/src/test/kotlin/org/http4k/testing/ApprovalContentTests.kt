@@ -16,17 +16,17 @@ class ApprovalContentTests {
 
     @Test
     fun `body only`() {
-        assertThat(HttpBodyOnly()(input).reader().readText(), equalTo("hello"))
+        assertThat(HttpBodyOnly()(input).reader().use { it.readText() }, equalTo("hello"))
     }
 
     @Test
     fun `body only with formatter`() {
-        assertThat(HttpBodyOnly { it.reversed() }(input).reader().readText(), equalTo("olleh"))
+        assertThat(HttpBodyOnly { it.reversed() }(input).reader().use { it.readText() }, equalTo("olleh"))
     }
 
     @Test
     fun `entire message`() {
-        assertThat(EntireHttpMessage()(input).reader().readText(), equalTo(("HTTP/1.1 200 OK\r\n" +
+        assertThat(EntireHttpMessage()(input).reader().use { it.readText() }, equalTo(("HTTP/1.1 200 OK\r\n" +
             "some-header: some header value\r\n" +
             "\r\n" +
             "hello")))

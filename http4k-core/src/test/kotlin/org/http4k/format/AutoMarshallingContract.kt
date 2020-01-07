@@ -180,7 +180,7 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     @Test
     fun `convert to inputstream`() {
-        assertThat(j.asInputStream(StringHolder("hello")).reader().readText(), equalTo("""{"value":"hello"}"""))
+        assertThat(j.asInputStream(StringHolder("hello")).reader().use { it.readText() }, equalTo("""{"value":"hello"}"""))
     }
 
     @Test

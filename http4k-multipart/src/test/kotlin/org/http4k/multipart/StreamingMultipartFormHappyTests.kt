@@ -367,7 +367,7 @@ internal fun assertFieldPart(form: Iterator<StreamingPart>, fieldName: String, f
 
 internal fun assertPart(fieldName: String, fieldValue: String, StreamingPart: StreamingPart, encoding: Charset) {
     assertThat("field name", StreamingPart.fieldName, equalTo(fieldName))
-    assertThat("contents", StreamingPart.inputStream.reader(encoding).readText(), equalTo(fieldValue))
+    assertThat("contents", StreamingPart.inputStream.reader(encoding).use { it.readText() }, equalTo(fieldValue))
 }
 
 internal fun assertThereAreNoMoreParts(form: Iterator<StreamingPart>) {
