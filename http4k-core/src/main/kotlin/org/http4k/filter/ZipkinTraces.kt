@@ -55,6 +55,12 @@ data class ZipkinTraces(val traceId: TraceId, val spanId: TraceId, val parentSpa
         operator fun invoke(target: HttpMessage): ZipkinTraces = lens(target)
         operator fun <T : HttpMessage> invoke(value: ZipkinTraces, target: T): T = lens(value, target)
 
+        fun setForCurrentThread(zipkinTraces: ZipkinTraces) {
+            THREAD_LOCAL.set(zipkinTraces)
+        }
+
+        fun forCurrentThread(): ZipkinTraces = THREAD_LOCAL.get()
+
         internal val THREAD_LOCAL = object : ThreadLocal<ZipkinTraces>() {
             override fun initialValue() = ZipkinTraces(TraceId.new(), TraceId.new(), null, SAMPLE)
         }
