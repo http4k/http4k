@@ -4,6 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.208.0
+- [all] Upgrade some dependency versions.
 - [http4k-core] PR #333. Copy zipkin traces across threads. H/T @jshiell for the PR.
 - [http4k-testing-approval] Close Readers when reading from them.
 - [http4k-incubator] Next iteration of Servirtium JUnit extensions for recording and replaying.

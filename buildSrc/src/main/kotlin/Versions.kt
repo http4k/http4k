@@ -18,7 +18,7 @@ object Versions {
 
      const val jackson_databind: String = "2.10.2"
 
-     const val jackson_dataformat_xml: String ="2.10.2"
+     const val jackson_dataformat_xml: String = "2.10.2"
 
      const val jackson_module_kotlin: String = "2.10.2"
 
@@ -38,11 +38,11 @@ object Versions {
 
      const val com_squareup_moshi: String = "1.9.2"
 
-     const val okhttp: String = "4.3.0"
+     const val okhttp: String = "4.3.1"
 
      const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-     const val jade4j: String = "1.2.7"
+     const val jade4j: String = "1.3.0"
 
      const val io_github_resilience4j: String = "1.2.0"
 
