@@ -2,15 +2,15 @@ title: http4k Templating Modules
 description: Feature overview of the http4k-templating modules
 
 ### Installation (Gradle)
-**Dust:** ```compile group: "org.http4k", name: "http4k-template-dust", version: "3.207.0"```
+**Dust:** ```compile group: "org.http4k", name: "http4k-template-dust", version: "3.208.0"```
 
-**Freemarker:** ```compile group: "org.http4k", name: "http4k-template-freemarker", version: "3.207.0"```
+**Freemarker:** ```compile group: "org.http4k", name: "http4k-template-freemarker", version: "3.208.0"```
 
-**Handlebars:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.207.0"```
+**Handlebars:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.208.0"```
 
-**Pebble:** ```compile group: "org.http4k", name: "http4k-template-pebble", version: "3.207.0"```
+**Pebble:** ```compile group: "org.http4k", name: "http4k-template-pebble", version: "3.208.0"```
 
-**Thymeleaf:** ```compile group: "org.http4k", name: "http4k-template-thymeleaf", version: "3.207.0"```
+**Thymeleaf:** ```compile group: "org.http4k", name: "http4k-template-thymeleaf", version: "3.208.0"```
 
 ### About
 The [http4k] templating API provides a standard mechanism for rendering using common templating libraries. Simply implement the `ViewModel` interface on a model class and pass it to the renderer to get a string. All of the implementations support view rendering using the following strategies:
