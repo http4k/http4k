@@ -10,15 +10,19 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
 
-class ServirtiumRecording(private val name: String,
-                          private val original: HttpHandler,
+class ServirtiumRecording(private val original: HttpHandler,
                           private val root: File = File(".")) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler {
-        File(root, name + "." + ec.requiredTestMethod.name + ".md").apply { delete() }
-        return TrafficFilters.RecordTo(ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)).then(original)
-    }
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
+        with(ec.testInstance.get()) {
+            when (this) {
+                is ServirtiumContract -> TrafficFilters.RecordTo(
+                    ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
+                ).then(original)
+                else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
+            }
+        }
 }
 
 private fun ParameterContext.supportedParam() = parameter.parameterizedType.typeName ==

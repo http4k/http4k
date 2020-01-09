@@ -33,7 +33,7 @@ class RecordingClientTest : ClientContract {
 
     @JvmField
     @RegisterExtension
-    val record = ServirtiumRecording(name, app)
+    val record = ServirtiumRecording(app)
 }
 
 @Disabled

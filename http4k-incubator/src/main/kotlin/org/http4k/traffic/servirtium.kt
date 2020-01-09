@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Read and write HTTP traffic to disk in Servirtium markdown format
  */
-fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String): ReadWriteStream {
-    val storageFile = File(baseDir, "$name.md")
+fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, clean: Boolean = false): ReadWriteStream {
+    val storageFile = File(baseDir, "$name.md").apply { if (clean) delete() }
     return object : ReadWriteStream, Replay by Replay.Servirtium(storageFile), Sink by Sink.Servirtium(storageFile) {}
 }
 
