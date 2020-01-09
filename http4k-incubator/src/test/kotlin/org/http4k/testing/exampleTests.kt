@@ -37,4 +37,4 @@ class RecordingClientTest : ClientContract {
 }
 
 @Disabled
-class VerifyRecordedClientContractTest : VerifyServirtiumContract(File("."), ClientContract::class.java.name)
+class VerifyRecordedClientContractTest : VerifyServirtiumContract(File("."), ClientContract::class.java.simpleName)
