@@ -13,7 +13,10 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-class ServirtiumRecording(private val original: HttpHandler,
+/**
+ * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
+ */
+class ServirtiumRecording(private val httpHandler: HttpHandler,
                           private val root: File = File(".")) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
@@ -22,12 +25,15 @@ class ServirtiumRecording(private val original: HttpHandler,
             when (this) {
                 is ServirtiumContract -> TrafficFilters.RecordTo(
                     ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
-                ).then(original)
+                ).then(httpHandler)
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
 }
 
+/**
+ * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
+ */
 class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
