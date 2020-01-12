@@ -194,7 +194,6 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 
     abstract fun customJson(): AutoMarshallingJson
 }
-
 fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .bigDecimal(::BigDecimalHolder, BigDecimalHolder::value)
     .bigInteger(::BigIntegerHolder, BigIntegerHolder::value)
@@ -202,5 +201,16 @@ fun <T> AutoMappingConfiguration<T>.customise(): T = prohibitStrings()
     .text(::AnotherString, AnotherString::value)
     .text(OutOnly::value)
     .text(::InOnly)
+    .uuid({ it }, { it })
+    .uri({ it }, { it })
+    .instant({ it }, { it })
+    .localDateTime({ it }, { it })
+    .localDate({ it }, { it })
+    .localTime({ it }, { it })
+    .offsetDateTime({ it }, { it })
+    .offsetTime({ it }, { it })
+    .yearMonth({ it }, { it })
+    .zonedDateTime({ it }, { it })
     .text(StringBiDiMappings.bigDecimal().map(::MappedBigDecimalHolder, MappedBigDecimalHolder::value))
     .done()
+
