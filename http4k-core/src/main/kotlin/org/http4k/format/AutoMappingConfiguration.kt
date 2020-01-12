@@ -1,5 +1,6 @@
 package org.http4k.format
 
+import org.http4k.core.Status
 import org.http4k.lens.BiDiMapping
 import org.http4k.lens.StringBiDiMappings.duration
 import org.http4k.lens.StringBiDiMappings.eventCategory
@@ -55,6 +56,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(duration())
     text(uri())
     text(url())
+    int({ Status(it, "") }, Status::code)
     text(uuid())
     text(regexObject())
     text(instant())
