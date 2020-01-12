@@ -54,7 +54,7 @@ class GenerateAccessTokenTest {
                 .form("redirect_uri", authRequest.redirectUri.toString())
         )
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token"))))
+        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
     }
 
     @Test
@@ -72,7 +72,7 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "dummy-id-token-for-access-token")))
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", "dummy-id-token-for-access-token")))
     }
 
     @Test
@@ -90,7 +90,7 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "dummy-id-token-for-access-token")))
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", "dummy-id-token-for-access-token")))
     }
 
     @Test
@@ -102,7 +102,7 @@ class GenerateAccessTokenTest {
             .form("client_id", authRequest.client.value)
         )
 
-        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token"))))
+        assertThat(response, hasStatus(OK) and hasBody(accessTokenResponseBody, equalTo(AccessTokenResponse("dummy-access-token", "Bearer"))))
     }
 
     @Test

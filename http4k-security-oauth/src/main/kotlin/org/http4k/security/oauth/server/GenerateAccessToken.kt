@@ -27,6 +27,6 @@ class GenerateAccessToken(
 
     override fun invoke(request: Request) = generator.generate(request)
         .map { token ->
-            Response(OK).with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.idToken?.value, token.accessToken.scope))
+                    Response(OK).with(accessTokenResponseBody of AccessTokenResponse(token.accessToken.value, token.accessToken.type,  token.idToken?.value, token.accessToken.scope))
         }.mapFailure(errorRenderer::response).get()
 }
