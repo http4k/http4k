@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.209.0 (uncut)
 - [all] Added `Status` to auto-marshalling JSON mappings.
+- [http4-security-oauth] adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
 
 ### v3.208.0
 - [all] Upgrade some dependency versions.
