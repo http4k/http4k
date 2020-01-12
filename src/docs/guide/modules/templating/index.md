@@ -8,6 +8,8 @@ description: Feature overview of the http4k-templating modules
 
 **Handlebars:** ```compile group: "org.http4k", name: "http4k-template-handlebars", version: "3.208.0"```
 
+**Jade4j:** ```compile group: "org.http4k", name: "http4k-template-jade4j", version: "3.208.0"```
+
 **Pebble:** ```compile group: "org.http4k", name: "http4k-template-pebble", version: "3.208.0"```
 
 **Thymeleaf:** ```compile group: "org.http4k", name: "http4k-template-thymeleaf", version: "3.208.0"```
