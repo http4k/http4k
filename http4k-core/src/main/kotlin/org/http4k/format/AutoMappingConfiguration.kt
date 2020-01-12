@@ -56,7 +56,6 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(duration())
     text(uri())
     text(url())
-    int({ Status(it, "") }, Status::code)
     text(uuid())
     text(regexObject())
     text(instant())
@@ -71,6 +70,7 @@ fun <T> AutoMappingConfiguration<T>.withStandardMappings() = apply {
     text(traceId())
     text(samplingDecision())
     text(throwable())
+    int({ Status(it, "") }, Status::code)
 }
 
 /**
