@@ -6,10 +6,12 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.then
 import org.http4k.traffic.ReadWriteCache
 import org.http4k.traffic.ReadWriteStream
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 class TrafficFiltersTest {
     private val request = Request(Method.GET, "/bob")
@@ -38,4 +40,15 @@ class TrafficFiltersTest {
         assertThat(handler(Request(Method.GET, "/bob2")), equalTo(notFound))
     }
 
+    @Test
+    fun `ReplayFrom serves stored requests later or returns 400`() {
+        val cache = ReadWriteStream.Memory()
+        cache[request] = response
+        cache[request] = response
+        val handler = TrafficFilters.ReplayFrom(cache).then { fail("") }
+
+        assertThat(handler(request), equalTo(response))
+        assertThat(handler(request), equalTo(response))
+        assertThat(handler(Request(Method.GET, "/bob2")), equalTo(Response(BAD_REQUEST)))
+    }
 }
