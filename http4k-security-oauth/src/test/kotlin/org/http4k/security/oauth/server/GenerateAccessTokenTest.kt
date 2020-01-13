@@ -72,7 +72,7 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", "dummy-id-token-for-access-token")))
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", idToken = "dummy-id-token-for-access-token")))
     }
 
     @Test
@@ -90,7 +90,7 @@ class GenerateAccessTokenTest {
 
         assertThat(response, hasStatus(OK))
 
-        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", "dummy-id-token-for-access-token")))
+        assertThat(accessTokenResponseBody(response), equalTo(AccessTokenResponse("dummy-access-token", "Bearer", idToken = "dummy-id-token-for-access-token")))
     }
 
     @Test
