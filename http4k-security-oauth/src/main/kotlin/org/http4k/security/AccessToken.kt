@@ -7,7 +7,10 @@ import org.http4k.core.Body
 import org.http4k.format.Jackson.auto
 import org.http4k.security.openid.IdToken
 
-data class AccessToken(val value: String, val type: String? = "Bearer", val scope: String? = null)
+data class AccessToken(val value: String,
+                       val type: String? = "Bearer",
+                       val expiresIn: Long? = null,
+                       val scope: String? = null)
 
 data class AccessTokenDetails(val accessToken: AccessToken, val idToken: IdToken? = null)
 
@@ -15,6 +18,7 @@ data class AccessTokenDetails(val accessToken: AccessToken, val idToken: IdToken
 data class AccessTokenResponse(
         @JsonProperty("access_token") val accessToken: String,
         @JsonProperty("token_type") val tokenType: String? = null,
+        @JsonProperty("expires_in") val expiresIn: Long? = null,
         @JsonProperty("id_token") val idToken: String? = null,
         @JsonProperty("scope") val scope: String? = null
 )
