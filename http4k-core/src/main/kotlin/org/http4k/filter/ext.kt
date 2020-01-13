@@ -11,9 +11,11 @@ import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-enum class GzipCompressionMode(internal val compress: (Body) -> Body, internal val decompress: (Body) -> Body) {
-    Memory({ it.gzipped() }, { it.gunzipped() }),
-    Streaming({ it.gzippedStream() }, { it.gunzippedStream() })
+sealed class GzipCompressionMode(internal val compress: (Body) -> Body, internal val decompress: (Body) -> Body) {
+
+    object Memory : GzipCompressionMode(Body::gzipped, Body::gunzipped)
+
+    object Streaming : GzipCompressionMode(Body::gzippedStream, Body::gunzippedStream)
 }
 
 fun Body.gzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
@@ -42,10 +44,10 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
         // see http://www.zlib.org/rfc-gzip.html#header-trailer
         private const val GZIP_MAGIC = 0x8b1f
         private val HEADER_DATA = byteArrayOf(
-                GZIP_MAGIC.toByte(),
-                (GZIP_MAGIC shr 8).toByte(),
-                Deflater.DEFLATED.toByte(),
-                0, 0, 0, 0, 0, 0, 0)
+            GZIP_MAGIC.toByte(),
+            (GZIP_MAGIC shr 8).toByte(),
+            Deflater.DEFLATED.toByte(),
+            0, 0, 0, 0, 0, 0, 0)
     }
 
     private enum class State {
@@ -119,15 +121,15 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
     }
 
     private fun createTrailer(crcValue: Int, totalIn: Int) =
-            ByteArrayInputStream(byteArrayOf(
-                    (crcValue shr 0).toByte(),
-                    (crcValue shr 8).toByte(),
-                    (crcValue shr 16).toByte(),
-                    (crcValue shr 24).toByte(),
-                    (totalIn shr 0).toByte(),
-                    (totalIn shr 8).toByte(),
-                    (totalIn shr 16).toByte(),
-                    (totalIn shr 24).toByte()))
+        ByteArrayInputStream(byteArrayOf(
+            (crcValue shr 0).toByte(),
+            (crcValue shr 8).toByte(),
+            (crcValue shr 16).toByte(),
+            (crcValue shr 24).toByte(),
+            (totalIn shr 0).toByte(),
+            (totalIn shr 8).toByte(),
+            (totalIn shr 16).toByte(),
+            (totalIn shr 24).toByte()))
 
     @Throws(IOException::class)
     override fun close() {
