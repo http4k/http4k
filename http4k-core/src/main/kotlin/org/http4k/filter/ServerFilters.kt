@@ -19,7 +19,7 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
-import org.http4k.filter.GzipCompressionMode.NON_STREAMING
+import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -244,7 +244,7 @@ object ServerFilters {
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING): Filter =
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
                 RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
     }
 
@@ -254,7 +254,7 @@ object ServerFilters {
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
     class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>,
-                           private val compressionMode: GzipCompressionMode = NON_STREAMING) : Filter {
+                           private val compressionMode: GzipCompressionMode = Memory) : Filter {
         override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
             .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)

@@ -20,7 +20,7 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
-import org.http4k.filter.GzipCompressionMode.STREAMING
+import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
@@ -180,7 +180,7 @@ class ClientFiltersTest {
 
     @Test
     fun `gzip request and gunzip streamed response`() {
-        val handler = ClientFilters.GZip(STREAMING).then {
+        val handler = ClientFilters.GZip(Streaming).then {
             assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream()))))
             Response(OK).header("content-encoding", "gzip").body(Body("hello").gzippedStream())
         }

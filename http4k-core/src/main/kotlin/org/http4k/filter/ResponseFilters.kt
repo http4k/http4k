@@ -1,7 +1,12 @@
 package org.http4k.filter
 
-import org.http4k.core.*
-import org.http4k.filter.GzipCompressionMode.NON_STREAMING
+import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.HttpHandler
+import org.http4k.core.HttpTransaction
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.filter.GzipCompressionMode.Memory
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -55,7 +60,7 @@ object ResponseFilters {
     /**
      * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
      */
-    class GZipContentTypes(compressibleContentTypes: Set<ContentType>, private val compressionMode: GzipCompressionMode = NON_STREAMING) : Filter {
+    class GZipContentTypes(compressibleContentTypes: Set<ContentType>, private val compressionMode: GzipCompressionMode = Memory) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
             .map { it.split(";").first() }
@@ -84,7 +89,7 @@ object ResponseFilters {
      * Basic GZipping of Response.
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
             { request ->
                 val originalResponse = next(request)
                 if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
@@ -100,7 +105,7 @@ object ResponseFilters {
      * Basic UnGZipping of Response.
      */
     object GunZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
             { request ->
                 next(request).let { response ->
                     response.header("content-encoding")

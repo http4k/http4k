@@ -12,6 +12,7 @@ import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.cookies
 import org.http4k.core.extend
 import org.http4k.core.then
+import org.http4k.filter.GzipCompressionMode.Memory
 import org.http4k.filter.ZipkinTraces.Companion.THREAD_LOCAL
 import org.http4k.filter.cookie.BasicCookieStorage
 import org.http4k.filter.cookie.CookieStorage
@@ -140,7 +141,7 @@ object ClientFilters {
      * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
      */
     object GZip {
-        operator fun invoke(compressionMode: GzipCompressionMode = GzipCompressionMode.NON_STREAMING): Filter =
+        operator fun invoke(compressionMode: GzipCompressionMode = Memory): Filter =
                 RequestFilters.GZip(compressionMode).then(ResponseFilters.GunZip(compressionMode))
     }
 

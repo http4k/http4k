@@ -4,11 +4,12 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.210.0
-- [http4-security-oauth] adding expires_in to token endpoint response. H/T @tom
+- [http4-core] Support for GZipping response streams. H/T @jshiell
+- [http4-security-oauth] Adding expires_in to token endpoint response. H/T @tom
 
 ### v3.209.0
 - [all] Added `Status` to auto-marshalling JSON mappings.
-- [http4-security-oauth] adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
+- [http4-security-oauth] Adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
 
 ### v3.208.0
 - [all] Upgrade some dependency versions.

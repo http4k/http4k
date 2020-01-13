@@ -12,7 +12,6 @@ import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.Filter
 import org.http4k.core.Headers
-import org.http4k.core.Method
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.OPTIONS
@@ -30,7 +29,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
-import org.http4k.filter.GzipCompressionMode.STREAMING
+import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
@@ -249,7 +248,7 @@ class ServerFiltersTest {
     inner class GzipStreamFilters {
         @Test
         fun `gunzip request and gzip response`() {
-            val handler = ServerFilters.GZip(STREAMING).then {
+            val handler = ServerFilters.GZip(Streaming).then {
                 assertThat(it, hasBody(equalTo("hello")))
                 Response(OK).body(Body("hello"))
             }
@@ -260,7 +259,7 @@ class ServerFiltersTest {
 
         @Test
         fun `passes through non-gzipped request`() {
-            val handler = ServerFilters.GZip(STREAMING).then {
+            val handler = ServerFilters.GZip(Streaming).then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
             }
@@ -270,7 +269,7 @@ class ServerFiltersTest {
 
         @Test
         fun `gunzip request and gzip response with matching content type`() {
-            val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), STREAMING).then {
+            val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), Streaming).then {
                 assertThat(it, hasBody(equalTo("hello")))
                 Response(OK).header("content-type", "text/plain").body(Body("hello"))
             }
@@ -281,7 +280,7 @@ class ServerFiltersTest {
 
         @Test
         fun `gunzip request and do not gzip response with unmatched content type`() {
-            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), STREAMING).then {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming).then {
                 assertThat(it, hasBody(equalTo("hello")))
                 Response(OK).header("content-type", "text/plain").body(it.body)
             }
@@ -292,7 +291,7 @@ class ServerFiltersTest {
 
         @Test
         fun `passes through non-gzipped request despite content type`() {
-            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), STREAMING).then {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), Streaming).then {
                 assertThat(it, hasBody("hello"))
                 Response(OK).body("hello")
             }

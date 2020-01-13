@@ -11,9 +11,9 @@ import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-enum class GzipCompressionMode(val compress: (Body) -> Body, val decompress: (Body) -> Body) {
-    NON_STREAMING({ it.gzipped() }, { it.gunzipped() }),
-    STREAMING({ it.gzippedStream() }, { it.gunzippedStream() })
+enum class GzipCompressionMode(internal val compress: (Body) -> Body, internal val decompress: (Body) -> Body) {
+    Memory({ it.gzipped() }, { it.gunzipped() }),
+    Streaming({ it.gzippedStream() }, { it.gunzippedStream() })
 }
 
 fun Body.gzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
