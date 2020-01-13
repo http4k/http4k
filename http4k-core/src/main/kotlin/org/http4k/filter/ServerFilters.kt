@@ -19,6 +19,7 @@ import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.Store
 import org.http4k.core.then
 import org.http4k.core.with
+import org.http4k.filter.GzipCompressionMode.NON_STREAMING
 import org.http4k.lens.Failure
 import org.http4k.lens.Header
 import org.http4k.lens.Header.CONTENT_TYPE
@@ -238,22 +239,24 @@ object ServerFilters {
     }
 
     /**
-     * Basic GZip and Gunzip support of Request/Response. Does not currently support GZipping streams.
+     * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip'.
      */
     object GZip {
-        operator fun invoke(): Filter = RequestFilters.GunZip().then(ResponseFilters.GZip())
+        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING): Filter =
+                RequestFilters.GunZip(compressionMode).then(ResponseFilters.GZip(compressionMode))
     }
 
     /**
-     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list. Does not currently support GZipping streams.
+     * Basic GZip and Gunzip support of Request/Response where the content-type is in the allowed list.
      * Only Gunzips requests which contain "transfer-encoding" header containing 'gzip'
      * Only Gzips responses when request contains "accept-encoding" header containing 'gzip' and the content-type (sans-charset) is one of the compressible types.
      */
-    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>) : Filter {
-        override fun invoke(next: HttpHandler) = RequestFilters.GunZip()
-            .then(ResponseFilters.GZipContentTypes(compressibleContentTypes))
+    class GZipContentTypes(private val compressibleContentTypes: Set<ContentType>,
+                           private val compressionMode: GzipCompressionMode = NON_STREAMING) : Filter {
+        override fun invoke(next: HttpHandler) = RequestFilters.GunZip(compressionMode)
+            .then(ResponseFilters.GZipContentTypes(compressibleContentTypes, compressionMode))
             .invoke(next)
     }
 

@@ -30,6 +30,7 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.then
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
+import org.http4k.filter.GzipCompressionMode.STREAMING
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
@@ -42,6 +43,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.lens.Missing
 import org.http4k.lens.Unsupported
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -190,54 +192,113 @@ class ServerFiltersTest {
         assertThat(response.headers, equalTo(listOf("b" to "2") as Headers))
     }
 
-    @Test
-    fun `gunzip request and gzip response`() {
-        val handler = ServerFilters.GZip().then {
-            assertThat(it, hasBody(equalTo("hello")))
-            Response(OK).body(it.body)
+    @Nested
+    inner class GzipFilters {
+        @Test
+        fun `gunzip request and gzip response`() {
+            val handler = ServerFilters.GZip().then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).body(it.body)
+            }
+
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
         }
 
-        assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
+        @Test
+        fun `passes through non-gzipped request`() {
+            val handler = ServerFilters.GZip().then {
+                assertThat(it, hasBody("hello"))
+                Response(OK).body("hello")
+            }
+
+            handler(Request(GET, "/").body("hello"))
+        }
+
+        @Test
+        fun `gunzip request and gzip response with matching content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).header("content-type", "text/plain").body(it.body)
+            }
+
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
+        }
+
+        @Test
+        fun `gunzip request and do not gzip response with unmatched content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).header("content-type", "text/plain").body(it.body)
+            }
+
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
+        }
+
+        @Test
+        fun `passes through non-gzipped request despite content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
+                assertThat(it, hasBody("hello"))
+                Response(OK).body("hello")
+            }
+
+            handler(Request(GET, "/").body("hello"))
+        }
     }
 
-    @Test
-    fun `passes through non-gzipped request`() {
-        val handler = ServerFilters.GZip().then {
-            assertThat(it, hasBody("hello"))
-            Response(OK).body("hello")
+    @Nested
+    inner class GzipStreamFilters {
+        @Test
+        fun `gunzip request and gzip response`() {
+            val handler = ServerFilters.GZip(STREAMING).then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).body(Body("hello"))
+            }
+
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())),
+                    hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream()))))
         }
 
-        handler(Request(GET, "/").body("hello"))
-    }
+        @Test
+        fun `passes through non-gzipped request`() {
+            val handler = ServerFilters.GZip(STREAMING).then {
+                assertThat(it, hasBody("hello"))
+                Response(OK).body("hello")
+            }
 
-    @Test
-    fun `gunzip request and gzip response with matching content type`() {
-        val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN)).then {
-            assertThat(it, hasBody(equalTo("hello")))
-            Response(OK).header("content-type", "text/plain").body(it.body)
+            handler(Request(GET, "/").body("hello"))
         }
 
-        assertThat(handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
-    }
+        @Test
+        fun `gunzip request and gzip response with matching content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_PLAIN), STREAMING).then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).header("content-type", "text/plain").body(Body("hello"))
+            }
 
-    @Test
-    fun `gunzip request and do not gzip response with unmatched content type`() {
-        val handler = ServerFilters.GZipContentTypes(setOf(ContentType.TEXT_HTML)).then {
-            assertThat(it, hasBody(equalTo("hello")))
-            Response(OK).header("content-type", "text/plain").body(it.body)
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())),
+                    hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream()))))
         }
 
-        assertThat(handler(Request(Method.GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())), !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
-    }
+        @Test
+        fun `gunzip request and do not gzip response with unmatched content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), STREAMING).then {
+                assertThat(it, hasBody(equalTo("hello")))
+                Response(OK).header("content-type", "text/plain").body(it.body)
+            }
 
-    @Test
-    fun `passes through non-gzipped request despite content type`() {
-        val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML)).then {
-            assertThat(it, hasBody("hello"))
-            Response(OK).body("hello")
+            assertThat(handler(Request(GET, "/").header("accept-encoding", "gzip").header("content-encoding", "gzip").body(Body("hello").gzipped())),
+                    !hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello")))))
         }
 
-        handler(Request(GET, "/").body("hello"))
+        @Test
+        fun `passes through non-gzipped request despite content type`() {
+            val handler = ServerFilters.GZipContentTypes(setOf(TEXT_HTML), STREAMING).then {
+                assertThat(it, hasBody("hello"))
+                Response(OK).body("hello")
+            }
+
+            handler(Request(GET, "/").body("hello"))
+        }
     }
 
     @Test

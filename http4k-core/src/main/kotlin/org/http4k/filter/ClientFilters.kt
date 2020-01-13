@@ -136,11 +136,12 @@ object ClientFilters {
     }
 
     /**
-     * Basic GZip and Gunzip support of Request/Response. Does not currently support GZipping streams.
+     * Basic GZip and Gunzip support of Request/Response.
      * Only Gunzip responses when the response contains "transfer-encoding" header containing 'gzip'
      */
     object GZip {
-        operator fun invoke(): Filter = RequestFilters.GZip().then(ResponseFilters.GunZip())
+        operator fun invoke(compressionMode: GzipCompressionMode = GzipCompressionMode.NON_STREAMING): Filter =
+                RequestFilters.GZip(compressionMode).then(ResponseFilters.GunZip(compressionMode))
     }
 
     /**

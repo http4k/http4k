@@ -1,11 +1,7 @@
 package org.http4k.filter
 
-import org.http4k.core.ContentType
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.HttpTransaction
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.*
+import org.http4k.filter.GzipCompressionMode.NON_STREAMING
 import java.time.Clock
 import java.time.Duration
 import java.time.Duration.between
@@ -59,7 +55,7 @@ object ResponseFilters {
     /**
      * GZipping of the response where the content-type (sans-charset) matches an allowed list of compressible types.
      */
-    class GZipContentTypes(compressibleContentTypes: Set<ContentType>) : Filter {
+    class GZipContentTypes(compressibleContentTypes: Set<ContentType>, private val compressionMode: GzipCompressionMode = NON_STREAMING) : Filter {
         private val compressibleMimeTypes = compressibleContentTypes
             .map { it.value }
             .map { it.split(";").first() }
@@ -67,7 +63,7 @@ object ResponseFilters {
         override fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let {
                 if (requestAcceptsGzip(request) && isCompressible(it)) {
-                    it.body(it.body.gzipped()).replaceHeader("content-encoding", "gzip")
+                    it.body(compressionMode.compress(it.body)).replaceHeader("content-encoding", "gzip")
                 } else {
                     it
                 }
@@ -85,15 +81,15 @@ object ResponseFilters {
     }
 
     /**
-     * Basic GZipping of Response. Does not currently support GZipping streams
+     * Basic GZipping of Response.
      */
     object GZip {
-        operator fun invoke() = Filter { next ->
-            {
-                val originalResponse = next(it)
-                if ((it.header("accept-encoding") ?: "").contains("gzip", true)) {
+        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
+            { request ->
+                val originalResponse = next(request)
+                if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
                     originalResponse.let {
-                        it.body(it.body.gzipped()).replaceHeader("Content-Encoding", "gzip")
+                        it.body(compressionMode.compress(it.body)).replaceHeader("Content-Encoding", "gzip")
                     }
                 } else originalResponse
             }
@@ -101,19 +97,20 @@ object ResponseFilters {
     }
 
     /**
-     * Basic UnGZipping of Response. Does not currently support GZipping streams
+     * Basic UnGZipping of Response.
      */
     object GunZip {
-        operator fun invoke() = Filter { next ->
-            {
-                next(it).let { response ->
+        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
+            { request ->
+                next(request).let { response ->
                     response.header("content-encoding")
-                        ?.let { if (it.contains("gzip")) it else null }
-                        ?.let { response.body(response.body.gunzipped()) } ?: response
+                            ?.let { if (it.contains("gzip")) it else null }
+                            ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
                 }
             }
         }
     }
+
 }
 
 typealias HttpTransactionLabeller = (HttpTransaction) -> HttpTransaction

@@ -20,9 +20,11 @@ import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
 import org.http4k.core.parse
 import org.http4k.core.then
+import org.http4k.filter.GzipCompressionMode.STREAMING
 import org.http4k.filter.SamplingDecision.Companion.SAMPLE
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.junit.jupiter.api.BeforeEach
@@ -35,12 +37,12 @@ class ClientFiltersTest {
         when (request.uri.path) {
             "/redirect" -> Response(Status.FOUND).header("location", "/ok")
             "/loop" -> Response(Status.FOUND).header("location", "/loop")
-            "/absolute-target" -> if (request.uri.host == "example.com") Response(Status.OK).body("absolute") else Response(Status.INTERNAL_SERVER_ERROR)
+            "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(Status.INTERNAL_SERVER_ERROR)
             "/absolute-redirect" -> Response(Status.MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
             "/redirect-with-charset" -> Response(Status.MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
             "/destination" -> Response(OK).body("destination")
-            "/ok" -> Response(Status.OK).body("ok")
-            else -> Response(Status.OK).let { if (request.query("foo") != null) it.body("with query") else it }
+            "/ok" -> Response(OK).body("ok")
+            else -> Response(OK).let { if (request.query("foo") != null) it.body("with query") else it }
         }
     }
 
@@ -54,32 +56,32 @@ class ClientFiltersTest {
 
     @Test
     fun `follows redirect for temporary redirect response`() {
-        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(Status.OK).body("ok")))
+        assertThat(followRedirects(Request(GET, "/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `follows redirect for post`() {
-        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(Status.OK).body("ok")))
+        assertThat(followRedirects(Request(POST, "/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `follows redirect for put`() {
-        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(Status.OK).body("ok")))
+        assertThat(followRedirects(Request(PUT, "/redirect")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `supports absolute redirects`() {
-        assertThat(followRedirects(Request(GET, "/absolute-redirect")), equalTo(Response(Status.OK).body("absolute")))
+        assertThat(followRedirects(Request(GET, "/absolute-redirect")), equalTo(Response(OK).body("absolute")))
     }
 
     @Test
     fun `discards query parameters in relative redirects`() {
-        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(Status.OK).body("ok")))
+        assertThat(followRedirects(Request(GET, "/redirect?foo=bar")), equalTo(Response(OK).body("ok")))
     }
 
     @Test
     fun `discards charset from location header`() {
-        assertThat(followRedirects(Request(GET, "/redirect-with-charset")), equalTo(Response(Status.OK).body("destination")))
+        assertThat(followRedirects(Request(GET, "/redirect-with-charset")), equalTo(Response(OK).body("destination")))
     }
 
     @Test
@@ -167,13 +169,23 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `gzip request and gunzip response`() {
+    fun `gzip request and gunzip non-streamed response`() {
         val handler = ClientFilters.GZip().then {
             assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzipped()))))
             Response(OK).header("content-encoding", "gzip").body(it.body)
         }
 
         assertThat(handler(Request(GET, "/").body("hello")), hasBody("hello"))
+    }
+
+    @Test
+    fun `gzip request and gunzip streamed response`() {
+        val handler = ClientFilters.GZip(STREAMING).then {
+            assertThat(it, hasHeader("content-encoding", "gzip").and(hasBody(equalTo(Body("hello").gzippedStream()))))
+            Response(OK).header("content-encoding", "gzip").body(Body("hello").gzippedStream())
+        }
+
+        assertThat(handler(Request(GET, "/").body("hello")), hasStatus(OK))
     }
 
     @Test
