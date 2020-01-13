@@ -1,10 +1,8 @@
 package org.http4k.filter
 
-import org.http4k.core.Filter
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.*
 import org.http4k.core.Status.Companion.BAD_REQUEST
-import org.http4k.core.Uri
+import org.http4k.filter.GzipCompressionMode.NON_STREAMING
 
 object RequestFilters {
 
@@ -21,25 +19,25 @@ object RequestFilters {
     }
 
     /**
-     * Basic GZipping of Request. Does not currently support GZipping streams
+     * Basic GZipping of Request.
      */
     object GZip {
-        operator fun invoke() = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
             { request ->
-                next(request.body(request.body.gzipped()).replaceHeader("content-encoding", "gzip"))
+                next(request.body(compressionMode.compress(request.body)).replaceHeader("content-encoding", "gzip"))
             }
         }
     }
 
     /**
-     * Basic UnGZipping of Request. Does not currently support GZipping streams
+     * Basic UnGZipping of Request.
      */
     object GunZip {
-        operator fun invoke() = Filter { next ->
+        operator fun invoke(compressionMode: GzipCompressionMode = NON_STREAMING) = Filter { next ->
             { request ->
                 request.header("content-encoding")
-                    ?.let { if (it.contains("gzip")) it else null }
-                    ?.let { next(request.body(request.body.gunzipped())) } ?: next(request)
+                        ?.let { if (it.contains("gzip")) it else null }
+                        ?.let { next(request.body(compressionMode.decompress(request.body))) } ?: next(request)
             }
         }
     }
