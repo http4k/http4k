@@ -14,14 +14,14 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request) = request.query("code")
+    override fun invoke(request: Request) = request.queryOrFragmentParameter("code")
         ?.let { code ->
-            val state = request.query("state")?.toParameters() ?: emptyList()
+            val state = request.queryOrFragmentParameter("state")?.toParameters() ?: emptyList()
             state.find { it.first == "csrf" }?.second
                 ?.let(::CrossSiteRequestForgeryToken)
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
-                    request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdToken(it)) }
+                    request.queryOrFragmentParameter("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdToken(it)) }
                     accessTokenFetcher.fetch(code)
                         ?.let { tokenDetails ->
                             tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
@@ -34,3 +34,5 @@ class OAuthCallback(
         }
         ?: oAuthPersistence.authFailureResponse()
 }
+
+private fun Request.queryOrFragmentParameter(name: String): String? = this.query(name) ?: fragmentParameter(name)

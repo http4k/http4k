@@ -15,9 +15,9 @@ fun <K, V> Map<K, List<V>>.getFirst(key: K) = this[key]?.firstOrNull()
 
 fun String.toParameters() = if (isNotEmpty()) split("&").map(String::toParameter) else listOf()
 
-internal fun Parameters.findSingle(name: String): String? = find { it.first == name }?.second
+fun Parameters.findSingle(name: String): String? = find { it.first == name }?.second
 
-internal fun Parameters.findMultiple(name: String) = filter { it.first == name }.map { it.second }
+fun Parameters.findMultiple(name: String) = filter { it.first == name }.map { it.second }
 
 private fun String.toParameter(): Parameter = split("=").map(String::fromFormEncoded).let { l -> l.elementAt(0) to l.elementAtOrNull(1) }
 
