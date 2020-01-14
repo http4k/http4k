@@ -1,6 +1,8 @@
 package org.http4k.filter
 
 import org.http4k.core.Body
+import org.http4k.core.Request
+import org.http4k.core.Response
 import java.io.*
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
@@ -8,17 +10,33 @@ import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-sealed class GzipCompressionMode(internal val compress: (Body) -> Body, internal val decompress: (Body) -> Body) {
+sealed class GzipCompressionMode(internal val compress: (Body) -> CompressionResult, internal val decompress: (Body) -> Body) {
 
     object Memory : GzipCompressionMode(Body::gzipped, Body::gunzipped)
 
     object Streaming : GzipCompressionMode(Body::gzippedStream, Body::gunzippedStream)
 }
 
-fun Body.gzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
+data class CompressionResult(val body: Body,
+                             val contentEncoding: String?) {
+    fun apply(request: Request): Request =
+        (contentEncoding?.let {
+            request.header("content-encoding", it)
+        } ?: request)
+            .body(body)
+
+    fun apply(response: Response): Response =
+        (contentEncoding?.let {
+            response.header("content-encoding", it)
+        } ?: response)
+            .body(body)
+}
+
+fun Body.gzipped(): CompressionResult = if (payload.array().isEmpty())
+    CompressionResult(Body.EMPTY, null)
 else ByteArrayOutputStream().run {
     GZIPOutputStream(this).use { it.write(payload.array()) }
-    Body(ByteBuffer.wrap(toByteArray()))
+    CompressionResult(Body(ByteBuffer.wrap(toByteArray())), "gzip")
 }
 
 fun Body.gunzipped(): Body = if (payload.array().isEmpty()) Body.EMPTY
@@ -27,18 +45,27 @@ else ByteArrayOutputStream().use {
     Body(ByteBuffer.wrap(it.toByteArray()))
 }
 
-fun Body.gzippedStream(): Body = Body(GZippingInputStream(stream))
+fun Body.gzippedStream(): CompressionResult =
+    sampleStream(stream,
+        { CompressionResult(Body.EMPTY, null) },
+        { compressedStream -> CompressionResult(Body(GZippingInputStream(compressedStream)), "gzip") })
 
 fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
     Body.EMPTY
 } else {
-    val pushbackStream = PushbackInputStream(stream)
+    sampleStream(stream,
+        { Body.EMPTY },
+        { compressedStream -> Body(GZIPInputStream(compressedStream)) })
+}
+
+private fun <T> sampleStream(sourceStream: InputStream, actionIfEmpty: () -> T, actionIfHasContent: (InputStream) -> T): T {
+    val pushbackStream = PushbackInputStream(sourceStream)
     val firstByte = pushbackStream.read()
-    if (firstByte == -1) {
-        Body.EMPTY
+    return if (firstByte == -1) {
+        actionIfEmpty()
     } else {
         pushbackStream.unread(firstByte)
-        Body(GZIPInputStream(pushbackStream))
+        actionIfHasContent(pushbackStream)
     }
 }
 

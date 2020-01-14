@@ -1,11 +1,6 @@
 package org.http4k.filter
 
-import org.http4k.core.ContentType
-import org.http4k.core.Filter
-import org.http4k.core.HttpHandler
-import org.http4k.core.HttpTransaction
-import org.http4k.core.Request
-import org.http4k.core.Response
+import org.http4k.core.*
 import org.http4k.filter.GzipCompressionMode.Memory
 import java.time.Clock
 import java.time.Duration
@@ -68,7 +63,7 @@ object ResponseFilters {
         override fun invoke(next: HttpHandler): HttpHandler = { request ->
             next(request).let {
                 if (requestAcceptsGzip(request) && isCompressible(it)) {
-                    it.body(compressionMode.compress(it.body)).replaceHeader("content-encoding", "gzip")
+                    compressionMode.compress(it.body).apply(it)
                 } else {
                     it
                 }
@@ -91,12 +86,11 @@ object ResponseFilters {
     object GZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
             { request ->
-                val originalResponse = next(request)
-                if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
-                    originalResponse.let {
-                        it.body(compressionMode.compress(it.body)).replaceHeader("Content-Encoding", "gzip")
-                    }
-                } else originalResponse
+                next(request).let {
+                    if ((request.header("accept-encoding") ?: "").contains("gzip", true)) {
+                        compressionMode.compress(it.body).apply(it)
+                    } else it
+                }
             }
         }
     }
