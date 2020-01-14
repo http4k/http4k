@@ -50,8 +50,17 @@ class GzipBodyTest {
         }
 
         @Test
-        fun `a empty body can be decompressed`() {
+        fun `a empty in-memory body can be decompressed`() {
             val compressedBody = Body("")
+
+            val gunzipped = compressedBody.gunzippedStream()
+
+            assertThat(gunzipped.payload.asString(), equalTo(""))
+        }
+
+        @Test
+        fun `a empty stream body can be decompressed`() {
+            val compressedBody = Body("".byteInputStream(Charsets.UTF_8))
 
             val gunzipped = compressedBody.gunzippedStream()
 

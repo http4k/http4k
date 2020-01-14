@@ -1,10 +1,7 @@
 package org.http4k.filter
 
 import org.http4k.core.Body
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 import java.util.zip.Deflater
@@ -35,7 +32,14 @@ fun Body.gzippedStream(): Body = Body(GZippingInputStream(stream))
 fun Body.gunzippedStream(): Body = if (length != null && length == 0L) {
     Body.EMPTY
 } else {
-    Body(GZIPInputStream(stream))
+    val pushbackStream = PushbackInputStream(stream)
+    val firstByte = pushbackStream.read()
+    if (firstByte == -1) {
+        Body.EMPTY
+    } else {
+        pushbackStream.unread(firstByte)
+        Body(GZIPInputStream(pushbackStream))
+    }
 }
 
 internal class GZippingInputStream(private val source: InputStream) : InputStream() {
@@ -130,6 +134,13 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             (totalIn shr 8).toByte(),
             (totalIn shr 16).toByte(),
             (totalIn shr 24).toByte()))
+
+    override fun available(): Int {
+        if (stage == State.DONE) {
+            return 0
+        }
+        return 1
+    }
 
     @Throws(IOException::class)
     override fun close() {
