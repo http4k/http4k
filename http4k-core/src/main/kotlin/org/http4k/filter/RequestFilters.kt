@@ -26,8 +26,8 @@ object RequestFilters {
      */
     object GZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
-            { request ->
-                next(request.body(compressionMode.compress(request.body)).replaceHeader("content-encoding", "gzip"))
+            {
+                next(compressionMode.compress(it.body).apply(it))
             }
         }
     }

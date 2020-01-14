@@ -4,7 +4,6 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
-import org.http4k.core.Method
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -49,7 +48,7 @@ class RequestFiltersTest {
 
     @Test
     fun `tap passes request through to function`() {
-        val get = Request(Method.GET, "")
+        val get = Request(GET, "")
         var called = false
         RequestFilters.Tap { called = true; assertThat(it, equalTo(get)) }.then(Response(OK).toHttpHandler())(get)
         assertThat(called, equalTo(true))
@@ -57,15 +56,20 @@ class RequestFiltersTest {
 
     @Test
     fun `gzip request and add content encoding`() {
-        fun assertSupportsZipping(body: String) {
-            val handler = RequestFilters.GZip().then {
-                assertThat(it, hasBody(equalTo(Body(body).gzipped())).and(hasHeader("content-encoding", "gzip")))
-                Response(OK)
-            }
-            handler(Request(Method.GET, "").body(body))
+        val handler = RequestFilters.GZip().then {
+            assertThat(it, hasBody(equalTo(Body("foobar").gzipped().body)).and(hasHeader("content-encoding", "gzip")))
+            Response(OK)
         }
-        assertSupportsZipping("foobar")
-        assertSupportsZipping("")
+        handler(Request(GET, "").body("foobar"))
+    }
+
+    @Test
+    fun `gzip request and add do not content encoding where request is empty`() {
+        val handler = RequestFilters.GZip().then {
+            assertThat(it, hasBody(equalTo(Body.EMPTY)).and(!hasHeader("content-encoding", "gzip")))
+            Response(OK)
+        }
+        handler(Request(GET, "").body(Body.EMPTY))
     }
 
     @Test
@@ -75,7 +79,7 @@ class RequestFiltersTest {
                 assertThat(it, hasBody(body))
                 Response(OK)
             }
-            handler(Request(Method.GET, "").body(Body(body).gzipped()).header("content-encoding", "gzip"))
+            handler(Request(GET, "").body(Body(body).gzipped().body).header("content-encoding", "gzip"))
         }
         assertSupportsUnzipping("foobar")
         assertSupportsUnzipping("")
@@ -88,7 +92,7 @@ class RequestFiltersTest {
             assertThat(it, hasBody(body))
             Response(OK)
         }
-        handler(Request(Method.GET, "").body(body))
+        handler(Request(GET, "").body(body))
     }
 
 }
