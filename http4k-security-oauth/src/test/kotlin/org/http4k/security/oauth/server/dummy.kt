@@ -9,6 +9,7 @@ import org.http4k.core.Uri
 import org.http4k.security.AccessToken
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
+import org.http4k.security.openid.Nonce
 import java.time.Clock
 import java.time.Instant
 import java.util.*
@@ -22,8 +23,8 @@ class DummyAuthorizationCodes(private val request: AuthRequest, private val shou
 
 class DummyIdTokens(private val username: String? = null) : IdTokens {
 
-    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, code: AuthorizationCode) =
-        IdToken("dummy-id-token-for-" + (username ?: "unknown"))
+    override fun createForAuthorization(request: Request, authRequest: AuthRequest, response: Response, nonce: Nonce?, code: AuthorizationCode) =
+        IdToken("dummy-id-token-for-" + (username ?: "unknown") + "-nonce:" + (nonce?.value ?: "unknown"))
 
     override fun createForAccessToken(authorizationCodeDetails: AuthorizationCodeDetails, code: AuthorizationCode, accessToken: AccessToken): IdToken =
         IdToken("dummy-id-token-for-access-token")
@@ -83,9 +84,11 @@ class InMemoryAuthorizationCodes(private val clock: Clock) : AuthorizationCodes 
         })
 }
 
-class InMemoryIdTokenConsumer : IdTokenConsumer {
+class InMemoryIdTokenConsumer(var expectedNonce: Nonce? = null) : IdTokenConsumer {
     var consumedFromAuthorizationResponse: IdToken? = null
     var consumedFromAccessTokenResponse: IdToken? = null
+
+    override fun nonceFromIdToken(idToken: IdToken): Nonce? = expectedNonce
 
     override fun consumeFromAuthorizationResponse(idToken: IdToken) {
         consumedFromAuthorizationResponse = idToken

@@ -53,7 +53,7 @@ class AuthenticationCompleteTest {
             and hasHeader("location",
             authorizationRequest.redirectUri
                 .fragmentParameter("code", "dummy-token-for-jdoe")
-                .fragmentParameter("id_token", "dummy-id-token-for-jdoe")
+                .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
                 .fragmentParameter("state", "some state").toString()))
     }
 

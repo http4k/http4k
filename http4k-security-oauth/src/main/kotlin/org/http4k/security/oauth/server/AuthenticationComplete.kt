@@ -37,7 +37,7 @@ class AuthenticationComplete(
                 when (authorizationRequest.responseType) {
                     Code -> query("code", it.value)
                     CodeIdToken -> fragmentParameter("code", it.value)
-                        .fragmentParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, it).value)
+                        .fragmentParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
                 }
             }
                 .mapFailure {

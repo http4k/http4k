@@ -8,7 +8,6 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.FormField
 import org.http4k.lens.Query
 import org.http4k.lens.Validator.Strict
-import org.http4k.lens.string
 import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
@@ -18,6 +17,7 @@ import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentica
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
+import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
 
@@ -85,7 +85,7 @@ class OAuthServer(
         val redirectUriQueryParameter = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
-        val nonce = Query.string().optional("nonce")
+        val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")
         val request = Query.map(::RequestJwtContainer, RequestJwtContainer::value).optional("request")
 
         val clientIdForm = FormField.map(::ClientId, ClientId::value).optional("client_id")

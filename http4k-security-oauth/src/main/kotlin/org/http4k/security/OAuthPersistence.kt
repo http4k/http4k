@@ -3,6 +3,7 @@ package org.http4k.security
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.FORBIDDEN
+import org.http4k.security.openid.Nonce
 
 /**
  * Provides persistence for OAuth lifecycle values:
@@ -21,6 +22,17 @@ interface OAuthPersistence {
      * Retrieve the stored CSRF token for this user request
      */
     fun retrieveCsrf(request: Request): CrossSiteRequestForgeryToken?
+
+    /**
+     * Assign a nonce to this OIDC auth redirection (to the end-service) response. Opportunity here to modify the
+     * response returned to the user when the redirection happens.
+     */
+    fun assignNonce(redirect: Response, nonce: Nonce): Response
+
+    /**
+     * Retrieve the stored nonce token for this user request
+     */
+    fun retrieveNonce(request: Request): Nonce?
 
     /**
      * Assign the swapped AccessToken returned by the end-service. Opportunity here to modify the

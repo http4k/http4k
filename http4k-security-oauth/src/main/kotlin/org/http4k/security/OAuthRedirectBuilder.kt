@@ -8,11 +8,17 @@ import org.http4k.security.openid.RequestJwts
 typealias RedirectionUriBuilder = (Uri, AuthRequest, state: String) -> Uri
 
 val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequest, state: String ->
-    uri.query("client_id", authRequest.client.value)
+    val nonce = authRequest.nonce
+    val oauthUri = uri.query("client_id", authRequest.client.value)
         .query("response_type", authRequest.responseType.queryParameterValue)
         .query("scope", authRequest.scopes.joinToString(" "))
         .query("redirect_uri", authRequest.redirectUri.toString())
         .query("state", state)
+    if (nonce != null) {
+        oauthUri.query("nonce", nonce.value)
+    } else {
+        oauthUri
+    }
 }
 
 fun uriBuilderWithRequestJwt(requestJwts: RequestJwts) = { uri: Uri, authRequest: AuthRequest, state: String ->

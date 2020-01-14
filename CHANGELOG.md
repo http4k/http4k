@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.211.0
 - [http4-security-oauth] [Break] OIDC callback urls using the ResponseType 'code id_token' will now have the parameters returned as a fragment not a query as per 3.3.2.5 of the OpenID Connect Core 1.0 spec H/T @tom
+- [http4-security-oauth] [Break] Initial support of nonce in OIDC requests H/T @tom
 
 ### v3.210.0
 - [http4-core] Support for GZipping response streams. H/T @jshiell
