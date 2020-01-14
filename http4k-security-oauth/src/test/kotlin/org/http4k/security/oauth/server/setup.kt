@@ -16,6 +16,7 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.InsecureCookieBasedOAuthPersistence
+import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
 import org.http4k.security.ResponseType
@@ -73,9 +74,9 @@ fun oauthClientApp(
     debug: Boolean,
     responseType: ResponseType = ResponseType.Code,
     idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
-    scopes: List<String> = listOf("name", "age")
+    scopes: List<String> = listOf("name", "age"),
+    persistence: OAuthPersistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 ): RoutingHttpHandler {
-    val persistence = InsecureCookieBasedOAuthPersistence("oauthTest")
 
     val oauthProvider = OAuthProvider(
         OAuthProviderConfig(Uri.of("http://irrelevant"),

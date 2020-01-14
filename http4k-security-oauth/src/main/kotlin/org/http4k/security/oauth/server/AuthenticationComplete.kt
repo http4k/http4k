@@ -11,6 +11,7 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.fragmentParameter
 
 class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
@@ -26,7 +27,7 @@ class AuthenticationComplete(
         return Response(SEE_OTHER)
             .header("location", authorizationRequest.redirectUri
                 .addResponseTypeValues(authorizationRequest, request, response)
-                .query("state", authorizationRequest.state)
+                .withState(authorizationRequest)
                 .toString())
     }
 
@@ -35,8 +36,8 @@ class AuthenticationComplete(
             map {
                 when (authorizationRequest.responseType) {
                     Code -> query("code", it.value)
-                    CodeIdToken -> query("code", it.value)
-                        .query("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, it).value)
+                    CodeIdToken -> fragmentParameter("code", it.value)
+                        .fragmentParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
                 }
             }
                 .mapFailure {
@@ -46,6 +47,11 @@ class AuthenticationComplete(
                 }
                 .get()
         }
+
+    private fun Uri.withState(authorizationRequest: AuthRequest) = when (authorizationRequest.responseType) {
+        Code -> query("state", authorizationRequest.state)
+        CodeIdToken -> fragmentParameter("state", authorizationRequest.state)
+    }
 
     private fun String.addTo(uri: Uri): Uri = uri.query("error_uri", this)
 }

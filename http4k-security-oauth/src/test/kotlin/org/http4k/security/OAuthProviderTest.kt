@@ -21,6 +21,7 @@ import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.oauth.server.AuthRequest
+import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import org.http4k.security.openid.RequestJwts
 import org.junit.jupiter.api.Test
@@ -42,8 +43,9 @@ class OAuthProviderTest {
         Uri.of("http://callbackHost/callback"),
         listOf("scope1", "scope2"),
         persistence,
-        { it.query("nonce", "randomNonce") },
+        { it.query("response_mode", "form_post") },
         { CrossSiteRequestForgeryToken("randomCsrf") },
+        { Nonce("randomNonce") },
         responseType
     )
 
@@ -55,13 +57,13 @@ class OAuthProviderTest {
 
     @Test
     fun `filter - when no accessToken value present, request is redirected to expected location`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&nonce=randomNonce"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&response_mode=form_post"""
         assertThat(oAuth(oAuthPersistence).authFilter.then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))
     }
 
     @Test
     fun `filter - accepts custom request JWT container`() {
-        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&nonce=randomNonce"""
+        val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&response_mode=form_post"""
 
         val jwts = object : RequestJwts {
             override fun create(authRequest: AuthRequest, state: String) = RequestJwtContainer("myCustomJwt")

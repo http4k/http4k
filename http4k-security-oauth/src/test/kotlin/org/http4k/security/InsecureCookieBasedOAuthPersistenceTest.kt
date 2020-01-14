@@ -11,6 +11,7 @@ import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
+import org.http4k.security.openid.Nonce
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
@@ -28,7 +29,7 @@ class InsecureCookieBasedOAuthPersistenceTest {
     @Test
     fun `failed response has correct cookies`() {
         assertThat(persistence.authFailureResponse(), equalTo(
-            Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken")
+            Response(FORBIDDEN).invalidateCookie("prefixCsrf").invalidateCookie("prefixAccessToken").invalidateCookie("prefixNonce")
         ))
     }
 
@@ -45,6 +46,12 @@ class InsecureCookieBasedOAuthPersistenceTest {
     }
 
     @Test
+    fun `nonce retrieval based on cookie`() {
+        assertThat(persistence.retrieveNonce(Request(GET, "")), absent())
+        assertThat(persistence.retrieveNonce(Request(GET, "").cookie(Cookie("prefixNonce", "nonceValue"))), equalTo(Nonce("nonceValue")))
+    }
+
+    @Test
     fun `adds csrf as a cookie to the auth redirect`() {
         assertThat(persistence.assignCsrf(Response(TEMPORARY_REDIRECT), CrossSiteRequestForgeryToken("csrfValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixCsrf", "csrfValue",
@@ -55,7 +62,15 @@ class InsecureCookieBasedOAuthPersistenceTest {
     fun `adds csrf as a cookie to the token redirect`() {
         assertThat(persistence.assignToken(Request(GET, ""), Response(TEMPORARY_REDIRECT), AccessToken("tokenValue")), equalTo(
             Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixAccessToken", "tokenValue",
-                expires = LocalDateTime.now(clock).plus(cookieValidity))).invalidateCookie("prefixCsrf")
+                expires = LocalDateTime.now(clock).plus(cookieValidity))).invalidateCookie("prefixCsrf").invalidateCookie("prefixNonce")
+        ))
+    }
+
+    @Test
+    fun `adds nonce as a cookie to the auth redirect`() {
+        assertThat(persistence.assignNonce(Response(TEMPORARY_REDIRECT), Nonce("nonceValue")), equalTo(
+            Response(TEMPORARY_REDIRECT).cookie(Cookie("prefixNonce", "nonceValue",
+                expires = LocalDateTime.now(clock).plus(cookieValidity)))
         ))
     }
 }

@@ -14,23 +14,35 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request) = request.query("code")
+    override fun invoke(request: Request) = request.queryOrFragmentParameter("code")
         ?.let { code ->
-            val state = request.query("state")?.toParameters() ?: emptyList()
+            val state = request.queryOrFragmentParameter("state")?.toParameters() ?: emptyList()
             state.find { it.first == "csrf" }?.second
                 ?.let(::CrossSiteRequestForgeryToken)
                 ?.takeIf { it == oAuthPersistence.retrieveCsrf(request) }
                 ?.let {
-                    request.query("id_token")?.let { idTokenConsumer.consumeFromAuthorizationResponse(IdToken(it)) }
-                    accessTokenFetcher.fetch(code)
-                        ?.let { tokenDetails ->
-                            tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
-
-                            val originalUri = state.find { it.first == "uri" }?.second ?: "/"
-                            oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
-                                .header("Location", originalUri), tokenDetails.accessToken)
-                        }
+                    val idToken = request.queryOrFragmentParameter("id_token")?.let { IdToken(it) }
+                    if(hasValidNonceInIdToken(request, idToken)) {
+                        idToken?.let {  idTokenConsumer.consumeFromAuthorizationResponse(it)}
+                        accessTokenFetcher.fetch(code)
+                            ?.let { tokenDetails ->
+                                tokenDetails.idToken?.also(idTokenConsumer::consumeFromAccessTokenResponse)
+                                val originalUri = state.find { it.first == "uri" }?.second ?: "/"
+                                oAuthPersistence.assignToken(request, Response(TEMPORARY_REDIRECT)
+                                    .header("Location", originalUri), tokenDetails.accessToken)
+                            }
+                    } else {
+                        null
+                    }
                 }
         }
         ?: oAuthPersistence.authFailureResponse()
+
+    private fun hasValidNonceInIdToken(request: Request, idToken: IdToken?): Boolean {
+        return if(idToken != null) {
+            idTokenConsumer.nonceFromIdToken(idToken) == oAuthPersistence.retrieveNonce(request)
+        } else true
+    }
 }
+
+private fun Request.queryOrFragmentParameter(name: String): String? = this.query(name) ?: fragmentParameter(name)

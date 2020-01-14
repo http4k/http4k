@@ -13,6 +13,7 @@ import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.fragmentParameter
 import org.junit.jupiter.api.Test
 
 class AuthenticationCompleteTest {
@@ -51,9 +52,9 @@ class AuthenticationCompleteTest {
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
             authorizationRequest.redirectUri
-                .query("code", "dummy-token-for-jdoe")
-                .query("id_token", "dummy-id-token-for-jdoe")
-                .query("state", "some state").toString()))
+                .fragmentParameter("code", "dummy-token-for-jdoe")
+                .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
+                .fragmentParameter("state", "some state").toString()))
     }
 
     @Test

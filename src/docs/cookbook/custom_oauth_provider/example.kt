@@ -17,6 +17,7 @@ import org.http4k.security.CrossSiteRequestForgeryToken
 import org.http4k.security.OAuthPersistence
 import org.http4k.security.OAuthProvider
 import org.http4k.security.OAuthProviderConfig
+import org.http4k.security.openid.Nonce
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 
@@ -53,6 +54,7 @@ fun main() {
 // this interface allows us to provide custom logic for storing and verifying the CSRF and AccessTokens.
 // to be maximally secure, never let the end-user see the access token!
 class CustomOAuthPersistence : OAuthPersistence {
+    var nonce: Nonce? = null
     var csrf: CrossSiteRequestForgeryToken? = null
     var accessToken: AccessToken? = null
 
@@ -62,6 +64,13 @@ class CustomOAuthPersistence : OAuthPersistence {
         this.csrf = csrf
         return redirect.header("action", "assignCsrf")
     }
+
+    override fun assignNonce(redirect: Response, nonce: Nonce): Response {
+        this.nonce = nonce
+        return redirect.header("action", "assignNonce")
+    }
+
+    override fun retrieveNonce(request: Request): Nonce? = nonce
 
     override fun retrieveToken(request: Request): AccessToken? = accessToken
 
