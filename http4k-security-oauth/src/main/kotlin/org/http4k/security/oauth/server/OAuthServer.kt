@@ -74,7 +74,7 @@ class OAuthServer(
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(authoriseRequestValidator, errorRenderer, authRequestExtractor)
-            .then(AuthRequestTrackingFilter(authRequestTracking, AuthRequestFromQueryParameters, errorRenderer))
+            .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, errorRenderer))
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
