@@ -14,7 +14,8 @@ data class AuthRequest(
     val state: String?,
     val responseType: ResponseType = Code,
     val nonce: Nonce? = null,
-    val request: RequestJwtContainer? = null) {
+    val request: RequestJwtContainer? = null,
+    val additionalProperties: Map<String, Any> = emptyMap()) {
 
     fun isOIDC() = scopes.map { it.toLowerCase() }.contains(OIDC_SCOPE)
 
