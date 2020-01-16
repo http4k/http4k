@@ -79,6 +79,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             (GZIP_MAGIC shr 8).toByte(),
             Deflater.DEFLATED.toByte(),
             0, 0, 0, 0, 0, 0, 0)
+        private const val INITIAL_BUFFER_SIZE = 8192
     }
 
     private enum class State {
@@ -90,6 +91,7 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
     private var trailer: ByteArrayInputStream? = null
     private val header = ByteArrayInputStream(HEADER_DATA)
 
+    private var deflationBuffer: ByteArray = ByteArray(INITIAL_BUFFER_SIZE)
     private var stage = State.HEADER
 
     override fun read(): Int {
@@ -115,20 +117,23 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             bytesRead
         }
         State.DATA -> {
-            val deflationBuffer = ByteArray(readLength)
-            val bytesRead = source.read(deflationBuffer, 0, readLength)
-            if (bytesRead <= 0) {
-                stage = State.FINALISE
-                deflater.finish()
-                0
+            if (!deflater.needsInput()) {
+                deflatePendingInput(readBuffer, readOffset, readLength)
             } else {
-                crc.update(deflationBuffer, 0, bytesRead)
-                deflater.setInput(deflationBuffer, 0, bytesRead)
-                var bufferBytesRead = 0
-                while (!deflater.needsInput() && readLength - bufferBytesRead > 0) {
-                    bufferBytesRead += deflater.deflate(readBuffer, readOffset + bufferBytesRead, readLength - bufferBytesRead, Deflater.NO_FLUSH)
+                if (deflationBuffer.size < readLength) {
+                    deflationBuffer = ByteArray(readLength)
                 }
-                bufferBytesRead
+
+                val bytesRead = source.read(deflationBuffer, 0, readLength)
+                if (bytesRead <= 0) {
+                    stage = State.FINALISE
+                    deflater.finish()
+                    0
+                } else {
+                    crc.update(deflationBuffer, 0, bytesRead)
+                    deflater.setInput(deflationBuffer, 0, bytesRead)
+                    deflatePendingInput(readBuffer, readOffset, readLength)
+                }
             }
         }
         State.FINALISE -> if (deflater.finished()) {
@@ -149,6 +154,14 @@ internal class GZippingInputStream(private val source: InputStream) : InputStrea
             bytesRead
         }
         State.DONE -> -1
+    }
+
+    private fun deflatePendingInput(readBuffer: ByteArray, readOffset: Int, readLength: Int): Int {
+        var bytesCompressed = 0
+        while (!deflater.needsInput() && readLength - bytesCompressed > 0) {
+            bytesCompressed += deflater.deflate(readBuffer, readOffset + bytesCompressed, readLength - bytesCompressed, Deflater.NO_FLUSH)
+        }
+        return bytesCompressed
     }
 
     private fun createTrailer(crcValue: Int, totalIn: Int) =
