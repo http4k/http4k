@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.213.0
+- [http4-security-oauth] Fixing wrong AuthRequestExtractor passed to AuthRequestTrackingFilter H/T @tom
+
 ### v3.212.0
 - [http4-security-oauth] allowing additional properties to be stored on auth request, if using additional extractors H/T @tom
 
