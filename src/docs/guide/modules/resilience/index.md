@@ -2,7 +2,7 @@ title: http4k Resilience4J Module
 description: Feature overview of the http4k-resilience4j module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-resilience4j", version: "3.212.0"```
+```compile group: "org.http4k", name: "http4k-resilience4j", version: "3.213.0"```
 
 ### About
 
