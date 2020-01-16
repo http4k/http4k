@@ -11,6 +11,7 @@ import org.http4k.filter.GzipCompressionMode.Streaming
 import org.http4k.filter.ResponseFilters.ReportHttpTransaction
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
+import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.RoutedRequest
 import org.http4k.routing.RoutedResponse
 import org.http4k.routing.bind
@@ -73,6 +74,15 @@ class ResponseFiltersTest {
     @Nested
     inner class GzipFilters {
         @Test
+        fun `gunzip response handling sets the accept-encoding header to gzip on requests`() {
+            val handler = ResponseFilters.GunZip().then {
+                assertThat(it, hasHeader("accept-encoding", "gzip"))
+                Response(OK)
+            }
+            assertThat(handler(Request(GET, "/")), hasStatus(OK))
+        }
+
+        @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip`() {
             val zipped = ResponseFilters.GZip().then { Response(OK).body("foobar") }
             assertThat(zipped(Request(GET, "").header("accept-encoding", "gzip")),
@@ -133,6 +143,15 @@ class ResponseFiltersTest {
 
     @Nested
     inner class GzipStreamFilters {
+        @Test
+        fun `gunzip response handling sets the accept-encoding header to gzip on requests`() {
+            val handler = ResponseFilters.GunZip(Streaming).then {
+                assertThat(it, hasHeader("accept-encoding", "gzip"))
+                Response(OK)
+            }
+            assertThat(handler(Request(GET, "/")), hasStatus(OK))
+        }
+
         @Test
         fun `gzip response and adds gzip content encoding if the request has accept-encoding of gzip`() {
             val zipped = ResponseFilters.GZip(Streaming).then { Response(OK).body("foobar") }
