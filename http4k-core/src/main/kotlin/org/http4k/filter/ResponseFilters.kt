@@ -101,7 +101,7 @@ object ResponseFilters {
     object GunZip {
         operator fun invoke(compressionMode: GzipCompressionMode = Memory) = Filter { next ->
             { request ->
-                next(request).let { response ->
+                next(request.header("accept-encoding", "gzip")).let { response ->
                     response.header("content-encoding")
                             ?.let { if (it.contains("gzip")) it else null }
                             ?.let { response.body(compressionMode.decompress(response.body)) } ?: response
