@@ -58,4 +58,7 @@ The standard Jackson module is used for JSON creation and marshalling.
 #### Plaintext pipelining: [results](https://www.techempower.com/benchmarks/#section=data-r17&hw=ph&test=plaintext&l=fjd30b):
 *Top rank: 23/66 - Apache backend*
 
+### Recommendations
+Benchmark your own app's performance trying different engines if performance is critical.  The Tech Empower benchmarks attempt to simulate simple real-world scenarios, but they can behave drastically different than your app.  One other consideration is test time; some engines start up much faster than others.
+
 [http4k]: https://http4k.org
