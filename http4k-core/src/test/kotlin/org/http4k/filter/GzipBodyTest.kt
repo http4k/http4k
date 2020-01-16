@@ -12,6 +12,7 @@ import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import kotlin.random.Random
 
 class GzipBodyTest {
 
@@ -47,6 +48,26 @@ class GzipBodyTest {
 
             assertThat(decompressedOutput, equalTo("foo"))
         }
+
+        @Test
+        fun `a large randomised gzipped body can be decompressed by the standard library`() {
+            val expectedBody = randomContent(512 * 1024)
+            val gzipped = Body(expectedBody).gzippedStream()
+
+            val decompressedOutput = InputStreamReader(GZIPInputStream(gzipped.body.stream), Charsets.UTF_8).use {
+                it.readText()
+            }
+
+            assertThat(decompressedOutput, equalTo(expectedBody))
+        }
+
+        private fun randomContent(characterCount: Int): String =
+            (('a'..'z') + ('A'..'Z') + ('0'..'9') + ' ').let { characterPool ->
+                (0..characterCount)
+                    .map { Random.nextInt(0, characterPool.size) }
+                    .map { characterPool[it] }
+                    .joinToString("")
+            }
 
         @Test
         fun `a body gzipped by the standard library can be decompressed`() {
@@ -91,7 +112,7 @@ class GzipBodyTest {
         @Test
         fun `a round-trip of a streaming body works`() {
             assertThat(Body("foo".byteInputStream(Charsets.UTF_8)).gzippedStream().body.gunzippedStream().payload,
-                    equalTo(Body("foo").payload))
+                equalTo(Body("foo").payload))
         }
 
         @Test
