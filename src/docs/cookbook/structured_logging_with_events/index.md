@@ -3,8 +3,8 @@ description: Recipe for using http4k Events to send structured logs to external 
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.213.0"
-    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.213.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.214.0"
+    compile group: "org.http4k", name: "http4k-format-jackson", version: "3.214.0"
 ```
 
 In order to leverage modern log aggregation platforms, we should move away from logging arbitrary strings into the StdOut of our applications, and move towards [Structured Logging](https://www.thoughtworks.com/radar/techniques/structured-logging) instead, which allows us to treat logs as data which can be mined to give us better observability of our systems. This also encourages the move for developers to think about which events happening in your apps are actually important and what data is appropriate to be attached to each one.

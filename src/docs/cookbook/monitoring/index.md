@@ -5,8 +5,8 @@ Measuring performance of application estate is crucial in today's microservice w
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.213.0"
-    compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.213.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.214.0"
+    compile group: "org.http4k", name: "http4k-metrics-micrometer", version: "3.214.0"
 ```
  
 ### Metrics (Micrometer) [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/monitoring/example_micrometer.kt)
