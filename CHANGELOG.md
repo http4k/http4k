@@ -3,6 +3,10 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.215.0
+- [http4-core] GZip client filters now send correct accept-encoding header. @jshiell
+- [http4-core] New AcceptGZip client filter allows handling of remote GZip without compressing client requests. @jshiell
+
 ### v3.214.0
 - [http4-core] Fix #344 H/T Streaming GZip encoder loses data. @jshiell
 
