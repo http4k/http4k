@@ -33,5 +33,5 @@ data class AuthorizationCodeDetails(
     val state: String?,
     val isOIDC: Boolean,
     val responseType: ResponseType = Code,
-    val nonce: Nonce?
+    val nonce: Nonce? = null
 )
