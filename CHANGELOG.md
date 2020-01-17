@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.216.0 (uncut)
 - [http4-core] [Breaking] Removed clashing Events `then()` from deprecated (meaning it cannot be used as there is also another `then()` in that package). Use the one in `org.http4k.events` instead.
+- [http4-security-oauth] Adding nonce to AuthorizationCodeDetails H/T @tom
 
 ### v3.215.0
 - [http4-core] GZip client filters now send correct accept-encoding header. @jshiell
