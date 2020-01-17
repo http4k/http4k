@@ -2,7 +2,7 @@ title: http4k Chaos Module
 description: Feature overview of the http4k-testing-chaos module
 
 ## Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-chaos", version: "3.215.0"```
+```compile group: "org.http4k", name: "http4k-testing-chaos", version: "3.216.0"```
 
 ## About
 The http4k Chaos module provides the facility to statically or dynamically inject failure modes into http4k applications, such as random HTTP failures, killing of processes, and extra latency injection. By modelling these modes, it is possible to plan for mitigation of particular scenarios on a wider scale, resulting either from failures within your system boundary, or those caused by dependent remote HTTP services.
