@@ -31,7 +31,7 @@ class ExtensionTests {
 
     @Test
     fun `replayingMatchingContent blows up with non-matching request`() {
-        assertThat({ http(Request(GET, "w")) }, throws(has(
+        assertThat({ http(Request(GET, "/foobar")) }, throws(has(
             AssertionFailedError::getLocalizedMessage,
             containsSubstring("Unexpected request received for Interaction 0 ==>")
         )))
@@ -42,7 +42,7 @@ class ExtensionTests {
         assertThat(http(request), equalTo(response))
         assertThat({ http(request) }, throws(has(
             AssertionFailedError::getLocalizedMessage,
-            containsSubstring("Unexpected request received for Interaction 0 ==>")
+            containsSubstring("Unexpected request received for Interaction 1 ==>")
         )))
     }
 

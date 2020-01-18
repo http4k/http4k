@@ -49,24 +49,24 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
 }
 
 fun ReadWriteStream.replayingMatchingContent(): HttpHandler {
-    val zipped = requests().zip(responses()).iterator()
+    val interactions = requests().zip(responses()).iterator()
     val count = AtomicInteger()
 
     return { received: Request ->
-        if (zipped.hasNext()) {
-            val (expectedReq, response) = zipped.next()
+        if (interactions.hasNext()) {
+            val (expectedReq, response) = interactions.next()
 
             assertEquals(
                 expectedReq.toString(),
                 received.removeHeadersNotIn(expectedReq).toString(),
-                "Unexpected request received for Interaction " + count.get()
+                "Unexpected request received for Interaction " + count.getAndIncrement()
             )
             response
         } else {
             assertEquals(
                 "",
                 received.toString(),
-                "Unexpected request received for Interaction " + count.get()
+                "Unexpected request received for Interaction " + count.getAndIncrement()
             )
             fail("")
         }
