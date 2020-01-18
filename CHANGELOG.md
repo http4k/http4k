@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.218.0
+### v3.217.0
 - [all] Upgrade some dependency versions.
 - [http4k-incubator] Next iteration of Servirtium JUnit extensions. Only check content which is in the contract when replaying.
 
