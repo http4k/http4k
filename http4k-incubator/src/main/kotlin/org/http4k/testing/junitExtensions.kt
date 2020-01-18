@@ -45,14 +45,26 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
                     val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
                     val count = AtomicInteger()
 
-                    return { req: Request ->
-                        val (request, response) = zipped.next()
-                        assertEquals(req.toString(), request.toString(), "Unexpected request received for Interaction " + count.get())
+                    return { received: Request ->
+                        val (expectedReq, response) = zipped.next()
+
+                        assertEquals(
+                            received.toString(),
+                            received.removeHeadersNotIn(expectedReq).toString(),
+                            "Unexpected request received for Interaction " + count.get()
+                        )
                         response
                     }
                 }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
+        }
+
+    private fun Request.removeHeadersNotIn(that: Request) =
+        that.headers.fold(this) { reqToCheck, nextExpectedHeader ->
+            reqToCheck
+                .takeIf { it.header(nextExpectedHeader.first) != null }
+                ?: reqToCheck.removeHeader(nextExpectedHeader.first)
         }
 }
 
