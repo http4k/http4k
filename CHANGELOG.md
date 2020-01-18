@@ -3,35 +3,38 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.217.0
+- [http4k-incubator] Next iteration of Servirtium JUnit extensions. Only check content which is in the contract when replaying.
+
 ### v3.216.0
-- [http4-core] [Breaking] Removed clashing Events `then()` from deprecated (meaning it cannot be used as there is also another `then()` in that package). Use the one in `org.http4k.events` instead.
-- [http4-security-oauth] Adding nonce to AuthorizationCodeDetails H/T @tom
+- [http4k-core] [Breaking] Removed clashing Events `then()` from deprecated (meaning it cannot be used as there is also another `then()` in that package). Use the one in `org.http4k.events` instead.
+- [http4k-security-oauth] Adding nonce to AuthorizationCodeDetails H/T @tom
 
 ### v3.215.0
-- [http4-core] GZip client filters now send correct accept-encoding header. @jshiell
-- [http4-core] New AcceptGZip client filter allows handling of remote GZip without compressing client requests. @jshiell
+- [http4k-core] GZip client filters now send correct accept-encoding header. @jshiell
+- [http4k-core] New AcceptGZip client filter allows handling of remote GZip without compressing client requests. @jshiell
 
 ### v3.214.0
-- [http4-core] Fix #344 H/T Streaming GZip encoder loses data. @jshiell
+- [http4k-core] Fix #344 H/T Streaming GZip encoder loses data. @jshiell
 
 ### v3.213.0
-- [http4-security-oauth] Fixing wrong AuthRequestExtractor passed to AuthRequestTrackingFilter. H/T @tom
+- [http4k-security-oauth] Fixing wrong AuthRequestExtractor passed to AuthRequestTrackingFilter. H/T @tom
 
 ### v3.212.0
-- [http4-security-oauth] allowing additional properties to be stored on auth request, if using additional extractors H/T @tom
+- [http4k-security-oauth] allowing additional properties to be stored on auth request, if using additional extractors H/T @tom
 
 ### v3.211.0
 - [http4k-core] Fixes for #338 - Gzip filters send content-encoding of gzip even when body is empty. H/T @jshiell
-- [http4-security-oauth] [Break] OIDC callback urls using the ResponseType 'code id_token' will now have the parameters returned as a fragment not a query as per 3.3.2.5 of the OpenID Connect Core 1.0 spec H/T @tom
-- [http4-security-oauth] [Break] Initial support of nonce in OIDC requests H/T @tom
+- [http4k-security-oauth] [Break] OIDC callback urls using the ResponseType 'code id_token' will now have the parameters returned as a fragment not a query as per 3.3.2.5 of the OpenID Connect Core 1.0 spec H/T @tom
+- [http4k-security-oauth] [Break] Initial support of nonce in OIDC requests H/T @tom
 
 ### v3.210.0
-- [http4-core] Support for GZipping response streams. H/T @jshiell
-- [http4-security-oauth] Adding expires_in to token endpoint response. H/T @tom
+- [http4k-core] Support for GZipping response streams. H/T @jshiell
+- [http4k-security-oauth] Adding expires_in to token endpoint response. H/T @tom
 
 ### v3.209.0
 - [all] Added `Status` to auto-marshalling JSON mappings.
-- [http4-security-oauth] Adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
+- [http4k-security-oauth] Adding token_type to token endpoint response, and strip out nulls in response. H/T @tom
 
 ### v3.208.0
 - [all] Upgrade some dependency versions.
@@ -52,20 +55,20 @@ changes with their rationale when appropriate:
 
 ### v3.205.0
 - [all] Upgrade some dependency versions, including Kotlin to 1.3.61
-- [http4-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
+- [http4k-security-oauth] allowing setting scopes on AccessToken creation so they are set on the response. H/T @tom
 
 ### v3.204.0
 - [http4k-core, http4k-aws] - increase efficiency of Hex implementation for trace ids and HMAC. H/T @time4tea
 - [http4k-cloudnative] Reimplemented Environment to be more efficient. H/T @time4tea for noticing this.
 
 ### v3.203.0
-- [http4-security-oauth] On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
+- [http4k-security-oauth] On generating tokens allowing for the client id to be based on the result of validation rather than just the form parameters of the request. To support client assertions. H/T @tom
 
 ### v3.202.0
-- [http4-security-oauth] Adding new errors to support issues with client assertions. H/T @tom
+- [http4k-security-oauth] Adding new errors to support issues with client assertions. H/T @tom
 
 ### v3.201.0
-- [http4-security-oauth] Allowing a scope to be set on AccessToken. Allowing for more low level validation of Authorise and Token Requests, by implementing `org.http4k.security.oauth.server.AuthoriseRequestValidator` and `org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication` respectively. H/T @tom
+- [http4k-security-oauth] Allowing a scope to be set on AccessToken. Allowing for more low level validation of Authorise and Token Requests, by implementing `org.http4k.security.oauth.server.AuthoriseRequestValidator` and `org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication` respectively. H/T @tom
 
 ### v3.200.0
 - [http4k-contract] Support multiple request bodies in OpenApi v3
@@ -79,7 +82,7 @@ changes with their rationale when appropriate:
 
 ### v3.198.0
 - [http4k-core] [Breaking] Reworking of ContentType to support multiple directives. `directive` field is now `directives`, so just add the extra 's' to fix :)
-- [http4-security-oauth] Moar options on `OAuthProviderConfig`. H/T @tom
+- [http4k-security-oauth] Moar options on `OAuthProviderConfig`. H/T @tom
 
 ### v3.197.0
 - [all] Update some dependency versions, including Kotlin to `1.3.60`.
@@ -159,7 +162,7 @@ changes with their rationale when appropriate:
 - [all] Update various dependencies.
 - [http4k-testing-hamcrest] Improve messages of Hamkrest matchers. H/T @albertlatacz
 - [http4k-cloudnative] Fix #291 - Readiness check result when there are > 2 checks may not report the correct result. H/T @alfi
-- [http4-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows. H/T @tom
+- [http4k-security-oauth] [Possibly breaking] Making client_secret optional in AuthorizationCodeAccessTokenRequest to support non client_secret flows. H/T @tom
 
 ### v3.179.1
 - [http4k-client-okhttp] Include status description in Response object.
@@ -169,18 +172,18 @@ changes with their rationale when appropriate:
 - [http4k-contract] Support composite security models using `or()` and `and()`. Once again, H/T @rgladwell :)
 
 ### v3.178.0
-- [http4-security-oauth] [Possibly breaking] Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
+- [http4k-security-oauth] [Possibly breaking] Request is passed as a parameter to the ClientValidator. Just pass it in! :)  H/T @tom
 - [http4k-contract] [Behaviour change] When specified, individual route security now replaces global security (this is as the security model in the OpenApi spec is specified) as opposed to both being applied. 
  
 ### v3.177.0
-- [http4-security-oauth] [Possibly breaking] More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
+- [http4k-security-oauth] [Possibly breaking] More support for OIDC, adding state to AuthorizationCodeDetails, and passing it into createForAccessToken on IdTokens. H/T @tom
 
 ### v3.176.0
-- [http4-security-oauth] More support for OIDC. H/T @tom
+- [http4k-security-oauth] More support for OIDC. H/T @tom
 
 ### v3.175.0
 - [all] Update various dependencies, including Kotlin to 1.3.50.
-- [http4-security-oauth] Some support for OIDC. H/T @tom
+- [http4k-security-oauth] Some support for OIDC. H/T @tom
 
 ### v3.174.0
 - [all] Update various dependencies, including Jackson for a CVE.
@@ -365,17 +368,17 @@ set on a contract-level basis.
 - [http4k-core] (Small) Breaking Fixed location of some extension files to be relevant to the particular package that they are referencing. This will require reimporting the new location into your source if you were using the imports.
 
 ### v3.134.0
-- [http4-testing-approval] Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
+- [http4k-testing-approval] Made content-type aware approval tests check the content type after the content. This is friendlier for failing tests, as 
 it is more important that the content is correct than the content-type (and often errors don't have content type set so you 
 get an erroneous error message which masks the fact that the content was wrong).
 
 ### v3.133.0
-- [http4-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This allows for more fine grained custom control of which Responses are acceptable.
+- [http4k-cloudnative] `HandleUpstreamRequestFailed` client filter now takes a predicate `(Response) -> Boolean` instead of a boolean. This allows for more fine grained custom control of which Responses are acceptable.
 - [all] Upgrade deps, including Kotlin to `1.3.30`.
-- [http4-contract] Fix #221 - Contract path fixed segments cannot contain slash characters.
+- [http4k-contract] Fix #221 - Contract path fixed segments cannot contain slash characters.
 
 ### v3.132.0
-- [http4-format-jackson] Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
+- [http4k-format-jackson] Convert `Jackson` to use `readValue` instead of `convertValue`. This fixes some problems with type conversions.
 
 ### v3.131.0
 - [http4k-core] (Possible) Break: Made lense implementations `Query, Header etc` clear previous values by default instead of 
@@ -385,27 +388,27 @@ envisage the impact of this change is limited as it's only Queries that generall
 values, and in the vast majority of cases a replace rather than append is expected.
 
 ### v3.130.0
-- [http4-contract] Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
+- [http4k-contract] Generify contract handling code to allow for custom `HttpMessageMeta<XYZ>` 
 
 ### v3.129.0
 - (Slight) Break: Collapsed `UpstreamRequestFailed` exceptions to contain the status, and thus removing non-special 
 cases like `BadRequest` and `BadGateway`. This makes them much easier to use in practice as users have access 
 to the the status. To migrate, simply replace previous classes with `UpstreamRequestFailed(Status.XYZ, message)`. 
-- [http4-contract] Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
+- [http4k-contract] Open up `ContractRoute` API to facilitate extension when defining a custom `ContractRenderer`.
 - [all] Upgrade deps.
 
 ### v3.128.0
-- [http4-core] Added base64 to the supported mappings for Query/Headers etc...
-- [http4-testing-approval] Approver does not write actual output if there is none to write and there is no approved content
+- [http4k-core] Added base64 to the supported mappings for Query/Headers etc...
+- [http4k-testing-approval] Approver does not write actual output if there is none to write and there is no approved content
 
 ### v3.127.0
-- [http4-testing-approval] Improved `Approver` interface to more closely match the traditional 
+- [http4k-testing-approval] Improved `Approver` interface to more closely match the traditional 
 `assert<XYZ>` approach - this results in a more discoverable/obvious API.
-- [http4-testing-hamkrest] Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
+- [http4k-testing-hamkrest] Added ability to create a Hamkrest matcher directly from the `Approver` instance to be combined 
 with other relevant matchers.
 
 ### v3.126.0
-- [http4-testing-approval] Add support for XML and HTML approval tests.
+- [http4k-testing-approval] Add support for XML and HTML approval tests.
 
 ### v3.125.0
 - Added `http4k-testing-approval` module, which is compatible with JUnit5 tests and integrates with 
@@ -413,10 +416,10 @@ the [OkeyDoke](https://github.com/dmcg/okey-doke) approval testing files and Int
 @jshiell for the inspiration Gist containing the base Junit5 Extension.
 
 ### v3.124.0
-- [http4-security-oauth] Make authentication response available when creating AuthorizationCode.
+- [http4k-security-oauth] Make authentication response available when creating AuthorizationCode.
 
 ### v3.123.0
-- [http4-security-oauth] Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
+- [http4k-security-oauth] Introduce OAuthServer to `http4k-security-oauth` to assist in the creation of authorization servers.
 
 ### v3.122.0
 - Generified `GenerateXmlDataClasses` filter, and added default implementations for 
