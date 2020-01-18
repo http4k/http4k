@@ -46,11 +46,11 @@ object Versions {
 
      const val io_github_resilience4j: String = "1.2.0"
 
-     const val ktor_server_cio: String = "1.2.6"
+     const val ktor_server_cio: String = "1.3.0"
 
-     const val micrometer_core: String = "1.3.2"
+     const val micrometer_core: String = "1.3.3"
 
-     const val netty_codec_http2: String = "4.1.44.Final"
+     const val netty_codec_http2: String = "4.1.45.Final"
 
      const val pebble: String = "3.1.2"
 
@@ -72,15 +72,15 @@ object Versions {
 
      const val httpasyncclient: String = "4.1.4"
 
-     const val httpclient: String = "4.5.10"
+     const val httpclient: String = "4.5.11"
 
-     const val httpcore: String = "4.4.12"
+     const val httpcore: String = "4.4.13"
 
-     const val http2_server: String = "9.4.25.v20191220"
+     const val http2_server: String = "9.4.26.v20200117"
 
-     const val javax_websocket_server_impl: String = "9.4.25.v20191220"
+     const val javax_websocket_server_impl: String = "9.4.26.v20200117"
 
-     const val org_eclipse_jetty: String = "9.4.25.v20191220"
+     const val org_eclipse_jetty: String = "9.4.26.v20200117"
 
      const val freemarker: String = "2.3.29"
 
@@ -111,7 +111,7 @@ object Versions {
       * See issue 19: How to update Gradle itself?
       * https://github.com/jmfayard/buildSrcVersions/issues/19
       */
-     const val gradleLatestVersion: String = "6.0.1"
+     const val gradleLatestVersion: String = "6.1"
 
      const val gradleCurrentVersion: String = "5.5"
 }
