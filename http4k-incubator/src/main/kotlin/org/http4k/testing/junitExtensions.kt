@@ -7,6 +7,7 @@ import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteStream
 import org.http4k.traffic.Servirtium
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
@@ -52,14 +53,24 @@ fun ReadWriteStream.replayingMatchingContent(): HttpHandler {
     val count = AtomicInteger()
 
     return { received: Request ->
-        val (expectedReq, response) = zipped.next()
+        if (zipped.hasNext()) {
+            val (expectedReq, response) = zipped.next()
 
-        assertEquals(
-            expectedReq.toString(),
-            received.removeHeadersNotIn(expectedReq).toString(),
-            "Unexpected request received for Interaction " + count.get()
-        )
-        response
+            assertEquals(
+                expectedReq.toString(),
+                received.removeHeadersNotIn(expectedReq).toString(),
+                "Unexpected request received for Interaction " + count.get()
+            )
+            response
+        } else {
+            assertEquals(
+                "",
+                received.toString(),
+                "Unexpected request received for Interaction " + count.get()
+            )
+            fail("")
+        }
+
     }
 }
 

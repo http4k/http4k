@@ -1,7 +1,9 @@
 package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
@@ -29,7 +31,19 @@ class ExtensionTests {
 
     @Test
     fun `replayingMatchingContent blows up with non-matching request`() {
-        assertThat({ http(Request(GET, "/foo")) }, throws<AssertionFailedError>())
+        assertThat({ http(Request(GET, "w")) }, throws(has(
+            AssertionFailedError::getLocalizedMessage,
+            containsSubstring("Unexpected request received for Interaction 0 ==>")
+        )))
+    }
+
+    @Test
+    fun `replayingMatchingContent blows up when more requests than interactions`() {
+        assertThat(http(request), equalTo(response))
+        assertThat({ http(request) }, throws(has(
+            AssertionFailedError::getLocalizedMessage,
+            containsSubstring("Unexpected request received for Interaction 0 ==>")
+        )))
     }
 
 }
