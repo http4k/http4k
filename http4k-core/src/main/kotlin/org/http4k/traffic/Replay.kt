@@ -31,7 +31,7 @@ interface Replay {
         /**
          * Provides a stream of pre-stored HTTP traffic from Memory.
          */
-        fun MemoryStream(stream: MutableList<Pair<Request, Response>>) = object : Replay {
+        fun MemoryStream(stream: List<Pair<Request, Response>>) = object : Replay {
             override fun requests() = stream.map { it.first }.asSequence()
             override fun responses() = stream.map { it.second }.asSequence()
         }
