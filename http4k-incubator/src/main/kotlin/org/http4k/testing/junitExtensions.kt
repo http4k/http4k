@@ -40,33 +40,34 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler =
         with(ec.testInstance.get()) {
             when (this) {
-                is ServirtiumContract -> {
-                    val readWriteStream = ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
-                    val zipped = readWriteStream.requests().zip(readWriteStream.responses()).iterator()
-                    val count = AtomicInteger()
-
-                    return { received: Request ->
-                        val (expectedReq, response) = zipped.next()
-
-                        assertEquals(
-                            received.toString(),
-                            received.removeHeadersNotIn(expectedReq).toString(),
-                            "Unexpected request received for Interaction " + count.get()
-                        )
-                        response
-                    }
-                }
+                is ServirtiumContract ->
+                    ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}").replayingMatchingContent()
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
-
-    private fun Request.removeHeadersNotIn(that: Request) =
-        that.headers.fold(this) { reqToCheck, nextExpectedHeader ->
-            reqToCheck
-                .takeIf { it.header(nextExpectedHeader.first) != null }
-                ?: reqToCheck.removeHeader(nextExpectedHeader.first)
-        }
 }
+
+fun ReadWriteStream.replayingMatchingContent(): HttpHandler {
+    val zipped = requests().zip(responses()).iterator()
+    val count = AtomicInteger()
+
+    return { received: Request ->
+        val (expectedReq, response) = zipped.next()
+
+        assertEquals(
+            expectedReq.toString(),
+            received.removeHeadersNotIn(expectedReq).toString(),
+            "Unexpected request received for Interaction " + count.get()
+        )
+        response
+    }
+}
+
+private fun Request.removeHeadersNotIn(checkReq: Request) =
+    headers.fold(this) { acc, nextExpectedHeader ->
+        if (checkReq.header(nextExpectedHeader.first) != null) acc
+        else acc.removeHeader(nextExpectedHeader.first)
+    }
 
 private fun ParameterContext.supportedParam() = parameter.parameterizedType.typeName ==
     "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
