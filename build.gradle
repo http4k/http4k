@@ -265,10 +265,10 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
         def version = Config.okhttp_major
         url = new URL("https://square.github.io/okhttp/${version}.x/okhttp/")
     }
-    externalDocumentationLink {
-        // No version, argo does not seem to keep old versions of javadoc around
-        url = new URL("http://argo.sourceforge.net/javadoc/")
-    }
+//    externalDocumentationLink {
+//        // No version, argo does not seem to keep old versions of javadoc around
+//        url = new URL("http://argo.sourceforge.net/javadoc/")
+//    }
 //    externalDocumentationLink {
 //        def version = Config.jackson_major_minor
 //        url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
