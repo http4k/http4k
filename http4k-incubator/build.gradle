@@ -7,6 +7,7 @@ dependencies {
 
     testCompile Config.TestDependencies
     testCompile project(":http4k-client-apache")
+    testCompile project(":http4k-cloudnative")
     testCompile project(":http4k-testing-hamkrest")
     testCompile project(":http4k-testing-approval")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')

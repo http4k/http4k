@@ -11,8 +11,10 @@ import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
+import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.routing.bind
 import org.http4k.routing.routes
@@ -34,7 +36,9 @@ import java.io.File
  * This client wraps the calls to a remote WordCounter service
  */
 class WordCounterClient(baseUri: Uri) {
-    private val http = SetBaseUriFrom(baseUri).then(ApacheClient())
+    private val http = SetBaseUriFrom(baseUri)
+        .then(ClientFilters.HandleRemoteRequestFailed())
+        .then(ApacheClient())
     fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
@@ -70,11 +74,17 @@ interface WordCounterContract {
     }
 }
 
+/**
+ * This calls the server directly
+ */
 @Disabled
 class DirectHttpRecordingWordCounterTest : WordCounterContract {
     override val uri = Uri.of("http://serverundertest:8080")
 }
 
+/**
+ * Proxies traffic to the real service and records it to disk.
+ */
 @Disabled
 class MiTMRecordingWordCounterTest : WordCounterContract {
 
@@ -96,6 +106,9 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     }
 }
 
+/**
+ * Replays incoming traffic from disk.
+ */
 @Disabled
 class MiTMReplayingWordCounterTest : WordCounterContract {
 
@@ -114,26 +127,38 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
     }
 }
 
+/**
+ * MiTM recorder to store the incoming traffic. At the moment you need to pass the Uri in for the
+ * target server, but if we were happy to use java system proxy settings then it would work without
+ * There is no request cleaning going on here.
+ */
 fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
     RecordTo(ReadWriteStream.Servirtium(root, name, clean = true))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
 
+/**
+ * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
+ * excess headers from the actual traffic are discarded.
+ */
 fun MiTMReplayer(name: String, root: File = File(".")) =
     DebuggingFilters.PrintRequestAndResponse()
         .then(CatchUnmatchedRequest())
         .then(ReadWriteStream.Servirtium(root, name).replayingMatchingContent())
         .asServer(SunHttp(0))
 
-// At the moment, the replayingMatchingContent() above throws an AssertionFailedError
+/**
+ * At the moment, the replayingMatchingContent() above throws an AssertionFailedError, so we need a filter
+ * to convert the error
+ */
 fun CatchUnmatchedRequest() = Filter { next ->
     {
         try {
             next(it)
         } catch (e: AssertionFailedError) {
             e.printStackTrace()
-            Response(INTERNAL_SERVER_ERROR)
+            Response(INTERNAL_SERVER_ERROR).body(e.localizedMessage)
         }
     }
 }
