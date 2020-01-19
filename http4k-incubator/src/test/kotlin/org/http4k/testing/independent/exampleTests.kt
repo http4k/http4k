@@ -13,7 +13,6 @@ import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.routing.bind
@@ -39,6 +38,7 @@ class WordCounterClient(baseUri: Uri) {
     private val http = SetBaseUriFrom(baseUri)
         .then(ClientFilters.HandleRemoteRequestFailed())
         .then(ApacheClient())
+
     fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
@@ -143,8 +143,7 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
  * excess headers from the actual traffic are discarded.
  */
 fun MiTMReplayer(name: String, root: File = File(".")) =
-    DebuggingFilters.PrintRequestAndResponse()
-        .then(CatchUnmatchedRequest())
+    CatchUnmatchedRequest()
         .then(ReadWriteStream.Servirtium(root, name).replayingMatchingContent())
         .asServer(SunHttp(0))
 
