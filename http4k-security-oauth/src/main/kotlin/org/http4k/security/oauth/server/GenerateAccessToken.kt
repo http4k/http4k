@@ -15,12 +15,12 @@ import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
 import java.time.Clock
 
 class GenerateAccessToken(
-    authorizationCodes: AuthorizationCodes,
-    accessTokens: AccessTokens,
-    clock: Clock,
-    idTokens: IdTokens,
-    private val errorRenderer: ErrorRenderer,
-    grantTypes: GrantTypesConfiguration
+        authorizationCodes: AuthorizationCodes,
+        accessTokens: AccessTokens,
+        clock: Clock,
+        idTokens: IdTokens,
+        private val errorRenderer: JsonResponseErrorRenderer,
+        grantTypes: GrantTypesConfiguration
 ) : HttpHandler {
 
     private val generator = GenerateAccessTokenForGrantType(authorizationCodes, accessTokens, clock, idTokens, grantTypes)

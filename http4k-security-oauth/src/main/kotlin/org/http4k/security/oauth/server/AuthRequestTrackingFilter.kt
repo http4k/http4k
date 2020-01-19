@@ -10,13 +10,13 @@ import org.http4k.core.Request
 class AuthRequestTrackingFilter(
     private val tracking: AuthRequestTracking,
     private val extractor: AuthRequestExtractor,
-    private val errorRenderer: ErrorRenderer
+    private val authoriseRequestErrorRender: AuthoriseRequestErrorRender
 ) : Filter {
     override fun invoke(next: HttpHandler) = { request: Request ->
         extractor.extract(request)
             .map {
                 val response = next(request)
                 tracking.trackAuthRequest(request, it, response)
-            }.mapFailure(errorRenderer::response).get()
+            }.mapFailure { authoriseRequestErrorRender.errorFor(request, it) }.get()
     }
 }

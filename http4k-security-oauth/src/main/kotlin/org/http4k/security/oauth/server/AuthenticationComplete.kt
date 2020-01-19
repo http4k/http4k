@@ -6,12 +6,8 @@ import com.natpryce.mapFailure
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.SEE_OTHER
-import org.http4k.core.Uri
-import org.http4k.core.query
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
-import org.http4k.security.fragmentParameter
 
 class AuthenticationComplete(
     private val authorizationCodes: AuthorizationCodes,
@@ -20,38 +16,34 @@ class AuthenticationComplete(
     private val documentationUri: String? = null) : HttpHandler {
 
     override fun invoke(request: Request): Response {
-        val response = Response(SEE_OTHER)
         val authorizationRequest = requestTracking.resolveAuthRequest(request)
             ?: error("Authorization request could not be found.")
 
-        return Response(SEE_OTHER)
-            .header("location", authorizationRequest.redirectUri
-                .addResponseTypeValues(authorizationRequest, request, response)
-                .withState(authorizationRequest)
-                .toString())
+        return ResponseRender
+            .forAuthRequest(authorizationRequest).addResponseTypeValues(authorizationRequest, request)
+            .withState(authorizationRequest.state)
+            .complete()
+
     }
 
-    private fun Uri.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response): Uri =
+    private fun ResponseRender.addResponseTypeValues(authorizationRequest: AuthRequest, request: Request, response: Response = this.complete()): ResponseRender =
         with(authorizationCodes.create(request, authorizationRequest, response)) {
             map {
                 when (authorizationRequest.responseType) {
-                    Code -> query("code", it.value)
-                    CodeIdToken -> fragmentParameter("code", it.value)
-                        .fragmentParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
+                    Code -> addParameter("code", it.value)
+                    CodeIdToken -> addParameter("code", it.value)
+                        .addParameter("id_token", idTokens.createForAuthorization(request, authorizationRequest, response, authorizationRequest.nonce, it).value)
                 }
             }
                 .mapFailure {
-                    val uri = query("error", it.rfcError.rfcValue)
-                        .query("error_description", it.description)
-                    documentationUri?.addTo(uri) ?: uri
+                    val responseRender = addParameter("error", it.rfcError.rfcValue)
+                        .addParameter("error_description", it.description)
+                    documentationUri?.addTo(responseRender) ?: responseRender
                 }
                 .get()
         }
 
-    private fun Uri.withState(authorizationRequest: AuthRequest) = when (authorizationRequest.responseType) {
-        Code -> query("state", authorizationRequest.state)
-        CodeIdToken -> fragmentParameter("state", authorizationRequest.state)
-    }
 
-    private fun String.addTo(uri: Uri): Uri = uri.query("error_uri", this)
+    private fun String.addTo(responseRender: ResponseRender): ResponseRender = responseRender.addParameter("error_uri", this)
 }
+
