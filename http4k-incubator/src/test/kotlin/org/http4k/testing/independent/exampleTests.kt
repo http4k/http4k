@@ -83,20 +83,19 @@ class DirectHttpRecordingWordCounterTest : WordCounterContract {
 }
 
 /**
- * Proxies traffic to the real service and records it to disk.
+ * Proxies traffic to the real service and records it to disk. Both MiTM and Producer start on a random port.
  */
-@Disabled
 class MiTMRecordingWordCounterTest : WordCounterContract {
 
     override val uri get() = Uri.of("http://localhost:${mitm.port()}")
 
-    private val app = WordCounterApp(8080)
+    private val app = WordCounterApp(0)
     private lateinit var mitm: Http4kServer
 
     @BeforeEach
     fun start(info: TestInfo) {
-        app.start()
-        mitm = MiTMRecorder(info.displayName.removeSuffix("()"), Uri.of("http://localhost:8080")).start()
+        val appPort = app.start().port()
+        mitm = MiTMRecorder(info.displayName.removeSuffix("()"), Uri.of("http://localhost:$appPort")).start()
     }
 
     @AfterEach
@@ -107,7 +106,7 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
 }
 
 /**
- * Replays incoming traffic from disk.
+ * Replays incoming traffic from disk. MiTM starts on a random port.
  */
 @Disabled
 class MiTMReplayingWordCounterTest : WordCounterContract {
