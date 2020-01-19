@@ -139,7 +139,7 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
 
 /**
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
- * excess headers from the actual traffic are discarded.
+ * excess headers from the actual requests are discarded.
  */
 fun MiTMReplayer(name: String, root: File = File(".")) =
     CatchUnmatchedRequest()
