@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.testing.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -13,6 +13,9 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.testing.ServirtiumContract
+import org.http4k.testing.ServirtiumRecording
+import org.http4k.testing.ServirtiumReplay
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -31,12 +34,9 @@ class WordCounterClient(private val http: HttpHandler) {
  * This is our producing app
  */
 class WordCounterApp : HttpHandler {
-    override fun invoke(req: Request): Response {
-        println(req)
-        return Response(OK).body(
-            req.bodyString().run { if (isBlank()) 0 else split(" ").size }.toString()
-        )
-    }
+    override fun invoke(req: Request) = Response(OK).body(
+        req.bodyString().run { if (isBlank()) 0 else split(" ").size }.toString()
+    )
 }
 
 /**
@@ -45,7 +45,8 @@ class WordCounterApp : HttpHandler {
  */
 interface WordCounterContract : ServirtiumContract {
     @JvmDefault
-    override val name get() = "WordCounter"
+    override val name
+        get() = "WordCounter"
 
     @Test
     @JvmDefault
