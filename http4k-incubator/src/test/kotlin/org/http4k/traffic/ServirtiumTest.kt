@@ -42,4 +42,22 @@ class ServirtiumTest {
 
         approver.assertApproved(Response(OK).body(File(tempDir, "some name.md").readText()))
     }
+
+    @Test
+    fun `ignores notes added to markdown`() {
+        val readWriteStream = ReadWriteStream.Servirtium(File("src/test/resources/org/http4k/traffic"), "ServirtiumTest.ignores notes added to markdown")
+
+        val request1 = Request(GET, "/hello?query=123")
+            .header("header1", "value1")
+            .header("Content-Type", "request-content-type/value")
+            .body("body1")
+
+        val response1 = Response(OK)
+            .header("header3", "value3")
+            .header("Content-Type", "response-content-type/value")
+            .body("body1")
+
+        assertThat(readWriteStream.requests().toList(), equalTo(listOf(request1)))
+        assertThat(readWriteStream.responses().toList(), equalTo(listOf(response1)))
+    }
 }

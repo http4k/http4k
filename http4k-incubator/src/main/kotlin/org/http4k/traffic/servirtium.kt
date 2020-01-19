@@ -7,26 +7,28 @@ import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import java.io.File
-import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Consumer
+import java.util.function.Supplier
 
 /**
  * Read and write HTTP traffic to disk in Servirtium markdown format
  */
 fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, clean: Boolean = false): ReadWriteStream {
-    val storageFile = File(baseDir, "$name.md").apply { if (clean) delete() }
-    return object : ReadWriteStream, Replay by Replay.Servirtium(storageFile), Sink by Sink.Servirtium(storageFile) {}
+    val storage = ByteStorage.Disk(File(baseDir, "$name.md"), clean)
+    return object : ReadWriteStream,
+        Replay by Replay.Servirtium(storage),
+        Sink by Sink.Servirtium(storage) {}
 }
 
 /**
  * Write HTTP traffic to disk in Servirtium markdown format
  */
-fun Sink.Companion.Servirtium(output: File) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
-        with(FileWriter(output, true)) {
-            use {
-                write("""## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
+        target.accept(
+            """## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
 
 ${headerLine<Request>()}:
 ${request.headerBlock()}
@@ -36,9 +38,7 @@ ${headerLine<Response>()}:
 ${response.headerBlock()}
 ${bodyLine<Response>()} (${response.status.code}: ${CONTENT_TYPE(response)?.toHeaderValue() ?: ""}):
 ${response.bodyBlock()}
-""")
-            }
-        }
+""".toByteArray())
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
@@ -51,13 +51,13 @@ ${response.bodyBlock()}
 /**
  * Read HTTP traffic from disk in Servirtium markdown format
  */
-fun Replay.Companion.Servirtium(output: File) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
 
-    override fun requests() = output.readText().parseInteractions().map { it.first }.asSequence()
+    override fun requests() = output.parseInteractions().map { it.first }.asSequence()
 
-    override fun responses() = output.readText().parseInteractions().map { it.second }.asSequence()
+    override fun responses() = output.parseInteractions().map { it.second }.asSequence()
 
-    private fun String.parseInteractions() = split(Regex("## Interaction \\d+: "))
+    private fun Supplier<ByteArray>.parseInteractions() = String(get()).split(Regex("## Interaction \\d+: "))
         .filter { it.trim().isNotBlank() }
         .map {
             val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
