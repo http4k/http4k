@@ -5,6 +5,7 @@ import org.http4k.core.Request
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteStream
+import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
@@ -48,7 +49,7 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
         }
 }
 
-fun ReadWriteStream.replayingMatchingContent(): HttpHandler {
+fun Replay.replayingMatchingContent(): HttpHandler {
     val interactions = requests().zip(responses()).iterator()
     val count = AtomicInteger()
 
