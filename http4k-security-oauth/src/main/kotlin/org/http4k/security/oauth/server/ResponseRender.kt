@@ -17,12 +17,11 @@ interface ResponseRender {
     fun complete(): Response
 
     companion object {
-        fun forAuthRequest(authorizationRequest: AuthRequest): ResponseRender {
-            return forAuthRequest(authorizationRequest.responseMode, authorizationRequest.responseType, authorizationRequest.redirectUri)
-        }
+        fun forAuthRequest(authorizationRequest: AuthRequest) =
+            forAuthRequest(authorizationRequest.responseMode, authorizationRequest.responseType, authorizationRequest.redirectUri)
 
-        fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri): ResponseRender {
-            return when (responseMode) {
+        fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri) =
+            when (responseMode) {
                 ResponseMode.Query -> QueryResponseRender(redirectUri)
                 ResponseMode.Fragment -> FragmentResponseRender(redirectUri)
                 null -> if (responseType == ResponseType.CodeIdToken) {
@@ -32,9 +31,7 @@ interface ResponseRender {
                 }
 
             }
-        }
     }
-
 }
 
 class QueryResponseRender(private val uri: Uri) : ResponseRender {
