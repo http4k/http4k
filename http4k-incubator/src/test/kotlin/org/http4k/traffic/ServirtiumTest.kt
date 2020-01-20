@@ -44,8 +44,8 @@ class ServirtiumTest {
     }
 
     @Test
-    fun ignoresNotesAddedToMarkdown() {
-        val readWriteStream = ReadWriteStream.Servirtium(File("src/test/resources/org/http4k/traffic"), "ServirtiumTest.ignores notes added to markdown")
+    fun `ignores notes added to markdown`() {
+        val readWriteStream = ReadWriteStream.Servirtium(File("src/test/resources/org/http4k/traffic"), "ServirtiumTest.ignoresNotesAddedToMarkdown")
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
