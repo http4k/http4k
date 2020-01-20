@@ -13,5 +13,13 @@ interface ByteStorage : Supplier<ByteArray>, Consumer<ByteArray> {
             override fun get() = file.readBytes()
             override fun accept(data: ByteArray) = file.apply { if (clean) delete() }.appendBytes(data)
         }
+
+        fun InMemory() = object : ByteStorage {
+            private var bytes = ByteArray(0)
+            override fun get() = bytes
+            override fun accept(data: ByteArray) {
+                bytes += data
+            }
+        }
     }
 }
