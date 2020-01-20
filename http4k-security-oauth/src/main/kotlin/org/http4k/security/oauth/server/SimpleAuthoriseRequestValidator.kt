@@ -4,8 +4,12 @@ import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
 import org.http4k.core.Request
+import org.http4k.core.Uri
 
 class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidator) : AuthoriseRequestValidator {
+
+    override fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean
+        = clientValidator.validateRedirection(request, clientId, redirectUri)
 
     override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
         return if (!clientValidator.validateClientId(request, authorizationRequest.client)) {

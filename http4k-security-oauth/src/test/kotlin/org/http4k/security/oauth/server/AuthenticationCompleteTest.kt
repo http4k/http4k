@@ -10,6 +10,9 @@ import org.http4k.core.query
 import org.http4k.core.with
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.security.ResponseMode
+import org.http4k.security.ResponseMode.Fragment
+import org.http4k.security.ResponseMode.Query
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
@@ -46,6 +49,17 @@ class AuthenticationCompleteTest {
     }
 
     @Test
+    fun `redirects on successful login, with a fragment if requested`() {
+        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = ResponseMode.Fragment), responseMode = Fragment))
+
+        assertThat(response, hasStatus(SEE_OTHER)
+            and hasHeader("location",
+            authorizationRequest.redirectUri
+                .fragmentParameter("code", "dummy-token-for-jdoe")
+                .fragmentParameter("state", "some state").toString()))
+    }
+
+    @Test
     fun `includes id_token if response_type requires it`() {
         val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest, CodeIdToken))
 
@@ -55,6 +69,18 @@ class AuthenticationCompleteTest {
                 .fragmentParameter("code", "dummy-token-for-jdoe")
                 .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
                 .fragmentParameter("state", "some state").toString()))
+    }
+
+    @Test
+    fun `includes id_token if response_type requires it, with code if requested`() {
+        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest, CodeIdToken, Query))
+
+        assertThat(response, hasStatus(SEE_OTHER)
+            and hasHeader("location",
+            authorizationRequest.redirectUri
+                .query("code", "dummy-token-for-jdoe")
+                .query("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
+                .query("state", "some state").toString()))
     }
 
     @Test
@@ -90,9 +116,10 @@ class AuthenticationCompleteTest {
     }
 }
 
-private fun Request.withAuthorization(authorizationRequest: AuthRequest, responseType: ResponseType = Code) =
+private fun Request.withAuthorization(authorizationRequest: AuthRequest, responseType: ResponseType = Code, responseMode: ResponseMode? = null) =
     with(OAuthServer.clientIdQueryParameter of authorizationRequest.client)
         .with(OAuthServer.scopesQueryParameter of authorizationRequest.scopes)
         .with(OAuthServer.redirectUriQueryParameter of authorizationRequest.redirectUri)
         .with(OAuthServer.state of authorizationRequest.state)
         .with(OAuthServer.responseType of responseType)
+        .with(OAuthServer.responseMode of responseMode)

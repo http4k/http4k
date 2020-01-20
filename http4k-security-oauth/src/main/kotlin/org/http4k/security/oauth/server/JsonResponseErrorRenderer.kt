@@ -9,7 +9,7 @@ import org.http4k.format.AutoMarshallingJson
 import org.http4k.lens.Header
 
 
-class ErrorRenderer(
+class JsonResponseErrorRenderer(
     private val json: AutoMarshallingJson,
     private val documentationUri: String? = null
 ) {

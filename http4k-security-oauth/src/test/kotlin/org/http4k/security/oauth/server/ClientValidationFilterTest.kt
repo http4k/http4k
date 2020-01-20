@@ -11,6 +11,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.format.Jackson
@@ -29,9 +30,12 @@ internal class ClientValidationFilterTest {
     private val isLoginPage = hasStatus(OK) and hasBody("login page")
     private val json = Jackson
 
-    private val  authoriseRequestValidator: AuthoriseRequestValidator = object : AuthoriseRequestValidator{
+    private val authoriseRequestValidator: AuthoriseRequestValidator = object : AuthoriseRequestValidator {
+
+        override fun isValidClientAndRedirectUriInCaseOfError(request: Request, clientId: ClientId, redirectUri: Uri): Boolean = clientId == validClientId
+
         override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
-            return if(authorizationRequest.client == validClientId) {
+            return if (authorizationRequest.client == validClientId) {
                 Success(request.header("Success", "true"))
             } else {
                 Failure(InvalidClientId)
@@ -40,8 +44,10 @@ internal class ClientValidationFilterTest {
 
     }
 
+    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(authoriseRequestValidator, JsonResponseErrorRenderer(json, documentationUri), documentationUri)
+
     private val filter =
-        ClientValidationFilter(authoriseRequestValidator, ErrorRenderer(json, documentationUri), AuthRequestFromQueryParameters)
+        ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, AuthRequestFromQueryParameters)
             .then(loginPage)
 
 
@@ -88,6 +94,29 @@ internal class ClientValidationFilterTest {
         )
         assertThat(response, hasStatus(BAD_REQUEST))
         assertThat(response.bodyString(), equalTo("{\"error\":\"invalid_client\",\"error_description\":\"The specified client id is invalid\",\"error_uri\":\"SomeUri\"}"))
+    }
+
+    @Test
+    fun `validates presence of resonse_type`() {
+        val response = filter(Request(GET, "/auth")
+            .query("response_type", "something invalid")
+            .query("client_id", validClientId.value)
+            .query("redirect_uri", validRedirectUri.toString())
+            .query("scope", validScopes.joinToString(" "))
+        )
+        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri?state&error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
+    }
+
+    @Test
+    fun `validates presence of resonse_type, even taking into account response mode, and with state`() {
+        val response = filter(Request(GET, "/auth")
+            .query("response_type", "something invalid")
+            .query("response_mode", "fragment")
+            .query("client_id", validClientId.value)
+            .query("redirect_uri", validRedirectUri.toString())
+            .query("state", "someState")
+        )
+        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri#state=someState&error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
     }
 
 }

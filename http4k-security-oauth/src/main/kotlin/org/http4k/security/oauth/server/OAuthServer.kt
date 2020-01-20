@@ -12,6 +12,7 @@ import org.http4k.lens.uri
 import org.http4k.lens.webForm
 import org.http4k.routing.bind
 import org.http4k.routing.routes
+import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
@@ -29,18 +30,18 @@ import java.time.Clock
  *  - OAuth 2 Security Best Current Practices: https://tools.ietf.org/html/draft-ietf-oauth-security-topics-11
  */
 class OAuthServer(
-        tokenPath: String,
-        authRequestTracking: AuthRequestTracking,
-        authoriseRequestValidator: AuthoriseRequestValidator,
-        accessTokenRequestAuthentication: AccessTokenRequestAuthentication,
-        authorizationCodes: AuthorizationCodes,
-        accessTokens: AccessTokens,
-        json: AutoMarshallingJson,
-        clock: Clock,
-        authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
-        grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
-        idTokens: IdTokens = IdTokens.Unsupported,
-        documentationUri: String? = null
+    tokenPath: String,
+    authRequestTracking: AuthRequestTracking,
+    authoriseRequestValidator: AuthoriseRequestValidator,
+    accessTokenRequestAuthentication: AccessTokenRequestAuthentication,
+    authorizationCodes: AuthorizationCodes,
+    accessTokens: AccessTokens,
+    json: AutoMarshallingJson,
+    clock: Clock,
+    authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
+    grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
+    idTokens: IdTokens = IdTokens.Unsupported,
+    documentationUri: String? = null
 ) {
 
     constructor(tokenPath: String,
@@ -54,27 +55,28 @@ class OAuthServer(
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
                 idTokens: IdTokens = IdTokens.Unsupported,
                 documentationUri: String? = null) : this(
-            tokenPath,
-            authRequestTracking,
-            SimpleAuthoriseRequestValidator(clientValidator),
-            ClientSecretAccessTokenRequestAuthentication(clientValidator),
-            authorizationCodes,
-            accessTokens,
-            json,
-            clock,
-            authRequestExtractor,
-            grantTypes,
-            idTokens,
-            documentationUri
+        tokenPath,
+        authRequestTracking,
+        SimpleAuthoriseRequestValidator(clientValidator),
+        ClientSecretAccessTokenRequestAuthentication(clientValidator),
+        authorizationCodes,
+        accessTokens,
+        json,
+        clock,
+        authRequestExtractor,
+        grantTypes,
+        idTokens,
+        documentationUri
     )
 
-    private val errorRenderer = ErrorRenderer(json, documentationUri)
+    private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
+    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(authoriseRequestValidator, errorRenderer, documentationUri)
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, errorRenderer, grantTypes))
 
     // use this filter to protect your authentication/authorization pages
-    val authenticationStart = ClientValidationFilter(authoriseRequestValidator, errorRenderer, authRequestExtractor)
-            .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, errorRenderer))
+    val authenticationStart = ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, authRequestExtractor)
+        .then(AuthRequestTrackingFilter(authRequestTracking, authRequestExtractor, authoriseRequestErrorRender))
 
     // endpoint to handle authorization code generation and redirection back to client
     val authenticationComplete = AuthenticationComplete(authorizationCodes, authRequestTracking, idTokens, documentationUri)
@@ -85,6 +87,7 @@ class OAuthServer(
         val redirectUriQueryParameter = Query.uri().required("redirect_uri")
         val state = Query.optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
+        val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue).optional("response_mode")
         val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")
         val request = Query.map(::RequestJwtContainer, RequestJwtContainer::value).optional("request")
 
@@ -96,14 +99,14 @@ class OAuthServer(
         val clientAssertionType = FormField.uri().optional("client_assertion_type")
         val clientAssertion = FormField.optional("client_assertion")
         val tokenRequestWebForm = Body.webForm(
-                Strict,
-                clientIdForm,
-                clientSecret,
-                code,
-                redirectUriForm,
-                scopesForm,
-                clientAssertionType,
-                clientAssertion).toLens()
+            Strict,
+            clientIdForm,
+            clientSecret,
+            code,
+            redirectUriForm,
+            scopesForm,
+            clientAssertionType,
+            clientAssertion).toLens()
     }
 }
 
@@ -112,25 +115,26 @@ data class ClientId(val value: String)
 data class AuthorizationCode(val value: String)
 
 internal fun Request.authorizationRequest() =
-        AuthRequest(
-                OAuthServer.clientIdQueryParameter(this),
-                OAuthServer.scopesQueryParameter(this) ?: listOf(),
-                OAuthServer.redirectUriQueryParameter(this),
-                OAuthServer.state(this),
-                OAuthServer.responseType(this),
-                OAuthServer.nonce(this),
-                OAuthServer.request(this)
-        )
+    AuthRequest(
+        OAuthServer.clientIdQueryParameter(this),
+        OAuthServer.scopesQueryParameter(this) ?: listOf(),
+        OAuthServer.redirectUriQueryParameter(this),
+        OAuthServer.state(this),
+        OAuthServer.responseType(this),
+        OAuthServer.nonce(this),
+        OAuthServer.responseMode(this),
+        OAuthServer.request(this)
+    )
 
 internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
     val tokenRequestWebForm = OAuthServer.tokenRequestWebForm(this)
     return TokenRequest(
-            grantType,
-            OAuthServer.clientIdForm(tokenRequestWebForm),
-            OAuthServer.clientSecret(tokenRequestWebForm),
-            OAuthServer.code(tokenRequestWebForm),
-            OAuthServer.redirectUriForm(tokenRequestWebForm),
-            OAuthServer.scopesForm(tokenRequestWebForm) ?: listOf(),
-            OAuthServer.clientAssertionType(tokenRequestWebForm),
-            OAuthServer.clientAssertion(tokenRequestWebForm))
+        grantType,
+        OAuthServer.clientIdForm(tokenRequestWebForm),
+        OAuthServer.clientSecret(tokenRequestWebForm),
+        OAuthServer.code(tokenRequestWebForm),
+        OAuthServer.redirectUriForm(tokenRequestWebForm),
+        OAuthServer.scopesForm(tokenRequestWebForm) ?: listOf(),
+        OAuthServer.clientAssertionType(tokenRequestWebForm),
+        OAuthServer.clientAssertion(tokenRequestWebForm))
 }
