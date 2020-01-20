@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.219.0
+- [http4k-incubator] Next iteration of Servirtium JUnit extensions. Improved API to support multiple storage engines.
+
 ### v3.218.0
 - [http4k-incubator] Next iteration of Servirtium JUnit extensions. Correct indexing of interactions.
 - [http4k-security-oauth] Authorisation rendering will now taking into account 'response_mode' of either query or fragment in responses and no longer just use the default fo the 'response_type'. H/T @tom
