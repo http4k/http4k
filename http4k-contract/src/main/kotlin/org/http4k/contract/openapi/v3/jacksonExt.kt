@@ -33,11 +33,7 @@ object JacksonJsonPropertyAnnotated : FieldRetrieval {
         .mapNotNull { f ->
             f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
                 ?.let { f.name }
-        }.firstOrNull() ?: try {
-        superclass.findName(name)
-    } catch (e: IllegalStateException) {
-        throw NoFieldFound(name, this, e)
-    }
+        }.firstOrNull() ?: superclass?.findName(name)
 }
 
 object JacksonJsonNamingAnnotated : FieldRetrieval {
