@@ -99,12 +99,18 @@ class EnvironmentKeyTest {
 
     @Test
     fun `composite can use a mixture of overridden and non overridden values`() {
-        data class Target(val foo: String, val bar: Int)
+        data class Target(val foo: String, val bar: Int, var foobar: Int?)
 
         val finalEnv = from("bar" to "123") overrides from("FOO" to "bill")
 
-        val key = EnvironmentKey.composite { Target(required("FOO")(it), int().required("BAR")(it)) }
+        val key = EnvironmentKey.composite {
+            Target(
+                required("FOO")(it),
+                int().required("BAR")(it),
+                int().optional("FOOBAR")(it)
+            )
+        }
 
-        assertThat(key(finalEnv), equalTo(Target("bill", 123)))
+        assertThat(key(finalEnv), equalTo(Target("bill", 123, null)))
     }
 }
