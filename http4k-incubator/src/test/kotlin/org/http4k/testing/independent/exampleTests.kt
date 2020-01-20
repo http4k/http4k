@@ -133,7 +133,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * There is no request cleaning going on here.
  */
 fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
-    RecordTo(ReadWriteStream.Servirtium(root, name, clean = true))
+    RecordTo(ReadWriteStream.Servirtium(root, name))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
