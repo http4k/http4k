@@ -18,7 +18,7 @@ buildscript {
 plugins {
     id 'com.github.kt3k.coveralls' version "2.9.0"
     id "com.jfrog.bintray" version "1.8.4"
-    id 'de.fayard.buildSrcVersions' version "0.4.2"
+    id 'de.fayard.buildSrcVersions' version "0.7.0"
     id 'nebula.provided-base' version "3.0.3"
     id 'net.saliman.cobertura' version "3.0.0"
 }
@@ -324,7 +324,6 @@ task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
 
 buildSrcVersions {
     indent = "     "
-    rejectedVersionKeywords.add("pr1") // jackson_dataformat_xml
 }
 
 // To update Gradle, run `$ ./gradlew :buildSrcVersions && ./gradlew wrapper`
