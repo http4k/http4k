@@ -53,34 +53,39 @@ ${response.bodyBlock()}
  */
 fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
 
-    override fun requests() = output.parseInteractions().map { it.first }.asSequence()
+    override fun requests() = output.parseInteractions { it.first }
 
-    override fun responses() = output.parseInteractions().map { it.second }.asSequence()
+    override fun responses() = output.parseInteractions { it.second }
 
-    private fun Supplier<ByteArray>.parseInteractions() = String(get()).split(Regex("## Interaction \\d+: "))
-        .filter { it.trim().isNotBlank() }
-        .map {
-            val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
+    private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
+        String(get())
+            .split(Regex("## Interaction \\d+: "))
+            .filter { it.trim().isNotBlank() }
+            .map {
+                val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
 
-            val req = Request.parse(listOf(
-                listOf(sections[0][0] + " " + HTTP_1_1),
-                sections[1].dropWhile(String::isBlank) + "\r\n",
-                sections[3].dropWhile(String::isBlank)
-            ).flatten().joinToString("\r\n"))
+                val req = Request.parse(listOf(
+                    listOf(sections[0][0] + " " + HTTP_1_1),
+                    sections[1].dropWhile(String::isBlank) + "\r\n",
+                    sections[3].dropWhile(String::isBlank)
+                ).flatten().joinToString("\r\n"))
 
-            val resp = Response.parse(
-                listOf(
-                    listOf(HTTP_1_1 +
-                        " " +
-                        sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
-                        " "
-                    ),
-                    sections[5].dropWhile(String::isBlank) + "\r\n",
-                    sections[7].dropWhile(String::isBlank)
-                ).flatten().joinToString("\r\n")
-            )
-            req to resp
-        }
+                val resp = Response.parse(
+                    listOf(
+                        listOf(HTTP_1_1 +
+                            " " +
+                            sections[6].first { it.startsWith(bodyLine<Response>()) }.split('(', ':')[1] +
+                            " "
+                        ),
+                        sections[5].dropWhile(String::isBlank) + "\r\n",
+                        sections[7].dropWhile(String::isBlank)
+                    ).flatten().joinToString("\r\n")
+                )
+                req to resp
+            }
+            .map(fn)
+            .asSequence()
+
 }
 
 private inline fun <reified T : HttpMessage> headerLine() = """### ${T::class.java.simpleName} headers recorded for playback"""
