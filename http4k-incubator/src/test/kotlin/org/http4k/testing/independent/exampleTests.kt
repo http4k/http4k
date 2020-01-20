@@ -85,6 +85,7 @@ class DirectHttpRecordingWordCounterTest : WordCounterContract {
 /**
  * Proxies traffic to the real service and records it to disk. Both MiTM and Producer start on a random port.
  */
+@Disabled
 class MiTMRecordingWordCounterTest : WordCounterContract {
 
     override val uri get() = Uri.of("http://localhost:${mitm.port()}")
