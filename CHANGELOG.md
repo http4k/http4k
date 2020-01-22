@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.221.0 
 - [all] [Unlikely break from Java only] Make all custom http4k exceptions extend RuntimeException. This helps with Java compatibility so things like LensFailure inside Java Lambdas don't require catching (as they are caught/dealt with by other bits of http4k automatically)
+- [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the 'request' parameter, this will require a validator for that jwt be implemented. H/T @tom
 
 ### v3.220.0
 - [http4k-moshi] [Behaviour break] Fix #353 Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations. H/T cnusp for the report.

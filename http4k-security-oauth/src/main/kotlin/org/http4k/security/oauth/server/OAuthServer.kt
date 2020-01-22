@@ -18,6 +18,7 @@ import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentica
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
+import org.http4k.security.oauth.server.request.RequestValidator
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
@@ -41,6 +42,7 @@ class OAuthServer(
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
+    requestValidator: RequestValidator = RequestValidator.Unsupported,
     documentationUri: String? = null
 ) {
 
@@ -54,6 +56,7 @@ class OAuthServer(
                 authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
                 idTokens: IdTokens = IdTokens.Unsupported,
+                requestValidator: RequestValidator = RequestValidator.Unsupported,
                 documentationUri: String? = null) : this(
         tokenPath,
         authRequestTracking,
@@ -66,11 +69,16 @@ class OAuthServer(
         authRequestExtractor,
         grantTypes,
         idTokens,
+        requestValidator,
         documentationUri
     )
 
     private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
-    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(authoriseRequestValidator, errorRenderer, documentationUri)
+    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(
+        authoriseRequestValidator,
+        requestValidator,
+        errorRenderer,
+        documentationUri)
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, errorRenderer, grantTypes))
 

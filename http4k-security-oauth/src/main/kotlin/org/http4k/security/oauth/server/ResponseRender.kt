@@ -10,7 +10,9 @@ import org.http4k.security.fragmentParameter
 
 interface ResponseRender {
 
-    fun withState(state: String?) = addParameter("state", state)
+    fun withState(state: String?) = if (state == null || state.isBlank()) this else addParameter("state", state)
+
+    fun withDocumentationUri(documentationUri: String?) = if (documentationUri.isNullOrEmpty()) this else addParameter("error_uri", documentationUri)
 
     fun addParameter(key: String, value: String?): ResponseRender
 
