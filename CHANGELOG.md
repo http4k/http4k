@@ -4,7 +4,7 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.220.0
-- [http4k-moshi] [Behaviour break] Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations.
+- [http4k-moshi] [Behaviour break] Fix #353 Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations. H/T cnusp for the report.
 
 ### v3.219.0
 - [http4k-incubator] Next iteration of Servirtium JUnit extensions. Improved API to support multiple storage engines.
