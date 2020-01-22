@@ -25,9 +25,12 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         with(ec.testInstance.get()) {
             when (this) {
-                is ServirtiumContract -> TrafficFilters.RecordTo(
-                    ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
-                ).then(httpHandler)
+                is ServirtiumContract ->
+                    manipulations.then(
+                        TrafficFilters.RecordTo(
+                            ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
+                        )
+                    ).then(httpHandler)
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
@@ -43,7 +46,9 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}").replayingMatchingContent()
+                    manipulations.then(
+                        ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}").replayingMatchingContent()
+                    )
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
