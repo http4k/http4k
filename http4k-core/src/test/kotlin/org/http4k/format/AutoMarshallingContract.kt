@@ -79,6 +79,11 @@ abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
     }
 
     @Test
+    open fun `does not fail decoding when unknown value is encountered`() {
+        assertThat(j.asA("""{"value":"value","unknown":"ohno!"}""", StringHolder::class), equalTo(StringHolder("value")))
+    }
+
+    @Test
     fun `roundtrip object with common java primitive types`() {
         val localDate = LocalDate.of(2000, 1, 1)
         val localTime = LocalTime.of(1, 1, 1)

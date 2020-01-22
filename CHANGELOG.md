@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.220.0
+- [http4k-moshi] [Behaviour break] Don't fail by default on unknown properties. This is the expected default behaviour for all JSON implementations.
+
 ### v3.219.0
 - [http4k-incubator] Next iteration of Servirtium JUnit extensions. Improved API to support multiple storage engines.
 
