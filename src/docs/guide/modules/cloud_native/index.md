@@ -2,7 +2,7 @@ title: http4k Cloud Native tooling
 description: Feature overview of the http4k-cloudnative module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-cloudnative", version: "3.219.0"```
+```compile group: "org.http4k", name: "http4k-cloudnative", version: "3.220.0"```
 
 http4k applications are naturally at home operating in distributed, Cloud Native environments. Whilst simple to create, this module 
 provides requisite tooling to get apps up and running with the minimum of effort to enable the following operational aspects:

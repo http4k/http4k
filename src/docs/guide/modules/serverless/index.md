@@ -2,7 +2,7 @@ title: http4k Serverless Modules
 description: Feature overview of the http4k-serverless modules, covering Serverless backends
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.219.0"```
+```compile group: "org.http4k", name: "http4k-serverless-lambda", version: "3.220.0"```
 
 ### About
 These modules provide integration with Serverless deployment environments, such as AWS Lambda. 
