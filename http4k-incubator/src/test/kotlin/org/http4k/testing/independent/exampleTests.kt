@@ -5,7 +5,6 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
 import org.http4k.core.Filter
 import org.http4k.core.Method.POST
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
@@ -62,20 +61,6 @@ interface WordCounterContract {
 
     val uri: Uri
 
-    val manipulations
-        get() = Filter { next ->
-            {
-                val response = next(
-                    it.replaceHeader("toBeReplacedInRequest", "newValue")
-                        .body(it.bodyString() + " extra")
-                )
-                response
-                    .replaceHeader("div", "2")
-                    .body(response.bodyString() + 0)
-            }
-        }
-
-
     @Test
     @JvmDefault
     fun `count the number of words`() {
@@ -111,10 +96,7 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        mitm = MiTMRecorder(
-            info.displayName.removeSuffix("()"),
-            Uri.of("http://localhost:$appPort"),
-            manipulations = manipulations).start()
+        mitm = MiTMRecorder(info.displayName.removeSuffix("()"), Uri.of("http://localhost:$appPort")).start()
     }
 
     @AfterEach
@@ -136,8 +118,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        mitm = MiTMReplayer(info.displayName.removeSuffix("()"),
-            manipulations = manipulations).start()
+        mitm = MiTMReplayer(info.displayName.removeSuffix("()")).start()
     }
 
     @AfterEach
@@ -151,9 +132,8 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * target server, but if we were happy to use java system proxy settings then it would work without
  * There is no request cleaning going on here.
  */
-fun MiTMRecorder(name: String, target: Uri, root: File = File("."), manipulations: Filter = Filter.NoOp) =
-    manipulations
-        .then(RecordTo(ReadWriteStream.Servirtium(root, name)))
+fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
+    RecordTo(ReadWriteStream.Servirtium(root, name))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
@@ -162,9 +142,8 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File("."), manipulation
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
  * excess headers from the actual requests are discarded.
  */
-fun MiTMReplayer(name: String, root: File = File("."), manipulations: Filter = Filter.NoOp) =
-    manipulations
-        .then(CatchUnmatchedRequest())
+fun MiTMReplayer(name: String, root: File = File(".")) =
+    CatchUnmatchedRequest()
         .then(ReadWriteStream.Servirtium(root, name).replayingMatchingContent())
         .asServer(SunHttp(0))
 

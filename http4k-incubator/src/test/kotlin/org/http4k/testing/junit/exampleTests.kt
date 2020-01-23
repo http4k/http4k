@@ -3,7 +3,6 @@ package org.http4k.testing.junit
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -28,22 +27,15 @@ import org.junit.jupiter.api.extension.RegisterExtension
  * This client wraps the calls to a remote WordCounter service
  */
 class WordCounterClient(private val http: HttpHandler) {
-    fun wordCount(name: String): Int {
-        val response = http(Request(POST, "/count")
-            .header("toBeReplacedInRequest", "oldValue")
-            .body(name))
-        return response.bodyString().toInt() / response.header("div")!!.toInt()
-    }
+    fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
 /**
  * This is our producing app
  */
 class WordCounterApp : HttpHandler {
-    override fun invoke(req: Request) = Response(OK)
-        .header("div", "illegalValue")
-        .body(
-        req.bodyString().run { if (isBlank()) 0 else trim().split(" ").size }.toString()
+    override fun invoke(req: Request) = Response(OK).body(
+        req.bodyString().run { if (isBlank()) 0 else split(" ").size }.toString()
     )
 }
 
@@ -56,29 +48,16 @@ interface WordCounterContract : ServirtiumContract {
     override val name
         get() = "WordCounter"
 
-    override val manipulations
-        get() = Filter { next ->
-            {
-                val response = next(
-                    it.replaceHeader("toBeReplacedInRequest", "newValue")
-                        .body(it.bodyString() + " extra")
-                )
-                response
-                    .replaceHeader("div", "2")
-                    .body(response.bodyString() + 0)
-            }
-        }
-
     @Test
     @JvmDefault
-    fun `count the number of words (+1 then *10 then div 2)`(handler: HttpHandler) {
-        assertThat(WordCounterClient(handler).wordCount("A random string with 6 words"), equalTo(35))
+    fun `count the number of words`(handler: HttpHandler) {
+        assertThat(WordCounterClient(handler).wordCount("A random string with 6 words"), equalTo(6))
     }
 
     @Test
     @JvmDefault
-    fun `empty string has zero words (+1 then *10 then div 2)`(handler: HttpHandler) {
-        assertThat(WordCounterClient(handler).wordCount(""), equalTo(5))
+    fun `empty string has zero words`(handler: HttpHandler) {
+        assertThat(WordCounterClient(handler).wordCount(""), equalTo(0))
     }
 }
 
