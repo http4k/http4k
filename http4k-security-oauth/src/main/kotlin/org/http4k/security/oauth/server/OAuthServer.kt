@@ -14,6 +14,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
+import org.http4k.security.State
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
@@ -93,7 +94,7 @@ class OAuthServer(
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val redirectUriQueryParameter = Query.uri().required("redirect_uri")
-        val state = Query.optional("state")
+        val state = Query.map(::State, State::value).optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
         val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue).optional("response_mode")
         val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")

@@ -9,6 +9,7 @@ import org.http4k.lens.LensFailure
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
+import org.http4k.security.State
 import org.http4k.security.oauth.server.ResponseRender.Companion.forAuthRequest
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
 import org.http4k.security.oauth.server.request.RequestValidator
@@ -37,7 +38,7 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
         val requestResponseMode = extractValue(request, requestObjectMap, "response_mode", { OAuthServer.responseMode(it) }, ResponseMode.Companion::fromQueryParameterValue)
         val requestResponseType = extractValue(request, requestObjectMap, "response_type", { OAuthServer.responseType(it) }, ResponseType.Companion::fromQueryParameterValue)
             ?: Code
-        val requestState = extractValue(request, requestObjectMap, "state", { OAuthServer.state(it) }) { it }
+        val requestState = extractValue(request, requestObjectMap, "state", { OAuthServer.state(it) }) { State(it) }
         return if (isUnsafeToRedirectBackToRedirectUri(isRequestJwtValid, requestClientId, requestJwtClientId, requestRedirectUri, request)) {
             fallBack.response(error)
         } else {

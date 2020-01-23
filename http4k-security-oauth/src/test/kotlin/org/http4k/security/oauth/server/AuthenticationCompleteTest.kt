@@ -16,6 +16,7 @@ import org.http4k.security.ResponseMode.Query
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
 import org.http4k.security.ResponseType.CodeIdToken
+import org.http4k.security.State
 import org.http4k.security.fragmentParameter
 import org.junit.jupiter.api.Test
 
@@ -26,7 +27,7 @@ class AuthenticationCompleteTest {
             ClientId("a-client-id"),
             listOf("email"),
             Uri.of("http://destination"),
-            "some state"
+            State("some state")
         )
 
     val underTest = AuthenticationComplete(

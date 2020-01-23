@@ -6,11 +6,12 @@ import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
+import org.http4k.security.State
 import org.http4k.security.fragmentParameter
 
 interface ResponseRender {
 
-    fun withState(state: String?) = if (state == null || state.isBlank()) this else addParameter("state", state)
+    fun withState(state: State?) = if (state == null || state.value.isBlank()) this else addParameter("state", state.value)
 
     fun withDocumentationUri(documentationUri: String?) = if (documentationUri.isNullOrEmpty()) this else addParameter("error_uri", documentationUri)
 

@@ -4,6 +4,7 @@ import org.http4k.core.Uri
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
 import org.http4k.security.ResponseType.Code
+import org.http4k.security.State
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 
@@ -11,7 +12,7 @@ data class AuthRequest(
     val client: ClientId,
     val scopes: List<String>,
     val redirectUri: Uri,
-    val state: String?,
+    val state: State?,
     val responseType: ResponseType = Code,
     val nonce: Nonce? = null,
     val responseMode: ResponseMode? = null,
