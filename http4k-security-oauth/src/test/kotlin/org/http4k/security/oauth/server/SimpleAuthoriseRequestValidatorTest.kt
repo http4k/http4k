@@ -9,6 +9,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType
+import org.http4k.security.State
 import org.junit.jupiter.api.Test
 
 class SimpleAuthoriseRequestValidatorTest {
@@ -31,7 +32,7 @@ class SimpleAuthoriseRequestValidatorTest {
                 client = validClientId,
                 redirectUri = validRedirectUri,
                 scopes = validScopes,
-                state = ""
+                state = State("")
         )
         assertThat(authoriseRequestValidator.validate(aRequest, validAuthRequest),
                 equalTo(success(aRequest)))
@@ -44,7 +45,7 @@ class SimpleAuthoriseRequestValidatorTest {
                 client = ClientId("invalid-client"),
                 redirectUri = validRedirectUri,
                 scopes = validScopes,
-                state = "some state"
+                state = State("some state")
         )
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidClientId)))
     }
@@ -56,7 +57,7 @@ class SimpleAuthoriseRequestValidatorTest {
                 client = validClientId,
                 redirectUri = Uri.of("http://invalid.uri"),
                 scopes = validScopes,
-                state = "some state"
+                state = State("some state")
         )
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidRedirectUri)))
     }
@@ -67,7 +68,7 @@ class SimpleAuthoriseRequestValidatorTest {
                 client = validClientId,
                 redirectUri = validRedirectUri,
                 scopes = listOf("some", "invalid", "scopes"),
-                state = "some state"
+                state = State("some state")
         )
         assertThat(authoriseRequestValidator.validate(aRequest, authRequest), equalTo(failure(InvalidScopes)))
     }

@@ -14,10 +14,12 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
+import org.http4k.security.State
 import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
+import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
@@ -41,6 +43,7 @@ class OAuthServer(
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
+    requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
     documentationUri: String? = null
 ) {
 
@@ -54,6 +57,7 @@ class OAuthServer(
                 authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
                 idTokens: IdTokens = IdTokens.Unsupported,
+                requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
                 documentationUri: String? = null) : this(
         tokenPath,
         authRequestTracking,
@@ -66,11 +70,16 @@ class OAuthServer(
         authRequestExtractor,
         grantTypes,
         idTokens,
+        requestJWTValidator,
         documentationUri
     )
 
     private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
-    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(authoriseRequestValidator, errorRenderer, documentationUri)
+    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(
+        authoriseRequestValidator,
+        requestJWTValidator,
+        errorRenderer,
+        documentationUri)
     // endpoint to retrieve access token for a given authorization code
     val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, errorRenderer, grantTypes))
 
@@ -84,8 +93,8 @@ class OAuthServer(
     companion object {
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
-        val redirectUriQueryParameter = Query.uri().required("redirect_uri")
-        val state = Query.optional("state")
+        val redirectUriQueryParameter = Query.uri().optional("redirect_uri")
+        val state = Query.map(::State, State::value).optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
         val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue).optional("response_mode")
         val nonce = Query.map(::Nonce, Nonce::value).optional("nonce")

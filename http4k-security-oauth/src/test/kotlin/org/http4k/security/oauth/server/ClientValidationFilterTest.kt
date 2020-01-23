@@ -18,6 +18,8 @@ import org.http4k.format.Jackson
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.security.ResponseType.Code
+import org.http4k.security.oauth.server.request.RequestJWTValidator
+import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.Test
 
 internal class ClientValidationFilterTest {
@@ -44,7 +46,20 @@ internal class ClientValidationFilterTest {
 
     }
 
-    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(authoriseRequestValidator, JsonResponseErrorRenderer(json, documentationUri), documentationUri)
+    private val requestValidator = object : RequestJWTValidator {
+        override fun validate(clientId: ClientId, requestJwtContainer: RequestJwtContainer): InvalidAuthorizationRequest? {
+            return if (requestJwtContainer.value == "inValidRequest") {
+                InvalidAuthorizationRequest("request not correctly signed")
+            } else null
+        }
+
+    }
+
+    private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(
+        authoriseRequestValidator,
+        requestValidator,
+        JsonResponseErrorRenderer(json, documentationUri),
+        documentationUri)
 
     private val filter =
         ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, AuthRequestFromQueryParameters)
@@ -104,7 +119,7 @@ internal class ClientValidationFilterTest {
             .query("redirect_uri", validRedirectUri.toString())
             .query("scope", validScopes.joinToString(" "))
         )
-        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri?state&error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
+        assertThat(response, equalTo(Response(SEE_OTHER).header("Location", "https://a-redirect-uri?error=unsupported_response_type&error_description=The+specified+response_type+%27something+invalid%27+is+not+supported&error_uri=SomeUri")))
     }
 
     @Test

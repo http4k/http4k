@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType
+import org.http4k.security.State
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -26,7 +27,7 @@ internal class AuthRequestTest {
         client = ClientId(UUID.randomUUID().toString()),
         redirectUri = Uri.of("http://someredirecturi"),
         responseType = ResponseType.Code,
-        state = "some state",
+        state = State("some state"),
         scopes = emptyList())
 
 }

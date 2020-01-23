@@ -14,7 +14,7 @@ class SimpleAuthoriseRequestValidator(private val clientValidator: ClientValidat
     override fun validate(request: Request, authorizationRequest: AuthRequest): Result<Request, OAuthError> {
         return if (!clientValidator.validateClientId(request, authorizationRequest.client)) {
             Failure(InvalidClientId)
-        } else if (!clientValidator.validateRedirection(request, authorizationRequest.client, authorizationRequest.redirectUri)) {
+        } else if (!clientValidator.validateRedirection(request, authorizationRequest.client, authorizationRequest.redirectUri!!)) {
             Failure(InvalidRedirectUri)
         } else if (!clientValidator.validateScopes(request, authorizationRequest.client, authorizationRequest.scopes)) {
             Failure(InvalidScopes)

@@ -52,5 +52,6 @@ object UserRejectedRequest : AuthorizationError(RfcError.AccessDenied, "The user
 object InvalidClientId : AuthorizationError(InvalidClient, "The specified client id is invalid")
 object InvalidRedirectUri : AuthorizationError(InvalidClient, "The specified redirect uri is not registered")
 object InvalidScopes : AuthorizationError(InvalidScope, "The specified scopes are invalid")
+object InvalidRequestObject : AuthorizationError(InvalidRequestObject, "The specified request is invalid")
 data class UnsupportedResponseType(val requestedResponseType: String) : AuthorizationError(RfcError.UnsupportedResponseType, "The specified response_type '$requestedResponseType' is not supported")
 data class InvalidAuthorizationRequest(val reason: String) : AuthorizationError(InvalidRequest, reason)
