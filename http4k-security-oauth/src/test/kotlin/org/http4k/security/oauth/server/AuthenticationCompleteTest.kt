@@ -44,18 +44,18 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .query("code", "dummy-token-for-jdoe")
                 .query("state", "some state").toString()))
     }
 
     @Test
     fun `redirects on successful login, with a fragment if requested`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = ResponseMode.Fragment), responseMode = Fragment))
+        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = Fragment), responseMode = Fragment))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .fragmentParameter("code", "dummy-token-for-jdoe")
                 .fragmentParameter("state", "some state").toString()))
     }
@@ -66,7 +66,7 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .fragmentParameter("code", "dummy-token-for-jdoe")
                 .fragmentParameter("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
                 .fragmentParameter("state", "some state").toString()))
@@ -78,7 +78,7 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .query("code", "dummy-token-for-jdoe")
                 .query("id_token", "dummy-id-token-for-jdoe-nonce:unknown")
                 .query("state", "some state").toString()))
@@ -90,7 +90,7 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .query("error", "access_denied")
                 .query("error_description", UserRejectedRequest.description)
                 .query("state", "some state").toString()))
@@ -109,7 +109,7 @@ class AuthenticationCompleteTest {
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
-            authorizationRequest.redirectUri
+            authorizationRequest.redirectUri!!
                 .query("error", "access_denied")
                 .query("error_description", UserRejectedRequest.description)
                 .query("error_uri", errorUri)
@@ -120,7 +120,7 @@ class AuthenticationCompleteTest {
 private fun Request.withAuthorization(authorizationRequest: AuthRequest, responseType: ResponseType = Code, responseMode: ResponseMode? = null) =
     with(OAuthServer.clientIdQueryParameter of authorizationRequest.client)
         .with(OAuthServer.scopesQueryParameter of authorizationRequest.scopes)
-        .with(OAuthServer.redirectUriQueryParameter of authorizationRequest.redirectUri)
+        .with(OAuthServer.redirectUriQueryParameter of authorizationRequest.redirectUri!!)
         .with(OAuthServer.state of authorizationRequest.state)
         .with(OAuthServer.responseType of responseType)
         .with(OAuthServer.responseMode of responseMode)

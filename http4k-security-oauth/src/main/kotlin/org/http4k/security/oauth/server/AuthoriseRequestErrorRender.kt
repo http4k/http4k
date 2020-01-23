@@ -12,11 +12,11 @@ import org.http4k.security.ResponseType.Code
 import org.http4k.security.State
 import org.http4k.security.oauth.server.ResponseRender.Companion.forAuthRequest
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
-import org.http4k.security.oauth.server.request.RequestValidator
+import org.http4k.security.oauth.server.request.RequestJWTValidator
 import java.lang.IllegalArgumentException
 
 class AuthoriseRequestErrorRender(private val authoriseRequestValidator: AuthoriseRequestValidator,
-                                  private val requestValidator: RequestValidator,
+                                  private val requestJWTValidator: RequestJWTValidator,
                                   private val fallBack: JsonResponseErrorRenderer,
                                   private val documentationUri: String? = null) {
 
@@ -24,7 +24,7 @@ class AuthoriseRequestErrorRender(private val authoriseRequestValidator: Authori
         val requestClientId = extractValueFromRequestOrNull(request) { OAuthServer.clientIdQueryParameter(it) }
         val requestJwt = extractValueFromRequestOrNull(request) { OAuthServer.request(it) }
         val isRequestJwtValid = requestJwt?.let { jwt ->
-            requestClientId?.let { clientId -> requestValidator.validate(clientId, jwt) == null }
+            requestClientId?.let { clientId -> requestJWTValidator.validate(clientId, jwt) == null }
         }
         val requestObjectMap = requestJwt
             ?.let { jwt ->

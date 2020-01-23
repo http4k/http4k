@@ -12,7 +12,7 @@ import org.http4k.security.openid.RequestJwtContainer
 data class AuthRequest(
     val client: ClientId,
     val scopes: List<String>,
-    val redirectUri: Uri,
+    val redirectUri: Uri?,
     val state: State?,
     val responseType: ResponseType = Code,
     val nonce: Nonce? = null,

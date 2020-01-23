@@ -21,7 +21,7 @@ interface ResponseRender {
 
     companion object {
         fun forAuthRequest(authorizationRequest: AuthRequest) =
-            forAuthRequest(authorizationRequest.responseMode, authorizationRequest.responseType, authorizationRequest.redirectUri)
+            forAuthRequest(authorizationRequest.responseMode, authorizationRequest.responseType, authorizationRequest.redirectUri!!)
 
         fun forAuthRequest(responseMode: ResponseMode?, responseType: ResponseType, redirectUri: Uri) =
             when (responseMode) {

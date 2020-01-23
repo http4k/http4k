@@ -19,7 +19,7 @@ class ClientValidationFilter(private val authoriseRequestValidator: AuthoriseReq
                 errorRenderer.errorFor(it, UnsupportedResponseType(it.query("response_type").orEmpty()))
             } else {
                 extractor.extract(it).map { authorizationRequest ->
-                    when (val result = authoriseRequestValidator.validate(it, authorizationRequest)) {
+                    when (val result = MustHaveRedirectUri(authoriseRequestValidator).validate(it, authorizationRequest)) {
                         is Success -> next(result.value)
                         is Failure -> errorRenderer.errorFor(it, result.reason)
                     }

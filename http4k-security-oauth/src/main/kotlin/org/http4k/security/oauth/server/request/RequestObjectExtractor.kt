@@ -43,7 +43,7 @@ object RequestObjectExtractor {
         }
     }
 
-    private object RequestObjectExtractorJson : ConfigurableJackson(
+    internal object RequestObjectExtractorJson : ConfigurableJackson(
         KotlinModule()
             .asConfigurable()
             .text(BiDiMapping(ResponseMode::class.java, { ResponseMode.fromQueryParameterValue(it) }, { it.queryParameterValue }))

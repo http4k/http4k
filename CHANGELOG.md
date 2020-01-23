@@ -4,10 +4,12 @@ This list is not currently intended to be all-encompassing - it will document ma
 changes with their rationale when appropriate:
 
 ### v3.222.0 (uncut)
-- [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the 'request' parameter, this will require a validator for that jwt be implemented. H/T @tom
+- [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the `request` parameter, this will require a validator for that jwt be implemented. H/T @tom
 - [http4k-security-oauth] [Breaking] State is now its own type, and not just a string, so it can be validated. H/T @tom
+- [http4k-security-oauth] [Breaking] `redirectUri` on `AuthRequest` is now nullable as it might come on a request jwt, this is validated to be always be present downstream. H/T @tom
 - [http4k-security-oauth] Allow parsing of request jwt. H/T @tom
-- [http4k-security-oauth] Adding request 'RequestObject' to 'AuthRequest'. H/T @tom
+- [http4k-security-oauth] Adding request `RequestObject` to `AuthRequest`. H/T @tom
+- [http4k-security-oauth] Adding `AuthRequestWithRequestAuthRequestExtractor` that will extract the request from the jwt, assuming the validator is implemented which can be used instead of just using `AuthRequestFromQueryParameters` if support for parsing a request jwt is required. H/T @tom
 
 ### v3.221.0 
 - [all] [Unlikely break from Java only] Make all custom http4k exceptions extend RuntimeException. This helps with Java compatibility so things like LensFailure inside Java Lambdas don't require catching (as they are caught/dealt with by other bits of http4k automatically)

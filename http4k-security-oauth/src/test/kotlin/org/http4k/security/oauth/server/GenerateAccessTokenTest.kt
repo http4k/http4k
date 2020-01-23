@@ -41,7 +41,7 @@ class GenerateAccessTokenTest {
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), State("state"))
     private val request = Request(Method.GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK)).get()
-    private val clientValidator = HardcodedClientValidator(authRequest.client, authRequest.redirectUri, "a-secret")
+    private val clientValidator = HardcodedClientValidator(authRequest.client, authRequest.redirectUri!!, "a-secret")
     private val handler = GenerateAccessToken(codes, DummyAccessTokens(), handlerClock, DummyIdTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)))
 
     @Test

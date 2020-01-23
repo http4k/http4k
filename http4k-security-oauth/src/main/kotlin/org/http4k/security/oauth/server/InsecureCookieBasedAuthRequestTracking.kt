@@ -16,12 +16,11 @@ class InsecureCookieBasedAuthRequestTracking : AuthRequestTracking {
 
     override fun resolveAuthRequest(request: Request): AuthRequest? =
         request.cookie(cookieName)?.value
-            ?.let { Request(GET, Uri.of("dummy").query(it)) }
-            ?.let { it.authorizationRequest() }
+            ?.let { Request(GET, Uri.of("dummy").query(it)) }?.authorizationRequest()
 
     private fun AuthRequest.serialise() = Request(GET, "dummy")
         .with(OAuthServer.clientIdQueryParameter of client)
-        .with(OAuthServer.redirectUriQueryParameter of redirectUri)
+        .with(OAuthServer.redirectUriQueryParameter of redirectUri!!)
         .with(OAuthServer.scopesQueryParameter of scopes)
         .with(OAuthServer.state of state)
         .with(OAuthServer.responseType of responseType)

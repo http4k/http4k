@@ -19,7 +19,7 @@ import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentica
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
-import org.http4k.security.oauth.server.request.RequestValidator
+import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
 import java.time.Clock
@@ -43,7 +43,7 @@ class OAuthServer(
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
-    requestValidator: RequestValidator = RequestValidator.Unsupported,
+    requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
     documentationUri: String? = null
 ) {
 
@@ -57,7 +57,7 @@ class OAuthServer(
                 authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
                 idTokens: IdTokens = IdTokens.Unsupported,
-                requestValidator: RequestValidator = RequestValidator.Unsupported,
+                requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
                 documentationUri: String? = null) : this(
         tokenPath,
         authRequestTracking,
@@ -70,14 +70,14 @@ class OAuthServer(
         authRequestExtractor,
         grantTypes,
         idTokens,
-        requestValidator,
+        requestJWTValidator,
         documentationUri
     )
 
     private val errorRenderer = JsonResponseErrorRenderer(json, documentationUri)
     private val authoriseRequestErrorRender = AuthoriseRequestErrorRender(
         authoriseRequestValidator,
-        requestValidator,
+        requestJWTValidator,
         errorRenderer,
         documentationUri)
     // endpoint to retrieve access token for a given authorization code
@@ -93,7 +93,7 @@ class OAuthServer(
     companion object {
         val clientIdQueryParameter = Query.map(::ClientId, ClientId::value).required("client_id")
         val scopesQueryParameter = Query.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
-        val redirectUriQueryParameter = Query.uri().required("redirect_uri")
+        val redirectUriQueryParameter = Query.uri().optional("redirect_uri")
         val state = Query.map(::State, State::value).optional("state")
         val responseType = Query.map(ResponseType.Companion::fromQueryParameterValue, ResponseType::queryParameterValue).required("response_type")
         val responseMode = Query.map(ResponseMode.Companion::fromQueryParameterValue, ResponseMode::queryParameterValue).optional("response_mode")
