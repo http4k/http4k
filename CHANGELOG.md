@@ -7,6 +7,7 @@ changes with their rationale when appropriate:
 - [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the 'request' parameter, this will require a validator for that jwt be implemented. H/T @tom
 - [http4k-security-oauth] [Breaking] State is now its own type, and not just a string, so it can be validated. H/T @tom
 - [http4k-security-oauth] Allow parsing of request jwt. H/T @tom
+- [http4k-security-oauth] Adding request 'RequestObject' to 'AuthRequest'. H/T @tom
 
 ### v3.221.0 
 - [all] [Unlikely break from Java only] Make all custom http4k exceptions extend RuntimeException. This helps with Java compatibility so things like LensFailure inside Java Lambdas don't require catching (as they are caught/dealt with by other bits of http4k automatically)
