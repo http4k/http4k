@@ -3,7 +3,7 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.222.0 (uncut)
+### v3.222.0
 - [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the `request` parameter, this will require a validator for that jwt be implemented. H/T @tom
 - [http4k-security-oauth] [Breaking] State is now its own type, and not just a string, so it can be validated. H/T @tom
 - [http4k-security-oauth] [Breaking] `redirectUri` on `AuthRequest` is now nullable as it might come on a request jwt, this is validated to be always be present downstream. H/T @tom
