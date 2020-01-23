@@ -25,9 +25,17 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         with(ec.testInstance.get()) {
             when (this) {
-                is ServirtiumContract -> TrafficFilters.RecordTo(
-                    ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)
-                ).then(httpHandler)
+                is ServirtiumContract -> {
+                    val recorder = manipulations
+                        .then(TrafficFilters.RecordTo(ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)))
+                        .then(manipulations)
+
+                    val http = { req: Request ->
+                        val resp = httpHandler(req)
+                        recorder.then { resp }(req)
+                    }
+                    http
+                }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
