@@ -57,7 +57,7 @@ data class InOnlyHolder(val value: InOnly)
 data class InOnly(val value: String)
 data class ExceptionHolder(val value: Throwable)
 
-class CustomException(m: String) : Exception(m)
+class CustomException(m: String) : RuntimeException(m)
 
 abstract class AutoMarshallingContract(private val j: AutoMarshallingJson) {
 

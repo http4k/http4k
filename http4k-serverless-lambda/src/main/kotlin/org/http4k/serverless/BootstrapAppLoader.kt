@@ -21,7 +21,7 @@ object BootstrapAppLoader : AppLoaderWithContexts {
     }
 }
 
-open class BootstrapException(m: String?, cause: Throwable? = null) : Exception(m, cause)
+open class BootstrapException(m: String?, cause: Throwable? = null) : RuntimeException(m, cause)
 
 class CouldNotFindAppLoaderException(cause: ClassNotFoundException) : BootstrapException("Could not find AppLoader class: ${cause.message}", cause)
 

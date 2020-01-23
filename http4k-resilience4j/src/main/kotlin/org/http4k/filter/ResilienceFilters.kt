@@ -21,7 +21,7 @@ object ResilienceFilters {
      * By default, uses a % failure rate of 50% detection and an Circuit Open period of 1minute
      */
     object CircuitBreak {
-        private object CircuitError : Exception()
+        private object CircuitError : RuntimeException()
 
         operator fun invoke(circuitBreaker: CircuitBreaker = CircuitBreaker.ofDefaults("Circuit"),
                             isError: (Response) -> Boolean = { it.status.serverError },

@@ -38,6 +38,6 @@ object SimpleLookup : FieldRetrieval {
     }
 }
 
-class NoFieldFound(name: String, target: Any, cause: Throwable? = null) : Exception("Could not find $name in $target", cause)
+class NoFieldFound(name: String, target: Any, cause: Throwable? = null) : RuntimeException("Could not find $name in $target", cause)
 
 data class Field(val value: Any, val isNullable: Boolean)

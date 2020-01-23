@@ -28,4 +28,4 @@ enum class Validator(private val actOn: (LensFailure) -> List<Failure>) {
         }
 }
 
-data class LensFailures(val causes: List<LensFailure>) : Exception()
+data class LensFailures(val causes: List<LensFailure>) : RuntimeException()

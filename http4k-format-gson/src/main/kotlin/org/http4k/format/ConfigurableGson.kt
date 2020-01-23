@@ -101,7 +101,7 @@ open class ConfigurableGson(builder: GsonBuilder) : JsonLibAutoMarshallingJson<J
 inline fun <reified T : Any> Gson.read(): (String) -> T =
     { fromJson(it, object : TypeToken<T>() {}.type) as T }
 
-class InvalidJsonException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class InvalidJsonException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 fun GsonBuilder.asConfigurable() = object : AutoMappingConfiguration<GsonBuilder> {
     override fun <OUT> int(mapping: BiDiMapping<Int, OUT>) = adapter(mapping, ::JsonPrimitive, JsonElement::getAsInt)

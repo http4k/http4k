@@ -6,4 +6,4 @@ interface JsonSchemaCreator<IN, OUT> {
 
 data class JsonSchema<out NODE>(val node: NODE, val definitions: Set<Pair<String, NODE>> = emptySet())
 
-class IllegalSchemaException(message: String) : Exception(message)
+class IllegalSchemaException(message: String) : RuntimeException(message)

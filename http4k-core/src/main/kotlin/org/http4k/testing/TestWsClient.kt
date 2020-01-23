@@ -11,7 +11,7 @@ import org.http4k.websocket.WsStatus
 import org.http4k.websocket.WsStatus.Companion.NORMAL
 import java.util.ArrayDeque
 
-data class ClosedWebsocket(val status: WsStatus = NORMAL) : Exception()
+data class ClosedWebsocket(val status: WsStatus = NORMAL) : RuntimeException()
 
 /**
  * A class that is used for *offline* testing of a routed Websocket, without starting up a Server. Calls

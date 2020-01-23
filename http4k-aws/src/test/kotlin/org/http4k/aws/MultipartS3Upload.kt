@@ -51,7 +51,7 @@ object MultipartS3Upload {
 
     private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (status != Status.OK) throw UploadError(this, uploadId) }
 
-    private data class UploadError(val response: Response, val uploadId: UploadId?) : Exception()
+    private data class UploadError(val response: Response, val uploadId: UploadId?) : RuntimeException()
 }
 
 internal data class UploadId(val value: String) {
