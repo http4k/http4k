@@ -2,7 +2,7 @@ title: http4k Webdriver Module
 description: Feature overview of the http4k-webdriver module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-testing-webdriver", version: "3.221.0"```
+```compile group: "org.http4k", name: "http4k-testing-webdriver", version: "3.222.0"```
 
 ### About
 
