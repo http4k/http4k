@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.224.0
+- [http4k-security-oauth] Fix issue where `AuthRequestWithRequestAuthRequestExtractor` doesn't take into account scopes not being nullable correctly. H/T @tom
+
 ### v3.223.0
 - [http4k-security-oauth] Adding `expiry` to `RequestObject`. H/T @tom
 - [http4k-security-oauth] Fixing issue where unknown fields cause extracting `RequestObject` from a jwt, fails due to unknown fields. H/T @tom
