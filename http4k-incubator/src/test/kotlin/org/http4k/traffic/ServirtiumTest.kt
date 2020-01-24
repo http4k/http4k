@@ -22,13 +22,13 @@ import java.util.function.Consumer
 class ServirtiumTest {
 
     @Test
-    fun `stores traffic in servirtium markdown format, applying manipulations `(@TempDir tempDir: File, approver: Approver) {
+    fun `sink stores traffic in servirtium markdown format, applying manipulations `(@TempDir tempDir: File, approver: Approver) {
         val received = AtomicReference<ByteArray>()
         val sink = Sink.Servirtium(Consumer(received::set), Filter { next ->
             {
                 next(
                     it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString())
-                ).removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString())
+                ).run { removeHeader("toBeRemoved").body(bodyString() + bodyString()) }
             }
         })
 
@@ -48,7 +48,7 @@ class ServirtiumTest {
     }
 
     @Test
-    fun `stores and replays traffic in servirtium markdown format`(@TempDir tempDir: File, approver: Approver) {
+    fun `readwritestream stores and replays traffic in servirtium markdown format`(@TempDir tempDir: File, approver: Approver) {
         val readWriteStream = ReadWriteStream.Servirtium(tempDir, "some name")
 
         val request1 = Request(GET, "/hello?query=123")

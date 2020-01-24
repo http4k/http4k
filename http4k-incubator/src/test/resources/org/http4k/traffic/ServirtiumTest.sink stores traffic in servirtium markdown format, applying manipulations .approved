@@ -9,7 +9,7 @@ header1: value1
 ### Request body recorded for playback ():
 
 ```
-body1
+body1body1
 ```
 
 ### Response headers recorded for playback:
@@ -21,6 +21,6 @@ header3: value3
 ### Response body recorded for playback (200: ):
 
 ```
-body1body1
+body2body2
 ```
 

@@ -8,7 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.core.then
-import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.lens.Header
 import org.http4k.traffic.ByteStorage.Companion.Disk
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
@@ -18,7 +18,7 @@ import java.util.function.Supplier
 /**
  * Read and write HTTP traffic to disk in Servirtium markdown format
  */
-fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, manipulations: Filter = Filter. NoOp): ReadWriteStream {
+fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, manipulations: Filter = Filter.NoOp): ReadWriteStream {
     val storage = Disk(File(baseDir, "$name.md"), false)
     return object : ReadWriteStream,
         Replay by Replay.Servirtium(storage),
@@ -28,22 +28,27 @@ fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, manipulati
 /**
  * Write HTTP traffic to disk in Servirtium markdown format
  */
-fun Sink.Companion.Servirtium(target: Consumer<ByteArray>, manipulations: Filter = Filter. NoOp) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>, manipulations: Filter = Filter.NoOp) = object : Sink {
     private val count = AtomicInteger()
-    override fun set(request: Request, originalResponse: Response) {
-        val response = manipulations.then { originalResponse }(request)
-        target.accept(
-            """## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
+    override fun set(request: Request, response: Response) {
+        manipulations.then {
+            val manipulatedResponse = manipulations.then { response }(request)
+            target.accept(
+                """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
 
 ${headerLine<Request>()}:
-${request.headerBlock()}
-${bodyLine<Request>()} (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):
-${request.bodyBlock()}
+${it.headerBlock()}
+${bodyLine<Request>()} (${Header.CONTENT_TYPE(it)?.toHeaderValue() ?: ""}):
+${it.bodyBlock()}
 ${headerLine<Response>()}:
-${response.headerBlock()}
-${bodyLine<Response>()} (${response.status.code}: ${CONTENT_TYPE(response)?.toHeaderValue() ?: ""}):
-${response.bodyBlock()}
+${manipulatedResponse.headerBlock()}
+${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${Header.CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
+                    ?: ""}):
+${manipulatedResponse.bodyBlock()}
 """.toByteArray())
+
+            response
+        }(request)
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
