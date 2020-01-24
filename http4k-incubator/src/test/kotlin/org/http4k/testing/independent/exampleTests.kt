@@ -101,7 +101,8 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
         mitm = MiTMRecorder(
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
-            responseManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
+            requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
+            responseManipulations = { it.removeHeader("Date") }
         ).start()
     }
 
@@ -124,7 +125,9 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        mitm = MiTMReplayer(info.displayName.removeSuffix("()")).start()
+        mitm = MiTMReplayer(info.displayName.removeSuffix("()")) {
+            it.header("Date", "some overridden date")
+        }.start()
     }
 
     @AfterEach
