@@ -26,15 +26,12 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract -> {
-                    val recorder = manipulations
-                        .then(TrafficFilters.RecordTo(ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)))
-                        .then(manipulations)
+                    val originalHandler = TrafficFilters.RecordTo(ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name, manipulations)).then(httpHandler)
 
-                    val http = { req: Request ->
-                        val resp = httpHandler(req)
-                        recorder.then { resp }(req)
+                    val modified: HttpHandler = { request: Request ->
+                        manipulations.then { originalHandler(request) }(request)
                     }
-                    http
+                    modified
                 }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
