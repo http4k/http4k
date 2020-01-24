@@ -2,7 +2,6 @@ package org.http4k.traffic
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -21,13 +20,10 @@ class ServirtiumTest {
     @Test
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
         val received = AtomicReference<ByteArray>()
-        val sink = Sink.Servirtium(Consumer(received::set), Filter { next ->
-            {
-                next(
-                    it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString())
-                ).run { removeHeader("toBeRemoved").body(bodyString() + bodyString()) }
-            }
-        })
+        val sink = Sink.Servirtium(Consumer(received::set),
+            requestManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) },
+            responseManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) }
+        )
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")

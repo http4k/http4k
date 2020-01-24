@@ -1,13 +1,10 @@
 package org.http4k.traffic
 
-import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
-import org.http4k.core.then
 import org.http4k.lens.Header
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
@@ -16,13 +13,16 @@ import java.util.function.Supplier
 /**
  * Write HTTP traffic to disk in Servirtium markdown format
  */
-fun Sink.Companion.Servirtium(target: Consumer<ByteArray>, manipulations: Filter = Filter.NoOp) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
+                              requestManipulations: (Request) -> Request = { it },
+                              responseManipulations: (Response) -> Response = { it }
+) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
-        manipulations.then {
-            val manipulatedResponse = manipulations.then { response }(request)
-            target.accept(
-                """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
+        val it = requestManipulations(request)
+        val manipulatedResponse = responseManipulations(response)
+        target.accept(
+            """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
 
 ${headerLine<Request>()}:
 ${it.headerBlock()}
@@ -31,12 +31,9 @@ ${it.bodyBlock()}
 ${headerLine<Response>()}:
 ${manipulatedResponse.headerBlock()}
 ${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${Header.CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
-                    ?: ""}):
+                ?: ""}):
 ${manipulatedResponse.bodyBlock()}
 """.toByteArray())
-
-            response
-        }(request)
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {

@@ -32,9 +32,6 @@ class ServirtiumReplayTest {
 
     @Test
     fun `replays traffic from the recording`(approver: Approver) {
-        val manipulations = { response: Response ->
-            response.header("toBeAdded", "value").body(response.bodyString().replace("body1", "goodbye"))
-        }
 
         javaClass.getResourceAsStream("/org/http4k/testing/storedTraffic.txt").use {
             it.reader().copyTo(File(root, "name.hashCode.md").writer())
@@ -51,7 +48,11 @@ class ServirtiumReplayTest {
             .header("toBeAdded", "value")
             .body("goodbye")
 
-        val actualResponse = ServirtiumReplay(root, manipulations).resolveParameter(stub, stub)(originalRequest)
+        val actualResponse = ServirtiumReplay(root)
+        {
+            it.header("toBeAdded", "value").body(it.bodyString().replace("body1", "goodbye"))
+        }
+            .resolveParameter(stub, stub)(originalRequest)
 
         assertThat(actualResponse, equalTo(expectedResponse))
     }

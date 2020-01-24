@@ -1,8 +1,6 @@
 package org.http4k.testing
 
-import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.then
@@ -24,14 +22,16 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class ServirtiumRecording(private val httpHandler: HttpHandler,
                           private val root: File = File("."),
-                          private val manipulations: Filter = Filter.NoOp) : ParameterResolver {
+                          private val requestManipulations: (Request) -> Request = { it },
+                          private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    RecordTo(Sink.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true), manipulations))
+                    RecordTo(Sink.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true),
+                        requestManipulations, responseManipulations))
                         .then(httpHandler)
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }

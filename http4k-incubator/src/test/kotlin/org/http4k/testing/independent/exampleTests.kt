@@ -98,7 +98,11 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        mitm = MiTMRecorder(info.displayName.removeSuffix("()"), Uri.of("http://localhost:$appPort")).start()
+        mitm = MiTMRecorder(
+            info.displayName.removeSuffix("()"),
+            Uri.of("http://localhost:$appPort"),
+            responseManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
+        ).start()
     }
 
     @AfterEach
@@ -134,8 +138,11 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * target server, but if we were happy to use java system proxy settings then it would work without
  * There is no request cleaning going on here.
  */
-fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
-    RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true)))
+fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
+                 requestManipulations: (Request) -> Request = { it },
+                 responseManipulations: (Response) -> Response = { it }
+) =
+    RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
@@ -144,9 +151,9 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
  * excess headers from the actual requests are discarded.
  */
-fun MiTMReplayer(name: String, root: File = File(".")) =
+fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Response) -> Response = { it }) =
     CatchUnmatchedRequest()
-        .then(Replay.Servirtium(Disk(File(root, "$name.md"))).replayingMatchingContent())
+        .then(Replay.Servirtium(Disk(File(root, "$name.md")), manipulations).replayingMatchingContent())
         .asServer(SunHttp(0))
 
 /**
