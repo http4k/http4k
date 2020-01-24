@@ -8,14 +8,12 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.util.Optional
 
-@ExtendWith(ApprovalTest::class)
 class ServirtiumReplayTest {
 
     class Stub(private val t: Any) : ExtensionContext by proxy(), ParameterContext by proxy() {
@@ -31,10 +29,9 @@ class ServirtiumReplayTest {
     lateinit var root: File
 
     @Test
-    fun `replays traffic from the recording`(approver: Approver) {
-
-        javaClass.getResourceAsStream("/org/http4k/testing/storedTraffic.txt").use {
-            it.reader().copyTo(File(root, "name.hashCode.md").writer())
+    fun `replays traffic from the recording`() {
+        javaClass.getResourceAsStream("/org/http4k/testing/storedTraffic.txt").reader().use {r ->
+            File(root, "name.hashCode.md").writer().use { r.copyTo(it) }
         }
 
         val stub = Stub(AContract)
