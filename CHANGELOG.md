@@ -3,12 +3,16 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.223.0
+- [http4k-security-oauth] Adding `expiry` to `RequestObject`. H/T @tom
+- [http4k-security-oauth] Fixing issue where unknown fields cause extracting `RequestObject` from a jwt, fails due to unknown fields. H/T @tom
+
 ### v3.222.0
 - [http4k-security-oauth] [Breaking] Error responses in the authorise endpoint now take into account values from the `request` parameter, this will require a validator for that jwt be implemented. H/T @tom
 - [http4k-security-oauth] [Breaking] State is now its own type, and not just a string, so it can be validated. H/T @tom
 - [http4k-security-oauth] [Breaking] `redirectUri` on `AuthRequest` is now nullable as it might come on a request jwt, this is validated to be always be present downstream. H/T @tom
 - [http4k-security-oauth] Allow parsing of request jwt. H/T @tom
-- [http4k-security-oauth] Adding request `RequestObject` to `AuthRequest`. H/T @tom
+- [http4k-security-oauth] Adding `RequestObject` to `AuthRequest`. H/T @tom
 - [http4k-security-oauth] Adding `AuthRequestWithRequestAuthRequestExtractor` that will extract the request from the jwt, assuming the validator is implemented which can be used instead of just using `AuthRequestFromQueryParameters` if support for parsing a request jwt is required. H/T @tom
 
 ### v3.221.0 

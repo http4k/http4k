@@ -16,6 +16,7 @@ import org.http4k.security.oauth.server.InvalidRequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.extractRequestJwtClaimsAsMap
 import org.http4k.security.openid.Nonce
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 internal class RequestObjectExtractorTest {
 
@@ -45,6 +46,7 @@ internal class RequestObjectExtractorTest {
 
     @Test
     fun `parses 'full' object correctly`() {
+        val expiry = Instant.now().epochSecond
         val rawData = mapOf(
             "iss" to "s6BhdRkqt3",
             "aud" to "https://server.example.com",
@@ -56,6 +58,7 @@ internal class RequestObjectExtractorTest {
             "state" to "af0ifjsldkj",
             "nonce" to "n-0S6_WzA2Mj",
             "max_age" to 86400,
+            "exp" to expiry,
             "claims" to mapOf(
                 "userinfo" to mapOf(
                     "given_name" to mapOf("essential" to true),
@@ -81,6 +84,7 @@ internal class RequestObjectExtractorTest {
             state = State("af0ifjsldkj"),
             nonce = Nonce("n-0S6_WzA2Mj"),
             magAge = 86400,
+            expiry = expiry,
             claims = Claims(
                 userInfo = mapOf(
                     "given_name" to Claim(true),
@@ -101,9 +105,10 @@ internal class RequestObjectExtractorTest {
     }
 
     @Test
-    fun `parses mostly empty object correctly`() {
+    fun `if has unknown fields ignore them, and parse known ones`() {
         val rawData = mapOf(
-            "iss" to "s6BhdRkqt3")
+            "iss" to "s6BhdRkqt3",
+            "foo" to "bar")
 
         val correspondingExpectedRequestObject = RequestObject(
             issuer = "s6BhdRkqt3",
