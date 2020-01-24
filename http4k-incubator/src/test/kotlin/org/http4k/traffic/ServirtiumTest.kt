@@ -17,6 +17,7 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumTest {
@@ -45,6 +46,30 @@ class ServirtiumTest {
         sink[request1] = response1
 
         approver.assertApproved(Response(OK).body(received.get().inputStream()))
+    }
+
+    @Test
+    fun `replay replays traffic in servirtium markdown format, applying manipulations to recording`() {
+
+        val replay = Replay.Servirtium(Supplier {
+            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
+        }, Filter { next ->
+            {
+                next(it).run { header("toBeAdded", "value").body(bodyString() + bodyString()) }
+            }
+        })
+
+        val request1 = Request(GET, "/hello?query=123")
+            .header("header1", "value1")
+            .body("body")
+
+        val response1 = Response(OK)
+            .header("header3", "value3")
+            .header("toBeAdded", "value")
+            .body("body1body1")
+
+        assertThat(replay.requests().toList(), equalTo(listOf(request1)))
+        assertThat(replay.responses().toList(), equalTo(listOf(response1)))
     }
 
     @Test

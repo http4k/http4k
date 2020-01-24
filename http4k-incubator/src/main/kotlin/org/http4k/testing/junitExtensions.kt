@@ -48,7 +48,7 @@ class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}").replayingMatchingContent()
+                    ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}", manipulations).replayingMatchingContent()
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
