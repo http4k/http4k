@@ -3,7 +3,6 @@ package org.http4k.traffic
 import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
-import org.http4k.core.Method.GET
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -50,11 +49,11 @@ ${manipulatedResponse.bodyBlock()}
 /**
  * Read HTTP traffic from disk in Servirtium markdown format
  */
-fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, manipulations: Filter = Filter.NoOp) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, manipulations: (Response) -> Response = { it }) = object : Replay {
 
     override fun requests() = output.parseInteractions { it.first }
 
-    override fun responses() = output.parseInteractions { manipulations.then { _ -> it.second }(Request(GET, "")) }
+    override fun responses() = output.parseInteractions { manipulations(it.second) }
 
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())

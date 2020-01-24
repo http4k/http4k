@@ -64,13 +64,13 @@ class ServirtiumTest {
 
     @Test
     fun `replay replays traffic in servirtium markdown format, applying manipulations to recording`() {
-        val replay = Replay.Servirtium(Supplier {
-            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
-        }, Filter { next ->
-            {
-                next(it).run { header("toBeAdded", "value").body(bodyString() + bodyString()) }
-            }
-        })
+        val content = javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
+
+        val replay = Replay.Servirtium(
+            Supplier { content }
+        ) {
+            it.header("toBeAdded", "value").body(it.bodyString() + it.bodyString())
+        }
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")

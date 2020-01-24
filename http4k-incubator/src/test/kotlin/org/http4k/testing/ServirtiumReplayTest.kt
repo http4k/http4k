@@ -2,7 +2,6 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Filter
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -33,17 +32,12 @@ class ServirtiumReplayTest {
 
     @Test
     fun `replays traffic from the recording`(approver: Approver) {
-        val manipulations = Filter { next ->
-            {
-                next(it)
-                    .run {
-                        header("toBeAdded", "value").body(bodyString().replace("body1", "goodbye"))
-                    }
-            }
+        val manipulations = { response: Response ->
+            response.header("toBeAdded", "value").body(response.bodyString().replace("body1", "goodbye"))
         }
 
         javaClass.getResourceAsStream("/org/http4k/testing/storedTraffic.txt").use {
-            File(root, "name.hashCode.md").writeBytes(it.readAllBytes())
+            it.reader().copyTo(File(root, "name.hashCode.md").writer())
         }
 
         val stub = Stub(AContract)

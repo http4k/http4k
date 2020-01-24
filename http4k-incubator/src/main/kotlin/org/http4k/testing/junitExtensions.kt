@@ -4,6 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.NoOp
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.traffic.ByteStorage.Companion.Disk
@@ -41,7 +42,7 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
 class ServirtiumReplay(private val root: File = File("."),
-                       private val manipulations: Filter = Filter.NoOp) : ParameterResolver {
+                       private val manipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler =
