@@ -18,6 +18,7 @@ data class RequestObject(@JsonProperty("client_id") val client: ClientId? = null
                          @JsonProperty("state") val state: State? = null,
                          @JsonProperty("nonce") val nonce: Nonce? = null,
                          @JsonProperty("max_age") val magAge: Long? = null,
+                         @JsonProperty("exp") val expiry: Long? = null,
                          @JsonProperty("claims") val claims: Claims = Claims()) {
 
     fun scopes(): List<String> = this.scope?.let { it.split(" ") } ?: emptyList()
