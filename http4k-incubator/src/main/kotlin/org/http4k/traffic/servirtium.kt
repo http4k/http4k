@@ -1,10 +1,13 @@
 package org.http4k.traffic
 
+import org.http4k.core.Filter
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
+import org.http4k.core.then
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.traffic.ByteStorage.Companion.Disk
 import java.io.File
@@ -15,19 +18,20 @@ import java.util.function.Supplier
 /**
  * Read and write HTTP traffic to disk in Servirtium markdown format
  */
-fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String): ReadWriteStream {
+fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, manipulations: Filter = Filter. NoOp): ReadWriteStream {
     val storage = Disk(File(baseDir, "$name.md"), false)
     return object : ReadWriteStream,
         Replay by Replay.Servirtium(storage),
-        Sink by Sink.Servirtium(storage) {}
+        Sink by Sink.Servirtium(storage, manipulations) {}
 }
 
 /**
  * Write HTTP traffic to disk in Servirtium markdown format
  */
-fun Sink.Companion.Servirtium(target: Consumer<ByteArray>) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>, manipulations: Filter = Filter. NoOp) = object : Sink {
     private val count = AtomicInteger()
-    override fun set(request: Request, response: Response) {
+    override fun set(request: Request, originalResponse: Response) {
+        val response = manipulations.then { originalResponse }(request)
         target.accept(
             """## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
 

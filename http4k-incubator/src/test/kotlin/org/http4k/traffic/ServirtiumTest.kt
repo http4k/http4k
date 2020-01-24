@@ -2,6 +2,7 @@ package org.http4k.traffic
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -14,9 +15,37 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumTest {
+
+    @Test
+    fun `stores traffic in servirtium markdown format, applying manipulations `(@TempDir tempDir: File, approver: Approver) {
+        val received = AtomicReference<ByteArray>()
+        val sink = Sink.Servirtium(Consumer(received::set), Filter { next ->
+            {
+                next(
+                    it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString())
+                ).removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString())
+            }
+        })
+
+        val request1 = Request(GET, "/hello?query=123")
+            .header("header1", "value1")
+            .header("toBeRemoved", "notThere")
+            .body("body1")
+
+        val response1 = Response(OK)
+            .header("header3", "value3")
+            .header("toBeRemoved", "notThere")
+            .body("body2")
+
+        sink[request1] = response1
+
+        approver.assertApproved(Response(OK).body(received.get().inputStream()))
+    }
 
     @Test
     fun `stores and replays traffic in servirtium markdown format`(@TempDir tempDir: File, approver: Approver) {
