@@ -22,7 +22,7 @@ import java.util.function.Consumer
 class ServirtiumTest {
 
     @Test
-    fun `sink stores traffic in servirtium markdown format, applying manipulations `(@TempDir tempDir: File, approver: Approver) {
+    fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(@TempDir tempDir: File, approver: Approver) {
         val received = AtomicReference<ByteArray>()
         val sink = Sink.Servirtium(Consumer(received::set), Filter { next ->
             {
