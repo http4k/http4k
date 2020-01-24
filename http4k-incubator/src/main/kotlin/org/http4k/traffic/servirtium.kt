@@ -5,40 +5,34 @@ import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.parse
-import org.http4k.lens.Header.CONTENT_TYPE
-import org.http4k.traffic.ByteStorage.Companion.Disk
-import java.io.File
+import org.http4k.lens.Header
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
 
 /**
- * Read and write HTTP traffic to disk in Servirtium markdown format
- */
-fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String): ReadWriteStream {
-    val storage = Disk(File(baseDir, "$name.md"), false)
-    return object : ReadWriteStream,
-        Replay by Replay.Servirtium(storage),
-        Sink by Sink.Servirtium(storage) {}
-}
-
-/**
  * Write HTTP traffic to disk in Servirtium markdown format
  */
-fun Sink.Companion.Servirtium(target: Consumer<ByteArray>) = object : Sink {
+fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
+                              requestManipulations: (Request) -> Request = { it },
+                              responseManipulations: (Response) -> Response = { it }
+) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
+        val it = requestManipulations(request)
+        val manipulatedResponse = responseManipulations(response)
         target.accept(
-            """## Interaction ${count.getAndIncrement()}: ${request.method.name} ${request.uri}
+            """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
 
 ${headerLine<Request>()}:
-${request.headerBlock()}
-${bodyLine<Request>()} (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):
-${request.bodyBlock()}
+${it.headerBlock()}
+${bodyLine<Request>()} (${Header.CONTENT_TYPE(it)?.toHeaderValue() ?: ""}):
+${it.bodyBlock()}
 ${headerLine<Response>()}:
-${response.headerBlock()}
-${bodyLine<Response>()} (${response.status.code}: ${CONTENT_TYPE(response)?.toHeaderValue() ?: ""}):
-${response.bodyBlock()}
+${manipulatedResponse.headerBlock()}
+${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${Header.CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
+                ?: ""}):
+${manipulatedResponse.bodyBlock()}
 """.toByteArray())
     }
 
@@ -52,11 +46,11 @@ ${response.bodyBlock()}
 /**
  * Read HTTP traffic from disk in Servirtium markdown format
  */
-fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, manipulations: (Response) -> Response = { it }) = object : Replay {
 
     override fun requests() = output.parseInteractions { it.first }
 
-    override fun responses() = output.parseInteractions { it.second }
+    override fun responses() = output.parseInteractions { manipulations(it.second) }
 
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())

@@ -2,7 +2,6 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Filter
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -27,13 +26,6 @@ class ServirtiumRecordingTest {
 
     object AContract : ServirtiumContract {
         override val name get() = "name"
-        override val manipulations = Filter { next ->
-            {
-                next(it.removeHeader("toBeRemoved")).run {
-                    removeHeader("toBeRemoved").body(bodyString().replace("hello", "goodbye"))
-                }
-            }
-        }
     }
 
     @TempDir
@@ -41,6 +33,12 @@ class ServirtiumRecordingTest {
 
     @Test
     fun `records the values into the recording`(approver: Approver) {
+        val requestManipulations = { it: Request -> it.removeHeader("toBeRemoved") }
+        val responseManipulations = { it: Response ->
+            it.removeHeader("toBeRemoved")
+                .body(it.bodyString().replace("hello", "goodbye"))
+        }
+
         val stub = Stub(AContract)
 
         val originalRequest = Request(POST, "/foo")
@@ -53,18 +51,14 @@ class ServirtiumRecordingTest {
             .header("toBeRemoved", "respHeaderValue2")
             .body("helloWorldResponse")
 
-        val expectedResponse = Response(INTERNAL_SERVER_ERROR)
-            .header("toBeRetained", "respHeaderValue1")
-            .body("goodbyeWorldResponse")
-
         val httpHandler = { it: Request ->
             assertThat(it, equalTo(originalRequest))
             originalResponse
         }
 
-        val actualResponse = ServirtiumRecording(httpHandler, root).resolveParameter(stub, stub)(originalRequest)
+        val actualResponse = ServirtiumRecording(httpHandler, root, requestManipulations, responseManipulations).resolveParameter(stub, stub)(originalRequest)
 
-        assertThat(actualResponse, equalTo(expectedResponse))
+        assertThat(actualResponse, equalTo(originalResponse))
 
         val expectedFile = File(root, "name.hashCode.md")
 

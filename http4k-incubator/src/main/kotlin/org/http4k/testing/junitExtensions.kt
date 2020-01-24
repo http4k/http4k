@@ -2,11 +2,13 @@ package org.http4k.testing
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.then
-import org.http4k.filter.TrafficFilters
-import org.http4k.traffic.ReadWriteStream
+import org.http4k.filter.TrafficFilters.RecordTo
+import org.http4k.traffic.ByteStorage.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
+import org.http4k.traffic.Sink
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -19,23 +21,18 @@ import java.util.concurrent.atomic.AtomicInteger
  * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
  */
 class ServirtiumRecording(private val httpHandler: HttpHandler,
-                          private val root: File = File(".")) : ParameterResolver {
+                          private val root: File = File("."),
+                          private val requestManipulations: (Request) -> Request = { it },
+                          private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
         with(ec.testInstance.get()) {
             when (this) {
-                is ServirtiumContract -> {
-                    val recorder = manipulations
-                        .then(TrafficFilters.RecordTo(ReadWriteStream.Servirtium(root, name + "." + ec.requiredTestMethod.name)))
-                        .then(manipulations)
-
-                    val http = { req: Request ->
-                        val resp = httpHandler(req)
-                        recorder.then { resp }(req)
-                    }
-                    http
-                }
+                is ServirtiumContract ->
+                    RecordTo(Sink.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true),
+                        requestManipulations, responseManipulations))
+                        .then(httpHandler)
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
@@ -44,14 +41,16 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
 /**
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
-class ServirtiumReplay(private val root: File = File(".")) : ParameterResolver {
+class ServirtiumReplay(private val root: File = File("."),
+                       private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler =
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    ReadWriteStream.Servirtium(root, "$name.${ec.requiredTestMethod.name}").replayingMatchingContent()
+                    Replay.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true), responseManipulations)
+                        .replayingMatchingContent()
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }

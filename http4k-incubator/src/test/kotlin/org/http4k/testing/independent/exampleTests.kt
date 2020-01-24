@@ -21,8 +21,10 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.testing.replayingMatchingContent
-import org.http4k.traffic.ReadWriteStream
+import org.http4k.traffic.ByteStorage.Companion.Disk
+import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
+import org.http4k.traffic.Sink
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -96,7 +98,12 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        mitm = MiTMRecorder(info.displayName.removeSuffix("()"), Uri.of("http://localhost:$appPort")).start()
+        mitm = MiTMRecorder(
+            info.displayName.removeSuffix("()"),
+            Uri.of("http://localhost:$appPort"),
+            requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
+            responseManipulations = { it.removeHeader("Date") }
+        ).start()
     }
 
     @AfterEach
@@ -118,7 +125,9 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        mitm = MiTMReplayer(info.displayName.removeSuffix("()")).start()
+        mitm = MiTMReplayer(info.displayName.removeSuffix("()")) {
+            it.header("Date", "some overridden date")
+        }.start()
     }
 
     @AfterEach
@@ -132,8 +141,11 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * target server, but if we were happy to use java system proxy settings then it would work without
  * There is no request cleaning going on here.
  */
-fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
-    RecordTo(ReadWriteStream.Servirtium(root, name))
+fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
+                 requestManipulations: (Request) -> Request = { it },
+                 responseManipulations: (Response) -> Response = { it }
+) =
+    RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
@@ -142,9 +154,9 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
  * excess headers from the actual requests are discarded.
  */
-fun MiTMReplayer(name: String, root: File = File(".")) =
+fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Response) -> Response = { it }) =
     CatchUnmatchedRequest()
-        .then(ReadWriteStream.Servirtium(root, name).replayingMatchingContent())
+        .then(Replay.Servirtium(Disk(File(root, "$name.md")), manipulations).replayingMatchingContent())
         .asServer(SunHttp(0))
 
 /**

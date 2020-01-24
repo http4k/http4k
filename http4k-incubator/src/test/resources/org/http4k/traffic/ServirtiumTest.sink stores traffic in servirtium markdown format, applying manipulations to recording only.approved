@@ -1,0 +1,26 @@
+## Interaction 0: GET /hello?query=123
+
+### Request headers recorded for playback:
+
+```
+header1: value1
+```
+
+### Request body recorded for playback ():
+
+```
+body1body1
+```
+
+### Response headers recorded for playback:
+
+```
+header3: value3
+```
+
+### Response body recorded for playback (200: ):
+
+```
+body2body2
+```
+

@@ -3,61 +3,81 @@ package org.http4k.traffic
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
-import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
+import java.util.function.Supplier
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumTest {
 
     @Test
-    fun `stores and replays traffic in servirtium markdown format`(@TempDir tempDir: File, approver: Approver) {
-        val readWriteStream = ReadWriteStream.Servirtium(tempDir, "some name")
+    fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
+        val received = AtomicReference<ByteArray>()
+        val sink = Sink.Servirtium(Consumer(received::set),
+            requestManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) },
+            responseManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) }
+        )
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
-            .header("Content-Type", "request-content-type/value")
+            .header("toBeRemoved", "notThere")
             .body("body1")
 
         val response1 = Response(OK)
             .header("header3", "value3")
-            .header("Content-Type", "response-content-type/value")
-            .body("body1")
-        val request2 = Request(POST, "/")
-        val response2 = Response(INTERNAL_SERVER_ERROR)
+            .header("toBeRemoved", "notThere")
+            .body("body2")
 
-        readWriteStream[request1] = response1
-        readWriteStream[request2] = response2
+        sink[request1] = response1
 
-        assertThat(readWriteStream.requests().toList(), equalTo(listOf(request1, request2)))
-        assertThat(readWriteStream.responses().toList(), equalTo(listOf(response1, response2)))
-
-        approver.assertApproved(Response(OK).body(File(tempDir, "some name.md").readText()))
+        approver.assertApproved(Response(OK).body(received.get().inputStream()))
     }
 
     @Test
-    fun `ignores notes added to markdown`() {
-        val readWriteStream = ReadWriteStream.Servirtium(File("src/test/resources/org/http4k/traffic"), "ServirtiumTest.ignoresNotesAddedToMarkdown")
+    fun `replay replays traffic in servirtium markdown format`() {
+        val replay = Replay.Servirtium(Supplier {
+            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
+        })
 
         val request1 = Request(GET, "/hello?query=123")
             .header("header1", "value1")
-            .header("Content-Type", "request-content-type/value")
-            .body("body1")
+            .body("body")
 
         val response1 = Response(OK)
             .header("header3", "value3")
-            .header("Content-Type", "response-content-type/value")
             .body("body1")
 
-        assertThat(readWriteStream.requests().toList(), equalTo(listOf(request1)))
-        assertThat(readWriteStream.responses().toList(), equalTo(listOf(response1)))
+        assertThat(replay.requests().toList(), equalTo(listOf(request1)))
+        assertThat(replay.responses().toList(), equalTo(listOf(response1)))
+    }
+
+    @Test
+    fun `replay replays traffic in servirtium markdown format, applying manipulations to recording`() {
+        val content = javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
+
+        val replay = Replay.Servirtium(
+            Supplier { content }
+        ) {
+            it.header("toBeAdded", "value").body(it.bodyString() + it.bodyString())
+        }
+
+        val request1 = Request(GET, "/hello?query=123")
+            .header("header1", "value1")
+            .body("body")
+
+        val response1 = Response(OK)
+            .header("header3", "value3")
+            .header("toBeAdded", "value")
+            .body("body1body1")
+
+        assertThat(replay.requests().toList(), equalTo(listOf(request1)))
+        assertThat(replay.responses().toList(), equalTo(listOf(response1)))
     }
 }
