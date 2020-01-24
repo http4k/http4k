@@ -4,7 +4,6 @@
 
 ```
 header1: value1
-toBeRemoved: notThere
 ```
 
 ### Request body recorded for playback ():
