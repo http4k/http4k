@@ -10,21 +10,9 @@ import org.http4k.core.Response
 import org.http4k.core.parse
 import org.http4k.core.then
 import org.http4k.lens.Header
-import org.http4k.traffic.ByteStorage.Companion.Disk
-import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
-
-/**
- * Read and write HTTP traffic to disk in Servirtium markdown format
- */
-fun ReadWriteStream.Companion.Servirtium(baseDir: File, name: String, manipulations: Filter = Filter.NoOp): ReadWriteStream {
-    val storage = Disk(File(baseDir, "$name.md"), false)
-    return object : ReadWriteStream,
-        Replay by Replay.Servirtium(storage),
-        Sink by Sink.Servirtium(storage, manipulations) {}
-}
 
 /**
  * Write HTTP traffic to disk in Servirtium markdown format

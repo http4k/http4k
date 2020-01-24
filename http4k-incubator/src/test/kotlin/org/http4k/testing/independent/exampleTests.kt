@@ -21,8 +21,10 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.testing.replayingMatchingContent
-import org.http4k.traffic.ReadWriteStream
+import org.http4k.traffic.ByteStorage.Companion.Disk
+import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
+import org.http4k.traffic.Sink
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -133,7 +135,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * There is no request cleaning going on here.
  */
 fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
-    RecordTo(ReadWriteStream.Servirtium(root, name))
+    RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true)))
         .then(SetBaseUriFrom(target))
         .then(ApacheClient())
         .asServer(SunHttp(0))
@@ -144,7 +146,7 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File(".")) =
  */
 fun MiTMReplayer(name: String, root: File = File(".")) =
     CatchUnmatchedRequest()
-        .then(ReadWriteStream.Servirtium(root, name).replayingMatchingContent())
+        .then(Replay.Servirtium(Disk(File(root, "$name.md"))).replayingMatchingContent())
         .asServer(SunHttp(0))
 
 /**

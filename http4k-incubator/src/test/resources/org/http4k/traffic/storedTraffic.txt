@@ -2,6 +2,8 @@
 
 ### Request headers recorded for playback:
 
+## some note
+
 ```
 header1: value1
 ```
@@ -11,6 +13,8 @@ header1: value1
 ```
 body
 ```
+
+## some other note
 
 ### Response headers recorded for playback:
 
