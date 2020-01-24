@@ -10,6 +10,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.security.ResponseType.Code
+import org.http4k.security.State
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.RequestObjectExtractorJson
@@ -109,6 +110,36 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
             redirectUri = Uri.of("https://somehost"),
             scopes = listOf("openid", "email", "address"),
             state = null,
+            requestObject = requestObject,
+            request = RequestJwtContainer(requestObjectJwt)
+        ))))
+    }
+
+    @Test
+    fun `if scopes on the request are missing but available on the request jwt`() {
+        val requestObject = RequestObject(scope = "email openid address")
+        val requestObjectJwt = requestJwt(requestObject)
+        assertThat(underTest.extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
+            client = ClientId("12345"),
+            responseType = Code,
+            redirectUri = Uri.of("https://somehost"),
+            scopes = listOf("email", "openid", "address"),
+            state = null,
+            requestObject = requestObject,
+            request = RequestJwtContainer(requestObjectJwt)
+        ))))
+    }
+
+    @Test
+    fun `if scopes on the request are missing but missing on the request jwt`() {
+        val requestObject = RequestObject(state = State("some state"))
+        val requestObjectJwt = requestJwt(requestObject)
+        assertThat(underTest.extract(Request(GET, "/?client_id=12345=&response_type=code&scope=openid+email+address&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
+            client = ClientId("12345"),
+            responseType = Code,
+            redirectUri = Uri.of("https://somehost"),
+            scopes = listOf("openid", "email", "address"),
+            state = State("some state"),
             requestObject = requestObject,
             request = RequestJwtContainer(requestObjectJwt)
         ))))

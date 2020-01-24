@@ -42,21 +42,28 @@ class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator
             redirectUri = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.redirectUri, requestObject.redirectUri).onFailure { return it },
             state = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.state, requestObject.state).onFailure { return it },
             nonce = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.nonce, requestObject.nonce).onFailure { return it },
-            responseType = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseType, requestObject.responseType).onFailure { return it } ?: Code,
+            responseType = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseType, requestObject.responseType).onFailure { return it }
+                ?: Code,
             responseMode = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseMode, requestObject.responseMode).onFailure { return it },
-            scopes = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scopes())
-            { scopes1, scopes2 -> scopes1.toSet() == scopes2.toSet() }
+            scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scopes())
                 .onFailure { return it } ?: emptyList()
         ))
     }
 
     private fun <T> nonNullValueIfExistsOrErrorIfNotEqual(authRequestValue: T?,
-                                                          requestObjectValue: T?,
-                                                          equalityOperator: (t1: T, t2: T) -> Boolean = { t1, t2 -> t1 == t2 }): Result<T?, InvalidAuthorizationRequest> {
-        if (authRequestValue != null && requestObjectValue != null && !equalityOperator(authRequestValue, requestObjectValue)) {
+                                                          requestObjectValue: T?): Result<T?, InvalidAuthorizationRequest> {
+        if (authRequestValue != null && requestObjectValue != null && authRequestValue != requestObjectValue) {
             return Failure(InvalidAuthorizationRequest("request object is invalid"))
         }
         return Success(authRequestValue ?: requestObjectValue)
+    }
+
+    private fun nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequestValue: List<String>,
+                                                       requestObjectValue: List<String>): Result<List<String>, InvalidAuthorizationRequest> {
+        if (authRequestValue.isNotEmpty() && requestObjectValue.isNotEmpty() && authRequestValue.toSet() != requestObjectValue.toSet()) {
+            return Failure(InvalidAuthorizationRequest("request object is invalid"))
+        }
+        return Success(if (authRequestValue.isNotEmpty()) authRequestValue else requestObjectValue)
     }
 
 }
