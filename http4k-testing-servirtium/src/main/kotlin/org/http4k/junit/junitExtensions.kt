@@ -62,7 +62,7 @@ class ServirtiumReplay(private val root: File = File("."),
 
 }
 
-private fun ConvertBadResponseToAssertionFailed(): Filter = Filter { next ->
+private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
     {
         with(next(it)) {
             if (status == NOT_IMPLEMENTED) throw AssertionFailedError(bodyString())

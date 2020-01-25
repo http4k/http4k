@@ -3,11 +3,9 @@ package guide.modules.servirtium.independent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
-import org.http4k.core.Filter
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -30,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import org.opentest4j.AssertionFailedError
 import java.io.File
 
 /**
@@ -138,8 +135,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
 /**
  * MiTM recorder to store the incoming traffic. At the moment you need to pass the Uri in for the
- * target server, but if we were happy to use java system proxy settings then it would work without
- * There is no request cleaning going on here.
+ * target server, but if we were happy to use java system proxy settings then it would work without.
  */
 fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
                  requestManipulations: (Request) -> Request = { it },
@@ -155,21 +151,6 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
  * excess headers from the actual requests are discarded.
  */
 fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Request) -> Request = { it }) =
-    CatchUnmatchedRequest()
-        .then(Replay.Servirtium(Disk(File(root, "$name.md"))).replayingMatchingContent(manipulations))
+    Replay.Servirtium(Disk(File(root, "$name.md")))
+        .replayingMatchingContent(manipulations)
         .asServer(SunHttp(0))
-
-/**
- * At the moment, the replayingMatchingContent() above throws an AssertionFailedError, so we need a filter
- * to convert the error
- */
-fun CatchUnmatchedRequest() = Filter { next ->
-    {
-        try {
-            next(it)
-        } catch (e: AssertionFailedError) {
-            e.printStackTrace()
-            Response(INTERNAL_SERVER_ERROR).body(e.localizedMessage)
-        }
-    }
-}
