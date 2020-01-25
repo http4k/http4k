@@ -9,7 +9,7 @@ dependencies {
     provided Libs.kotlin_stdlib_jdk8
     provided project(":http4k-core")
 
-    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0"
+    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
 
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
     testCompile project(path: ":http4k-jsonrpc", configuration: 'testArtifacts')
