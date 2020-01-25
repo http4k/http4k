@@ -2,18 +2,18 @@ package org.http4k.format
 
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.*
-import kotlinx.serialization.json.JsonElement
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.serialization.json.Json as KotlinxJson
 
 /**
  * To implement custom JSON configuration, create your own object singleton. Extra mappings can be added before done() is called.
  */
 object KotlinxSerialization : Json<JsonElement> {
 
-    private val json = Json(JsonConfiguration.Stable)
+    private val json = KotlinxJson(JsonConfiguration.Stable)
     @UnstableDefault
-    private val prettyJson = Json(JsonConfiguration(prettyPrint = true, indent = "\t"))
+    private val prettyJson = KotlinxJson(JsonConfiguration(prettyPrint = true, indent = "\t"))
 
     override fun typeOf(value: JsonElement): JsonType =
         when (value) {
@@ -31,6 +31,7 @@ object KotlinxSerialization : Json<JsonElement> {
 
     @UnstableDefault
     override fun JsonElement.asPrettyJsonString() = prettyJson.stringify(JsonElement.serializer(), this)
+
     override fun JsonElement.asCompactJsonString() = json.stringify(JsonElement.serializer(), this)
 
     override fun String.asJsonObject() = json.parse(JsonObjectSerializer, this)
@@ -58,11 +59,12 @@ object KotlinxSerialization : Json<JsonElement> {
     override fun fields(node: JsonElement) =
         if (node !is JsonObject) emptyList() else node.toList()
 
-    override fun elements(value: JsonElement) = when(value) {
+    override fun elements(value: JsonElement) = when (value) {
         is JsonObject -> value.values
         is JsonArray -> value.content
         else -> emptyList()
     }
+
     override fun text(value: JsonElement) =
         value.content
 
