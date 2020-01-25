@@ -35,21 +35,21 @@ object KotlinxSerialization : Json<JsonElement> {
 
     override fun String.asJsonObject() = json.parse(JsonObjectSerializer, this)
 
-    override fun String?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun String?.asJsonValue() = JsonPrimitive(this)
 
-    override fun Int?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun Int?.asJsonValue() = JsonPrimitive(this)
 
-    override fun Double?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun Double?.asJsonValue() = JsonPrimitive(this)
 
-    override fun Long?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun Long?.asJsonValue() = JsonPrimitive(this)
 
     override fun BigDecimal?.asJsonValue() = this?.let {
         json.parse(JsonLiteralSerializer, "$it")
     } ?: JsonNull
 
-    override fun BigInteger?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun BigInteger?.asJsonValue() = JsonPrimitive(this)
 
-    override fun Boolean?.asJsonValue() = this?.let { JsonLiteral(it) } ?: JsonNull
+    override fun Boolean?.asJsonValue() = JsonPrimitive(this)
 
     override fun <T : Iterable<JsonElement>> T.asJsonArray() = JsonArray(this.toList())
 
