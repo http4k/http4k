@@ -8,7 +8,7 @@ HTML form support is provided on 2 levels:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.225.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.226.0"
 ```
 
 ### Standard (non-typesafe) API [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/html_forms/example_standard.kt)
