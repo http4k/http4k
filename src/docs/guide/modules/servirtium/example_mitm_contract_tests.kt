@@ -17,8 +17,8 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.servirtium.MiTMRecorder
-import org.http4k.servirtium.MiTMReplayer
+import org.http4k.servirtium.ServirtiumReplayServer
+import org.http4k.servirtium.ServirtumRecordingServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -90,7 +90,7 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        mitm = MiTMRecorder(
+        mitm = ServirtumRecordingServer(
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
@@ -117,7 +117,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        mitm = MiTMReplayer(info.displayName.removeSuffix("()")) {
+        mitm = ServirtiumReplayServer(info.displayName.removeSuffix("()")) {
             it.header("Date", "some overridden date")
         }.start()
     }

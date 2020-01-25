@@ -10,10 +10,10 @@ import org.http4k.traffic.replayingMatchingContent
 import java.io.File
 
 /**
- * MiTM replay server which will match and replay recorded traffic from the named Servirtium Markdown file.
+ * MiTM replay server which will match and replay recorded traffic read from the named Servirtium Markdown file.
  * Incoming requests can be manipulated to ensure that it matches the expected request.
  */
-object MiTMReplayer {
+object ServirtiumReplayServer {
     operator fun invoke(
         name: String,
         root: File = File("."),

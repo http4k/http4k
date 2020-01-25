@@ -15,9 +15,12 @@ import org.http4k.traffic.Sink
 import java.io.File
 
 /**
- * MiTM recording server which will store incoming request and response traffic in the named Servirtium Markdown file.
+ * MiTM proxy server which sits inbetween the client and the target and stores traffic in the
+ * named Servirtium Markdown file.
+ *
+ * Manipulations can be made to the requests and responses before they are stored.
  */
-object MiTMRecorder {
+object ServirtumRecordingServer {
     operator fun invoke(
         name: String,
         target: Uri,
