@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -7,6 +7,9 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.ServirtiumContract
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
 import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

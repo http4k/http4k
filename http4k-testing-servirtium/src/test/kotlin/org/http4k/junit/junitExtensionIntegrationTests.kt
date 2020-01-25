@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
@@ -11,6 +11,9 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.ServirtiumContract
+import org.http4k.testing.ApprovalTest
+import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -60,7 +63,7 @@ class ServirtiumReplayIntegrationTest : AContract {
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
 
     init {
-        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").also {
+        File("src/test/resources/org/http4k/junit/ServirtiumReplayIntegrationTest.traffic.txt").also {
             it.copyTo(File(root, "$name.scenario.md"))
             it.copyTo(File(root, "$name.unexpected content.md"))
             it.copyTo(File(root, "$name.too many requests.md"))

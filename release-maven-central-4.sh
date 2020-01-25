@@ -7,13 +7,13 @@ set -o nounset
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-LOCAL_VERSION=`jq -r .http4k.version $DIR/version.json`
+LOCAL_VERSION=$(jq -r .http4k.version $DIR/version.json)
 
 function maven_publish {
     local PACKAGE=$1
     local PAYLOAD="{\"username\": \"${SONATYPE_USER}\", \"password\": \"${SONATYPE_KEY}\"}"
 
-    local PUBLISHED=$(curl --fail --silent -o /dev/null https://mvnrepository.com/artifact/org.http4k/${PACKAGE}/${LOCAL_VERSION} ; echo $?)
+    local PUBLISHED=$(curl --fail --silent -o /dev/null https://mvnrepository.com/artifact/org.http4k/"${PACKAGE}"/"${LOCAL_VERSION}" ; echo $?)
 
     if [[ $PUBLISHED == "0" ]]; then
         echo "$PACKAGE is already published. Skipping"

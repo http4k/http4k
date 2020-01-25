@@ -224,6 +224,7 @@ dependencies {
     provided project(":http4k-testing-approval")
     provided project(":http4k-testing-chaos")
     provided project(":http4k-testing-hamkrest")
+    provided project(":http4k-testing-servirtium")
     provided project(":http4k-testing-webdriver")
 
     testCompile Config.TestDependencies

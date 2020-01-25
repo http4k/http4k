@@ -15,7 +15,7 @@ import java.util.function.Consumer
 import java.util.function.Supplier
 
 @ExtendWith(ApprovalTest::class)
-class ServirtiumTest {
+class TrafficExtensionTests {
 
     @Test
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
