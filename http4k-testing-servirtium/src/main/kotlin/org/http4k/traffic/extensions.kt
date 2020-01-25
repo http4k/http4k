@@ -29,7 +29,6 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
             }
             else -> renderMismatch(index, "", received.toString())
         }
-
     }
 }
 

@@ -1,9 +1,8 @@
-package guide.modules.servirtium.independent
+package guide.modules.servirtium.mitm
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
-import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -13,23 +12,18 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
 import org.http4k.filter.HandleRemoteRequestFailed
-import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.traffic.ByteStorage.Companion.Disk
-import org.http4k.traffic.Replay
-import org.http4k.traffic.Servirtium
-import org.http4k.traffic.Sink
-import org.http4k.traffic.replayingMatchingContent
+import org.http4k.servirtium.MiTMRecorder
+import org.http4k.servirtium.MiTMReplayer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import java.io.File
 
 /**
  * This client wraps the calls to a remote WordCounter service
@@ -132,37 +126,4 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
     fun stop() {
         mitm.stop()
     }
-}
-
-/**
- * MiTM recorder to store the incoming traffic. At the moment you need to pass the Uri in for the
- * target server, but if we were happy to use java system proxy settings then it would work without.
- */
-object MiTMRecorder {
-    operator fun invoke(
-        name: String,
-        target: Uri,
-        root: File = File("."),
-        requestManipulations: (Request) -> Request = { it },
-        responseManipulations: (Response) -> Response = { it }
-    ) =
-        RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
-            .then(SetBaseUriFrom(target))
-            .then(JavaHttpClient())
-            .asServer(SunHttp(0))
-}
-
-/**
- * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
- * excess headers from the actual requests are discarded.
- */
-object MiTMReplayer {
-    operator fun invoke(
-        name: String,
-        root: File = File("."),
-        manipulations: (Request) -> Request = { it }
-    ) =
-        Replay.Servirtium(Disk(File(root, "$name.md")))
-            .replayingMatchingContent(manipulations)
-            .asServer(SunHttp(0))
 }
