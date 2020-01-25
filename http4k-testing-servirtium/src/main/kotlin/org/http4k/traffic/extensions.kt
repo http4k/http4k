@@ -23,7 +23,7 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
             interactions.hasNext() -> {
                 val (expectedReq, response) = interactions.next()
 
-                val actual = manipulations(received).removeHeadersNotIn(expectedReq).toString()
+                val actual = manipulations(received).toString()
                 if (expectedReq.toString() == actual) response
                 else renderMismatch(index, expectedReq.toString(), actual)
             }
@@ -36,14 +36,8 @@ private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Re
     "Unexpected request received for Interaction $index ==> " +
         "expected:<$expectedReq> but was:<$actual>")
 
-private fun Request.removeHeadersNotIn(checkReq: Request) =
-    headers.fold(this) { acc, nextExpectedHeader ->
-        if (checkReq.header(nextExpectedHeader.first) != null) acc
-        else acc.removeHeader(nextExpectedHeader.first)
-    }
-
 /**
- * Write HTTP traffic to disk in Servirtium markdown format
+ * Write HTTP traffic to disk in Servirtium markdown format.
  */
 fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                               requestManipulations: (Request) -> Request = { it },
@@ -76,7 +70,7 @@ ${manipulatedResponse.bodyBlock()}
 }
 
 /**
- * Read HTTP traffic from disk in Servirtium markdown format
+ * Read HTTP traffic from disk in Servirtium markdown format.
  */
 fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
 

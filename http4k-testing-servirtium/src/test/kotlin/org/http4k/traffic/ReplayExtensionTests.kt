@@ -17,18 +17,13 @@ import org.junit.jupiter.api.Test
 class ReplayExtensionTests {
     private val request = Request(GET, "/")
     private val response = Response(OK)
-    private val http = MemoryStream(mutableListOf(request to response)).replayingMatchingContent {
+    private val http = MemoryStream(mutableListOf(request.header("toBeAdded", "value") to response)).replayingMatchingContent {
         it.header("toBeAdded", "value").body(it.bodyString() + it.bodyString())
     }
 
     @Test
-    fun `replayingMatchingContent replays matching content ok`() {
+    fun `replayingMatchingContent replays matching content ok, applying the manipulations to make request match`() {
         assertThat(http(request), equalTo(response))
-    }
-
-    @Test
-    fun `replayingMatchingContent ignores headers which were not in stream`() {
-        assertThat(http(request.header("foo", "bar")), equalTo(response))
     }
 
     @Test
