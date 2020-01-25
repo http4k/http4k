@@ -36,7 +36,7 @@ class ReplayExtensionTests {
     @Test
     fun `replayingMatchingContent blows up when more requests than interactions`() {
         assertThat(http(request), equalTo(response))
-        assertThat(http(Request(GET, "/foobar")),
+        assertThat(http(request),
             hasStatus(NOT_IMPLEMENTED).and(
                 hasBody(containsSubstring("Unexpected request received for Interaction 1 ==>"))))
     }
