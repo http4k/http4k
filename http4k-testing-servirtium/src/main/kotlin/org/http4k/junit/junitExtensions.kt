@@ -44,7 +44,7 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
 class ServirtiumReplay(private val root: File = File("."),
-                       private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
+                       private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler =
@@ -53,8 +53,8 @@ class ServirtiumReplay(private val root: File = File("."),
                 is ServirtiumContract ->
                     ConvertBadResponseToAssertionFailed().then(
                         Replay.Servirtium(
-                            Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true),
-                            responseManipulations).replayingMatchingContent()
+                            Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true))
+                            .replayingMatchingContent(requestManipulations)
                     )
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }

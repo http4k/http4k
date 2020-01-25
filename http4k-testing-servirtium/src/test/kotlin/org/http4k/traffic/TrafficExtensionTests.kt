@@ -57,27 +57,4 @@ class TrafficExtensionTests {
         assertThat(replay.requests().toList(), equalTo(listOf(request1)))
         assertThat(replay.responses().toList(), equalTo(listOf(response1)))
     }
-
-    @Test
-    fun `replay replays traffic in servirtium markdown format, applying manipulations to recording`() {
-        val content = javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
-
-        val replay = Replay.Servirtium(
-            Supplier { content }
-        ) {
-            it.header("toBeAdded", "value").body(it.bodyString() + it.bodyString())
-        }
-
-        val request1 = Request(GET, "/hello?query=123")
-            .header("header1", "value1")
-            .body("body")
-
-        val response1 = Response(OK)
-            .header("header3", "value3")
-            .header("toBeAdded", "value")
-            .body("body1body1")
-
-        assertThat(replay.requests().toList(), equalTo(listOf(request1)))
-        assertThat(replay.responses().toList(), equalTo(listOf(response1)))
-    }
 }

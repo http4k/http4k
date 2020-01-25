@@ -154,9 +154,9 @@ fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
  * excess headers from the actual requests are discarded.
  */
-fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Response) -> Response = { it }) =
+fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Request) -> Request = { it }) =
     CatchUnmatchedRequest()
-        .then(Replay.Servirtium(Disk(File(root, "$name.md")), manipulations).replayingMatchingContent())
+        .then(Replay.Servirtium(Disk(File(root, "$name.md"))).replayingMatchingContent(manipulations))
         .asServer(SunHttp(0))
 
 /**

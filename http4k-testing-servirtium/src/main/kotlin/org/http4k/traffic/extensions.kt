@@ -5,14 +5,14 @@ import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.parse
 import org.http4k.lens.Header
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-fun Replay.replayingMatchingContent(): HttpHandler {
+fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }): HttpHandler {
     val interactions = requests().zip(responses()).iterator()
     val count = AtomicInteger()
 
@@ -23,7 +23,7 @@ fun Replay.replayingMatchingContent(): HttpHandler {
             interactions.hasNext() -> {
                 val (expectedReq, response) = interactions.next()
 
-                val actual = received.removeHeadersNotIn(expectedReq).toString()
+                val actual = manipulations(received).removeHeadersNotIn(expectedReq).toString()
                 if (expectedReq.toString() == actual) response
                 else renderMismatch(index, expectedReq.toString(), actual)
             }
@@ -33,7 +33,7 @@ fun Replay.replayingMatchingContent(): HttpHandler {
     }
 }
 
-private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(Status.NOT_IMPLEMENTED).body(
+private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
     "Unexpected request received for Interaction $index ==> " +
         "expected:<$expectedReq> but was:<$actual>")
 
@@ -79,11 +79,11 @@ ${manipulatedResponse.bodyBlock()}
 /**
  * Read HTTP traffic from disk in Servirtium markdown format
  */
-fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, manipulations: (Response) -> Response = { it }) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
 
     override fun requests() = output.parseInteractions { it.first }
 
-    override fun responses() = output.parseInteractions { manipulations(it.second) }
+    override fun responses() = output.parseInteractions { it.second }
 
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())
