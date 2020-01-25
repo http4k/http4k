@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.junit
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -7,6 +7,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
+import org.http4k.servirtium.ServirtiumContract
 import org.http4k.traffic.ByteStorage.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium

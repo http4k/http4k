@@ -11,11 +11,11 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters.SetBaseUriFrom
+import org.http4k.junit.ServirtiumRecording
+import org.http4k.junit.ServirtiumReplay
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.testing.ServirtiumContract
-import org.http4k.testing.ServirtiumRecording
-import org.http4k.testing.ServirtiumReplay
+import org.http4k.servirtium.ServirtiumContract
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package org.http4k.testing
+package org.http4k.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
@@ -6,6 +6,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.ServirtiumContract
 import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -30,7 +31,7 @@ class ServirtiumReplayTest {
 
     @Test
     fun `replays traffic from the recording`() {
-        javaClass.getResourceAsStream("/org/http4k/testing/storedTraffic.txt").reader().use {r ->
+        javaClass.getResourceAsStream("/org/http4k/junit/storedTraffic.txt").reader().use {r ->
             File(root, "name.hashCode.md").writer().use { r.copyTo(it) }
         }
 
