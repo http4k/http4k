@@ -1,16 +1,20 @@
 package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
+import com.natpryce.hamkrest.has
+import com.natpryce.hamkrest.throws
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.opentest4j.AssertionFailedError
 import java.io.File
 import java.nio.file.Files
 
@@ -40,7 +44,6 @@ class ServirtiumRecordingIntegrationTest : AContract {
 
     @Test
     fun `check contents are recorded as per manipulations`(
-        testInfo: TestInfo,
         handler: HttpHandler,
         approver: Approver
     ) {
@@ -60,11 +63,34 @@ class ServirtiumReplayIntegrationTest : AContract {
         File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
             File(root, "$name.scenario.md")
         )
+        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
+            File(root, "$name.unexpected content.md")
+        )
+        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
+            File(root, "$name.too many requests.md")
+        )
     }
 
     @JvmField
     @RegisterExtension
     val replay = ServirtiumReplay(root) {
         it.body(it.bodyString().replace("2", ""))
+    }
+
+    @Test
+    fun `unexpected content`(handler: HttpHandler) {
+        assertThat({
+            handler(Request(GET, "/foobar").body("welcome"))
+        }, throws(
+            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 0"))))
+    }
+
+    @Test
+    fun `too many requests`(handler: HttpHandler) {
+        handler(Request(POST, "/foobar").body("welcome"))
+        assertThat({
+            handler(Request(POST, "/foobar").body("welcome"))
+        }, throws(
+            has(AssertionFailedError::getLocalizedMessage, containsSubstring("Unexpected request received for Interaction 1"))))
     }
 }
