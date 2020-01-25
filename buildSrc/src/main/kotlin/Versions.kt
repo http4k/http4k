@@ -20,7 +20,7 @@ object Versions {
 
      const val org_eclipse_jetty: String = "9.4.26.v20200117"
 
-     const val org_junit_jupiter: String = "5.5.2"
+     const val org_junit_jupiter: String = "5.6.0"
 
      const val io_undertow: String = "2.0.29.Final"
 
@@ -111,7 +111,7 @@ object Versions {
       * See issue 19: How to update Gradle itself?
       * https://github.com/jmfayard/buildSrcVersions/issues/19
       */
-     const val gradleLatestVersion: String = "6.1"
+     const val gradleLatestVersion: String = "6.1.1"
 }
 
 /**
