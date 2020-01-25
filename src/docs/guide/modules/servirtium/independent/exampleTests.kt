@@ -3,6 +3,7 @@ package guide.modules.servirtium.independent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
+import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -137,20 +138,31 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
  * MiTM recorder to store the incoming traffic. At the moment you need to pass the Uri in for the
  * target server, but if we were happy to use java system proxy settings then it would work without.
  */
-fun MiTMRecorder(name: String, target: Uri, root: File = File("."),
-                 requestManipulations: (Request) -> Request = { it },
-                 responseManipulations: (Response) -> Response = { it }
-) =
-    RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
-        .then(SetBaseUriFrom(target))
-        .then(ApacheClient())
-        .asServer(SunHttp(0))
+object MiTMRecorder {
+    operator fun invoke(
+        name: String,
+        target: Uri,
+        root: File = File("."),
+        requestManipulations: (Request) -> Request = { it },
+        responseManipulations: (Response) -> Response = { it }
+    ) =
+        RecordTo(Sink.Servirtium(Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
+            .then(SetBaseUriFrom(target))
+            .then(JavaHttpClient())
+            .asServer(SunHttp(0))
+}
 
 /**
  * MiTM replayer. At the moment, traffic is only checked using the headers which exist in the recording -
  * excess headers from the actual requests are discarded.
  */
-fun MiTMReplayer(name: String, root: File = File("."), manipulations: (Request) -> Request = { it }) =
-    Replay.Servirtium(Disk(File(root, "$name.md")))
-        .replayingMatchingContent(manipulations)
-        .asServer(SunHttp(0))
+object MiTMReplayer {
+    operator fun invoke(
+        name: String,
+        root: File = File("."),
+        manipulations: (Request) -> Request = { it }
+    ) =
+        Replay.Servirtium(Disk(File(root, "$name.md")))
+            .replayingMatchingContent(manipulations)
+            .asServer(SunHttp(0))
+}
