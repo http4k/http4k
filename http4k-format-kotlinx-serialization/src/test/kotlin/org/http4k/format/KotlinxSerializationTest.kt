@@ -8,4 +8,4 @@ class KotlinxSerializationTest : JsonContract<JsonElement>(KotlinxSerialization)
 }"""
 }
 
-class ArgoGenerateDataClassesTest : GenerateDataClassesContract<JsonElement>(KotlinxSerialization)
+class KotlinxSerializationGenerateDataClassesTest : GenerateDataClassesContract<JsonElement>(KotlinxSerialization)

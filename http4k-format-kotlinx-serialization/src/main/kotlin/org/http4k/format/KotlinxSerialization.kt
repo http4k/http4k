@@ -1,7 +1,8 @@
 package org.http4k.format
 
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.*
-import java.lang.RuntimeException
+import kotlinx.serialization.json.JsonElement
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -11,6 +12,7 @@ import java.math.BigInteger
 object KotlinxSerialization : Json<JsonElement> {
 
     private val json = Json(JsonConfiguration.Stable)
+    @UnstableDefault
     private val prettyJson = Json(JsonConfiguration(prettyPrint = true, indent = "\t"))
 
     override fun typeOf(value: JsonElement): JsonType =
@@ -24,9 +26,10 @@ object KotlinxSerialization : Json<JsonElement> {
             is JsonArray -> JsonType.Array
             is JsonObject -> JsonType.Object
             is JsonNull -> JsonType.Null
-            else -> throw IllegalArgumentException("Don't know now to translate $value")
+            else -> throw IllegalArgumentException("Don't know how to translate $value")
         }
 
+    @UnstableDefault
     override fun JsonElement.asPrettyJsonString() = prettyJson.stringify(JsonElement.serializer(), this)
     override fun JsonElement.asCompactJsonString() = json.stringify(JsonElement.serializer(), this)
 
