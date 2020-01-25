@@ -166,6 +166,11 @@ allprojects {
     }
 }
 
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+    freeCompilerArgs += "-Xjvm-default=enable"
+}
+
 coveralls {
     sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
     jacocoReportPath = file("${buildDir}/reports/jacoco/test/jacocoRootReport.xml")

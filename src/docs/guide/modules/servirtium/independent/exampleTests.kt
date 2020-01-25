@@ -1,4 +1,4 @@
-package org.http4k.testing.independent
+package guide.modules.servirtium.independent
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo

@@ -1,4 +1,4 @@
-package org.http4k.testing.junit
+package guide.modules.servirtium.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
