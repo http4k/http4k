@@ -35,7 +35,7 @@ class ServirtiumRecordingIntegrationTest : AContract {
         { Response(OK).body("hello") },
         root,
         { it.body(it.bodyString() + it.bodyString()) },
-        { it.body(it.bodyString().replace("l", "")) }
+        { it.body(it.bodyString() + "2") }
     )
 
     @Test
@@ -48,5 +48,23 @@ class ServirtiumRecordingIntegrationTest : AContract {
         approver.assertApproved(Response(OK).body(
             File(root, "$name.check contents are recorded as per manipulations.md").readText()
         ))
+    }
+}
+
+@ExtendWith(ApprovalTest::class)
+class ServirtiumReplayIntegrationTest : AContract {
+
+    private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
+
+    init {
+        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
+            File(root, "$name.scenario.md")
+        )
+    }
+
+    @JvmField
+    @RegisterExtension
+    val replay = ServirtiumReplay(root) {
+        it.body(it.bodyString().replace("2", ""))
     }
 }

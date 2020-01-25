@@ -3,24 +3,22 @@
 ### Request headers recorded for playback:
 
 ```
-
 ```
 
 ### Request body recorded for playback ():
 
 ```
-welcomewelcome
+welcome
 ```
 
 ### Response headers recorded for playback:
 
 ```
-
 ```
 
 ### Response body recorded for playback (200: ):
 
 ```
-hello2
+hello
 ```
 
