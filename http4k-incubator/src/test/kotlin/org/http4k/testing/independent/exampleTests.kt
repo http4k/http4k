@@ -20,11 +20,11 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.testing.replayingMatchingContent
 import org.http4k.traffic.ByteStorage.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
+import org.http4k.traffic.replayingMatchingContent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
