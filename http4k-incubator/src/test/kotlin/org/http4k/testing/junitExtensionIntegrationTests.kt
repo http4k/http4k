@@ -60,15 +60,11 @@ class ServirtiumReplayIntegrationTest : AContract {
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
 
     init {
-        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
-            File(root, "$name.scenario.md")
-        )
-        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
-            File(root, "$name.unexpected content.md")
-        )
-        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").copyTo(
-            File(root, "$name.too many requests.md")
-        )
+        File("src/test/resources/org/http4k/testing/ServirtiumReplayIntegrationTest.traffic.txt").also {
+            it.copyTo(File(root, "$name.scenario.md"))
+            it.copyTo(File(root, "$name.unexpected content.md"))
+            it.copyTo(File(root, "$name.too many requests.md"))
+        }
     }
 
     @JvmField
