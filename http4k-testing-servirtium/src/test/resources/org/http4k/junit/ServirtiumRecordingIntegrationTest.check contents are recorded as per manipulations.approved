@@ -1,3 +1,5 @@
+## this is a note
+
 ## Interaction 0: POST /foobar
 
 ### Request headers recorded for playback:
@@ -23,4 +25,34 @@ welcomewelcome
 ```
 hello2
 ```
+
+## this is another note
+
+## Interaction 1: POST /foobar
+
+### Request headers recorded for playback:
+
+```
+
+```
+
+### Request body recorded for playback ():
+
+```
+welcomewelcome
+```
+
+### Response headers recorded for playback:
+
+```
+
+```
+
+### Response body recorded for playback (200: ):
+
+```
+hello2
+```
+
+## this is yet another note
 

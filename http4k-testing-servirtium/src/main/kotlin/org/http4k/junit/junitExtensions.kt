@@ -7,6 +7,8 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
+import org.http4k.servirtium.RecordingControl
+import org.http4k.servirtium.RecordingControl.Companion.NoOp
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.traffic.ByteStorage.Companion.Disk
 import org.http4k.traffic.Replay
@@ -26,15 +28,19 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
                           private val root: File = File("."),
                           private val requestManipulations: (Request) -> Request = { it },
                           private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
-    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
+    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext) =
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         with(ec.testInstance.get()) {
             when (this) {
-                is ServirtiumContract ->
-                    RecordTo(Sink.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true),
-                        requestManipulations, responseManipulations))
-                        .then(httpHandler)
+                is ServirtiumContract -> {
+                    val file = File(root, "$name.${ec.requiredTestMethod.name}.md").apply { delete() }
+
+                    if (pc.isHttpHandler()) {
+                        RecordTo(Sink.Servirtium(Disk(file), requestManipulations, responseManipulations))
+                            .then(httpHandler)
+                    } else RecordingControl.Disk(file)
+                }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
@@ -45,17 +51,18 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
  */
 class ServirtiumReplay(private val root: File = File("."),
                        private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
-    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.supportedParam()
+    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): HttpHandler =
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    ConvertBadResponseToAssertionFailed().then(
-                        Replay.Servirtium(
-                            Disk(File(root, "$name.${ec.requiredTestMethod.name}.md"), true))
-                            .replayingMatchingContent(requestManipulations)
-                    )
+                    if (pc.isHttpHandler())
+                        ConvertBadResponseToAssertionFailed()
+                            .then(Replay.Servirtium(Disk(File(root, "$name.${ec.requiredTestMethod.name}.md")))
+                                .replayingMatchingContent(requestManipulations)
+                            )
+                    else NoOp
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
         }
@@ -71,5 +78,9 @@ private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
     }
 }
 
-private fun ParameterContext.supportedParam() = parameter.parameterizedType.typeName ==
-    "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
+private fun ParameterContext.isRecordingControl() =
+    parameter.parameterizedType.typeName == RecordingControl::class.java.name
+
+private fun ParameterContext.isHttpHandler() =
+    parameter.parameterizedType.typeName == "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"
+

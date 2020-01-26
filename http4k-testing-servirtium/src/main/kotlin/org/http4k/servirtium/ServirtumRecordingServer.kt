@@ -29,7 +29,7 @@ object ServirtumRecordingServer {
         requestManipulations: (Request) -> Request = { it },
         responseManipulations: (Response) -> Response = { it }
     ) =
-        TrafficFilters.RecordTo(Sink.Servirtium(ByteStorage.Disk(File(root, "$name.md"), true), requestManipulations, responseManipulations))
+        TrafficFilters.RecordTo(Sink.Servirtium(ByteStorage.Disk(File(root, "$name.md")), requestManipulations, responseManipulations))
             .then(ClientFilters.SetBaseUriFrom(target))
             .then(JavaHttpClient())
             .asServer(SunHttp(port))

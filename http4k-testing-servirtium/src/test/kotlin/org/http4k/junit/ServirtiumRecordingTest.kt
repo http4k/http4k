@@ -2,6 +2,7 @@ package org.http4k.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -59,7 +60,10 @@ class ServirtiumRecordingTest {
             originalResponse
         }
 
-        val actualResponse = ServirtiumRecording(httpHandler, root, requestManipulations, responseManipulations).resolveParameter(stub, stub)(originalRequest)
+        val servirtiumRecording = ServirtiumRecording(httpHandler, root, requestManipulations, responseManipulations)
+
+        @Suppress("UNCHECKED_CAST")
+        val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)
 
         assertThat(actualResponse, equalTo(originalResponse))
 

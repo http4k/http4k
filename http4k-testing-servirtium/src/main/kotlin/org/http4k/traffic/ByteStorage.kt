@@ -9,9 +9,9 @@ import java.util.function.Supplier
  */
 interface ByteStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     companion object {
-        fun Disk(file: File, clean: Boolean = false) = object : ByteStorage {
+        fun Disk(file: File) = object : ByteStorage {
             override fun get() = file.readBytes()
-            override fun accept(data: ByteArray) = file.apply { if (clean) delete() }.appendBytes(data)
+            override fun accept(data: ByteArray) = file.appendBytes(data)
         }
 
         fun InMemory() = object : ByteStorage {

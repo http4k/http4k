@@ -11,6 +11,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.RecordingControl
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -26,8 +27,16 @@ interface AContract : ServirtiumContract {
 
     @Test
     @JvmDefault
-    fun scenario(handler: HttpHandler) {
+    fun scenario(handler: HttpHandler, control: RecordingControl) {
+        control.addNote("this is a note")
+
         assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+
+        control.addNote("this is another note")
+
+        assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+
+        control.addNote("this is yet another note")
     }
 }
 
@@ -48,22 +57,22 @@ class ServirtiumRecordingIntegrationTest : AContract {
     @Test
     fun `check contents are recorded as per manipulations`(
         handler: HttpHandler,
+        control: RecordingControl,
         approver: Approver
     ) {
-        super.scenario(handler)
+        super.scenario(handler, control)
         approver.assertApproved(Response(OK).body(
             File(root, "$name.check contents are recorded as per manipulations.md").readText()
         ))
     }
 }
 
-@ExtendWith(ApprovalTest::class)
 class ServirtiumReplayIntegrationTest : AContract {
 
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
 
     init {
-        File("src/test/resources/org/http4k/junit/ServirtiumReplayIntegrationTest.traffic.txt").also {
+        File("src/test/resources/org/http4k/junit/ServirtiumRecordingIntegrationTest.check contents are recorded as per manipulations.approved").also {
             it.copyTo(File(root, "$name.scenario.md"))
             it.copyTo(File(root, "$name.unexpected content.md"))
             it.copyTo(File(root, "$name.too many requests.md"))
