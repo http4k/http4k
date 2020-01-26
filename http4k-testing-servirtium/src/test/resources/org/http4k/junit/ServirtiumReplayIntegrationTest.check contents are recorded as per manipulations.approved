@@ -9,7 +9,7 @@
 ### Request body recorded for playback ():
 
 ```
-welcomewelcome
+welcome
 ```
 
 ### Response headers recorded for playback:
@@ -21,7 +21,7 @@ welcomewelcome
 ### Response body recorded for playback (200: ):
 
 ```
-hello2
+hello
 ```
 
 ## this is another note
@@ -37,7 +37,7 @@ hello2
 ### Request body recorded for playback ():
 
 ```
-welcomewelcome
+welcome
 ```
 
 ### Response headers recorded for playback:
@@ -49,7 +49,7 @@ welcomewelcome
 ### Response body recorded for playback (200: ):
 
 ```
-hello2
+hello
 ```
 
 ## this is yet another note
