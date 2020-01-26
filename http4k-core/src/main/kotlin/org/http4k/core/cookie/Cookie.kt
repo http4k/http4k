@@ -3,7 +3,6 @@ package org.http4k.core.cookie
 import org.http4k.core.Parameters
 import org.http4k.quoted
 import org.http4k.unquoted
-import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -26,10 +25,6 @@ data class Cookie(val name: String, val value: String,
     fun httpOnly() = copy(httpOnly = true)
     fun expires(date: LocalDateTime): Cookie = copy(expires = date)
     fun sameSite(sameSite: SameSite) = copy(sameSite = sameSite)
-
-    enum class SameSite {
-        Strict, Lax, None
-    }
 
     override fun toString(): String = fullCookieString()
 
@@ -66,7 +61,7 @@ data class Cookie(val name: String, val value: String,
         private fun Parameters.path(): String? = find { it.first.equals("Path", true) }?.second
         private fun Parameters.secure(): Boolean = find { it.first.equals("secure", true) } != null
         private fun Parameters.httpOnly(): Boolean = find { it.first.equals("HttpOnly", true) } != null
-        private fun Parameters.sameSite(): SameSite? = find { it.first.equals("SameSite", true) }?.second?.toSameSite()
+        private fun Parameters.sameSite(): SameSite? = find { it.first.equals("SameSite", true) }?.second?.parseSameSite()
 
         private fun String.parseDate(): LocalDateTime? {
             for (supportedFormat in supportedFormats) {
@@ -78,12 +73,10 @@ data class Cookie(val name: String, val value: String,
             return null
         }
 
-        private fun String.toSameSite(): SameSite? {
-            return try {
-                SameSite.valueOf(this)
-            } catch (_: IllegalArgumentException) {
-                null
-            }
+        private fun String.parseSameSite() = try {
+            SameSite.valueOf(this)
+        } catch (_: IllegalArgumentException) {
+            null
         }
     }
 
@@ -97,6 +90,10 @@ data class Cookie(val name: String, val value: String,
 
     fun fullCookieString(): String = "$name=${value.quoted()}; ${attributes()}"
     fun keyValueCookieString(): String = "$name=${value.quoted()}"
+}
+
+enum class SameSite {
+    Strict, Lax, None
 }
 
 private val RFC822 = ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz", US)

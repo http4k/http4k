@@ -8,6 +8,7 @@ import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.cookie.SameSite.Lax
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -24,7 +25,7 @@ class CookieTest {
             .path("/")
             .secure()
             .httpOnly()
-            .sameSite(Cookie.SameSite.Lax)
+            .sameSite(Lax)
 
         assertThat(cookie.toString(),
             equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly; SameSite=Lax"""))
@@ -52,7 +53,7 @@ class CookieTest {
             .path("/")
             .secure()
             .httpOnly()
-            .sameSite(Cookie.SameSite.Lax)
+            .sameSite(Lax)
 
         val parsed = Cookie.parse(original.toString())
 
