@@ -30,10 +30,13 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
             port: Int = 0,
             requestManipulations: (Request) -> Request = { it }
         ): ServirtiumServer {
-            return object : ServirtiumServer, Http4kServer by
-            Replay.Servirtium(ByteStorage.Disk(File(root, "$name.md")))
-                .replayingMatchingContent(requestManipulations)
-                .asServer(SunHttp(port)),
+            val storage = ByteStorage.Disk(File(root, "$name.md"))
+
+            return object : ServirtiumServer,
+                Http4kServer by
+                Replay.Servirtium(storage)
+                    .replayingMatchingContent(requestManipulations)
+                    .asServer(SunHttp(port)),
                 RecordingControl by RecordingControl.Companion.NoOp {}
         }
 
@@ -50,15 +53,18 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
             port: Int = 0,
             requestManipulations: (Request) -> Request = { it },
             responseManipulations: (Response) -> Response = { it }
-        ): ServirtiumServer = object : ServirtiumServer, Http4kServer by
-        TrafficFilters.RecordTo(
-            Sink.Servirtium(
-                ByteStorage.Disk(File(root, "$name.md")), requestManipulations, responseManipulations))
-            .then(ClientFilters.SetBaseUriFrom(target))
-            .then(JavaHttpClient())
-            .asServer(SunHttp(port)),
-            RecordingControl by RecordingControl.ByteStorage(ByteStorage.Disk(File(root, "$name.md"))) {
+        ): ServirtiumServer {
+            val storage = ByteStorage.Disk(File(root, "$name.md"))
 
+            return object : ServirtiumServer,
+                Http4kServer by
+                TrafficFilters.RecordTo(
+                    Sink.Servirtium(storage, requestManipulations, responseManipulations))
+                    .then(ClientFilters.SetBaseUriFrom(target))
+                    .then(JavaHttpClient())
+                    .asServer(SunHttp(port)),
+                RecordingControl by RecordingControl.ByteStorage(storage) {
+            }
         }
     }
 }
