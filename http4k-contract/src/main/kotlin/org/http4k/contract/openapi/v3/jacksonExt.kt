@@ -34,7 +34,7 @@ object JacksonJsonPropertyAnnotated : FieldRetrieval {
             f.annotations.filterIsInstance<JsonProperty>().find { it.value == name }
                 ?.let { f.name }
         }.firstOrNull() ?: try {
-        superclass.findName(name)
+        superclass?.findName(name)
     } catch (e: IllegalStateException) {
         throw NoFieldFound(name, this, e)
     }
@@ -64,11 +64,11 @@ object JacksonJsonNamingAnnotated : FieldRetrieval {
             .filterIsInstance<JsonNaming>()
             .map { it.value }
             .getOrElse(0) { PropertyNamingStrategy::class }
-        if (namingStrategyClazz.isSubclassOf(PropertyNamingStrategy.PropertyNamingStrategyBase::class)) {
+        return if (namingStrategyClazz.isSubclassOf(PropertyNamingStrategy.PropertyNamingStrategyBase::class)) {
             val namingStrategy = namingStrategyClazz.createInstance() as PropertyNamingStrategy.PropertyNamingStrategyBase
-            return { name: String -> namingStrategy.translate(name) }
+            { name: String -> namingStrategy.translate(name) }
         } else {
-            return { name -> name }
+            { name -> name }
         }
     }
 }
