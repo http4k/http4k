@@ -11,22 +11,13 @@ import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
-import org.http4k.util.proxy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.ExtensionContext
-import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import java.util.Optional
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingTest {
-
-    class Stub(private val t: Any) : ExtensionContext by proxy(), ParameterContext by proxy() {
-        override fun getTestInstance() = Optional.of(t)
-        override fun getTestMethod() = Optional.of(ServirtiumRecordingTest::class.java.getMethod("hashCode"))
-    }
 
     object AContract : ServirtiumContract {
         override val name get() = "name"
@@ -43,7 +34,7 @@ class ServirtiumRecordingTest {
                 .body(it.bodyString().replace("hello", "goodbye"))
         }
 
-        val stub = Stub(AContract)
+        val stub = JUnitStub(AContract)
 
         val originalRequest = Request(POST, "/foo")
             .header("toBeRetained", "reqHeaderValue1")
