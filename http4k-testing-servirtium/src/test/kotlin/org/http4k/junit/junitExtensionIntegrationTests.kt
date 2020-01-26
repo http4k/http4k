@@ -22,7 +22,7 @@ import org.opentest4j.AssertionFailedError
 import java.io.File
 import java.nio.file.Files
 
-interface AContract : ServirtiumContract {
+interface TestContract : ServirtiumContract {
     override val name get() = "contractName"
 
     @Test
@@ -41,7 +41,7 @@ interface AContract : ServirtiumContract {
 }
 
 @ExtendWith(ApprovalTest::class)
-class ServirtiumRecordingIntegrationTest : AContract {
+class ServirtiumRecordingIntegrationTest : TestContract {
 
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
 
@@ -67,7 +67,7 @@ class ServirtiumRecordingIntegrationTest : AContract {
     }
 }
 
-class ServirtiumReplayIntegrationTest : AContract {
+class ServirtiumReplayIntegrationTest : TestContract {
 
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
 

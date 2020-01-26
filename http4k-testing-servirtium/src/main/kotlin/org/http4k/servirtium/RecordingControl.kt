@@ -1,13 +1,13 @@
 package org.http4k.servirtium
 
-import java.io.File
+import org.http4k.traffic.ByteStorage
 
 interface RecordingControl {
     fun addNote(note: String)
 
     companion object {
-        fun Disk(file: File) = object : RecordingControl {
-            override fun addNote(note: String) = file.appendText("## $note\n\n")
+        fun ByteStorage(storage: ByteStorage) = object : RecordingControl {
+            override fun addNote(note: String) = storage.accept("## $note\n\n".toByteArray())
         }
 
         object NoOp : RecordingControl {

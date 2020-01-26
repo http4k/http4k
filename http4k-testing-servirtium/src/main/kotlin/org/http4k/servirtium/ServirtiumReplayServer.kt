@@ -1,6 +1,7 @@
 package org.http4k.servirtium
 
 import org.http4k.core.Request
+import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.traffic.ByteStorage
@@ -19,7 +20,7 @@ object ServirtiumReplayServer {
         root: File = File("."),
         port: Int = 0,
         manipulations: (Request) -> Request = { it }
-    ) =
+    ): Http4kServer =
         Replay.Servirtium(ByteStorage.Disk(File(root, "$name.md")))
             .replayingMatchingContent(manipulations)
             .asServer(SunHttp(port))

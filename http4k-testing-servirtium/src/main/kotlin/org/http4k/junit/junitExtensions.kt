@@ -34,12 +34,12 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract -> {
-                    val file = File(root, "$name.${ec.requiredTestMethod.name}.md").apply { delete() }
+                    val storage = Disk(File(root, "$name.${ec.requiredTestMethod.name}.md").apply { delete() })
 
                     if (pc.isHttpHandler()) {
-                        RecordTo(Sink.Servirtium(Disk(file), requestManipulations, responseManipulations))
+                        RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
                             .then(httpHandler)
-                    } else RecordingControl.Disk(file)
+                    } else RecordingControl.ByteStorage(storage)
                 }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
             }
