@@ -18,12 +18,11 @@ import java.nio.file.Files
 @ExtendWith(ApprovalTest::class)
 class ServirtiumReplayServerTest : TestContract {
 
-    override val uri get() = Uri.of("http://localhost:${replay.port()}")
+    override val uri get() = Uri.of("http://localhost:${control.port()}")
 
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
-    private lateinit var replay: ServirtiumReplayServer
 
-    override val control by lazy { replay }
+    override lateinit var control: ServirtiumServer
 
     @BeforeEach
     fun start(info: TestInfo) {
@@ -31,17 +30,17 @@ class ServirtiumReplayServerTest : TestContract {
             File(root, "${info.displayName}.md").writer().use { r.copyTo(it) }
         }
 
-        replay = ServirtiumReplayServer(
+        control = ServirtiumServer.Replay(
             info.displayName,
             root,
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
         )
-        replay.start()
+        control.start()
     }
 
     @AfterEach
     fun stop() {
-        replay.stop()
+        control.stop()
     }
 
     @Test

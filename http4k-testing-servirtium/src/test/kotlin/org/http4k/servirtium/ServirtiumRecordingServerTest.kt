@@ -19,31 +19,30 @@ import java.nio.file.Files
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingServerTest : TestContract {
 
-    override val uri get() = Uri.of("http://localhost:${record.port()}")
+    override val uri get() = Uri.of("http://localhost:${control.port()}")
 
     private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
     private val app = { _: Request -> Response(OK).body("hello") }.asServer(SunHttp(0))
-    private lateinit var record: ServirtumRecordingServer
 
-    override val control by lazy { record }
+    override lateinit var control: ServirtiumServer
 
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        record = ServirtumRecordingServer(
+        control = ServirtiumServer.Recording(
             info.displayName,
             Uri.of("http://localhost:$appPort"),
             root,
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
             responseManipulations = { it.removeHeader("Date") }
         )
-        record.start()
+        control.start()
     }
 
     @AfterEach
     fun stop() {
         app.stop()
-        record.stop()
+        control.stop()
     }
 
     @Test

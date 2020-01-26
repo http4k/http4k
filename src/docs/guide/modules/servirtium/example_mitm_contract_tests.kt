@@ -17,8 +17,7 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.servirtium.ServirtiumReplayServer
-import org.http4k.servirtium.ServirtumRecordingServer
+import org.http4k.servirtium.ServirtiumServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -82,15 +81,15 @@ class DirectHttpRecordingWordCounterTest : WordCounterContract {
 @Disabled
 class MiTMRecordingWordCounterTest : WordCounterContract {
 
-    override val uri get() = Uri.of("http://localhost:${mitm.port()}")
+    override val uri get() = Uri.of("http://localhost:${servirtium.port()}")
 
     private val app = WordCounterApp(0)
-    private lateinit var mitm: Http4kServer
+    private lateinit var servirtium: Http4kServer
 
     @BeforeEach
     fun start(info: TestInfo) {
         val appPort = app.start().port()
-        mitm = ServirtumRecordingServer(
+        servirtium = ServirtiumServer.Recording(
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
@@ -101,7 +100,7 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
     @AfterEach
     fun stop() {
         app.stop()
-        mitm.stop()
+        servirtium.stop()
     }
 }
 
@@ -111,19 +110,19 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
 @Disabled
 class MiTMReplayingWordCounterTest : WordCounterContract {
 
-    override val uri get() = Uri.of("http://localhost:${mitm.port()}")
+    override val uri get() = Uri.of("http://localhost:${servirtium.port()}")
 
-    private lateinit var mitm: Http4kServer
+    private lateinit var servirtium: Http4kServer
 
     @BeforeEach
     fun start(info: TestInfo) {
-        mitm = ServirtiumReplayServer(info.displayName.removeSuffix("()")) {
+        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()")) {
             it.header("Date", "some overridden date")
         }.start()
     }
 
     @AfterEach
     fun stop() {
-        mitm.stop()
+        servirtium.stop()
     }
 }
