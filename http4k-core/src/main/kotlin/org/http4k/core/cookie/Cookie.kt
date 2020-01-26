@@ -3,6 +3,7 @@ package org.http4k.core.cookie
 import org.http4k.core.Parameters
 import org.http4k.quoted
 import org.http4k.unquoted
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -15,7 +16,8 @@ data class Cookie(val name: String, val value: String,
                   val domain: String? = null,
                   val path: String? = null,
                   val secure: Boolean = false,
-                  val httpOnly: Boolean = false) {
+                  val httpOnly: Boolean = false,
+                  val sameSite: SameSite? = null) {
 
     fun domain(domain: String) = copy(domain = domain)
     fun maxAge(seconds: Long) = copy(maxAge = seconds)
@@ -23,6 +25,11 @@ data class Cookie(val name: String, val value: String,
     fun secure() = copy(secure = true)
     fun httpOnly() = copy(httpOnly = true)
     fun expires(date: LocalDateTime): Cookie = copy(expires = date)
+    fun sameSite(sameSite: SameSite) = copy(sameSite = sameSite)
+
+    enum class SameSite {
+        Strict, Lax, None
+    }
 
     override fun toString(): String = fullCookieString()
 
@@ -33,6 +40,7 @@ data class Cookie(val name: String, val value: String,
         appendIfPresent(path, "Path=$path")
         appendIfTrue(secure, "secure")
         appendIfTrue(httpOnly, "HttpOnly")
+        appendIfPresent(sameSite, "SameSite=$sameSite")
     }.joinToString("; ")
 
     companion object {
@@ -47,7 +55,7 @@ data class Cookie(val name: String, val value: String,
                         .map { attrString -> attrString.split("=").let { it[0] to it.getOrNull(1) } }
                     Cookie(pair[0], valueAndAttributes[0].unquoted(),
                         attributes.maxAge(), attributes.expires(), attributes.domain(),
-                        attributes.path(), attributes.secure(), attributes.httpOnly())
+                        attributes.path(), attributes.secure(), attributes.httpOnly(), attributes.sameSite())
                 }
             }
         }
@@ -58,6 +66,7 @@ data class Cookie(val name: String, val value: String,
         private fun Parameters.path(): String? = find { it.first.equals("Path", true) }?.second
         private fun Parameters.secure(): Boolean = find { it.first.equals("secure", true) } != null
         private fun Parameters.httpOnly(): Boolean = find { it.first.equals("HttpOnly", true) } != null
+        private fun Parameters.sameSite(): SameSite? = find { it.first.equals("SameSite", true) }?.second?.toSameSite()
 
         private fun String.parseDate(): LocalDateTime? {
             for (supportedFormat in supportedFormats) {
@@ -67,6 +76,14 @@ data class Cookie(val name: String, val value: String,
                 }
             }
             return null
+        }
+
+        private fun String.toSameSite(): SameSite? {
+            return try {
+                SameSite.valueOf(this)
+            } catch (_: IllegalArgumentException) {
+                null
+            }
         }
     }
 

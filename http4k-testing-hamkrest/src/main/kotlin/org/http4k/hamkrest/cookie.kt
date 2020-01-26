@@ -27,3 +27,5 @@ fun isHttpOnlyCookie(expected: Boolean = true): Matcher<Cookie> = has("httpOnly"
 fun hasCookieExpiry(expected: LocalDateTime): Matcher<Cookie> = hasCookieExpiry(equalTo(expected))
 
 fun hasCookieExpiry(matcher: Matcher<LocalDateTime>): Matcher<Cookie> = has("expiry", { c: Cookie -> c.expires!! }, matcher)
+
+fun hasCookieSameSite(expected: Cookie.SameSite): Matcher<Cookie> = has("sameSite", { c: Cookie -> c.sameSite }, equalTo(expected))
