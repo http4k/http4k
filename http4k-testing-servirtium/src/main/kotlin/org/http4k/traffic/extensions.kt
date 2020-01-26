@@ -81,7 +81,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())
             .split(Regex("## Interaction \\d+: "))
-            .filter { it.trim().isNotBlank() }
+            .filter { it.contains("```") }
             .map {
                 val sections = it.split("```").map { it.byteInputStream().reader().readLines() }
 

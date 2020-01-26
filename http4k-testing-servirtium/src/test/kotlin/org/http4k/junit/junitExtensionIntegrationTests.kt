@@ -28,6 +28,8 @@ interface AContract : ServirtiumContract {
     @Test
     @JvmDefault
     fun scenario(handler: HttpHandler, control: RecordingControl) {
+        control.addNote("this is a note")
+
         assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
 
         control.addNote("this is another note")
