@@ -24,9 +24,10 @@ class CookieTest {
             .path("/")
             .secure()
             .httpOnly()
+            .sameSite(Cookie.SameSite.Lax)
 
         assertThat(cookie.toString(),
-            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly"""))
+            equalTo("""my-cookie="my-value"; Max-Age=37; Expires=Sat, 11 Mar 2017 12:15:21 GMT; Domain=google.com; Path=/; secure; HttpOnly; SameSite=Lax"""))
     }
 
     @Test
@@ -51,6 +52,7 @@ class CookieTest {
             .path("/")
             .secure()
             .httpOnly()
+            .sameSite(Cookie.SameSite.Lax)
 
         val parsed = Cookie.parse(original.toString())
 
@@ -203,5 +205,12 @@ class CookieTest {
         assertThat(Cookie.parse("foo=bar; Expires=Sat Mar 11 17 12:15:21 GMT"), equalTo(expected))
         assertThat(Cookie.parse("foo=bar; Expires=Sat Mar 11 2017 12:15:21 GMT"), equalTo(expected))
         assertThat(Cookie.parse("foo=bar; Expires=anything else"), equalTo(Cookie("foo", "bar")))
+    }
+
+    @Test
+    fun `ignores unrecognized SameSite attribute`() {
+        val expected = Cookie("foo", "bar")
+
+        assertThat(Cookie.parse("foo=bar; SameSite=Unknown"), equalTo(expected))
     }
 }

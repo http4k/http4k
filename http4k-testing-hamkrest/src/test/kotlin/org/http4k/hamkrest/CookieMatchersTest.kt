@@ -38,4 +38,7 @@ class CookieMatchersTest {
             hasCookieExpiry(expires), hasCookieExpiry(expires.plusDays(1)))
     }
 
+    @Test
+    fun `sameSite`() = assertMatchAndNonMatch(Cookie("name", "value", sameSite = Cookie.SameSite.Strict), hasCookieSameSite(Cookie.SameSite.Strict), hasCookieSameSite(Cookie.SameSite.None))
+
 }
