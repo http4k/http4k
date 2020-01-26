@@ -10,6 +10,7 @@ import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.RecordingControl.Companion.ByteStorage
 import org.http4k.traffic.ByteStorage
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
@@ -63,7 +64,7 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
-                RecordingControl by RecordingControl.ByteStorage(storage) {
+                RecordingControl by ByteStorage(storage) {
             }
         }
     }
