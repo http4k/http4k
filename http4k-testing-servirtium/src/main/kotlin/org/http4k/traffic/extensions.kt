@@ -47,24 +47,24 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
         target.accept(
-            header(manipulatedRequest, manipulatedResponse, count.getAndIncrement()) +
+            ("## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}\n\n" +
+                headerLine<Request>() + ":\n" +
+                manipulatedRequest.headerBlock() + "\n" +
+                bodyLine<Request>() + " (${CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: ""}):\n" +
+                "\n```\n").toByteArray() +
+                manipulatedRequest.encodedBody().toByteArray() +
+                ("\n```\n\n" +
+                    headerLine<Response>() + ":\n" +
+                    manipulatedResponse.headerBlock() + "\n" +
+                    bodyLine<Response>() + " (${manipulatedResponse.status.code}: ${(CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
+                    ?: "")}):\n\n```\n"
+                    ).toByteArray() +
                 manipulatedResponse.encodedBody().toByteArray() +
                 footer()
         )
     }
 
     private fun footer() = "\n```\n\n".toByteArray()
-
-    private fun header(request: Request, response: Response, index: Int): ByteArray =
-        ("## Interaction $index: ${request.method.name} ${request.uri}\n\n" +
-            headerLine<Request>() + ":\n" +
-            request.headerBlock() + "\n" +
-            bodyLine<Request>() + " (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):\n" +
-            "\n```\n${request.encodedBody()}\n```\n\n" +
-            headerLine<Response>() + ":\n" +
-            response.headerBlock() + "\n" +
-            bodyLine<Response>() + " (${response.status.code}: ${(CONTENT_TYPE(response)?.toHeaderValue() ?: "")}):\n\n```\n"
-            ).toByteArray()
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
         it.first + ": " + (it.second ?: "")
