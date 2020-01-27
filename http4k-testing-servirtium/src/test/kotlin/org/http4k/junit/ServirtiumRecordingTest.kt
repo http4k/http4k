@@ -24,11 +24,6 @@ class ServirtiumRecordingTest {
 
     @Test
     fun `records the values into the recording`(approver: Approver) {
-        val options = object : InteractionOptions {
-            override fun modify(request: Request) = request.removeHeader("toBeRemoved")
-            override fun modify(response: Response) = response.removeHeader("toBeRemoved")
-                .body(response.bodyString().replace("hello", "goodbye"))
-        }
 
         val stub = JUnitStub(AContract)
 
@@ -47,7 +42,16 @@ class ServirtiumRecordingTest {
             originalResponse
         }
 
-        val servirtiumRecording = ServirtiumRecording("name", httpHandler, storage, options)
+        val servirtiumRecording = ServirtiumRecording(
+            "name",
+            httpHandler,
+            storage,
+            object : InteractionOptions {
+                override fun modify(request: Request) = request.removeHeader("toBeRemoved")
+                override fun modify(response: Response) = response.removeHeader("toBeRemoved")
+                    .body(response.bodyString().replace("hello", "goodbye"))
+            }
+        )
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)

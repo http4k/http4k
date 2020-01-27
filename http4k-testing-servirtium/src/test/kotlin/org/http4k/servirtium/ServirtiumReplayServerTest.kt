@@ -32,7 +32,7 @@ class ServirtiumReplayServerTest : TestContract {
         control = ServirtiumServer.Replay(
             info.displayName,
             storage,
-            options = object : InteractionOptions {
+            object : InteractionOptions {
                 override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
             }
         )

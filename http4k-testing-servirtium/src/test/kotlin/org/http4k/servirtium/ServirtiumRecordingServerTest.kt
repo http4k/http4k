@@ -37,7 +37,6 @@ class ServirtiumRecordingServerTest : TestContract {
                 override fun modify(response: Response) = response.removeHeader("Date")
             })
 
-
             control.start()
     }
 

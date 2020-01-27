@@ -47,7 +47,7 @@ class ServirtiumRecording(
  */
 class ServirtiumReplay(private val baseName: String,
                        private val storageLookup: InteractionStorageLookup = Disk(),
-                       private val options: InteractionOptions = InteractionOptions.Companion.Defaults) : ParameterResolver {
+                       private val options: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
