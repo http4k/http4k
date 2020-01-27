@@ -34,13 +34,16 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract -> {
-                    val storage = storageFactory("$name.${ec.requiredTestMethod.name}")
+                    val testName = "$name.${ec.requiredTestMethod.name}"
+                    storageFactory.clean(testName)
+
+                    val storage = storageFactory(testName)
                     if (pc.isHttpHandler())
                         RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
                             .then(httpHandler)
                     else RecordingControl.ByteStorage(storage)
                 }
-                else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
+                else -> throw IllegalArgumentException("Class is not an instance of: ServirtiumContract")
             }
         }
 }
@@ -56,13 +59,13 @@ class ServirtiumReplay(private val storageFactory: StorageFactory = Disk(),
         with(ec.testInstance.get()) {
             when (this) {
                 is ServirtiumContract ->
-                    if (pc.isHttpHandler())
+                    if (pc.isHttpHandler()) {
                         ConvertBadResponseToAssertionFailed()
                             .then(Replay.Servirtium(storageFactory("$name.${ec.requiredTestMethod.name}"))
                                 .replayingMatchingContent(requestManipulations)
                             )
-                    else NoOp
-                else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
+                    } else NoOp
+                else -> throw IllegalArgumentException("Class is not an instance of: ServirtiumContract")
             }
         }
 

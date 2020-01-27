@@ -28,8 +28,8 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
         fun Replay(
             name: String,
             storageFactory: StorageFactory = Disk(File(".")),
-            requestManipulations: (Request) -> Request = { it },
-            port: Int = 0
+            port: Int = 0,
+            requestManipulations: (Request) -> Request = { it }
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             Replay.Servirtium(storageFactory(name))
@@ -50,14 +50,19 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
             requestManipulations: (Request) -> Request = { it },
             responseManipulations: (Response) -> Response = { it },
             port: Int = 0
-        ): ServirtiumServer = object : ServirtiumServer,
-            Http4kServer by
-            TrafficFilters.RecordTo(
-                Sink.Servirtium(storageFactory(name), requestManipulations, responseManipulations))
-                .then(ClientFilters.SetBaseUriFrom(target))
-                .then(JavaHttpClient())
-                .asServer(SunHttp(port)),
-            RecordingControl by ByteStorage(storageFactory(name)) {
+        ): ServirtiumServer {
+            return object : ServirtiumServer,
+                Http4kServer by
+                TrafficFilters.RecordTo(
+                    Sink.Servirtium(storageFactory(name), requestManipulations, responseManipulations))
+                    .then(ClientFilters.SetBaseUriFrom(target))
+                    .then(JavaHttpClient())
+                    .asServer(SunHttp(port)),
+                RecordingControl by ByteStorage(storageFactory(name)) {
+                init {
+                    storageFactory.clean(name)
+                }
+            }
         }
     }
 }

@@ -8,27 +8,40 @@ import java.io.File
 
 class StorageFactoryTest {
 
-    @TempDir
-    lateinit var root: File
-
     @Test
-    fun `disk storage creates clean file`() {
-        val expectedFile = File(root, "name.md")
-        expectedFile.writer().use { it.write("goodbye") }
-        assertThat(expectedFile.readText(), equalTo("goodbye"))
+    fun `disk storage handles contract`(@TempDir root: File) {
+        val factory = StorageFactory.Disk(root)
+        val storage = factory("foo")
+        val file = File(root, "foo.md")
 
-        val storage = StorageFactory.Disk(root)("name")
-        storage.accept("hello".toByteArray())
-        assertThat(expectedFile.exists(), equalTo(true))
-        assertThat(String(storage.get()), equalTo("hello"))
-    }
-
-    @Test
-    fun `memory storage creates clean file`() {
-        val storage = StorageFactory.InMemory()("foo")
         storage.accept("hello".toByteArray())
         storage.accept("goodbye".toByteArray())
         assertThat(String(storage.get()), equalTo("hellogoodbye"))
+        assertThat(file.readText(), equalTo("hellogoodbye"))
+
+        factory.clean("foo")
+        assertThat(String(storage.get()), equalTo(""))
+        assertThat(file.exists(), equalTo(false))
+
+        storage.accept("goodbye".toByteArray())
+        assertThat(String(storage.get()), equalTo("goodbye"))
+        assertThat(file.readText(), equalTo("goodbye"))
+    }
+
+    @Test
+    fun `memory storage handles contract`() {
+        val factory = StorageFactory.InMemory()
+        val storage = factory("foo")
+
+        storage.accept("hello".toByteArray())
+        storage.accept("goodbye".toByteArray())
+        assertThat(String(storage.get()), equalTo("hellogoodbye"))
+
+        factory.clean("foo")
+        assertThat(String(storage.get()), equalTo(""))
+
+        storage.accept("goodbye".toByteArray())
+        assertThat(String(storage.get()), equalTo("goodbye"))
     }
 }
 
