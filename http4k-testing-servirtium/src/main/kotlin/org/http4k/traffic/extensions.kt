@@ -46,48 +46,53 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
-        val bytes = (
-            "## Interaction " +
-                count.getAndIncrement() +
-                ": " + manipulatedRequest.method.name +
-                " " + manipulatedRequest.uri +
-                "\n\n" +
-                headerLine<Request>() +
-                ":\n" +
-                manipulatedRequest.headerBlock() +
-                "\n" +
-                bodyLine<Request>() +
-                " (" +
-                (CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: "") +
-                "):\n" +
-                "\n```\n${manipulatedRequest.encodedBody()}\n```\n" +
-                "\n" +
-                headerLine<Response>() +
-                ":\n" +
-                manipulatedResponse.headerBlock() +
-                "\n" +
-                bodyLine<Response>() +
-                " (" +
-                manipulatedResponse.status.code +
-                ": " +
-                (CONTENT_TYPE(manipulatedResponse)?.toHeaderValue() ?: "") +
-                "):\n").toByteArray() +
-            "\n```\n".toByteArray() +
-            manipulatedResponse.encodedBody().toByteArray() +
-            "\n```\n".toByteArray() +
-            "\n".toByteArray()
-        target.accept(bytes)
+        target.accept(
+            header(manipulatedRequest, manipulatedResponse, count.getAndIncrement()) +
+                manipulatedResponse.encodedBody().toByteArray() +
+                footer()
+        )
     }
+
+    private fun footer() = "\n```\n\n".toByteArray()
+
+    private fun header(request: Request, response: Response, index: Int): ByteArray =
+        ("## Interaction " +
+            index +
+            ": " + request.method.name +
+            " " + request.uri +
+            "\n\n" +
+            headerLine<Request>() +
+            ":\n" +
+            request.headerBlock() +
+            "\n" +
+            bodyLine<Request>() +
+            " (" +
+            (CONTENT_TYPE(request)?.toHeaderValue() ?: "") +
+            "):\n" +
+            "\n```\n${request.encodedBody()}\n```\n" +
+            "\n" +
+            headerLine<Response>() +
+            ":\n" +
+            response.headerBlock() +
+            "\n" +
+            bodyLine<Response>() +
+            " (" +
+            response.status.code +
+            ": " +
+            (CONTENT_TYPE(response)?.toHeaderValue() ?: "") +
+            "):\n\n```\n"
+            ).toByteArray()
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
         it.first + ": " + (it.second ?: "")
     }}\n```\n"
 
-    private fun HttpMessage.encodedBody() = CONTENT_TYPE(this)
-        ?.let {
-            if (!options.contentTypeIsBinary(it)) bodyString()
-            else bodyString()
-        } ?: bodyString()
+    private fun HttpMessage.encodedBody() =
+        CONTENT_TYPE(this)
+            ?.let {
+                if (!options.contentTypeIsBinary(it)) bodyString()
+                else bodyString()
+            } ?: bodyString()
 }
 
 /**
