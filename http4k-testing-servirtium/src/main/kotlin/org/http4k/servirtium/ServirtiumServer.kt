@@ -10,8 +10,8 @@ import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
 import org.http4k.servirtium.RecordingControl.Companion.ByteStorage
-import org.http4k.traffic.ByteStorage
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -27,22 +27,18 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
          */
         fun Replay(
             name: String,
-            root: File = File("."),
+            storageLookup: InteractionStorageLookup = Disk(File(".")),
             port: Int = 0,
             requestManipulations: (Request) -> Request = { it }
-        ): ServirtiumServer {
-            val storage = ByteStorage.Disk(File(root, "$name.md"))
-
-            return object : ServirtiumServer,
-                Http4kServer by
-                Replay.Servirtium(storage)
-                    .replayingMatchingContent(requestManipulations)
-                    .asServer(SunHttp(port)),
-                RecordingControl by RecordingControl.Companion.NoOp {}
-        }
+        ): ServirtiumServer = object : ServirtiumServer,
+            Http4kServer by
+            Replay.Servirtium(storageLookup(name))
+                .replayingMatchingContent(requestManipulations)
+                .asServer(SunHttp(port)),
+            RecordingControl by RecordingControl.Companion.NoOp {}
 
         /**
-         * MiTM proxy server which sits inbetween the client and the target and stores traffic in the
+         * MiTM proxy server which sits in between the client and the target and stores traffic in the
          * named Servirtium Markdown file.
          *
          * Manipulations can be made to the requests and responses before they are stored.
@@ -50,21 +46,22 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
         fun Recording(
             name: String,
             target: Uri,
-            root: File = File("."),
-            port: Int = 0,
+            storageLookup: InteractionStorageLookup = Disk(File(".")),
             requestManipulations: (Request) -> Request = { it },
-            responseManipulations: (Response) -> Response = { it }
+            responseManipulations: (Response) -> Response = { it },
+            port: Int = 0
         ): ServirtiumServer {
-            val storage = ByteStorage.Disk(File(root, "$name.md"))
-
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
-                    Sink.Servirtium(storage, requestManipulations, responseManipulations))
+                    Sink.Servirtium(storageLookup(name), requestManipulations, responseManipulations))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
-                RecordingControl by ByteStorage(storage) {
+                RecordingControl by ByteStorage(storageLookup(name)) {
+                init {
+                    storageLookup.clean(name)
+                }
             }
         }
     }

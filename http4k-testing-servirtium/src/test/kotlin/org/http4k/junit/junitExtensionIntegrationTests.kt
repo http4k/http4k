@@ -11,6 +11,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.servirtium.RecordingControl
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.opentest4j.AssertionFailedError
 import java.io.File
-import java.nio.file.Files
 
 interface TestContract : ServirtiumContract {
     override val name get() = "contractName"
@@ -43,13 +43,13 @@ interface TestContract : ServirtiumContract {
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingIntegrationTest : TestContract {
 
-    private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
+    private val storage = InteractionStorageLookup.InMemory()
 
     @JvmField
     @RegisterExtension
     val record = ServirtiumRecording(
         { Response(OK).body("hello") },
-        root,
+        storage,
         { it.body(it.bodyString() + it.bodyString()) },
         { it.body(it.bodyString() + "2") }
     )
@@ -62,26 +62,26 @@ class ServirtiumRecordingIntegrationTest : TestContract {
     ) {
         super.scenario(handler, control)
         approver.assertApproved(Response(OK).body(
-            File(root, "$name.check contents are recorded as per manipulations.md").readText()
+            String(storage("$name.check contents are recorded as per manipulations").get())
         ))
     }
 }
 
 class ServirtiumReplayIntegrationTest : TestContract {
 
-    private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
+    private val storage = InteractionStorageLookup.InMemory()
 
     init {
         File("src/test/resources/org/http4k/junit/ServirtiumReplayIntegrationTest.check contents are recorded as per manipulations.approved").also {
-            it.copyTo(File(root, "$name.scenario.md"))
-            it.copyTo(File(root, "$name.unexpected content.md"))
-            it.copyTo(File(root, "$name.too many requests.md"))
+            storage("$name.scenario").accept(it.readText().toByteArray())
+            storage("$name.unexpected content").accept(it.readText().toByteArray())
+            storage("$name.too many requests").accept(it.readText().toByteArray())
         }
     }
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay(root) {
+    val replay = ServirtiumReplay(storage) {
         it.body(it.bodyString().replace("2", ""))
     }
 
