@@ -77,13 +77,9 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
 
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
-            ?.let {
-                if (options.contentTypeIsBinary(it)) {
-                    println("BINARY!")
-                    Base64.getEncoder().encode(body.payload.array())
-                }
-                else bodyString().toByteArray()
-            } ?: bodyString().toByteArray()
+            ?.takeIf { options.contentTypeIsBinary(it) }
+            ?.let { Base64.getEncoder().encode(body.payload.array()) }
+            ?: bodyString().toByteArray()
 }
 
 /**
