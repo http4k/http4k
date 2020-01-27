@@ -47,22 +47,26 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
         target.accept(
-            ("## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}\n\n" +
-                headerLine<Request>() + ":\n" +
-                manipulatedRequest.headerBlock() + "\n" +
-                bodyLine<Request>() + " (${CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: ""}):\n" +
-                "\n```\n").toByteArray() +
+            manipulatedRequest.header() +
                 manipulatedRequest.encodedBody() +
-                ("\n```\n\n" +
-                    headerLine<Response>() + ":\n" +
-                    manipulatedResponse.headerBlock() + "\n" +
-                    bodyLine<Response>() + " (${manipulatedResponse.status.code}: ${(CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
-                    ?: "")}):\n\n```\n"
-                    ).toByteArray() +
+                manipulatedResponse.middle() +
                 manipulatedResponse.encodedBody() +
                 footer()
         )
     }
+
+    private fun Response.middle() = ("\n```\n\n" +
+        headerLine<Response>() + ":\n" +
+        headerBlock() + "\n" +
+        bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
+        ?: "")}):\n\n```\n"
+        ).toByteArray()
+
+    private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +
+        headerLine<Request>() + ":\n" +
+        headerBlock() + "\n" +
+        bodyLine<Request>() + " (${CONTENT_TYPE(this)?.toHeaderValue() ?: ""}):\n" +
+        "\n```\n").toByteArray()
 
     private fun footer() = "\n```\n\n".toByteArray()
 
