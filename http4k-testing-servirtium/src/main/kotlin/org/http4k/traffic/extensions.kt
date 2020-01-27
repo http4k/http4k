@@ -59,11 +59,11 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         ("## Interaction $index: ${request.method.name} ${request.uri}\n\n" +
             headerLine<Request>() + ":\n" +
             request.headerBlock() + "\n" +
-            bodyLine<Request>() + " (" + (CONTENT_TYPE(request)?.toHeaderValue() ?: "") + "):\n" +
+            bodyLine<Request>() + " (${CONTENT_TYPE(request)?.toHeaderValue() ?: ""}):\n" +
             "\n```\n${request.encodedBody()}\n```\n\n" +
             headerLine<Response>() + ":\n" +
             response.headerBlock() + "\n" +
-            bodyLine<Response>() + " (" + response.status.code + ": " + (CONTENT_TYPE(response)?.toHeaderValue() ?: "") + "):\n\n```\n"
+            bodyLine<Response>() + " (${response.status.code}: ${(CONTENT_TYPE(response)?.toHeaderValue() ?: "")}):\n\n```\n"
             ).toByteArray()
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
