@@ -2,6 +2,7 @@ package org.http4k.traffic
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.ContentType
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -42,6 +43,20 @@ class TrafficExtensionTests {
             .body("body2")
 
         sink[request1] = response1
+
+        approver.assertApproved(Response(OK).body(received.get().inputStream()))
+    }
+
+    @Test
+    fun `sink stores binary artifacts as base64 encoded`(approver: Approver) {
+        val received = AtomicReference<ByteArray>()
+        val sink = Sink.Servirtium(Consumer(received::set),
+            object : InteractionOptions {
+                override fun contentTypeIsBinary(contentType: ContentType) = true
+            }
+        )
+
+        sink[Request(GET, "/").body("body1")] = Response(OK).body("body2")
 
         approver.assertApproved(Response(OK).body(received.get().inputStream()))
     }

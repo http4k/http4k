@@ -46,8 +46,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
-        target.accept(
-            """## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}
+        val bytes = """## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}
 
 ${headerLine<Request>()}:
 ${manipulatedRequest.headerBlock()}
@@ -56,9 +55,10 @@ ${manipulatedRequest.bodyBlock()}
 ${headerLine<Response>()}:
 ${manipulatedResponse.headerBlock()}
 ${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
-                ?: ""}):
-${manipulatedResponse.bodyBlock()}
-""".toByteArray())
+            ?: ""}):
+""".toByteArray() + """${manipulatedResponse.bodyBlock()}
+""".toByteArray()
+        target.accept(bytes)
     }
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
