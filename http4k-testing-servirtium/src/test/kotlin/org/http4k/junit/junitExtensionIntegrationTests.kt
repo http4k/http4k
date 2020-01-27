@@ -83,9 +83,10 @@ class ServirtiumReplayIntegrationTest : TestContract {
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay("contractName", storage) {
-        it.body(it.bodyString().replace("2", ""))
-    }
+    val replay = ServirtiumReplay("contractName", storage,
+        object : InteractionOptions {
+            override fun requestManipulations(request: Request) = request.body(request.bodyString().replace("2", ""))
+        })
 
     @Test
     fun `unexpected content`(handler: HttpHandler) {

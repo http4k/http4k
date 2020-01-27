@@ -1,5 +1,6 @@
 package org.http4k.traffic
 
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
@@ -9,6 +10,8 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
+import org.http4k.servirtium.InteractionOptions.Companion.Defaults
+import java.nio.ByteBuffer
 import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
@@ -85,11 +88,23 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
 /**
  * Read HTTP traffic from disk in Servirtium markdown format.
  */
-fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: InteractionOptions = Defaults) = object : Replay {
 
     override fun requests() = output.parseInteractions { it.first }
+        .map { req ->
+            CONTENT_TYPE(req)
+                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?: req
+        }
 
     override fun responses() = output.parseInteractions { it.second }
+        .map { req ->
+            CONTENT_TYPE(req)
+                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?: req
+        }
 
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())

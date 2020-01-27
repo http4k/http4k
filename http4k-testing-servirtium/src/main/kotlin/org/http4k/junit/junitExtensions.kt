@@ -2,7 +2,6 @@ package org.http4k.junit
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
@@ -49,14 +48,14 @@ class ServirtiumRecording(
  */
 class ServirtiumReplay(private val baseName: String,
                        private val storageLookup: InteractionStorageLookup = Disk(),
-                       private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
+                       private val options: InteractionOptions = InteractionOptions.Companion.Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         if (pc.isHttpHandler()) {
             ConvertBadResponseToAssertionFailed()
-                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"))
-                    .replayingMatchingContent(requestManipulations)
+                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"), options)
+                    .replayingMatchingContent(options::requestManipulations)
                 )
         } else NoOp
 }

@@ -7,6 +7,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionStorageLookup.Companion.InMemory
 import org.junit.jupiter.api.Test
 
@@ -32,9 +33,11 @@ class ServirtiumReplayTest {
             .header("header3", "value3")
             .body("body1")
 
-        val servirtiumReplay = ServirtiumReplay("name", storage) {
-            it.header("toBeAdded", "value")
-        }
+        val servirtiumReplay = ServirtiumReplay("name", storage,
+            object : InteractionOptions {
+                override fun requestManipulations(request: Request): Request = request.header("toBeAdded", "value")
+            })
+
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumReplay.resolveParameter(stub, stub) as HttpHandler)(originalRequest)
 

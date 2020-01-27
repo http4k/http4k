@@ -65,7 +65,7 @@ class TrafficExtensionTests {
     }
 
     @Test
-    fun `replay replays traffic in servirtium markdown format`() {
+    fun `replay replays traffic from servirtium markdown format`() {
         val replay = Replay.Servirtium(Supplier {
             javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
         })
@@ -77,6 +77,28 @@ class TrafficExtensionTests {
         val response1 = Response(OK)
             .header("header3", "value3")
             .body("body1")
+
+        assertThat(replay.requests().toList(), equalTo(listOf(request1)))
+        assertThat(replay.responses().toList(), equalTo(listOf(response1)))
+    }
+
+    @Test
+    fun `replay replays binary traffic from servirtium markdown format`() {
+        val replay = Replay.Servirtium(Supplier {
+            javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readAllBytes()
+        },
+            object : InteractionOptions {
+                override fun contentTypeIsBinary(contentType: ContentType) = true
+            }
+        )
+
+        val request1 = Request(GET, "/")
+            .with(CONTENT_TYPE of APPLICATION_PDF)
+            .body("body1")
+
+        val response1 = Response(OK)
+            .with(CONTENT_TYPE of APPLICATION_PDF)
+            .body("body2")
 
         assertThat(replay.requests().toList(), equalTo(listOf(request1)))
         assertThat(replay.responses().toList(), equalTo(listOf(response1)))
