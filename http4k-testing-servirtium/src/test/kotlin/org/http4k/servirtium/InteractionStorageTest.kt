@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
-class InteractionStorageLookupTest {
+class InteractionStorageTest {
 
     @Test
     fun `disk storage handles contract`(@TempDir root: File) {
-        val factory = InteractionStorageLookup.Disk(root)
+        val factory = InteractionStorage.Disk(root)
         val storage = factory("foo")
         val file = File(root, "foo.md")
 
@@ -30,7 +30,7 @@ class InteractionStorageLookupTest {
 
     @Test
     fun `memory storage handles contract`() {
-        val factory = InteractionStorageLookup.InMemory()
+        val factory = InteractionStorage.InMemory()
         val storage = factory("foo")
 
         storage.accept("hello".toByteArray())

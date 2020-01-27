@@ -9,7 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionOptions
-import org.http4k.servirtium.InteractionStorageLookup
+import org.http4k.servirtium.InteractionStorage
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -20,7 +20,7 @@ class ServirtiumRecordingTest {
 
     object AContract
 
-    private val storage = InteractionStorageLookup.InMemory()
+    private val storage = InteractionStorage.InMemory()
 
     @Test
     fun `records the values into the recording`(approver: Approver) {

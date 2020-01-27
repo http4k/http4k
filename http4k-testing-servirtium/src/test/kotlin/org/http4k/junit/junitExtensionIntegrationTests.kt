@@ -13,7 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionOptions
-import org.http4k.servirtium.InteractionStorageLookup
+import org.http4k.servirtium.InteractionStorage.Companion.InMemory
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -42,7 +42,7 @@ interface TestContract {
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingIntegrationTest : TestContract {
 
-    private val storage = InteractionStorageLookup.InMemory()
+    private val storage = InMemory()
 
     @JvmField
     @RegisterExtension
@@ -71,7 +71,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
 
 class ServirtiumReplayIntegrationTest : TestContract {
 
-    private val storage = InteractionStorageLookup.InMemory()
+    private val storage = InMemory()
 
     init {
         File("src/test/resources/org/http4k/junit/ServirtiumReplayIntegrationTest.check contents are recorded as per manipulations.approved").also {

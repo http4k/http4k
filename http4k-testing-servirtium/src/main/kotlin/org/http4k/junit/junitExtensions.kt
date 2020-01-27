@@ -9,8 +9,8 @@ import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
+import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.http4k.servirtium.InteractionStorageLookup
-import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink

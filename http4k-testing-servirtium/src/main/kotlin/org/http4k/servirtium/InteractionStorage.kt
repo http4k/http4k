@@ -5,17 +5,13 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+typealias InteractionStorageLookup = (String) -> InteractionStorage
+
 interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     fun clean(): Boolean
-}
-
-/**
- * Provides a way of providing a storage layer for
- */
-interface InteractionStorageLookup : (String) -> InteractionStorage {
 
     companion object {
-        fun Disk(root: File = File(".")) = object : InteractionStorageLookup {
+        fun Disk(root: File = File(".")): InteractionStorageLookup = object : InteractionStorageLookup {
             override fun invoke(name: String): InteractionStorage {
                 val file = fileFor(name)
                 return object : InteractionStorage {
@@ -45,7 +41,6 @@ interface InteractionStorageLookup : (String) -> InteractionStorage {
                     override fun clean() = created[name]?.let { it.set(ByteArray(0)); true } ?: false
                 }
             }
-
         }
     }
 }
