@@ -6,7 +6,7 @@ import org.http4k.core.Response
 
 interface InteractionOptions {
     fun requestManipulations(request: Request): Request = request
-    fun responseManipulations(response: Response): Response = response
+    fun modify(response: Response): Response = response
     fun isBinary(contentType: ContentType): Boolean = false
 
     companion object {

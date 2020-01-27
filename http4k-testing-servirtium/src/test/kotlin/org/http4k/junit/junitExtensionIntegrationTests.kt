@@ -52,7 +52,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
         storage,
         object : InteractionOptions {
             override fun requestManipulations(request: Request) = request.body(request.bodyString() + request.bodyString())
-            override fun responseManipulations(response: Response) = response.body(response.bodyString() + "2")
+            override fun modify(response: Response) = response.body(response.bodyString() + "2")
         }
     )
 

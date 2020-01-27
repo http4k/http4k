@@ -26,7 +26,7 @@ class ServirtiumRecordingTest {
     fun `records the values into the recording`(approver: Approver) {
         val options = object : InteractionOptions {
             override fun requestManipulations(request: Request) = request.removeHeader("toBeRemoved")
-            override fun responseManipulations(response: Response) = response.removeHeader("toBeRemoved")
+            override fun modify(response: Response) = response.removeHeader("toBeRemoved")
                 .body(response.bodyString().replace("hello", "goodbye"))
         }
 

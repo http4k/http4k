@@ -49,7 +49,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.requestManipulations(request)
-        val manipulatedResponse = options.responseManipulations(response)
+        val manipulatedResponse = options.modify(response)
         target.accept(
             manipulatedRequest.header() +
                 manipulatedRequest.encodedBody() +

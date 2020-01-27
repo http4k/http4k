@@ -30,7 +30,7 @@ class TrafficExtensionTests {
                 override fun requestManipulations(request: Request) =
                     request.removeHeader("toBeRemoved").body(request.bodyString() + request.bodyString())
 
-                override fun responseManipulations(response: Response) =
+                override fun modify(response: Response) =
                     response.removeHeader("toBeRemoved").body(response.bodyString() + response.bodyString())
             }
         )
