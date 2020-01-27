@@ -22,4 +22,13 @@ class StorageFactoryTest {
         assertThat(expectedFile.exists(), equalTo(true))
         assertThat(String(storage.get()), equalTo("hello"))
     }
+
+    @Test
+    fun `memory storage creates clean file`() {
+        val storage = StorageFactory.InMemory()("foo")
+        storage.accept("hello".toByteArray())
+        storage.accept("goodbye".toByteArray())
+        assertThat(String(storage.get()), equalTo("hellogoodbye"))
+    }
 }
+

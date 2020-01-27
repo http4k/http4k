@@ -11,6 +11,7 @@ import org.http4k.servirtium.RecordingControl
 import org.http4k.servirtium.RecordingControl.Companion.NoOp
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.servirtium.StorageFactory
+import org.http4k.servirtium.StorageFactory.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -24,7 +25,7 @@ import org.opentest4j.AssertionFailedError
  * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
  */
 class ServirtiumRecording(private val httpHandler: HttpHandler,
-                          private val storageFactory: StorageFactory = StorageFactory.Disk(),
+                          private val storageFactory: StorageFactory = Disk(),
                           private val requestManipulations: (Request) -> Request = { it },
                           private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
@@ -36,7 +37,7 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
                     val storage = storageFactory("$name.${ec.requiredTestMethod.name}")
                     if (pc.isHttpHandler())
                         RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
-                        .then(httpHandler)
+                            .then(httpHandler)
                     else RecordingControl.ByteStorage(storage)
                 }
                 else -> throw IllegalArgumentException("Class is not an instance of: ${ServirtiumContract::name}")
@@ -47,7 +48,7 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
 /**
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
-class ServirtiumReplay(private val storageFactory: StorageFactory = StorageFactory.Disk(),
+class ServirtiumReplay(private val storageFactory: StorageFactory = Disk(),
                        private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
