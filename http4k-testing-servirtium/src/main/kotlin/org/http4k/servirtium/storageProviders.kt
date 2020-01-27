@@ -27,7 +27,7 @@ fun InteractionStorage.Companion.Github(
     credentials: Credentials,
     baseApiUri: Uri = Uri.of("https://api.github.com"),
     http: HttpHandler = SetBaseUriFrom(baseApiUri).then(JavaHttpClient())
-) = object : InteractionStorageLookup {
+) = object : StorageProvider {
 
     private val authed = BasicAuth(credentials)
         .then(ClientFilters.HandleRemoteRequestFailed())

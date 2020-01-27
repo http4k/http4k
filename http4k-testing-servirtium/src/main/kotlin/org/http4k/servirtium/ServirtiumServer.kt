@@ -25,12 +25,12 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          */
         fun Replay(
             name: String,
-            storageLookup: InteractionStorageLookup = Disk(),
+            storageProvider: StorageProvider = Disk(),
             options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
-            Replay.Servirtium(storageLookup(name))
+            Replay.Servirtium(storageProvider(name))
                 .replayingMatchingContent(options::modify)
                 .asServer(SunHttp(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
@@ -44,11 +44,11 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
         fun Recording(
             name: String,
             target: Uri,
-            storageLookup: InteractionStorageLookup = Disk(),
+            storageProvider: StorageProvider = Disk(),
             options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer {
-            val storage = storageLookup(name).apply { clean() }
+            val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(

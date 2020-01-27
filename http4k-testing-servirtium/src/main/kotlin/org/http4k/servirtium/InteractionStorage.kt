@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-typealias InteractionStorageLookup = (String) -> InteractionStorage
+typealias StorageProvider = (String) -> InteractionStorage
 
 /**
  * Provides storage for the recorded Servirtium interaction data.
@@ -14,7 +14,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     fun clean(): Boolean
 
     companion object {
-        fun Disk(root: File = File(".")): InteractionStorageLookup = object : InteractionStorageLookup {
+        fun Disk(root: File = File(".")): StorageProvider = object : StorageProvider {
             override fun invoke(name: String): InteractionStorage {
                 val file = fileFor(name)
                 return object : InteractionStorage {
@@ -30,7 +30,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
             private fun fileFor(name: String) = File(root, "$name.md")
         }
 
-        fun InMemory() = object : InteractionStorageLookup {
+        fun InMemory() = object : StorageProvider {
             private val created = mutableMapOf<String, AtomicReference<ByteArray>>()
 
             override fun invoke(name: String): InteractionStorage {
