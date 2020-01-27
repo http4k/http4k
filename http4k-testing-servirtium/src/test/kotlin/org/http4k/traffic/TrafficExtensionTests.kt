@@ -55,7 +55,7 @@ class TrafficExtensionTests {
         val received = AtomicReference<ByteArray>()
         val sink = Sink.Servirtium(Consumer(received::set),
             object : InteractionOptions {
-                override fun contentTypeIsBinary(contentType: ContentType) = true
+                override fun isBinary(contentType: ContentType) = true
             }
         )
 
@@ -88,7 +88,7 @@ class TrafficExtensionTests {
             javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readAllBytes()
         },
             object : InteractionOptions {
-                override fun contentTypeIsBinary(contentType: ContentType) = true
+                override fun isBinary(contentType: ContentType) = true
             }
         )
 

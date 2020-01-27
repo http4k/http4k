@@ -80,7 +80,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
 
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
-            ?.takeIf { options.contentTypeIsBinary(it) }
+            ?.takeIf { options.isBinary(it) }
             ?.let { Base64.getEncoder().encode(body.payload.array()) }
             ?: bodyString().toByteArray()
 }
@@ -93,7 +93,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
     override fun requests() = output.parseInteractions { it.first }
         .map { req ->
             CONTENT_TYPE(req)
-                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.takeIf { options.isBinary(it) }
                 ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
                 ?: req
         }
@@ -101,7 +101,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
     override fun responses() = output.parseInteractions { it.second }
         .map { req ->
             CONTENT_TYPE(req)
-                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.takeIf { options.isBinary(it) }
                 ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
                 ?: req
         }
