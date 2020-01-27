@@ -72,7 +72,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                 ": " +
                 (CONTENT_TYPE(manipulatedResponse)?.toHeaderValue() ?: "") +
                 "):\n").toByteArray() +
-            "\n```\n${manipulatedResponse.encodedBody()}\n```\n".toByteArray() +
+            ("\n```\n" + manipulatedResponse.encodedBody() + "\n```\n").toByteArray() +
             "\n".toByteArray()
         target.accept(bytes)
     }
