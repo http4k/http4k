@@ -46,18 +46,32 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     override fun set(request: Request, response: Response) {
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
-        val bytes = """## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}
-
-${headerLine<Request>()}:
-${manipulatedRequest.headerBlock()}
-${bodyLine<Request>()} (${CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: ""}):
-${manipulatedRequest.bodyBlock()}
-${headerLine<Response>()}:
-${manipulatedResponse.headerBlock()}
-${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
-            ?: ""}):
-""".toByteArray() + """${manipulatedResponse.bodyBlock()}
-""".toByteArray()
+        val bytes = (
+            "## Interaction " + count.getAndIncrement() +
+                ": " + manipulatedRequest.method.name +
+                " " + manipulatedRequest.uri +
+                "\n\n" +
+                headerLine<Request>() +
+                ":\n" +
+                manipulatedRequest.headerBlock() +
+                "\n" +
+                bodyLine<Request>() +
+                " (" +
+                (CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: "") +
+                "):\n" +
+                manipulatedRequest.bodyBlock() +
+                "\n" +
+                headerLine<Response>() +
+                ":\n" +
+                manipulatedResponse.headerBlock() +
+                "\n" +
+                bodyLine<Response>() +
+                " (" +
+                manipulatedResponse.status.code +
+                ": " +
+                (CONTENT_TYPE(manipulatedResponse)?.toHeaderValue() ?: "") +
+                "):\n").toByteArray() +
+            "${manipulatedResponse.bodyBlock()}\n".toByteArray()
         target.accept(bytes)
     }
 
