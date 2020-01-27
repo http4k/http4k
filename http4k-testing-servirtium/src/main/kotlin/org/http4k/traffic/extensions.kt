@@ -60,7 +60,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                 " (" +
                 (CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: "") +
                 "):\n" +
-                manipulatedRequest.bodyBlock() +
+                "\n```\n${manipulatedRequest.encodedBody()}\n```\n" +
                 "\n" +
                 headerLine<Response>() +
                 ":\n" +
@@ -72,7 +72,7 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                 ": " +
                 (CONTENT_TYPE(manipulatedResponse)?.toHeaderValue() ?: "") +
                 "):\n").toByteArray() +
-            manipulatedResponse.bodyBlock().toByteArray() +
+            "\n```\n${manipulatedResponse.encodedBody()}\n```\n".toByteArray() +
             "\n".toByteArray()
         target.accept(bytes)
     }
@@ -80,8 +80,6 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
         it.first + ": " + (it.second ?: "")
     }}\n```\n"
-
-    private fun HttpMessage.bodyBlock() = "\n```\n${encodedBody()}\n```\n"
 
     private fun HttpMessage.encodedBody() = CONTENT_TYPE(this)
         ?.let {
