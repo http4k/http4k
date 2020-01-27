@@ -55,7 +55,7 @@ class ServirtiumReplay(private val baseName: String,
         if (pc.isHttpHandler()) {
             ConvertBadResponseToAssertionFailed()
                 .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"), options)
-                    .replayingMatchingContent(options::requestManipulations)
+                    .replayingMatchingContent(options::modify)
                 )
         } else NoOp
 }

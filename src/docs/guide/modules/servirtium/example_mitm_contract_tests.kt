@@ -94,7 +94,7 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
             options = object : InteractionOptions {
-                override fun requestManipulations(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
+                override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
                 override fun modify(response: Response) = response.removeHeader("Date")
             }
         ).start()
@@ -120,7 +120,7 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"), options = object : InteractionOptions {
-            override fun requestManipulations(request: Request) = request.header("Date", "some overridden date")
+            override fun modify(request: Request) = request.header("Date", "some overridden date")
         }).start()
     }
 

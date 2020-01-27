@@ -33,7 +33,7 @@ class ServirtiumRecordingServerTest : TestContract {
             Uri.of("http://localhost:$appPort"),
             storage,
             object : InteractionOptions {
-                override fun requestManipulations(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
+                override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
                 override fun modify(response: Response) = response.removeHeader("Date")
             })
 

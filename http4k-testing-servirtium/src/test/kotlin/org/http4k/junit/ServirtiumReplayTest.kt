@@ -35,7 +35,7 @@ class ServirtiumReplayTest {
 
         val servirtiumReplay = ServirtiumReplay("name", storage,
             object : InteractionOptions {
-                override fun requestManipulations(request: Request): Request = request.header("toBeAdded", "value")
+                override fun modify(request: Request): Request = request.header("toBeAdded", "value")
             })
 
         @Suppress("UNCHECKED_CAST")

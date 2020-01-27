@@ -51,7 +51,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
         { Response(OK).body("hello") },
         storage,
         object : InteractionOptions {
-            override fun requestManipulations(request: Request) = request.body(request.bodyString() + request.bodyString())
+            override fun modify(request: Request) = request.body(request.bodyString() + request.bodyString())
             override fun modify(response: Response) = response.body(response.bodyString() + "2")
         }
     )
@@ -85,7 +85,7 @@ class ServirtiumReplayIntegrationTest : TestContract {
     @RegisterExtension
     val replay = ServirtiumReplay("contractName", storage,
         object : InteractionOptions {
-            override fun requestManipulations(request: Request) = request.body(request.bodyString().replace("2", ""))
+            override fun modify(request: Request) = request.body(request.bodyString().replace("2", ""))
         })
 
     @Test

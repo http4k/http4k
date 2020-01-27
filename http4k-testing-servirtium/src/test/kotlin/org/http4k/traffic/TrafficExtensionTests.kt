@@ -27,7 +27,7 @@ class TrafficExtensionTests {
         val received = AtomicReference<ByteArray>()
         val sink = Sink.Servirtium(Consumer(received::set),
             object : InteractionOptions {
-                override fun requestManipulations(request: Request) =
+                override fun modify(request: Request) =
                     request.removeHeader("toBeRemoved").body(request.bodyString() + request.bodyString())
 
                 override fun modify(response: Response) =

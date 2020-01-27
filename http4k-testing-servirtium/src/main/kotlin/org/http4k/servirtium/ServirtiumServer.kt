@@ -32,7 +32,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             Replay.Servirtium(storageLookup(name))
-                .replayingMatchingContent(options::requestManipulations)
+                .replayingMatchingContent(options::modify)
                 .asServer(SunHttp(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
 
