@@ -33,9 +33,8 @@ class ServirtiumRecording(
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         with(ec.testInstance.get()) {
             val testName = "$baseName.${ec.requiredTestMethod.name}"
-            storageLookup.clean(testName)
 
-            val storage = storageLookup(testName)
+            val storage = storageLookup(testName).apply { clean() }
             if (pc.isHttpHandler())
                 RecordTo(Sink.Servirtium(storage, interactionOptions))
                     .then(httpHandler)

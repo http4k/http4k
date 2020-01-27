@@ -48,17 +48,15 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer {
+            val storage = storageLookup(name).apply { clean() }
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
-                    Sink.Servirtium(storageLookup(name), options))
+                    Sink.Servirtium(storage, options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
-                InteractionControl by StorageBased(storageLookup(name)) {
-                init {
-                    storageLookup.clean(name)
-                }
+                InteractionControl by StorageBased(storage) {
             }
         }
     }

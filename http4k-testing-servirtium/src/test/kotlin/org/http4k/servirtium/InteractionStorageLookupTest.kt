@@ -19,7 +19,7 @@ class InteractionStorageLookupTest {
         assertThat(String(storage.get()), equalTo("hellogoodbye"))
         assertThat(file.readText(), equalTo("hellogoodbye"))
 
-        factory.clean("foo")
+        storage.clean()
         assertThat(String(storage.get()), equalTo(""))
         assertThat(file.exists(), equalTo(false))
 
@@ -37,7 +37,7 @@ class InteractionStorageLookupTest {
         storage.accept("goodbye".toByteArray())
         assertThat(String(storage.get()), equalTo("hellogoodbye"))
 
-        factory.clean("foo")
+        storage.clean()
         assertThat(String(storage.get()), equalTo(""))
 
         storage.accept("goodbye".toByteArray())

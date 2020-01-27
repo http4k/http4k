@@ -5,13 +5,14 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray>
+interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
+    fun clean(): Boolean
+}
 
 /**
  * Provides a way of providing a storage layer for
  */
 interface InteractionStorageLookup : (String) -> InteractionStorage {
-    fun clean(name: String): Boolean
 
     companion object {
         fun Disk(root: File = File(".")) = object : InteractionStorageLookup {
@@ -22,10 +23,10 @@ interface InteractionStorageLookup : (String) -> InteractionStorage {
                     override fun accept(data: ByteArray) {
                         file.appendBytes(data)
                     }
+
+                    override fun clean(): Boolean = fileFor(name).delete()
                 }
             }
-
-            override fun clean(name: String): Boolean = fileFor(name).delete()
 
             private fun fileFor(name: String) = File(root, "$name.md")
         }
@@ -41,10 +42,10 @@ interface InteractionStorageLookup : (String) -> InteractionStorage {
                     override fun accept(data: ByteArray) {
                         ref.set(ref.get() + data)
                     }
+                    override fun clean() = created[name]?.let { it.set(ByteArray(0)); true } ?: false
                 }
             }
 
-            override fun clean(name: String) = created[name]?.let { it.set(ByteArray(0)); true } ?: false
         }
     }
 }
