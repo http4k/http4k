@@ -52,14 +52,14 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                 manipulatedRequest.headerBlock() + "\n" +
                 bodyLine<Request>() + " (${CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: ""}):\n" +
                 "\n```\n").toByteArray() +
-                manipulatedRequest.encodedBody().toByteArray() +
+                manipulatedRequest.encodedBody() +
                 ("\n```\n\n" +
                     headerLine<Response>() + ":\n" +
                     manipulatedResponse.headerBlock() + "\n" +
                     bodyLine<Response>() + " (${manipulatedResponse.status.code}: ${(CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
                     ?: "")}):\n\n```\n"
                     ).toByteArray() +
-                manipulatedResponse.encodedBody().toByteArray() +
+                manipulatedResponse.encodedBody() +
                 footer()
         )
     }
@@ -73,9 +73,9 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
             ?.let {
-                if (!options.contentTypeIsBinary(it)) bodyString()
-                else bodyString()
-            } ?: bodyString()
+                if (!options.contentTypeIsBinary(it)) bodyString().toByteArray()
+                else bodyString().toByteArray()
+            } ?: bodyString().toByteArray()
 }
 
 /**
