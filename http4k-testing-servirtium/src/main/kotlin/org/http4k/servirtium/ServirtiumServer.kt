@@ -15,7 +15,6 @@ import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
 import org.http4k.traffic.replayingMatchingContent
-import java.io.File
 
 interface ServirtiumServer : Http4kServer, InteractionControl {
 
@@ -26,7 +25,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          */
         fun Replay(
             name: String,
-            storageLookup: InteractionStorageLookup = Disk(File(".")),
+            storageLookup: InteractionStorageLookup = Disk(),
             options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer = object : ServirtiumServer,
@@ -45,7 +44,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
         fun Recording(
             name: String,
             target: Uri,
-            storageLookup: InteractionStorageLookup = Disk(File(".")),
+            storageLookup: InteractionStorageLookup = Disk(),
             options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer {
