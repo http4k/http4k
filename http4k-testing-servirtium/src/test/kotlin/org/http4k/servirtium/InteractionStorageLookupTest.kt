@@ -44,4 +44,3 @@ class InteractionStorageLookupTest {
         assertThat(String(storage.get()), equalTo("goodbye"))
     }
 }
-
