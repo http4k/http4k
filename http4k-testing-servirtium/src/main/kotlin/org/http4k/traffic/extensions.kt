@@ -9,6 +9,7 @@ import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.parse
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
+import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -77,7 +78,10 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
     private fun HttpMessage.encodedBody() =
         CONTENT_TYPE(this)
             ?.let {
-                if (!options.contentTypeIsBinary(it)) bodyString().toByteArray()
+                if (options.contentTypeIsBinary(it)) {
+                    println("BINARY!")
+                    Base64.getEncoder().encode(body.payload.array())
+                }
                 else bodyString().toByteArray()
             } ?: bodyString().toByteArray()
 }

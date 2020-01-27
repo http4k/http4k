@@ -3,10 +3,13 @@ package org.http4k.traffic
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType
+import org.http4k.core.ContentType.Companion.APPLICATION_PDF
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.with
+import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -56,7 +59,7 @@ class TrafficExtensionTests {
             }
         )
 
-        sink[Request(GET, "/").body("body1")] = Response(OK).body("body2")
+        sink[Request(GET, "/").body("body1").with(CONTENT_TYPE of APPLICATION_PDF)] = Response(OK).body("body2").with(CONTENT_TYPE of APPLICATION_PDF)
 
         approver.assertApproved(Response(OK).body(received.get().inputStream()))
     }
