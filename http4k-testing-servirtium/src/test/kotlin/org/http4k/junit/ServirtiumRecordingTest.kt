@@ -9,6 +9,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.ServirtiumContract
+import org.http4k.servirtium.StorageFactory.Companion.Disk
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -51,7 +52,7 @@ class ServirtiumRecordingTest {
             originalResponse
         }
 
-        val servirtiumRecording = ServirtiumRecording(httpHandler, root, requestManipulations, responseManipulations)
+        val servirtiumRecording = ServirtiumRecording(httpHandler, Disk(root), requestManipulations, responseManipulations)
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)

@@ -8,6 +8,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.ServirtiumContract
+import org.http4k.servirtium.StorageFactory.Companion.Disk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -38,7 +39,7 @@ class ServirtiumReplayTest {
             .header("header3", "value3")
             .body("body1")
 
-        val servirtiumReplay = ServirtiumReplay(root) {
+        val servirtiumReplay = ServirtiumReplay(Disk(root)) {
             it.header("toBeAdded", "value")
         }
         @Suppress("UNCHECKED_CAST")

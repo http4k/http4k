@@ -13,6 +13,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.RecordingControl
 import org.http4k.servirtium.ServirtiumContract
+import org.http4k.servirtium.StorageFactory.Companion.Disk
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -49,7 +50,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
     @RegisterExtension
     val record = ServirtiumRecording(
         { Response(OK).body("hello") },
-        root,
+        Disk(root),
         { it.body(it.bodyString() + it.bodyString()) },
         { it.body(it.bodyString() + "2") }
     )
@@ -81,7 +82,7 @@ class ServirtiumReplayIntegrationTest : TestContract {
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay(root) {
+    val replay = ServirtiumReplay(Disk(root)) {
         it.body(it.bodyString().replace("2", ""))
     }
 

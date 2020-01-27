@@ -33,7 +33,7 @@ class ServirtiumReplayServerTest : TestContract {
 
         control = ServirtiumServer.Replay(
             info.displayName,
-            root,
+            StorageFactory.Disk(root),
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
         )
         control.start()

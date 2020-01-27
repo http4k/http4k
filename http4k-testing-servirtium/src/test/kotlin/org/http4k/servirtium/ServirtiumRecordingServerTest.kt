@@ -32,7 +32,7 @@ class ServirtiumRecordingServerTest : TestContract {
         control = ServirtiumServer.Recording(
             info.displayName,
             Uri.of("http://localhost:$appPort"),
-            root,
+            StorageFactory.Disk(root),
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
             responseManipulations = { it.removeHeader("Date") }
         )
