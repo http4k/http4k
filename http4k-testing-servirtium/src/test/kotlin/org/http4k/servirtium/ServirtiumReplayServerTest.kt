@@ -9,7 +9,6 @@ import org.http4k.testing.Approver
 import org.http4k.testing.assertApproved
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,7 +30,7 @@ class ServirtiumReplayServerTest : TestContract {
 
         control = ServirtiumServer.Replay(
             info.displayName,
-            StorageFactory.InMemory(),
+            storage,
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
         )
         control.start()
@@ -43,13 +42,11 @@ class ServirtiumReplayServerTest : TestContract {
     }
 
     @Test
-    @Disabled("for the moment as there seems to be an issue between local and travis")
     fun `unexpected content`(approver: Approver) {
         approver.assertApproved(createHandler()(Request(GET, "/foo")), NOT_IMPLEMENTED)
     }
 
     @Test
-    @Disabled("for the moment as there seems to be an issue between local and travis")
     fun `too many requests`(approver: Approver) {
         super.scenario()
         val httpMessage = createHandler()(Request(GET, "/foo")).run {

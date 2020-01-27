@@ -3,7 +3,7 @@ package org.http4k.servirtium
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Method
+import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -24,11 +24,11 @@ interface TestContract {
 
         control.addNote("this is a note")
 
-        assertThat(handler(Request(Method.POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+        assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
 
         control.addNote("this is another note")
 
-        assertThat(handler(Request(Method.POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
+        assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
 
         control.addNote("this is yet another note")
     }
