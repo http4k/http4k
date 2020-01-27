@@ -12,6 +12,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionControl
+import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -49,8 +50,10 @@ class ServirtiumRecordingIntegrationTest : TestContract {
         "contractName",
         { Response(OK).body("hello") },
         storage,
-        { it.body(it.bodyString() + it.bodyString()) },
-        { it.body(it.bodyString() + "2") }
+        object : InteractionOptions {
+            override fun requestManipulations(request: Request) = request.body(request.bodyString() + request.bodyString())
+            override fun responseManipulations(response: Response) = response.body(response.bodyString() + "2")
+        }
     )
 
     @Test
@@ -80,9 +83,10 @@ class ServirtiumReplayIntegrationTest : TestContract {
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay("contractName", storage) {
-        it.body(it.bodyString().replace("2", ""))
-    }
+    val replay = ServirtiumReplay("contractName", storage,
+        object : InteractionOptions {
+            override fun requestManipulations(request: Request) = request.body(request.bodyString().replace("2", ""))
+        })
 
     @Test
     fun `unexpected content`(handler: HttpHandler) {

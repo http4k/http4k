@@ -32,10 +32,13 @@ class ServirtiumRecordingServerTest : TestContract {
             info.displayName,
             Uri.of("http://localhost:$appPort"),
             storage,
-            requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
-            responseManipulations = { it.removeHeader("Date") }
-        )
-        control.start()
+            object : InteractionOptions {
+                override fun requestManipulations(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
+                override fun responseManipulations(response: Response) = response.removeHeader("Date")
+            })
+
+
+            control.start()
     }
 
     @AfterEach

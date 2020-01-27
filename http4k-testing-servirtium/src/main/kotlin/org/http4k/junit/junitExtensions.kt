@@ -2,13 +2,13 @@ package org.http4k.junit
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
 import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionControl.Companion.NoOp
+import org.http4k.servirtium.InteractionOptions
+import org.http4k.servirtium.InteractionOptions.Companion.Defaults
 import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
 import org.http4k.traffic.Replay
@@ -27,8 +27,7 @@ class ServirtiumRecording(
     private val baseName: String,
     private val httpHandler: HttpHandler,
     private val storageLookup: InteractionStorageLookup = Disk(),
-    private val requestManipulations: (Request) -> Request = { it },
-    private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
+    private val interactionOptions: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
@@ -38,7 +37,7 @@ class ServirtiumRecording(
 
             val storage = storageLookup(testName)
             if (pc.isHttpHandler())
-                RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
+                RecordTo(Sink.Servirtium(storage, interactionOptions))
                     .then(httpHandler)
             else InteractionControl.StorageBased(storage)
         }
@@ -49,14 +48,14 @@ class ServirtiumRecording(
  */
 class ServirtiumReplay(private val baseName: String,
                        private val storageLookup: InteractionStorageLookup = Disk(),
-                       private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
+                       private val options: InteractionOptions = InteractionOptions.Companion.Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         if (pc.isHttpHandler()) {
             ConvertBadResponseToAssertionFailed()
-                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"))
-                    .replayingMatchingContent(requestManipulations)
+                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"), options)
+                    .replayingMatchingContent(options::requestManipulations)
                 )
         } else NoOp
 }

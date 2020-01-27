@@ -1,5 +1,6 @@
 package org.http4k.traffic
 
+import org.http4k.core.Body
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpMessage
 import org.http4k.core.HttpMessage.Companion.HTTP_1_1
@@ -7,7 +8,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.parse
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.servirtium.InteractionOptions
+import org.http4k.servirtium.InteractionOptions.Companion.Defaults
+import java.nio.ByteBuffer
+import java.util.Base64
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -40,43 +45,66 @@ private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Re
  * Write HTTP traffic to disk in Servirtium markdown format.
  */
 fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
-                              requestManipulations: (Request) -> Request = { it },
-                              responseManipulations: (Response) -> Response = { it }
-) = object : Sink {
+                              options: InteractionOptions) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
-        val it = requestManipulations(request)
-        val manipulatedResponse = responseManipulations(response)
+        val manipulatedRequest = options.requestManipulations(request)
+        val manipulatedResponse = options.responseManipulations(response)
         target.accept(
-            """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
-
-${headerLine<Request>()}:
-${it.headerBlock()}
-${bodyLine<Request>()} (${Header.CONTENT_TYPE(it)?.toHeaderValue() ?: ""}):
-${it.bodyBlock()}
-${headerLine<Response>()}:
-${manipulatedResponse.headerBlock()}
-${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${Header.CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
-                ?: ""}):
-${manipulatedResponse.bodyBlock()}
-""".toByteArray())
+            manipulatedRequest.header() +
+                manipulatedRequest.encodedBody() +
+                manipulatedResponse.middle() +
+                manipulatedResponse.encodedBody() +
+                footer()
+        )
     }
+
+    private fun Response.middle() = ("\n```\n\n" +
+        headerLine<Response>() + ":\n" +
+        headerBlock() + "\n" +
+        bodyLine<Response>() + " (${status.code}: ${(CONTENT_TYPE(this)?.toHeaderValue()
+        ?: "")}):\n\n```\n"
+        ).toByteArray()
+
+    private fun Request.header() = ("## Interaction ${count.getAndIncrement()}: ${method.name} $uri\n\n" +
+        headerLine<Request>() + ":\n" +
+        headerBlock() + "\n" +
+        bodyLine<Request>() + " (${CONTENT_TYPE(this)?.toHeaderValue() ?: ""}):\n" +
+        "\n```\n").toByteArray()
+
+    private fun footer() = "\n```\n\n".toByteArray()
 
     private fun HttpMessage.headerBlock() = "\n```\n${headers.joinToString("\n") {
         it.first + ": " + (it.second ?: "")
     }}\n```\n"
 
-    private fun HttpMessage.bodyBlock() = "\n```\n${bodyString()}\n```\n"
+    private fun HttpMessage.encodedBody() =
+        CONTENT_TYPE(this)
+            ?.takeIf { options.contentTypeIsBinary(it) }
+            ?.let { Base64.getEncoder().encode(body.payload.array()) }
+            ?: bodyString().toByteArray()
 }
 
 /**
  * Read HTTP traffic from disk in Servirtium markdown format.
  */
-fun Replay.Companion.Servirtium(output: Supplier<ByteArray>) = object : Replay {
+fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: InteractionOptions = Defaults) = object : Replay {
 
     override fun requests() = output.parseInteractions { it.first }
+        .map { req ->
+            CONTENT_TYPE(req)
+                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?: req
+        }
 
     override fun responses() = output.parseInteractions { it.second }
+        .map { req ->
+            CONTENT_TYPE(req)
+                ?.takeIf { options.contentTypeIsBinary(it) }
+                ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
+                ?: req
+        }
 
     private fun <T : HttpMessage> Supplier<ByteArray>.parseInteractions(fn: (Pair<Request, Response>) -> T) =
         String(get())

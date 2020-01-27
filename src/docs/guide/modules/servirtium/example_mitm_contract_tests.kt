@@ -17,6 +17,7 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.ServirtiumServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -92,8 +93,10 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
         servirtium = ServirtiumServer.Recording(
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
-            requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
-            responseManipulations = { it.removeHeader("Date") }
+            options = object : InteractionOptions {
+                override fun requestManipulations(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
+                override fun responseManipulations(response: Response) = response.removeHeader("Date")
+            }
         ).start()
     }
 
@@ -116,9 +119,9 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()")) {
-            it.header("Date", "some overridden date")
-        }.start()
+        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"), options = object : InteractionOptions {
+            override fun requestManipulations(request: Request) = request.header("Date", "some overridden date")
+        }).start()
     }
 
     @AfterEach
