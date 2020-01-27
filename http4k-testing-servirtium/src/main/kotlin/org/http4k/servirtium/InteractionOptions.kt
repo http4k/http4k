@@ -12,17 +12,17 @@ import org.http4k.core.Response
 interface InteractionOptions {
 
     /**
-     * Modify received requests before they are stored
+     * Modify received requests before they are stored.
      */
     fun modify(request: Request): Request = request
 
     /**
-     * Modify received responses before they are stored
+     * Modify received responses before they are stored.
      */
     fun modify(response: Response): Response = response
 
     /**
-     * Determine if the content type should be treated as binary. Binary messages are
+     * Determine if the content type should be treated as binary.
      */
     fun isBinary(contentType: ContentType): Boolean = false
 
