@@ -7,6 +7,9 @@ import java.util.function.Supplier
 
 typealias InteractionStorageLookup = (String) -> InteractionStorage
 
+/**
+ * Provides storage for the recorded Servirtium interaction data.
+ */
 interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     fun clean(): Boolean
 
@@ -38,6 +41,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
                     override fun accept(data: ByteArray) {
                         ref.set(ref.get() + data)
                     }
+
                     override fun clean() = created[name]?.let { it.set(ByteArray(0)); true } ?: false
                 }
             }

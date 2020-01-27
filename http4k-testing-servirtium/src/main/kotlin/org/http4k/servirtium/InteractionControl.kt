@@ -1,5 +1,8 @@
 package org.http4k.servirtium
 
+/**
+ * Provides controls for interacting with an in-action Interaction recording.
+ */
 interface InteractionControl {
     fun addNote(note: String)
 
