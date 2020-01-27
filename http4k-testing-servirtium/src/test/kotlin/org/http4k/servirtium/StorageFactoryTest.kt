@@ -10,7 +10,7 @@ class StorageFactoryTest {
 
     @Test
     fun `disk storage handles contract`(@TempDir root: File) {
-        val factory = StorageFactory.Disk(root)
+        val factory = InteractionStorageLookup.Disk(root)
         val storage = factory("foo")
         val file = File(root, "foo.md")
 
@@ -30,7 +30,7 @@ class StorageFactoryTest {
 
     @Test
     fun `memory storage handles contract`() {
-        val factory = StorageFactory.InMemory()
+        val factory = InteractionStorageLookup.InMemory()
         val storage = factory("foo")
 
         storage.accept("hello".toByteArray())

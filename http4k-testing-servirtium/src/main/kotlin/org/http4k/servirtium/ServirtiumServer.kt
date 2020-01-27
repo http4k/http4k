@@ -10,8 +10,8 @@ import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
 import org.http4k.servirtium.RecordingControl.Companion.ByteStorage
-import org.http4k.servirtium.StorageFactory.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -27,12 +27,12 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
          */
         fun Replay(
             name: String,
-            storageFactory: StorageFactory = Disk(File(".")),
+            storageLookup: InteractionStorageLookup = Disk(File(".")),
             port: Int = 0,
             requestManipulations: (Request) -> Request = { it }
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
-            Replay.Servirtium(storageFactory(name))
+            Replay.Servirtium(storageLookup(name))
                 .replayingMatchingContent(requestManipulations)
                 .asServer(SunHttp(port)),
             RecordingControl by RecordingControl.Companion.NoOp {}
@@ -46,7 +46,7 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
         fun Recording(
             name: String,
             target: Uri,
-            storageFactory: StorageFactory = Disk(File(".")),
+            storageLookup: InteractionStorageLookup = Disk(File(".")),
             requestManipulations: (Request) -> Request = { it },
             responseManipulations: (Response) -> Response = { it },
             port: Int = 0
@@ -54,13 +54,13 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
-                    Sink.Servirtium(storageFactory(name), requestManipulations, responseManipulations))
+                    Sink.Servirtium(storageLookup(name), requestManipulations, responseManipulations))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
-                RecordingControl by ByteStorage(storageFactory(name)) {
+                RecordingControl by ByteStorage(storageLookup(name)) {
                 init {
-                    storageFactory.clean(name)
+                    storageLookup.clean(name)
                 }
             }
         }

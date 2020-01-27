@@ -18,7 +18,7 @@ class ServirtiumReplayServerTest : TestContract {
 
     override val uri get() = Uri.of("http://localhost:${control.port()}")
 
-    private val storage = StorageFactory.InMemory()
+    private val storage = InteractionStorageLookup.InMemory()
 
     override lateinit var control: ServirtiumServer
 

@@ -4,7 +4,7 @@ interface RecordingControl {
     fun addNote(note: String)
 
     companion object {
-        fun ByteStorage(storage: Storage) = object : RecordingControl {
+        fun ByteStorage(storage: InteractionStorage) = object : RecordingControl {
             override fun addNote(note: String) = storage.accept("## $note\n\n".toByteArray())
         }
 

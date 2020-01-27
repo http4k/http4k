@@ -19,7 +19,7 @@ class ServirtiumRecordingServerTest : TestContract {
 
     override val uri get() = Uri.of("http://localhost:${control.port()}")
 
-    private val storage = StorageFactory.InMemory()
+    private val storage = InteractionStorageLookup.InMemory()
 
     private val app = { _: Request -> Response(OK).body("hello") }.asServer(SunHttp(0))
 

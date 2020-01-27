@@ -8,8 +8,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.servirtium.ServirtiumContract
-import org.http4k.servirtium.StorageFactory
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ class ServirtiumRecordingTest {
         override val name get() = "name"
     }
 
-    private val storage = StorageFactory.InMemory()
+    private val storage = InteractionStorageLookup.InMemory()
     @Test
     fun `records the values into the recording`(approver: Approver) {
         val requestManipulations = { it: Request -> it.removeHeader("toBeRemoved") }

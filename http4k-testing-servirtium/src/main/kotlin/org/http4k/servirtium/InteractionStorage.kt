@@ -5,16 +5,19 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-interface Storage : Supplier<ByteArray>, Consumer<ByteArray>
+interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray>
 
-interface StorageFactory : (String) -> Storage {
+/**
+ * Provides a way of providing a storage layer for
+ */
+interface InteractionStorageLookup : (String) -> InteractionStorage {
     fun clean(name: String): Boolean
 
     companion object {
-        fun Disk(root: File = File(".")) = object : StorageFactory {
-            override fun invoke(name: String): Storage {
+        fun Disk(root: File = File(".")) = object : InteractionStorageLookup {
+            override fun invoke(name: String): InteractionStorage {
                 val file = fileFor(name)
-                return object : Storage {
+                return object : InteractionStorage {
                     override fun get() = file.takeIf { it.exists() }?.readBytes() ?: ByteArray(0)
                     override fun accept(data: ByteArray) {
                         file.appendBytes(data)
@@ -27,13 +30,13 @@ interface StorageFactory : (String) -> Storage {
             private fun fileFor(name: String) = File(root, "$name.md")
         }
 
-        fun InMemory() = object : StorageFactory {
+        fun InMemory() = object : InteractionStorageLookup {
             private val created = mutableMapOf<String, AtomicReference<ByteArray>>()
 
-            override fun invoke(name: String): Storage {
+            override fun invoke(name: String): InteractionStorage {
                 val ref = created[name] ?: AtomicReference(ByteArray(0))
                 created[name] = ref
-                return object : Storage {
+                return object : InteractionStorage {
                     override fun get() = ref.get()
                     override fun accept(data: ByteArray) {
                         ref.set(ref.get() + data)
