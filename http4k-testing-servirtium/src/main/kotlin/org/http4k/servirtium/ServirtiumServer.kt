@@ -10,15 +10,15 @@ import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.InteractionControl.Companion.StorageBased
 import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
-import org.http4k.servirtium.RecordingControl.Companion.ByteStorage
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
 import org.http4k.traffic.replayingMatchingContent
 import java.io.File
 
-interface ServirtiumServer : Http4kServer, RecordingControl {
+interface ServirtiumServer : Http4kServer, InteractionControl {
 
     companion object {
         /**
@@ -35,7 +35,7 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
             Replay.Servirtium(storageLookup(name))
                 .replayingMatchingContent(requestManipulations)
                 .asServer(SunHttp(port)),
-            RecordingControl by RecordingControl.Companion.NoOp {}
+            InteractionControl by InteractionControl.Companion.NoOp {}
 
         /**
          * MiTM proxy server which sits in between the client and the target and stores traffic in the
@@ -58,7 +58,7 @@ interface ServirtiumServer : Http4kServer, RecordingControl {
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
-                RecordingControl by ByteStorage(storageLookup(name)) {
+                InteractionControl by StorageBased(storageLookup(name)) {
                 init {
                     storageLookup.clean(name)
                 }

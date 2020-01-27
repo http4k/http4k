@@ -7,10 +7,10 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters.RecordTo
+import org.http4k.servirtium.InteractionControl
+import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
-import org.http4k.servirtium.RecordingControl
-import org.http4k.servirtium.RecordingControl.Companion.NoOp
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
@@ -41,7 +41,7 @@ class ServirtiumRecording(private val httpHandler: HttpHandler,
                     if (pc.isHttpHandler())
                         RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
                             .then(httpHandler)
-                    else RecordingControl.ByteStorage(storage)
+                    else InteractionControl.StorageBased(storage)
                 }
                 else -> throw IllegalArgumentException("Class is not an instance of: ServirtiumContract")
             }
@@ -81,7 +81,7 @@ private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
 }
 
 private fun ParameterContext.isRecordingControl() =
-    parameter.parameterizedType.typeName == RecordingControl::class.java.name
+    parameter.parameterizedType.typeName == InteractionControl::class.java.name
 
 private fun ParameterContext.isHttpHandler() =
     parameter.parameterizedType.typeName == "kotlin.jvm.functions.Function1<? super org.http4k.core.Request, ? extends org.http4k.core.Response>"

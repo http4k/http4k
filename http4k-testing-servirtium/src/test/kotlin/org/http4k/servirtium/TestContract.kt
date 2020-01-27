@@ -15,7 +15,7 @@ interface TestContract {
 
     fun createHandler() = ClientFilters.SetBaseUriFrom(uri).then(JavaHttpClient())
 
-    val control: RecordingControl
+    val control: InteractionControl
 
     @Test
     @JvmDefault

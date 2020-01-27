@@ -11,8 +11,8 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionStorageLookup
-import org.http4k.servirtium.RecordingControl
 import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
@@ -27,7 +27,7 @@ interface TestContract : ServirtiumContract {
 
     @Test
     @JvmDefault
-    fun scenario(handler: HttpHandler, control: RecordingControl) {
+    fun scenario(handler: HttpHandler, control: InteractionControl) {
         control.addNote("this is a note")
 
         assertThat(handler(Request(POST, "/foobar").body("welcome")).bodyString(), equalTo("hello"))
@@ -57,7 +57,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
     @Test
     fun `check contents are recorded as per manipulations`(
         handler: HttpHandler,
-        control: RecordingControl,
+        control: InteractionControl,
         approver: Approver
     ) {
         super.scenario(handler, control)
