@@ -8,14 +8,11 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionStorageLookup.Companion.InMemory
-import org.http4k.servirtium.ServirtiumContract
 import org.junit.jupiter.api.Test
 
 class ServirtiumReplayTest {
 
-    object AContract : ServirtiumContract {
-        override val name get() = "name"
-    }
+    object AContract
 
     private val storage = InMemory()
 
@@ -35,7 +32,7 @@ class ServirtiumReplayTest {
             .header("header3", "value3")
             .body("body1")
 
-        val servirtiumReplay = ServirtiumReplay(storage) {
+        val servirtiumReplay = ServirtiumReplay("name", storage) {
             it.header("toBeAdded", "value")
         }
         @Suppress("UNCHECKED_CAST")

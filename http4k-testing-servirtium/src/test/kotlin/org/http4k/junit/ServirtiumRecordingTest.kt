@@ -9,7 +9,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionStorageLookup
-import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -18,11 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingTest {
 
-    object AContract : ServirtiumContract {
-        override val name get() = "name"
-    }
+    object AContract
 
     private val storage = InteractionStorageLookup.InMemory()
+
     @Test
     fun `records the values into the recording`(approver: Approver) {
         val requestManipulations = { it: Request -> it.removeHeader("toBeRemoved") }
@@ -48,7 +46,7 @@ class ServirtiumRecordingTest {
             originalResponse
         }
 
-        val servirtiumRecording = ServirtiumRecording(httpHandler, storage, requestManipulations, responseManipulations)
+        val servirtiumRecording = ServirtiumRecording("name", httpHandler, storage, requestManipulations, responseManipulations)
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)

@@ -15,7 +15,6 @@ import org.http4k.junit.ServirtiumRecording
 import org.http4k.junit.ServirtiumReplay
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.servirtium.ServirtiumContract
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -43,10 +42,7 @@ class WordCounterApp : HttpHandler {
  * Defines the test contract which will be recorded and replayed later. The injected HttpHandler
  * is provided by the implementations of this interface.
  */
-interface WordCounterContract : ServirtiumContract {
-    @JvmDefault
-    override val name
-        get() = "WordCounter"
+interface WordCounterContract {
 
     @Test
     @JvmDefault
@@ -73,7 +69,7 @@ class RemoteHttpRecordingWordCounterTest : WordCounterContract {
 
     @JvmField
     @RegisterExtension
-    val record = ServirtiumRecording(app)
+    val record = ServirtiumRecording("WordCounter", app)
 }
 
 /**
@@ -89,7 +85,7 @@ class InMemoryRecordingWordCounterTest : WordCounterContract {
 
     @JvmField
     @RegisterExtension
-    val record = ServirtiumRecording(app)
+    val record = ServirtiumRecording("WordCounter", app)
 }
 
 /**
@@ -113,12 +109,12 @@ class PortBoundRecordingWordCounterTest : WordCounterContract {
 
     @JvmField
     @RegisterExtension
-    val record = ServirtiumRecording(app)
+    val record = ServirtiumRecording("WordCounter", app)
 }
 
 @Disabled
 class ReplayTest : WordCounterContract {
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay()
+    val replay = ServirtiumReplay("WordCounter")
 }

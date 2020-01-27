@@ -13,7 +13,6 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionStorageLookup
-import org.http4k.servirtium.ServirtiumContract
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -22,8 +21,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.opentest4j.AssertionFailedError
 import java.io.File
 
-interface TestContract : ServirtiumContract {
-    override val name get() = "contractName"
+interface TestContract {
 
     @Test
     @JvmDefault
@@ -48,6 +46,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
     @JvmField
     @RegisterExtension
     val record = ServirtiumRecording(
+        "contractName",
         { Response(OK).body("hello") },
         storage,
         { it.body(it.bodyString() + it.bodyString()) },
@@ -62,7 +61,7 @@ class ServirtiumRecordingIntegrationTest : TestContract {
     ) {
         super.scenario(handler, control)
         approver.assertApproved(Response(OK).body(
-            String(storage("$name.check contents are recorded as per manipulations").get())
+            String(storage("contractName.check contents are recorded as per manipulations").get())
         ))
     }
 }
@@ -73,15 +72,15 @@ class ServirtiumReplayIntegrationTest : TestContract {
 
     init {
         File("src/test/resources/org/http4k/junit/ServirtiumReplayIntegrationTest.check contents are recorded as per manipulations.approved").also {
-            storage("$name.scenario").accept(it.readText().toByteArray())
-            storage("$name.unexpected content").accept(it.readText().toByteArray())
-            storage("$name.too many requests").accept(it.readText().toByteArray())
+            storage("contractName.scenario").accept(it.readText().toByteArray())
+            storage("contractName.unexpected content").accept(it.readText().toByteArray())
+            storage("contractName.too many requests").accept(it.readText().toByteArray())
         }
     }
 
     @JvmField
     @RegisterExtension
-    val replay = ServirtiumReplay(storage) {
+    val replay = ServirtiumReplay("contractName", storage) {
         it.body(it.bodyString().replace("2", ""))
     }
 

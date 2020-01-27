@@ -11,7 +11,6 @@ import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionStorageLookup
 import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
-import org.http4k.servirtium.ServirtiumContract
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -24,51 +23,42 @@ import org.opentest4j.AssertionFailedError
 /**
  * JUnit 5 extension for recording HTTP traffic to disk in Servirtium format.
  */
-class ServirtiumRecording(private val httpHandler: HttpHandler,
-                          private val storageLookup: InteractionStorageLookup = Disk(),
-                          private val requestManipulations: (Request) -> Request = { it },
-                          private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
+class ServirtiumRecording(
+    private val baseName: String,
+    private val httpHandler: HttpHandler,
+    private val storageLookup: InteractionStorageLookup = Disk(),
+    private val requestManipulations: (Request) -> Request = { it },
+    private val responseManipulations: (Response) -> Response = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         with(ec.testInstance.get()) {
-            when (this) {
-                is ServirtiumContract -> {
-                    val testName = "$name.${ec.requiredTestMethod.name}"
-                    storageLookup.clean(testName)
+            val testName = "$baseName.${ec.requiredTestMethod.name}"
+            storageLookup.clean(testName)
 
-                    val storage = storageLookup(testName)
-                    if (pc.isHttpHandler())
-                        RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
-                            .then(httpHandler)
-                    else InteractionControl.StorageBased(storage)
-                }
-                else -> throw IllegalArgumentException("Class is not an instance of: ServirtiumContract")
-            }
+            val storage = storageLookup(testName)
+            if (pc.isHttpHandler())
+                RecordTo(Sink.Servirtium(storage, requestManipulations, responseManipulations))
+                    .then(httpHandler)
+            else InteractionControl.StorageBased(storage)
         }
 }
 
 /**
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
-class ServirtiumReplay(private val storageLookup: InteractionStorageLookup = Disk(),
+class ServirtiumReplay(private val baseName: String,
+                       private val storageLookup: InteractionStorageLookup = Disk(),
                        private val requestManipulations: (Request) -> Request = { it }) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
-        with(ec.testInstance.get()) {
-            when (this) {
-                is ServirtiumContract ->
-                    if (pc.isHttpHandler()) {
-                        ConvertBadResponseToAssertionFailed()
-                            .then(Replay.Servirtium(storageLookup("$name.${ec.requiredTestMethod.name}"))
-                                .replayingMatchingContent(requestManipulations)
-                            )
-                    } else NoOp
-                else -> throw IllegalArgumentException("Class is not an instance of: ServirtiumContract")
-            }
-        }
-
+        if (pc.isHttpHandler()) {
+            ConvertBadResponseToAssertionFailed()
+                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"))
+                    .replayingMatchingContent(requestManipulations)
+                )
+        } else NoOp
 }
 
 private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
