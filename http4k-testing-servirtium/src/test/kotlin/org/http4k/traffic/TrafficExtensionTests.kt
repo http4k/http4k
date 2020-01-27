@@ -6,6 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
+import org.http4k.servirtium.InteractionOptions
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -21,8 +22,13 @@ class TrafficExtensionTests {
     fun `sink stores traffic in servirtium markdown format, applying manipulations to recording only`(approver: Approver) {
         val received = AtomicReference<ByteArray>()
         val sink = Sink.Servirtium(Consumer(received::set),
-            requestManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) },
-            responseManipulations = { it.removeHeader("toBeRemoved").body(it.bodyString() + it.bodyString()) }
+            object : InteractionOptions {
+                override fun requestManipulations(request: Request) =
+                    request.removeHeader("toBeRemoved").body(request.bodyString() + request.bodyString())
+
+                override fun responseManipulations(response: Response) =
+                    response.removeHeader("toBeRemoved").body(response.bodyString() + response.bodyString())
+            }
         )
 
         val request1 = Request(GET, "/hello?query=123")

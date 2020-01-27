@@ -7,7 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_IMPLEMENTED
 import org.http4k.core.parse
-import org.http4k.lens.Header
+import org.http4k.lens.Header.CONTENT_TYPE
+import org.http4k.servirtium.InteractionOptions
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -40,23 +41,21 @@ private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Re
  * Write HTTP traffic to disk in Servirtium markdown format.
  */
 fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
-                              requestManipulations: (Request) -> Request = { it },
-                              responseManipulations: (Response) -> Response = { it }
-) = object : Sink {
+                              options: InteractionOptions) = object : Sink {
     private val count = AtomicInteger()
     override fun set(request: Request, response: Response) {
-        val it = requestManipulations(request)
-        val manipulatedResponse = responseManipulations(response)
+        val manipulatedRequest = options.requestManipulations(request)
+        val manipulatedResponse = options.responseManipulations(response)
         target.accept(
-            """## Interaction ${count.getAndIncrement()}: ${it.method.name} ${it.uri}
+            """## Interaction ${count.getAndIncrement()}: ${manipulatedRequest.method.name} ${manipulatedRequest.uri}
 
 ${headerLine<Request>()}:
-${it.headerBlock()}
-${bodyLine<Request>()} (${Header.CONTENT_TYPE(it)?.toHeaderValue() ?: ""}):
-${it.bodyBlock()}
+${manipulatedRequest.headerBlock()}
+${bodyLine<Request>()} (${CONTENT_TYPE(manipulatedRequest)?.toHeaderValue() ?: ""}):
+${manipulatedRequest.bodyBlock()}
 ${headerLine<Response>()}:
 ${manipulatedResponse.headerBlock()}
-${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${Header.CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
+${bodyLine<Response>()} (${manipulatedResponse.status.code}: ${CONTENT_TYPE(manipulatedResponse)?.toHeaderValue()
                 ?: ""}):
 ${manipulatedResponse.bodyBlock()}
 """.toByteArray())
@@ -66,7 +65,13 @@ ${manipulatedResponse.bodyBlock()}
         it.first + ": " + (it.second ?: "")
     }}\n```\n"
 
-    private fun HttpMessage.bodyBlock() = "\n```\n${bodyString()}\n```\n"
+    private fun HttpMessage.bodyBlock() = "\n```\n${encodedBody()}\n```\n"
+
+    private fun HttpMessage.encodedBody() = CONTENT_TYPE(this)
+        ?.let {
+            if (!options.contentTypeIsBinary(it)) bodyString()
+            else bodyString()
+        } ?: bodyString()
 }
 
 /**

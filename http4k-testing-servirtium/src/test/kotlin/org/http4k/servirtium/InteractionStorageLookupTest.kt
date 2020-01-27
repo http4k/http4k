@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
-class StorageFactoryTest {
+class InteractionStorageLookupTest {
 
     @Test
     fun `disk storage handles contract`(@TempDir root: File) {

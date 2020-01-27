@@ -1,8 +1,6 @@
 package org.http4k.servirtium
 
 import org.http4k.client.JavaHttpClient
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -11,6 +9,7 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.InteractionControl.Companion.StorageBased
+import org.http4k.servirtium.InteractionOptions.Companion.Defaults
 import org.http4k.servirtium.InteractionStorageLookup.Companion.Disk
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
@@ -28,12 +27,12 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
         fun Replay(
             name: String,
             storageLookup: InteractionStorageLookup = Disk(File(".")),
-            port: Int = 0,
-            requestManipulations: (Request) -> Request = { it }
+            options: InteractionOptions = Defaults,
+            port: Int = 0
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             Replay.Servirtium(storageLookup(name))
-                .replayingMatchingContent(requestManipulations)
+                .replayingMatchingContent(options::requestManipulations)
                 .asServer(SunHttp(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
 
@@ -47,14 +46,13 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             name: String,
             target: Uri,
             storageLookup: InteractionStorageLookup = Disk(File(".")),
-            requestManipulations: (Request) -> Request = { it },
-            responseManipulations: (Response) -> Response = { it },
+            options: InteractionOptions = Defaults,
             port: Int = 0
         ): ServirtiumServer {
             return object : ServirtiumServer,
                 Http4kServer by
                 TrafficFilters.RecordTo(
-                    Sink.Servirtium(storageLookup(name), requestManipulations, responseManipulations))
+                    Sink.Servirtium(storageLookup(name), options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
                     .asServer(SunHttp(port)),
