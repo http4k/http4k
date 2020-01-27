@@ -13,27 +13,25 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
-import java.io.File
-import java.nio.file.Files
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumReplayServerTest : TestContract {
 
     override val uri get() = Uri.of("http://localhost:${control.port()}")
 
-    private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
+    private val storage = StorageFactory.InMemory()
 
     override lateinit var control: ServirtiumServer
 
     @BeforeEach
     fun start(info: TestInfo) {
         javaClass.getResourceAsStream("/org/http4k/servirtium/ServirtiumReplayServerTest.txt").reader().use { r ->
-            File(root, "${info.displayName}.md").writer().use { r.copyTo(it) }
+            storage(info.displayName).accept(r.readText().toByteArray())
         }
 
         control = ServirtiumServer.Replay(
             info.displayName,
-            StorageFactory.Disk(root),
+            StorageFactory.InMemory(),
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") }
         )
         control.start()

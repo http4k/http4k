@@ -13,15 +13,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
-import java.io.File
-import java.nio.file.Files
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingServerTest : TestContract {
 
     override val uri get() = Uri.of("http://localhost:${control.port()}")
 
-    private val root = Files.createTempDirectory(".").toFile().apply { deleteOnExit() }
+    private val storage = StorageFactory.InMemory()
+
     private val app = { _: Request -> Response(OK).body("hello") }.asServer(SunHttp(0))
 
     override lateinit var control: ServirtiumServer
@@ -32,7 +31,7 @@ class ServirtiumRecordingServerTest : TestContract {
         control = ServirtiumServer.Recording(
             info.displayName,
             Uri.of("http://localhost:$appPort"),
-            StorageFactory.Disk(root),
+            storage,
             requestManipulations = { it.removeHeader("Host").removeHeader("User-agent") },
             responseManipulations = { it.removeHeader("Date") }
         )
@@ -48,8 +47,6 @@ class ServirtiumRecordingServerTest : TestContract {
     @Test
     fun `check contents are recorded as per manipulations`(info: TestInfo, approver: Approver) {
         super.scenario()
-        approver.assertApproved(Response(OK).body(
-            File(root, "${info.displayName}.md").readText()
-        ))
+        approver.assertApproved(Response(OK).body(String(storage(info.displayName).get())))
     }
 }

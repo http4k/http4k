@@ -9,13 +9,11 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
 import org.http4k.servirtium.ServirtiumContract
-import org.http4k.servirtium.StorageFactory.Companion.Disk
+import org.http4k.servirtium.StorageFactory
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 @ExtendWith(ApprovalTest::class)
 class ServirtiumRecordingTest {
@@ -24,9 +22,7 @@ class ServirtiumRecordingTest {
         override val name get() = "name"
     }
 
-    @TempDir
-    lateinit var root: File
-
+    private val storage = StorageFactory.InMemory()
     @Test
     fun `records the values into the recording`(approver: Approver) {
         val requestManipulations = { it: Request -> it.removeHeader("toBeRemoved") }
@@ -52,15 +48,13 @@ class ServirtiumRecordingTest {
             originalResponse
         }
 
-        val servirtiumRecording = ServirtiumRecording(httpHandler, Disk(root), requestManipulations, responseManipulations)
+        val servirtiumRecording = ServirtiumRecording(httpHandler, storage, requestManipulations, responseManipulations)
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)
 
         assertThat(actualResponse, equalTo(originalResponse))
 
-        val expectedFile = File(root, "name.hashCode.md")
-
-        approver.assertApproved(Response(OK).body(expectedFile.readText()))
+        approver.assertApproved(Response(OK).body(String(storage("name.hashCode").get())))
     }
 }

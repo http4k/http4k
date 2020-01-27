@@ -19,12 +19,16 @@ interface StorageFactory : (String) -> Storage {
         }
 
         fun InMemory() = object : StorageFactory {
-            override fun invoke(name: String): Storage = object : Storage {
-                private var bytes = ByteArray(0)
-                override fun get() = bytes
-                override fun accept(data: ByteArray) {
-                    bytes += data
-                }
+            private val created = mutableMapOf<String, Storage>()
+
+            override fun invoke(name: String): Storage {
+                return created[name] ?: object : Storage {
+                    private var bytes = ByteArray(0)
+                    override fun get() = bytes
+                    override fun accept(data: ByteArray) {
+                        bytes += data
+                    }
+                }.also { created[name] = it }
             }
         }
     }
