@@ -47,7 +47,8 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
         val manipulatedRequest = options.requestManipulations(request)
         val manipulatedResponse = options.responseManipulations(response)
         val bytes = (
-            "## Interaction " + count.getAndIncrement() +
+            "## Interaction " +
+                count.getAndIncrement() +
                 ": " + manipulatedRequest.method.name +
                 " " + manipulatedRequest.uri +
                 "\n\n" +
@@ -71,7 +72,8 @@ fun Sink.Companion.Servirtium(target: Consumer<ByteArray>,
                 ": " +
                 (CONTENT_TYPE(manipulatedResponse)?.toHeaderValue() ?: "") +
                 "):\n").toByteArray() +
-            "${manipulatedResponse.bodyBlock()}\n".toByteArray()
+            manipulatedResponse.bodyBlock().toByteArray() +
+            "\n".toByteArray()
         target.accept(bytes)
     }
 
