@@ -46,5 +46,5 @@ fun InteractionStorage.Companion.Github(
 }
 
 data class GithubFile(val content: String) {
-    val decoded by lazy { Base64.getDecoder().decode(content) }
+    val decoded by lazy { Base64.getDecoder().decode(content.replace("\n","")) }
 }
