@@ -66,8 +66,6 @@ object Versions {
 
      const val java_websocket: String = "1.4.0"
 
-     const val slf4j_simple: String = "1.7.25"
-
      const val commons_pool2: String = "2.8.0"
 
      const val http2_server: String = "9.4.26.v20200117"
