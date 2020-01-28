@@ -225,6 +225,8 @@ object Libs {
      const val java_websocket: String = "org.java-websocket:Java-WebSocket:" +
                Versions.java_websocket
 
+
+     const val slf4j_simple: String = "org.slf4j:slf4j-simple:" + Versions.slf4j_simple
      /**
       * https://commons.apache.org/proper/commons-pool/
       */
