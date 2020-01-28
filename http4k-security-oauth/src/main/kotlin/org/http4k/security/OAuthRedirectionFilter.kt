@@ -44,7 +44,7 @@ class OAuthRedirectionFilter(
 
             val redirect = Response(TEMPORARY_REDIRECT)
                 .with(
-                    LOCATION of redirectionBuilder(providerConfig.authUri, authRequest, state)
+                    LOCATION of redirectionBuilder(providerConfig.authUri, authRequest, state, nonce)
                         .with(modifyState)
                 )
 

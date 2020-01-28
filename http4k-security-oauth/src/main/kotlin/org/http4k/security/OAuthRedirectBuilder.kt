@@ -3,12 +3,12 @@ package org.http4k.security
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.oauth.server.AuthRequest
+import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwts
 
-typealias RedirectionUriBuilder = (Uri, AuthRequest, state: State) -> Uri
+typealias RedirectionUriBuilder = (Uri, AuthRequest, state: State, nonce: Nonce?) -> Uri
 
-val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequest, state: State ->
-    val nonce = authRequest.nonce
+val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequest, state: State, nonce: Nonce? ->
     val oauthUri = uri.query("client_id", authRequest.client.value)
         .query("response_type", authRequest.responseType.queryParameterValue)
         .query("scope", authRequest.scopes.joinToString(" "))
@@ -21,7 +21,7 @@ val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequ
     }
 }
 
-fun uriBuilderWithRequestJwt(requestJwts: RequestJwts) = { uri: Uri, authRequest: AuthRequest, state: State ->
-    defaultUriBuilder(uri, authRequest, state)
-        .query("request", requestJwts.create(authRequest, state, authRequest.nonce).value)
+fun uriBuilderWithRequestJwt(requestJwts: RequestJwts) = { uri: Uri, authRequest: AuthRequest, state: State, nonce: Nonce? ->
+    defaultUriBuilder(uri, authRequest, state, nonce)
+        .query("request", requestJwts.create(authRequest, state, nonce).value)
 }
