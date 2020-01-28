@@ -1,8 +1,9 @@
-package guide.modules.servirtium.junit
+package cookbook.service_virtualisation.junit
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
+import org.http4k.core.Credentials
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -15,6 +16,8 @@ import org.http4k.junit.ServirtiumRecording
 import org.http4k.junit.ServirtiumReplay
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.Github
+import org.http4k.servirtium.InteractionStorage
 import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
@@ -115,8 +118,17 @@ class PortBoundRecordingWordCounterTest : WordCounterContract {
 }
 
 @Disabled
-class ReplayTest : WordCounterContract {
+class ReplayFromDiskTest : WordCounterContract {
     @JvmField
     @RegisterExtension
     val replay = ServirtiumReplay("WordCounter", Disk(File(".")))
+}
+
+@Disabled
+class ReplayFromGitHubTest : WordCounterContract {
+    @JvmField
+    @RegisterExtension
+    val replay = ServirtiumReplay("WordCounter",
+        InteractionStorage.Github("http4k", "http4k", "master", Credentials("user", "password"))
+    )
 }

@@ -17,7 +17,6 @@ import org.http4k.routing.routes
 
 class FakeGitHub : HttpHandler {
     private val repoFile = Jackson.parse(String(javaClass.getResourceAsStream("/org/http4k/servirtium/gitHubFile.json").readAllBytes()))
-
     private val app =
         ServerFilters.BasicAuth("", credentials)
             .then(
