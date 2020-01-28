@@ -32,17 +32,6 @@ import java.io.File
 import java.nio.file.Path
 
 /**
- * This client wraps the calls to a remote WordCounter service
- */
-class WordCounterClient(baseUri: Uri) {
-    private val http = SetBaseUriFrom(baseUri)
-        .then(ClientFilters.HandleRemoteRequestFailed())
-        .then(ApacheClient())
-
-    fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
-}
-
-/**
  * This is our producing app
  */
 fun WordCounterApp(port: Int): Http4kServer {
@@ -52,6 +41,17 @@ fun WordCounterApp(port: Int): Http4kServer {
         )
     })
     return app.asServer(SunHttp(port))
+}
+
+/**
+ * This client wraps the calls to a remote WordCounter service
+ */
+class WordCounterClient(baseUri: Uri) {
+    private val http = SetBaseUriFrom(baseUri)
+        .then(ClientFilters.HandleRemoteRequestFailed())
+        .then(ApacheClient())
+
+    fun wordCount(name: String): Int = http(Request(POST, "/count").body(name)).bodyString().toInt()
 }
 
 /**
@@ -78,7 +78,7 @@ interface WordCounterContract {
  * This calls the server directly
  */
 @Disabled
-class DirectHttpRecordingWordCounterTest : WordCounterContract {
+class DirectHttpWordCounterTest : WordCounterContract {
     override val uri = Uri.of("http://serverundertest:8080")
 }
 
