@@ -9,7 +9,6 @@ import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
-import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.http4k.servirtium.StorageProvider
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
@@ -26,7 +25,7 @@ import org.opentest4j.AssertionFailedError
 class ServirtiumRecording(
     private val baseName: String,
     private val httpHandler: HttpHandler,
-    private val storageProvider: StorageProvider = Disk(),
+    private val storageProvider: StorageProvider,
     private val interactionOptions: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
@@ -46,7 +45,7 @@ class ServirtiumRecording(
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
 class ServirtiumReplay(private val baseName: String,
-                       private val storageProvider: StorageProvider = Disk(),
+                       private val storageProvider: StorageProvider,
                        private val options: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 

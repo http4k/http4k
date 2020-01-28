@@ -18,12 +18,14 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.InteractionOptions
+import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.http4k.servirtium.ServirtiumServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import java.io.File
 
 /**
  * This client wraps the calls to a remote WordCounter service
@@ -93,7 +95,8 @@ class MiTMRecordingWordCounterTest : WordCounterContract {
         servirtium = ServirtiumServer.Recording(
             info.displayName.removeSuffix("()"),
             Uri.of("http://localhost:$appPort"),
-            options = object : InteractionOptions {
+            Disk(File(".")),
+            object : InteractionOptions {
                 override fun modify(request: Request) = request.removeHeader("Host").removeHeader("User-agent")
                 override fun modify(response: Response) = response.removeHeader("Date")
             }
@@ -119,9 +122,12 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"), options = object : InteractionOptions {
-            override fun modify(request: Request) = request.header("Date", "some overridden date")
-        }).start()
+        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
+            Disk(File(".")),
+            object : InteractionOptions {
+                override fun modify(request: Request) = request.header("Date", "some overridden date")
+            }
+        ).start()
     }
 
     @AfterEach

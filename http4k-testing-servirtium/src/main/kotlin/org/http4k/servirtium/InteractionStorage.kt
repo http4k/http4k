@@ -14,7 +14,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     fun clean(): Boolean
 
     companion object {
-        fun Disk(root: File = File(".")): StorageProvider = object : StorageProvider {
+        fun Disk(root: File): StorageProvider = object : StorageProvider {
             override fun invoke(name: String): InteractionStorage {
                 val file = fileFor(name)
                 return object : InteractionStorage {
