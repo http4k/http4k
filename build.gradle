@@ -233,6 +233,7 @@ dependencies {
     provided project(":http4k-testing-webdriver")
 
     testCompile Config.TestDependencies
+    testCompile project(path: ":http4k-testing-servirtium", configuration: 'testArtifacts')
 }
 
 sourceSets {

@@ -9,8 +9,7 @@ import org.http4k.servirtium.InteractionControl
 import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
-import org.http4k.servirtium.InteractionStorage.Companion.Disk
-import org.http4k.servirtium.InteractionStorageLookup
+import org.http4k.servirtium.StorageProvider
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -26,7 +25,7 @@ import org.opentest4j.AssertionFailedError
 class ServirtiumRecording(
     private val baseName: String,
     private val httpHandler: HttpHandler,
-    private val storageLookup: InteractionStorageLookup = Disk(),
+    private val storageProvider: StorageProvider,
     private val interactionOptions: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
@@ -34,7 +33,7 @@ class ServirtiumRecording(
         with(ec.testInstance.get()) {
             val testName = "$baseName.${ec.requiredTestMethod.name}"
 
-            val storage = storageLookup(testName).apply { clean() }
+            val storage = storageProvider(testName).apply { clean() }
             if (pc.isHttpHandler())
                 RecordTo(Sink.Servirtium(storage, interactionOptions))
                     .then(httpHandler)
@@ -46,14 +45,14 @@ class ServirtiumRecording(
  * JUnit 5 extension for replaying HTTP traffic from disk in Servirtium format.
  */
 class ServirtiumReplay(private val baseName: String,
-                       private val storageLookup: InteractionStorageLookup = Disk(),
+                       private val storageProvider: StorageProvider,
                        private val options: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         if (pc.isHttpHandler()) {
             ConvertBadResponseToAssertionFailed()
-                .then(Replay.Servirtium(storageLookup("$baseName.${ec.requiredTestMethod.name}"), options)
+                .then(Replay.Servirtium(storageProvider("$baseName.${ec.requiredTestMethod.name}"), options)
                     .replayingMatchingContent(options::modify)
                 )
         } else NoOp
