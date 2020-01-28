@@ -13,7 +13,7 @@ git stash
 
 echo Upgrade from "$BINTRAY_VERSION" to "$NEW_VERSION"
 
-find . -name "*.md" | grep -v "CHANGELOG" | xargs  sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g
+find . -name "*.md" | grep -v "CHANGELOG" | xargs -I '{}' sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g '{}'
 sed -i '' s/"$BINTRAY_VERSION"/"$NEW_VERSION"/g version.json
 
 git commit -am"Release $NEW_VERSION"
