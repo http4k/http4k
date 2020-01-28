@@ -131,7 +131,7 @@ class ReplayFromGitHubTest : WordCounterContract {
     @RegisterExtension
     val replay = ServirtiumReplay("WordCounter",
         InteractionStorage.Github("http4k", "http4k",
-            Credentials("user", "password"),
+            Credentials("<github user>", "<personal access token>"),
             Path.of("src/test/resources/cookbook/service_virtualisation")
         )
     )

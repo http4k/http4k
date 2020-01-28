@@ -6,7 +6,6 @@ import org.http4k.cloudnative.Unauthorized
 import org.http4k.core.Credentials
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Uri
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
@@ -19,13 +18,13 @@ class GitHubStorageProviderTest {
     @Test
     fun `can load content from github`(approver: Approver) {
         val storage = gitHubFor(FakeGitHub.credentials)
-        approver.assertApproved(Response(OK).body(String(storage("gitHubFile.json").get())))
+        approver.assertApproved(Response(OK).body(String(storage("gitHubFile").get())))
     }
 
     @Test
     fun `wrong credentials fails`() {
         val storage = gitHubFor(Credentials("notuser", "noway"))
-        assertThat({ storage("gitHubFile.json").get() }, throws<Unauthorized>())
+        assertThat({ storage("gitHubFile").get() }, throws<Unauthorized>())
     }
 
     private fun gitHubFor(credentials: Credentials) = InteractionStorage.Github(
@@ -34,7 +33,6 @@ class GitHubStorageProviderTest {
         credentials,
         Path.of("org/http4k/servirtium"),
         "master",
-        Uri.of("https://api.github.com"),
         FakeGitHub()
     )
 }

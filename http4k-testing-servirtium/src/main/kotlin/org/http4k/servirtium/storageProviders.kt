@@ -27,8 +27,7 @@ fun InteractionStorage.Companion.Github(
     credentials: Credentials,
     basePath: Path = Path.of(""),
     reference: String? = null,
-    baseApiUri: Uri = Uri.of("https://api.github.com"),
-    http: HttpHandler = SetBaseUriFrom(baseApiUri).then(JavaHttpClient())
+    http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
 ) = object : StorageProvider {
 
     private val authed = BasicAuth(credentials)
@@ -37,7 +36,7 @@ fun InteractionStorage.Companion.Github(
 
     override fun invoke(name: String): InteractionStorage = object : InteractionStorage {
         override fun get() = Body.auto<GithubFile>().toLens()(
-            authed(Request(GET, "/repos/$owner/$repo/contents/$basePath/$name")
+            authed(Request(GET, "/repos/$owner/$repo/contents/$basePath/${name.replace(" ", "%20")}.md")
                 .with(Query.optional("ref") of reference)
             )).decoded
 
