@@ -75,12 +75,12 @@ internal class RequestObjectExtractorTest {
 
         val correspondingExpectedRequestObject = RequestObject(
             issuer = "s6BhdRkqt3",
-            audience = "https://server.example.com",
+            audience = listOf("https://server.example.com"),
             responseMode = Query,
             responseType = CodeIdToken,
             client = ClientId("s6BhdRkqt3"),
             redirectUri = Uri.of("https://client.example.org/cb"),
-            scope = "openid",
+            scope = listOf("openid"),
             state = State("af0ifjsldkj"),
             nonce = Nonce("n-0S6_WzA2Mj"),
             magAge = 86400,
@@ -112,7 +112,25 @@ internal class RequestObjectExtractorTest {
 
         val correspondingExpectedRequestObject = RequestObject(
             issuer = "s6BhdRkqt3",
+            audience = emptyList(),
+            scope = emptyList(),
             claims = Claims()
+        )
+
+        val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"
+
+        assertThat(RequestObjectExtractor.extractRequestObjectFromJwt(requestJwt), equalTo(success(correspondingExpectedRequestObject)))
+    }
+
+    @Test
+    fun `multiple audiences are supported`() {
+        val rawData = mapOf(
+            "aud" to listOf("https://audience1", "https://audience2", "https://audience3")
+        )
+
+        val correspondingExpectedRequestObject = RequestObject(
+            audience = listOf("https://audience1", "https://audience2", "https://audience3"),
+            scope = emptyList()
         )
 
         val requestJwt = "someHeader.${Base64.encodeBase64URLSafeString(Jackson.asJsonString(rawData).toByteArray()).replace("=", "")}.someSignature"

@@ -66,7 +66,7 @@ class OAuthProviderTest {
         val expectedHeader = """http://authHost/auth?client_id=user&response_type=code&scope=scope1+scope2&redirect_uri=http%3A%2F%2FcallbackHost%2Fcallback&state=csrf%3DrandomCsrf%26uri%3D%252F&request=myCustomJwt&response_mode=form_post"""
 
         val jwts = object : RequestJwts {
-            override fun create(authRequest: AuthRequest, state: State) = RequestJwtContainer("myCustomJwt")
+            override fun create(authRequest: AuthRequest, state: State, nonce: Nonce?) = RequestJwtContainer("myCustomJwt")
 
         }
         assertThat(oAuth(oAuthPersistence).authFilter(jwts).then { Response(OK) }(Request(GET, "/")), hasStatus(TEMPORARY_REDIRECT).and(hasHeader("Location", expectedHeader)))

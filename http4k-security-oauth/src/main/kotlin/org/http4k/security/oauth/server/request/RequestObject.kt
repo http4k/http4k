@@ -1,6 +1,18 @@
 package org.http4k.security.oauth.server.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.databind.node.TextNode
 import org.http4k.core.Uri
 import org.http4k.security.ResponseMode
 import org.http4k.security.ResponseType
@@ -8,23 +20,21 @@ import org.http4k.security.State
 import org.http4k.security.oauth.server.ClientId
 import org.http4k.security.openid.Nonce
 
-data class RequestObject(@JsonProperty("client_id") val client: ClientId? = null,
-                         @JsonProperty("redirect_uri") val redirectUri: Uri? = null,
-                         @JsonProperty("aud") val audience: String? = null,
-                         @JsonProperty("iss") val issuer: String? = null,
-                         @JsonProperty("scope") val scope: String? = null,
-                         @JsonProperty("response_mode") val responseMode: ResponseMode? = null,
-                         @JsonProperty("response_type") val responseType: ResponseType? = null,
-                         @JsonProperty("state") val state: State? = null,
-                         @JsonProperty("nonce") val nonce: Nonce? = null,
-                         @JsonProperty("max_age") val magAge: Long? = null,
-                         @JsonProperty("exp") val expiry: Long? = null,
-                         @JsonProperty("claims") val claims: Claims = Claims()) {
-
-    fun scopes(): List<String> = this.scope?.let { it.split(" ") } ?: emptyList()
-}
+data class RequestObject(val client: ClientId? = null,
+                         val redirectUri: Uri? = null,
+                         val audience: List<String> = emptyList(),
+                         val issuer: String? = null,
+                         val scope: List<String> = emptyList(),
+                         val responseMode: ResponseMode? = null,
+                         val responseType: ResponseType? = null,
+                         val state: State? = null,
+                         val nonce: Nonce? = null,
+                         val magAge: Long? = null,
+                         val expiry: Long? = null,
+                         val claims: Claims = Claims())
 
 data class Claims(@JsonProperty("userinfo") val userInfo: Map<String, Claim>? = null,
                   @JsonProperty("id_token") val idToken: Map<String, Claim>? = null)
 
 data class Claim(val essential: Boolean = false, val value: String? = null, val values: List<String>? = null)
+

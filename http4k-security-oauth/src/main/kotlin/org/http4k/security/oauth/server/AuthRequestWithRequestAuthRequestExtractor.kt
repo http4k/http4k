@@ -45,8 +45,8 @@ class AuthRequestWithRequestAuthRequestExtractor(private val requestJWTValidator
             responseType = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseType, requestObject.responseType).onFailure { return it }
                 ?: Code,
             responseMode = nonNullValueIfExistsOrErrorIfNotEqual(authRequest.responseMode, requestObject.responseMode).onFailure { return it },
-            scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scopes())
-                .onFailure { return it } ?: emptyList()
+            scopes = nonEmptyScopeIfExistsOrErrorIfNotEqual(authRequest.scopes, requestObject.scope)
+                .onFailure { return it }
         ))
     }
 
