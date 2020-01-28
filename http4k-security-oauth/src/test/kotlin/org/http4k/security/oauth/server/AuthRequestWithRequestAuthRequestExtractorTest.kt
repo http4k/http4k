@@ -1,5 +1,10 @@
 package org.http4k.security.oauth.server
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
+import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.databind.node.TextNode
 import com.natpryce.Failure
 import com.natpryce.Result
 import com.natpryce.Success
@@ -13,6 +18,7 @@ import org.http4k.security.ResponseType.Code
 import org.http4k.security.State
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.oauth.server.request.RequestObject
+import org.http4k.security.oauth.server.request.RequestObjectExtractor
 import org.http4k.security.oauth.server.request.RequestObjectExtractor.RequestObjectExtractorJson
 import org.http4k.security.openid.RequestJwtContainer
 import org.junit.jupiter.api.Test
@@ -102,7 +108,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     @Test
     fun `scopes are the same on request and request object but in different order than it is correct`() {
-        val requestObject = RequestObject(scope = "email openid address")
+        val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
         val requestObjectJwt = requestJwt(requestObject)
         assertThat(underTest.extract(Request(GET, "/?client_id=12345&scope=openid+email+address=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
             client = ClientId("12345"),
@@ -117,7 +123,7 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
 
     @Test
     fun `if scopes on the request are missing but available on the request jwt`() {
-        val requestObject = RequestObject(scope = "email openid address")
+        val requestObject = RequestObject(scope = listOf("email", "openid", "address"))
         val requestObjectJwt = requestJwt(requestObject)
         assertThat(underTest.extract(Request(GET, "/?client_id=12345=&response_type=code&redirect_uri=https://somehost&request=$requestObjectJwt")), equalTo(success(AuthRequest(
             client = ClientId("12345"),
@@ -148,8 +154,37 @@ internal class AuthRequestWithRequestAuthRequestExtractorTest {
     private fun success(authRequest: AuthRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Success(authRequest)
     private fun failure(error: InvalidAuthorizationRequest): Result<AuthRequest, InvalidAuthorizationRequest> = Failure(error)
 
-    private fun requestJwt(requestObject: RequestObject): String =
-        "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asJsonString(requestObject).toByteArray()).replace("=", "")}.someSignature"
+    private fun requestJwt(requestObject: RequestObject): String {
+        val requestObjectJson = RequestObjectExtractor.RequestObjectJson(
+            client = requestObject.client,
+            redirectUri = requestObject.redirectUri,
+            audience = audienceToJson(requestObject.audience),
+            issuer = requestObject.issuer,
+            scope = if(requestObject.scope.isEmpty()) null else requestObject.scope.joinToString(" "),
+            responseMode = requestObject.responseMode,
+            responseType = requestObject.responseType,
+            state = requestObject.state,
+            nonce = requestObject.nonce,
+            magAge = requestObject.magAge,
+            expiry = requestObject.expiry,
+            claims = requestObject.claims
+        )
+        return "someHeader.${Base64.encodeBase64URLSafeString(RequestObjectExtractorJson.asJsonString(requestObjectJson).toByteArray()).replace("=", "")}.someSignature"
+    }
+
+    private fun audienceToJson(audience: List<String>): JsonNode {
+        return when {
+            audience.isEmpty() -> {
+                NullNode.instance
+            }
+            audience.size == 1 -> {
+                TextNode(audience[0])
+            }
+            else -> {
+                ArrayNode(instance, audience.map { TextNode(it) })
+            }
+        }
+    }
 
 
 }

@@ -23,5 +23,5 @@ val defaultUriBuilder: RedirectionUriBuilder = { uri: Uri, authRequest: AuthRequ
 
 fun uriBuilderWithRequestJwt(requestJwts: RequestJwts) = { uri: Uri, authRequest: AuthRequest, state: State ->
     defaultUriBuilder(uri, authRequest, state)
-        .query("request", requestJwts.create(authRequest, state).value)
+        .query("request", requestJwts.create(authRequest, state, authRequest.nonce).value)
 }
