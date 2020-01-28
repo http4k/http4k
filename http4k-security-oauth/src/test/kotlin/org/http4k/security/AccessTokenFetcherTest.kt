@@ -14,12 +14,13 @@ import org.junit.jupiter.api.Test
 
 internal class AccessTokenFetcherTest {
     private val config = OAuthProviderConfig(Uri.of("irrelevant"), "/", "/path", Credentials("", ""))
+    private val accessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(config)
 
     @Test
     fun `can get access token from plain text body`() {
         val api = { _: Request -> Response(OK).body("some-access-token") }
 
-        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
+        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
         assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
     }
@@ -30,7 +31,7 @@ internal class AccessTokenFetcherTest {
         //see https://tools.ietf.org/html/rfc6749#section-4.1.4
         val api = { _: Request -> Response(OK).with(accessTokenResponseBody of AccessTokenResponse("some-access-token")) }
 
-        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
+        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
         assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
     }
@@ -43,7 +44,7 @@ internal class AccessTokenFetcherTest {
                 .body("{\"access_token\": \"some-access-token\"}")
         }
 
-        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
+        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
         assertThat(fetcher.fetch("some-code"), equalTo(AccessTokenDetails(AccessToken("some-access-token"))))
     }
@@ -52,7 +53,7 @@ internal class AccessTokenFetcherTest {
     fun `handle non-successful response`() {
         val api = { _: Request -> Response(BAD_REQUEST) }
 
-        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config)
+        val fetcher = AccessTokenFetcher(api, Uri.of("irrelevant"), config, accessTokenFetcherAuthenticator)
 
         assertThat(fetcher.fetch("some-code"), absent())
     }

@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.229.0
+- [http4k-security-oauth] Allowing for custom authenticate methods when fetching access tokens H/T @tom
+
 ### v3.228.0
 - [http4k-testing-servirtium] [Breaking] API is still in beta, so moving to a more composed approach which will increase reuse and allow for running Servirtium infra without a dependency on http4k or Junit. Added loading from GitHub. :)
 - [http4k-security-oauth] [Breaking] Audience on request object is now a list to support multiple audiences. H/T @tom

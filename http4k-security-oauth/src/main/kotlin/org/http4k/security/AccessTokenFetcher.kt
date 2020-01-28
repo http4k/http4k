@@ -15,14 +15,15 @@ import org.http4k.security.openid.IdToken
 class AccessTokenFetcher(
     private val api: HttpHandler,
     private val callbackUri: Uri,
-    private val providerConfig: OAuthProviderConfig
+    private val providerConfig: OAuthProviderConfig,
+    private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator
 ) {
     fun fetch(code: String): AccessTokenDetails? = api(Request(POST, providerConfig.tokenPath)
         .with(CONTENT_TYPE of APPLICATION_FORM_URLENCODED)
         .form("grant_type", "authorization_code")
         .form("redirect_uri", callbackUri.toString())
         .form("client_id", providerConfig.credentials.user)
-        .form("client_secret", providerConfig.credentials.password)
+        .authenticate(accessTokenFetcherAuthenticator)
         .form("code", code))
         .let { if (it.status != OK) null else it }
         ?.let { msg ->
@@ -33,4 +34,7 @@ class AccessTokenFetcher(
                     }
                 } ?: AccessTokenDetails(AccessToken(msg.bodyString()))
         }
+
+    private fun Request.authenticate(accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator): Request =
+        accessTokenFetcherAuthenticator.authenticate(this)
 }

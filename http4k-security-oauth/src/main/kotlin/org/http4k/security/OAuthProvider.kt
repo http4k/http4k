@@ -24,7 +24,8 @@ class OAuthProvider(
     private val generateCrsf: CsrfGenerator = SECURE_CSRF,
     private val nonceGenerator: NonceGenerator = SECURE_NONCE,
     private val responseType: ResponseType = ResponseType.Code,
-    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp
+    idTokenConsumer: IdTokenConsumer = IdTokenConsumer.NoOp,
+    private val accessTokenFetcherAuthenticator: AccessTokenFetcherAuthenticator = ClientSecretAccessTokenFetcherAuthenticator(providerConfig)
 ) {
 
     // pre-configured API client for this provider
@@ -36,7 +37,7 @@ class OAuthProvider(
     // protect endpoint and provide custom request JWT creation mechanism
     fun authFilter(requestJwts: RequestJwts): Filter = OAuthRedirectionFilter(providerConfig, callbackUri, scopes, generateCrsf, nonceGenerator, modifyAuthState, oAuthPersistence, responseType, uriBuilderWithRequestJwt(requestJwts))
 
-    private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig)
+    private val accessTokenFetcher = AccessTokenFetcher(api, callbackUri, providerConfig, accessTokenFetcherAuthenticator)
 
     // this HttpHandler should exist at the callback URI registered with the OAuth Provider
     val callback: HttpHandler = OAuthCallback(oAuthPersistence, idTokenConsumer, accessTokenFetcher)
