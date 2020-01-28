@@ -153,13 +153,18 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
 
     @BeforeEach
     fun start(info: TestInfo) {
-        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
+        servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
             InteractionStorage.Github("http4k", "http4k",
                 Credentials("<github user>", "<personal access token>"),
                 Path.of("src/test/resources/cookbook/service_virtualisation")
             ),
             object : InteractionOptions {
-                override fun modify(request: Request) = request.header("Date", "some overridden date")
+                override fun modify(request: Request) = request
+                    .removeHeader("Accept-encoding")
+                    .removeHeader("Connection")
+                    .removeHeader("Host")
+                    .removeHeader("User-agent")
+                    .removeHeader("Content-length")
             }
         ).start()
     }
