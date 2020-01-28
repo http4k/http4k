@@ -3,6 +3,7 @@ package cookbook.service_virtualisation.mitm
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.ApacheClient
+import org.http4k.core.Credentials
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -17,7 +18,9 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
+import org.http4k.servirtium.Github
 import org.http4k.servirtium.InteractionOptions
+import org.http4k.servirtium.InteractionStorage
 import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.http4k.servirtium.ServirtiumServer
 import org.junit.jupiter.api.AfterEach
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.io.File
+import java.nio.file.Path
 
 /**
  * This client wraps the calls to a remote WordCounter service
@@ -124,6 +128,36 @@ class MiTMReplayingWordCounterTest : WordCounterContract {
     fun start(info: TestInfo) {
         servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
             Disk(File(".")),
+            object : InteractionOptions {
+                override fun modify(request: Request) = request.header("Date", "some overridden date")
+            }
+        ).start()
+    }
+
+    @AfterEach
+    fun stop() {
+        servirtium.stop()
+    }
+}
+
+/**
+ * Replays incoming traffic from GitHub. MiTM starts on a random port. Requires a github username
+ * and personal access token.
+ */
+@Disabled
+class GitHubReplayingWordCounterTest : WordCounterContract {
+
+    override val uri get() = Uri.of("http://localhost:${servirtium.port()}")
+
+    private lateinit var servirtium: Http4kServer
+
+    @BeforeEach
+    fun start(info: TestInfo) {
+        servirtium = ServirtiumServer.Replay(info.displayName.removeSuffix("()"),
+            InteractionStorage.Github("http4k", "http4k",
+                Credentials("<github user>", "<personal access token>"),
+                Path.of("src/test/resources/cookbook/service_virtualisation")
+            ),
             object : InteractionOptions {
                 override fun modify(request: Request) = request.header("Date", "some overridden date")
             }
