@@ -77,11 +77,7 @@ private val Method.allowsContent: Boolean
 private fun buildAuthHeader(scope: AwsCredentialScope,
                             credentials: AwsCredentials,
                             canonicalRequest: AwsCanonicalRequest, date: AwsRequestDate) =
-    String.format("%s Credential=%s/%s, SignedHeaders=%s, Signature=%s",
-        "AWS4-HMAC-SHA256",
-        credentials.accessKey, scope.datedScope(date),
-        canonicalRequest.signedHeaders,
-        AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date))
+    "AWS4-HMAC-SHA256 Credential=${credentials.accessKey}/${scope.datedScope(date)}, SignedHeaders=${canonicalRequest.signedHeaders}, Signature=${AwsSignatureV4Signer.sign(canonicalRequest, scope, credentials, date)}"
 
 data class CanonicalPayload(val hash: String, val length: Long)
 
