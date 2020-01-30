@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.230.0 (uncut)
 - [http4k-aws] Improved efficiency of building AWS credentials (replace String.format).
+- [all] Upgrade some dependency versions.
 
 ### v3.229.0
 - [http4k-security-oauth] Allowing for custom authenticate methods when fetching access tokens H/T @tom
