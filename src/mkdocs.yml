@@ -48,7 +48,7 @@ nav:
       - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
-      - Service Virtualisaion: guide/modules/servirtium/index.md
+      - Service Virtualisaion: guide/modules/servicevirtualisation/index.md
     - Application Testing: guide/testing/index.md
   - Tutorials:
     - TDDing http4k: tutorials/tdding_http4k/index.md
