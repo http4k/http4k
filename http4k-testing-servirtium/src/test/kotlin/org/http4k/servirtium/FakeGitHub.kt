@@ -23,7 +23,7 @@ class FakeGitHub : HttpHandler {
             .then(
                 routes(
                     "/repos/{owner}/{repo}/contents/{resource:.+}" bind GET to {
-                        javaClass.getResourceAsStream("/" + it.path("resource") ?: "")?.let {
+                        javaClass.getResourceAsStream("/" + (it.path("resource") ?: ""))?.let {
                             val repoFile = Jackson.parse(String(it.readAllBytes()))
                             Response(OK).with(Body.json().toLens() of repoFile)
                         } ?: Response(NOT_FOUND)
