@@ -26,7 +26,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.extension.RegisterExtension
 import java.io.File
-import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * This client wraps the calls to a remote WordCounter service
@@ -132,7 +132,8 @@ class ReplayFromGitHubTest : WordCounterContract {
     val replay = ServirtiumReplay("WordCounter",
         InteractionStorage.Github("http4k", "http4k",
             Credentials("<github user>", "<personal access token>"),
-            Path.of("src/test/resources/cookbook/service_virtualisation")
+            Paths.get("src/test/resources/cookbook/service_virtualisation")
         )
     )
 }
+

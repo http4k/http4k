@@ -10,7 +10,7 @@ import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.nio.file.Path
+import java.nio.file.Paths
 
 @ExtendWith(ApprovalTest::class)
 class GitHubStorageProviderTest {
@@ -31,7 +31,7 @@ class GitHubStorageProviderTest {
         "owner",
         "repo",
         credentials,
-        Path.of("org/http4k/servirtium"),
+        Paths.get("org/http4k/servirtium"),
         "master",
         FakeGitHub()
     )

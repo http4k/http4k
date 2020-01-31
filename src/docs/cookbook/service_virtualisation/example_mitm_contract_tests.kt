@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.io.File
-import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * This is our producing app
@@ -156,7 +156,7 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
         servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
             InteractionStorage.Github("http4k", "http4k",
                 Credentials("<github user>", "<personal access token>"),
-                Path.of("src/test/resources/cookbook/service_virtualisation")
+                Paths.get("src/test/resources/cookbook/service_virtualisation")
             ),
             object : InteractionOptions {
                 override fun modify(request: Request) = request

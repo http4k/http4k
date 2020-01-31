@@ -16,6 +16,7 @@ import org.http4k.filter.HandleRemoteRequestFailed
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Query
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Base64
 
 /**
@@ -25,7 +26,7 @@ fun InteractionStorage.Companion.Github(
     owner: String,
     repo: String,
     credentials: Credentials,
-    basePath: Path = Path.of(""),
+    basePath: Path = Paths.get(""),
     reference: String? = null,
     http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
 ) = object : StorageProvider {
