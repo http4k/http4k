@@ -48,6 +48,7 @@ nav:
       - Approval Testing: guide/modules/approvaltests/index.md
       - WebDriver: guide/modules/webdriver/index.md
       - Chaos Testing: guide/modules/chaos/index.md
+      - Service Virtualisaion: guide/modules/servirtium/index.md
     - Application Testing: guide/testing/index.md
   - Tutorials:
     - TDDing http4k: tutorials/tdding_http4k/index.md
@@ -57,11 +58,12 @@ nav:
     - Client as a function: cookbook/client_as_a_function/index.md
     - Container integration: cookbook/container_integration/index.md
     - Simple routing: cookbook/simple_routing/index.md
+    - Service Virtualisation with Servirtium: cookbook/service_virtualisation/index.md
     - Nestable routes: cookbook/nestable_routes/index.md
-    - JSON messaging: cookbook/using_json/index.md
     - Templating engines: cookbook/using_templates/index.md
     - Typesafe RequestContexts: cookbook/request_context/index.md
     - Typesafe HTTP requests with lenses: cookbook/typesafe_http_requests_with_lenses/index.md
+    - Custom JSON marshallers: cookbook/custom_json_marshallers/index.md
     - HTML forms: cookbook/html_forms/index.md
     - Multipart forms: cookbook/multipart_forms/index.md
     - Generating data classes for messages: cookbook/generating_data_classes/index.md
