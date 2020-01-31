@@ -2,7 +2,7 @@ title: http4k OAuth security Module
 description: Feature overview of the http4k-security-oauth form module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-security-oauth", version: "3.229.0"```
+```compile group: "org.http4k", name: "http4k-security-oauth", version: "3.230.0"```
 
 ### About
 

@@ -10,9 +10,9 @@ This contract example shows:
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.229.0"
-    compile group: "org.http4k", name: "http4k-contract", version: "3.229.0"
-    compile group: "org.http4k", name: "http4k-format-argo", version: "3.229.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.230.0"
+    compile group: "org.http4k", name: "http4k-contract", version: "3.230.0"
+    compile group: "org.http4k", name: "http4k-format-argo", version: "3.230.0"
 ```
 
 Note: although we use Argo here as our JSON API, you could also switch in any of the `http4k-format-xxx` JSON modules. 
