@@ -22,12 +22,12 @@ import java.util.Base64
 /**
  * Read a file from a repository using the GitHub API.
  */
-class Github(private val owner: String,
-             private val repo: String,
-             credentials: Credentials,
-             private val basePath: Path = Paths.get(""),
-             private val reference: String? = null,
-             http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
+class Github @JvmOverloads constructor(private val owner: String,
+                                       private val repo: String,
+                                       credentials: Credentials,
+                                       private val basePath: Path = Paths.get(""),
+                                       private val reference: String? = null,
+                                       http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
 ) : StorageProvider {
 
     private val authed = BasicAuth(credentials)
