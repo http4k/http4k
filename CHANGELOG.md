@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.230.0 (uncut)
+### v3.230.0
 - [http4k-aws] Improved efficiency of building AWS credentials (replace String.format).
+- [http4k-testing-servirtium] Making API a bit more Java-compatible friendly.
 - [all] Upgrade some dependency versions.
 
 ### v3.229.0

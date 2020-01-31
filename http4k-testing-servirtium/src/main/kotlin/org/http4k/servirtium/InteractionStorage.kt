@@ -14,6 +14,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
     fun clean(): Boolean
 
     companion object {
+        @JvmStatic
         fun Disk(root: File): StorageProvider = object : StorageProvider {
             override fun invoke(name: String): InteractionStorage {
                 val file = fileFor(name)
@@ -30,6 +31,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
             private fun fileFor(name: String) = File(root, "$name.md")
         }
 
+        @JvmStatic
         fun InMemory() = object : StorageProvider {
             private val created = mutableMapOf<String, AtomicReference<ByteArray>>()
 

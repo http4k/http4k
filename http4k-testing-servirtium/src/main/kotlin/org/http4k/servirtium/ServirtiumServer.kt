@@ -22,6 +22,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Replay server which will match and replay recorded traffic read from the named Servirtium Markdown file.
          * Incoming requests can be manipulated to ensure that it matches the expected request.
          */
+        @JvmStatic
         fun Replay(
             name: String,
             storageProvider: StorageProvider,
@@ -40,6 +41,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          *
          * Manipulations can be made to the requests and responses before they are stored.
          */
+        @JvmStatic
         fun Recording(
             name: String,
             target: Uri,

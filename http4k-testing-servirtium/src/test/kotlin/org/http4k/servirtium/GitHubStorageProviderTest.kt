@@ -27,7 +27,7 @@ class GitHubStorageProviderTest {
         assertThat({ storage("gitHubFile").get() }, throws<Unauthorized>())
     }
 
-    private fun gitHubFor(credentials: Credentials) = InteractionStorage.Github(
+    private fun gitHubFor(credentials: Credentials) = Github(
         "owner",
         "repo",
         credentials,

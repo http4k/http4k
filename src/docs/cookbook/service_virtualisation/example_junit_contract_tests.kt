@@ -17,7 +17,6 @@ import org.http4k.junit.ServirtiumReplay
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.Github
-import org.http4k.servirtium.InteractionStorage
 import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
@@ -130,7 +129,7 @@ class ReplayFromGitHubTest : WordCounterContract {
     @JvmField
     @RegisterExtension
     val replay = ServirtiumReplay("WordCounter",
-        InteractionStorage.Github("http4k", "http4k",
+        Github("http4k", "http4k",
             Credentials("<github user>", "<personal access token>"),
             Paths.get("src/test/resources/cookbook/service_virtualisation")
         )

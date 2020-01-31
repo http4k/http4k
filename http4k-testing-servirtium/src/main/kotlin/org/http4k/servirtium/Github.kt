@@ -22,14 +22,13 @@ import java.util.Base64
 /**
  * Read a file from a repository using the GitHub API.
  */
-fun InteractionStorage.Companion.Github(
-    owner: String,
-    repo: String,
-    credentials: Credentials,
-    basePath: Path = Paths.get(""),
-    reference: String? = null,
-    http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
-) = object : StorageProvider {
+class Github(private val owner: String,
+             private val repo: String,
+             credentials: Credentials,
+             private val basePath: Path = Paths.get(""),
+             private val reference: String? = null,
+             http: HttpHandler = SetBaseUriFrom(Uri.of("https://api.github.com")).then(JavaHttpClient())
+) : StorageProvider {
 
     private val authed = BasicAuth(credentials)
         .then(ClientFilters.HandleRemoteRequestFailed())
@@ -48,5 +47,5 @@ fun InteractionStorage.Companion.Github(
 }
 
 data class GithubFile(val content: String) {
-    val decoded by lazy { Base64.getDecoder().decode(content.replace("\n","")) }
+    val decoded by lazy { Base64.getDecoder().decode(content.replace("\n", "")) }
 }
