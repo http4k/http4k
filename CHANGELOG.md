@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.230.1 (uncut)
+- [http4k-server-jetty] Fix #362 - Websocket disconnect early causes lateinit reference race condition. H/T @fintara for the report/fix.
+
 ### v3.230.0
 - [http4k-aws] Improved efficiency of building AWS credentials (replace String.format).
 - [http4k-testing-servirtium] Making API a bit more Java-compatible friendly.
