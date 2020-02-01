@@ -1,4 +1,3 @@
-
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -12,6 +11,8 @@ import org.gradle.plugin.use.PluginDependencySpec
  * YOU are responsible for updating manually the dependency version.
  */
 object Versions {
+     const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.14.0"
+
      const val io_github_resilience4j: String = "1.2.0"
 
      const val org_jetbrains_kotlin: String = "1.3.61"
@@ -34,7 +35,7 @@ object Versions {
 
      const val com_jfrog_bintray_gradle_plugin: String = "1.8.4"
 
-     const val openapi_generator_gradle_plugin: String = "4.2.2"
+     const val openapi_generator_gradle_plugin: String = "4.2.2" // available: "4.2.3"
 
      const val javax_websocket_server_impl: String = "9.4.26.v20200117"
 
@@ -60,7 +61,7 @@ object Versions {
 
      const val httpasyncclient: String = "4.1.4"
 
-     const val ktor_server_cio: String = "1.3.0"
+     const val ktor_server_cio: String = "1.1.1" // available: "1.3.0"
 
      const val micrometer_core: String = "1.3.3"
 
@@ -78,7 +79,7 @@ object Versions {
 
      const val httpclient: String = "4.5.11"
 
-     const val underscore: String = "1.51"
+     const val underscore: String = "1.51" // available: "1.52"
 
      const val alpn_boot: String = "8.1.13.v20181017"
 
@@ -105,8 +106,6 @@ object Versions {
      const val gson: String = "2.8.6"
 
      const val json: String = "20190722"
-
-    const val kotlinx_serialization_runtime = "0.14.0"
 
      /**
       * Current version: "5.5"
