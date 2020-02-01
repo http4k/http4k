@@ -61,7 +61,7 @@ object Versions {
 
      const val httpasyncclient: String = "4.1.4"
 
-     const val ktor_server_cio: String = "1.1.1" // available: "1.3.0"
+     const val ktor_server_cio: String = "1.3.0"
 
      const val micrometer_core: String = "1.3.3"
 
