@@ -17,7 +17,7 @@ import java.math.BigDecimal
 abstract class GenerateDataClassesContract<NODE : Any>(val j: Json<NODE>) {
 
     @Test
-    fun `generates data classes correctly`() {
+    open fun `generates data classes correctly`() {
         val input = j {
             obj(
                 "string" to string("value"),
