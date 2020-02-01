@@ -44,9 +44,7 @@ object KotlinxSerialization : Json<JsonElement> {
 
     override fun Long?.asJsonValue() = JsonPrimitive(this)
 
-    override fun BigDecimal?.asJsonValue() = this?.let {
-        json.parse(JsonLiteralSerializer, "$it")
-    } ?: JsonNull
+    override fun BigDecimal?.asJsonValue() = JsonPrimitive("$this")
 
     override fun BigInteger?.asJsonValue() = JsonPrimitive(this)
 
