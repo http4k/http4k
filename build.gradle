@@ -12,6 +12,7 @@ buildscript {
         classpath Libs.com_jfrog_bintray_gradle_plugin
         classpath Libs.nebula_provided_base_gradle_plugin
         classpath Libs.openapi_generator_gradle_plugin
+        classpath Libs.kotlinx_serialization_plugin
     }
 }
 

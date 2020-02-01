@@ -326,4 +326,15 @@ object Libs {
       * https://github.com/douglascrockford/JSON-java
       */
      const val json: String = "org.json:json:" + Versions.json
+
+    /**
+     * https://github.com/Kotlin/kotlinx.serialization
+     */
+    const val kotlinx_serialization_runtime: String = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:" + Versions.kotlinx_serialization_runtime
+
+    /**
+     * https://github.com/Kotlin/kotlinx.serialization
+     */
+    const val kotlinx_serialization_plugin: String = "org.jetbrains.kotlin:kotlin-serialization:" + Versions.org_jetbrains_kotlin
+
 }

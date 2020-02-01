@@ -106,6 +106,8 @@ object Versions {
 
      const val json: String = "20190722"
 
+    const val kotlinx_serialization_runtime = "0.14.0"
+
      /**
       * Current version: "5.5"
       * See issue 19: How to update Gradle itself?
