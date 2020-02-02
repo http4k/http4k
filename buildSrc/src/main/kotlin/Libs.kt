@@ -6,6 +6,13 @@
  */
 object Libs {
      /**
+      * https://github.com/Kotlin/kotlinx.serialization
+      */
+     const val kotlinx_serialization_runtime: String =
+               "org.jetbrains.kotlinx:kotlinx-serialization-runtime:" +
+               Versions.org_jetbrains_kotlinx_kotlinx_serialization
+
+     /**
       * https://github.com/resilience4j/resilience4j
       */
      const val resilience4j_bulkhead: String = "io.github.resilience4j:resilience4j-bulkhead:" +
@@ -48,6 +55,18 @@ object Libs {
      const val kotlin_scripting_compiler_embeddable: String =
                "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:" +
                Versions.org_jetbrains_kotlin
+
+     /**
+      * https://kotlinlang.org/
+      */
+     const val kotlin_serialization: String = "org.jetbrains.kotlin:kotlin-serialization:" +
+               Versions.org_jetbrains_kotlin
+
+     /**
+      * https://kotlinlang.org/
+      */
+     const val kotlin_serialization_unshaded: String =
+               "org.jetbrains.kotlin:kotlin-serialization-unshaded:" + Versions.org_jetbrains_kotlin
 
      /**
       * https://kotlinlang.org/

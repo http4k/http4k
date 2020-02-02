@@ -31,7 +31,7 @@ abstract class JsonContract<NODE>(open val j: Json<NODE>) {
     }
 
     @Test
-    fun `serializes object to json`() {
+    open fun `serializes object to json`() {
         j {
             val input = obj(
                 "string" to string("value"),
