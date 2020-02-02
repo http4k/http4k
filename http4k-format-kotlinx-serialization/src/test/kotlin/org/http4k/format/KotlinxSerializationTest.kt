@@ -3,7 +3,12 @@ package org.http4k.format
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import kotlinx.serialization.json.JsonElement
-import org.http4k.core.*
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.core.then
+import org.http4k.core.with
 import org.http4k.filter.GenerateDataClasses
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
