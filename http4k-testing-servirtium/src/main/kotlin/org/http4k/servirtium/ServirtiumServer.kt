@@ -6,6 +6,7 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
+import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.InteractionControl.Companion.StorageBased
@@ -27,12 +28,13 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             name: String,
             storageProvider: StorageProvider,
             options: InteractionOptions = Defaults,
-            port: Int = 0
+            port: Int = 0,
+            serverFn: (Int) -> ServerConfig = ::SunHttp
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             Replay.Servirtium(storageProvider(name))
                 .replayingMatchingContent(options::modify)
-                .asServer(SunHttp(port)),
+                .asServer(serverFn(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
 
         /**
@@ -47,7 +49,8 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             target: Uri,
             storageProvider: StorageProvider,
             options: InteractionOptions = Defaults,
-            port: Int = 0
+            port: Int = 0,
+            serverFn: (Int) -> ServerConfig = ::SunHttp
         ): ServirtiumServer {
             val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
@@ -56,7 +59,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                     Sink.Servirtium(storage, options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
-                    .asServer(SunHttp(port)),
+                    .asServer(serverFn(port)),
                 InteractionControl by StorageBased(storage) {
             }
         }
