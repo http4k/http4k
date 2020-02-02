@@ -6,7 +6,6 @@ import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
-import org.http4k.server.ServerConfig
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.InteractionControl.Companion.StorageBased
@@ -24,18 +23,16 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Incoming requests can be manipulated to ensure that it matches the expected request.
          */
         @JvmStatic
-        @JvmOverloads
         fun Replay(
             name: String,
             storageProvider: StorageProvider,
             options: InteractionOptions = Defaults,
-            port: Int = 0,
-            serverFn: (Int) -> ServerConfig = ::SunHttp
+            port: Int = 0
         ): ServirtiumServer = object : ServirtiumServer,
             Http4kServer by
             Replay.Servirtium(storageProvider(name))
                 .replayingMatchingContent(options::modify)
-                .asServer(serverFn(port)),
+                .asServer(SunHttp(port)),
             InteractionControl by InteractionControl.Companion.NoOp {}
 
         /**
@@ -45,14 +42,12 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
          * Manipulations can be made to the requests and responses before they are stored.
          */
         @JvmStatic
-        @JvmOverloads
         fun Recording(
             name: String,
             target: Uri,
             storageProvider: StorageProvider,
             options: InteractionOptions = Defaults,
-            port: Int = 0,
-            serverFn: (Int) -> ServerConfig = ::SunHttp
+            port: Int = 0
         ): ServirtiumServer {
             val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
@@ -61,7 +56,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                     Sink.Servirtium(storage, options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(JavaHttpClient())
-                    .asServer(serverFn(port)),
+                    .asServer(SunHttp(port)),
                 InteractionControl by StorageBased(storage) {
             }
         }
