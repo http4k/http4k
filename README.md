@@ -90,6 +90,7 @@ plugging together of services without HTTP container being required.
             * **Jackson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
             * **Gson** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
             * **Moshi** - includes support for **fully [automatic marshalling](https://http4k.org/guide/modules/json/#auto-marshalling-capabilities) of Data classes**
+            * **KotlinX Serialization** - official Kotlin JSON API. 
             * **Argo** - lightweight Java JSON API with zero dependencies.            
         * **[XML](https://www.http4k.org/guide/modules/xml/)** - includes support for:
             * **Jackson** - includes support for **fully automatic marshalling of Data classes**
@@ -119,6 +120,8 @@ plugging together of services without HTTP container being required.
     * JUnit 5 extensions for [Approval testing](http://approvaltests.com/) of [http4k] Request and Response messages.
 * [Chaos:](https://http4k.org/guide/modules/chaos) 
     * API for declaring and injecting failure modes into [http4k] applications, allowing modelling and hence answering of "what if" style questions to help understand how code fares under failure conditions such as latency and dying processes.
+* [Service Virtualisation:](https://http4k.org/guide/modules/servicevirtualisation) 
+    * Record and replay versioned HTTP contracts to/from `Servirtium` Markdown format. Includes Servirtium MiTM server and simple JUnit extensions.
     
 ## Example [<img class="octocat" src="https://www.http4k.org/img/octocat-32.png"/>](https://github.com/http4k/http4k/blob/master/src/docs/cookbook/readme/example.kt)
 

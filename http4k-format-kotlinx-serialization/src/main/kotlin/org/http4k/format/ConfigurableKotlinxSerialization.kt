@@ -1,18 +1,24 @@
 package org.http4k.format
 
-import kotlinx.serialization.json.*
-import kotlinx.serialization.modules.EmptyModule
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonLiteral
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonObjectSerializer
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.content
+import kotlinx.serialization.json.long
 import kotlinx.serialization.modules.SerialModule
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.serialization.json.Json as KotlinxJson
 
-/**
- * To implement custom JSON configuration, create your own object singleton. Extra mappings can be added before done() is called.
- */
 open class ConfigurableKotlinxSerialization(
-    config: JsonConfiguration = JsonConfiguration.Stable,
-    context: SerialModule = EmptyModule
+    config: JsonConfiguration,
+    context: SerialModule
 ) : Json<JsonElement> {
 
     private val json = KotlinxJson(config, context)
@@ -65,8 +71,7 @@ open class ConfigurableKotlinxSerialization(
         else -> emptyList()
     }
 
-    override fun text(value: JsonElement) =
-        value.content
+    override fun text(value: JsonElement) = value.content
 
     override fun bool(value: JsonElement) = value.boolean
 

@@ -35,7 +35,7 @@ object Versions {
 
      const val com_jfrog_bintray_gradle_plugin: String = "1.8.4"
 
-     const val openapi_generator_gradle_plugin: String = "4.2.2" // available: "4.2.3"
+     const val openapi_generator_gradle_plugin: String = "4.2.3"
 
      const val javax_websocket_server_impl: String = "9.4.26.v20200117"
 
@@ -79,7 +79,7 @@ object Versions {
 
      const val httpclient: String = "4.5.11"
 
-     const val underscore: String = "1.51" // available: "1.52"
+     const val underscore: String = "1.52"
 
      const val alpn_boot: String = "8.1.13.v20181017"
 

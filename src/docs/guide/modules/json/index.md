@@ -10,6 +10,8 @@ description: Feature overview of the JSON http4k-format modules, several of whic
 
 **Moshi:** ```compile group: "org.http4k", name: "http4k-format-moshi", version: "3.231.0"```
 
+**KotlinX Serialization:** ```compile group: "org.http4k", name: "http4k-format-kotlinx-serialization", version: "3.231.0"```
+
 ### About
 These modules add the ability to use JSON as a first-class citizen when reading from and to HTTP messages. Each 
 implementation adds a set of standard methods and extension methods for converting common types into native JSON/XML 
