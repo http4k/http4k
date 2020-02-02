@@ -18,10 +18,10 @@ The result of these 2 implementations is that we can exercise the `Client-Under-
 
 1. [JUnit5] extensions which provide the record/replay behaviour, providing a way to record and replay contracts without the use of a real server. This is only compatible when the `Client-Under-Test` utilises a [http4k] Client, since it leverages the Server-as-a-Function paradigm.
 
-2. MiTM proxy servers for record/replay behaviour, by inserting themselves as a proxy in the HTTP call chain and intercepting the HTTP traffic. This is compatible with HTTP clients using any JVM technology, not just [http4k] services - so can be used as a general JVM-based solution for implementing [Serviritum]-style tests.
+2. MiTM proxy servers for record/replay behaviour, by inserting themselves as a proxy in the HTTP call chain and intercepting the HTTP traffic. This is compatible with HTTP clients using any JVM technology, not just [http4k] services - so can be used as a general JVM-based solution for implementing [Servirtium]-style tests.
 
 3. A Storage Provider abstraction for storing and loading recorded contracts from various locations including disk and directly from [GitHub].
 
 [http4k]: https://http4k.org
-[Serviritum]: https://servirtium.dev
+[Servirtium]: https://servirtium.dev
 [GitHub]: https://github.com
