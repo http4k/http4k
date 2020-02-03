@@ -21,7 +21,7 @@ interface InteractionStorage : Supplier<ByteArray>, Consumer<ByteArray> {
                 return object : InteractionStorage {
                     override fun get() = file.takeIf { it.exists() }?.readBytes() ?: ByteArray(0)
                     override fun accept(data: ByteArray) {
-                        file.appendBytes(data)
+                        file.apply { parentFile.mkdirs() }.appendBytes(data)
                     }
 
                     override fun clean(): Boolean = fileFor(name).delete()
