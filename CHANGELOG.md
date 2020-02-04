@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.233.0
 - [http4k-testing-servirtium] Upgrade ServirtiumServer to use OkHttp instead of JavaHttpClient (due to streaming restrictions on MiTM).
+- [http4k-testing-servirtium] [Break] Rename `Github` to `GitHub`.
 
 ### v3.232.0
 - [http4k-format-kotlinx-serialization] New JSON module! H/T @joscha-alisch for the PR. :)
