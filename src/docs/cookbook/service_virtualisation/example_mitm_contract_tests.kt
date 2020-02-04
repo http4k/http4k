@@ -18,7 +18,7 @@ import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
 import org.http4k.server.SunHttp
 import org.http4k.server.asServer
-import org.http4k.servirtium.Github
+import org.http4k.servirtium.GitHub
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionStorage.Companion.Disk
 import org.http4k.servirtium.ServirtiumServer
@@ -153,7 +153,7 @@ class GitHubReplayingWordCounterTest : WordCounterContract {
     @BeforeEach
     fun start(info: TestInfo) {
         servirtium = ServirtiumServer.Replay("WordCounter." + info.displayName.removeSuffix("()"),
-            Github("http4k", "http4k",
+            GitHub("http4k", "http4k",
                 Credentials("<github user>", "<personal access token>"),
                 Paths.get("src/test/resources/cookbook/service_virtualisation")
             ),

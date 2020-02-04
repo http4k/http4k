@@ -22,7 +22,7 @@ import java.util.Base64
 /**
  * Read a file from a repository using the GitHub API.
  */
-class Github @JvmOverloads constructor(private val owner: String,
+class GitHub @JvmOverloads constructor(private val owner: String,
                                        private val repo: String,
                                        credentials: Credentials,
                                        private val basePath: Path = Paths.get(""),
