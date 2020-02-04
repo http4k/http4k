@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.233.0
+- [http4k-testing-servirtium] Upgrade ServirtiumServer to use OkHttp instead of JavaHttpClient (due to streaming restrictions on MiTM).
+
 ### v3.232.0
 - [http4k-format-kotlinx-serialization] New JSON module! H/T @joscha-alisch for the PR. :)
 - [http4k-testing-servirtium] Work around Kotlin @JvmOverloads problem in ServitriumServer.
