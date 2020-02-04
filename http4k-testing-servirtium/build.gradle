@@ -6,9 +6,9 @@ dependencies {
     provided Libs.junit_jupiter_api
     compile project(":http4k-cloudnative")
     compile project(":http4k-format-jackson")
+    compile project(":http4k-client-okhttp")
 
     testCompile Config.TestDependencies
-    testCompile project(":http4k-client-apache")
     testCompile project(":http4k-testing-approval")
     testCompile project(path: ":http4k-core", configuration: 'testArtifacts')
 }
