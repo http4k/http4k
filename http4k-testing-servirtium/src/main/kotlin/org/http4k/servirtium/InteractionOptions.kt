@@ -6,7 +6,7 @@ import org.http4k.core.Response
 
 /**
  * General controls for the Servirtium interactions and how they are recorded to the storage format. The
- * manipulations areused to replace/remove any dynamic parts of the request (eg. "Date" header) so that the
+ * manipulations are used to replace/remove any dynamic parts of the request (eg. "Date" header) so that the
  * traffic can be correctly matched during the replay process.
  */
 interface InteractionOptions {
