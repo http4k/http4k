@@ -5,19 +5,21 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 
 /**
- * This controls how the Servirtium interactions are recorded to the storage format. The manipulations are
- * used to replace/remove any dynamic parts of the request (eg. Date headers) so that the traffic can be
- * correctly matched during the replay process.
+ * General controls for the Servirtium interactions and how they are recorded to the storage format. The
+ * manipulations areused to replace/remove any dynamic parts of the request (eg. "Date" header) so that the
+ * traffic can be correctly matched during the replay process.
  */
 interface InteractionOptions {
 
     /**
-     * Modify received requests before they are stored.
+     * Modify received requests before they are stored. Use this to replace/remove dynamic parts of the message
+     * before serialisation.
      */
     fun modify(request: Request): Request = request
 
     /**
-     * Modify received responses before they are stored.
+     * Modify received responses before they are stored. Use this to replace/remove dynamic parts of the message
+     * before serialisation.
      */
     fun modify(response: Response): Response = response
 
@@ -26,7 +28,17 @@ interface InteractionOptions {
      */
     fun isBinary(contentType: ContentType): Boolean = false
 
+    /**
+     * Turn on/off the printing of raw HTTP traffic to the console.
+     */
+    fun debugTraffic() = false
+
     companion object {
+        /**
+         * By default, no modifications are made to the raw traffic before it gets output to disk. This will
+         * not be used very often as dynamic headers such as "Date" and "User-Agent" will almost always be present and
+         * need to be stripped out.
+         */
         object Defaults : InteractionOptions
     }
 }
