@@ -101,7 +101,7 @@ fun Replay.Companion.Servirtium(output: Supplier<ByteArray>, options: Interactio
     override fun responses() = output.parseInteractions { it.second }
         .map { req ->
             CONTENT_TYPE(req)
-                ?.takeIf { options.isBinary(it) }
+                .takeIf { options.isBinary(it) }
                 ?.let { req.body(Body(ByteBuffer.wrap(Base64.getDecoder().decode(req.bodyString())))) }
                 ?: req
         }

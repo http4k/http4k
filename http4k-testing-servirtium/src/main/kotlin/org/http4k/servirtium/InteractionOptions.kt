@@ -24,9 +24,9 @@ interface InteractionOptions {
     fun modify(response: Response): Response = response
 
     /**
-     * Determine if the content type should be treated as binary.
+     * Determine if the content type from a message should be treated as binary.
      */
-    fun isBinary(contentType: ContentType): Boolean = false
+    fun isBinary(contentType: ContentType?): Boolean = false
 
     /**
      * Turn on/off the printing of raw HTTP traffic to the console.
