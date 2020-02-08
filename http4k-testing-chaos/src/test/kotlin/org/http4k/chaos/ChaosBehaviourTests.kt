@@ -16,7 +16,6 @@ import org.http4k.chaos.ChaosBehaviours.Variable
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -82,7 +81,7 @@ class LatencyBehaviourTest : ChaosBehaviourContract() {
     override fun `deserialises from JSON`() {
         assertBehaviour("""{"type":"latency","min":"PT0.1S","max":"PT0.3S"}""",
             description,
-            hasStatus(Status.OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
+            hasStatus(OK).and(hasHeader("x-http4k-chaos", Regex("Latency.*"))))
     }
 
     @Test
