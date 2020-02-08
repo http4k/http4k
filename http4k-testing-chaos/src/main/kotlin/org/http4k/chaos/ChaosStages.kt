@@ -36,7 +36,7 @@ fun Stage.until(trigger: Trigger): Stage = object : Stage {
         return if (active.get()) this@until(request) else null
     }
 
-    override fun toString(): String = "${this@until} until $trigger"
+    override fun toString(): String = this@until.toString() + " until " + trigger
 }
 
 /**
