@@ -171,10 +171,9 @@ fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
 ): RoutingHttpHandler {
     val trigger = SwitchTrigger()
     val variable = Variable(stage)
-    val repeatStage = Repeat { Wait.until(trigger).then(variable).until(!trigger) }
     return routes(
         ChaosEngine(trigger, variable, controlsPath, security, openApiPath, corsPolicy),
-        repeatStage.asFilter().then(this)
+        Repeat { Wait.until(trigger).then(variable).until(!trigger) }.asFilter().then(this)
     )
 }
 
