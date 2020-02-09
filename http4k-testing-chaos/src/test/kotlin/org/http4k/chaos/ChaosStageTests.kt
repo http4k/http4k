@@ -89,7 +89,7 @@ class VariableStageTest {
     @Test
     fun `should provide ability to modify stage at runtime`() {
         val variable = Variable()
-        assertThat(variable.toString(), equalTo(("Always None")))
+        assertThat(variable.toString(), equalTo(("Wait")))
         assertThat(variable(request)!!.then { response }(request), equalTo(response))
         variable.current = Repeat { ReturnStatus(NOT_FOUND).appliedWhen(Always()) }
         assertThat(variable.toString(), equalTo(("Repeat [Always ReturnStatus (404)]")))
