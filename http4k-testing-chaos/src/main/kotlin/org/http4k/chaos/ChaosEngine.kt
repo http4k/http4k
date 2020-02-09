@@ -11,10 +11,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * The Chaos Engine controls the lifecycle of applying Chaotic behaviour to traffic, which is exposed as a
  * standard Http4k Filter. Chaos can be programmatically updated and enabled/disabled.
  */
-class ChaosEngine(initialStage: Stage = Wait, alreadyActivated: Boolean = true) : Filter {
-    constructor(behaviour: Behaviour, alreadyActivated: Boolean = true): this(behaviour.appliedWhen(Always()), alreadyActivated)
+class ChaosEngine(initialStage: Stage = Wait) : Filter {
+    constructor(behaviour: Behaviour) : this(behaviour.appliedWhen(Always()))
 
-    private val on = AtomicBoolean(alreadyActivated)
+    private val on = AtomicBoolean(false)
     private val trigger: Trigger = { on.get() }
     private val state = ChaosStages.Variable(initialStage)
 
@@ -26,21 +26,26 @@ class ChaosEngine(initialStage: Stage = Wait, alreadyActivated: Boolean = true) 
     fun isActive() = on.get()
 
     /**
-     * Toggle the behaviour on/off.
+     * Turn on Chaos behaviour
      */
-    fun toggle(isActive: Boolean) = on.set(isActive)
+    fun activate() = apply { on.set(true) }
+
+    /**
+     * Turn off Chaos behaviour
+     */
+    fun deactivate() = apply { on.set(false) }
 
     /**
      * Update the new simple Chaotic behaviour to be applied when the ChaosEngine is enabled.
      */
-    fun update(behaviour: Behaviour) {
+    fun update(behaviour: Behaviour) = apply {
         state.current = behaviour.appliedWhen(trigger)
     }
 
     /**
      * Update the new complex (multi-stage, triggers etc) Chaotic behaviour to be applied when the ChaosEngine is enabled.
      */
-    fun update(stage: Stage) {
+    fun update(stage: Stage) = apply {
         state.current = stage
     }
 

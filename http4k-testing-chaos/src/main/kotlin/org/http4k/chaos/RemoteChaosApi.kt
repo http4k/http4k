@@ -43,29 +43,26 @@ import java.time.Instant.ofEpochSecond
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun HttpHandler.withChaosEngine(stage: Stage = Wait,
-                                security: Security = NoSecurity,
-                                controlsPath: String = "/chaos",
-                                openApiPath: String = "",
-                                corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
+fun HttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
+                             security: Security = NoSecurity,
+                             controlsPath: String = "/chaos",
+                             openApiPath: String = "",
+                             corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy)
 
 /**
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
  * Optionally a Security can be passed to limit access to the chaos controls.
  */
-fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
-                                       security: Security = NoSecurity,
-                                       controlsPath: String = "/chaos",
-                                       openApiPath: String = "",
-                                       corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-): RoutingHttpHandler {
-    val engine = ChaosEngine(stage, false)
-    return routes(
-        RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy),
-        engine.then(this)
-    )
-}
+fun RoutingHttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
+                                    security: Security = NoSecurity,
+                                    controlsPath: String = "/chaos",
+                                    openApiPath: String = "",
+                                    corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+) = routes(
+    RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy),
+    engine.then(this)
+)
 
 /**
  *  A set of endpoints to an application which will control the setting and toggling chaos behaviour. The added endpoints are:
@@ -98,21 +95,24 @@ object RemoteChaosApi {
         val activate = Filter { next ->
             {
                 if (it.bodyString().isNotEmpty()) engine.update(setStages(it))
-                engine.toggle(true)
+                engine.activate()
                 next(it)
             }
         }
 
         val deactivate = Filter { next ->
             {
-                engine.toggle(false)
+                engine.deactivate()
                 next(it)
             }
         }
 
         val toggle = Filter { next ->
             {
-                engine.toggle(!engine.isActive())
+                when {
+                    engine.isActive() -> engine.deactivate()
+                    else -> engine.activate()
+                }
                 next(it)
             }
         }

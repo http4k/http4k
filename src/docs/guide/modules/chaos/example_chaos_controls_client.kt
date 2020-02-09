@@ -1,9 +1,8 @@
 package guide.modules.chaos
 
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosTriggers.Always
-import org.http4k.chaos.appliedWhen
-import org.http4k.chaos.withChaosEngine
+import org.http4k.chaos.ChaosEngine
+import org.http4k.chaos.withChaosApi
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -16,7 +15,7 @@ import org.http4k.routing.routes
 fun main() {
     val app = routes("/" bind routes("/" bind GET to { Response(OK).body("hello!") }))
 
-    val appWithChaos = app.withChaosEngine(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
+    val appWithChaos = app.withChaosApi(ChaosEngine(ReturnStatus(NOT_FOUND)))
 
     println(">>chaos is deactivated by default")
     println(appWithChaos(Request(GET, "/chaos/status")).bodyString())

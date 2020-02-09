@@ -1,9 +1,8 @@
 package cookbook.nanoservices
 
 import org.http4k.chaos.ChaosBehaviours.Latency
-import org.http4k.chaos.ChaosTriggers.Always
-import org.http4k.chaos.appliedWhen
-import org.http4k.chaos.withChaosEngine
+import org.http4k.chaos.ChaosEngine
+import org.http4k.chaos.withChaosApi
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -18,7 +17,7 @@ import java.lang.System.setProperty
 fun `latency injection proxy (between 100ms-500ms)`() =
     ProxyHost(Https)
         .then(JavaHttpClient())
-        .withChaosEngine(Latency().appliedWhen(Always()))
+        .withChaosApi(ChaosEngine(Latency()).activate())
         .asServer(SunHttp())
         .start()
 

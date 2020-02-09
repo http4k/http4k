@@ -1,6 +1,6 @@
 package guide.modules.chaos
 
-import org.http4k.chaos.withChaosEngine
+import org.http4k.chaos.withChaosApi
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
@@ -14,7 +14,7 @@ fun main() {
     Cors(UnsafeGlobalPermissive)
         .then(ServerFilters.CatchAll())
         .then { Response(OK).body("A normal response") }
-        .withChaosEngine()
+        .withChaosApi()
         .asServer(SunHttp(9000))
         .start()
         .also { println("Visit the app at http://localhost:9000 or see the OpenApi at https://www.http4k.org/openapi3/?url=http://localhost:9000/chaos") }

@@ -3,12 +3,8 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.contract.security.ApiKeySecurity
-import org.http4k.contract.security.NoSecurity
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -38,15 +34,15 @@ class ChaosEngineTest {
     fun `can convert a normal app to be chaotic`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val engine = ChaosEngine(ReturnStatus(NOT_FOUND), false)
+        val engine = ChaosEngine(ReturnStatus(NOT_FOUND))
         val appWithChaos = engine.then(app)
 
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
-        engine.toggle(true)
+        engine.activate()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
         engine.update(ReturnStatus(I_M_A_TEAPOT))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
-        engine.toggle(false)
+        engine.deactivate()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
     }
 
@@ -54,8 +50,9 @@ class ChaosEngineTest {
     fun `can convert a normal app to support the set of remote Chaos endpoints`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosEngine(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
+        val appWithChaos = app.withChaosApi(ChaosEngine(ReturnStatus(NOT_FOUND)))
 
+        assertThat(appWithChaos(Request(POST, "/")), hasStatus(NOT_FOUND))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(originalChaos))
@@ -86,10 +83,9 @@ class ChaosEngineTest {
     fun `can configure chaos controls`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosEngine(
-            Wait,
-            ApiKeySecurity(Header.required("secret"), { true }),
-            "/context"
+        val appWithChaos = app.withChaosApi(
+            security = ApiKeySecurity(Header.required("secret"), { true }),
+            controlsPath = "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
@@ -100,11 +96,7 @@ class ChaosEngineTest {
     fun `combines with other route blocks`() {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
-        val appWithChaos = app.withChaosEngine(
-            Wait,
-            NoSecurity,
-            "/context"
-        )
+        val appWithChaos = app.withChaosApi(controlsPath = "/context")
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
 
@@ -117,11 +109,7 @@ class ChaosEngineTest {
     fun `combines with a standard handler route blocks`() {
         val app = { _: Request -> Response(I_M_A_TEAPOT) }
 
-        val appWithChaos = app.withChaosEngine(
-            Wait,
-            NoSecurity,
-            "/context"
-        )
+        val appWithChaos = app.withChaosApi(controlsPath = "/context")
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
 
