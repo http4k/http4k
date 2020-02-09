@@ -15,7 +15,7 @@ import org.http4k.routing.bind
 import org.http4k.routing.routes
 
 class FakeSystem : HttpHandler {
-    private val chaosEngine = ChaosEngine().enable()
+    private val chaosEngine = ChaosEngine()
 
     private val app = chaosEngine.then(routes("/hello" bind GET to { Response(Status.OK) }))
 
