@@ -3,8 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.235.0 (uncut)
-- [http4k-testing-chaos] [Break/Rename] ChaosEngine is now exposed when configuring API. Renamed `withChaosEngine()` to `withChaosApi()`.
+### v3.235.0
+- [http4k-testing-chaos] [Break/Rename] ChaosEngine is now exposed when configuring API. Renamed `withChaosEngine()` to `withChaosApi()`, replaced `toggle()` with `enable()/disable()`
 
 ### v3.234.0
 - [http4k-testing-chaos] [Break] Tweaked API make it simpler to use the `ChaosEngine` via programmatically (as opposed to REST).

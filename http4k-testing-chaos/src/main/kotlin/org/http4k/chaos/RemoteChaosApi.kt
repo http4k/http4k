@@ -89,20 +89,20 @@ object RemoteChaosApi {
 
         val jsonLens = Body.json().toLens()
         val showCurrentStatus: HttpHandler = {
-            Response(OK).with(jsonLens of chaosStatus(if (engine.isActive()) engine.toString() else "none"))
+            Response(OK).with(jsonLens of chaosStatus(if (engine.isEnabled()) engine.toString() else "none"))
         }
 
         val activate = Filter { next ->
             {
                 if (it.bodyString().isNotEmpty()) engine.update(setStages(it))
-                engine.activate()
+                engine.enable()
                 next(it)
             }
         }
 
         val deactivate = Filter { next ->
             {
-                engine.deactivate()
+                engine.disable()
                 next(it)
             }
         }
@@ -110,8 +110,8 @@ object RemoteChaosApi {
         val toggle = Filter { next ->
             {
                 when {
-                    engine.isActive() -> engine.deactivate()
-                    else -> engine.activate()
+                    engine.isEnabled() -> engine.disable()
+                    else -> engine.enable()
                 }
                 next(it)
             }

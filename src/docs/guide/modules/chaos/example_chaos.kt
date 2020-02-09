@@ -29,7 +29,7 @@ fun main() {
     val errorStage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(PercentageBased(50))
 
     // chain the stages together with then() and create the Chaos Engine (activated)
-    val engine = ChaosEngine(doNothingStage.then(errorStage)).activate()
+    val engine = ChaosEngine(doNothingStage.then(errorStage)).enable()
 
     val svc: HttpHandler = { Response(OK).body("A normal response") }
     engine.then(svc).asServer(SunHttp(9000)).start().use {
@@ -41,7 +41,7 @@ fun main() {
         repeat(10) { performA(GET) }
 
         // disable the chaos
-        engine.deactivate()
+        engine.disable()
 
         repeat(10) { performA(GET) }
     }

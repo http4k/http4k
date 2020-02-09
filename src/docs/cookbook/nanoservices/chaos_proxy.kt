@@ -17,7 +17,7 @@ import java.lang.System.setProperty
 fun `latency injection proxy (between 100ms-500ms)`() =
     ProxyHost(Https)
         .then(JavaHttpClient())
-        .withChaosApi(ChaosEngine(Latency()).activate())
+        .withChaosApi(ChaosEngine(Latency()).enable())
         .asServer(SunHttp())
         .start()
 

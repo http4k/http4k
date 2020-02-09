@@ -9,7 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * The Chaos Engine controls the lifecycle of applying Chaotic behaviour to traffic, which is exposed as a
- * standard Http4k Filter. Chaos can be programmatically updated and enabled/disabled.
+ * standard Http4k Filter. Chaos can be programmatically updated and enabled/disabled. By default, the engine
+ * is deactivated, so activate() needs to be called to witness any change in behaviour,
  */
 class ChaosEngine(initialStage: Stage = Wait) : Filter {
     constructor(behaviour: Behaviour) : this(behaviour.appliedWhen(Always()))
@@ -23,27 +24,28 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     /**
      * Check if the configured Chaos behaviour is currently being applied to all traffic.
      */
-    fun isActive() = on.get()
+    fun isEnabled() = on.get()
 
     /**
-     * Turn on Chaos behaviour
+     * Turn on Chaos Engine. Note that this may not actually produce any effect based on the configured behaviour
+     * (e.g. if there is a specific Trigger that is condition-based.
      */
-    fun activate() = apply { on.set(true) }
+    fun enable() = apply { on.set(true) }
 
     /**
-     * Turn off Chaos behaviour
+     * Turn on Chaos Engine. No Chaotic behaviour will be applied.
      */
-    fun deactivate() = apply { on.set(false) }
+    fun disable() = apply { on.set(false) }
 
     /**
-     * Update the new simple Chaotic behaviour to be applied when the ChaosEngine is enabled.
+     * Update with new simple Chaotic behaviour to be applied whenever the ChaosEngine is enabled.
      */
     fun update(behaviour: Behaviour) = apply {
         state.current = behaviour.appliedWhen(trigger)
     }
 
     /**
-     * Update the new complex (multi-stage, triggers etc) Chaotic behaviour to be applied when the ChaosEngine is enabled.
+     * Update the new complex (multi-stage, triggers etc) Chaotic behaviour to be applied whenever the ChaosEngine is enabled.
      */
     fun update(stage: Stage) = apply {
         state.current = stage
