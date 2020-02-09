@@ -136,21 +136,6 @@ class MatchRequestTriggerTest : ChaosTriggerContract() {
     }
 }
 
-class SwitchTriggerTest {
-    @Test
-    fun `behaves as expected`() {
-        val trigger = SwitchTrigger(true)
-        assertThat(trigger.toString(), equalTo("SwitchTrigger (active = true)"))
-        assertThat(trigger(request), equalTo(true))
-        trigger.toggle()
-        assertThat(trigger(request), equalTo(false))
-        trigger.toggle(false)
-        assertThat(trigger(request), equalTo(false))
-        trigger.toggle(true)
-        assertThat(trigger(request), equalTo(true))
-    }
-}
-
 class AlwaysTest : ChaosTriggerContract() {
     override val asJson = """{"type":"always"}"""
 

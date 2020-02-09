@@ -158,20 +158,4 @@ internal fun JsonNode.asTrigger(clock: Clock): Trigger = when (nonNullable<Strin
     else -> throw IllegalArgumentException("unknown trigger")
 }
 
-private fun JsonNode.toRegexMap(name: String) =
-    asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
-
-/**
- * Simple toggleable trigger to turn ChaosBehaviour on/off
- */
-class SwitchTrigger(initialPosition: Boolean = false) : Trigger {
-    private val on = AtomicBoolean(initialPosition)
-
-    fun isActive() = on.get()
-
-    fun toggle(newValue: Boolean? = null) = on.set(newValue ?: !on.get())
-
-    override fun invoke(req: Request) = on.get()
-
-    override fun toString() = "SwitchTrigger (active = ${on.get()})"
-}
+private fun JsonNode.toRegexMap(name: String) = asNullable<Map<String, String>>(name)?.mapValues { it.value.toRegex() }
