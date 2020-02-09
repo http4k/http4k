@@ -45,21 +45,30 @@ class ChaosEngineTest {
         val appWithChaos = engine.then(app)
 
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
+        assertThat(engine.toString(), equalTo("Wait"))
+
         engine.enable()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
+        assertThat(engine.toString(), equalTo("Always ReturnStatus (404)"))
+
         engine.enable(ReturnStatus(I_M_A_TEAPOT))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
+        assertThat(engine.toString(), equalTo("Always ReturnStatus (418)"))
+
         engine.disable()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
+        assertThat(engine.toString(), equalTo("Wait"))
     }
 
     @Test
     fun `can convert a normal app to support the set of remote Chaos endpoints`() {
         val app = routes("/" bind GET to { Response(OK) })
 
-        val appWithChaos = app.withChaosApi(ChaosEngine(ReturnStatus(NOT_FOUND)))
+        val engine = ChaosEngine(ReturnStatus(NOT_FOUND))
 
-        assertThat(appWithChaos(Request(POST, "/")), hasStatus(NOT_FOUND))
+        val appWithChaos = app.withChaosApi(engine)
+
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(originalChaos))

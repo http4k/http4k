@@ -1,10 +1,8 @@
 package org.http4k.chaos
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.http4k.chaos.ChaosBehaviours.None
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.core.Filter
 import org.http4k.core.NoOp
 import org.http4k.core.Request
@@ -76,7 +74,7 @@ object ChaosStages {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(internal var current: Stage = None().appliedWhen(Always())) : Stage {
+    class Variable(internal var current: Stage = Wait) : Stage {
         override fun invoke(request: Request) = current(request)
         override fun toString() = current.toString()
     }

@@ -86,7 +86,6 @@ class JacksonAutoTest : AutoMarshallingContract(Jackson) {
         val firstChild: PolymorphicParent = FirstChild("hello")
         val secondChild: PolymorphicParent = SecondChild("world")
 
-        println(Response(OK).with(body of firstChild))
         assertThat(body(Response(OK).with(body of firstChild)), equalTo(firstChild))
         assertThat(body(Response(OK).with(body of secondChild)), equalTo(secondChild))
     }

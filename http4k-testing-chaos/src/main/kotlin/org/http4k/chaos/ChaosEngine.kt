@@ -16,7 +16,7 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     constructor(behaviour: Behaviour) : this(behaviour.appliedWhen(Always()))
 
     private val on = AtomicBoolean(false)
-    private val trigger: Trigger = { on.get() }
+    private var trigger: Trigger = { on.get() }
     private val state = ChaosStages.Variable(initialStage)
 
     override fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state.until(!trigger)) }.asFilter()(p1)
@@ -41,7 +41,7 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
      * Update with new simple Chaotic behaviour to be applied whenever the ChaosEngine is enabled.
      */
     fun enable(behaviour: Behaviour) = apply {
-        state.current = behaviour.appliedWhen(trigger)
+        state.current = behaviour.appliedWhen(Always())
         enable()
     }
 
@@ -56,5 +56,5 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     /**
      * Outputs description of the current state.
      */
-    override fun toString() = state.toString()
+    override fun toString() = if (isEnabled()) state.toString() else Wait.toString()
 }
