@@ -18,6 +18,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.core.UriTemplate
+import org.http4k.core.then
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasStatus
 import org.http4k.lens.Header
@@ -35,6 +36,22 @@ class ChaosEngineTest {
 
     @Test
     fun `can convert a normal app to be chaotic`() {
+        val app = routes("/" bind GET to { Response(OK) })
+
+        val engine = ChaosEngine(ReturnStatus(NOT_FOUND), false)
+        val appWithChaos = engine.then(app)
+
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
+        engine.toggle(true)
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
+        engine.update(ReturnStatus(I_M_A_TEAPOT))
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
+        engine.toggle(false)
+        assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
+    }
+
+    @Test
+    fun `can convert a normal app to support the set of remote Chaos endpoints`() {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosEngine(ReturnStatus(NOT_FOUND).appliedWhen(Always()))

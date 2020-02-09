@@ -38,7 +38,7 @@ typealias Behaviour = Filter
 
 fun Behaviour.appliedWhen(trigger: Trigger) = object : Stage {
     override fun invoke(req: Request) = if (trigger(req)) this@appliedWhen else null
-    override fun toString() = "$trigger ${this@appliedWhen}"
+    override fun toString() = trigger.toString() + " " + this@appliedWhen
 }
 
 object ChaosBehaviours {

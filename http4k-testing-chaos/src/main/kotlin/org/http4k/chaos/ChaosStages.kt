@@ -36,11 +36,11 @@ fun Stage.until(trigger: Trigger): Stage = object : Stage {
         return if (active.get()) this@until(request) else null
     }
 
-    override fun toString(): String = "${this@until} until $trigger"
+    override fun toString(): String = this@until.toString() + " until " + trigger
 }
 
 /**
- * Converts this chaos behaviour to a standard http4k Filter.
+ * Converts this chaos stage to a standard http4k Filter.
  */
 fun Stage.asFilter(): Filter = Filter { next ->
     {
@@ -76,7 +76,7 @@ object ChaosStages {
     /**
      * Provide a means of modifying a ChaosBehaviour at runtime.
      */
-    class Variable(var current: Stage = None().appliedWhen(Always())) : Stage {
+    class Variable(internal var current: Stage = None().appliedWhen(Always())) : Stage {
         override fun invoke(request: Request) = current(request)
         override fun toString() = current.toString()
     }
