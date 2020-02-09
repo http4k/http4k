@@ -2,62 +2,50 @@ package org.http4k.chaos
 
 import org.http4k.chaos.ChaosStages.Repeat
 import org.http4k.chaos.ChaosStages.Wait
-import org.http4k.contract.security.NoSecurity
-import org.http4k.contract.security.Security
+import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.then
-import org.http4k.filter.CorsPolicy
-import org.http4k.routing.RoutingHttpHandler
-import org.http4k.routing.bind
-import org.http4k.routing.routes
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
- * Optionally a Security can be passed to limit access to the chaos controls.
+ * The Chaos Engine controls the lifecycle of applying Chaotic behaviour to traffic, which is exposed as a
+ * standard Http4k Filter. Chaos can be programmatically updated and enabled/disabled.
  */
-fun HttpHandler.withChaosEngine(stage: Stage = Wait,
-                                security: Security = NoSecurity,
-                                controlsPath: String = "/chaos",
-                                openApiPath: String = "",
-                                corsPolicy: CorsPolicy = CorsPolicy.UnsafeGlobalPermissive
-): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
+class ChaosEngine(initialStage: Stage = Wait, alreadyActivated: Boolean = true) : Filter {
+    constructor(behaviour: Behaviour, alreadyActivated: Boolean = true): this(behaviour.appliedWhen(Always()), alreadyActivated)
 
-/**
- * Convert a standard HttpHandler to be Chaos-enabled, using the passed ChaosStage.
- * Optionally a Security can be passed to limit access to the chaos controls.
- */
-fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
-                                       security: Security = NoSecurity,
-                                       controlsPath: String = "/chaos",
-                                       openApiPath: String = "",
-                                       corsPolicy: CorsPolicy = CorsPolicy.UnsafeGlobalPermissive
-): RoutingHttpHandler {
-    val engine = ChaosEngine(stage, false)
-    return routes(
-        RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy),
-        engine.then(this)
-    )
-}
-
-class ChaosEngine(initialStage: Stage = Wait, initialPosition: Boolean = true) : Filter {
-    private val on = AtomicBoolean(initialPosition)
+    private val on = AtomicBoolean(alreadyActivated)
     private val trigger: Trigger = { on.get() }
     private val state = ChaosStages.Variable(initialStage)
 
-    override fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state).until(!trigger) }.asFilter()(p1)
+    override fun invoke(p1: HttpHandler) = Repeat { Wait.until(trigger).then(state.until(!trigger)) }.asFilter()(p1)
 
-    override fun toString() = state.toString()
-
+    /**
+     * Check if the configured Chaos behaviour is currently being applied to all traffic.
+     */
     fun isActive() = on.get()
-    fun toggle(newValue: Boolean? = null) = on.set(newValue ?: !on.get())
 
+    /**
+     * Toggle the behaviour on/off.
+     */
+    fun toggle(isActive: Boolean) = on.set(isActive)
+
+    /**
+     * Update the new simple Chaotic behaviour to be applied when the ChaosEngine is enabled.
+     */
+    fun update(behaviour: Behaviour) {
+        state.current = behaviour.appliedWhen(trigger)
+    }
+
+    /**
+     * Update the new complex (multi-stage, triggers etc) Chaotic behaviour to be applied when the ChaosEngine is enabled.
+     */
     fun update(stage: Stage) {
         state.current = stage
     }
 
-    fun update(behaviour: Behaviour) {
-        state.current = behaviour.appliedWhen(trigger)
-    }
+    /**
+     * Outputs description of the current state.
+     */
+    override fun toString() = state.toString()
 }

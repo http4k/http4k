@@ -34,9 +34,38 @@ import org.http4k.format.Jackson.obj
 import org.http4k.format.Jackson.string
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
+import org.http4k.routing.routes
 import java.time.Clock
 import java.time.Duration.ofMinutes
 import java.time.Instant.ofEpochSecond
+
+/**
+ * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
+ * Optionally a Security can be passed to limit access to the chaos controls.
+ */
+fun HttpHandler.withChaosEngine(stage: Stage = Wait,
+                                security: Security = NoSecurity,
+                                controlsPath: String = "/chaos",
+                                openApiPath: String = "",
+                                corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+): RoutingHttpHandler = routes("/{path:.*}" bind this).withChaosEngine(stage, security, controlsPath, openApiPath, corsPolicy)
+
+/**
+ * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
+ * Optionally a Security can be passed to limit access to the chaos controls.
+ */
+fun RoutingHttpHandler.withChaosEngine(stage: Stage = Wait,
+                                       security: Security = NoSecurity,
+                                       controlsPath: String = "/chaos",
+                                       openApiPath: String = "",
+                                       corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+): RoutingHttpHandler {
+    val engine = ChaosEngine(stage, false)
+    return routes(
+        RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy),
+        engine.then(this)
+    )
+}
 
 /**
  *  A set of endpoints to an application which will control the setting and toggling chaos behaviour. The added endpoints are:
@@ -83,7 +112,7 @@ object RemoteChaosApi {
 
         val toggle = Filter { next ->
             {
-                engine.toggle()
+                engine.toggle(!engine.isActive())
                 next(it)
             }
         }

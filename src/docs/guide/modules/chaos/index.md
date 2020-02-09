@@ -53,7 +53,7 @@ A **Stage** provides the lifecycle for applying a behaviour, and applies until a
 |(Triggered)|Combines a Trigger and a Behaviour |`{"type":"trigger","behaviour":{"type":"body"},"trigger":<insert trigger json>,"until":<insert trigger json>}}`|
 
 ## Manually injecting Chaos
-For use in automated test suites, it is simple to define the Chaos behaviour programmatically using the API and then apply it as a Filter onto an existing application.
+For use in automated test suites, it is simple to define the Chaos behaviour programmatically using the API and then use the `ChaosEngine` to add it onto an existing application.
 
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt)
 <script src="https://gist-it.appspot.com/https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/chaos/example_chaos.kt"></script>
