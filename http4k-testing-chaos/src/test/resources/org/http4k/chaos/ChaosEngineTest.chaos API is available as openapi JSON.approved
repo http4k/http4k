@@ -1,0 +1,293 @@
+{
+  "info": {
+    "title": "http4k Chaos Engine",
+    "version": "1.0",
+    "description": "This is the Open API interface for the http4k Chaos Engine. \n\nUsing this UI you can inject new dynamic chaotic behaviour into any http4k application, or toggle/disable it. \n\nSee the <a href=\"https://www.http4k.org/guide/modules/chaos/\">user guide</a> for details about the \n exact format of the JSON to post to the activation endpoint."
+  },
+  "tags": [
+  ],
+  "paths": {
+    "/chaos/activate": {
+      "post": {
+        "summary": "Activate Chaos on all routes.",
+        "description": "Toggles on the previously stored Chaos behaviour.",
+        "tags": [
+          "/chaos"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "The current Chaos being applied to requests.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-2131380971"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+        ],
+        "operationId": "postChaosActivate",
+        "deprecated": false
+      }
+    },
+    "/chaos/activate/new": {
+      "post": {
+        "summary": "Activate new Chaos on all routes.",
+        "description": "Replace the current Chaos being applied to traffic and activates that behaviour.",
+        "tags": [
+          "/chaos"
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": [
+                {
+                  "type": "repeat",
+                  "stages": [
+                    {
+                      "type": "wait",
+                      "until": {
+                        "type": "delay",
+                        "period": "PT30S"
+                      }
+                    },
+                    {
+                      "type": "trigger",
+                      "behaviour": {
+                        "type": "status",
+                        "status": 418
+                      },
+                      "trigger": {
+                        "type": "always"
+                      },
+                      "until": {
+                        "type": "countdown",
+                        "count": 10
+                      }
+                    }
+                  ],
+                  "until": {
+                    "type": "deadline",
+                    "endTime": "2030-01-01T00:00:00Z"
+                  }
+                }
+              ],
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/object892534508"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "New Chaos could not be deserialised from the request body.",
+            "content": {
+            }
+          },
+          "200": {
+            "description": "The current Chaos being applied to requests.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-2131380971"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+        ],
+        "operationId": "postChaosActivateNew",
+        "deprecated": false
+      }
+    },
+    "/chaos/deactivate": {
+      "post": {
+        "summary": "Deactivate Chaos on all routes.",
+        "description": "Toggles off the previously stored Chaos behaviour.",
+        "tags": [
+          "/chaos"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "The current Chaos being applied to requests.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-2131380971"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+        ],
+        "operationId": "postChaosDeactivate",
+        "deprecated": false
+      }
+    },
+    "/chaos/status": {
+      "get": {
+        "summary": "Show the current Chaos being applied.",
+        "description": "Returns a textual description of the current Chaos behaviour being applied to traffic.",
+        "tags": [
+          "/chaos"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "The current Chaos being applied to requests.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-2131380971"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+        ],
+        "operationId": "getChaosStatus",
+        "deprecated": false
+      }
+    },
+    "/chaos/toggle": {
+      "post": {
+        "summary": "Toggle on/off the Chaos on all routes.",
+        "description": "Toggles the previously stored Chaos behaviour.",
+        "tags": [
+          "/chaos"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "The current Chaos being applied to requests.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "chaos": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/object-2131380971"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+        ],
+        "operationId": "postChaosToggle",
+        "deprecated": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "object-2131380971": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "chaos": {
+            "type": "string",
+            "example": "Repeat [[Wait until Delay (expires 1970-01-01T00:01:00Z)] then [Always ReturnStatus (418) until Deadline (2025-01-01T00:00:00Z)]]"
+          }
+        }
+      },
+      "object-1220661178": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "delay"
+          },
+          "period": {
+            "type": "string",
+            "example": "PT30S"
+          }
+        }
+      },
+      "object-1161480839": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "wait"
+          },
+          "until": {
+            "$ref": "#/components/schemas/object-1220661178"
+          }
+        }
+      },
+      "object-123542215": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "deadline"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "2030-01-01T00:00:00Z"
+          }
+        }
+      },
+      "object892534508": {
+        "type": "object",
+        "required": [
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "repeat"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/object-1161480839"
+            }
+          },
+          "until": {
+            "$ref": "#/components/schemas/object-123542215"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+    }
+  },
+  "openapi": "3.0.0"
+}

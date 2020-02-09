@@ -47,8 +47,9 @@ fun HttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
                              security: Security = NoSecurity,
                              controlsPath: String = "/chaos",
                              openApiPath: String = "",
-                             corsPolicy: CorsPolicy = UnsafeGlobalPermissive
-) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy)
+                             corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
+                             clock: Clock = Clock.systemUTC()
+) = routes("/{path:.*}" bind this).withChaosApi(engine, security, controlsPath, openApiPath, corsPolicy, clock)
 
 /**
  * Mixin the set of remote Chaos API endpoints to a standard HttpHandler, using the passed ChaosStage.
@@ -58,9 +59,10 @@ fun RoutingHttpHandler.withChaosApi(engine: ChaosEngine = ChaosEngine(),
                                     security: Security = NoSecurity,
                                     controlsPath: String = "/chaos",
                                     openApiPath: String = "",
-                                    corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+                                    corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
+                                    clock: Clock = Clock.systemUTC()
 ) = routes(
-    RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy),
+    RemoteChaosApi(engine, controlsPath, security, openApiPath, corsPolicy, clock),
     engine.then(this)
 )
 
@@ -79,11 +81,12 @@ object RemoteChaosApi {
         controlsPath: String = "/chaos",
         chaosSecurity: Security = NoSecurity,
         openApiPath: String = "",
-        corsPolicy: CorsPolicy = UnsafeGlobalPermissive
+        corsPolicy: CorsPolicy = UnsafeGlobalPermissive,
+        clock: Clock = Clock.systemUTC()
     ): RoutingHttpHandler {
         val setStages = Body.json().map { node ->
             (if (node.isArray) node.elements().asSequence() else sequenceOf(node))
-                .map { it.asStage(Clock.systemUTC()) }
+                .map { it.asStage(clock) }
                 .reduce { acc, next -> acc.then(next) }
         }.toLens()
 
@@ -124,7 +127,7 @@ object RemoteChaosApi {
 
 
         val currentChaosDescription = Repeat {
-            Wait.until(Delay(ofMinutes(1)))
+            Wait.until(Delay(ofMinutes(1), clock))
                 .then(ReturnStatus(I_M_A_TEAPOT)
                     .appliedWhen(Always())
                     .until(Deadline(ofEpochSecond(1735689600))))
