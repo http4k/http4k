@@ -94,8 +94,8 @@ object RemoteChaosApi {
 
         val activate = Filter { next ->
             {
-                if (it.bodyString().isNotEmpty()) engine.update(setStages(it))
-                engine.enable()
+                if (it.bodyString().isNotEmpty()) engine.enable(setStages(it))
+                else engine.enable()
                 next(it)
             }
         }
@@ -109,9 +109,8 @@ object RemoteChaosApi {
 
         val toggle = Filter { next ->
             {
-                when {
-                    engine.isEnabled() -> engine.disable()
-                    else -> engine.enable()
+                with(engine) {
+                    if (isEnabled()) disable() else enable()
                 }
                 next(it)
             }

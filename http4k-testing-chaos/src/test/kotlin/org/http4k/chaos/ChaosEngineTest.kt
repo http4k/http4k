@@ -40,7 +40,7 @@ class ChaosEngineTest {
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))
         engine.enable()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
-        engine.update(ReturnStatus(I_M_A_TEAPOT))
+        engine.enable(ReturnStatus(I_M_A_TEAPOT))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(I_M_A_TEAPOT))
         engine.disable()
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(OK))

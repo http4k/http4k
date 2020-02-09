@@ -27,28 +27,30 @@ class ChaosEngine(initialStage: Stage = Wait) : Filter {
     fun isEnabled() = on.get()
 
     /**
-     * Turn on Chaos Engine. Note that this may not actually produce any effect based on the configured behaviour
-     * (e.g. if there is a specific Trigger that is condition-based.
-     */
-    fun enable() = apply { on.set(true) }
-
-    /**
-     * Turn on Chaos Engine. No Chaotic behaviour will be applied.
+     * Turn off Chaos Engine. No Chaotic behaviour will be applied.
      */
     fun disable() = apply { on.set(false) }
 
     /**
+     * Turn on Chaos Engine using the pre-initialised chaotic behaviour. Note that this may not actually produce any
+     * effect based on the configured behaviour (e.g. if there is a specific Trigger that is condition-based.)
+     */
+    fun enable() = apply { on.set(true) }
+
+    /**
      * Update with new simple Chaotic behaviour to be applied whenever the ChaosEngine is enabled.
      */
-    fun update(behaviour: Behaviour) = apply {
+    fun enable(behaviour: Behaviour) = apply {
         state.current = behaviour.appliedWhen(trigger)
+        enable()
     }
 
     /**
      * Update the new complex (multi-stage, triggers etc) Chaotic behaviour to be applied whenever the ChaosEngine is enabled.
      */
-    fun update(stage: Stage) = apply {
+    fun enable(stage: Stage) = apply {
         state.current = stage
+        enable()
     }
 
     /**

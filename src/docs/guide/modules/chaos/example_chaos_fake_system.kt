@@ -20,7 +20,7 @@ class FakeSystem : HttpHandler {
     private val app = chaosEngine.then(routes("/hello" bind GET to { Response(Status.OK) }))
 
     fun blowUpOnce() {
-        chaosEngine.enable().update(ReturnStatus(I_M_A_TEAPOT).appliedWhen(Once()))
+        chaosEngine.enable(ReturnStatus(I_M_A_TEAPOT).appliedWhen(Once()))
     }
 
     fun relax() {
