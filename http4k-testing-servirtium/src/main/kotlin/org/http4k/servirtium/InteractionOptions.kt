@@ -1,8 +1,11 @@
 package org.http4k.servirtium
 
 import org.http4k.core.ContentType
+import org.http4k.core.Filter
+import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.filter.DebuggingFilters
 
 /**
  * General controls for the Servirtium interactions and how they are recorded to the storage format. The
@@ -41,4 +44,9 @@ interface InteractionOptions {
          */
         object Defaults : InteractionOptions
     }
+}
+
+internal fun InteractionOptions.trafficPrinter() = when {
+    debugTraffic() -> DebuggingFilters.PrintRequestAndResponse()
+    else -> Filter.NoOp
 }

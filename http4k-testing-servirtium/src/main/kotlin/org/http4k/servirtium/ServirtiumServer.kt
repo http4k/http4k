@@ -1,12 +1,9 @@
 package org.http4k.servirtium
 
 import org.http4k.client.OkHttp
-import org.http4k.core.Filter
-import org.http4k.core.NoOp
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.TrafficFilters
 import org.http4k.server.Http4kServer
 import org.http4k.server.ServerConfig
@@ -69,9 +66,4 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             }
         }
     }
-}
-
-private fun InteractionOptions.trafficPrinter() = when {
-    debugTraffic() -> DebuggingFilters.PrintRequestAndResponse()
-    else -> Filter.NoOp
 }

@@ -10,6 +10,7 @@ import org.http4k.servirtium.InteractionControl.Companion.NoOp
 import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionOptions.Companion.Defaults
 import org.http4k.servirtium.StorageProvider
+import org.http4k.servirtium.trafficPrinter
 import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
@@ -26,7 +27,7 @@ class ServirtiumRecording(
     private val baseName: String,
     private val httpHandler: HttpHandler,
     private val storageProvider: StorageProvider,
-    private val interactionOptions: InteractionOptions = Defaults) : ParameterResolver {
+    private val options: InteractionOptions = Defaults) : ParameterResolver {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
@@ -35,7 +36,8 @@ class ServirtiumRecording(
 
             val storage = storageProvider(testName).apply { clean() }
             if (pc.isHttpHandler())
-                RecordTo(Sink.Servirtium(storage, interactionOptions))
+                RecordTo(Sink.Servirtium(storage, options))
+                    .then(options.trafficPrinter())
                     .then(httpHandler)
             else InteractionControl.StorageBased(storage)
         }
