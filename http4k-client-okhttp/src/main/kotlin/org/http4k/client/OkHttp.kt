@@ -5,6 +5,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.http.HttpMethod.permitsRequestBody
+import okio.Timeout
 import org.http4k.core.BodyMode
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -19,11 +20,11 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object OkHttp {
-    operator fun invoke(client: OkHttpClient = defaultOkHttpClient(), bodyMode: BodyMode = BodyMode.Memory): DualSyncAsyncHttpHandler =
+    operator fun invoke(client: OkHttpClient = defaultOkHttpClient(), bodyMode: BodyMode = BodyMode.Memory, timeoutModifier: Timeout.() -> Unit = {}): DualSyncAsyncHttpHandler =
         object : DualSyncAsyncHttpHandler {
             override fun invoke(request: Request): Response =
                 try {
-                    client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+                    client.newCall(request.asOkHttp()).apply { timeoutModifier(timeout()) }.execute().asHttp4k(bodyMode)
                 } catch (e: ConnectException) {
                     Response(CONNECTION_REFUSED.toClientStatus(e))
                 } catch (e: UnknownHostException) {
@@ -33,7 +34,7 @@ object OkHttp {
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-                client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
+                client.newCall(request.asOkHttp()).apply { timeoutModifier(timeout()) }.enqueue(Http4kCallback(bodyMode, fn))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
