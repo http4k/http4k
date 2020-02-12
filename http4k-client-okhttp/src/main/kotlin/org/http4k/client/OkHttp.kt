@@ -19,11 +19,13 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object OkHttp {
-    operator fun invoke(client: OkHttpClient = defaultOkHttpClient(), bodyMode: BodyMode = BodyMode.Memory): DualSyncAsyncHttpHandler =
+    operator fun invoke(client: OkHttpClient = defaultOkHttpClient(),
+                        bodyMode: BodyMode = BodyMode.Memory,
+                        requestModifier: (okhttp3.Request.Builder) -> okhttp3.Request.Builder = { it }): DualSyncAsyncHttpHandler =
         object : DualSyncAsyncHttpHandler {
             override fun invoke(request: Request): Response =
                 try {
-                    client.newCall(request.asOkHttp()).execute().asHttp4k(bodyMode)
+                    client.newCall(request.asOkHttp(requestModifier)).execute().asHttp4k(bodyMode)
                 } catch (e: ConnectException) {
                     Response(CONNECTION_REFUSED.toClientStatus(e))
                 } catch (e: UnknownHostException) {
@@ -33,7 +35,7 @@ object OkHttp {
                 }
 
             override operator fun invoke(request: Request, fn: (Response) -> Unit) =
-                client.newCall(request.asOkHttp()).enqueue(Http4kCallback(bodyMode, fn))
+                client.newCall(request.asOkHttp(requestModifier)).enqueue(Http4kCallback(bodyMode, fn))
         }
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
@@ -50,12 +52,13 @@ object OkHttp {
         .build()
 }
 
-private fun Request.asOkHttp(): okhttp3.Request = headers.fold(okhttp3.Request.Builder()
+private fun Request.asOkHttp(requestModifier: (okhttp3.Request.Builder) -> okhttp3.Request.Builder): okhttp3.Request = headers.fold(okhttp3.Request.Builder()
     .url(uri.toString())
     .method(method.toString(), requestBody())) { memo, (first, second) ->
-    val notNullValue = second ?: ""
-    memo.addHeader(first, notNullValue)
-}.build()
+        val notNullValue = second ?: ""
+        memo.addHeader(first, notNullValue)
+    }.let(requestModifier)
+    .build()
 
 private fun Request.requestBody() =
     if (permitsRequestBody(method.toString())) body.payload.array().toRequestBody()
