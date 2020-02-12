@@ -4,7 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.hamkrest.hasStatus
 import org.http4k.server.SunHttp
 import org.junit.jupiter.api.Test
@@ -20,6 +20,6 @@ class OkHttpAsyncTest : AsyncHttpClientContract({ SunHttp(it) }, OkHttp(), OkHtt
             response.complete(it)
         }
 
-        assertThat(response.get(), hasStatus(Status(503, "Client Error: caused by timeout")))
+        assertThat(response.get(), hasStatus(CLIENT_TIMEOUT))
     }
 }

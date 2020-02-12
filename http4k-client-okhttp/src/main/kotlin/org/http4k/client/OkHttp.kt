@@ -40,7 +40,7 @@ object OkHttp {
 
     private class Http4kCallback(private val bodyMode: BodyMode, private val fn: (Response) -> Unit) : Callback {
         override fun onFailure(call: Call, e: IOException) = fn(Response(when (e) {
-            is SocketTimeoutException -> CLIENT_TIMEOUT
+            is InterruptedIOException -> CLIENT_TIMEOUT
             else -> SERVICE_UNAVAILABLE
         }.description("Client Error: caused by ${e.localizedMessage}")))
 
