@@ -5,12 +5,16 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.hamkrest.hasStatus
 import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
                                        val client: AsyncHttpClient,
@@ -40,12 +44,11 @@ abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `socket timeouts are converted into 504`() {
-        val latch = CountDownLatch(1)
-        timeoutClient(Request(GET, "http://localhost:$port/delay/1500")) { response ->
-            assertThat(response.status, equalTo(CLIENT_TIMEOUT))
-            latch.countDown()
+        val response = CompletableFuture<Response>()
+        timeoutClient(Request(GET, "http://localhost:$port/delay/1500")) {
+            response.complete(it)
         }
 
-        latch.await()
+        assertThat(response.get(1500, MILLISECONDS), hasStatus(CLIENT_TIMEOUT))
     }
 }
