@@ -16,6 +16,8 @@ import org.http4k.servirtium.InteractionOptions
 import org.http4k.servirtium.InteractionStorage.Companion.InMemory
 import org.http4k.testing.ApprovalTest
 import org.http4k.testing.Approver
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -44,11 +46,13 @@ class ServirtiumRecordingIntegrationTest : TestContract {
 
     private val storage = InMemory()
 
+    private val originalHandler: HttpHandler = { Response(OK).body("hello") }
+
     @JvmField
     @RegisterExtension
     val record = ServirtiumRecording(
         "contractName",
-        { Response(OK).body("hello") },
+        originalHandler,
         storage,
         object : InteractionOptions {
             override fun modify(request: Request) = request.body(request.bodyString() + request.bodyString())
@@ -66,6 +70,11 @@ class ServirtiumRecordingIntegrationTest : TestContract {
         approver.assertApproved(Response(OK).body(
             String(storage("contractName.check contents are recorded as per manipulations").get())
         ))
+    }
+
+    @AfterEach
+    fun `check that raw handler is passed into non test method`(handler: HttpHandler) {
+        assertTrue(originalHandler === handler)
     }
 }
 
