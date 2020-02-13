@@ -18,6 +18,7 @@ import org.http4k.server.SunHttp
 import org.http4k.server.asServer
 import org.http4k.servirtium.GitHub
 import org.http4k.servirtium.InteractionStorage.Companion.Disk
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -83,7 +84,6 @@ class RemoteHttpRecordingWordCounterTest : WordCounterContract {
  * 2. Is also written in http4k
  * ... we can have the Producer implement the contract entirely in-memory without a MiTM.
  */
-@Disabled
 class InMemoryRecordingWordCounterTest : WordCounterContract {
 
     private val app = WordCounterApp()
@@ -91,6 +91,12 @@ class InMemoryRecordingWordCounterTest : WordCounterContract {
     @JvmField
     @RegisterExtension
     val record = ServirtiumRecording("WordCounter", app, Disk(File(".")))
+
+    @AfterEach
+    fun after(handler: HttpHandler) {
+        val name = "this traffic is not recorded"
+        println(name + ": " + WordCounterClient(handler).wordCount(name))
+    }
 }
 
 /**
