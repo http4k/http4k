@@ -84,6 +84,7 @@ class RemoteHttpRecordingWordCounterTest : WordCounterContract {
  * 2. Is also written in http4k
  * ... we can have the Producer implement the contract entirely in-memory without a MiTM.
  */
+@Disabled
 class InMemoryRecordingWordCounterTest : WordCounterContract {
 
     private val app = WordCounterApp()
