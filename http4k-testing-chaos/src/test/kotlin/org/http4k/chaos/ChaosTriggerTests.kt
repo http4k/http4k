@@ -179,7 +179,7 @@ class OnceTest : ChaosTriggerContract() {
 
     @Test
     fun `Once only fires once with trigger`() {
-        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(Status.OK) }
+        val http = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Once { it.method == GET }).asFilter().then { Response(OK) }
         assertThat(http(Request(POST, "/foo")), hasStatus(OK))
         assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR))
         assertThat(http(Request(POST, "/foo")), hasStatus(OK))
@@ -194,7 +194,7 @@ class ChaosPolicyOperationTest {
         val stage: Stage = ReturnStatus(INTERNAL_SERVER_ERROR).appliedWhen(Always()).until { it.method == POST }
         assertThat(stage.toString(), equalTo("Always ReturnStatus (500) until (org.http4k.core.Request) -> kotlin.Boolean"))
 
-        val http: HttpHandler = stage.asFilter().then { Response(Status.OK) }
+        val http: HttpHandler = stage.asFilter().then { Response(OK) }
 
         assertThat(http(Request(GET, "/foo")), hasStatus(INTERNAL_SERVER_ERROR).and(hasHeader("x-http4k-chaos", "Status 500")))
         assertThat(http(Request(POST, "/bar")), hasStatus(OK).and(!hasHeader("x-http4k-chaos")))

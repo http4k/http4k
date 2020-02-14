@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method.*
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -58,8 +59,8 @@ body""".toPayload()), equalTo(Response(OK)
 
     @Test
     fun `parse response with other status`() {
-        assertThat(Response.parse(Response(Status.NOT_FOUND).body("hi").toString()),
-            equalTo(Response(Status.NOT_FOUND).body("hi")))
+        assertThat(Response.parse(Response(NOT_FOUND).body("hi").toString()),
+            equalTo(Response(NOT_FOUND).body("hi")))
     }
 
     @Test

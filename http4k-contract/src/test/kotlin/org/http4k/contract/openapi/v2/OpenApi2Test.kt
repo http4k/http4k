@@ -15,6 +15,7 @@ import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.format.Argo
 import org.http4k.lens.Query
@@ -37,7 +38,7 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
         val router = "/" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            routes += "/" bindContract GET to { Response(Status.OK) }
+            routes += "/" bindContract GET to { Response(OK) }
             descriptionPath = "/docs"
         }
 
@@ -58,7 +59,7 @@ class OpenApi2Test : ContractRendererContract<JsonNode>(
                 ),
                 filter = Filter.NoOp
             )
-            routes += "/example" bindContract GET to { Response(Status.OK) }
+            routes += "/example" bindContract GET to { Response(OK) }
         }
 
         approver.assertApproved(router(Request(GET, "/")))

@@ -10,6 +10,7 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
@@ -45,7 +46,7 @@ class ApiKeySecurityTest {
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, ""))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
@@ -55,7 +56,7 @@ class ApiKeySecurityTest {
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, "?name=asdasd"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
@@ -65,6 +66,6 @@ class ApiKeySecurityTest {
 
         val response = ApiKeySecurity(param, { false }).filter(next)(Request(GET, "?name=1"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 }

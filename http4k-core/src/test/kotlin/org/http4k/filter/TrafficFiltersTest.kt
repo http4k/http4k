@@ -7,6 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.BAD_REQUEST
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.traffic.ReadWriteCache
 import org.http4k.traffic.ReadWriteStream
@@ -15,7 +17,7 @@ import org.junit.jupiter.api.fail
 
 class TrafficFiltersTest {
     private val request = Request(GET, "/bob")
-    private val response = Response(Status.OK)
+    private val response = Response(OK)
 
     @Test
     fun `RecordTo stores traffic in underlying storage`() {
@@ -33,7 +35,7 @@ class TrafficFiltersTest {
     fun `ServeCachedFrom serves stored requests later or falls back`() {
         val cache = ReadWriteCache.Memory()
         cache[request] = response
-        val notFound = Response(Status.NOT_FOUND)
+        val notFound = Response(NOT_FOUND)
         val handler = TrafficFilters.ServeCachedFrom(cache).then { notFound }
 
         assertThat(handler(request), equalTo(response))

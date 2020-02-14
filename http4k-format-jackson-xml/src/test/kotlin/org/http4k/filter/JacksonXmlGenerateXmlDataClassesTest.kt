@@ -6,6 +6,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -20,7 +21,7 @@ class JacksonXmlGenerateXmlDataClassesTest {
 
         val os = ByteArrayOutputStream()
 
-        val app = JacksonXmlGenerateXmlDataClasses(PrintStream(os), { 1 }).then { Response(Status.OK).body(input) }
+        val app = JacksonXmlGenerateXmlDataClasses(PrintStream(os), { 1 }).then { Response(OK).body(input) }
 
         app(Request(GET, "/bob"))
 

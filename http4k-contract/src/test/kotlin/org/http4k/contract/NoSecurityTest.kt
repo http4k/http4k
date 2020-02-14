@@ -7,14 +7,15 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
 class NoSecurityTest {
     @Test
     fun `no security is rather lax`() {
-        val response = (NoSecurity.filter { Response(Status.OK).body("hello") })(Request(GET, ""))
+        val response = (NoSecurity.filter { Response(OK).body("hello") })(Request(GET, ""))
 
-        assertThat(response.status, equalTo(Status.OK))
+        assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
     }
 }

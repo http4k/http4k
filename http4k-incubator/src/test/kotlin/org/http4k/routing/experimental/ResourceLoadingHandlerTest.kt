@@ -13,6 +13,9 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.NOT_MODIFIED
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.etag.ETag
 import org.http4k.hamkrest.hasBody
@@ -31,7 +34,7 @@ class NewResourceLoadingHandlerTest {
 
     @Test
     fun `no resource returns NOT_FOUND`() {
-        assertThat(handler(MemoryRequest(GET, Uri.of("/root/nosuch"))), equalTo(Response(Status.NOT_FOUND)))
+        assertThat(handler(MemoryRequest(GET, Uri.of("/root/nosuch"))), equalTo(Response(NOT_FOUND)))
     }
 
     @Test
@@ -40,7 +43,7 @@ class NewResourceLoadingHandlerTest {
         assertThat(
             handler(Request(GET, Uri.of("/root/file.txt"))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasContentType(TEXT_PLAIN.withNoDirectives()),
                 hasHeader("Content-Length", "7"),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
@@ -55,7 +58,7 @@ class NewResourceLoadingHandlerTest {
         assertThat(
             handler(Request(GET, Uri.of("/root/file.txt"))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasHeader("Content-Length", absent()),
                 hasHeader("Last-Modified", absent()),
                 hasHeader("ETag", absent())
@@ -69,7 +72,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
                 hasBody("content")
             ))
@@ -82,7 +85,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:00 GMT"))),
             allOf(
-                hasStatus(Status.NOT_MODIFIED),
+                hasStatus(NOT_MODIFIED),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
                 hasBody("")
             ))
@@ -90,7 +93,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:06:01 GMT"))),
             allOf(
-                hasStatus(Status.NOT_MODIFIED),
+                hasStatus(NOT_MODIFIED),
                 hasHeader("Last-Modified", "Thu, 9 Aug 2018 23:06:00 GMT"),
                 hasBody("")
             ))
@@ -103,7 +106,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "Thu, 9 Aug 2018 23:05:59 GMT"))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasHeader("Last-Modified", absent()),
                 hasBody("content")
             ))
@@ -116,7 +119,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-Modified-Since" to "NOT A DATE"))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasBody("content")
             ))
     }
@@ -128,7 +131,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"something-else""""))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasHeader("ETag", """W/"etag-value""""),
                 hasBody("content")
             ))
@@ -141,7 +144,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"something-else", W/"etag-value""""))),
             allOf(
-                hasStatus(Status.NOT_MODIFIED),
+                hasStatus(NOT_MODIFIED),
                 hasHeader("ETag", """W/"etag-value""""),
                 hasBody("")
             ))
@@ -149,7 +152,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """*"""))),
             allOf(
-                hasStatus(Status.NOT_MODIFIED),
+                hasStatus(NOT_MODIFIED),
                 hasHeader("ETag", """W/"etag-value""""),
                 hasBody("")
             ))
@@ -157,7 +160,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """"etag-value""""))),
             allOf(
-                hasStatus(Status.NOT_MODIFIED),
+                hasStatus(NOT_MODIFIED),
                 hasHeader("ETag", """W/"etag-value""""),
                 hasBody("")
             ))
@@ -170,7 +173,7 @@ class NewResourceLoadingHandlerTest {
             handler(MemoryRequest(GET, Uri.of("/root/file.txt"),
                 listOf("If-None-Match" to """*"""))),
             allOf(
-                hasStatus(Status.OK),
+                hasStatus(OK),
                 hasHeader("ETag", absent()),
                 hasBody("content")
             ))

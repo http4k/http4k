@@ -16,7 +16,11 @@ import org.http4k.core.Method.TRACE
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.CONNECTION_REFUSED
+import org.http4k.core.Status.Companion.FOUND
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
 import org.http4k.filter.ServerFilters
@@ -40,7 +44,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
 
     @Test
     fun `supports gzipped content`() {
-        val asServer = ServerFilters.GZip().then { Response(Status.OK).body("hello") }.asServer(SunHttp(0))
+        val asServer = ServerFilters.GZip().then { Response(OK).body("hello") }.asServer(SunHttp(0))
         asServer.start()
         val client = JavaHttpClient()
 
@@ -101,7 +105,7 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     fun `does not follow redirects`() {
         val response = client(Request(GET, "http://localhost:$port/redirect"))
 
-        assertThat(response.status, equalTo(Status.FOUND))
+        assertThat(response.status, equalTo(FOUND))
         assertThat(response.header("location"), equalTo("/someUri"))
     }
 
@@ -151,21 +155,21 @@ abstract class HttpClientContract(serverConfig: (Int) -> ServerConfig,
     open fun `socket timeouts are converted into 504`() {
         val response = timeoutClient(Request(GET, "http://localhost:$port/delay/150"))
 
-        assertThat(response.status, equalTo(Status.CLIENT_TIMEOUT))
+        assertThat(response.status, equalTo(CLIENT_TIMEOUT))
     }
 
     @Test
     open fun `connection refused are converted into 503`() {
         val response = client(Request(GET, "http://localhost:1"))
 
-        assertThat(response.status, equalTo(Status.CONNECTION_REFUSED))
+        assertThat(response.status, equalTo(CONNECTION_REFUSED))
     }
 
     @Test
     open fun `unknown host are converted into 503`() {
         val response = client(Request(GET, "http://foobar.bill"))
 
-        assertThat(response.status, equalTo(Status.UNKNOWN_HOST))
+        assertThat(response.status, equalTo(UNKNOWN_HOST))
     }
 
     @Test

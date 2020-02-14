@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.http4k.core.ContentType
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.lens.Header
@@ -50,7 +51,7 @@ class JsonToJsonSchemaTest {
     }
 
     private fun Approver.assertApproved(obj: JsonNode, name: String) {
-        assertApproved(Response(Status.OK)
+        assertApproved(Response(OK)
             .with(Header.CONTENT_TYPE of ContentType.APPLICATION_JSON)
             .body(Jackson.asJsonString(creator.toSchema(obj, name))))
     }

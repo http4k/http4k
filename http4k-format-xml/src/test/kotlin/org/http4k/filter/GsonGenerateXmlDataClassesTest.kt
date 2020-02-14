@@ -7,6 +7,7 @@ import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -21,7 +22,7 @@ class GsonGenerateXmlDataClassesTest {
 
         val os = ByteArrayOutputStream()
 
-        val body = Response(Status.OK).body(input)
+        val body = Response(OK).body(input)
         val handler = GsonGenerateXmlDataClasses(PrintStream(os), { 1 }).then { body }
 
         handler(Request(GET, "/bob"))

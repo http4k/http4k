@@ -4,10 +4,14 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
 import org.http4k.core.NoOp
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.DebuggingFilters
@@ -38,8 +42,8 @@ fun customOauthAuthorizationServer(): RoutingHttpHandler {
 
     return routes(
         server.tokenRoute,
-        "/my-login-page" bind Method.GET to server.authenticationStart.then { Response(Status.OK).body("Please authenticate") },
-        "/my-login-page" bind Method.POST to server.authenticationComplete
+        "/my-login-page" bind GET to server.authenticationStart.then { Response(OK).body("Please authenticate") },
+        "/my-login-page" bind POST to server.authenticationComplete
     )
 }
 
@@ -59,13 +63,13 @@ fun customOauthAuthorizationServerWithPersistence(): RoutingHttpHandler {
 
     return routes(
         server.tokenRoute,
-        "/my-login-page" bind Method.GET to server.authenticationStart.then { Response(Status.OK).body("Please authenticate") },
-        "/my-login-page" bind Method.POST to { Response(Status.TEMPORARY_REDIRECT).header("location", "/verify-scope") },
-        "/verify-scope" bind Method.GET to {
+        "/my-login-page" bind GET to server.authenticationStart.then { Response(OK).body("Please authenticate") },
+        "/my-login-page" bind POST to { Response(TEMPORARY_REDIRECT).header("location", "/verify-scope") },
+        "/verify-scope" bind GET to {
             val flow = requestPersistence.resolveAuthRequest(it) ?: error("flow was not persisted")
-            Response(Status.OK).body("Allow ${flow.client.value} to access ${flow.scopes.joinToString(" and ")}?")
+            Response(OK).body("Allow ${flow.client.value} to access ${flow.scopes.joinToString(" and ")}?")
         },
-        "/verify-scope" bind Method.POST to server.authenticationComplete
+        "/verify-scope" bind POST to server.authenticationComplete
     )
 }
 
@@ -92,8 +96,8 @@ fun oauthClientApp(
     )
 
     return routes(
-        "/my-callback" bind Method.GET to oauthProvider.callback,
-        "/a-protected-resource" bind Method.GET to oauthProvider.authFilter.then { Response(Status.OK).body("user resource") }
+        "/my-callback" bind GET to oauthProvider.callback,
+        "/a-protected-resource" bind GET to oauthProvider.authFilter.then { Response(OK).body("user resource") }
     )
 }
 

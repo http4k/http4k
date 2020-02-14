@@ -23,7 +23,7 @@ data class Result(val name: String, val time: Long, val totalRequests: Int, val 
 
 fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Result {
     val config = fn(port)
-    val server = { _: Request -> Response(Status.OK).body(System.nanoTime().toString()) }.asServer(config).start()
+    val server = { _: Request -> Response(OK).body(System.nanoTime().toString()) }.asServer(config).start()
     Thread.sleep(1000)
 
     val client = ApacheClient()

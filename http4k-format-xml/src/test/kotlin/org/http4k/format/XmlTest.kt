@@ -7,6 +7,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.format.Xml.asXmlDocument
 import org.http4k.format.Xml.asXmlString
 import org.http4k.format.Xml.auto
@@ -46,14 +47,14 @@ class XmlTest {
         val xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?><value>1258421375.19</value>"""
         val lens = Body.auto<SimpleDocument>().toLens()
 
-        assertThat(lens(Response(Status.OK).body(xml)), equalTo(SimpleDocument("1258421375.19")))
+        assertThat(lens(Response(OK).body(xml)), equalTo(SimpleDocument("1258421375.19")))
     }
 
     @Test
     fun `convert XML to simple bean`() {
         val body = Body.auto<Base>().toLens()
         val expected = Base(XmlNode(listOf(SubWithText1("attrValue", "subText"), SubWithText1("attrValue3", "subText4")), SubWithAttr("attr2"), "asd"))
-        assertThat(body(Response(Status.OK).body(xml)), equalTo(expected))
+        assertThat(body(Response(OK).body(xml)), equalTo(expected))
     }
 
     @Test

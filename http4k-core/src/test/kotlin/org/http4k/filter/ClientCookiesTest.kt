@@ -7,6 +7,7 @@ import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
@@ -25,7 +26,7 @@ class ClientCookiesTest {
 
     @Test
     fun `can store and send cookies across multiple calls`() {
-        val server = { request: Request -> Response(Status.OK).counterCookie(request.counterCookie() + 1) }
+        val server = { request: Request -> Response(OK).counterCookie(request.counterCookie() + 1) }
 
         val client = ClientFilters.Cookies().then(server)
 
@@ -39,8 +40,8 @@ class ClientCookiesTest {
     fun `expired cookies are removed from storage and not sent`() {
         val server = { request: Request ->
             when (request.uri.path) {
-                "/set" -> Response(Status.OK).cookie(Cookie("foo", "bar", 5))
-                else -> Response(Status.OK).body(request.cookie("foo")?.value ?: "gone")
+                "/set" -> Response(OK).cookie(Cookie("foo", "bar", 5))
+                else -> Response(OK).body(request.cookie("foo")?.value ?: "gone")
             }
         }
 
@@ -79,8 +80,8 @@ class ClientCookiesTest {
 
         val server = { request: Request ->
             when (request.uri.path) {
-                "/set" -> Response(Status.OK).cookie(cookie)
-                else -> Response(Status.OK).body(request.cookie("foo")?.value ?: "gone")
+                "/set" -> Response(OK).cookie(cookie)
+                else -> Response(OK).body(request.cookie("foo")?.value ?: "gone")
             }
         }
 

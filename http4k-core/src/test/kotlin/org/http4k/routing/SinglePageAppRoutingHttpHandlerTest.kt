@@ -10,6 +10,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.hamkrest.hasBody
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
@@ -73,7 +74,7 @@ class SinglePageAppRoutingHttpHandlerTest : RoutingHttpHandlerContract() {
         assertThat(dslDefault(Request(GET, validPath)), criteria)
     }
 
-    private fun isHomePage(name: String = "root"): Matcher<Response> = hasStatus(Status.OK)
+    private fun isHomePage(name: String = "root"): Matcher<Response> = hasStatus(OK)
         .and(hasBody("hello from the $name index.html"))
         .and(hasHeader("Content-Type", equalTo(ContentType.TEXT_HTML.value)))
 }

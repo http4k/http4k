@@ -7,6 +7,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
+import org.http4k.core.Status.Companion.OK
 import org.http4k.server.ServerConfig
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -27,7 +28,7 @@ abstract class AsyncHttpClientContract(serverConfig: (Int) -> ServerConfig,
         client(Request(POST, "http://localhost:$port/someUri")
             .query("query", "123")
             .header("header", "value").body("body")) { response ->
-            assertThat(response.status, equalTo(Status.OK))
+            assertThat(response.status, equalTo(OK))
             assertThat(response.header("uri"), equalTo("/someUri?query=123"))
             assertThat(response.header("query"), equalTo("123"))
             assertThat(response.header("header"), equalTo("value"))
