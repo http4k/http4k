@@ -3,6 +3,7 @@ package guide.modules.resilience
 import io.github.resilience4j.retry.Retry
 import io.github.resilience4j.retry.RetryConfig
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -31,5 +32,5 @@ fun main() {
         response
     }
 
-    println(retrying(Request(Method.GET, "/")))
+    println(retrying(Request(GET, "/")))
 }

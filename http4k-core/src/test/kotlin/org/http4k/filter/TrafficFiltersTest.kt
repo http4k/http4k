@@ -2,7 +2,7 @@ package org.http4k.filter
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 class TrafficFiltersTest {
-    private val request = Request(Method.GET, "/bob")
+    private val request = Request(GET, "/bob")
     private val response = Response(Status.OK)
 
     @Test
@@ -37,7 +37,7 @@ class TrafficFiltersTest {
         val handler = TrafficFilters.ServeCachedFrom(cache).then { notFound }
 
         assertThat(handler(request), equalTo(response))
-        assertThat(handler(Request(Method.GET, "/bob2")), equalTo(notFound))
+        assertThat(handler(Request(GET, "/bob2")), equalTo(notFound))
     }
 
     @Test
@@ -49,6 +49,6 @@ class TrafficFiltersTest {
 
         assertThat(handler(request), equalTo(response))
         assertThat(handler(request), equalTo(response))
-        assertThat(handler(Request(Method.GET, "/bob2")), equalTo(Response(BAD_REQUEST)))
+        assertThat(handler(Request(GET, "/bob2")), equalTo(Response(BAD_REQUEST)))
     }
 }

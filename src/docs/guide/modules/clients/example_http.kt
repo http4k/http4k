@@ -7,6 +7,7 @@ import org.http4k.client.ApacheAsyncClient
 import org.http4k.client.ApacheClient
 import org.http4k.core.BodyMode
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import kotlin.concurrent.thread
 
@@ -14,7 +15,7 @@ fun main() {
 
     // standard client
     val client = ApacheClient()
-    val request = Request(Method.GET, "http://httpbin.org/get").query("location", "John Doe")
+    val request = Request(GET, "http://httpbin.org/get").query("location", "John Doe")
     val response = client(request)
     println("SYNC")
     println(response.status)
@@ -22,13 +23,13 @@ fun main() {
 
     // streaming client
     val streamingClient = ApacheClient(responseBodyMode = BodyMode.Stream)
-    val streamingRequest = Request(Method.GET, "http://httpbin.org/stream/100")
+    val streamingRequest = Request(GET, "http://httpbin.org/stream/100")
     println("STREAM")
     println(streamingClient(streamingRequest).bodyString())
 
     // async supporting clients can be passed a callback...
     val asyncClient = ApacheAsyncClient()
-    asyncClient(Request(Method.GET, "http://httpbin.org/stream/5")) {
+    asyncClient(Request(GET, "http://httpbin.org/stream/5")) {
         println("ASYNC")
         println(it.status)
         println(it.bodyString())

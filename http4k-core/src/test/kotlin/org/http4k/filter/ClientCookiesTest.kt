@@ -3,6 +3,7 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -29,7 +30,7 @@ class ClientCookiesTest {
         val client = ClientFilters.Cookies().then(server)
 
         (0..3).forEach {
-            val response = client(Request(Method.GET, "/"))
+            val response = client(Request(GET, "/"))
             assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}"; """))
         }
     }
@@ -57,15 +58,15 @@ class ClientCookiesTest {
 
         val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
 
-        client(Request(Method.GET, "/set"))
+        client(Request(GET, "/set"))
 
         assertThat(cookieStorage.retrieve().size, equalTo(1))
 
-        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
+        assertThat(client(Request(GET, "/get")), hasBody("bar"))
 
         clock.add(10)
 
-        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
+        assertThat(client(Request(GET, "/get")), hasBody("gone"))
     }
 
     @Test
@@ -97,17 +98,17 @@ class ClientCookiesTest {
 
         val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
 
-        client(Request(Method.GET, "/set"))
+        client(Request(GET, "/set"))
 
         assertThat(cookieStorage.retrieve().size, equalTo(1))
 
         // if the parser uses UTC and the expiry checker uses local time then this will be 'gone'
-        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
+        assertThat(client(Request(GET, "/get")), hasBody("bar"))
 
         clock.add(1)
 
         // if the parser uses local time and the expiry checker uses UTC then this will be 'bar'
-        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
+        assertThat(client(Request(GET, "/get")), hasBody("gone"))
     }
 
     fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0

@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.base64Encode
 import org.http4k.core.Method
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
@@ -53,7 +53,7 @@ class PathTest {
 
     @Test
     fun `value present in request when it has been pre-parsed`() {
-        val target = RoutedRequest(Request(Method.GET, "/some/world"), UriTemplate.from("/some/{hello}"))
+        val target = RoutedRequest(Request(GET, "/some/world"), UriTemplate.from("/some/{hello}"))
 
         assertThat(Path.of("hello")(target), equalTo("world"))
         assertThat(Path.of("hello").extract(target), equalTo("world"))

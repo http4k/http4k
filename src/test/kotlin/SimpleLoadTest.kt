@@ -1,5 +1,6 @@
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -32,7 +33,7 @@ fun testWith(threads: Int, reps: Int, fn: (Int) -> ServerConfig, port: Int): Res
     (0..threads).forEach {
         thread {
             (0..reps).forEach {
-                if (client(Request(Method.GET, "http://localhost:$port")).status != OK) {
+                if (client(Request(GET, "http://localhost:$port")).status != OK) {
                     errors.incrementAndGet()
                 }
             }

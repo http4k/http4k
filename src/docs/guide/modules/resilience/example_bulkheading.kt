@@ -3,6 +3,7 @@ package guide.modules.resilience
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadConfig
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -27,7 +28,7 @@ fun main() {
     // throw a bunch of requests at the filter - only 5 should pass
     (1..10).forEach {
         thread {
-            println(bulkheading(Request(Method.GET, "/")).status)
+            println(bulkheading(Request(GET, "/")).status)
         }
     }
 }

@@ -3,6 +3,7 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -19,7 +20,7 @@ class DebuggingFiltersTest {
     @Test
     fun `prints request and response`() {
         val os = ByteArrayOutputStream()
-        val req = Request(Method.GET, "")
+        val req = Request(GET, "")
         val resp = Response(OK)
         PrintRequestAndResponse(PrintStream(os))
             .then(resp.toHttpHandler())(req)
@@ -31,7 +32,7 @@ class DebuggingFiltersTest {
     @Test
     fun `prints request and response when handler blows up`() {
         val os = ByteArrayOutputStream()
-        val req = Request(Method.GET, "")
+        val req = Request(GET, "")
         try {
             PrintRequestAndResponse(PrintStream(os))
                 .then { throw IllegalArgumentException("foobar") }(req)
@@ -47,7 +48,7 @@ class DebuggingFiltersTest {
     @Test
     fun `suppresses stream body by default`() {
         val os = ByteArrayOutputStream()
-        val req = Request(Method.GET, "").body("anything".byteInputStream())
+        val req = Request(GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
         PrintRequestAndResponse(PrintStream(os))
             .then(resp.toHttpHandler())(req)
@@ -59,7 +60,7 @@ class DebuggingFiltersTest {
     @Test
     fun `can print stream body`() {
         val os = ByteArrayOutputStream()
-        val req = Request(Method.GET, "").body("anything".byteInputStream())
+        val req = Request(GET, "").body("anything".byteInputStream())
         val resp = Response(OK).body("anything".byteInputStream())
         PrintRequestAndResponse(PrintStream(os), true)
             .then(resp.toHttpHandler())(req)

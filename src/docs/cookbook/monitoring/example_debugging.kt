@@ -1,6 +1,7 @@
 package cookbook.monitoring
 
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -13,5 +14,5 @@ fun main() {
 
     val debuggedApp = DebuggingFilters.PrintRequestAndResponse().then(app)
 
-    debuggedApp(Request(Method.GET, "/foobar").header("Accepted", "my-great-content/type"))
+    debuggedApp(Request(GET, "/foobar").header("Accepted", "my-great-content/type"))
 }

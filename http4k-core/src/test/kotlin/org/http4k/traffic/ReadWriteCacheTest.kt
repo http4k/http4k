@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -26,10 +27,10 @@ class ReadWriteCacheTest {
     }
 
     private fun testCache(cache: ReadWriteCache) {
-        val request = Request(Method.GET, "/")
+        val request = Request(GET, "/")
         val response = Response(Status.OK).body("hello")
         cache[request] = response
         assertThat(cache[request], equalTo(response))
-        assertThat(cache[Request(Method.GET, "/bob")], absent())
+        assertThat(cache[Request(GET, "/bob")], absent())
     }
 }

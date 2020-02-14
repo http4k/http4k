@@ -3,6 +3,7 @@ package org.http4k.traffic
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -25,8 +26,8 @@ class ReadWriteStreamTest {
     }
 
     private fun testStream(stream: ReadWriteStream) {
-        val request = Request(Method.GET, "/")
-        val otherRequest = Request(Method.GET, "/bob")
+        val request = Request(GET, "/")
+        val otherRequest = Request(GET, "/bob")
         val response = Response(Status.OK).body("hello")
         val otherResponse = Response(Status.INTERNAL_SERVER_ERROR).body("world")
         stream[request] = response

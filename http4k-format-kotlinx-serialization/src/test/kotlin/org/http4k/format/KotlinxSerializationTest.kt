@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import kotlinx.serialization.json.JsonElement
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -92,7 +93,7 @@ class KotlinxSerializationGenerateDataClassesTest : GenerateDataClassesContract<
 
         val handler = GenerateDataClasses(j, PrintStream(os)) { 1 }.then { Response(Status.OK).with(j.body().toLens() of input) }
 
-        handler(Request(Method.GET, "/bob"))
+        handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
         assertThat(actual, equalTo("""// result generated from /bob
 

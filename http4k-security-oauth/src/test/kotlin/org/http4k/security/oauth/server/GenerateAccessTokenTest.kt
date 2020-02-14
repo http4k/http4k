@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.BAD_REQUEST
@@ -39,14 +40,14 @@ class GenerateAccessTokenTest {
     private val handlerClock = SettableClock()
     private val codes = InMemoryAuthorizationCodes(FixedClock)
     private val authRequest = AuthRequest(ClientId("a-clientId"), listOf(), Uri.of("redirect"), State("state"))
-    private val request = Request(Method.GET, "http://some-thing")
+    private val request = Request(GET, "http://some-thing")
     private val code = codes.create(request, authRequest, Response(OK)).get()
     private val clientValidator = HardcodedClientValidator(authRequest.client, authRequest.redirectUri!!, "a-secret")
     private val handler = GenerateAccessToken(codes, DummyAccessTokens(), handlerClock, DummyIdTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)))
 
     @Test
     fun `generates a dummy token`() {
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
                 .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
                 .form("grant_type", "authorization_code")
                 .form("code", code.value)
@@ -62,7 +63,7 @@ class GenerateAccessTokenTest {
     fun `generates dummy access_token and id_token if an oidc request`() {
         val codeForIdTokenRequest = codes.create(request, authRequest.copy(scopes = listOf("openid")), Response(OK)).get()
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", codeForIdTokenRequest.value)
@@ -80,7 +81,7 @@ class GenerateAccessTokenTest {
     fun `generates dummy access_token and id_token`() {
         val codeForIdTokenRequest = codes.create(request, authRequest.copy(responseType = CodeIdToken, scopes = listOf("openid")), Response(OK)).get()
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", codeForIdTokenRequest.value)
@@ -96,7 +97,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `generates dummy token for client credentials grant type`() {
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "client_credentials")
             .form("client_secret", "a-secret")
@@ -108,7 +109,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles invalid grant_type`() {
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "something_else")
             .form("code", code.value)
@@ -122,7 +123,7 @@ class GenerateAccessTokenTest {
 
     @Test
     fun `handles invalid client credentials`() {
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", code.value)
@@ -140,7 +141,7 @@ class GenerateAccessTokenTest {
 
         val expiredCode = codes.create(request, authRequest, Response(OK)).get()
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", expiredCode.value)
@@ -156,7 +157,7 @@ class GenerateAccessTokenTest {
     fun `handles client id different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(client = ClientId("different client")), Response(OK)).get()
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", storedCode.value)
@@ -172,7 +173,7 @@ class GenerateAccessTokenTest {
     fun `handles redirectUri different from one in authorization code`() {
         val storedCode = codes.create(request, authRequest.copy(redirectUri = Uri.of("somethingelse")), Response(OK)).get()
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", storedCode.value)
@@ -187,7 +188,7 @@ class GenerateAccessTokenTest {
     @Test
     fun `handles already used authentication code`() {
         val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)))
-        val request = Request(Method.POST, "/token")
+        val request = Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", code.value)
@@ -203,7 +204,7 @@ class GenerateAccessTokenTest {
     fun `correctly returns documentation uri if provided`() {
         val documentationUri = "SomeUri"
         val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdTokens(), JsonResponseErrorRenderer(json, documentationUri), GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)))
-        val request = Request(Method.POST, "/token")
+        val request = Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", "authorization_code")
             .form("code", code.value)
@@ -219,7 +220,7 @@ class GenerateAccessTokenTest {
     fun `handles grant type not in configuration`() {
         val handler = GenerateAccessToken(codes, ErroringAccessTokens(AuthorizationCodeAlreadyUsed), handlerClock, DummyIdTokens(), JsonResponseErrorRenderer(json), GrantTypesConfiguration(emptyMap()))
 
-        val response = handler(Request(Method.POST, "/token")
+        val response = handler(Request(POST, "/token")
             .header("content-type", ContentType.APPLICATION_FORM_URLENCODED.value)
             .form("grant_type", GrantType.ClientCredentials.rfcValue)
             .form("client_id", authRequest.client.value)

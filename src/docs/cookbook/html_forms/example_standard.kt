@@ -1,6 +1,7 @@
 package cookbook.html_forms
 
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.body.form
 import org.http4k.core.getFirst
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 
 fun main() {
-    val request = Request(Method.GET, "/").form("name", "rita").form("age", "55")
+    val request = Request(GET, "/").form("name", "rita").form("age", "55")
 
     // reparses body every invocation
     assertEquals("rita", request.form("name"))

@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -34,9 +35,9 @@ fun main() {
         isError = { r: Response -> !r.status.successful } // this defaults to >= 500
     ).then { responses.removeFirst() }
 
-    println("Result: " + circuited(Request(Method.GET, "/")).status + " Circuit is: " + circuitBreaker.state)
-    println("Result: " + circuited(Request(Method.GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
     Thread.sleep(1100) // wait for reset
-    println("Result: " + circuited(Request(Method.GET, "/")).status + " Circuit is: " + circuitBreaker.state)
-    println("Result: " + circuited(Request(Method.GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
+    println("Result: " + circuited(Request(GET, "/")).status + " Circuit is: " + circuitBreaker.state)
 }

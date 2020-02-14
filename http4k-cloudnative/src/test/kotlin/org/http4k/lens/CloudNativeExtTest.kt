@@ -9,6 +9,7 @@ import org.http4k.cloudnative.env.Port
 import org.http4k.cloudnative.env.Secret
 import org.http4k.cloudnative.env.Timeout
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.BiDiLensContract.checkContract
@@ -39,7 +40,7 @@ class CloudNativeExtTest {
     @Test
     fun `host header`() {
         fun assertFormat(input: Authority) {
-            val reqWithHeader = Request(Method.GET, "").with(Header.HOST of input)
+            val reqWithHeader = Request(GET, "").with(Header.HOST of input)
             assertThat(reqWithHeader.header("Host"), equalTo(input.toString()))
             assertThat(Header.HOST(reqWithHeader), equalTo(input))
         }

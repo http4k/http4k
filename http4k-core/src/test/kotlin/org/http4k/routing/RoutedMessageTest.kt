@@ -5,7 +5,7 @@ import com.natpryce.hamkrest.isA
 import org.http4k.core.Body
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
@@ -20,7 +20,7 @@ class RoutedMessageTest {
     fun `request manipulations maintain the same type`() {
         val request = RoutedRequest(Request(GET, "/"), template)
 
-        assertThat(request.method(Method.POST), isA<RoutedRequest>())
+        assertThat(request.method(POST), isA<RoutedRequest>())
         assertThat(request.uri(Uri.of("/changed")), isA<RoutedRequest>())
         assertThat(request.query("foo", "bar"), isA<RoutedRequest>())
         assertThat(request.headers(listOf("foo" to "bar")), isA<RoutedRequest>())

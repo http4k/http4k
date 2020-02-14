@@ -4,6 +4,7 @@ import org.http4k.client.ApacheClient
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -45,7 +46,7 @@ fun main() {
     val multipartform = MultipartForm().with(
         nameField of Name("rita"),
         imageFile of MultipartFormFile("image.txt", ContentType.OCTET_STREAM, "somebinarycontent".byteInputStream()))
-    val validRequest = Request(Method.POST, "http://localhost:8000").with(strictFormBody of multipartform)
+    val validRequest = Request(POST, "http://localhost:8000").with(strictFormBody of multipartform)
 
     println(ApacheClient()(validRequest))
 

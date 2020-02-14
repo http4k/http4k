@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.allElements
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
+import org.http4k.core.Method.*
 import org.http4k.lens.Header
 import org.http4k.lens.MultipartFormField
 import org.http4k.lens.MultipartFormFile
@@ -37,7 +38,7 @@ class MultipartFormBodyTest {
         val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
             ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
-        val req = Request(Method.POST, "")
+        val req = Request(POST, "")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
@@ -52,7 +53,7 @@ class MultipartFormBodyTest {
         val form = MultipartFormBody("bob") + ("field" to formFieldValue) +
             ("file" to MultipartFormFile("foo.txt", TEXT_PLAIN, "content".byteInputStream()))
 
-        val req = Request(Method.POST, "")
+        val req = Request(POST, "")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 
@@ -96,7 +97,7 @@ class MultipartFormBodyTest {
 
         val original = streams.toMultipartForm()
 
-        MultipartFormBody.from(Request(Method.POST, "/")
+        MultipartFormBody.from(Request(POST, "/")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(original.boundary))
             .body(original))
 

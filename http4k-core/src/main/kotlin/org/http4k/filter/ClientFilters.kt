@@ -5,6 +5,7 @@ import org.http4k.core.Credentials
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
@@ -107,7 +108,7 @@ object ClientFilters {
         private fun Response.isRedirection(): Boolean = status.redirection && header("location")?.let(String::isNotBlank) == true
 
         private fun Request.ensureValidMethodForRedirect(): Request =
-            if (method == Method.GET || method == Method.HEAD) this else method(Method.GET)
+            if (method == GET || method == HEAD) this else method(GET)
 
         private fun Request.newLocation(location: String): Uri =
             Uri.of(location).run {

@@ -4,6 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_HTML
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -29,6 +30,6 @@ fun main() {
         Response(OK).with(view of viewModel)
     }
 
-    println(app(Request(Method.GET, "/someUrl")))
+    println(app(Request(GET, "/someUrl")))
 }
 

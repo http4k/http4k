@@ -4,8 +4,7 @@ import org.http4k.core.Body
 import org.http4k.core.BodyMode
 import org.http4k.core.Filter
 import org.http4k.core.Method
-import org.http4k.core.Method.DELETE
-import org.http4k.core.Method.POST
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -31,7 +30,7 @@ object MultipartS3Upload {
 
     private fun Request.initialiseMultipart() = Request(POST, uri.query("uploads", ""))
 
-    private fun Request.uploadPart(index: Int, uploadId: UploadId, body: Body): Request = Request(Method.PUT, uri
+    private fun Request.uploadPart(index: Int, uploadId: UploadId, body: Body): Request = Request(PUT, uri
         .query("partNumber", (index + 1).toString())
         .query("uploadId", uploadId.value))
         .body(body)

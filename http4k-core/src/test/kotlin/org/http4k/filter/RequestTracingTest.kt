@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import org.http4k.core.*
+import org.http4k.core.Method.*
 import org.http4k.core.Status.Companion.OK
 import org.http4k.filter.SamplingDecision.Companion.DO_NOT_SAMPLE
 import org.junit.jupiter.api.BeforeEach
@@ -35,9 +36,9 @@ class RequestTracingTest {
             Response(OK)
         }
 
-        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then { client(Request(Method.GET, "/somePath")) }
+        val simpleProxyServer: HttpHandler = ServerFilters.RequestTracing().then { client(Request(GET, "/somePath")) }
 
-        val response = simpleProxyServer(ZipkinTraces(traces, Request(Method.GET, "")))
+        val response = simpleProxyServer(ZipkinTraces(traces, Request(GET, "")))
 
         assertThat(ZipkinTraces(response), equalTo(traces))
     }
@@ -65,12 +66,12 @@ class RequestTracingTest {
             val traceForOuterThread = ZipkinTraces.forCurrentThread()
             val clientTask = {
                 ZipkinTraces.setForCurrentThread(traceForOuterThread)
-                client(Request(Method.GET, "/somePath"))
+                client(Request(GET, "/somePath"))
             }
             executor.submit(clientTask).get()
         }
 
-        val response = simpleProxyServer(ZipkinTraces(traces, Request(Method.GET, "")))
+        val response = simpleProxyServer(ZipkinTraces(traces, Request(GET, "")))
 
         assertThat(ZipkinTraces(response), equalTo(traces))
     }

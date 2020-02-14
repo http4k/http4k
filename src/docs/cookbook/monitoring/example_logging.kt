@@ -3,6 +3,7 @@ package cookbook.monitoring
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -24,7 +25,7 @@ fun main() {
 
     val monitoredApp: HttpHandler = audit.then(app)
 
-    monitoredApp(Request(Method.GET, "/foo"))
+    monitoredApp(Request(GET, "/foo"))
 
 //    prints...
 //    2017-12-04T08:38:27.499Z my call to /foo returned 200 OK and took 5

@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.client.withAsyncApi
+import org.http4k.core.Method.*
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
@@ -14,7 +15,7 @@ class AsyncHttpClientTest {
         val handler = { _: Request -> Response(OK) }.withAsyncApi()
 
         val latch = CountDownLatch(1)
-        handler(Request(Method.GET, "/")) {
+        handler(Request(GET, "/")) {
             assertThat(it.status, equalTo(OK))
             latch.countDown()
         }

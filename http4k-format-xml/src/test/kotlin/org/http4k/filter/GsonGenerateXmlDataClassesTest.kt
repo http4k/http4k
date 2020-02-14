@@ -3,6 +3,7 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -23,7 +24,7 @@ class GsonGenerateXmlDataClassesTest {
         val body = Response(Status.OK).body(input)
         val handler = GsonGenerateXmlDataClasses(PrintStream(os), { 1 }).then { body }
 
-        handler(Request(Method.GET, "/bob"))
+        handler(Request(GET, "/bob"))
         val actual = String(os.toByteArray())
 
         assertThat(actual, equalTo("""// result generated from /bob

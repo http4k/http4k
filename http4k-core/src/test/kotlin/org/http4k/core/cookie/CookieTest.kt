@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -67,12 +68,12 @@ class CookieTest {
 
     @Test
     fun `cookies can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+        assertThat(Request(GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
     fun `cookies with ending semicolon can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
@@ -83,9 +84,9 @@ class CookieTest {
 
     @Test
     fun `cookies with equals signs inside quotes can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
     }
 
     @Test
@@ -113,7 +114,7 @@ class CookieTest {
 
     @Test
     fun `cookies can be removed from the request`() {
-        val request = Request(Method.GET, "")
+        val request = Request(GET, "")
             .header("Cookie", "other-cookie=\"other-value\"")
             .header("Cookie", "a-cookie=\"a-value\"")
             .header("Other-Header", "other-value")
@@ -137,28 +138,28 @@ class CookieTest {
 
     @Test
     fun `cookies can be stored in request`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "bar")
+        val request = Request(GET, "ignore").cookie("foo", "bar")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"") as Parameters))
     }
 
     @Test
     fun `cookies can be retrieved from request`() {
-        val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"")
+        val request = Request(GET, "ignore").header("Cookie", "foo=\"bar\"")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
     }
 
     @Test
     fun `request stores multiple cookies in single header`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "one").cookie("bar", "two")
+        val request = Request(GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="one"; bar="two"""") as Parameters))
     }
 
     @Test
     fun `request can store cookies with special characters`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
+        val request = Request(GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="\"one\""; bar="two=three"""") as Parameters))
     }

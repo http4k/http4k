@@ -2,6 +2,7 @@ package guide.modules.jsonrpc
 
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.format.Jackson
 import org.http4k.format.Json
@@ -48,7 +49,7 @@ fun main() {
     fun runRequest(s: String) {
         println(
             rpcHandler(
-                Request(Method.POST, "/rpc")
+                Request(POST, "/rpc")
                     .header("Content-Type", "application/json")
                     .body(s)
             )

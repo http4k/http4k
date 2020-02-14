@@ -3,6 +3,7 @@ package cookbook.request_context
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
@@ -47,5 +48,5 @@ fun main() {
         .then(AddState(key))
         .then(PrintState(key))
 
-    app(Request(Method.GET, "/hello"))
+    app(Request(GET, "/hello"))
 }

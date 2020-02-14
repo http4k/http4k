@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -18,7 +19,7 @@ import org.http4k.lens.string
 
 fun main() {
 
-    val request = Request(Method.POST, "/?a=b").body("http4k is cool").header("my header", "a value")
+    val request = Request(POST, "/?a=b").body("http4k is cool").header("my header", "a value")
 
     // status
     assertThat(Response(OK), hasStatus(OK))
