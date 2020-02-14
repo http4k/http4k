@@ -3,13 +3,14 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 
 class StatusTest {
 
     @Test
     fun `can override description`() {
-        val description = Status.OK.description("all good")
+        val description = OK.description("all good")
         assertThat(description.description, equalTo("all good"))
         assertThat(description.toString(), equalTo("200 all good"))
     }

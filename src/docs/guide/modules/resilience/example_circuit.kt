@@ -3,11 +3,11 @@ package guide.modules.resilience
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType.COUNT_BASED
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import java.time.Duration
@@ -18,9 +18,9 @@ fun main() {
 
     // these example responses are queued up to trigger the circuit state changes
     val responses = ArrayDeque<Response>()
-    responses.add(Response(Status.INTERNAL_SERVER_ERROR))
-    responses.add(Response(Status.OK))
-    responses.add(Response(Status.OK))
+    responses.add(Response(INTERNAL_SERVER_ERROR))
+    responses.add(Response(OK))
+    responses.add(Response(OK))
 
     // configure the circuit breaker filter here
     val circuitBreaker = CircuitBreaker.of("circuit",

@@ -4,7 +4,7 @@ import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.lens.Lens
 import org.http4k.lens.LensFailure
 
@@ -28,7 +28,7 @@ class ApiKeySecurity<out T>(val param: Lens<Request, T>,
                 } catch (e: LensFailure) {
                     false
                 }
-                if (keyValid) next(it) else Response(Status.UNAUTHORIZED)
+                if (keyValid) next(it) else Response(UNAUTHORIZED)
             }
         }
     }

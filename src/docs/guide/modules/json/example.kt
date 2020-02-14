@@ -5,7 +5,7 @@ import org.http4k.core.Body
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Jackson
 import org.http4k.format.Jackson.asJsonArray
@@ -45,7 +45,7 @@ val objectUsingDslApi: JsonNode = json {
     )
 }
 
-val response = Response(Status.OK).with(
+val response = Response(OK).with(
     Body.json().toLens() of json.array(listOf(objectUsingDirectApi, objectUsingExtensionFunctions, objectUsingDslApi))
 )
 

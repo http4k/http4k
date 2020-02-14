@@ -3,11 +3,12 @@ package org.http4k.aws
 import org.http4k.core.Body
 import org.http4k.core.BodyMode
 import org.http4k.core.Filter
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.query
 
 object MultipartS3Upload {
@@ -48,7 +49,7 @@ object MultipartS3Upload {
         ).asSequence().map { it.byteInputStream() }
     }
 
-    private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (status != Status.OK) throw UploadError(this, uploadId) }
+    private fun Response.orFail(uploadId: UploadId? = null): Response = apply { if (status != OK) throw UploadError(this, uploadId) }
 
     private data class UploadError(val response: Response, val uploadId: UploadId?) : RuntimeException()
 }

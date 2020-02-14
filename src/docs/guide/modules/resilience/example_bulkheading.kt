@@ -2,11 +2,10 @@ package guide.modules.resilience
 
 import io.github.resilience4j.bulkhead.Bulkhead
 import io.github.resilience4j.bulkhead.BulkheadConfig
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ResilienceFilters
 import java.time.Duration
@@ -22,7 +21,7 @@ fun main() {
 
     val bulkheading = ResilienceFilters.Bulkheading(Bulkhead.of("bulkhead", config)).then {
         Thread.sleep(100)
-        Response(Status.OK)
+        Response(OK)
     }
 
     // throw a bunch of requests at the filter - only 5 should pass

@@ -14,7 +14,6 @@ import org.http4k.core.Filter
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.then
@@ -98,7 +97,7 @@ fun main() {
         defaultConfig
 
     // the end-server that we will proxy to
-    val upstream = { _: Request -> Response(Status.OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
+    val upstream = { _: Request -> Response(OK).body("HELLO!") }.asServer(SunHttp(9000)).start()
 
     val server = App(k8sPodEnv).start()
 

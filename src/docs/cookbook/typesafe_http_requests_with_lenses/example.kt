@@ -2,11 +2,10 @@ package cookbook.typesafe_http_requests_with_lenses
 
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.ServerFilters
@@ -31,7 +30,7 @@ fun main() {
 
         val msg = "$name is ${age ?: "unknown"} years old and has " +
             "${children.size} children (${children.map { it.name }.joinToString()})"
-        Response(Status.OK).with(
+        Response(OK).with(
             Body.string(TEXT_PLAIN).toLens() of msg
         )
     }

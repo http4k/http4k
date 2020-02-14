@@ -14,6 +14,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.core.Status.Companion.CONNECTION_REFUSED
+import org.http4k.core.Status.Companion.SERVICE_UNAVAILABLE
 import org.http4k.core.Status.Companion.UNKNOWN_HOST
 import java.net.ConnectException
 import java.net.UnknownHostException
@@ -99,8 +100,8 @@ object JettyClient {
             private fun HttpFields.toHttp4kHeaders(): Headers = flatMap { it.values.map { hValue -> it.name to hValue } }
 
             private fun Throwable.asHttp4kResponse(): Response = Response(when (this) {
-                is TimeoutException -> Status.CLIENT_TIMEOUT
-                else -> Status.SERVICE_UNAVAILABLE
+                is TimeoutException -> CLIENT_TIMEOUT
+                else -> SERVICE_UNAVAILABLE
             }.description("Client Error: caused by $localizedMessage"))
 
         }
