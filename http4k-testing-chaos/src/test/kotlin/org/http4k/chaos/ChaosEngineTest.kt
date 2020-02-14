@@ -24,11 +24,9 @@ import org.http4k.routing.path
 import org.http4k.routing.routes
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 @ExtendWith(JsonApprovalTest::class)
 class ChaosEngineTest {
@@ -138,6 +136,6 @@ class ChaosEngineTest {
     fun `chaos API is available as openapi JSON`(approver: Approver) {
         val app = { _: Request -> Response(I_M_A_TEAPOT) }
 
-        approver.assertApproved(app.withChaosApi(clock = Clock.fixed(Instant.EPOCH, ZoneId.of("UTC")))(Request(GET, "/chaos")))
+        approver.assertApproved(app.withChaosApi(clock = FixedClock)(Request(GET, "/chaos")))
     }
 }

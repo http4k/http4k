@@ -14,12 +14,10 @@ import org.http4k.filter.ZipkinTraces
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.http4k.testing.Approver
 import org.http4k.testing.JsonApprovalTest
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.StringWriter
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 @ExtendWith(JsonApprovalTest::class)
 abstract class AutoJsonEventsContract(private val j: AutoMarshallingJson) {
@@ -36,7 +34,7 @@ abstract class AutoJsonEventsContract(private val j: AutoMarshallingJson) {
         ))
 
         val pipeline = EventFilters.AddZipkinTraces()
-            .then(EventFilters.AddTimestamp(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault())))
+            .then(EventFilters.AddTimestamp(FixedClock))
             .then(AutoJsonEvents(j, w::write))
 
         pipeline(final)
