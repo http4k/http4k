@@ -24,7 +24,6 @@ class ServirtiumRecordingTest {
 
     @Test
     fun `records the values into the recording`(approver: Approver) {
-
         val stub = JUnitStub(AContract)
 
         val originalRequest = Request(POST, "/foo")
@@ -52,6 +51,8 @@ class ServirtiumRecordingTest {
                     .body(response.bodyString().replace("hello", "goodbye"))
             }
         )
+
+        servirtiumRecording.beforeTestExecution(stub)
 
         @Suppress("UNCHECKED_CAST")
         val actualResponse = (servirtiumRecording.resolveParameter(stub, stub) as HttpHandler)(originalRequest)
