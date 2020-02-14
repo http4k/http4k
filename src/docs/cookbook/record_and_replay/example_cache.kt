@@ -1,10 +1,9 @@
 package cookbook.record_and_replay
 
-import org.http4k.core.Method
-import org.http4k.core.Method.*
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.TrafficFilters
 import org.http4k.traffic.ReadWriteCache
@@ -15,7 +14,7 @@ fun main() {
     val storage = ReadWriteCache.Disk()
 
     // wrap any HTTP Handler in a Recording Filter and play traffic through it
-    val withCachedContent = TrafficFilters.ServeCachedFrom(storage).then { Response(Status.OK).body("hello world") }
+    val withCachedContent = TrafficFilters.ServeCachedFrom(storage).then { Response(OK).body("hello world") }
     val aRequest = Request(GET, "http://localhost:8000/")
     withCachedContent(aRequest)
 
