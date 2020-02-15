@@ -9,6 +9,7 @@ import org.http4k.core.ContentType.Companion
 import org.http4k.core.ContentType.Companion.MultipartFormWithBoundary
 import org.http4k.core.ContentType.Companion.MultipartMixedWithBoundary
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.Validator.Feedback
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(ApprovalTest::class)
 class MultipartFormTest {
 
-    private val emptyRequest = Request(Method.GET, "")
+    private val emptyRequest = Request(GET, "")
     private val stringRequiredField = MultipartFormField.string().required("hello")
     private val intRequiredField = MultipartFormField.string().int().required("another")
     private val fieldWithHeaders = MultipartFormField.required("fieldWithHeaders")

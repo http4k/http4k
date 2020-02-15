@@ -27,10 +27,8 @@ import org.http4k.core.then
 import org.http4k.format.Jackson.asJsonObject
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 private val request = Request(GET, "")
 private val response = Response(OK).body("body")
@@ -41,8 +39,7 @@ abstract class ChaosStageContract {
 
     @Test
     fun `deserialises from JSON`() {
-        val clock = Clock.fixed(Instant.EPOCH, ZoneId.of("UTC"))
-        assertThat(asJson.asJsonObject().asStage(clock).toString(), equalTo(expectedDescription))
+        assertThat(asJson.asJsonObject().asStage(FixedClock).toString(), equalTo(expectedDescription))
     }
 }
 

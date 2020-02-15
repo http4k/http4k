@@ -1,6 +1,7 @@
 import org.http4k.core.Method.GET
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.webdriver.Http4kWebDriver
@@ -13,7 +14,7 @@ fun main() {
 
     val app = routes(
         "/hello" bind GET to {
-            Response(Status.OK).body("<html><title>hello</title></html>")
+            Response(OK).body("<html><title>hello</title></html>")
         }
     )
 

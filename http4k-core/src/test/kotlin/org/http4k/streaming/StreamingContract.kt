@@ -8,6 +8,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Http4kServer
@@ -41,9 +42,9 @@ abstract class StreamingContract(private val config: StreamingTestConfiguration 
     private var countdown = CountDownLatch(config.beeps * 2)
 
     val app = routes(
-        "/stream-response" bind GET to { Response(Status.OK).body(beeper("server")) },
+        "/stream-response" bind GET to { Response(OK).body(beeper("server")) },
         "/stream-request" bind POST to {
-            captureReceivedStream("server") { it.body.stream }; Response(Status.OK)
+            captureReceivedStream("server") { it.body.stream }; Response(OK)
         }
     )
 

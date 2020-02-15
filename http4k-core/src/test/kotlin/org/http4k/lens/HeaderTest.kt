@@ -6,7 +6,7 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.ContentType
 import org.http4k.core.Method
-import org.http4k.core.Method.GET
+import org.http4k.core.Method.*
 import org.http4k.core.Parameter
 import org.http4k.core.Request
 import org.http4k.core.Uri.Companion.of
@@ -83,7 +83,7 @@ class HeaderTest {
         val custom = Header.map(::MyCustomType, { it.value }).required("bob")
 
         val instance = MyCustomType("hello world!")
-        val reqWithHeader = custom(instance, Request(Method.GET, ""))
+        val reqWithHeader = custom(instance, Request(GET, ""))
 
         assertThat(reqWithHeader.header("bob"), equalTo("hello world!"))
 

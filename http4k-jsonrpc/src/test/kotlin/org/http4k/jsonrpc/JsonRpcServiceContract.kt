@@ -11,7 +11,10 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
+import org.http4k.core.Status.Companion.NO_CONTENT
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNSUPPORTED_MEDIA_TYPE
 import org.http4k.core.with
 import org.http4k.format.Json
 import org.http4k.format.JsonLibAutoMarshallingJson
@@ -207,7 +210,7 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     fun `rpc call using GET http method returns method not allowed`() {
         assertThat(
             rpc(Request(GET, "/rpc")),
-            hasStatus(Status.METHOD_NOT_ALLOWED) and hasBody("")
+            hasStatus(METHOD_NOT_ALLOWED) and hasBody("")
         )
     }
 
@@ -215,7 +218,7 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
     fun `rpc call using wrong content type returns unsupported media type`() {
         assertThat(
             rpc(Request(POST, "/rpc")),
-            hasStatus(Status.UNSUPPORTED_MEDIA_TYPE) and hasBody("")
+            hasStatus(UNSUPPORTED_MEDIA_TYPE) and hasBody("")
         )
     }
 
@@ -304,7 +307,7 @@ abstract class JsonRpcServiceContract<NODE : Any>(builder: (Counter) -> JsonRpcS
         hasResponse(Success(result, id))
 
     private fun hasNoContentResponse(): Matcher<Response> =
-        hasStatus(Status.NO_CONTENT) and
+        hasStatus(NO_CONTENT) and
             hasContentType(APPLICATION_JSON) and
             hasBody("")
 

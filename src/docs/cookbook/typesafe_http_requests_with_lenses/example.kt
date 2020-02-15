@@ -3,6 +3,7 @@ package cookbook.typesafe_http_requests_with_lenses
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -37,14 +38,14 @@ fun main() {
 
     val app = ServerFilters.CatchLensFailure.then(endpoint)
 
-    val goodRequest = Request(Method.GET, "http://localhost:9000").with(
+    val goodRequest = Request(GET, "http://localhost:9000").with(
         nameHeader of "Jane Doe",
         ageQuery of 25,
         childrenBody of listOf(Child("Rita"), Child("Sue")))
 
     println(listOf("", "Request:", goodRequest, app(goodRequest)).joinToString("\n"))
 
-    val badRequest = Request(Method.GET, "http://localhost:9000")
+    val badRequest = Request(GET, "http://localhost:9000")
         .with(nameHeader of "Jane Doe")
         .query("age", "some illegal age!")
 

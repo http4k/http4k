@@ -3,6 +3,7 @@ package org.http4k.security.oauth.server
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
@@ -40,7 +41,7 @@ class AuthenticationCompleteTest {
 
     @Test
     fun `redirects on successful login`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
@@ -51,7 +52,7 @@ class AuthenticationCompleteTest {
 
     @Test
     fun `redirects on successful login, with a fragment if requested`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = Fragment), responseMode = Fragment))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest.copy(responseMode = Fragment), responseMode = Fragment))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
@@ -62,7 +63,7 @@ class AuthenticationCompleteTest {
 
     @Test
     fun `includes id_token if response_type requires it`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest, CodeIdToken))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest, CodeIdToken))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
@@ -74,7 +75,7 @@ class AuthenticationCompleteTest {
 
     @Test
     fun `includes id_token if response_type requires it, with code if requested`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest, CodeIdToken, Query))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest, CodeIdToken, Query))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
@@ -86,7 +87,7 @@ class AuthenticationCompleteTest {
 
     @Test
     fun `redirects with error details if login is not successful`() {
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",
@@ -105,7 +106,7 @@ class AuthenticationCompleteTest {
             DummyIdTokens("jdoe"),
             errorUri
         )
-        val response = underTest(Request(Method.POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
+        val response = underTest(Request(POST, "/login").withAuthorization(authorizationRequest).query("fail", "true"))
 
         assertThat(response, hasStatus(SEE_OTHER)
             and hasHeader("location",

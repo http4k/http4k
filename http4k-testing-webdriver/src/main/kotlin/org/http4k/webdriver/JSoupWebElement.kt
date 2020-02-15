@@ -2,6 +2,7 @@ package org.http4k.webdriver
 
 import org.http4k.core.Body
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.with
@@ -43,7 +44,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun submit() {
         current("form")?.let {
-            val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: Method.POST
+            val method = it.element.attr("method")?.let(String::toUpperCase)?.let(Method::valueOf) ?: POST
             val inputs = it
                 .findElements(By.tagName("input"))
                 .filter { it.getAttribute("name") != "" }
@@ -78,7 +79,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
             }
             val postRequest = Request(method, action.toString()).with(body of form)
 
-            if (method == Method.POST) navigate(postRequest)
+            if (method == POST) navigate(postRequest)
             else navigate(Request(method, action.query(postRequest.bodyString())).body(""))
         }
     }
@@ -92,7 +93,7 @@ data class JSoupWebElement(private val navigate: Navigate, private val getURL: G
 
     override fun click() {
         if (isA("a")) {
-            element.attr("href")?.let { navigate(Request(Method.GET, it)) }
+            element.attr("href")?.let { navigate(Request(GET, it)) }
         } else if (isCheckable()) {
             if (isSelected) clear()
             else element.attr("checked", "checked")

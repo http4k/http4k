@@ -2,7 +2,7 @@ package org.http4k.lens
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.lens.Header.CONTENT_TYPE
 import org.junit.jupiter.api.Test
@@ -14,22 +14,22 @@ class LensFailureTest {
 
     @Test
     fun `overall returns invalid if there are no failures`() {
-        assertThat(LensFailure(target = Request(Method.GET, "")).overall(), equalTo(Failure.Type.Invalid))
+        assertThat(LensFailure(target = Request(GET, "")).overall(), equalTo(Failure.Type.Invalid))
     }
 
     @Test
     fun `overall returns unsupported if there any unsupported failures`() {
-        assertThat(LensFailure(unsupported, invalid, missing, target = Request(Method.GET, "")).overall(), equalTo(Failure.Type.Unsupported))
+        assertThat(LensFailure(unsupported, invalid, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Unsupported))
     }
 
     @Test
     fun `overall returns invalid if there only invalid and missing failures`() {
-        assertThat(LensFailure(unsupported, invalid, missing, target = Request(Method.GET, "")).overall(), equalTo(Failure.Type.Unsupported))
+        assertThat(LensFailure(unsupported, invalid, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Unsupported))
     }
 
     @Test
     fun `overall returns missing if there no invalid for unsupported ailures`() {
-        assertThat(LensFailure(missing, missing, target = Request(Method.GET, "")).overall(), equalTo(Failure.Type.Missing))
+        assertThat(LensFailure(missing, missing, target = Request(GET, "")).overall(), equalTo(Failure.Type.Missing))
     }
 
     @Test

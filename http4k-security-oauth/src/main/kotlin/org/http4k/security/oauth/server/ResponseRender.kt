@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.Uri
 import org.http4k.core.query
 import org.http4k.security.ResponseMode
@@ -41,7 +42,7 @@ class QueryResponseRender(private val uri: Uri) : ResponseRender {
 
     override fun addParameter(key: String, value: String?): ResponseRender = QueryResponseRender(uri.query(key, value))
 
-    override fun complete(): Response = Response(Status.SEE_OTHER).header("Location", uri.toString())
+    override fun complete(): Response = Response(SEE_OTHER).header("Location", uri.toString())
 
 }
 
@@ -49,6 +50,6 @@ class FragmentResponseRender(private val uri: Uri) : ResponseRender {
 
     override fun addParameter(key: String, value: String?): ResponseRender = FragmentResponseRender(uri.fragmentParameter(key, value))
 
-    override fun complete(): Response = Response(Status.SEE_OTHER).header("Location", uri.toString())
+    override fun complete(): Response = Response(SEE_OTHER).header("Location", uri.toString())
 
 }

@@ -7,6 +7,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Body
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.with
 import org.http4k.format.Gson.asA
 import org.http4k.format.Gson.auto
@@ -35,7 +36,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
-        assertThat(body(Response(Status.OK).with(body of listOf(obj))), equalTo(listOf(obj)))
+        assertThat(body(Response(OK).with(body of listOf(obj))), equalTo(listOf(obj)))
     }
 
     @Test
@@ -44,7 +45,7 @@ class GsonAutoTest : AutoMarshallingContract(Gson) {
 
         val obj = ArbObject("hello", ArbObject("world", null, listOf(1), true), emptyList(), false)
 
-        assertThat(body(Response(Status.OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
+        assertThat(body(Response(OK).with(body of arrayOf(obj))).toList(), equalTo(listOf(obj)))
     }
 
     @Test

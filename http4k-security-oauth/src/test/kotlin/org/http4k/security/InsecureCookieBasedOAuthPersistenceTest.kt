@@ -12,18 +12,17 @@ import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.cookie.invalidateCookie
 import org.http4k.security.openid.Nonce
+import org.http4k.util.FixedClock
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 class InsecureCookieBasedOAuthPersistenceTest {
 
     private val cookieValidity = Duration.ofHours(2)
 
-    private val clock: Clock = Clock.fixed(Instant.EPOCH, ZoneId.of("UTC"))
+    private val clock: Clock = FixedClock
     private val persistence = InsecureCookieBasedOAuthPersistence("prefix", cookieValidity, clock)
 
     @Test

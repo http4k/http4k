@@ -4,10 +4,12 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.containsSubstring
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Parameters
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.SameSite.Lax
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -67,12 +69,12 @@ class CookieTest {
 
     @Test
     fun `cookies can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+        assertThat(Request(GET, "/").cookie("foo", "bar").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
     fun `cookies with ending semicolon can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"bar\";").cookies(), equalTo(listOf(Cookie("foo", "bar"))))
     }
 
     @Test
@@ -83,23 +85,23 @@ class CookieTest {
 
     @Test
     fun `cookies with equals signs inside quotes can be extracted from request`() {
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
-        assertThat(Request(Method.GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"bar==\";").cookies(), equalTo(listOf(Cookie("foo", "bar=="))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"==bar==\";").cookies(), equalTo(listOf(Cookie("foo", "==bar=="))))
+        assertThat(Request(GET, "/").header("cookie", "foo=\"==bar\";").cookies(), equalTo(listOf(Cookie("foo", "==bar"))))
     }
 
     @Test
     fun `cookies can be added to the response`() {
         val cookie = Cookie("my-cookie", "my value")
 
-        val response = Response(Status.OK).cookie(cookie)
+        val response = Response(OK).cookie(cookie)
 
         assertThat(response.headers, equalTo(listOf("Set-Cookie" to cookie.toString()) as Parameters))
     }
 
     @Test
     fun `cookies can be removed from the response`() {
-        val response = Response(Status.OK)
+        val response = Response(OK)
             .header("Set-Cookie", "other-cookie=\"other-value\"")
             .header("Set-Cookie", "a-cookie=\"a-value\"")
             .header("Other-Header", "other-value")
@@ -113,7 +115,7 @@ class CookieTest {
 
     @Test
     fun `cookies can be removed from the request`() {
-        val request = Request(Method.GET, "")
+        val request = Request(GET, "")
             .header("Cookie", "other-cookie=\"other-value\"")
             .header("Cookie", "a-cookie=\"a-value\"")
             .header("Other-Header", "other-value")
@@ -130,35 +132,35 @@ class CookieTest {
         val cookie = Cookie("my-cookie", "my value")
         val replacement = Cookie("my-cookie", "my second value")
 
-        val response = Response(Status.OK).cookie(cookie).replaceCookie(replacement)
+        val response = Response(OK).cookie(cookie).replaceCookie(replacement)
 
         assertThat(response.headers, equalTo(listOf("Set-Cookie" to replacement.toString()) as Parameters))
     }
 
     @Test
     fun `cookies can be stored in request`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "bar")
+        val request = Request(GET, "ignore").cookie("foo", "bar")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to "foo=\"bar\"") as Parameters))
     }
 
     @Test
     fun `cookies can be retrieved from request`() {
-        val request = Request(Method.GET, "ignore").header("Cookie", "foo=\"bar\"")
+        val request = Request(GET, "ignore").header("Cookie", "foo=\"bar\"")
 
         assertThat(request.cookie("foo"), equalTo(Cookie("foo", "bar")))
     }
 
     @Test
     fun `request stores multiple cookies in single header`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "one").cookie("bar", "two")
+        val request = Request(GET, "ignore").cookie("foo", "one").cookie("bar", "two")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="one"; bar="two"""") as Parameters))
     }
 
     @Test
     fun `request can store cookies with special characters`() {
-        val request = Request(Method.GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
+        val request = Request(GET, "ignore").cookie("foo", "\"one\"").cookie("bar", "two=three")
 
         assertThat(request.headers, equalTo(listOf("Cookie" to """foo="\"one\""; bar="two=three"""") as Parameters))
     }
@@ -167,7 +169,7 @@ class CookieTest {
     fun `cookies can be extracted from response`() {
         val cookies = listOf(Cookie("foo", "one"), Cookie("bar", "two").maxAge(3))
 
-        val response = cookies.fold(Response(Status.OK), Response::cookie)
+        val response = cookies.fold(Response(OK), Response::cookie)
 
         assertThat(response.cookies(), equalTo(cookies))
     }
@@ -185,13 +187,13 @@ class CookieTest {
 
     @Test
     fun `cookie can be invalidated at response level`() {
-        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
+        assertThat(Response(OK).cookie(Cookie("foo", "bar").maxAge(10)).invalidateCookie("foo").cookies().first(),
             equalTo(Cookie("foo", "").invalidate()))
     }
 
     @Test
     fun `cookie with domain can be invalidated at response level`() {
-        assertThat(Response(Status.OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
+        assertThat(Response(OK).cookie(Cookie("foo", "bar", domain = "foo.com").maxAge(10)).invalidateCookie("foo", "foo.com").cookies().first(),
             equalTo(Cookie("foo", "", domain = "foo.com").invalidate()))
     }
 

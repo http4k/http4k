@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.absent
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -30,27 +31,27 @@ class FragmentParametersTest {
 
     @Test
     fun `can retrieve form parameter from request`() {
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameter("code"), equalTo("12345"))
-        assertThat(Request(Method.GET, "http://localhost#code=12345&code=some+different+code").fragmentParameter("code"), equalTo("12345"))
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameter("foo"), absent())
-        assertThat(Request(Method.GET, "http://localhost#onlyAKey").fragmentParameter("foo"), absent())
-        assertThat(Request(Method.GET, "http://localhost#onlyAKey=").fragmentParameter("foo"), absent())
-        assertThat(Request(Method.GET, "http://localhost#onlyAKey").fragmentParameter("onlyAKey"), absent())
-        assertThat(Request(Method.GET, "http://localhost#onlyAKey=").fragmentParameter("onlyAKey"), equalTo(""))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("code"), equalTo("12345"))
+        assertThat(Request(GET, "http://localhost#code=12345&code=some+different+code").fragmentParameter("code"), equalTo("12345"))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("foo"), absent())
+        assertThat(Request(GET, "http://localhost#onlyAKey").fragmentParameter("foo"), absent())
+        assertThat(Request(GET, "http://localhost#onlyAKey=").fragmentParameter("foo"), absent())
+        assertThat(Request(GET, "http://localhost#onlyAKey").fragmentParameter("onlyAKey"), absent())
+        assertThat(Request(GET, "http://localhost#onlyAKey=").fragmentParameter("onlyAKey"), equalTo(""))
     }
 
     @Test
     fun `can retrieve multiple form parameters from request`() {
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameters("code"), equalTo(listOf<String?>("12345")))
-        assertThat(Request(Method.GET, "http://localhost#code=12345&code=some+different+code").fragmentParameters("code"), equalTo(listOf<String?>("12345", "some different code")))
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameters("foo"), equalTo(emptyList()))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameters("code"), equalTo(listOf<String?>("12345")))
+        assertThat(Request(GET, "http://localhost#code=12345&code=some+different+code").fragmentParameters("code"), equalTo(listOf<String?>("12345", "some different code")))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameters("foo"), equalTo(emptyList()))
     }
 
     @Test
     fun `can add form parameter to request`() {
-        assertThat(Request(Method.GET, "http://localhost").fragmentParameter("code", "12345"), equalTo(Request(Method.GET, "http://localhost#code=12345")))
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameter("code", "some different code"), equalTo(Request(Method.GET, "http://localhost#code=12345&code=some+different+code")))
-        assertThat(Request(Method.GET, "http://localhost#code=12345").fragmentParameter("foo", null), equalTo(Request(Method.GET, "http://localhost#code=12345&foo")))
+        assertThat(Request(GET, "http://localhost").fragmentParameter("code", "12345"), equalTo(Request(GET, "http://localhost#code=12345")))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("code", "some different code"), equalTo(Request(GET, "http://localhost#code=12345&code=some+different+code")))
+        assertThat(Request(GET, "http://localhost#code=12345").fragmentParameter("foo", null), equalTo(Request(GET, "http://localhost#code=12345&foo")))
     }
 
 }

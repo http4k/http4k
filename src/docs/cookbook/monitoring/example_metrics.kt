@@ -3,6 +3,7 @@ package cookbook.monitoring
 import org.http4k.core.HttpHandler
 import org.http4k.core.HttpTransaction
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -43,7 +44,7 @@ fun main() {
         .then(identifiedRouteFilter)
         .then(app)
 
-    monitoredApp(Request(Method.GET, "/foo/bob"))
+    monitoredApp(Request(GET, "/foo/bob"))
 
 //    prints...
 //    requestGroup is: GET.foo_{name}.2xx.200 7ms

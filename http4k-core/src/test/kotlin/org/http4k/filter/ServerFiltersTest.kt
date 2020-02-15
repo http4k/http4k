@@ -391,7 +391,7 @@ class ServerFiltersTest {
         fun returning(status: Status) = ServerFilters.ReplaceResponseContentsWithStaticFile().then { Response(status).body(status.toString()) }
 
         assertThat(returning(NOT_FOUND)(Request(GET, "/")), hasBody("404 contents"))
-        assertThat(returning(OK)(Request(GET, "/")), hasBody(Status.OK.toString()))
+        assertThat(returning(OK)(Request(GET, "/")), hasBody(OK.toString()))
     }
 
     @Test

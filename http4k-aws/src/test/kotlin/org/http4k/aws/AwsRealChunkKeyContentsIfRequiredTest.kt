@@ -10,7 +10,8 @@ import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.PUT
 import org.http4k.core.Request
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.NO_CONTENT
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ChunkKeyContentsIfRequired
 import org.http4k.filter.ClientFilters
@@ -52,7 +53,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Put of bucket should succeed",
             aClient(Request(PUT, bucketUrl)).status,
-            equalTo(Status.OK))
+            equalTo(OK))
         assertThat(
             "Bucket should exist in root listing",
             aClient(Request(GET, s3Root)).bodyString(),
@@ -76,7 +77,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Delete of key should succeed",
             aClient(Request(DELETE, keyUrl)).status,
-            equalTo(Status.NO_CONTENT))
+            equalTo(NO_CONTENT))
         assertThat(
             "Key should no longer appear in bucket listing",
             aClient(Request(GET, bucketUrl)).bodyString(),
@@ -84,7 +85,7 @@ class AwsRealChunkKeyContentsIfRequiredTest : AbstractAwsRealS3TestCase() {
         assertThat(
             "Delete of bucket should succeed",
             aClient(Request(DELETE, bucketUrl)).status,
-            equalTo(Status.NO_CONTENT))
+            equalTo(NO_CONTENT))
         assertThat(
             "Bucket should no longer exist in root listing",
             aClient(Request(GET, s3Root)).bodyString(),

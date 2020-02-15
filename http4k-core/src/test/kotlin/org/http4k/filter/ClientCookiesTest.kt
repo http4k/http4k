@@ -3,9 +3,11 @@ package org.http4k.filter
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.cookie.Cookie
 import org.http4k.core.cookie.cookie
 import org.http4k.core.then
@@ -24,12 +26,12 @@ class ClientCookiesTest {
 
     @Test
     fun `can store and send cookies across multiple calls`() {
-        val server = { request: Request -> Response(Status.OK).counterCookie(request.counterCookie() + 1) }
+        val server = { request: Request -> Response(OK).counterCookie(request.counterCookie() + 1) }
 
         val client = ClientFilters.Cookies().then(server)
 
         (0..3).forEach {
-            val response = client(Request(Method.GET, "/"))
+            val response = client(Request(GET, "/"))
             assertThat(response, hasHeader("Set-Cookie", """counter="${it + 1}"; """))
         }
     }
@@ -38,8 +40,8 @@ class ClientCookiesTest {
     fun `expired cookies are removed from storage and not sent`() {
         val server = { request: Request ->
             when (request.uri.path) {
-                "/set" -> Response(Status.OK).cookie(Cookie("foo", "bar", 5))
-                else -> Response(Status.OK).body(request.cookie("foo")?.value ?: "gone")
+                "/set" -> Response(OK).cookie(Cookie("foo", "bar", 5))
+                else -> Response(OK).body(request.cookie("foo")?.value ?: "gone")
             }
         }
 
@@ -57,15 +59,15 @@ class ClientCookiesTest {
 
         val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
 
-        client(Request(Method.GET, "/set"))
+        client(Request(GET, "/set"))
 
         assertThat(cookieStorage.retrieve().size, equalTo(1))
 
-        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
+        assertThat(client(Request(GET, "/get")), hasBody("bar"))
 
         clock.add(10)
 
-        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
+        assertThat(client(Request(GET, "/get")), hasBody("gone"))
     }
 
     @Test
@@ -78,8 +80,8 @@ class ClientCookiesTest {
 
         val server = { request: Request ->
             when (request.uri.path) {
-                "/set" -> Response(Status.OK).cookie(cookie)
-                else -> Response(Status.OK).body(request.cookie("foo")?.value ?: "gone")
+                "/set" -> Response(OK).cookie(cookie)
+                else -> Response(OK).body(request.cookie("foo")?.value ?: "gone")
             }
         }
 
@@ -97,17 +99,17 @@ class ClientCookiesTest {
 
         val client = ClientFilters.Cookies(clock, cookieStorage).then(server)
 
-        client(Request(Method.GET, "/set"))
+        client(Request(GET, "/set"))
 
         assertThat(cookieStorage.retrieve().size, equalTo(1))
 
         // if the parser uses UTC and the expiry checker uses local time then this will be 'gone'
-        assertThat(client(Request(Method.GET, "/get")), hasBody("bar"))
+        assertThat(client(Request(GET, "/get")), hasBody("bar"))
 
         clock.add(1)
 
         // if the parser uses local time and the expiry checker uses UTC then this will be 'bar'
-        assertThat(client(Request(Method.GET, "/get")), hasBody("gone"))
+        assertThat(client(Request(GET, "/get")), hasBody("gone"))
     }
 
     fun Request.counterCookie() = cookie("counter")?.value?.toInt() ?: 0

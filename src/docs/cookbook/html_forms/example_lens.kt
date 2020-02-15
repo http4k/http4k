@@ -3,6 +3,7 @@ package cookbook.html_forms
 import org.http4k.core.Body
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.with
 import org.http4k.lens.FormField
@@ -25,7 +26,7 @@ fun main() {
     val strictFormBody = Body.webForm(Validator.Strict, nameField, ageField).toLens()
     val feedbackFormBody = Body.webForm(Validator.Feedback, nameField, ageField).toLens()
 
-    val invalidRequest = Request(Method.GET, "/")
+    val invalidRequest = Request(GET, "/")
         .with(Header.CONTENT_TYPE of ContentType.APPLICATION_FORM_URLENCODED)
 
     // the "strict" form rejects (throws a LensFailure) because "age" is required
@@ -41,7 +42,7 @@ fun main() {
 
     // creating valid form using "with()" and setting it onto the request
     val webForm = WebForm().with(ageField of 55, nameField of Name("rita"))
-    val validRequest = Request(Method.GET, "/").with(strictFormBody of webForm)
+    val validRequest = Request(GET, "/").with(strictFormBody of webForm)
 
     // to extract the contents, we first extract the form and then extract the fields from it using the lenses
     val validForm = strictFormBody(validRequest)

@@ -5,10 +5,12 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.Status.Companion.OK
+import org.http4k.core.Status.Companion.UNAUTHORIZED
 import org.http4k.lens.Query
 import org.http4k.lens.int
 import org.junit.jupiter.api.Test
@@ -20,7 +22,7 @@ class ApiKeySecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=1"))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, "?name=1"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
@@ -31,7 +33,7 @@ class ApiKeySecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKeySecurity(param, { true }, false).filter(next)(Request(Method.OPTIONS, "/"))
+        val response = ApiKeySecurity(param, { true }, false).filter(next)(Request(OPTIONS, "/"))
 
         assertThat(response.status, equalTo(OK))
         assertThat(response.bodyString(), equalTo("hello"))
@@ -42,9 +44,9 @@ class ApiKeySecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, ""))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, ""))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
@@ -52,9 +54,9 @@ class ApiKeySecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=asdasd"))
+        val response = ApiKeySecurity(param, { true }).filter(next)(Request(GET, "?name=asdasd"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 
     @Test
@@ -62,8 +64,8 @@ class ApiKeySecurityTest {
         val param = Query.int().required("name")
         val next: HttpHandler = { Response(OK).body("hello") }
 
-        val response = ApiKeySecurity(param, { false }).filter(next)(Request(Method.GET, "?name=1"))
+        val response = ApiKeySecurity(param, { false }).filter(next)(Request(GET, "?name=1"))
 
-        assertThat(response.status, equalTo(Status.UNAUTHORIZED))
+        assertThat(response.status, equalTo(UNAUTHORIZED))
     }
 }

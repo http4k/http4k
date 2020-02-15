@@ -4,6 +4,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.ContentType
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.MultipartFormBody
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -23,7 +24,7 @@ class FiltersTest {
             ("file" to MultipartFormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
             ("field" to "bar")
 
-        val req = Request(Method.POST, "")
+        val req = Request(POST, "")
             .with(Header.CONTENT_TYPE of ContentType.MultipartFormWithBoundary(form.boundary))
             .body(form)
 

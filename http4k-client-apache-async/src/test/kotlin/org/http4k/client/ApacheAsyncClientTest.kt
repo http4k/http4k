@@ -10,6 +10,7 @@ import org.apache.http.nio.protocol.HttpAsyncRequestProducer
 import org.apache.http.nio.protocol.HttpAsyncResponseConsumer
 import org.apache.http.protocol.HttpContext
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Status.Companion.CLIENT_TIMEOUT
 import org.http4k.hamkrest.hasStatus
@@ -39,7 +40,7 @@ class ApacheAsyncClientTest : AsyncHttpClientContract({ SunHttp(it) }, ApacheAsy
 
             override fun close() {}
 
-        })(Request(Method.GET, "http://localhost:8000")) {
+        })(Request(GET, "http://localhost:8000")) {
             assertThat(it, hasStatus(CLIENT_TIMEOUT))
             latch.countDown()
         }

@@ -2,11 +2,11 @@ package cookbook.request_context
 
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
-import org.http4k.core.Method
+import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.RequestContexts
 import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
@@ -23,7 +23,7 @@ fun main() {
     fun PrintState(contexts: RequestContexts): HttpHandler = { request ->
         val message: SharedState? = contexts[request]["myKey"]
         println(message)
-        Response(Status.OK)
+        Response(OK)
     }
 
     // this is the shared RequestContexts object - it holds the bag of state for each request and
@@ -37,5 +37,5 @@ fun main() {
         .then(AddState(contexts))
         .then(PrintState(contexts))
 
-    app(Request(Method.GET, "/hello"))
+    app(Request(GET, "/hello"))
 }

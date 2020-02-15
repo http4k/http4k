@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.RequestContext
 import org.http4k.core.RequestContexts
@@ -15,7 +16,7 @@ import java.util.UUID
 class RequestContextKeyTest {
     private val contexts = RequestContexts()
 
-    private val request = contexts(RequestContext(UUID.randomUUID()), Request(Method.GET, ""))
+    private val request = contexts(RequestContext(UUID.randomUUID()), Request(GET, ""))
 
     @Test
     fun `required key behaviour`() {

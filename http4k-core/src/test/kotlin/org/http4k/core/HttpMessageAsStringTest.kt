@@ -2,6 +2,8 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Method.*
+import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
@@ -10,7 +12,7 @@ class HttpMessageAsStringTest {
 
     @Test
     fun `represents request as string`() {
-        val request = Request(Method.GET, Uri.of("http://www.somewhere.com/path"))
+        val request = Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one").header("bar", "two").body(Body("body"))
         assertThat(request.toString(), equalTo("""
             GET http://www.somewhere.com/path HTTP/1.1
@@ -38,7 +40,7 @@ class HttpMessageAsStringTest {
 foo: one
 bar: two
 
-body""".toPayload()), equalTo(Request(Method.GET, Uri.of("http://www.somewhere.com/path"))
+body""".toPayload()), equalTo(Request(GET, Uri.of("http://www.somewhere.com/path"))
             .header("foo", "one").header("bar", "two").body(Body("body"))
         ))
     }
@@ -57,8 +59,8 @@ body""".toPayload()), equalTo(Response(OK)
 
     @Test
     fun `parse response with other status`() {
-        assertThat(Response.parse(Response(Status.NOT_FOUND).body("hi").toString()),
-            equalTo(Response(Status.NOT_FOUND).body("hi")))
+        assertThat(Response.parse(Response(NOT_FOUND).body("hi").toString()),
+            equalTo(Response(NOT_FOUND).body("hi")))
     }
 
     @Test

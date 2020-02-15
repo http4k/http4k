@@ -15,6 +15,9 @@ import org.http4k.core.Method.PUT
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.FOUND
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.MOVED_PERMANENTLY
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.UriTemplate
@@ -37,11 +40,11 @@ import java.util.concurrent.atomic.AtomicReference
 class ClientFiltersTest {
     val server = { request: Request ->
         when (request.uri.path) {
-            "/redirect" -> Response(Status.FOUND).header("location", "/ok")
-            "/loop" -> Response(Status.FOUND).header("location", "/loop")
-            "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(Status.INTERNAL_SERVER_ERROR)
-            "/absolute-redirect" -> Response(Status.MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
-            "/redirect-with-charset" -> Response(Status.MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
+            "/redirect" -> Response(FOUND).header("location", "/ok")
+            "/loop" -> Response(FOUND).header("location", "/loop")
+            "/absolute-target" -> if (request.uri.host == "example.com") Response(OK).body("absolute") else Response(INTERNAL_SERVER_ERROR)
+            "/absolute-redirect" -> Response(MOVED_PERMANENTLY).header("location", "http://example.com/absolute-target")
+            "/redirect-with-charset" -> Response(MOVED_PERMANENTLY).header("location", "/destination; charset=utf8")
             "/destination" -> Response(OK).body("destination")
             "/ok" -> Response(OK).body("ok")
             else -> Response(OK).let { if (request.query("foo") != null) it.body("with query") else it }
@@ -53,7 +56,7 @@ class ClientFiltersTest {
     @Test
     fun `does not follow redirect by default`() {
         val defaultClient = server
-        assertThat(defaultClient(Request(GET, "/redirect")), equalTo(Response(Status.FOUND).header("location", "/ok")))
+        assertThat(defaultClient(Request(GET, "/redirect")), equalTo(Response(FOUND).header("location", "/ok")))
     }
 
     @Test

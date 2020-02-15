@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import org.http4k.client.ApacheClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
@@ -29,7 +30,7 @@ fun main() {
         val app: HttpHandler = TweetEchoLambda(mapOf())
         val localLambda = app.asServer(SunHttp(8000)).start()
 
-        println(ApacheClient()(Request(Method.GET, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore..")))
+        println(ApacheClient()(Request(GET, "http://localhost:8000/").body("hello hello hello, i suppose this isn't 140 characters anymore..")))
         localLambda.stop()
     }
 

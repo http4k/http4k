@@ -3,6 +3,7 @@ package org.http4k.core
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.throws
+import org.http4k.core.Method.*
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -13,7 +14,7 @@ class RequestContextsTest {
     fun `can get and set and remove a request context using just the request`() {
         val requestContexts = RequestContexts()
         val value = RequestContext(UUID.randomUUID())
-        val updated = requestContexts.inject(value, Request(Method.GET, ""))
+        val updated = requestContexts.inject(value, Request(GET, ""))
         assertThat(updated.header("x-http4k-context"), equalTo(value.id.toString()))
 
         assertThat(requestContexts.extract(updated), equalTo(value))

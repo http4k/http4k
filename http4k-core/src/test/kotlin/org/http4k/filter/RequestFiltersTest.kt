@@ -8,6 +8,7 @@ import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.BAD_REQUEST
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
 import org.http4k.filter.RequestFilters.ProxyProtocolMode.Http
@@ -25,7 +26,7 @@ class RequestFiltersTest {
         val handler = RequestFilters.ProxyHost(Http).then { Response(OK).body(it.uri.toString()) }
         assertThat(handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")), hasBody("http://bob.com:443/loop"))
         assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("http://bob.com/loop"))
-        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(BAD_REQUEST))
     }
 
     @Test
@@ -33,7 +34,7 @@ class RequestFiltersTest {
         val handler = RequestFilters.ProxyHost(Https).then { Response(OK).body(it.uri.toString()) }
         assertThat(handler(Request(GET, "http://localhost:9000/loop").header("host", "bob.com:443")), hasBody("https://bob.com:443/loop"))
         assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("https://bob.com/loop"))
-        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(BAD_REQUEST))
     }
 
     @Test
@@ -43,7 +44,7 @@ class RequestFiltersTest {
         assertThat(handler(Request(GET, "http://localhost:81/loop").header("host", "bob.com:81")), hasBody("http://bob.com:81/loop"))
         assertThat(handler(Request(GET, "http://localhost:80/loop").header("host", "bob.com:80")), hasBody("http://bob.com:80/loop"))
         assertThat(handler(Request(GET, "http://localhost/loop").header("host", "bob.com")), hasBody("http://bob.com/loop"))
-        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(Status.BAD_REQUEST))
+        assertThat(handler(Request(GET, "http://localhost:9000/loop")), hasStatus(BAD_REQUEST))
     }
 
     @Test

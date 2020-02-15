@@ -3,9 +3,12 @@ package org.http4k.traffic
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.http4k.core.Method
+import org.http4k.core.Method.*
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 
@@ -25,10 +28,10 @@ class ReadWriteStreamTest {
     }
 
     private fun testStream(stream: ReadWriteStream) {
-        val request = Request(Method.GET, "/")
-        val otherRequest = Request(Method.GET, "/bob")
-        val response = Response(Status.OK).body("hello")
-        val otherResponse = Response(Status.INTERNAL_SERVER_ERROR).body("world")
+        val request = Request(GET, "/")
+        val otherRequest = Request(GET, "/bob")
+        val response = Response(OK).body("hello")
+        val otherResponse = Response(INTERNAL_SERVER_ERROR).body("world")
         stream[request] = response
         stream[otherRequest] = otherResponse
 

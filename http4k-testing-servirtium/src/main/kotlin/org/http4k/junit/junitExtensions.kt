@@ -15,6 +15,8 @@ import org.http4k.traffic.Replay
 import org.http4k.traffic.Servirtium
 import org.http4k.traffic.Sink
 import org.http4k.traffic.replayingMatchingContent
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
@@ -27,20 +29,32 @@ class ServirtiumRecording(
     private val baseName: String,
     private val httpHandler: HttpHandler,
     private val storageProvider: StorageProvider,
-    private val options: InteractionOptions = Defaults) : ParameterResolver {
+    private val options: InteractionOptions = Defaults)
+    : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
     override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
 
-    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
-        with(ec.testInstance.get()) {
-            val testName = "$baseName.${ec.requiredTestMethod.name}"
+    private var inTest = false
 
-            val storage = storageProvider(testName).apply { clean() }
-            if (pc.isHttpHandler())
-                RecordTo(Sink.Servirtium(storage, options))
+    override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any = with(ec.testInstance.get()) {
+        val testName = "$baseName.${ec.requiredTestMethod.name}"
+        val storage = storageProvider(testName).apply { clean() }
+        if (pc.isHttpHandler()) {
+            when {
+                inTest -> RecordTo(Sink.Servirtium(storage, options))
                     .then(options.trafficPrinter())
                     .then(httpHandler)
-            else InteractionControl.StorageBased(storage)
-        }
+                else -> httpHandler
+            }
+        } else InteractionControl.StorageBased(storage)
+    }
+
+    override fun beforeTestExecution(context: ExtensionContext?) {
+        inTest = true
+    }
+
+    override fun afterTestExecution(context: ExtensionContext) {
+        inTest = false
+    }
 }
 
 /**

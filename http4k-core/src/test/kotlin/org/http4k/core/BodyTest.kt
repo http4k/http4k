@@ -2,24 +2,25 @@ package org.http4k.core
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import org.http4k.core.Status.Companion.OK
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 
 class BodyTest {
     @Test
     fun `body string`() {
-        assertThat(Response(Status.OK).body("abc").bodyString(), equalTo("abc"))
+        assertThat(Response(OK).body("abc").bodyString(), equalTo("abc"))
     }
 
     @Test
     fun `body bytebuffer`() {
-        assertThat(Response(Status.OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
+        assertThat(Response(OK).body(Body(ByteBuffer.wrap("abc".toByteArray()))).bodyString(),
             equalTo("abc"))
     }
 
     @Test
     fun `body stream`() {
-        assertThat(String(Response(Status.OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
+        assertThat(String(Response(OK).body(Body("abc".byteInputStream())).body.stream.readBytes()),
             equalTo("abc"))
     }
 
