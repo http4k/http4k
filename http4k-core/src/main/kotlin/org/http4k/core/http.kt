@@ -105,6 +105,11 @@ interface HttpMessage : Closeable {
     fun headers(headers: Headers): HttpMessage
 
     /**
+     * Replace all headers with ones passed.
+     */
+    fun replaceHeaders(source: Headers): HttpMessage
+
+    /**
      * (Copy &) Adds a header value with this name, replacing any previously set values.
      */
     fun replaceHeader(name: String, value: String?): HttpMessage
@@ -193,6 +198,8 @@ interface Request : HttpMessage {
 
     override fun replaceHeader(name: String, value: String?): Request
 
+    override fun replaceHeaders(source: Headers): Request
+
     override fun removeHeader(name: String): Request
 
     override fun body(body: Body): Request
@@ -223,6 +230,8 @@ data class MemoryRequest(override val method: Method, override val uri: Uri, ove
     override fun queries(name: String): List<String?> = uri.queries().findMultiple(name)
 
     override fun header(name: String, value: String?) = copy(headers = headers.plus(name to value))
+
+    override fun replaceHeaders(source: Headers) = copy(headers = source)
 
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
@@ -257,6 +266,8 @@ interface Response : HttpMessage {
 
     override fun replaceHeader(name: String, value: String?): Response
 
+    override fun replaceHeaders(source: Headers): Response
+
     override fun removeHeader(name: String): Response
 
     override fun body(body: Body): Response
@@ -281,6 +292,8 @@ data class MemoryResponse(override val status: Status, override val headers: Hea
     override fun headers(headers: Headers) = copy(headers = this.headers + headers)
 
     override fun replaceHeader(name: String, value: String?) = copy(headers = headers.replaceHeader(name, value))
+
+    override fun replaceHeaders(source: Headers) = copy(headers = source)
 
     override fun removeHeader(name: String) = copy(headers = headers.removeHeader(name))
 

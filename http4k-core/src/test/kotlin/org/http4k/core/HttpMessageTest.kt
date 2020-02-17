@@ -50,6 +50,14 @@ class HttpMessageTest {
     }
 
     @Test
+    fun can_replace_headers() {
+        val source = Response(OK).header("Foo", "replaced")
+        val message = Response(OK).header("Foo", "Bar").replaceHeaders(source.headers)
+
+        assertThat(message.headers, equalTo(listOf("Foo" to "replaced") as Headers))
+    }
+
+    @Test
     fun `multiple headers with different cases are all retreived`() {
         fun checkHeaderInsensitivity(request: HttpMessage) {
             val req = request
@@ -57,7 +65,7 @@ class HttpMessageTest {
                 .header("Foo", "two")
                 .header("FOO", "three")
 
-            assertThat(req.headerValues("foo"), equalTo<List<String?>>(listOf<String?>("one", "two", "three")))
+            assertThat(req.headerValues("foo"), equalTo(listOf<String?>("one", "two", "three")))
         }
 
         checkHeaderInsensitivity(Request(GET, "http://ignore"))
