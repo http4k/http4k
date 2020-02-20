@@ -12,8 +12,7 @@ import org.http4k.security.AccessTokenResponse
 import org.http4k.security.accessTokenResponseBody
 import org.http4k.security.oauth.server.accesstoken.GenerateAccessTokenForGrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
-import org.http4k.security.oauth.server.refreshToken.RefreshToken
-import org.http4k.security.oauth.server.refreshToken.RefreshTokens
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import java.time.Clock
 
 class GenerateAccessToken(

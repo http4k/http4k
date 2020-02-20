@@ -1,4 +1,4 @@
-package org.http4k.security.oauth.server.refreshToken
+package org.http4k.security.oauth.server.refreshtoken
 
 import com.natpryce.Failure
 import com.natpryce.Result

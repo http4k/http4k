@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.http4k.core.Body
 import org.http4k.format.Jackson.auto
-import org.http4k.security.oauth.server.refreshToken.RefreshToken
+import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 import org.http4k.security.openid.IdToken
 
 data class AccessToken(val value: String,

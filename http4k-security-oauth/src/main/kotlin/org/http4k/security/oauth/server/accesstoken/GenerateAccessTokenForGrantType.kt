@@ -17,8 +17,8 @@ import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.UnsupportedGrantType
 import org.http4k.security.oauth.server.accesstoken.GrantType.*
-import org.http4k.security.oauth.server.refreshToken.RefreshTokenAccessTokenGenerator
-import org.http4k.security.oauth.server.refreshToken.RefreshTokens
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokenAccessTokenGenerator
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.oauth.server.tokenRequest
 import java.time.Clock
 
