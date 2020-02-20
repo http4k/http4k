@@ -2,7 +2,7 @@ title: http4k AWS Module
 description: Feature overview of the http4k-aws module
 
 ### Installation (Gradle)
-```compile group: "org.http4k", name: "http4k-aws", version: "3.237.0"```
+```compile group: "org.http4k", name: "http4k-aws", version: "3.238.0"```
 
 ### About
 
