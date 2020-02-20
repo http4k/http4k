@@ -7,6 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessToken
+import org.http4k.security.oauth.server.refreshToken.RefreshToken
+import org.http4k.security.oauth.server.refreshToken.RefreshTokens
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.Nonce
@@ -35,6 +37,25 @@ class DummyAccessTokens : AccessTokens {
     override fun create(clientId: ClientId, tokenRequest: TokenRequest): Result<AccessToken, AccessTokenError> = Success(AccessToken("dummy-access-token"))
 
     override fun create(authorizationCode: AuthorizationCode) = Success(AccessToken("dummy-access-token"))
+}
+
+class DummyRefreshTokens : RefreshTokens {
+    override fun refreshAccessToken(refreshToken: RefreshToken): Result<AccessToken, AccessTokenError> {
+        if (refreshToken.value.startsWith("valid")) {
+            return Success(newAccessToken)
+        } else {
+            return Failure(InvalidRequest("Invalid refresh token"))
+        }
+    }
+
+    companion object {
+        val newAccessToken = AccessToken(
+            "new-valid-access-token",
+            expiresIn = 100,
+            scope = "openid",
+            refreshToken = RefreshToken("new-valid-refresh-token"))
+    }
+
 }
 
 class ErroringAccessTokens(private val error: AuthorizationCodeAlreadyUsed) : AccessTokens {
