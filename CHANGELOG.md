@@ -3,8 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.237.0 (uncut)
+### v3.237.0
 - [http4k-core] Fix #377. `Added replaceHeaders()` method. Thanks to @bastman for the idea.
+- [http4k-contract] Fix nullability of references in OpenApi3
 
 ### v3.236.0
 - [http4k-testing-servirtium] Don't pass recording handler into non-test methods as a resolved parameter.
