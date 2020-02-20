@@ -35,7 +35,7 @@ data class ArbObject(
     val nullableChild: ArbObject2? = ArbObject2(),
     val stringList: List<String> = listOf("hello", "goodbye"),
     val anyList: List<Any> = listOf("123", ArbObject2(), true, listOf(ArbObject2())),
-    val enumVal: Foo = Foo.value2
+    val enumVal: Foo? = Foo.value2
 ) : Generic
 
 data class JsonPrimitives(

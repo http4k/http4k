@@ -222,10 +222,8 @@
         "required": [
           "anyList",
           "child",
-          "enumVal",
           "list",
           "nestedList",
-          "nullableChild",
           "stringList"
         ]
       }

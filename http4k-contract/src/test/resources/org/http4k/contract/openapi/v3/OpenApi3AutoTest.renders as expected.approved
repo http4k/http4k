@@ -1052,7 +1052,6 @@
         "type": "object",
         "required": [
           "bool",
-          "child",
           "numbers",
           "string"
         ]
