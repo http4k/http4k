@@ -7,8 +7,8 @@ import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Uri
 import org.http4k.security.AccessToken
-import org.http4k.security.oauth.server.refreshToken.RefreshToken
-import org.http4k.security.oauth.server.refreshToken.RefreshTokens
+import org.http4k.security.oauth.server.refreshtoken.RefreshToken
+import org.http4k.security.oauth.server.refreshtoken.RefreshTokens
 import org.http4k.security.openid.IdToken
 import org.http4k.security.openid.IdTokenConsumer
 import org.http4k.security.openid.Nonce

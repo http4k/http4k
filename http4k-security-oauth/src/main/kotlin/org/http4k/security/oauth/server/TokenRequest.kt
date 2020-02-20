@@ -2,7 +2,7 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Uri
 import org.http4k.security.oauth.server.accesstoken.GrantType
-import org.http4k.security.oauth.server.refreshToken.RefreshToken
+import org.http4k.security.oauth.server.refreshtoken.RefreshToken
 
 data class TokenRequest(
         val grantType: GrantType,
