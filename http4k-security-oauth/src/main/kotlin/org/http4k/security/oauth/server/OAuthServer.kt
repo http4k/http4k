@@ -19,6 +19,8 @@ import org.http4k.security.oauth.server.accesstoken.AccessTokenRequestAuthentica
 import org.http4k.security.oauth.server.accesstoken.ClientSecretAccessTokenRequestAuthentication
 import org.http4k.security.oauth.server.accesstoken.GrantType
 import org.http4k.security.oauth.server.accesstoken.GrantTypesConfiguration
+import org.http4k.security.oauth.server.refreshToken.RefreshToken
+import org.http4k.security.oauth.server.refreshToken.RefreshTokens
 import org.http4k.security.oauth.server.request.RequestJWTValidator
 import org.http4k.security.openid.Nonce
 import org.http4k.security.openid.RequestJwtContainer
@@ -43,6 +45,7 @@ class OAuthServer(
     authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
     grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(accessTokenRequestAuthentication),
     idTokens: IdTokens = IdTokens.Unsupported,
+    refreshTokens: RefreshTokens = RefreshTokens.unsupported,
     requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
     documentationUri: String? = null
 ) {
@@ -57,6 +60,7 @@ class OAuthServer(
                 authRequestExtractor: AuthRequestExtractor = AuthRequestFromQueryParameters,
                 grantTypes: GrantTypesConfiguration = GrantTypesConfiguration.default(ClientSecretAccessTokenRequestAuthentication(clientValidator)),
                 idTokens: IdTokens = IdTokens.Unsupported,
+                refreshTokens: RefreshTokens = RefreshTokens.unsupported,
                 requestJWTValidator: RequestJWTValidator = RequestJWTValidator.Unsupported,
                 documentationUri: String? = null) : this(
         tokenPath,
@@ -70,6 +74,7 @@ class OAuthServer(
         authRequestExtractor,
         grantTypes,
         idTokens,
+        refreshTokens,
         requestJWTValidator,
         documentationUri
     )
@@ -81,7 +86,7 @@ class OAuthServer(
         errorRenderer,
         documentationUri)
     // endpoint to retrieve access token for a given authorization code
-    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, errorRenderer, grantTypes))
+    val tokenRoute = routes(tokenPath bind POST to GenerateAccessToken(authorizationCodes, accessTokens, clock, idTokens, refreshTokens, errorRenderer, grantTypes))
 
     // use this filter to protect your authentication/authorization pages
     val authenticationStart = ClientValidationFilter(authoriseRequestValidator, authoriseRequestErrorRender, authRequestExtractor)
@@ -107,6 +112,7 @@ class OAuthServer(
         val scopesForm = FormField.map({ it.split(" ").toList() }, { it.joinToString(" ") }).optional("scope")
         val clientAssertionType = FormField.uri().optional("client_assertion_type")
         val clientAssertion = FormField.optional("client_assertion")
+        val refreshToken = FormField.optional("refresh_token")
         val tokenRequestWebForm = Body.webForm(
             Strict,
             clientIdForm,
@@ -115,7 +121,8 @@ class OAuthServer(
             redirectUriForm,
             scopesForm,
             clientAssertionType,
-            clientAssertion).toLens()
+            clientAssertion,
+            refreshToken).toLens()
     }
 }
 
@@ -145,5 +152,6 @@ internal fun Request.tokenRequest(grantType: GrantType): TokenRequest {
         OAuthServer.redirectUriForm(tokenRequestWebForm),
         OAuthServer.scopesForm(tokenRequestWebForm) ?: listOf(),
         OAuthServer.clientAssertionType(tokenRequestWebForm),
-        OAuthServer.clientAssertion(tokenRequestWebForm))
+        OAuthServer.clientAssertion(tokenRequestWebForm),
+        OAuthServer.refreshToken(tokenRequestWebForm)?.let { RefreshToken(it) })
 }

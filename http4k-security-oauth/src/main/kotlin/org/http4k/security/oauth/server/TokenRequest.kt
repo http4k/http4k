@@ -2,6 +2,7 @@ package org.http4k.security.oauth.server
 
 import org.http4k.core.Uri
 import org.http4k.security.oauth.server.accesstoken.GrantType
+import org.http4k.security.oauth.server.refreshToken.RefreshToken
 
 data class TokenRequest(
         val grantType: GrantType,
@@ -11,4 +12,5 @@ data class TokenRequest(
         val redirectUri: Uri?,
         val scopes: List<String>,
         val clientAssertionType: Uri?,
-        val clientAssertion: String?)
+        val clientAssertion: String?,
+        val refreshToken: RefreshToken?)

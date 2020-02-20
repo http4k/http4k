@@ -44,6 +44,7 @@ object RedirectUriMismatch : AccessTokenError(InvalidGrant, "The 'redirect_uri' 
 object MissingRedirectUri : AccessTokenError(InvalidGrant, "The 'redirect_uri' parameter does not match the authorization request")
 object AuthorizationCodeAlreadyUsed : AccessTokenError(InvalidGrant, "The authorization code has already been used")
 object MissingAuthorizationCode : AccessTokenError(InvalidGrant, "The authorization code is required")
+data class InvalidRequest(val message: String) : AccessTokenError(InvalidRequest, message)
 
 // represents errors according to https://tools.ietf.org/html/rfc6749#section-4.1.2.1
 sealed class AuthorizationError(rfcError: RfcError, description: String) : OAuthError(rfcError, description)

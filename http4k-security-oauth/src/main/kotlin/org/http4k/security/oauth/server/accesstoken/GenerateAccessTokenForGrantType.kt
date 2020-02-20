@@ -16,8 +16,9 @@ import org.http4k.security.oauth.server.AccessTokens
 import org.http4k.security.oauth.server.AuthorizationCodes
 import org.http4k.security.oauth.server.IdTokens
 import org.http4k.security.oauth.server.UnsupportedGrantType
-import org.http4k.security.oauth.server.accesstoken.GrantType.AuthorizationCode
-import org.http4k.security.oauth.server.accesstoken.GrantType.ClientCredentials
+import org.http4k.security.oauth.server.accesstoken.GrantType.*
+import org.http4k.security.oauth.server.refreshToken.RefreshTokenAccessTokenGenerator
+import org.http4k.security.oauth.server.refreshToken.RefreshTokens
 import org.http4k.security.oauth.server.tokenRequest
 import java.time.Clock
 
@@ -26,10 +27,12 @@ class GenerateAccessTokenForGrantType(
     accessTokens: AccessTokens,
     clock: Clock,
     idTokens: IdTokens,
+    refreshTokens: RefreshTokens,
     private val grantTypes: GrantTypesConfiguration
 ) {
     private val authorizationCode = AuthorizationCodeAccessTokenGenerator(authorizationCodes, accessTokens, clock, idTokens)
     private val clientCredentials = ClientCredentialsAccessTokenGenerator(accessTokens)
+    private val refreshTokens = RefreshTokenAccessTokenGenerator(refreshTokens)
 
     fun generate(request: Request): Result<AccessTokenDetails, AccessTokenError> {
         val grantType = resolveGrantTypeFromRequest(request).onFailure { return it }
@@ -51,6 +54,7 @@ class GenerateAccessTokenForGrantType(
             return when (val grantType = grantType(form)) {
                 AuthorizationCode.rfcValue -> Success(AuthorizationCode)
                 ClientCredentials.rfcValue -> Success(ClientCredentials)
+                RefreshToken.rfcValue -> Success(RefreshToken)
                 else -> Failure(UnsupportedGrantType(grantType))
             }
         }
@@ -59,6 +63,7 @@ class GenerateAccessTokenForGrantType(
     private fun GrantType.generator() = when (this) {
         AuthorizationCode -> authorizationCode
         ClientCredentials -> clientCredentials
+        RefreshToken -> refreshTokens
     }
 
     companion object {
