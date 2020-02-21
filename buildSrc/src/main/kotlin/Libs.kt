@@ -277,6 +277,11 @@ object Libs {
      const val httpclient: String = "org.apache.httpcomponents:httpclient:" + Versions.httpclient
 
      /**
+      * https://repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/
+      */
+     const val httpclient5: String = "org.apache.httpcomponents.client5:httpclient5:" + Versions.httpclient5
+
+     /**
       * https://github.com/javadev/underscore-java
       */
      const val underscore: String = "com.github.javadev:underscore:" + Versions.underscore
@@ -305,6 +310,11 @@ object Libs {
       * http://hc.apache.org/httpcomponents-core-ga
       */
      const val httpcore: String = "org.apache.httpcomponents:httpcore:" + Versions.httpcore
+
+     /**
+      * https://hc.apache.org/httpcomponents-core-5.0.x/index.html
+      */
+     const val httpcore5: String = "org.apache.httpcomponents.core5:httpcore5:" + Versions.httpcore5
 
      /**
       * https://github.com/npryce/result4k
