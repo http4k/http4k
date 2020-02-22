@@ -28,10 +28,10 @@ object WebsocketClient {
      * Provides a client-side Websocket instance connected to a remote Websocket. The resultant object
      * can be have listeners attached to it. Optionally pass a WsConsumer which will be called onConnect
      */
-    fun nonBlocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, onConnect: WsConsumer = {}): Websocket {
+    fun nonBlocking(uri: Uri, headers: Headers = emptyList(), timeout: Duration = ZERO, onError: (Throwable) -> Unit = {}, onConnect: WsConsumer = {}): Websocket {
         val socket = AtomicReference<PushPullAdaptingWebSocket>()
         val client = NonBlockingClient(uri, headers, timeout, onConnect, socket)
-        socket.set(AdaptingWebSocket(uri, client))
+        socket.set(AdaptingWebSocket(uri, client).apply { onError(onError)})
         client.connect()
         return socket.get()
     }
