@@ -52,7 +52,7 @@ object Versions {
 
      const val aws_lambda_java_core: String = "1.2.0"
 
-     const val dokka_gradle_plugin: String = "0.9.18" // available: "0.10.0"
+     const val dokka_gradle_plugin: String = "0.10.0"
 
      const val javax_servlet_api: String = "4.0.1"
 

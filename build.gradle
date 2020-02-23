@@ -179,9 +179,10 @@ coveralls {
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
     dependsOn = subprojects.test
-    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(subprojects.sourceSets.main.output)
-    executionData = files(subprojects.jacocoTestReport.executionData)
+    getSourceDirectories().from(subprojects.sourceSets.main.allSource.srcDirs)
+    getClassDirectories().from(subprojects.sourceSets.main.output)
+    getExecutionData().from(subprojects.jacocoTestReport.executionData)
+
     reports {
         html.enabled = true
         xml.enabled = true
@@ -249,84 +250,17 @@ sourceSets {
     }
 }
 
-task dokka(type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
-    includes = ['src/packages.md']
-    moduleName = "$rootProject.name"
-    outputDirectory = "$buildDir/ddoc"
+dokka {
     outputFormat = "gfm"
-    processConfigurations = []
-    jdkVersion = 9
+    outputDirectory = "$buildDir/ddoc"
 
-    externalDocumentationLink {
-        // No version, apache does not seem to keep old versions of javadoc around
-        url = new URL("https://hc.apache.org/httpcomponents-asyncclient-ga/httpasyncclient/apidocs/")
-    }
-    externalDocumentationLink {
-        // No version, apache does not seem to keep old versions of javadoc around
-        url = new URL("https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/")
-    }
-    externalDocumentationLink {
-        // No version, apache does not seem to keep old versions of javadoc around
-        url = new URL("https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/")
-    }
-    externalDocumentationLink {
-        def version = Config.okhttp_major
-        url = new URL("https://square.github.io/okhttp/${version}.x/okhttp/")
-    }
-//    externalDocumentationLink {
-//        // No version, argo does not seem to keep old versions of javadoc around
-//        url = new URL("http://argo.sourceforge.net/javadoc/")
-//    }
-//    externalDocumentationLink {
-//        def version = Config.jackson_major_minor
-//        url = new URL("https://fasterxml.github.io/jackson-dataformat-xml/javadoc/$version/")
-//    }
-    externalDocumentationLink {
-        def version = Config.jackson_major_minor
-        url = new URL("https://fasterxml.github.io/jackson-databind/javadoc/$version/")
-    }
-    externalDocumentationLink {
-        def version = Config.moshi_major
-        url = new URL("http://square.github.io/moshi/${version}.x/moshi/")
-    }
-    externalDocumentationLink {
-        def version = Config.io_undertow_major_minor
-        url = new URL("http://undertow.io/javadoc/${version}.x/")
-    }
-    externalDocumentationLink {
-        def version = Config.netty_codec_http2_major_minor
-        url = new URL("https://netty.io/$version/api/")
-    }
-    externalDocumentationLink {
-        // No version, this was the latest linkable javadoc I could find for javax servlet api
-        url = new URL("https://javaee.github.io/javaee-spec/javadocs/")
-    }
-    externalDocumentationLink {
-        def version = Versions.org_junit_jupiter
-        url = new URL("https://junit.org/junit5/docs/$version/api/")
-    }
-    externalDocumentationLink {
-        // No version, selenium does not seem to keep old versions of javadoc around
-        url = new URL("https://seleniumhq.github.io/selenium/docs/api/java/")
-    }
-    externalDocumentationLink {
-        // No version, jsoup does not seem to keep old versions of javadoc around
-        url = new URL("https://jsoup.org/apidocs/")
-    }
+    subProjects = subprojects.collect { i -> i.name }
 
-    sourceDirs = files(subprojects.collect {
-        p ->
-            def path = new File(p.projectDir, "/src/main/kotlin")
-
-            def relativePath = rootDir.toPath().relativize(path.toPath()).toString()
-            linkMapping {
-                dir = path.toString().replace(File.separator, "/")
-                url = "https://github.com/http4k/http4k/blob/master/$relativePath"
-                suffix = "#L"
-            }
-
-            return path
-    })
+    configuration  {
+        includes = ['src/packages.md']
+        moduleName = "$rootProject.name"
+        jdkVersion = 9
+    }
 }
 
 

@@ -17,14 +17,13 @@ set -o nounset
 #    exit 0
 #fi
 
-TMP=/tmp/http4k-api/
 ./gradlew dokka
-rm -rf ${TMP}
-git clone https://${GH_TOKEN}@github.com/http4k/api.git ${TMP}
-rm -rf ${TMP}/*
-cp -R build/ddoc/http4k/* ${TMP}/
+rm -rf /tmp/http4k-api/
+git clone https://"${GH_TOKEN}"@github.com/http4k/api.git /tmp/http4k-api/
+rm -rf /tmp/http4k-api/*
+cp -R build/ddoc/http4k/* /tmp/http4k-api/
 
-cd ${TMP}
+cd /tmp/http4k-api
 git add .
 if [[ -z $(git status -s) ]]
 then
