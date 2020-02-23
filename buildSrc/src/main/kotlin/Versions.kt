@@ -1,3 +1,4 @@
+
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
@@ -13,7 +14,7 @@ import org.gradle.plugin.use.PluginDependencySpec
 object Versions {
      const val org_jetbrains_kotlinx_kotlinx_serialization: String = "0.14.0"
 
-     const val io_github_resilience4j: String = "1.2.0"
+     const val io_github_resilience4j: String = "1.3.1"
 
      const val org_jetbrains_kotlin: String = "1.3.61"
 
@@ -27,7 +28,7 @@ object Versions {
 
      const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.9.0"
+     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.10.0"
 
      const val net_saliman_cobertura_gradle_plugin: String = "3.0.0"
 
@@ -63,7 +64,7 @@ object Versions {
 
      const val ktor_server_cio: String = "1.3.0"
 
-     const val micrometer_core: String = "1.3.3"
+     const val micrometer_core: String = "1.3.5"
 
      const val java_websocket: String = "1.4.0"
 
@@ -95,11 +96,11 @@ object Versions {
 
      const val jade4j: String = "1.3.0"
 
-     const val okhttp: String = "4.3.1"
+     const val okhttp: String = "4.4.0"
 
      const val pebble: String = "3.1.2"
 
-     const val jsoup: String = "1.12.1"
+     const val jsoup: String = "1.12.2"
 
      const val argo: String = "5.9"
 
@@ -112,7 +113,7 @@ object Versions {
       * See issue 19: How to update Gradle itself?
       * https://github.com/jmfayard/buildSrcVersions/issues/19
       */
-     const val gradleLatestVersion: String = "6.1.1"
+     const val gradleLatestVersion: String = "6.2"
 }
 
 /**

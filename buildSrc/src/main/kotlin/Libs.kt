@@ -317,7 +317,7 @@ object Libs {
      const val jade4j: String = "de.neuland-bfi:jade4j:" + Versions.jade4j
 
      /**
-      * https://github.com/square/okhttp
+      * https://square.github.io/okhttp/
       */
      const val okhttp: String = "com.squareup.okhttp3:okhttp:" + Versions.okhttp
 
