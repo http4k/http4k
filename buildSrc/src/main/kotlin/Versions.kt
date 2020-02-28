@@ -88,7 +88,7 @@ object Versions {
 
     const val thymeleaf: String = "3.0.11.RELEASE"
 
-    const val hamkrest: String = "1.7.0.0"
+    const val hamkrest: String = "1.7.0.2"
 
     const val httpcore: String = "4.4.13"
 
