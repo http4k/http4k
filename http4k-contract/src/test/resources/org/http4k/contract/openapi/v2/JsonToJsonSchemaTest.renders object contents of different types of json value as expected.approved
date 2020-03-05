@@ -40,6 +40,10 @@
             "type": "number",
             "example": 1.9
           },
+          "aDouble": {
+            "type": "number",
+            "example": 1.0100000000000000088817841970012523233890533447265625
+          },
           "aBooleanTrue": {
             "type": "boolean",
             "example": true
