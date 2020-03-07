@@ -67,7 +67,7 @@ class TrafficExtensionTests {
     @Test
     fun `replay replays traffic from servirtium markdown format`() {
         val replay = Replay.Servirtium(Supplier {
-            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readAllBytes()
+            javaClass.getResourceAsStream("/org/http4k/traffic/storedTraffic.txt").readBytes()
         })
 
         val request1 = Request(GET, "/hello?query=123")
@@ -85,7 +85,7 @@ class TrafficExtensionTests {
     @Test
     fun `replay replays binary traffic from servirtium markdown format`() {
         val replay = Replay.Servirtium(Supplier {
-            javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readAllBytes()
+            javaClass.getResourceAsStream("/org/http4k/traffic/storedBinaryTraffic.txt").readBytes()
         },
             object : InteractionOptions {
                 override fun isBinary(contentType: ContentType?) = true
