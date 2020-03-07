@@ -1,6 +1,7 @@
 package org.http4k.servirtium
 
 import org.http4k.client.ApacheClient
+import org.http4k.core.HttpHandler
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -51,7 +52,8 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
             storageProvider: StorageProvider,
             options: InteractionOptions = Defaults,
             port: Int = 0,
-            serverFn: (Int) -> ServerConfig = ::SunHttp
+            serverFn: (Int) -> ServerConfig = ::SunHttp,
+            proxyClient: HttpHandler = ApacheClient()
         ): ServirtiumServer {
             val storage = storageProvider(name).apply { clean() }
             return object : ServirtiumServer,
@@ -60,7 +62,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                     Sink.Servirtium(storage, options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(options.trafficPrinter())
-                    .then(ApacheClient())
+                    .then(proxyClient)
                     .asServer(serverFn(port)),
                 InteractionControl by StorageBased(storage) {
             }
