@@ -1,6 +1,6 @@
 package org.http4k.servirtium
 
-import org.http4k.client.OkHttp
+import org.http4k.client.ApacheClient
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
@@ -60,7 +60,7 @@ interface ServirtiumServer : Http4kServer, InteractionControl {
                     Sink.Servirtium(storage, options))
                     .then(ClientFilters.SetBaseUriFrom(target))
                     .then(options.trafficPrinter())
-                    .then(OkHttp())
+                    .then(ApacheClient())
                     .asServer(serverFn(port)),
                 InteractionControl by StorageBased(storage) {
             }
