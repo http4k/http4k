@@ -31,7 +31,7 @@ class ServirtiumRecording(
     private val storageProvider: StorageProvider,
     private val options: InteractionOptions = Defaults)
     : ParameterResolver, BeforeTestExecutionCallback, AfterTestExecutionCallback {
-    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
+    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()
 
     private var inTest = false
 
@@ -63,7 +63,7 @@ class ServirtiumRecording(
 class ServirtiumReplay(private val baseName: String,
                        private val storageProvider: StorageProvider,
                        private val options: InteractionOptions = Defaults) : ParameterResolver {
-    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isRecordingControl()
+    override fun supportsParameter(pc: ParameterContext, ec: ExtensionContext) = pc.isHttpHandler() || pc.isInteractionControl()
 
     override fun resolveParameter(pc: ParameterContext, ec: ExtensionContext): Any =
         if (pc.isHttpHandler()) {
@@ -83,7 +83,7 @@ private fun ConvertBadResponseToAssertionFailed() = Filter { next ->
     }
 }
 
-private fun ParameterContext.isRecordingControl() =
+private fun ParameterContext.isInteractionControl() =
     parameter.parameterizedType.typeName == InteractionControl::class.java.name
 
 private fun ParameterContext.isHttpHandler() =
