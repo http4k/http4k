@@ -20,7 +20,7 @@ welcome
 ### Response headers recorded for playback:
 
 ```
-transfer-encoding: chunked
+Transfer-encoding: chunked
 ```
 
 ### Response body recorded for playback (200: ):
@@ -51,7 +51,7 @@ welcome
 ### Response headers recorded for playback:
 
 ```
-transfer-encoding: chunked
+Transfer-encoding: chunked
 ```
 
 ### Response body recorded for playback (200: ):
