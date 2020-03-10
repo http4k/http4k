@@ -52,7 +52,7 @@ object ApacheClient5 {
             OPTIONS -> HttpOptions(uri)
             TRACE -> HttpTrace(uri)
             DELETE -> HttpDelete(uri)
-            else -> ApacheRequest(requestBodyMode, request)
+            else -> Apache5Request(requestBodyMode, request)
         }
         request.headers.filter { !it.first.equals("content-length", true) }.map { apacheRequest.addHeader(it.first, it.second) }
         return apacheRequest
@@ -74,7 +74,7 @@ object ApacheClient5 {
 
 }
 
-private class ApacheRequest(requestBodyMode: BodyMode, private val request: Request) : HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
+private class Apache5Request(requestBodyMode: BodyMode, private val request: Request) : HttpUriRequestBase(request.method.toString(), URI(request.uri.toString())) {
     init {
         entity = when (requestBodyMode) {
             Stream -> InputStreamEntity(request.body.stream, request.header("content-length")?.toLong() ?: -1, null)
