@@ -64,7 +64,7 @@ class ContractRoute internal constructor(val method: Method,
                     (meta.security?.filter ?: Filter.NoOp)
                         .then(ServerFilters.CatchLensFailure { Response(BAD_REQUEST) })
                         .then(PreFlightExtractionFilter(meta, Companion.All))
-                        .then(matchResult.httpHandler)(request)
+                        .then(matchResult)(request)
                 }
                 is MethodNotMatched -> Response(METHOD_NOT_ALLOWED)
                 is Unmatched -> Response(NOT_FOUND)

@@ -141,8 +141,8 @@ internal data class SinglePageAppRoutingHandler(
             else -> null
         }
 
-        val matchOnIndex = when (val matchResult = staticHandler.match(Request(GET, pathSegments))) {
-            is MatchingHandler -> matchResult.httpHandler
+        val matchOnIndex: HttpHandler? = when (val matchResult = staticHandler.match(Request(GET, pathSegments))) {
+            is MatchingHandler -> matchResult
             else -> null
         }
 

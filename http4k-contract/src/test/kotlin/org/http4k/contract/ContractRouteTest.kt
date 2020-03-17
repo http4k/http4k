@@ -259,7 +259,7 @@ class ContractRouteTest {
     }
 
     private fun RouterMatchResult.matchOrNull() : HttpHandler? = when (this) {
-        is MatchingHandler -> this.httpHandler
+        is MatchingHandler -> this
         else -> null
     }
 }

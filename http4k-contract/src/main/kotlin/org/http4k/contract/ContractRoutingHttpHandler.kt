@@ -75,7 +75,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
                 when (memo) {
                     is MatchingHandler -> memo
                     else -> when (val matchResult = router.match(request)) {
-                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult.httpHandler))
+                        is MatchingHandler -> MatchingHandler(routeFilter.then(matchResult))
                         else -> minOf(memo, matchResult)
                     }
                 }

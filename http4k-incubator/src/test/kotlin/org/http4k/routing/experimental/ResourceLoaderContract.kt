@@ -60,7 +60,7 @@ abstract class ResourceLoaderContract(private val loader: Router) {
     }
 
     private fun RouterMatchResult.matchOrExplode() : HttpHandler = when (this) {
-        is MatchingHandler -> this.httpHandler
+        is MatchingHandler -> this
         else -> error("Unmatched, got $this")
     }
 }

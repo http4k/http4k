@@ -15,8 +15,8 @@ import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
 sealed class RouterMatchResult(private val priority: Int) : Comparable<RouterMatchResult> {
-    data class MatchingHandler(val httpHandler: HttpHandler) : RouterMatchResult(0) {
-        operator fun invoke(request: Request) = httpHandler(request)
+    data class MatchingHandler(private val httpHandler: HttpHandler) : RouterMatchResult(0), HttpHandler {
+        override fun invoke(request: Request): Response = httpHandler(request)
     }
     object MethodNotMatched : RouterMatchResult(5)
     object Unmatched : RouterMatchResult(10)
