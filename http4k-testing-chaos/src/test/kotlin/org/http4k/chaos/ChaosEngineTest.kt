@@ -10,6 +10,7 @@ import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.I_M_A_TEAPOT
+import org.http4k.core.Status.Companion.METHOD_NOT_ALLOWED
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.UNAUTHORIZED
@@ -70,7 +71,7 @@ class ChaosEngineTest {
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(originalChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(originalChaos))
-        assertThat(appWithChaos(Request(POST, "/")), hasStatus(NOT_FOUND))
+        assertThat(appWithChaos(Request(POST, "/")), hasStatus(METHOD_NOT_ALLOWED))
         assertThat(appWithChaos(Request(GET, "/")), hasStatus(NOT_FOUND))
         assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))

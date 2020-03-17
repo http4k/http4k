@@ -14,6 +14,16 @@ import org.http4k.websocket.WsConsumer
 import org.http4k.websocket.WsHandler
 import java.io.InputStream
 
+sealed class RouterMatchResult(private val priority: Int) : Comparable<RouterMatchResult> {
+    data class MatchingHandler(val httpHandler: HttpHandler) : RouterMatchResult(0) {
+        operator fun invoke(request: Request) = httpHandler(request)
+    }
+    object MethodNotMatched : RouterMatchResult(5)
+    object Unmatched : RouterMatchResult(10)
+
+    override fun compareTo(other: RouterMatchResult): Int = priority.compareTo(other.priority)
+}
+
 /**
  * Provides matching of a Request to an HttpHandler which can service it.
  */
@@ -21,7 +31,7 @@ interface Router {
     /**
      * Attempt to supply an HttpHandler which can service the passed request.
      */
-    fun match(request: Request): HttpHandler?
+    fun match(request: Request): RouterMatchResult
 }
 
 /**
@@ -84,9 +94,9 @@ data class PathMethod(val path: String, val method: Method) {
         when (action) {
             is StaticRoutingHttpHandler -> action.withBasePath(path).let {
                 object : RoutingHttpHandler by it {
-                    override fun match(request: Request): HttpHandler? = when (method) {
+                    override fun match(request: Request): RouterMatchResult = when (method) {
                         request.method -> it.match(request)
-                        else -> null
+                        else -> RouterMatchResult.MethodNotMatched
                     }
                 }
             }

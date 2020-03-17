@@ -45,7 +45,6 @@ class RoutingTest {
     }
 
     @Test
-    @Disabled
     fun `method not allowed`() {
         val routes = routes(
             "/a/{route}" bind GET to { Response(OK).body("matched") }

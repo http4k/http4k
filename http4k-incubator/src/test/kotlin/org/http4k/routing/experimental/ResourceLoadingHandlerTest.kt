@@ -12,7 +12,6 @@ import org.http4k.core.MemoryRequest
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.NOT_MODIFIED
 import org.http4k.core.Status.Companion.OK
@@ -23,6 +22,7 @@ import org.http4k.hamkrest.hasContentType
 import org.http4k.hamkrest.hasHeader
 import org.http4k.hamkrest.hasStatus
 import org.http4k.routing.Router
+import org.http4k.routing.RouterMatchResult
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
@@ -185,7 +185,9 @@ private class IndeterminateLengthResource : Resource {
 }
 
 private class InMemoryResourceLoader(val resources: Map<String, Resource>) : Router {
-    override fun match(request: Request): Resource? = resources[request.uri.path]
+    override fun match(request: Request): RouterMatchResult = resources[request.uri.path]?.let {
+        RouterMatchResult.MatchingHandler(it)
+    } ?: RouterMatchResult.Unmatched
 }
 
 
