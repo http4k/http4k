@@ -28,7 +28,7 @@ endpoint performs a series of diagnostic checks against it's dependencies (such 
 results to report back to the orchestrator. http4k provides the `ReadinessCheck` interface which can be implementaed as required 
 and plugged into the endpoint.
 
-In Kubernetes, his set of endpoints is generally hosted on a second port to avoid the API clashes, so http4k provides the machinery to 
+In Kubernetes, this set of endpoints is generally hosted on a second port to avoid the API clashes, so http4k provides the machinery to 
 easily start these services on a different port to the main application API via the `Http4kK8sServer` object.
  
 #### Code [<img class="octocat"/>](https://github.com/http4k/http4k/blob/master/src/docs/guide/modules/cloud_native/example_k8s.kt)
