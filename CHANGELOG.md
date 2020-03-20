@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.240.0 (uncut)
 - [http4k-testing-servirtium] Switch OkHttp client for Apache.
+- [http4k-server-jetty] Made some classes non-internal so they can be easily reused for custom `ServerConfig` implementations.
 
 ### v3.239.0
 - [http4k-client-websocket] [Breaking] Added extra onError handler when creating a non-blocking websocket.
