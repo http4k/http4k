@@ -40,7 +40,7 @@ class Jetty(private val port: Int, private val server: Server) : WsServerConfig 
     }
 }
 
-internal fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
+fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
     override fun configure(factory: WebSocketServletFactory) {
         factory.setCreator { req, _ ->
             val request = req.asHttp4kRequest()
@@ -49,7 +49,7 @@ internal fun WsHandler.toJettyHandler() = object : WebSocketHandler() {
     }
 }
 
-internal fun HttpHandler.toJettyHandler() = ServletContextHandler(SESSIONS).apply {
+fun HttpHandler.toJettyHandler() = ServletContextHandler(SESSIONS).apply {
     addServlet(ServletHolder(this@toJettyHandler.asServlet()), "/*")
 }
 
