@@ -28,7 +28,7 @@ object Versions {
 
      const val de_fayard_buildsrcversions_gradle_plugin: String = "0.7.0"
 
-    const val com_github_kt3k_coveralls_gradle_plugin: String = "2.9.0" // available: "2.10.1"
+     const val com_github_kt3k_coveralls_gradle_plugin: String = "2.9.0" // available: "2.10.1"
 
      const val net_saliman_cobertura_gradle_plugin: String = "3.0.0"
 
