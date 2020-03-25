@@ -3,8 +3,8 @@ description: Recipe for using http4k to create an authorization server that prov
 
 ### Gradle setup
 ```
-    compile group: "org.http4k", name: "http4k-core", version: "3.239.0"
-    compile group: "org.http4k", name: "http4k-security-oauth", version: "3.239.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.240.0"
+    compile group: "org.http4k", name: "http4k-security-oauth", version: "3.240.0"
 ```
 
 For this example, you need to configure `OAuthServer` instance with the correct implementations of your login pages, generation of authentication codes and access tokens.
