@@ -3,7 +3,8 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
-### v3.240.0 (uncut)
+### v3.240.0
+- [all] Upgrade Kotlin to `1.3.71`.
 - [http4k-testing-servirtium] Switch OkHttp client for Apache.
 - [http4k-server-jetty] Made some classes non-internal so they can be easily reused for custom `ServerConfig` implementations.
 
