@@ -16,7 +16,7 @@ object Versions {
 
      const val io_github_resilience4j: String = "1.3.1"
 
-     const val org_jetbrains_kotlin: String = "1.3.70"
+     const val org_jetbrains_kotlin: String = "1.3.71"
 
      const val com_squareup_moshi: String = "1.9.2"
 
