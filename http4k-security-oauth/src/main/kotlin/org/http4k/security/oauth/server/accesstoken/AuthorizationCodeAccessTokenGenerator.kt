@@ -39,7 +39,7 @@ class AuthorizationCodeAccessTokenGenerator(
             codeDetails.expiresAt.isBefore(clock.instant()) -> Failure(AuthorizationCodeExpired)
             codeDetails.clientId != request.clientId -> Failure(ClientIdMismatch)
             codeDetails.redirectUri != request.redirectUri -> Failure(RedirectUriMismatch)
-            else -> accessTokens.create(code)
+            else -> accessTokens.create(codeDetails.clientId, request, code)
                     .map { token ->
                         when {
                             codeDetails.isOIDC -> AccessTokenDetails(token, idTokens.createForAccessToken(codeDetails, code, token))
