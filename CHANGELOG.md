@@ -5,6 +5,7 @@ changes with their rationale when appropriate:
 
 ### v3.242.0 (uncut)
 - [all] Upgrade some dependency versions.
+- [http4k-testing-servirtium] Improve error diagnostics. H/T @vchekan for the PR.
 
 ### v3.241.0
 - [http4k-security-oauth] [Breaking] `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
