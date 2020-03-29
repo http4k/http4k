@@ -38,6 +38,6 @@ class ReplayExtensionTests {
         assertThat(http(request), equalTo(response))
         assertThat(http(request),
             hasStatus(NOT_IMPLEMENTED).and(
-                hasBody(containsSubstring("Unexpected request received for Interaction 1 ==>"))))
+                hasBody(containsSubstring("Have 1 interaction(s) in the script but called 2 times. Unexpected interaction"))))
     }
 }

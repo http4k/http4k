@@ -18,6 +18,8 @@ import java.util.function.Consumer
 import java.util.function.Supplier
 
 fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }): HttpHandler {
+    // TODO: avoid double execution of `requests()`
+    val interactionCount = requests().zip(responses()).count()
     val interactions = requests().zip(responses()).iterator()
     val count = AtomicInteger()
 
@@ -32,7 +34,7 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
                 if (expectedReq.toString() == actual) response
                 else renderMismatch(index, expectedReq.toString(), actual)
             }
-            else -> renderMismatch(index, "", received.toString())
+            else -> renderUnexpectedInteration(interactionCount, index+1)
         }
     }
 }
@@ -40,6 +42,13 @@ fun Replay.replayingMatchingContent(manipulations: (Request) -> Request = { it }
 private fun renderMismatch(index: Int, expectedReq: String, actual: String) = Response(NOT_IMPLEMENTED).body(
     "Unexpected request received for Interaction $index ==> " +
         "expected:<$expectedReq> but was:<$actual>")
+
+/**
+ * Interaction was called more times than there are interactions
+*/
+private fun renderUnexpectedInteration(interactions: Int, count: Int) = Response(NOT_IMPLEMENTED).body(
+    "Have $interactions interaction(s) in the script but called $count times. Unexpected interaction"
+)
 
 /**
  * Write HTTP traffic to disk in Servirtium markdown format.
