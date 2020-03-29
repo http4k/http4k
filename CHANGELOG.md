@@ -3,6 +3,9 @@
 This list is not currently intended to be all-encompassing - it will document major and breaking API 
 changes with their rationale when appropriate:
 
+### v3.242.0 (uncut)
+- [all] Upgrade some dependency versions.
+
 ### v3.241.0
 - [http4k-security-oauth] [Breaking] `client_id` along with the corresponding `TokenRequest` is passed into access and refresh token generators so additional validation can take place H/T @tom
 
